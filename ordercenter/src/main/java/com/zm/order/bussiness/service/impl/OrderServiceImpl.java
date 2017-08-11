@@ -2,6 +2,8 @@ package com.zm.order.bussiness.service.impl;
 
 import javax.annotation.Resource;
 
+import org.springframework.stereotype.Service;
+
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.pojo.OrderInfo;
@@ -15,6 +17,8 @@ import com.zm.order.pojo.OrderInfo;
  * @version   
  * @since JDK 1.7  
  */
+
+@Service
 public class OrderServiceImpl implements OrderService{
 
 	@Resource
