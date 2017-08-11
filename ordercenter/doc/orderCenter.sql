@@ -11,12 +11,12 @@ drop table if exists  `zm_order`.`order_base`;
 CREATE TABLE `zm_order`.`order_base` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
-  `combination_id` CHAR(20) NULL COMMENT '¶©µ¥²ğ·ÖºóµÄ×ÜID',
+  `combination_id` CHAR(20) NULL COMMENT 'è®¢å•æ‹†åˆ†åçš„æ€»ID',
   `user_id` BIGINT UNSIGNED NOT NULL,
-  `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0£º¿ìµİ£»1£º×ÔÌá',
+  `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0ï¼šå¿«é€’ï¼›1ï¼šè‡ªæ',
   `status` TINYINT UNSIGNED NOT NULL DEFAULT 0,
-  `regional_center_id` BIGINT UNSIGNED NULL COMMENT 'ÇøÓòÖĞĞÄID',
-  `shop_id` BIGINT UNSIGNED NULL COMMENT 'µ¥µêID',
+  `regional_center_id` BIGINT UNSIGNED NULL COMMENT 'åŒºåŸŸä¸­å¿ƒID',
+  `shop_id` BIGINT UNSIGNED NULL COMMENT 'å•åº—ID',
   `supplier_id` BIGINT UNSIGNED NULL,
   `tdq` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `payment` DECIMAL NULL,
@@ -40,7 +40,7 @@ CREATE TABLE `zm_order`.`order_base` (
   INDEX `idx_createTime` (`create_time` ASC),
   INDEX `idx_expressId` (`express_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¶©µ¥»ù±¾ĞÅÏ¢';
+COMMENT = 'è®¢å•åŸºæœ¬ä¿¡æ¯';
 
 
 
@@ -49,10 +49,10 @@ drop table if exists  `zm_order`.`order_detail`;
 CREATE TABLE `zm_order`.`order_detail` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
-  `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:¿ç¾³£»1Ò»°ãÃ³Ò×',
+  `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:è·¨å¢ƒï¼›1ä¸€èˆ¬è´¸æ˜“',
   `pay_no` VARCHAR(100) NULL,
   `delivery_place` VARCHAR(50)  NULL,
-  `carry_address` VARCHAR(200)  NULL COMMENT '×ÔÌáµØÖ·',
+  `carry_address` VARCHAR(200)  NULL COMMENT 'è‡ªæåœ°å€',
   `receive_name` VARCHAR(50) NOT NULL,
   `receive_phone` CHAR(15) NOT NULL ,
   `receive_province` VARCHAR(30) NOT NULL ,
@@ -70,7 +70,7 @@ CREATE TABLE `zm_order`.`order_detail` (
   INDEX `idx_deliveryPlace` (`delivery_place` ASC),
   INDEX `idx_orderFlag` (`order_flag` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¶©µ¥ÏêÏ¸ĞÅÏ¢';
+COMMENT = 'è®¢å•è¯¦ç»†ä¿¡æ¯';
 
 
 
@@ -95,7 +95,7 @@ CREATE TABLE `zm_order`.`order_goods` (
   INDEX `idx_sku` (`sku` ASC),
   INDEX `idx_itemCode` (`item_code` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¶©µ¥ÉÌÆ·';
+COMMENT = 'è®¢å•å•†å“';
 
 
 
@@ -112,7 +112,7 @@ CREATE TABLE `zm_order`.`customs_status` (
   PRIMARY KEY (`id`),
   INDEX `idx_orderId` (`order_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¿ç¾³¶©µ¥º£¹Ø×´Ì¬';
+COMMENT = 'è·¨å¢ƒè®¢å•æµ·å…³çŠ¶æ€';
 
 
 
@@ -133,7 +133,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   PRIMARY KEY (`id`),
   INDEX `idx_userId` (`user_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¹ºÎï³µ';
+COMMENT = 'è´­ç‰©è½¦';
 
 
 
@@ -143,7 +143,7 @@ drop table if exists  `zm_order`.`order_back_record`;
 CREATE TABLE `zm_order`.`order_back_record` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
-  `status` TINYINT UNSIGNED NULL COMMENT '0:Î´·¢ËÍ£¬1£º·¢ËÍ³É¹¦',
+  `status` TINYINT UNSIGNED NULL COMMENT '0:æœªå‘é€ï¼Œ1ï¼šå‘é€æˆåŠŸ',
   `send_time` DATETIME NULL,
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
@@ -151,7 +151,7 @@ CREATE TABLE `zm_order`.`order_back_record` (
   PRIMARY KEY (`id`),
   INDEX `idx_orderId` (`order_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = 'ÍËµ¥¼ÇÂ¼';
+COMMENT = 'é€€å•è®°å½•';
 
 
 
@@ -169,7 +169,7 @@ CREATE TABLE `zm_order`.`order_api` (
   UNIQUE INDEX `api_url_UNIQUE` (`api_url` ASC),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¶©µ¥API';
+COMMENT = 'è®¢å•API';
 
 
 
@@ -179,7 +179,7 @@ drop table if exists  `zm_order`.`order_search_parameter`;
 CREATE TABLE `zm_order`.`order_search_parameter` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `api_name` VARCHAR(100) NOT NULL,
-  `key_name` VARCHAR(45) NOT NULL COMMENT '×Ö¶ÎÖĞÎÄÃû',
+  `key_name` VARCHAR(45) NOT NULL COMMENT 'å­—æ®µä¸­æ–‡å',
   `key` VARCHAR(45) NULL,
   `value` VARCHAR(100) NULL,
   `html_tag` VARCHAR(30) NULL,
@@ -191,4 +191,4 @@ CREATE TABLE `zm_order`.`order_search_parameter` (
   UNIQUE INDEX `uk_apiName` (`api_name` ASC),
   INDEX `idx_apiName` (`api_name` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '¶©µ¥×Ö¶Î±í';
+COMMENT = 'è®¢å•å­—æ®µè¡¨';
