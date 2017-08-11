@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.order.bussiness.dao.OrderMapper">
+
+
+	<insert id="saveOrder" parameterType="Object">
+		INSERT INTO order_base
+		(order_id,combination_id,user_id,express_type,status,regional_center_id,shop_id,supplier_id,tdq,payment,pay_time,
+		carrier_key,express_id,gtime,send_time,create_time,remark)
+		VALUES
+		(#{orderId},#{combinationId},#{userId},#{expressType},#{status},#{regionalCenterId},#{shopId},#{supplierId},
+		#{tdq},#{payment},#{payTime},#{carrierKey},#{expressId},#{gtime},#{sendTime},now(),#{remark}
+		)
+	</insert>
+
+</mapper>
