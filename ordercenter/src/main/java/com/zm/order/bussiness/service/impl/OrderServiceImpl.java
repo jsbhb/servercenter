@@ -18,7 +18,7 @@ import com.zm.order.pojo.OrderInfo;
  * @since JDK 1.7  
  */
 
-@Service
+@Service("orderService")
 public class OrderServiceImpl implements OrderService{
 
 	@Resource
