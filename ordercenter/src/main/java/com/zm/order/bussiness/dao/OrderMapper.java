@@ -1,5 +1,9 @@
 package com.zm.order.bussiness.dao;
 
+import java.util.List;
+
+import com.zm.order.pojo.OrderDetail;
+import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 
 /**  
@@ -14,4 +18,8 @@ import com.zm.order.pojo.OrderInfo;
 public interface OrderMapper {
 
 	void saveOrder(OrderInfo info);
+	
+	void saveOrderDetail(OrderDetail orderDetail);
+	
+	void saveOrderGoods(List<OrderGoods> goodsList);
 }

@@ -1,12 +1,7 @@
 package com.zm.order.bussiness.controller;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,15 +30,15 @@ public class OrderController {
 	OrderService orderService;
 	
 	
-	@RequestMapping(value = "{version}/order/creative", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/order/creative", method = RequestMethod.POST)
 	public ResultPojo createOrder(@PathVariable("version") Double version, OrderInfo orderInfo) {
 		
-		ResultPojo result = new ResultPojo();
+		ResultPojo result = null;
 		//设置允许跨域请求
 //		res.setHeader(ConfigConstants.CROSS_DOMAIN, ConfigConstants.DOMAIN_NAME);
 		
 		if (ConfigConstants.FIRST_VERSION.equals(version)) {
-			orderService.saveOrder(orderInfo);
+			result = orderService.saveOrder(orderInfo);
 		}
 		return result;
 	}

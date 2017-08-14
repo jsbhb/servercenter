@@ -1,6 +1,7 @@
 package com.zm.order.bussiness.service;
 
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ResultPojo;
 
 /**  
  * ClassName: OrderService <br/>  
@@ -13,5 +14,5 @@ import com.zm.order.pojo.OrderInfo;
  */
 public interface OrderService {
 
-	void saveOrder(OrderInfo info);
+	ResultPojo saveOrder(OrderInfo info);
 }
