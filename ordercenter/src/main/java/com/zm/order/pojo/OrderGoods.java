@@ -22,6 +22,8 @@ public class OrderGoods {
 	
 	private String itemName;
 	
+	private String itemInfo;
+	
 	private String itemCode;
 	
 	private Integer itemQuantit;
@@ -112,10 +114,18 @@ public class OrderGoods {
 		this.remark = remark;
 	}
 
+	public String getItemInfo() {
+		return itemInfo;
+	}
+
+	public void setItemInfo(String itemInfo) {
+		this.itemInfo = itemInfo;
+	}
+
 	@Override
 	public String toString() {
 		return "OrderGoods [id=" + id + ", orderId=" + orderId + ", itemId=" + itemId + ", sku=" + sku + ", itemName="
-				+ itemName + ", itemCode=" + itemCode + ", itemQuantit=" + itemQuantit + ", itemPrice=" + itemPrice
-				+ ", actualPrice=" + actualPrice + ", remark=" + remark + "]";
+				+ itemName + ", itemInfo=" + itemInfo + ", itemCode=" + itemCode + ", itemQuantit=" + itemQuantit
+				+ ", itemPrice=" + itemPrice + ", actualPrice=" + actualPrice + ", remark=" + remark + "]";
 	}
 }

@@ -1,48 +1,54 @@
 package com.zm.order.pojo;
 
-
-
-/**  
- * ClassName: OrderDetail <br/>  
- * Function: TODO ADD FUNCTION. <br/>   
- * date: Aug 11, 2017 2:57:13 PM <br/>  
- *  
- * @author wqy  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: OrderDetail <br/>
+ * Function: TODO ADD FUNCTION. <br/>
+ * date: Aug 11, 2017 2:57:13 PM <br/>
+ * 
+ * @author wqy
+ * @version
+ * @since JDK 1.7
  */
 public class OrderDetail {
 
 	private Integer id;
-	
+
 	private String orderId;
-	
+
 	private Integer orderFlag;
-	
+
 	private Integer payType;
-	
+
+	private Double payment;
+
+	private String payTime;
+
+	private Double postFee;
+
+	private String faxFee;
+
 	private String payNo;
-	
-	//发货地
+
+	// 发货地
 	private String deliveryPlace;
-	
-	//自提地址
+
+	// 自提地址
 	private String carryAddress;
-	
+
 	private String receiveName;
-	
+
 	private String receivePhone;
-	
+
 	private String receiveProvince;
-	
+
 	private String receiveCity;
-	
+
 	private String receiveArea;
-	
+
 	private String receiveAddress;
-	
+
 	private String receiveZipCode;
-	
+
 	private String remark;
 
 	public Integer getId() {
@@ -75,6 +81,38 @@ public class OrderDetail {
 
 	public void setPayType(Integer payType) {
 		this.payType = payType;
+	}
+
+	public Double getPayment() {
+		return payment;
+	}
+
+	public void setPayment(Double payment) {
+		this.payment = payment;
+	}
+
+	public String getPayTime() {
+		return payTime;
+	}
+
+	public void setPayTime(String payTime) {
+		this.payTime = payTime;
+	}
+
+	public Double getPostFee() {
+		return postFee;
+	}
+
+	public void setPostFee(Double postFee) {
+		this.postFee = postFee;
+	}
+
+	public String getFaxFee() {
+		return faxFee;
+	}
+
+	public void setFaxFee(String faxFee) {
+		this.faxFee = faxFee;
 	}
 
 	public String getPayNo() {
@@ -168,11 +206,13 @@ public class OrderDetail {
 	@Override
 	public String toString() {
 		return "OrderDetail [id=" + id + ", orderId=" + orderId + ", orderFlag=" + orderFlag + ", payType=" + payType
+				+ ", payment=" + payment + ", payTime=" + payTime + ", postFee=" + postFee + ", faxFee=" + faxFee
 				+ ", payNo=" + payNo + ", deliveryPlace=" + deliveryPlace + ", carryAddress=" + carryAddress
 				+ ", receiveName=" + receiveName + ", receivePhone=" + receivePhone + ", receiveProvince="
 				+ receiveProvince + ", receiveCity=" + receiveCity + ", receiveArea=" + receiveArea
 				+ ", receiveAddress=" + receiveAddress + ", receiveZipCode=" + receiveZipCode + ", remark=" + remark
 				+ "]";
 	}
+
 	
 }

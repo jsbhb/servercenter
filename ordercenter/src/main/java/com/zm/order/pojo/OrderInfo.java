@@ -27,10 +27,6 @@ public class OrderInfo {
 	
 	private Integer tdq;
 	
-	private Double payment;
-	
-	private String payTime;
-	
 	private String carrierKey;
 	
 	private String expressId;
@@ -129,22 +125,6 @@ public class OrderInfo {
 		this.tdq = tdq;
 	}
 
-	public Double getPayment() {
-		return payment;
-	}
-
-	public void setPayment(Double payment) {
-		this.payment = payment;
-	}
-
-	public String getPayTime() {
-		return payTime;
-	}
-
-	public void setPayTime(String payTime) {
-		this.payTime = payTime;
-	}
-
 	public String getCarrierKey() {
 		return carrierKey;
 	}
@@ -221,11 +201,12 @@ public class OrderInfo {
 	public String toString() {
 		return "OrderInfo [id=" + id + ", orderId=" + orderId + ", combinationId=" + combinationId + ", userId="
 				+ userId + ", status=" + status + ", expressType=" + expressType + ", regionalCenterId="
-				+ regionalCenterId + ", shopId=" + shopId + ", supplierId=" + supplierId + ", tdq=" + tdq + ", payment="
-				+ payment + ", payTime=" + payTime + ", carrierKey=" + carrierKey + ", expressId=" + expressId
-				+ ", gtime=" + gtime + ", sendTime=" + sendTime + ", createTime=" + createTime + ", updateTime="
-				+ updateTime + ", remark=" + remark + ", orderDetail=" + orderDetail + ", orderGoodsList="
-				+ orderGoodsList + "]";
+				+ regionalCenterId + ", shopId=" + shopId + ", supplierId=" + supplierId + ", tdq=" + tdq
+				+ ", carrierKey=" + carrierKey + ", expressId=" + expressId + ", gtime=" + gtime + ", sendTime="
+				+ sendTime + ", createTime=" + createTime + ", updateTime=" + updateTime + ", remark=" + remark
+				+ ", orderDetail=" + orderDetail + ", orderGoodsList=" + orderGoodsList + "]";
 	}
+
+	
 	
 }
