@@ -1,4 +1,4 @@
-package com.zm.order;
+package com.zm.user;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -15,11 +15,11 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
  * @version
  * @since JDK 1.7
  */
-@EnableDiscoveryClient
 @SpringBootApplication
+@EnableDiscoveryClient
 @EnableFeignClients
-public class OrderApplication {
+public class UserApplication {
 	public static void main(String[] args) {
-		new SpringApplicationBuilder(OrderApplication.class).web(true).run(args);
+		new SpringApplicationBuilder(UserApplication.class).web(true).run(args);
 	}
 }

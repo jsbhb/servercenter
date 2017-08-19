@@ -13,6 +13,8 @@
 		<module>apigateway</module>
 		<module>eurekacenter</module>
 		<module>authserver</module>
+		<module>logcenter</module>
+		<module>3rdcenter</module>
 	</modules>
 	
 	<parent>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.log.bussiness.dao.LogMapper">
+
+	<resultMap type="com.zm.log.pojo.LogInfo" id="logInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="api_id" property="apiId" jdbcType="INTEGER" />
+		<result column="center_name" property="centerName" jdbcType="VARCHAR" />
+		<result column="api_name" property="apiName" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<select id="listLogInfo" resultMap="logInfo" parameterType="Object">
+		select id,center_id,api_id,center_name,api_name,content,create_time,opt from log where 1=1
+		<if test="centerId != null centerId != ''">
+			and center_id = #{centerId,jdbcType = INTEGER}
+		</if>
+		<if test="apiId != null and apiId != ''">
+			and api_id = #{apiId,jdbcType = INTEGER} 
+		</if>
+		<if test="startTime != null and startTime != ''">
+			and create_time &gt; #{startTime,jdbcType = VARCHAR} 
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and create_time &lt; #{endTime,jdbcType = VARCHAR} 
+		</if>
+	</select>
+
+
+	<insert id="saveLogInfo" parameterType="Object">
+		INSERT INTO log
+		(center_id,api_id,center_name,api_name,content,create_time,opt)
+		VALUES
+		(#{centerId},#{apiId},#{centerName},#{apiName},#{content},now(),#{opt})
+	</insert>
+
+	<delete id="removeLogInfo" parameterType="Object">
+		delete from log where create_time &lt; #{endTime,jdbcType = VARCHAR}
+	</delete>
+
+</mapper>

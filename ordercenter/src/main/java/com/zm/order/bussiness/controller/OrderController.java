@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
-import com.zm.order.constants.ConfigConstants;
+import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.LogFeignClient;
+import com.zm.order.feignclient.model.LogInfo;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ResultPojo;
 
@@ -34,6 +36,9 @@ public class OrderController {
 
 	@Resource
 	OrderService orderService;
+	
+	@Resource
+	LogFeignClient logFeignClient;
 
 	@RequestMapping(value = "{version}/order/creative", method = RequestMethod.POST)
 	public ResultPojo createOrder(@PathVariable("version") Double version, OrderInfo orderInfo,
@@ -41,9 +46,9 @@ public class OrderController {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
-		res.setHeader(ConfigConstants.CROSS_DOMAIN, ConfigConstants.DOMAIN_NAME);
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		if (ConfigConstants.FIRST_VERSION.equals(version)) {
+		if (Constants.FIRST_VERSION.equals(version)) {
 
 			try {
 				result = orderService.saveOrder(orderInfo);
@@ -67,7 +72,7 @@ public class OrderController {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
-		res.setHeader(ConfigConstants.CROSS_DOMAIN, ConfigConstants.DOMAIN_NAME);
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		Map<String, Integer> param = new HashMap<String, Integer>();
 		try {
@@ -90,7 +95,7 @@ public class OrderController {
 			return result;
 		}
 
-		if (ConfigConstants.FIRST_VERSION.equals(version)) {
+		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.listUserOrder(param);
 		}
 
@@ -103,38 +108,46 @@ public class OrderController {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
-		res.setHeader(ConfigConstants.CROSS_DOMAIN, ConfigConstants.DOMAIN_NAME);
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("userId", userId);
 		param.put("orderId", orderId);
 
-		if (ConfigConstants.FIRST_VERSION.equals(version)) {
+		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.removeUserOrder(param);
 		}
 
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/order/{userId}/{orderId}/confirm", method = RequestMethod.PATCH)
+	@RequestMapping(value = "{version}/order/{userId}/{orderId}/confirm", method = RequestMethod.PUT)
 	public ResultPojo confirmUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
-		res.setHeader(ConfigConstants.CROSS_DOMAIN, ConfigConstants.DOMAIN_NAME);
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("userId", userId);
 		param.put("orderId", orderId);
 
-		if (ConfigConstants.FIRST_VERSION.equals(version)) {
+		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.confirmUserOrder(param);
 		}
 
 		return result;
+	}
+	
+	@RequestMapping(value = "/test",method=RequestMethod.GET)
+	public ResultPojo test(){
+		
+		LogInfo logInfo = new LogInfo();
+		
+		return logFeignClient.saveLog(logInfo);
 	}
 
 }
