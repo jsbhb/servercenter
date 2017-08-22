@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zm.gateway.mapper.RoleMapper">
+
+
+    <select id="getUserRole" parameterType="java.lang.Integer" resultType="role">
+        SELECT
+            UR.USER_ID userId,
+            R.ROLE_ID roleId,
+            R.ROLE_NAME roleName,
+            R.ROLE_TYPE roleType,
+            R.CREATION_DATE creationDate,
+            R.CREATED_BY createdBy,
+            R.LAST_UPDATE_DATE lastUpdateDate,
+            R.LAST_UPDATED_BY lastUpdatedBy
+        FROM
+            ROLE R,
+            USER_ROLE UR
+        WHERE
+            UR.USER_ID = #{userId}
+        AND UR.ROLE_ID = R.ROLE_ID
+        AND R.STATUS = 1
+    </select>
+</mapper>
