@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.user.bussiness.dao.UserMapper">
+
+
+
+	<select id="userNameVerify" resultType="java.lang.Integer"
+		parameterType="Object">
+		select count(*) from user where 1=1
+		<if test="email != null and email != ''">
+			and email = #{email}
+		</if>
+		<if test="phone != null and phone != ''">
+			and phone = #{phone}
+		</if>
+		<if test="account != null and account != ''">
+			and account = #{account}
+		</if>
+	</select>
+
+	<insert id="saveAddress" parameterType="Object">
+		insert into
+		address(user_id,province,city,area,address,zipcode,receive_phone,receive_name,is_default,create_time)
+		values
+		(#{userId},#{province},#{city},#{area},#{address},#{zipCode},#{receivePhone},#{receiveName},#{setDefault},now())
+	</insert>
+
+	<update id="updateUndefaultAddress">
+		update address set is_default = 0 where user_id =
+		#{userId, jdbcType = INTEGER}
+	</update>
+
+	<update id="updateAddress">
+		update address
+		<set>
+			<foreach collection="param" index="key" item="value"
+				separator=",">
+				<if test="key != 'id'.toString() and key != 'userId'.toString()">
+
+					${key} = #{value}
+
+				</if>
+			</foreach>
+			,update_time = now()
+		</set>
+		where id = #{id, jdbcType = INTEGER}
+	</update>
+
+	<insert id="saveUserDetail" parameterType="Object">
+		insert into
+		user_detail(user_id,type,name,nick_name,head_img,company,location,certificates,idnum,sex,create_time)
+		values(#{userId,jdbcType = INTEGER},#{type,jdbcType =INTEGER},
+		#{name,jdbcType = VARCHAR},#{nickName,jdbcType = VARCHAR},
+		#{headImg,jdbcType = VARCHAR},#{company,jdbcType = VARCHAR},
+		#{location,jdbcType = VARCHAR},#{certificates,jdbcType = INTEGER},
+		#{idNum,,jdbcType = VARCHAR},#{sex,jdbcType = INTEGER},now())
+	</insert>
+
+	<update id="updateUserDetail" parameterType="Object">
+		update user_detail set 
+		<foreach collection="param" index="key" item="value"
+			separator=",">
+			<if test="key != 'id'.toString() and key != 'userId'.toString()">
+
+				${key} = values(#{value})
+
+			</if>
+			,update_time = now()
+		</foreach>
+		where user_id = #{userId,jdbcType = INTEGER}
+	</update>
+
+	<delete id="removeAddress" parameterType="Object">
+		delete from address
+		where user_id = #{userId, jdbcType = INTEGER} and id = #{id, jdbcType
+		= INTEGER}
+	</delete>
+
+	<insert id="saveUser" parameterType="Object" useGeneratedKeys="true"
+		keyProperty="id">
+		insert into
+		user(phone,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,register_center_id,
+		register_shop_id,create_time)
+		values
+		(#{phone},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
+		#{emailValidate},#{centerId},#{shopId},now())
+	</insert>
+
+
+	<select id="queryByWechatUnionid" parameterType="Object">
+		select count(*)
+		from user where wechat = #{openId}
+	</select>
+	
+	<update id="updateUserPwd" parameterType="Object">
+		update user set pwd = #{pwd} where id = #{userId,jdbcType = INTEGER}
+	</update>
+
+</mapper>

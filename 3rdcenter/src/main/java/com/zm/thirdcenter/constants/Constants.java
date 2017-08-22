@@ -1,6 +1,6 @@
-package com.zm.order.constants;
+package com.zm.thirdcenter.constants;
 
-public class ConfigConstants {
+public class Constants {
 
 	// 解决ajax跨域请求
 	public static final String CROSS_DOMAIN = "Access-Control-Allow-Origin";
@@ -9,4 +9,9 @@ public class ConfigConstants {
 	public static final String DOMAIN_NAME = "*";
 
 	public static final Double FIRST_VERSION = 1.0;
+	
+	public static final String APPID = "";
+
+	public static final String SECRET = "";
+	
 }
