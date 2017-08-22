@@ -1,4 +1,4 @@
-package com.zm.user.utils;
+package com.zm.thirdcenter.utils;
 
 /**
  * ClassName: RetryUtils <br/>

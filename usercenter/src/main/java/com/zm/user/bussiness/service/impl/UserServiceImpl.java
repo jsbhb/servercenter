@@ -85,21 +85,8 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public boolean verifyWechatIsRegister(String unionid) {
-		
-		int count = userMapper.queryByWechatUnionid(unionid);
-		
-		if(count > 0){
-			return true;
-		}
-		
-		return false;
-	}
+	public void packageUser(ApiResult apiResult,UserInfo info) {
 
-	@Override
-	public UserInfo packageUser(ApiResult apiResult) {
-
-		UserInfo info = new UserInfo();
 		info.setWechat(apiResult.get("unionid")+"");
 		UserDetail userDetail = new UserDetail();
 		boolean isNum = RegularUtil.isNumeric(apiResult.get("sex")+"");
@@ -114,7 +101,6 @@ public class UserServiceImpl implements UserService{
 		userDetail.setNickName(apiResult.get("nickname")+"");
 		
 		info.setUserDetail(userDetail);
-		return info;
 	}
 
 	@Override

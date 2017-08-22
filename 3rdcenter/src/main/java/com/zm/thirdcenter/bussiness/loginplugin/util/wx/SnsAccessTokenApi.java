@@ -1,10 +1,10 @@
 
-package com.zm.user.wx;
+package com.zm.thirdcenter.bussiness.loginplugin.util.wx;
 
 import java.util.concurrent.Callable;
 
-import com.zm.user.utils.HttpClientUtil;
-import com.zm.user.utils.RetryUtils;
+import com.zm.thirdcenter.utils.HttpClientUtil;
+import com.zm.thirdcenter.utils.RetryUtils;
 
 /**  
  * ClassName: SnsAccessTokenApi <br/>  

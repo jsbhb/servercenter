@@ -9,15 +9,15 @@ use zm_order;
 drop table if exists  `zm_order`.`order_base`;
 
 CREATE TABLE `zm_order`.`order_base` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
   `combination_id` CHAR(20) NULL COMMENT '订单拆分后的总ID',
-  `user_id` BIGINT UNSIGNED NOT NULL,
+  `user_id` INT UNSIGNED NOT NULL,
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
   `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单；8：删除',
-  `regional_center_id` BIGINT UNSIGNED NULL COMMENT '区域中心ID',
-  `shop_id` BIGINT UNSIGNED NULL COMMENT '单店ID',
-  `supplier_id` BIGINT UNSIGNED NULL,
+  `regional_center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
+  `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
+  `supplier_id` INT UNSIGNED NULL,
   `tdq` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `carrier_key` VARCHAR(50) NULL,
   `express_id` VARCHAR(50) NULL,
@@ -45,13 +45,13 @@ COMMENT = '订单基本信息';
 drop table if exists  `zm_order`.`order_detail`;
 
 CREATE TABLE `zm_order`.`order_detail` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
   `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
-  `payment` DECIMAL NULL,
+  `payment` DECIMAL(10,2) NULL,
   `pay_time` DATETIME NULL,
-  `post_fee` DECIMAL NULL,
-  `fax_fee` DECIMAL NULL,
+  `post_fee` DECIMAL(10,2) NULL,
+  `fax_fee` DECIMAL(10,2) NULL,
   `pay_no` VARCHAR(100) NULL,
   `delivery_place` VARCHAR(50)  NULL,
   `carry_address` VARCHAR(200)  NULL COMMENT '自提地址',
@@ -79,7 +79,7 @@ COMMENT = '订单详细信息';
 drop table if exists  `zm_order`.`order_goods`;
 
 CREATE TABLE `zm_order`.`order_goods` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
   `item_id` VARCHAR(100) NOT NULL,
   `sku` VARCHAR(50) NULL,
@@ -87,8 +87,8 @@ CREATE TABLE `zm_order`.`order_goods` (
   `item_info` VARCHAR(200) NULL,
   `item_code` VARCHAR(100) NULL,
   `item_quantity` INT UNSIGNED NOT NULL,
-  `item_price` DECIMAL NOT NULL,
-  `actual_price` DECIMAL NOT NULL,
+  `item_price` DECIMAL(10,2) NOT NULL,
+  `actual_price` DECIMAL(10,2) NOT NULL,
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
@@ -106,7 +106,7 @@ COMMENT = '订单商品';
 drop table if exists  `zm_order`.`customs_status`;
 
 CREATE TABLE `zm_order`.`customs_status` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
   `status` TINYINT UNSIGNED NOT NULL,
   `create_time` DATETIME NULL,
@@ -123,8 +123,8 @@ COMMENT = '跨境订单海关状态';
 drop table if exists  `zm_order`.`order_shopping_cart`;
 
 CREATE TABLE `zm_order`.`order_shopping_cart` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` BIGINT UNSIGNED NULL,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NULL,
   `item_id` VARCHAR(100) NOT NULL,
   `sku` VARCHAR(50) NULL,
   `item_name` VARCHAR(100) NULL,
@@ -145,7 +145,7 @@ COMMENT = '购物车';
 drop table if exists  `zm_order`.`order_back_record`;
 
 CREATE TABLE `zm_order`.`order_back_record` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(20) NOT NULL,
   `status` TINYINT UNSIGNED NULL COMMENT '0:未发送，1：发送成功',
   `send_time` DATETIME NULL,
@@ -163,7 +163,7 @@ COMMENT = '退单记录';
 drop table if exists  `zm_order`.`order_api`;
 
 CREATE TABLE `zm_order`.`order_api` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `api_url` VARCHAR(100) NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `create_time` DATETIME NULL,
@@ -181,7 +181,7 @@ COMMENT = '订单API';
 drop table if exists  `zm_order`.`order_search_parameter`;
 
 CREATE TABLE `zm_order`.`order_search_parameter` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `api_name` VARCHAR(100) NOT NULL,
   `key_name` VARCHAR(45) NOT NULL COMMENT '字段中文名',
   `key` VARCHAR(45) NULL,

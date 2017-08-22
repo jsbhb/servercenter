@@ -6,7 +6,7 @@ use usercenter;
 drop table if exists  `user`;
 
 CREATE TABLE `usercenter`.`user` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
   `email` VARCHAR(100) NULL COMMENT '邮箱',
@@ -14,13 +14,13 @@ CREATE TABLE `usercenter`.`user` (
   `qq` VARCHAR(100) NULL COMMENT 'qq',
   `sina_blog` VARCHAR(100) NULL COMMENT '新浪微博',
   `pwd` VARCHAR(50) NULL COMMENT '密码',
-  `parent_id` bigint UNSIGNED NULL COMMENT '上级ID',
+  `parent_id` INT UNSIGNED NULL COMMENT '上级ID',
   `band` TINYINT UNSIGNED NULL COMMENT '分销等级',
   `is_phone_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '手机是否验证',
   `is_email_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '邮箱是否验证',
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '用户状态',
-  `register_center_id` bigint UNSIGNED NULL COMMENT '注册区域中心ID',
-  `register_shop_id` bigint UNSIGNED NULL COMMENT '注册店中店ID',
+  `register_center_id` INT UNSIGNED NULL COMMENT '注册区域中心ID',
+  `register_shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
   `create_time` DATETIME NULL COMMENT '注册时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` DATETIME NULL COMMENT '操作人',
@@ -47,8 +47,8 @@ COMMENT = '用户表';
 drop table if exists  `user_detail`;
 
 CREATE TABLE `usercenter`.`user_detail` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `user_id` bigint UNSIGNED NOT NULL COMMENT '用户ID',
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
   `type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
   `name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
   `nick_name` VARCHAR(50) NOT NULL COMMENT '用户昵称',
@@ -70,8 +70,8 @@ COMMENT = '用户明细表';
 drop table if exists  `address`;
 
 CREATE TABLE `usercenter`.`address` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `user_id` bigint UNSIGNED NOT NULL COMMENT '账号ID',
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `provice` VARCHAR(20) NOT NULL COMMENT '省',
   `city` VARCHAR(20) NOT NULL COMMENT '市',
   `area` VARCHAR(20) NOT NULL COMMENT '区',
@@ -91,8 +91,8 @@ COMMENT = '收货地址表';
 drop table if exists  `collection`;
 
 CREATE TABLE `usercenter`.`collection` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `user_id` bigint UNSIGNED NOT NULL COMMENT '账号ID',
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `type` TINYINT UNSIGNED NOT NULL COMMENT '收藏类型',
   `type_id` VARCHAR(20) NOT NULL COMMENT '宝贝id',
   `type_name` VARCHAR(20) NOT NULL COMMENT '宝贝名称',
@@ -108,7 +108,7 @@ COMMENT = '用户收藏表';
 drop table if exists  `user_api`;
 
 CREATE TABLE `usercenter`.`user_api` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `api_url` VARCHAR(100) NOT NULL COMMENT 'api地址',
   `api_name` VARCHAR(50) NOT NULL COMMENT 'api名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
@@ -121,7 +121,7 @@ COMMENT = '服务api表';
 drop table if exists  `user_search_parameter`;
 
 CREATE TABLE `usercenter`.`user_search_parameter` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `key` VARCHAR(100) NOT NULL COMMENT '字段名',
   `value` VARCHAR(500) NOT NULL COMMENT '值',
   `html_tag` VARCHAR(50) NOT NULL COMMENT 'HTML标签',

@@ -1,4 +1,4 @@
-package com.zm.user.utils;
+package com.zm.thirdcenter.utils;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

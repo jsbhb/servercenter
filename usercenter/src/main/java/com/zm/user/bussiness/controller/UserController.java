@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,9 +29,6 @@ import com.zm.user.pojo.UserInfo;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
-import com.zm.user.wx.SnsAccessToken;
-import com.zm.user.wx.SnsAccessTokenApi;
-import com.zm.user.wx.SnsApi;
 
 /**
  * ClassName: UserController <br/>
@@ -45,11 +43,7 @@ import com.zm.user.wx.SnsApi;
 @RestController
 public class UserController {
 
-	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
-
 	private static final Integer VALIDATE = 1;
-
-	private static final String REDIRECT_URL = "";
 
 	@Resource
 	UserService userService;
@@ -59,6 +53,9 @@ public class UserController {
 
 	@Resource
 	LogFeignClient logFeignClient;
+	
+	@Resource
+	RedisTemplate<String, ApiResult> redisTemplate;
 
 	@RequestMapping(value = "{version}/user/userNameVerify", method = RequestMethod.GET)
 	public ResultPojo userNameVerify(@PathVariable("version") Double version, HttpServletRequest req,
@@ -186,24 +183,23 @@ public class UserController {
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		String code = req.getParameter("code");
-
 		if (Constants.FIRST_VERSION.equals(version)) {
-			boolean flag = thirdPartFeignClient.verifyPhoneCode(version, info.getPhone(), code);
-			if (flag) {
-				info.setPhoneValidate(VALIDATE);
+			info.setPhoneValidate(VALIDATE);
+			if(info.getPwd() != null && !"".equals(info.getPwd())){
 				info.setPwd(EncryptionUtil.MD5(info.getPwd()));
-				userService.saveUser(info);
-				
-				String content = "用户通过手机号  \""+info.getPhone()+"\"  注册了账号";
-				logFeignClient.saveLog(packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
-				
-				result.setSuccess(true);
-				result.setObj(info.getId());
-			} else {
-				result.setSuccess(false);
-				result.setErrorMsg("手机验证码错误");
 			}
+			
+			if(info.getWechat() != null && !"".equals(info.getWechat())){
+				ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
+				userService.packageUser(apiResult,info);
+			}
+			
+			userService.saveUser(info);
+
+			String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
+			logFeignClient.saveLog(packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
+
+			result.setSuccess(true);
 		}
 
 		return result;
@@ -225,51 +221,6 @@ public class UserController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/user/3rdLogin/wx", method = RequestMethod.GET)
-	public String getRequestCodeUrl(boolean snsapiBase) {
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("?appid=" + Constants.APPID);
-		sb.append("&redirect_uri=" + REDIRECT_URL);
-		sb.append("&response_type=code");
-		if (snsapiBase) {
-			sb.append("&scope=snsapi_userinfo");
-			sb.append("&state=user#wechat_redirect");
-		} else {
-			sb.append("&scope=snsapi_base");
-			sb.append("&state=base#wechat_redirect");
-		}
-
-		return authorize_uri + sb.toString();
-	}
-
-	@RequestMapping(value = "user/3rdLogin/wxLogin", method = RequestMethod.GET)
-	public ResultPojo loginByWechat(HttpServletRequest req, HttpServletResponse res) {
-
-		ResultPojo result = new ResultPojo();
-
-		String code = req.getParameter("code");
-		String state = req.getParameter("state");
-		SnsAccessToken token = SnsAccessTokenApi.getSnsAccessToken(Constants.APPID, Constants.SECRET, code);
-
-		if ("user".equals(state)) {
-			ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
-			boolean flag = userService.verifyWechatIsRegister(apiResult.get("unionid") + "");
-			if (flag) {
-				// FIXME 生成token直接登录
-				return result;
-			}
-
-			UserInfo info = userService.packageUser(apiResult);
-
-			result.setSuccess(true);
-			result.setObj(info);
-		}
-
-		return result;
-
-	}
-
 	private final String localPath = "upload/headImg/";
 	// 图片放后台
 	private final String Backstage = "1";
@@ -286,7 +237,7 @@ public class UserController {
 
 		String userId = req.getParameter("userId");
 		String type = req.getParameter("type");
-		if (headImg.isEmpty()){
+		if (headImg.isEmpty()) {
 			result.setSuccess(false);
 			result.setErrorMsg("没有文件信息");
 			return result;
@@ -313,18 +264,19 @@ public class UserController {
 				result.setSuccess(true);
 				result.setObj(filePath);
 			}
-			
+
 		}
 		return result;
-			
+
 	}
 
 	@RequestMapping(value = "{version}/user/modifyPwd", method = RequestMethod.PUT)
-	public ResultPojo modifyPwd(@PathVariable("version") Double version, HttpServletRequest req, HttpServletResponse res) {
-		
+	public ResultPojo modifyPwd(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res) {
+
 		ResultPojo result = new ResultPojo();
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
-		
+
 		String code = req.getParameter("code");
 		String phone = req.getParameter("phone");
 		String pwd = req.getParameter("pwd");
@@ -335,31 +287,30 @@ public class UserController {
 			result.setSuccess(false);
 			result.setErrorMsg("用户编号参数有误");
 		}
-		if (Constants.FIRST_VERSION.equals(version)){
+		if (Constants.FIRST_VERSION.equals(version)) {
 			boolean flag = thirdPartFeignClient.verifyPhoneCode(version, phone, code);
-			if(flag){
-				Map<String,Object> param = new HashMap<String, Object>();
+			if (flag) {
+				Map<String, Object> param = new HashMap<String, Object>();
 				param.put("userId", userId);
 				param.put("pwd", EncryptionUtil.MD5(pwd));
 				userService.modifyPwd(param);
-				
-				String content = "用户  \""+phone+"\"  修改了密码";
+
+				String content = "用户  \"" + phone + "\"  修改了密码";
 				logFeignClient.saveLog(packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
-				
+
 				result.setSuccess(true);
 			} else {
 				result.setSuccess(false);
 				result.setErrorMsg("手机验证码错误");
 			}
 		}
-		
+
 		return result;
 	}
-	
-	
-	private LogInfo packageLog(Integer apiId,String apiName,Integer clientId, String content,String opt){
+
+	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
 		LogInfo info = new LogInfo();
-		
+
 		info.setApiId(apiId);
 		info.setApiName(apiName);
 		info.setCenterId(LogConstants.USER_CENTER_ID);
@@ -367,7 +318,7 @@ public class UserController {
 		info.setClientId(clientId);
 		info.setContent(content);
 		info.setOpt(opt);
-		
+
 		return info;
 	}
 

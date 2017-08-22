@@ -4,12 +4,12 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
 
-package com.zm.user.wx;
+package com.zm.thirdcenter.bussiness.loginplugin.util.wx;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zm.user.utils.HttpClientUtil;
+import com.zm.thirdcenter.utils.HttpClientUtil;
 
 /**
  * 获取用户基本信息(UnionID机制)

@@ -10,4 +10,8 @@ public class Constants {
 
 	public static final Double FIRST_VERSION = 1.0;
 	
+	public static final String APPID = "";
+
+	public static final String SECRET = "";
+	
 }

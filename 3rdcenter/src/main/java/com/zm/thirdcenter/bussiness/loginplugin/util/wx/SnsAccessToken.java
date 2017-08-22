@@ -4,13 +4,13 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
 
-package com.zm.user.wx;
+package com.zm.thirdcenter.bussiness.loginplugin.util.wx;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import com.zm.user.utils.JSONUtil;
-import com.zm.user.utils.RetryUtils.ResultCheck;
+import com.zm.thirdcenter.utils.JSONUtil;
+import com.zm.thirdcenter.utils.RetryUtils.ResultCheck;
 
 
 /**

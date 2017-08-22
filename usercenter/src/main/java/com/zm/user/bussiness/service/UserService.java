@@ -84,15 +84,6 @@ public interface UserService {
 	 */
 	void saveUserDetail(UserDetail info);
 	
-	/**  
-	 * verifyWechatIsRegister:验证该openId是否已经注册. <br/>  
-	 *  
-	 * @author wqy  
-	 * @param openId
-	 * @return  
-	 * @since JDK 1.7  
-	 */
-	boolean verifyWechatIsRegister(String unionid);
 	
 	/**  
 	 * packageUser:封装用户微信信息. <br/>  
@@ -102,7 +93,7 @@ public interface UserService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	UserInfo packageUser(ApiResult apiResult);
+	void packageUser(ApiResult apiResult,UserInfo info);
 	
 	
 	/**  
