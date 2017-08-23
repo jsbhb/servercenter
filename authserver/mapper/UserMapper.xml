@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zm.gateway.mapper.UserMapper">
+
+
+    <select id="getUserByName" parameterType="java.lang.String" resultType="userInfo">
+          SELECT
+              U.USER_ID USERID,
+              U.USER_NAME USERNAME,
+              U.PASSWORD PASSWORD,
+              U.PHONE PHONE,
+              U.EMAIL EMAIL,
+              U.STATUS STATUS,
+              U.CREATION_DATE CREATIONDATE,
+              U.CREATED_BY CREATEDBY,
+              U.LAST_UPDATE_DATE LASTUPDATEDATE,
+              U.LAST_UPDATED_BY LASTUPDATEDBY
+          FROM
+              USER U
+          WHERE
+              U.STATUS = 1
+          AND U.USER_NAME = #{USERNAME}
+    </select>
+    
+    <select id="getUserByPhone" parameterType="java.lang.String" resultType="userInfo">
+          SELECT
+              U.USER_ID userId,
+              U.USER_NAME userName,
+              U.PASSWORD password,
+              U.PHONE phone,
+              U.EMAIL email,
+              U.STATUS status,
+              U.CREATION_DATE creationDate,
+              U.CREATED_BY createdBy,
+              U.LAST_UPDATE_DATE lastUpdateDate,
+              U.LAST_UPDATED_BY lastUpdatedBy
+          FROM
+              USER U
+          WHERE
+              U.STATUS = 1
+          AND U.PHONE = #{phone}
+    </select>
+    
+    <select id="insert" parameterType="object" >
+         INSERT INTO USER (
+              USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY) VALUE (#{userName},#{password},1,"123","123",now(),1,now(),1)
+    </select>
+</mapper>
