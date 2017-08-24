@@ -153,7 +153,7 @@ public class UserController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/user/userDetail", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/user/userDetail", method = RequestMethod.PUT)
 	public ResultPojo updateUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req) {
 

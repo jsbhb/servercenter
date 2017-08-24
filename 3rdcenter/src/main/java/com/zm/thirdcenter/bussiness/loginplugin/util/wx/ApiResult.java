@@ -6,6 +6,7 @@
 
 package com.zm.thirdcenter.bussiness.loginplugin.util.wx;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -29,9 +30,12 @@ import com.zm.thirdcenter.utils.JSONUtil;
  *  null                    null
  *  </pre>
  */
-public class ApiResult {
+public class ApiResult implements Serializable{
 
-    private Map<String, Object> attrs;
+	
+	private static final long serialVersionUID = -7398810013525439212L;
+	
+	private Map<String, Object> attrs;
     private String json;
     
     public ApiResult(){}

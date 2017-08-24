@@ -1,6 +1,11 @@
 package com.zm.thirdcenter.pojo;
 
-public class PhoneValidata {
+import java.io.Serializable;
+
+public class PhoneValidata implements Serializable{
+
+
+	private static final long serialVersionUID = -1115040946844422905L;
 
 	private Integer sendTime;
 	

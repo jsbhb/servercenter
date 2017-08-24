@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService{
 		userDetail.setLocation(apiResult.get("country")+" "+apiResult.get("province")+" "+apiResult.get("city"));
 		userDetail.setHeadImg(apiResult.get("headimgurl")+"");
 		userDetail.setNickName(apiResult.get("nickname")+"");
+		userDetail.setUserId(info.getId());
 		
 		info.setUserDetail(userDetail);
 	}

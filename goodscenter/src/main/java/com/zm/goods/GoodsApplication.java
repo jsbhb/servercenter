@@ -1,9 +1,8 @@
-package com.zm.thirdcenter;
+package com.zm.goods;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.feign.EnableFeignClients;
 
 /**
  * 
@@ -15,11 +14,10 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
  * @version
  * @since JDK 1.7
  */
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @SpringBootApplication
-//@EnableFeignClients
-public class ThirdPartApplication {
+public class GoodsApplication {
 	public static void main(String[] args) {
-		new SpringApplicationBuilder(ThirdPartApplication.class).web(true).run(args);
+		new SpringApplicationBuilder(GoodsApplication.class).web(true).run(args);
 	}
 }

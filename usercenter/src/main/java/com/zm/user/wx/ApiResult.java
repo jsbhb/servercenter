@@ -6,6 +6,7 @@
 
 package com.zm.user.wx;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -29,9 +30,11 @@ import com.zm.user.utils.JSONUtil;
  *  null                    null
  *  </pre>
  */
-public class ApiResult {
+public class ApiResult implements Serializable{
 
-    private Map<String, Object> attrs;
+	private static final long serialVersionUID = 2350823646909921554L;
+	
+	private Map<String, Object> attrs;
     private String json;
     
     public ApiResult(){}

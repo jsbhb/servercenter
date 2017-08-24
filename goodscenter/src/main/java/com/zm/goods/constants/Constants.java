@@ -1,4 +1,4 @@
-package com.zm.user.constants;
+package com.zm.goods.constants;
 
 public class Constants {
 
@@ -9,11 +9,5 @@ public class Constants {
 	public static final String DOMAIN_NAME = "*";
 
 	public static final Double FIRST_VERSION = 1.0;
-	
-	public static final String EMAIL = "email";
-	
-	public static final String MOBILE = "mobile";
-	
-	public static final String ACCOUNT = "account";
 	
 }

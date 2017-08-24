@@ -6,10 +6,10 @@ use zm_log;
 
 
 
-drop table if exists  `zm_log;`.`log`;
+drop table if exists  `zm_log`.`log`;
 
-CREATE TABLE `zm_log;`.`log`(
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE `zm_log`.`log`(
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `center_id` TINYINT UNSIGNED NOT NULL,
   `client_id` INT UNSIGNED NOT NULL,
   `api_id` TINYINT UNSIGNED NOT NULL,
@@ -31,7 +31,7 @@ COMMENT = '日志信息';
 drop table if exists  `zm_log`.`log_api`;
 
 CREATE TABLE `zm_log`.`log_api`(
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `api_url` VARCHAR(100) NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `create_time` DATETIME NULL,
@@ -49,7 +49,7 @@ COMMENT = '日志API';
 drop table if exists  `zm_log`.`log_search_parameter`;
 
 CREATE TABLE `zm_log`.`log_search_parameter`(
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `api_name` VARCHAR(100) NOT NULL,
   `key_name` VARCHAR(45) NOT NULL COMMENT '字段中文名',
   `key` VARCHAR(45) NULL,

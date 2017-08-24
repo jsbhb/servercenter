@@ -17,6 +17,7 @@ import com.zm.thirdcenter.constants.Constants;
 import com.zm.thirdcenter.pojo.PhoneValidata;
 import com.zm.thirdcenter.pojo.ResultPojo;
 import com.zm.thirdcenter.utils.CommonUtil;
+import com.zm.thirdcenter.utils.SmsSendUtil;
 
 /**
  * ClassName: ThirdPartPhoneController <br/>
@@ -52,7 +53,14 @@ public class ThirdPartPhoneController {
 			PhoneValidata model = redisTemplate.opsForValue().get(phone);
 			if (model == null) {
 
-				// TODO 通过第三方接口发送短信
+				boolean flag = SmsSendUtil.sendMessage(code, phone);
+
+				if (!flag) {
+					result.setSuccess(false);
+					result.setErrorMsg("发送失败");
+					return result;
+				}
+
 				model = new PhoneValidata();
 				model.setCode(code);
 				model.setSendTime(1);
@@ -68,7 +76,14 @@ public class ThirdPartPhoneController {
 					return result;
 				}
 
-				// TODO 通过第三方接口发送短信
+				boolean flag = SmsSendUtil.sendMessage(code, phone);
+
+				if (!flag) {
+					result.setSuccess(false);
+					result.setErrorMsg("发送失败");
+					return result;
+				}
+
 				Long time = redisTemplate.getExpire(phone, TimeUnit.MINUTES);
 				model.setCode(code);
 				model.setSendTime(model.getSendTime() + 1);

@@ -1,11 +1,11 @@
-drop SCHEMA if exists  `usercenter`;
-CREATE SCHEMA `usercenter` ;
+drop SCHEMA if exists  `zm_user`;
+CREATE SCHEMA `zm_user` ;
 
-use usercenter;
+use zm_user;
 
 drop table if exists  `user`;
 
-CREATE TABLE `usercenter`.`user` (
+CREATE TABLE `zm_user`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
@@ -46,7 +46,7 @@ COMMENT = '用户表';
 
 drop table if exists  `user_detail`;
 
-CREATE TABLE `usercenter`.`user_detail` (
+CREATE TABLE `zm_user`.`user_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
   `type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
@@ -69,7 +69,7 @@ COMMENT = '用户明细表';
 
 drop table if exists  `address`;
 
-CREATE TABLE `usercenter`.`address` (
+CREATE TABLE `zm_user`.`address` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `provice` VARCHAR(20) NOT NULL COMMENT '省',
@@ -90,7 +90,7 @@ COMMENT = '收货地址表';
 
 drop table if exists  `collection`;
 
-CREATE TABLE `usercenter`.`collection` (
+CREATE TABLE `zm_user`.`collection` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `type` TINYINT UNSIGNED NOT NULL COMMENT '收藏类型',
@@ -107,7 +107,7 @@ COMMENT = '用户收藏表';
 
 drop table if exists  `user_api`;
 
-CREATE TABLE `usercenter`.`user_api` (
+CREATE TABLE `zm_user`.`user_api` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `api_url` VARCHAR(100) NOT NULL COMMENT 'api地址',
   `api_name` VARCHAR(50) NOT NULL COMMENT 'api名称',
@@ -120,7 +120,7 @@ COMMENT = '服务api表';
 
 drop table if exists  `user_search_parameter`;
 
-CREATE TABLE `usercenter`.`user_search_parameter` (
+CREATE TABLE `zm_user`.`user_search_parameter` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `key` VARCHAR(100) NOT NULL COMMENT '字段名',
   `value` VARCHAR(500) NOT NULL COMMENT '值',

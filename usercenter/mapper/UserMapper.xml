@@ -53,7 +53,7 @@
 		#{name,jdbcType = VARCHAR},#{nickName,jdbcType = VARCHAR},
 		#{headImg,jdbcType = VARCHAR},#{company,jdbcType = VARCHAR},
 		#{location,jdbcType = VARCHAR},#{certificates,jdbcType = INTEGER},
-		#{idNum,,jdbcType = VARCHAR},#{sex,jdbcType = INTEGER},now())
+		#{idNum,jdbcType = VARCHAR},#{sex,jdbcType = INTEGER},now())
 	</insert>
 
 	<update id="updateUserDetail" parameterType="Object">
@@ -76,13 +76,12 @@
 		= INTEGER}
 	</delete>
 
-	<insert id="saveUser" parameterType="Object" useGeneratedKeys="true"
-		keyProperty="id">
+	<insert id="saveUser" parameterType="Object" >
 		insert into
-		user(phone,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,register_center_id,
+		user(id,phone,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,register_center_id,
 		register_shop_id,create_time)
 		values
-		(#{phone},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
+		(#{id},#{phone},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
 		#{emailValidate},#{centerId},#{shopId},now())
 	</insert>
 
