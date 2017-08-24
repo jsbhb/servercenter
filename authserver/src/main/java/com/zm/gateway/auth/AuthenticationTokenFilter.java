@@ -1,6 +1,9 @@
 package com.zm.gateway.auth;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -45,8 +48,11 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		String authHeader = request.getHeader(header);
-		if (authHeader != null && authHeader.startsWith(header)) {
+		Map<String, String> headerMap = getHeadersInfo(request);
+		
+		String authHeader = headerMap.get(header);
+		
+		if (authHeader != null && authHeader.startsWith(tokenHead)) {
 			final String authToken = authHeader.substring(tokenHead.length());
 			String username = JWTUtil.getUsernameFromToken(authToken);
 
@@ -64,6 +70,17 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 			}
 		}
 		chain.doFilter(request, response);
+	}
+
+	private Map<String, String> getHeadersInfo(HttpServletRequest request) {
+		Map<String, String> map = new HashMap<String, String>();
+		Enumeration headerNames = request.getHeaderNames();
+		while (headerNames.hasMoreElements()) {
+			String key = (String) headerNames.nextElement();
+			String value = request.getHeader(key);
+			map.put(key, value);
+		}
+		return map;
 	}
 
 }

@@ -41,4 +41,24 @@ public class DateUtil {
 		now.set(Calendar.DATE, now.get(Calendar.DATE) + day);
 		return now.getTime();
 	}
+
+	/**
+	 * 获取固定的时间 getFixDate:(这里用一句话描述这个方法的作用). <br/>
+	 * TODO(这里描述这个方法适用条件 – 可选).<br/>
+	 * TODO(这里描述这个方法的执行流程 – 可选).<br/>
+	 * TODO(这里描述这个方法的使用方法 – 可选).<br/>
+	 * TODO(这里描述这个方法的注意事项 – 可选).<br/>
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
+	 */
+	public static Date getFixDate(int year, int month, int day, int hour, int minute, int second) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year, month, day, hour, minute, second); // 年月日
+																// 也可以具体到时分秒如calendar.set(2015,
+		Date date = calendar.getTime();// date就是你需要的时间
+
+		return date;
+	}
 }

@@ -21,7 +21,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
  * @since JDK 1.7
  */
 public class JWTUtil {
-	
+
 	private final static String SECRET = "zmteambuilder";
 
 	public final static String USER_NAME = "username";
@@ -29,7 +29,7 @@ public class JWTUtil {
 	public final static String PASSWORD = "password";
 
 	public static String generateToken(Map<String, Object> claims) {
-		return Jwts.builder().setClaims(claims).setExpiration(DateUtil.getDateAfter(new Date(), 365))
+		return Jwts.builder().setClaims(claims).setExpiration(DateUtil.getFixDate(2020, 12, 30, 0, 0, 0))
 				.signWith(SignatureAlgorithm.HS512, SECRET).compact();
 	}
 
@@ -56,7 +56,10 @@ public class JWTUtil {
 		claim.put(PASSWORD, userDetails.getPassword());
 		claim.put(USER_NAME, userDetails.getUsername());
 
-		return authToken.equals(generateToken(claim));
+		String token = generateToken(claim);
+		System.out.println(token);
+
+		return authToken.equals(token);
 	}
 
 }

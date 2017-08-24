@@ -33,6 +33,7 @@ import com.zm.gateway.service.AuthService;
  * @since JDK 1.7
  */
 @RestController
+@RequestMapping(value = "/auth")
 public class UserController {
 
 	@Value("${jwt.header}")
@@ -41,7 +42,9 @@ public class UserController {
 	@Autowired
 	private AuthService authService;
 
-	@RequestMapping(value = "/auth", method = RequestMethod.POST)
+	
+	
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		final String token = authService.login(userInfo.getUserName(), userInfo.getPassword());
 		return ResponseEntity.ok(token);
@@ -59,7 +62,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/auth/register", method = RequestMethod.POST)
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		return ResponseEntity.ok(authService.register(userInfo));
 	}
