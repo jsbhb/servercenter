@@ -42,11 +42,11 @@ public interface UserService {
 	 * updateAddress:修改收货地址. <br/>  
 	 *  
 	 * @author wqy  
-	 * @param param
+	 * @param address
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultPojo updateAddress(Map<String,String> param);
+	ResultPojo updateAddress(Address address);
 	
 	/**  
 	 * removeAddress:删除收货地址. <br/>  
@@ -61,10 +61,10 @@ public interface UserService {
 	 * saveUserDetail:更新用户个人资料. <br/>  
 	 *  
 	 * @author wqy  
-	 * @param param  
+	 * @param detail  
 	 * @since JDK 1.7  
 	 */
-	void updateUserDetail(Map<String,String> param);
+	void updateUserDetail(UserDetail detail);
 	
 	/**  
 	 * saveUser:注册保存用户. <br/>  
@@ -103,6 +103,6 @@ public interface UserService {
 	 * @param param  
 	 * @since JDK 1.7  
 	 */
-	void modifyPwd(Map<String,Object> param);
+	void modifyPwd(Map<String,Object> param, String phone);
 	
 }

@@ -33,9 +33,9 @@
 
 	<insert id="saveLogInfo" parameterType="Object">
 		INSERT INTO log
-		(center_id,api_id,center_name,api_name,content,create_time,opt)
+		(center_id,api_id,center_name,api_name,client_id,content,create_time,opt)
 		VALUES
-		(#{centerId},#{apiId},#{centerName},#{apiName},#{content},now(),#{opt})
+		(#{centerId},#{apiId},#{centerName},#{apiName},#{clientId},#{content},now(),#{opt})
 	</insert>
 
 	<delete id="removeLogInfo" parameterType="Object">

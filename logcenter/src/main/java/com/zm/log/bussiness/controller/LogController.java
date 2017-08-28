@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class LogController {
 	LogService logService;
 
 	@RequestMapping(value = "{version}/log", method = RequestMethod.POST)
-	public ResultPojo saveLog(@PathVariable("version") Double version, LogInfo info, HttpServletResponse res) {
+	public ResultPojo saveLog(@PathVariable("version") Double version, @RequestBody LogInfo info, HttpServletResponse res, HttpServletRequest req) {
 
 		ResultPojo result = new ResultPojo();
 

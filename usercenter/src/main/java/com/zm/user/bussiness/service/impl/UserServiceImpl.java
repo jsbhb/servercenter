@@ -5,9 +5,13 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
+import com.zm.user.constants.LogConstants;
+import com.zm.user.feignclient.LogFeignClient;
+import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultPojo;
 import com.zm.user.pojo.UserDetail;
@@ -16,12 +20,16 @@ import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService{
 
 	private static final Integer DEFAULT = 1;
 	
 	@Resource
 	UserMapper userMapper;
+	
+	@Resource
+	LogFeignClient logFeignClient;
 	
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -44,27 +52,27 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public ResultPojo updateAddress(Map<String, String> param) {
+	public ResultPojo updateAddress(Address address) {
 		
 		ResultPojo result = new ResultPojo();
 		
-		if(DEFAULT.equals(param.get("setDefault"))){
+		if(DEFAULT.equals(address.getSetDefault())){
 			try {
-				userMapper.updateUndefaultAddress(Integer.valueOf(param.get("userId")));
+				userMapper.updateUndefaultAddress(Integer.valueOf(address.getUserId()));
 			} catch (NumberFormatException e) {
 				result.setSuccess(false);
 				result.setErrorMsg("userId参数有误");
 			}
 		}
-		userMapper.updateAddress(param);
+		userMapper.updateAddress(address);
 		result.setSuccess(true);
 		return result;
 	}
 
 	@Override
-	public void updateUserDetail(Map<String, String> param) {
+	public void updateUserDetail(UserDetail detail) {
 		
-		userMapper.updateUserDetail(param);
+		userMapper.updateUserDetail(detail);
 	}
 
 	@Override
@@ -75,6 +83,9 @@ public class UserServiceImpl implements UserService{
 		if(info.getUserDetail() != null){
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
+		
+		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
+		logFeignClient.saveLog(packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
 	}
 
 	@Override
@@ -111,10 +122,27 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void modifyPwd(Map<String, Object> param) {
+	public void modifyPwd(Map<String, Object> param, String phone) {
 		
 		userMapper.updateUserPwd(param);
 		
+		String content = "用户  \"" + phone + "\"  修改了密码";
+		logFeignClient.saveLog(packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
+		
+	}
+	
+	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
+		LogInfo info = new LogInfo();
+
+		info.setApiId(apiId);
+		info.setApiName(apiName);
+		info.setCenterId(LogConstants.USER_CENTER_ID);
+		info.setCenterName("用户服务中心");
+		info.setClientId(clientId);
+		info.setContent(content);
+		info.setOpt(opt);
+
+		return info;
 	}
 
 }

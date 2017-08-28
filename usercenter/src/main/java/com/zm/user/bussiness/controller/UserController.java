@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,10 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.constants.Constants;
-import com.zm.user.constants.LogConstants;
-import com.zm.user.feignclient.LogFeignClient;
 import com.zm.user.feignclient.ThirdPartFeignClient;
-import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultPojo;
 import com.zm.user.pojo.UserDetail;
@@ -51,9 +49,6 @@ public class UserController {
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
 
-	@Resource
-	LogFeignClient logFeignClient;
-	
 	@Resource
 	RedisTemplate<String, ApiResult> redisTemplate;
 
@@ -88,8 +83,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/address", method = RequestMethod.POST)
-	public ResultPojo saveAddress(@PathVariable("version") Double version, HttpServletResponse res, Address address,
-			HttpServletRequest req) {
+	public ResultPojo saveAddress(@PathVariable("version") Double version, HttpServletResponse res,
+			@RequestBody Address address, HttpServletRequest req) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
@@ -104,21 +99,15 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/address", method = RequestMethod.PUT)
-	public ResultPojo updateAddress(@PathVariable("version") Double version, HttpServletResponse res, Address address,
-			HttpServletRequest req) {
+	public ResultPojo updateAddress(@PathVariable("version") Double version, HttpServletResponse res,
+			@RequestBody Address address, HttpServletRequest req) {
 
 		ResultPojo result = null;
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		Map<String, String[]> parameter = req.getParameterMap();
-		Map<String, String> param = new HashMap<String, String>();
-		for (Map.Entry<String, String[]> entry : parameter.entrySet()) {
-			param.put(entry.getKey(), entry.getValue()[0]);
-		}
-
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = userService.updateAddress(param);
+			result = userService.updateAddress(address);
 		}
 
 		return result;
@@ -155,20 +144,14 @@ public class UserController {
 
 	@RequestMapping(value = "{version}/user/userDetail", method = RequestMethod.PUT)
 	public ResultPojo updateUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
-			HttpServletRequest req) {
+			@RequestBody UserDetail detail, HttpServletRequest req) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		Map<String, String[]> parameter = req.getParameterMap();
-		Map<String, String> param = new HashMap<String, String>();
-		for (Map.Entry<String, String[]> entry : parameter.entrySet()) {
-			param.put(entry.getKey(), entry.getValue()[0]);
-		}
-
 		if (Constants.FIRST_VERSION.equals(version)) {
-			userService.updateUserDetail(param);
+			userService.updateUserDetail(detail);
 			result.setSuccess(true);
 		}
 
@@ -176,8 +159,8 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/register", method = RequestMethod.POST)
-	public ResultPojo registerUser(@PathVariable("version") Double version, HttpServletResponse res, UserInfo info,
-			HttpServletRequest req) {
+	public ResultPojo registerUser(@PathVariable("version") Double version, HttpServletResponse res,
+			@RequestBody UserInfo info, HttpServletRequest req) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
@@ -185,19 +168,16 @@ public class UserController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			info.setPhoneValidate(VALIDATE);
-			if(info.getPwd() != null && !"".equals(info.getPwd())){
+			if (info.getPwd() != null && !"".equals(info.getPwd())) {
 				info.setPwd(EncryptionUtil.MD5(info.getPwd()));
 			}
-			
-			if(info.getWechat() != null && !"".equals(info.getWechat())){
-				ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
-				userService.packageUser(apiResult,info);
-			}
-			
-			userService.saveUser(info);
 
-			String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
-			logFeignClient.saveLog(packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
+			if (info.getWechat() != null && !"".equals(info.getWechat())) {
+				ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
+				userService.packageUser(apiResult, info);
+			}
+
+			userService.saveUser(info);
 
 			result.setSuccess(true);
 		}
@@ -207,7 +187,7 @@ public class UserController {
 
 	@RequestMapping(value = "{version}/user/userDetail", method = RequestMethod.POST)
 	public ResultPojo saveUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
-			UserDetail detail, HttpServletRequest req) {
+			@RequestBody UserDetail detail, HttpServletRequest req) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
@@ -293,10 +273,7 @@ public class UserController {
 				Map<String, Object> param = new HashMap<String, Object>();
 				param.put("userId", userId);
 				param.put("pwd", EncryptionUtil.MD5(pwd));
-				userService.modifyPwd(param);
-
-				String content = "用户  \"" + phone + "\"  修改了密码";
-				logFeignClient.saveLog(packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
+				userService.modifyPwd(param, phone);
 
 				result.setSuccess(true);
 			} else {
@@ -306,20 +283,6 @@ public class UserController {
 		}
 
 		return result;
-	}
-
-	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
-		LogInfo info = new LogInfo();
-
-		info.setApiId(apiId);
-		info.setApiName(apiName);
-		info.setCenterId(LogConstants.USER_CENTER_ID);
-		info.setCenterName("用户服务中心");
-		info.setClientId(clientId);
-		info.setContent(content);
-		info.setOpt(opt);
-
-		return info;
 	}
 
 }
