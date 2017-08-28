@@ -42,11 +42,15 @@ public class UserController {
 	@Autowired
 	private AuthService authService;
 
-	
-	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody UserInfo userInfo) throws AuthenticationException {
-		final String token = authService.login(userInfo.getUserName(), userInfo.getPassword());
+		String token = null;
+		try {
+			token = authService.login(userInfo.getUserName(), userInfo.getPassword());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			ResponseEntity.ok(e.getMessage());
+		}
 		return ResponseEntity.ok(token);
 	}
 

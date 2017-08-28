@@ -9,12 +9,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.zm.gateway.common.JWTUtil;
@@ -52,19 +48,23 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public UserInfo register(UserInfo userInfo) {
+	public String register(UserInfo userInfo) {
 
 		final String userName = userInfo.getUserName();
 		if (userMapper.getUserByName(userName) != null) {
 			return null;
 		}
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		final String rawPassword = userInfo.getPassword();
-		userInfo.setPassword(encoder.encode(rawPassword));
+		// BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		// final String rawPassword = userInfo.getPassword();
+		// userInfo.setPassword(encoder.encode(rawPassword));
 		userInfo.setLastPasswordResetDate(new Date());
 		userInfo.setAuthorities(asList("ROLE_USER"));
 		userMapper.insert(userInfo);
-		return userInfo;
+
+		Map<String, Object> claim = new HashMap<String, Object>();
+		claim.put(JWTUtil.PASSWORD, userInfo.getPassword());
+		claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
+		return JWTUtil.generateToken(claim);
 	}
 
 	private List<String> asList(String role) {
@@ -75,9 +75,11 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public String login(String username, String password) {
-		UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(username, password);
-		Authentication authentication = authenticationManager.authenticate(upToken);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		// UsernamePasswordAuthenticationToken upToken = new
+		// UsernamePasswordAuthenticationToken(username, password);
+		// Authentication authentication =
+		// authenticationManager.authenticate(upToken);
+		// SecurityContextHolder.getContext().setAuthentication(authentication);
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
 		Map<String, Object> claim = new HashMap<String, Object>();
