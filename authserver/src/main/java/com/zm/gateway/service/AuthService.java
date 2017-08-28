@@ -22,7 +22,7 @@ public interface AuthService {
 	 * @return  
 	 * @since JDK 1.7
 	 */
-	UserInfo register(UserInfo userInfo);
+	String register(UserInfo userInfo);
 	
 	
 	/**

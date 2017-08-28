@@ -30,41 +30,40 @@ public class ServiceFallbackProvider implements ZuulFallbackProvider {
 
 	@Override
 	public ClientHttpResponse fallbackResponse() {
-		
-		return null;
-		// return new ClientHttpResponse() {
-		// @Override
-		// public HttpStatus getStatusCode() throws IOException {
-		// return HttpStatus.OK;
-		// }
-		//
-		// @Override
-		// public int getRawStatusCode() throws IOException {
-		// return 200;
-		// }
-		//
-		// @Override
-		// public String getStatusText() throws IOException {
-		// return "OK";
-		// }
-		//
-		// @Override
-		// public void close() {
-		//
-		// }
-		//
-		// @Override
-		// public InputStream getBody() throws IOException {
-		// return new ByteArrayInputStream("服务故障，请稍后重试!".getBytes());
-		// }
-		//
-		// @Override
-		// public HttpHeaders getHeaders() {
-		// HttpHeaders headers = new HttpHeaders();
-		// headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		// return headers;
-		// }
-		// };
+
+		return new ClientHttpResponse() {
+			@Override
+			public HttpStatus getStatusCode() throws IOException {
+				return HttpStatus.OK;
+			}
+
+			@Override
+			public int getRawStatusCode() throws IOException {
+				return 200;
+			}
+
+			@Override
+			public String getStatusText() throws IOException {
+				return "OK";
+			}
+
+			@Override
+			public void close() {
+
+			}
+
+			@Override
+			public InputStream getBody() throws IOException {
+				return new ByteArrayInputStream("server over!".getBytes());
+			}
+
+			@Override
+			public HttpHeaders getHeaders() {
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+				return headers;
+			}
+		};
 	}
 
 }

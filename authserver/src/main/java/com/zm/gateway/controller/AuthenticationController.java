@@ -1,10 +1,11 @@
 package com.zm.gateway.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.zm.gateway.model.ResultPojo;
 
 /**
  * 
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class AuthenticationController {
-	
+
 	@RequestMapping(value = "/authentication", method = RequestMethod.GET)
-	public ResponseEntity<?> authentication() throws AuthenticationException {
-		return ResponseEntity.ok("认证通过！");
+	public ResultPojo authentication() throws AuthenticationException {
+		return new ResultPojo(null);
 	}
 }
