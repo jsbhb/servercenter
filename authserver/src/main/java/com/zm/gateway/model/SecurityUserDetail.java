@@ -19,18 +19,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class SecurityUserDetail implements UserDetails {
 
 	/**
-	 * serialVersionUID:TODO(用一句话描述这个变量表示什么).
+	 * serialVersionUID.
 	 * 
 	 * @since JDK 1.7
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private final String id;
-	private final String userName;
-	private final String password;
-	private final String email;
-	private final Collection<? extends GrantedAuthority> authorities;
-	private final Date lastPasswordResetDate;
+	private  String id;
+	private  String userName;
+	private  String password;
+	private  String email;
+	private  Collection<? extends GrantedAuthority> authorities;
+	private  Date lastPasswordResetDate;
+	
+	private  String token;
 
 	public SecurityUserDetail(String id, String userName, String password, String email,
 			Collection<? extends GrantedAuthority> authorities, Date lastPasswordResetDate) {
@@ -41,6 +43,15 @@ public class SecurityUserDetail implements UserDetails {
 		this.authorities = authorities;
 		this.lastPasswordResetDate = lastPasswordResetDate;
 	}
+	
+	public String getToken(){
+		return this.token;
+	}
+	
+	public void setToken(String token){
+		this.token = token;
+	}
+	
 
 	public String getId() {
 		return id;
@@ -92,5 +103,7 @@ public class SecurityUserDetail implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
+	
+	
 
 }

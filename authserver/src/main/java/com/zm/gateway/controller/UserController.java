@@ -11,6 +11,8 @@ package com.zm.gateway.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zm.gateway.model.ResultPojo;
+import com.zm.gateway.model.SecurityUserDetail;
 import com.zm.gateway.model.UserInfo;
 import com.zm.gateway.service.AuthService;
 
@@ -42,16 +46,16 @@ public class UserController {
 	@Autowired
 	private AuthService authService;
 
+	Logger logger = LoggerFactory.getLogger(UserController.class);
+
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody UserInfo userInfo) throws AuthenticationException {
-		String token = null;
+	public ResultPojo createAuthenticationToken(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		try {
-			token = authService.login(userInfo.getUserName(), userInfo.getPassword());
+			return new ResultPojo(authService.login(userInfo));
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			ResponseEntity.ok(e.getMessage());
+			logger.info(e.getMessage());
+			return new ResultPojo("401", e.getMessage());
 		}
-		return ResponseEntity.ok(token);
 	}
 
 	@RequestMapping(value = "/refresh", method = RequestMethod.GET)
@@ -67,8 +71,13 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws AuthenticationException {
-		return ResponseEntity.ok(authService.register(userInfo));
+	public ResultPojo register(@RequestBody UserInfo userInfo) throws AuthenticationException {
+		try {
+			return new ResultPojo(authService.register(userInfo));
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			return new ResultPojo("401", e.getMessage());
+		}
 	}
 
 }

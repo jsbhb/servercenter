@@ -1,5 +1,6 @@
 package com.zm.gateway.service;
 
+import com.zm.gateway.model.SecurityUserDetail;
 import com.zm.gateway.model.UserInfo;
 
 /**
@@ -22,7 +23,7 @@ public interface AuthService {
 	 * @return  
 	 * @since JDK 1.7
 	 */
-	String register(UserInfo userInfo);
+	SecurityUserDetail register(UserInfo userInfo);
 	
 	
 	/**
@@ -35,7 +36,7 @@ public interface AuthService {
 	 * @return  
 	 * @since JDK 1.7
 	 */
-	String login(String username, String password);
+	SecurityUserDetail login(UserInfo userInfo);
 	
 	
 	/**

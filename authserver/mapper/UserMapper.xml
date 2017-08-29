@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zm.gateway.mapper.UserMapper">
 
-
     <select id="getUserByName" parameterType="java.lang.String" resultType="userInfo">
           SELECT
               U.USER_ID USERID,
@@ -22,7 +21,37 @@
           AND U.USER_NAME = #{USERNAME}
     </select>
     
-    <select id="getUserByPhone" parameterType="java.lang.String" resultType="userInfo">
+    <select id="getUserForLogin" parameterType="userInfo" resultType="userInfo">
+          SELECT
+              U.USER_ID userId,
+              U.USER_NAME userName,
+              U.PASSWORD password,
+              U.PHONE phone,
+              U.EMAIL email,
+              U.STATUS status,
+              U.CREATION_DATE creationDate,
+              U.CREATED_BY createdBy,
+              U.LAST_UPDATE_DATE lastUpdateDate,
+              U.LAST_UPDATED_BY lastUpdatedBy
+          FROM
+              USER U
+          WHERE
+              U.STATUS = 1
+         <if test="userName != null and userName != ''">
+			and U.USER_NAME = #{userName}
+		 </if>
+		 <if test="phone != null and phone != ''">
+			and U.PHONE = #{phone}
+		 </if>
+		 <if test="password != null and password != ''">
+			and U.PASSWORD = #{password}
+		 </if>
+		 <if test="openId != null and openId != ''">
+			and U.OPENID = #{openId}
+		 </if>
+    </select>
+    
+     <select id="getUserByPhone" parameterType="java.lang.String" resultType="userInfo">
           SELECT
               U.USER_ID userId,
               U.USER_NAME userName,
@@ -41,8 +70,8 @@
           AND U.PHONE = #{phone}
     </select>
     
-    <select id="insert" parameterType="object" >
+    <insert id="insert"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
          INSERT INTO USER (
               USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY) VALUE (#{userName},#{password},1,"123","123",now(),1,now(),1)
-    </select>
+    </insert>
 </mapper>
