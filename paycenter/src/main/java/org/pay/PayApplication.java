@@ -1,4 +1,4 @@
-package com.zm.goods;
+package org.pay;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableFeignClients
 @EnableTransactionManagement
-public class GoodsApplication {
+public class PayApplication {
 	public static void main(String[] args) {
-		new SpringApplicationBuilder(GoodsApplication.class).web(true).run(args);
+		new SpringApplicationBuilder(PayApplication.class).web(true).run(args);
 	}
 }

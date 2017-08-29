@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
@@ -19,6 +20,7 @@ import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.utils.CommonUtils;
 
 @Service
+@Transactional
 public class GoodsServiceImpl implements GoodsService {
 
 	private static final Integer PICTURE_TYPE = 0;
