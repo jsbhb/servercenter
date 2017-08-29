@@ -33,6 +33,10 @@ public class GoodsSpecs {
 	
 	private String opt;
 	
+	private Double minPrice;
+	
+	private Double maxPrice;
+	
 	private List<GoodsPrice> priceList;
 
 	public Integer getId() {
@@ -123,11 +127,28 @@ public class GoodsSpecs {
 		this.priceList = priceList;
 	}
 
+	public Double getMinPrice() {
+		return minPrice;
+	}
+
+	public void setMinPrice(Double minPrice) {
+		this.minPrice = minPrice;
+	}
+
+	public Double getMaxPrice() {
+		return maxPrice;
+	}
+
+	public void setMaxPrice(Double maxPrice) {
+		this.maxPrice = maxPrice;
+	}
+
 	@Override
 	public String toString() {
 		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + ", itemCode=" + itemCode
 				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
-				+ ", updateTime=" + updateTime + ", opt=" + opt + ", priceList=" + priceList + "]";
+				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
+				+ ", priceList=" + priceList + "]";
 	}
 	
 }

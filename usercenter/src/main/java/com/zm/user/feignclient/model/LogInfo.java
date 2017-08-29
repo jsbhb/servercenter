@@ -1,5 +1,7 @@
 package com.zm.user.feignclient.model;
 
+import java.io.Serializable;
+
 /**  
  * ClassName: LogInfo <br/>  
  * Function: 日志类POJO. <br/>   
@@ -9,7 +11,9 @@ package com.zm.user.feignclient.model;
  * @version   
  * @since JDK 1.7  
  */
-public class LogInfo {
+public class LogInfo implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private Integer id;
 	

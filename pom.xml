@@ -15,6 +15,7 @@
 		<module>authserver</module>
 		<module>logcenter</module>
 		<module>3rdcenter</module>
+		<module>paycenter</module>
 	</modules>
 	
 	<parent>

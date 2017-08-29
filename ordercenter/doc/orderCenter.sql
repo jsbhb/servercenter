@@ -10,7 +10,7 @@ drop table if exists  `zm_order`.`order_base`;
 
 CREATE TABLE `zm_order`.`order_base` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` CHAR(20) NOT NULL,
+  `order_id` CHAR(21) NOT NULL,
   `combination_id` CHAR(20) NULL COMMENT '订单拆分后的总ID',
   `user_id` INT UNSIGNED NOT NULL,
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
@@ -46,7 +46,7 @@ drop table if exists  `zm_order`.`order_detail`;
 
 CREATE TABLE `zm_order`.`order_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` CHAR(20) NOT NULL,
+  `order_id` CHAR(21) NOT NULL,
   `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
   `payment` DECIMAL(10,2) NULL,
   `pay_time` DATETIME NULL,
@@ -80,7 +80,7 @@ drop table if exists  `zm_order`.`order_goods`;
 
 CREATE TABLE `zm_order`.`order_goods` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` CHAR(20) NOT NULL,
+  `order_id` CHAR(21) NOT NULL,
   `item_id` VARCHAR(100) NOT NULL,
   `sku` VARCHAR(50) NULL,
   `item_name` VARCHAR(100) NULL,
@@ -107,7 +107,7 @@ drop table if exists  `zm_order`.`customs_status`;
 
 CREATE TABLE `zm_order`.`customs_status` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` CHAR(20) NOT NULL,
+  `order_id` CHAR(21) NOT NULL,
   `status` TINYINT UNSIGNED NOT NULL,
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
@@ -146,7 +146,7 @@ drop table if exists  `zm_order`.`order_back_record`;
 
 CREATE TABLE `zm_order`.`order_back_record` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` CHAR(20) NOT NULL,
+  `order_id` CHAR(21) NOT NULL,
   `status` TINYINT UNSIGNED NULL COMMENT '0:未发送，1：发送成功',
   `send_time` DATETIME NULL,
   `create_time` DATETIME NULL,

@@ -14,9 +14,9 @@ public interface UserMapper {
 	
 	void updateUndefaultAddress(Integer userId);
 	
-	void updateAddress(Map<String,String> param);
+	void updateAddress(Address address);
 	
-	void updateUserDetail(Map<String,String> param);
+	void updateUserDetail(UserDetail detail);
 	
 	void saveUserDetail(UserDetail userDetail);
 	

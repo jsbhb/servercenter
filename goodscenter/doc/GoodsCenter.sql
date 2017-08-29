@@ -32,7 +32,7 @@ CREATE TABLE `zm_goods`.`goods_item` (
   `base_id` int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
   `goods_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
   `status` tinyint UNSIGNED NOT NULL COMMENT '商品状态0：停售，1：在售',
-  `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境',
+  `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2:海蒸鲜',
   `is_popular` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否推广0：否，1是',
   `is_hot` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否热卖0：否，1是',
   `is_good` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否好货0：否，1是',
@@ -179,7 +179,7 @@ CREATE TABLE `zm_goods`.`goods_price_contrast` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_item_id` (`item_id`),
-  UNIQUE INDEX `uq_contrast_time` (`contrast_time` ASC)
+  UNIQUE INDEX `uq_contrast_time` (`contrast_time`,`item_id` ASC)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品价格对比表';
 

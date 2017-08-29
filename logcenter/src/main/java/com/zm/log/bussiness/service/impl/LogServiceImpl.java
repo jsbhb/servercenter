@@ -6,12 +6,14 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.log.bussiness.dao.LogMapper;
 import com.zm.log.bussiness.service.LogService;
 import com.zm.log.pojo.LogInfo;
 
 @Service
+@Transactional
 public class LogServiceImpl implements LogService{
 
 	@Resource

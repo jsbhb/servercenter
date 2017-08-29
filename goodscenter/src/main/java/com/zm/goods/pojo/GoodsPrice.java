@@ -4,7 +4,7 @@ public class GoodsPrice {
 
 	private Integer id;
 	
-	private Integer itemId;
+	private String itemId;
 	
 	private Integer min;
 	
@@ -30,11 +30,11 @@ public class GoodsPrice {
 		this.id = id;
 	}
 
-	public Integer getItemId() {
+	public String getItemId() {
 		return itemId;
 	}
 
-	public void setItemId(Integer itemId) {
+	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
 

@@ -26,7 +26,7 @@ public class OrderGoods {
 	
 	private String itemCode;
 	
-	private Integer itemQuantit;
+	private Integer itemQuantity;
 	
 	private Double itemPrice;
 	
@@ -82,12 +82,12 @@ public class OrderGoods {
 		this.itemCode = itemCode;
 	}
 
-	public Integer getItemQuantit() {
-		return itemQuantit;
+	public Integer getItemQuantity() {
+		return itemQuantity;
 	}
 
-	public void setItemQuantit(Integer itemQuantit) {
-		this.itemQuantit = itemQuantit;
+	public void setItemQuantity(Integer itemQuantity) {
+		this.itemQuantity = itemQuantity;
 	}
 
 	public Double getItemPrice() {
@@ -125,7 +125,7 @@ public class OrderGoods {
 	@Override
 	public String toString() {
 		return "OrderGoods [id=" + id + ", orderId=" + orderId + ", itemId=" + itemId + ", sku=" + sku + ", itemName="
-				+ itemName + ", itemInfo=" + itemInfo + ", itemCode=" + itemCode + ", itemQuantit=" + itemQuantit
+				+ itemName + ", itemInfo=" + itemInfo + ", itemCode=" + itemCode + ", itemQuantity=" + itemQuantity
 				+ ", itemPrice=" + itemPrice + ", actualPrice=" + actualPrice + ", remark=" + remark + "]";
 	}
 }

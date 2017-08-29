@@ -32,7 +32,7 @@ public class ThirdLoginPluginController {
 
 	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
 
-	private static final String REDIRECT_URL = "http://4aadb655.ngrok.io/user/3rdLogin/wxLogin";
+	private static final String REDIRECT_URL = "http://0ca50d05.ngrok.io/user/3rdLogin/wxLogin";
 
 	@Resource
 	RedisTemplate<String, ApiResult> redisTemplate;

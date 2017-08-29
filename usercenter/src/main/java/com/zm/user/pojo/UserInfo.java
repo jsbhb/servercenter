@@ -23,11 +23,11 @@ public class UserInfo {
 	
 	private String qq;
 	
-	private String sina_blog;
+	private String sinaBlog;
 	
 	private String pwd;
 	
-	private Integer parent_id;
+	private Integer parentId;
 	
 	private Integer band;
 	
@@ -103,12 +103,12 @@ public class UserInfo {
 		this.qq = qq;
 	}
 
-	public String getSina_blog() {
-		return sina_blog;
+	public String getSinaBlog() {
+		return sinaBlog;
 	}
 
-	public void setSina_blog(String sina_blog) {
-		this.sina_blog = sina_blog;
+	public void setSinaBlog(String sinaBlog) {
+		this.sinaBlog = sinaBlog;
 	}
 
 	public String getPwd() {
@@ -119,12 +119,12 @@ public class UserInfo {
 		this.pwd = pwd;
 	}
 
-	public Integer getParent_id() {
-		return parent_id;
+	public Integer getParentId() {
+		return parentId;
 	}
 
-	public void setParent_id(Integer parent_id) {
-		this.parent_id = parent_id;
+	public void setParent_id(Integer parentId) {
+		this.parentId = parentId;
 	}
 
 	public Integer getBand() {
@@ -234,7 +234,7 @@ public class UserInfo {
 	@Override
 	public String toString() {
 		return "UserInfo [id=" + id + ", account=" + account + ", phone=" + phone + ", email=" + email + ", wechat="
-				+ wechat + ", qq=" + qq + ", sina_blog=" + sina_blog + ", pwd=" + pwd + ", parent_id=" + parent_id
+				+ wechat + ", qq=" + qq + ", sinaBlog=" + sinaBlog + ", pwd=" + pwd + ", parentId=" + parentId
 				+ ", band=" + band + ", phoneValidate=" + phoneValidate + ", emailValidate=" + emailValidate
 				+ ", status=" + status + ", centerId=" + centerId + ", shopId=" + shopId + ", lastLoginTime="
 				+ lastLoginTime + ", lastLoginIP=" + lastLoginIP + ", ipCity=" + ipCity + ", createTime=" + createTime

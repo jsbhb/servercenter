@@ -61,15 +61,14 @@ public class GoodsController {
 		return result;
 	}
 	
-	@RequestMapping(value = "{version}/goods/priceconstrast", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
 	public ResultPojo listPriceConstrast(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res) {
+			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
-		String itemId = req.getParameter("itemId");
 		String startTime = req.getParameter("startTime");
 		String endTime = req.getParameter("endTime");
 		
@@ -87,15 +86,13 @@ public class GoodsController {
 		return result;
 	}
 	
-	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/goods/goodsSpecs/{itemId}", method = RequestMethod.GET)
 	public ResultPojo getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res) {
+			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
 		ResultPojo result = new ResultPojo();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
-		
-		String itemId = req.getParameter("itemId");
 		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String,Object> resultMap = goodsService.tradeGoodsDetail(itemId);

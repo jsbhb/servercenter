@@ -25,23 +25,63 @@
 		(#{userId},#{province},#{city},#{area},#{address},#{zipCode},#{receivePhone},#{receiveName},#{setDefault},now())
 	</insert>
 
-	<update id="updateUndefaultAddress">
+	<update id="updateUndefaultAddress" parameterType="Object">
 		update address set is_default = 0 where user_id =
 		#{userId, jdbcType = INTEGER}
 	</update>
 
-	<update id="updateAddress">
+	<update id="updateAddress" parameterType="Object">
 		update address
 		<set>
-			<foreach collection="param" index="key" item="value"
-				separator=",">
-				<if test="key != 'id'.toString() and key != 'userId'.toString()">
-
-					${key} = #{value}
-
-				</if>
-			</foreach>
-			,update_time = now()
+			<if test="province != null and province != 'null'">
+				province = #{province},
+			</if>
+			<if test="province != null and province == 'null'">
+				province = NULL,
+			</if>
+			<if test="city != null and city != 'null'">
+				city = #{city},
+			</if>
+			<if test="city != null and city == 'null'">
+				city = NULL,
+			</if>
+			<if test="area != null and area != 'null'">
+				area = #{area},
+			</if>
+			<if test="area != null and area == 'null'">
+				area = NULL,
+			</if>
+			<if test="address != null and address != 'null'">
+				address = #{address},
+			</if>
+			<if test="address != null and address == 'null'">
+				address = NULL,
+			</if>
+			<if test="zipCode != null and zipCode != 'null'">
+				zipcode = #{zipCode},
+			</if>
+			<if test="zipCode != null and zipCode == 'null'">
+				zipcode = NULL,
+			</if>
+			<if test="receivePhone != null and receivePhone != 'null'">
+				receive_phone = #{receivePhone},
+			</if>
+			<if test="receivePhone != null and receivePhone == 'null'">
+				receive_phone = NULL,
+			</if>
+			<if test="receiveName != null and receiveName != 'null'">
+				receive_name = #{receiveName},
+			</if>
+			<if test="receiveName != null and receiveName == 'null'">
+				receive_name = NULL,
+			</if>
+			<if test="setDefault != null and setDefault != -101">
+				is_default = #{setDefault},
+			</if>
+			<if test="setDefault != null and setDefault == -101">
+				is_default = NULL,
+			</if>
+			update_time = now()
 		</set>
 		where id = #{id, jdbcType = INTEGER}
 	</update>
@@ -57,16 +97,40 @@
 	</insert>
 
 	<update id="updateUserDetail" parameterType="Object">
-		update user_detail set 
-		<foreach collection="param" index="key" item="value"
-			separator=",">
-			<if test="key != 'id'.toString() and key != 'userId'.toString()">
-
-				${key} = values(#{value})
-
+		update user_detail 
+		<set>
+			<if test="nickName != null and nickName != 'null'">
+				nick_name = #{nickName},
 			</if>
-			,update_time = now()
-		</foreach>
+			<if test="nickName != null and nickName == 'null'">
+				nick_name = NULL,
+			</if>
+			<if test="company != null and company != 'null'">
+				company = #{company},
+			</if>
+			<if test="company != null and company == 'null'">
+				company = NULL,
+			</if>
+			<if test="location != null and location != 'null'">
+				location = #{location},
+			</if>
+			<if test="location != null and location == 'null'">
+				location = NULL,
+			</if>
+			<if test="headImg != null and headImg != 'null'">
+				head_img = #{headImg},
+			</if>
+			<if test="headImg != null and headImg == 'null'">
+				head_img = NULL,
+			</if>
+			<if test="sex != null and sex != -101">
+				sex = #{sex},
+			</if>
+			<if test="sex != null and sex == -101">
+				sex = NULL,
+			</if>
+			update_time = now()
+		</set>
 		where user_id = #{userId,jdbcType = INTEGER}
 	</update>
 
@@ -76,7 +140,7 @@
 		= INTEGER}
 	</delete>
 
-	<insert id="saveUser" parameterType="Object" >
+	<insert id="saveUser" parameterType="Object">
 		insert into
 		user(id,phone,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,register_center_id,
 		register_shop_id,create_time)
@@ -90,9 +154,10 @@
 		select count(*)
 		from user where wechat = #{openId}
 	</select>
-	
+
 	<update id="updateUserPwd" parameterType="Object">
-		update user set pwd = #{pwd} where id = #{userId,jdbcType = INTEGER}
+		update user set pwd =
+		#{pwd} where id = #{userId,jdbcType = INTEGER}
 	</update>
 
 </mapper>
