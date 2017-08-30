@@ -1,9 +1,10 @@
 package com.zm.user.bussiness.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.zm.user.pojo.Address;
-import com.zm.user.pojo.ResultPojo;
+import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.wx.ApiResult;
@@ -30,6 +31,15 @@ public interface UserService {
 	boolean userNameVerify(Map<String,String> param);
 	
 	/**  
+	 * getUserInfo:获取用户信息. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param userId  
+	 * @since JDK 1.7  
+	 */
+	UserInfo getUserInfo(Integer userId);
+	
+	/**  
 	 * saveAddress:保存收货地址. <br/>  
 	 *  
 	 * @author wqy  
@@ -39,6 +49,15 @@ public interface UserService {
 	void saveAddress(Address address);
 	
 	/**  
+	 * listAddress:获取收货地址. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param userId  
+	 * @since JDK 1.7  
+	 */
+	List<Address> listAddress(Integer userId);
+	
+	/**  
 	 * updateAddress:修改收货地址. <br/>  
 	 *  
 	 * @author wqy  
@@ -46,7 +65,7 @@ public interface UserService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultPojo updateAddress(Address address);
+	ResultModel updateAddress(Address address);
 	
 	/**  
 	 * removeAddress:删除收货地址. <br/>  

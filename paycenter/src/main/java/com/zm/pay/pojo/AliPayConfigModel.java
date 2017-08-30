@@ -1,4 +1,4 @@
-package org.pay.pojo;
+package com.zm.pay.pojo;
 
 public class AliPayConfigModel {
 

@@ -1,5 +1,6 @@
 package com.zm.user.bussiness.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -13,7 +14,7 @@ import com.zm.user.constants.LogConstants;
 import com.zm.user.feignclient.LogFeignClient;
 import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.pojo.Address;
-import com.zm.user.pojo.ResultPojo;
+import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.utils.RegularUtil;
@@ -52,9 +53,9 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public ResultPojo updateAddress(Address address) {
+	public ResultModel updateAddress(Address address) {
 		
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		
 		if(DEFAULT.equals(address.getSetDefault())){
 			try {
@@ -129,6 +130,19 @@ public class UserServiceImpl implements UserService{
 		String content = "用户  \"" + phone + "\"  修改了密码";
 		logFeignClient.saveLog(packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
 		
+	}
+	
+
+	@Override
+	public List<Address> listAddress(Integer userId) {
+		
+		return userMapper.listAddress(userId);
+	}
+
+	@Override
+	public UserInfo getUserInfo(Integer userId) {
+		
+		return userMapper.getUserInfo(userId);
 	}
 	
 	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {

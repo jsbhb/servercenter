@@ -1,4 +1,4 @@
-package org.pay;
+package com.zm.pay;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;

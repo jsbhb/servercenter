@@ -1,5 +1,6 @@
 package com.zm.user.bussiness.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import com.zm.user.pojo.Address;
@@ -27,4 +28,8 @@ public interface UserMapper {
 	int queryByWechatUnionid(String openId);
 	
 	void updateUserPwd(Map<String,Object> param);
+	
+	List<Address> listAddress(Integer userId);
+	
+	UserInfo getUserInfo(Integer userId);
 }

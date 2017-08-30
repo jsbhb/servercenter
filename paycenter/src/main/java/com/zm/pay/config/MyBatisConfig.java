@@ -1,4 +1,4 @@
-package org.pay.config;
+package com.zm.pay.config;
 
 import java.util.Properties;
 

@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.zm.user.feignclient.model.LogInfo;
-import com.zm.user.pojo.ResultPojo;
+import com.zm.user.pojo.ResultModel;
 
 @FeignClient("logcenter")
 public interface LogFeignClient {
 
 	@RequestMapping(value="1.0/log", method = RequestMethod.POST)
-	ResultPojo saveLog(LogInfo logInfo);
+	ResultModel saveLog(LogInfo logInfo);
 }
