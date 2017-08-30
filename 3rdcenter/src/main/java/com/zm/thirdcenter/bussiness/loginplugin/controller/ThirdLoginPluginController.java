@@ -16,7 +16,7 @@ import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsAccessToken;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsAccessTokenApi;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsApi;
 import com.zm.thirdcenter.constants.Constants;
-import com.zm.thirdcenter.pojo.ResultPojo;
+import com.zm.thirdcenter.pojo.ResultModel;
 
 /**
  * ClassName: ThirdLoginPluginController <br/>
@@ -56,9 +56,9 @@ public class ThirdLoginPluginController {
 	}
 
 	@RequestMapping(value = "user/3rdLogin/wxLogin", method = RequestMethod.GET)
-	public ResultPojo loginByWechat(HttpServletRequest req, HttpServletResponse res) {
+	public ResultModel loginByWechat(HttpServletRequest req, HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 
 		String code = req.getParameter("code");
 		String state = req.getParameter("state");

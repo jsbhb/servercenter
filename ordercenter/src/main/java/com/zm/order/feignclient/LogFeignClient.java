@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.zm.order.feignclient.model.LogInfo;
-import com.zm.order.pojo.ResultPojo;
+import com.zm.order.pojo.ResultModel;
 
 @FeignClient("logcenter")
 public interface LogFeignClient {
 
 	@RequestMapping(value="{version}/log", method = RequestMethod.POST)
-	ResultPojo saveLog(@PathVariable("version") Double version, LogInfo logInfo);
+	ResultModel saveLog(@PathVariable("version") Double version, LogInfo logInfo);
 	
 }

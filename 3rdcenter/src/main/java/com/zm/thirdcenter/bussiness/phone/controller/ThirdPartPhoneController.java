@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.thirdcenter.constants.Constants;
 import com.zm.thirdcenter.pojo.PhoneValidata;
-import com.zm.thirdcenter.pojo.ResultPojo;
+import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.utils.CommonUtil;
 import com.zm.thirdcenter.utils.SmsSendUtil;
 
@@ -37,10 +37,10 @@ public class ThirdPartPhoneController {
 	RedisTemplate<String, PhoneValidata> redisTemplate;
 
 	@RequestMapping(value = "{version}/third-part/phone", method = RequestMethod.POST)
-	public ResultPojo getPhoneCode(@PathVariable("version") Double version, HttpServletRequest req,
+	public ResultModel getPhoneCode(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 

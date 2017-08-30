@@ -2,6 +2,7 @@ package com.zm.user.bussiness.controller;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -21,7 +22,7 @@ import com.zm.user.bussiness.service.UserService;
 import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.ThirdPartFeignClient;
 import com.zm.user.pojo.Address;
-import com.zm.user.pojo.ResultPojo;
+import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.utils.EncryptionUtil;
@@ -53,10 +54,10 @@ public class UserController {
 	RedisTemplate<String, ApiResult> redisTemplate;
 
 	@RequestMapping(value = "{version}/user/userNameVerify", method = RequestMethod.GET)
-	public ResultPojo userNameVerify(@PathVariable("version") Double version, HttpServletRequest req,
+	public ResultModel userNameVerify(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		String account = req.getParameter("account");
@@ -81,12 +82,29 @@ public class UserController {
 		result.setSuccess(flag);
 		return result;
 	}
+	
+	@RequestMapping(value = "{version}/user/{userId}", method = RequestMethod.GET)
+	public ResultModel getUserInfo(@PathVariable("version") Double version, HttpServletResponse res,
+			@PathVariable("userId") Integer userId, HttpServletRequest req) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			UserInfo info = userService.getUserInfo(userId);
+			result.setSuccess(true);
+			result.setObj(info);
+		}
+
+		return result;
+	}
 
 	@RequestMapping(value = "{version}/user/address", method = RequestMethod.POST)
-	public ResultPojo saveAddress(@PathVariable("version") Double version, HttpServletResponse res,
+	public ResultModel saveAddress(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody Address address, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -98,11 +116,28 @@ public class UserController {
 		return result;
 	}
 
+	@RequestMapping(value = "{version}/user/address/{userId}", method = RequestMethod.GET)
+	public ResultModel listAddress(@PathVariable("version") Double version, HttpServletResponse res,
+			@PathVariable("userId") Integer userId, HttpServletRequest req) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			List<Address> list = userService.listAddress(userId);
+			result.setSuccess(true);
+			result.setObj(list);
+		}
+
+		return result;
+	}
+
 	@RequestMapping(value = "{version}/user/address", method = RequestMethod.PUT)
-	public ResultPojo updateAddress(@PathVariable("version") Double version, HttpServletResponse res,
+	public ResultModel updateAddress(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody Address address, HttpServletRequest req) {
 
-		ResultPojo result = null;
+		ResultModel result = null;
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -114,10 +149,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/address", method = RequestMethod.DELETE)
-	public ResultPojo removeAddress(@PathVariable("version") Double version, HttpServletResponse res,
+	public ResultModel removeAddress(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -143,10 +178,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/userDetail", method = RequestMethod.PUT)
-	public ResultPojo updateUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
+	public ResultModel updateUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody UserDetail detail, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -159,10 +194,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/register", method = RequestMethod.POST)
-	public ResultPojo registerUser(@PathVariable("version") Double version, HttpServletResponse res,
+	public ResultModel registerUser(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody UserInfo info, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -186,10 +221,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/userDetail", method = RequestMethod.POST)
-	public ResultPojo saveUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
+	public ResultModel saveUserDetail(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody UserDetail detail, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -208,11 +243,11 @@ public class UserController {
 	private final String OSS = "2";
 
 	@RequestMapping(value = "{version}/user/uploadHeadImg", method = RequestMethod.POST)
-	public ResultPojo uploadDeclFile(@PathVariable("version") Double version,
+	public ResultModel uploadDeclFile(@PathVariable("version") Double version,
 			@RequestParam("headImg") MultipartFile headImg, HttpServletRequest req, HttpServletResponse res)
 					throws Exception {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String userId = req.getParameter("userId");
@@ -251,10 +286,10 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/modifyPwd", method = RequestMethod.PUT)
-	public ResultPojo modifyPwd(@PathVariable("version") Double version, HttpServletRequest req,
+	public ResultModel modifyPwd(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String code = req.getParameter("code");

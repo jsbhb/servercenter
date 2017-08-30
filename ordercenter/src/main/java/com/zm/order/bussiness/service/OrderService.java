@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.zm.order.pojo.OrderInfo;
-import com.zm.order.pojo.ResultPojo;
+import com.zm.order.pojo.ResultModel;
 
 /**  
  * ClassName: OrderService <br/>  
@@ -29,7 +29,7 @@ public interface OrderService {
 	 * @throws Exception  
 	 * @since JDK 1.7  
 	 */
-	ResultPojo saveOrder(OrderInfo info) throws DataIntegrityViolationException, Exception;
+	ResultModel saveOrder(OrderInfo info) throws DataIntegrityViolationException, Exception;
 	
 	/**  
 	 * listUserOrder:查询用户订单. <br/>  
@@ -39,7 +39,7 @@ public interface OrderService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultPojo listUserOrder(Map<String,Integer> param);
+	ResultModel listUserOrder(Map<String,Integer> param);
 	
 	/**  
 	 * removeUserOrder:用户删除订单. <br/>  
@@ -49,7 +49,7 @@ public interface OrderService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultPojo removeUserOrder(Map<String,Object> param);
+	ResultModel removeUserOrder(Map<String,Object> param);
 	
 	/**  
 	 * confirmUserOrder:确认订单. <br/>  
@@ -59,5 +59,5 @@ public interface OrderService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultPojo confirmUserOrder(Map<String,Object> param);
+	ResultModel confirmUserOrder(Map<String,Object> param);
 }

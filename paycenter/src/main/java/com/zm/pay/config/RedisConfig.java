@@ -1,4 +1,4 @@
-package org.pay.config;
+package com.zm.pay.config;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;

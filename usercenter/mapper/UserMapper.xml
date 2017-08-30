@@ -2,6 +2,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zm.user.bussiness.dao.UserMapper">
 
+	<resultMap type="com.zm.user.pojo.Address" id="address">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="area" property="area" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="zipCode" property="zipCode" jdbcType="VARCHAR" />
+		<result column="receivePhone" property="receivePhone" jdbcType="VARCHAR" />
+		<result column="receiveName" property="receiveName" jdbcType="VARCHAR" />
+		<result column="is_default" property="setDefault" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap type="com.zm.user.pojo.UserInfo" id="userInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="account" property="account" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="band" property="band" jdbcType="INTEGER" />
+		<result column="is_phone_validate" property="phoneValidate" jdbcType="INTEGER" />
+		<result column="is_email_validate" property="emailValidate" jdbcType="INTEGER" />
+		<result column="register_shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="register_center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="last_login_time" property="lastLoginTime" jdbcType="VARCHAR" />
+		<result column="ipcity" property="ipCity" jdbcType="VARCHAR" />
+		<association property="userDetail" javaType="com.zm.user.pojo.UserDetail">
+			<id column="detail_id" property="id" jdbcType="INTEGER" />
+			<result column="id" property="userId" jdbcType="INTEGER" />
+			<result column="type" property="type" jdbcType="INTEGER" />
+			<result column="name" property="name" jdbcType="VARCHAR" />
+			<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+			<result column="company" property="company" jdbcType="VARCHAR" />
+			<result column="head_img" property="headImg" jdbcType="VARCHAR" />
+			<result column="certificates" property="certificates" jdbcType="INTEGER" />
+			<result column="idNum" property="idNum" jdbcType="VARCHAR" />
+			<result column="sex" property="sex" jdbcType="INTEGER" />
+		</association>
+	</resultMap>
+	
+	<select id="getUserInfo" parameterType="Object" resultMap="userInfo">
+		select u.id,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.register_shop_id,
+		u.register_center_id,u.last_login_time,u.ipcity,ud.id as detail_id,ud.type,ud.name,ud.nick_name,ud.company,
+		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join  user_detail ud on u.id = ud.user_id 
+		where u.id = #{userId}
+	</select>
+
+	<select id="listAddress" parameterType="Object" resultMap="address">
+		select * from address where user_id = #{userId, jdbcType = INTEGER}
+	</select>
 
 
 	<select id="userNameVerify" resultType="java.lang.Integer"
@@ -26,7 +75,8 @@
 	</insert>
 
 	<update id="updateUndefaultAddress" parameterType="Object">
-		update address set is_default = 0 where user_id =
+		update address
+		set is_default = 0 where user_id =
 		#{userId, jdbcType = INTEGER}
 	</update>
 
@@ -97,7 +147,7 @@
 	</insert>
 
 	<update id="updateUserDetail" parameterType="Object">
-		update user_detail 
+		update user_detail
 		<set>
 			<if test="nickName != null and nickName != 'null'">
 				nick_name = #{nickName},

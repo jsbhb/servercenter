@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.log.bussiness.service.LogService;
 import com.zm.log.constants.Constants;
 import com.zm.log.pojo.LogInfo;
-import com.zm.log.pojo.ResultPojo;
+import com.zm.log.pojo.ResultModel;
 
 /**
  * ClassName: LogController <br/>
@@ -34,9 +34,9 @@ public class LogController {
 	LogService logService;
 
 	@RequestMapping(value = "{version}/log", method = RequestMethod.POST)
-	public ResultPojo saveLog(@PathVariable("version") Double version, @RequestBody LogInfo info, HttpServletResponse res, HttpServletRequest req) {
+	public ResultModel saveLog(@PathVariable("version") Double version, @RequestBody LogInfo info, HttpServletResponse res, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -49,9 +49,9 @@ public class LogController {
 	}
 
 	@RequestMapping(value = "{version}/log", method = RequestMethod.GET)
-	public ResultPojo listLog(@PathVariable("version") Double version, HttpServletResponse res, HttpServletRequest req) {
+	public ResultModel listLog(@PathVariable("version") Double version, HttpServletResponse res, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -71,9 +71,9 @@ public class LogController {
 	}
 	
 	@RequestMapping(value = "{version}/log", method = RequestMethod.DELETE)
-	public ResultPojo removeLog(@PathVariable("version") Double version, HttpServletResponse res, HttpServletRequest req) {
+	public ResultModel removeLog(@PathVariable("version") Double version, HttpServletResponse res, HttpServletRequest req) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 

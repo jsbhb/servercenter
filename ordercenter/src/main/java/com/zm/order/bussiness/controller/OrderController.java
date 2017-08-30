@@ -22,7 +22,7 @@ import com.zm.order.constants.Constants;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
-import com.zm.order.pojo.ResultPojo;
+import com.zm.order.pojo.ResultModel;
 import com.zm.order.utils.JSONUtil;
 
 /**
@@ -42,10 +42,10 @@ public class OrderController {
 	OrderService orderService;
 	
 	@RequestMapping(value = "{version}/order", method = RequestMethod.POST)
-	public ResultPojo createOrder(@PathVariable("version") Double version, @RequestBody OrderInfo orderInfo,
+	public ResultModel createOrder(@PathVariable("version") Double version, @RequestBody OrderInfo orderInfo,
 			HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -70,10 +70,10 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/{userId}", method = RequestMethod.GET)
-	public ResultPojo listUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+	public ResultModel listUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			HttpServletRequest req, HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -106,10 +106,10 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/{userId}/{orderId}", method = RequestMethod.DELETE)
-	public ResultPojo removeUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+	public ResultModel removeUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
@@ -126,10 +126,10 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/confirm/{userId}/{orderId}", method = RequestMethod.PUT)
-	public ResultPojo confirmUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+	public ResultModel confirmUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 

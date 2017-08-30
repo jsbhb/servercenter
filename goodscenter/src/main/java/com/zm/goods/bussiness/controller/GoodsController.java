@@ -17,7 +17,7 @@ import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.PriceContrast;
-import com.zm.goods.pojo.ResultPojo;
+import com.zm.goods.pojo.ResultModel;
 
 /**
  * ClassName: GoodsController <br/>
@@ -36,10 +36,10 @@ public class GoodsController {
 	GoodsService goodsService;
 
 	@RequestMapping(value = "{version}/goods/big-trade", method = RequestMethod.GET)
-	public ResultPojo listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
+	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
@@ -62,10 +62,10 @@ public class GoodsController {
 	}
 	
 	@RequestMapping(value = "{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
-	public ResultPojo listPriceConstrast(@PathVariable("version") Double version, HttpServletRequest req,
+	public ResultModel listPriceConstrast(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
@@ -87,10 +87,10 @@ public class GoodsController {
 	}
 	
 	@RequestMapping(value = "{version}/goods/goodsSpecs/{itemId}", method = RequestMethod.GET)
-	public ResultPojo getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
+	public ResultModel getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
-		ResultPojo result = new ResultPojo();
+		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		

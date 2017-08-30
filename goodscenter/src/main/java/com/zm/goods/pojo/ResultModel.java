@@ -1,4 +1,4 @@
-package com.zm.thirdcenter.pojo;
+package com.zm.goods.pojo;
 
 
 /**  
@@ -10,7 +10,7 @@ package com.zm.thirdcenter.pojo;
  * @version   
  * @since JDK 1.7  
  */
-public class ResultPojo {
+public class ResultModel {
 
 	private String errorCode;
 	private String errorMsg;
