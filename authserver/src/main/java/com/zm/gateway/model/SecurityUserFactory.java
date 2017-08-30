@@ -22,20 +22,12 @@ public class SecurityUserFactory {
 	}
 
 	public static SecurityUserDetail create(UserInfo user) {
-		return new SecurityUserDetail(user.getUserId() + "", user.getUserName(), user.getPassword(), user.getEmail(),
+		return new SecurityUserDetail(user.getUserId() + "", user.getUserName(), "", user.getEmail(),
 				mapToGrantedAuthorities(user.getAuthorities()), user.getLastPasswordResetDate());
 	}
+	
 
 	private static List<GrantedAuthority> mapToGrantedAuthorities(List<String> authorities) {
-
-		// List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
-		//
-		// for(String authority:authorities){
-		// list.add(new SimpleGrantedAuthority(authority));
-		// }
-		//
-		// return list;
-
 		return authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());// java8代替了以上代码
 	}
 

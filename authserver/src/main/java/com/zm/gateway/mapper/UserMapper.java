@@ -9,37 +9,51 @@ import com.zm.gateway.model.UserInfo;
  */
 public interface UserMapper {
 
-   /**
-    * 
-    * getUserByName:根据用户名获取用户。 <br/>  
-    *  
-    * @author hebin  
-    * @param userName
-    * @return  
-    * @since JDK 1.7
-    */
-    public UserInfo getUserByName(String userName);
+	/**
+	 * 
+	 * getUserByName:根据用户名获取用户。 <br/>
+	 * 
+	 * @author hebin
+	 * @param userName
+	 * @return
+	 * @since JDK 1.7
+	 */
+	public UserInfo getUserByName(String userName);
 
-    /**
-     * 
-     * getUserByPhone:根据电话号码获取用户。 <br/>  
-     *  
-     * @author hebin  
-     * @param phone
-     * @return  
-     * @since JDK 1.7
-     */
+	/**
+	 * 
+	 * getUserByPhone:根据电话号码获取用户。 <br/>
+	 * 
+	 * @author hebin
+	 * @param phone
+	 * @return
+	 * @since JDK 1.7
+	 */
 	public UserInfo getUserByPhone(String phone);
 
 	/**
 	 * 
-	 * insert:插入新用户. <br/>  
+	 * insert:插入新用户. <br/>
+	 * 
+	 * @author hebin
+	 * @param userInfo
+	 * @return
+	 * @since JDK 1.7
+	 */
+	public void insert(UserInfo userInfo);
+
+	/**
+	 * 
+	 * getUserForLogin：登录校验. <br/>  
 	 *  
 	 * @author hebin  
-	 * @param userInfo
+	 * @param userName
+	 * @param phone
+	 * @param openId
+	 * @param password
 	 * @return  
 	 * @since JDK 1.7
 	 */
-	public UserInfo insert(UserInfo userInfo);
+	public UserInfo getUserForLogin(UserInfo userInfo);
 
 }

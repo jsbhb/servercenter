@@ -22,6 +22,8 @@ public class UserInfo {
 	private Integer lastUpdatedBy;
 	private Date lastPasswordResetDate;
 	private List<String> authorities;
+	private String token;
+	private String openId;
 
 	public String getUserName() {
 		return userName;
@@ -117,6 +119,22 @@ public class UserInfo {
 
 	public void setAuthorities(List<String> authorities) {
 		this.authorities = authorities;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getOpenId() {
+		return openId;
+	}
+
+	public void setOpenId(String openId) {
+		this.openId = openId;
 	}
 
 }
