@@ -34,10 +34,10 @@ public interface UserService {
 	 * getUserInfo:获取用户信息. <br/>  
 	 *  
 	 * @author wqy  
-	 * @param userId  
+	 * @param param  
 	 * @since JDK 1.7  
 	 */
-	UserInfo getUserInfo(Integer userId);
+	UserInfo getUserInfo(Map<String,Object> param);
 	
 	/**  
 	 * saveAddress:保存收货地址. <br/>  
@@ -123,5 +123,14 @@ public interface UserService {
 	 * @since JDK 1.7  
 	 */
 	void modifyPwd(Map<String,Object> param, String phone);
+	
+	/**  
+	 * getVipUser:判断是否会员. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param param  
+	 * @since JDK 1.7  
+	 */
+	boolean getVipUser(Map<String,Object> param);
 	
 }

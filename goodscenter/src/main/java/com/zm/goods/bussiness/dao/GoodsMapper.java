@@ -10,7 +10,7 @@ import com.zm.goods.pojo.PriceContrast;
 
 public interface GoodsMapper {
 
-	List<GoodsItem> listBigTradeGoods(Map<String,Object> param);
+	List<GoodsItem> listGoods(Map<String,Object> param);
 	
 	List<GoodsFile> listGoodsFile(Map<String,Object> param);
 	

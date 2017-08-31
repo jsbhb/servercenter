@@ -1,5 +1,7 @@
 package com.zm.order.bussiness.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -10,8 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
+import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.GoodsFeignClient;
+import com.zm.order.feignclient.PayFeignClient;
+import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.feignclient.model.OrderBussinessModel;
+import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.utils.CommonUtils;
 
@@ -31,9 +40,18 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	OrderMapper orderMapper;
+	
+	@Resource
+	GoodsFeignClient goodsFeignClient;
+	
+	@Resource
+	UserFeignClient userFeignClient;
+	
+	@Resource
+	PayFeignClient payFeignClient;
 
 	@Override
-	public ResultModel saveOrder(OrderInfo info) throws DataIntegrityViolationException, Exception{
+	public ResultModel saveOrder(OrderInfo info, Double version, String openId, String payType, String type) throws DataIntegrityViolationException, Exception{
 		ResultModel result = new ResultModel();
 		if (info == null) {
 			result.setErrorMsg("订单不能为空");
@@ -52,6 +70,45 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		String orderId = CommonUtils.getOrderId(info.getOrderDetail().getOrderFlag() + "");
+		
+		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+		OrderBussinessModel model = null;
+		StringBuffer detail = new StringBuffer();
+		for(OrderGoods goods : info.getOrderGoodsList()){
+			model = new OrderBussinessModel();
+			model.setOrderId(orderId);
+			model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
+			model.setItemId(goods.getItemId());
+			model.setQuantity(goods.getItemQuantity());
+			list.add(model);
+			detail.append(goods.getItemName()+"*"+goods.getItemQuantity()+";");
+		}
+		boolean vip = userFeignClient.getVipUser(version, info.getUserId(), info.getRegionalCenterId());
+		
+		//根据itemID和数量获得金额并扣减库存（除了自营仓需要扣库存，其他不需要）
+		if(Constants.OWN_SUPPLIER.equals(info.getSupplierId())){
+			result = goodsFeignClient.getPriceAndDelStock(version, list, true, vip);
+		} else {
+			result = goodsFeignClient.getPriceAndDelStock(version, list, false, vip);
+		}
+		
+		if(!result.isSuccess()){
+			return result;
+		}
+		
+		String totalAmount = ((Double)result.getObj() * 100) + "";
+		
+		PayModel payModel = new PayModel();
+		payModel.setBody("中国供销-购物订单");
+		payModel.setOrderId(orderId);
+		payModel.setTotalAmount(totalAmount);
+		payModel.setDetail(detail.toString().substring(0, detail.toString().length()-1));
+		
+		if(Constants.WX_PAY.equals(payType)){
+			Map<String,String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(info.getRegionalCenterId()), type, payModel);
+			result.setObj(paymap);
+		}
+		
 		info.setOrderId(orderId);
 		info.getOrderDetail().setOrderId(orderId);
 		
@@ -64,14 +121,19 @@ public class OrderServiceImpl implements OrderService {
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
 
+		
 		result.setSuccess(true);
 		return result;
 
 	}
 
 	@Override
-	public ResultModel listUserOrder(Map<String, Integer> param) {
+	public ResultModel listUserOrder(Map<String, Object> param, Pagination pagination) {
 		ResultModel result = new ResultModel();
+		if(pagination != null){
+			pagination.init();
+			param.put("pagination", pagination);
+		}
 		
 		result.setObj(orderMapper.listOrderByUser(param));
 		result.setSuccess(true);
@@ -97,5 +159,22 @@ public class OrderServiceImpl implements OrderService {
 		
 		result.setSuccess(true);
 		return result;
+	}
+
+	@Override
+	public ResultModel updateOrderStatusByOrderId(Map<String, Object> param) {
+		
+		ResultModel result = new ResultModel();
+		
+		orderMapper.updateOrderStatusByOrderId(param);
+		
+		result.setSuccess(true);
+		return result;
+	}
+
+	@Override
+	public Integer getClientIdByOrderId(String orderId) {
+		
+		return orderMapper.getClientIdByOrderId(orderId);
 	}
 }

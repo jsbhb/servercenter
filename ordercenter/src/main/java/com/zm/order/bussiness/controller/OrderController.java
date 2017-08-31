@@ -22,6 +22,7 @@ import com.zm.order.constants.Constants;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.utils.JSONUtil;
 
@@ -40,19 +41,29 @@ public class OrderController {
 
 	@Resource
 	OrderService orderService;
-	
+
 	@RequestMapping(value = "{version}/order", method = RequestMethod.POST)
 	public ResultModel createOrder(@PathVariable("version") Double version, @RequestBody OrderInfo orderInfo,
-			HttpServletResponse res) {
+			HttpServletResponse res, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+		
+		String payType = req.getParameter("payType");
+		String type = req.getParameter("type");
+		String openId = req.getParameter("openId");
+		
+		if(payType == null || type == null){
+			result.setSuccess(false);
+			result.setErrorMsg("参数不全");
+			return result;
+		}
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			try {
-				result = orderService.saveOrder(orderInfo);
+				result = orderService.saveOrder(orderInfo, version, openId, payType, type);
 			} catch (DataIntegrityViolationException e) {
 				e.printStackTrace();
 				result.setSuccess(false);
@@ -71,17 +82,17 @@ public class OrderController {
 
 	@RequestMapping(value = "{version}/order/{userId}", method = RequestMethod.GET)
 	public ResultModel listUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
-			HttpServletRequest req, HttpServletResponse res) {
+			Pagination pagination, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		Map<String, Integer> param = new HashMap<String, Integer>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		try {
 			String orderFlag = req.getParameter("orderFlag");
 			String status = req.getParameter("status");
-			if(StringUtils.isEmpty(orderFlag) || userId == null){
+			if (StringUtils.isEmpty(orderFlag) || userId == null) {
 				result.setSuccess(false);
 				result.setErrorMsg("参数不全");
 				return result;
@@ -99,7 +110,7 @@ public class OrderController {
 		}
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = orderService.listUserOrder(param);
+			result = orderService.listUserOrder(param, pagination);
 		}
 
 		return result;
@@ -141,8 +152,40 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.confirmUserOrder(param);
 		}
- 
+
 		return result;
+	}
+
+	@RequestMapping(value = "{version}/order/status/{orderId}", method = RequestMethod.PUT)
+	public ResultModel updateOrderStatusByOrderId(@PathVariable("version") Double version, Integer status,
+			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("status", status);
+		param.put("orderId", orderId);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			result = orderService.updateOrderStatusByOrderId(param);
+		}
+
+		return result;
+	}
+
+	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
+	public Integer getClientIdByOrderId(@PathVariable("orderId") String orderId,
+			@PathVariable("version") Double version) {
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Integer clientId = orderService.getClientIdByOrderId(orderId);
+			
+			return clientId;
+		}
+		return null;
 	}
 
 	public static void main(String[] args) {
@@ -171,8 +214,8 @@ public class OrderController {
 		list.add(goods);
 		info.setOrderDetail(detail);
 		info.setOrderGoodsList(list);
-		
+
 		System.out.println(JSONUtil.toJson(info));
 	}
-	
+
 }

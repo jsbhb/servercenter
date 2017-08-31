@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 
 /**  
@@ -29,7 +30,7 @@ public interface OrderService {
 	 * @throws Exception  
 	 * @since JDK 1.7  
 	 */
-	ResultModel saveOrder(OrderInfo info) throws DataIntegrityViolationException, Exception;
+	ResultModel saveOrder(OrderInfo info, Double version, String openId, String payType, String type) throws DataIntegrityViolationException, Exception;
 	
 	/**  
 	 * listUserOrder:查询用户订单. <br/>  
@@ -39,7 +40,7 @@ public interface OrderService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultModel listUserOrder(Map<String,Integer> param);
+	ResultModel listUserOrder(Map<String,Object> param, Pagination pagination);
 	
 	/**  
 	 * removeUserOrder:用户删除订单. <br/>  
@@ -60,4 +61,16 @@ public interface OrderService {
 	 * @since JDK 1.7  
 	 */
 	ResultModel confirmUserOrder(Map<String,Object> param);
+	
+	/**  
+	 * updateOrder:更新订单状态. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param orderId
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	ResultModel updateOrderStatusByOrderId(Map<String,Object> param);
+	
+	Integer getClientIdByOrderId(String orderId);
 }

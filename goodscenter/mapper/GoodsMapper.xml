@@ -15,6 +15,7 @@
 		<result column="is_hot" property="hot" jdbcType="INTEGER" />
 		<result column="is_good" property="good" jdbcType="INTEGER" />
 		<result column="is_choice" property="choice" jdbcType="INTEGER" />
+		<result column="detail_path" property="detailPath" jdbcType="VARCHAR" />
 		<result column="index_status" property="indexStatus" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -47,6 +48,7 @@
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
 		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
 		<result column="info" property="info" jdbcType="VARCHAR" />
+		<result column="qpqty" property="stock" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
@@ -56,6 +58,7 @@
 			<result column="min" property="min" jdbcType="INTEGER" />
 			<result column="max" property="max" jdbcType="INTEGER" />
 			<result column="price" property="price" jdbcType="NUMERIC" />
+			<result column="delivery_place" property="deliveryPlace" jdbcType="VARCHAR" />
 			<result column="vip_price" property="vipPrice" jdbcType="NUMERIC" />
 			<result column="discount" property="discount" jdbcType="NUMERIC" />
 			<result column="sub_create_time" property="createTime" jdbcType="VARCHAR" />
@@ -77,7 +80,7 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 
-	<select id="listBigTradeGoods" parameterType="Object" resultMap="goodsItem">
+	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id as goodsId, gb.id,gi.goods_name as customGoodsName,
 		gi.status,gb.goods_name,
 		gb.brand_id,gb.brand,gb.origin from goods_item
@@ -92,6 +95,9 @@
 		<if test="goodsId != null and goodsId != ''">
 			and gi.id = #{goodsId, jdbcType = INTEGER}
 		</if>
+		<if test="goodsId == null or goodsId == ''">
+			limit #{pagination.startRow} , #{pagination.numPerPage}
+		</if>
 	</select>
 
 	<select id="listGoodsFile" parameterType="Object" resultMap="goodsFile">
@@ -104,9 +110,10 @@
 
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select gs.id,gs.item_id,gs.goods_id as goodsId,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time as sub_create_time,
+		gs.opt,gp.id as price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time as sub_create_time,stock.qpqty,
+		gp.delivery_place,
 		gp.update_time as sub_update_time,gp.opt as sub_opt from goods_specs gs left join goods_price gp on 
-		gs.item_id = gp.item_id where gs.goods_id in 
+		gs.item_id = gp.item_id left join goods_stock stock on gs.item_id = stock.item_id where gs.goods_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item,jdbcType = INTEGER}
 		</foreach>
@@ -124,9 +131,10 @@
 	
 	<select id="getGoodsSpecs"  parameterType="Object" resultMap="goodsSpecs">
 		select gs.id,gs.info,gs.item_id,gs.goods_id as goodsId,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time as sub_create_time,
+		gs.opt,gp.id as price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time as sub_create_time,stock.qpqty,
+		gp.delivery_place,
 		gp.update_time as sub_update_time,gp.opt as sub_opt from goods_specs gs left join goods_price gp on 
-		gs.item_id = gp.item_id where gs.item_id = #{item_id} 
+		gs.item_id = gp.item_id left join goods_stock stock on gs.item_id = stock.item_id where gs.item_id = #{item_id} 
 	</select>
 
 </mapper>

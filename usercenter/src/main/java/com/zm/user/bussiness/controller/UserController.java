@@ -82,17 +82,22 @@ public class UserController {
 		result.setSuccess(flag);
 		return result;
 	}
-	
-	@RequestMapping(value = "{version}/user/{userId}", method = RequestMethod.GET)
+
+	@RequestMapping(value = "{version}/user/{centerId}/{userId}", method = RequestMethod.GET)
 	public ResultModel getUserInfo(@PathVariable("version") Double version, HttpServletResponse res,
-			@PathVariable("userId") Integer userId, HttpServletRequest req) {
+			@PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			UserInfo info = userService.getUserInfo(userId);
+			Map<String,Object> param = new HashMap<String, Object>();
+			
+			param.put("userId", userId);
+			param.put("centerId", centerId);
+			UserInfo info = userService.getUserInfo(param);
 			result.setSuccess(true);
 			result.setObj(info);
 		}
@@ -318,6 +323,25 @@ public class UserController {
 		}
 
 		return result;
+	}
+	
+	@RequestMapping(value = "{version}/user/vip/{centerId}/{userId}", method = RequestMethod.GET)
+	public boolean getVipUser(@PathVariable("version") Double version, HttpServletResponse res,
+			@PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			HttpServletRequest req) {
+
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String,Object> param = new HashMap<String, Object>();
+			
+			param.put("userId", userId);
+			param.put("centerId", centerId);
+			return userService.getVipUser(param);
+		}
+
+		return false;
 	}
 
 }

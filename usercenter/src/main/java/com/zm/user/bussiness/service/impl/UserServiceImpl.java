@@ -140,9 +140,19 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public UserInfo getUserInfo(Integer userId) {
+	public UserInfo getUserInfo(Map<String,Object> param) {
 		
-		return userMapper.getUserInfo(userId);
+		UserInfo info = userMapper.getUserInfo((Integer)param.get("userId"));
+		
+		UserInfo vipUser = userMapper.getVipUser(param);
+		
+		if(vipUser != null){
+			info.setVipLevel(vipUser.getVipLevel());
+			info.setDuration(vipUser.getDuration());
+			info.setVipTime(vipUser.getVipTime());
+		}
+		
+		return info;
 	}
 	
 	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
@@ -157,6 +167,17 @@ public class UserServiceImpl implements UserService{
 		info.setOpt(opt);
 
 		return info;
+	}
+
+	@Override
+	public boolean getVipUser(Map<String, Object> param) {
+		
+		UserInfo vipUser = userMapper.getVipUser(param);
+		if(vipUser == null){
+			return false;
+		}
+		
+		return true;
 	}
 
 }

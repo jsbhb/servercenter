@@ -37,7 +37,17 @@ public class GoodsSpecs {
 	
 	private Double maxPrice;
 	
+	private Integer stock;
+	
 	private List<GoodsPrice> priceList;
+
+	public Integer getStock() {
+		return stock;
+	}
+
+	public void setStock(Integer stock) {
+		this.stock = stock;
+	}
 
 	public Integer getId() {
 		return id;
@@ -148,7 +158,7 @@ public class GoodsSpecs {
 		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + ", itemCode=" + itemCode
 				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
 				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
-				+ ", priceList=" + priceList + "]";
+				+ ", stock=" + stock + ", priceList=" + priceList + "]";
 	}
 	
 }

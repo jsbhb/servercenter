@@ -24,9 +24,13 @@ public interface OrderMapper {
 	
 	void saveOrderGoods(List<OrderGoods> goodsList);
 	
-	List<OrderInfo> listOrderByUser(Map<String,Integer> param);
+	List<OrderInfo> listOrderByUser(Map<String,Object> param);
 	
 	void removeUserOrder(Map<String,Object> param);
 	
 	void confirmUserOrder(Map<String,Object> param);
+	
+	void updateOrderStatusByOrderId(Map<String,Object> param);
+	
+	int getClientIdByOrderId(String orderId);
 }

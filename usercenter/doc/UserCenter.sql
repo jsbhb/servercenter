@@ -1,11 +1,11 @@
-drop SCHEMA if exists  `zm_user`;
-CREATE SCHEMA `zm_user` ;
+drop SCHEMA if exists  `usercenter`;
+CREATE SCHEMA `usercenter` ;
 
-use zm_user;
+use usercenter;
 
 drop table if exists  `user`;
 
-CREATE TABLE `zm_user`.`user` (
+CREATE TABLE `usercenter`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
@@ -21,7 +21,7 @@ CREATE TABLE `zm_user`.`user` (
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '用户状态',
   `register_center_id` INT UNSIGNED NULL COMMENT '注册区域中心ID',
   `register_shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
-  `create_time` DATETIME NULL COMMENT '注册时间',
+  `create_time` DATETIME NULL COMMENT '注册时间', 
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` DATETIME NULL COMMENT '操作人',
   `last_login_time` DATETIME NULL COMMENT '最后登录时间',
@@ -43,21 +43,37 @@ CREATE TABLE `zm_user`.`user` (
   UNIQUE INDEX `sina_blog_UNIQUE` (`sina_blog` ASC)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '用户表';
 
+drop table if exists  `user_vip`;
+
+CREATE TABLE `usercenter`.`user_vip` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
+  `center_id` INT UNSIGNED NOT NULL COMMENT '那个区域中心的会员',
+  `duration` TINYINT UNSIGNED NOT NULL COMMENT '持续时间（年）',
+  `vip_level` TINYINT UNSIGNED NOT NULL COMMENT 'vip等级',
+  `status` TINYINT UNSIGNED NOT NULL COMMENT '是否有效0：否；1：是',
+  `create_time` DATETIME NOT NULL COMMENT '成为vip时间',
+  PRIMARY KEY (`id`),
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_center_id` (`center_id`),
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '用户会员表';
+
 
 drop table if exists  `user_detail`;
 
-CREATE TABLE `zm_user`.`user_detail` (
+CREATE TABLE `usercenter`.`user_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `type` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户类型',
-  `name` VARCHAR(50) NULL COMMENT '真实姓名',
-  `nick_name` VARCHAR(50) NULL COMMENT '用户昵称',
+  `type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
+  `name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
+  `nick_name` VARCHAR(50) NOT NULL COMMENT '用户昵称',
   `head_img` VARCHAR(200) NULL COMMENT '头像地址',
   `company` VARCHAR(200) NULL COMMENT '公司',
   `location` VARCHAR(200) NULL COMMENT '所在地',
   `certificates` TINYINT UNSIGNED NULL COMMENT '证件类型',
   `idnum` VARCHAR(50) NULL COMMENT '证件号码',
-  `sex` TINYINT UNSIGNED NULL COMMENT '用户性别',
+  `sex` TINYINT UNSIGNED NOT NULL COMMENT '用户性别',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `optName` DATETIME NULL COMMENT '操作人',
@@ -69,17 +85,17 @@ COMMENT = '用户明细表';
 
 drop table if exists  `address`;
 
-CREATE TABLE `zm_user`.`address` (
+CREATE TABLE `usercenter`.`address` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
-  `province` VARCHAR(20) NOT NULL COMMENT '省',
+  `provice` VARCHAR(20) NOT NULL COMMENT '省',
   `city` VARCHAR(20) NOT NULL COMMENT '市',
   `area` VARCHAR(20) NOT NULL COMMENT '区',
   `address` VARCHAR(200) NOT NULL COMMENT '地址',
   `zipcode` VARCHAR(10) NOT NULL COMMENT '邮编',
   `receive_phone` VARCHAR(30) NOT NULL COMMENT '手机',
   `receive_name` VARCHAR(50) NOT NULL COMMENT '收货人',
-  `is_default` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '默认地址',
+  `is_default` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '默认地址',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `optName` DATETIME NULL COMMENT '操作人',
@@ -90,7 +106,7 @@ COMMENT = '收货地址表';
 
 drop table if exists  `collection`;
 
-CREATE TABLE `zm_user`.`collection` (
+CREATE TABLE `usercenter`.`collection` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `type` TINYINT UNSIGNED NOT NULL COMMENT '收藏类型',
@@ -104,10 +120,57 @@ CREATE TABLE `zm_user`.`collection` (
   INDEX `collection_user_id` (`user_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '用户收藏表';
 
+drop table if exists  `regional_center`;
+
+CREATE TABLE `usercenter`.`regional_center` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `platform_id` INT UNSIGNED NOT NULL COMMENT '平台ID',
+  `type` TINYINT UNSIGNED NOT NULL COMMENT '类型',
+  `name` VARCHAR(50) NOT NULL COMMENT '名称',
+  `attribute` VARCHAR(200) NULL COMMENT '备用字段',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `optName` DATETIME NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_platform_id` (`platform_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '区域中心表';
+
+drop table if exists  `regional_shop`;
+
+CREATE TABLE `usercenter`.`regional_shop` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `regional_id` INT UNSIGNED NOT NULL COMMENT '区域中心ID',
+  `type` TINYINT UNSIGNED NOT NULL COMMENT '类型',
+  `name` VARCHAR(50) NOT NULL COMMENT '名称',
+  `attribute` VARCHAR(200) NULL COMMENT '备用字段',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `optName` DATETIME NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_regional_id` (`regional_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '区域中心子店铺表';
+
+
+drop table if exists  `vip_price`;
+
+CREATE TABLE `usercenter`.`vip_price` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `vip_level` TINYINT UNSIGNED NOT NULL COMMENT 'vip等级',
+  `center_id` INT UNSIGNED NOT NULL COMMENT '区域中心',
+  `duration` TINYINT UNSIGNED NOT NULL COMMENT '持续时间（年）',
+  `price` DECIMAL(10,2) NOT NULL COMMENT '价格',
+  `attribute` VARCHAR(200) NULL COMMENT '备用字段',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `optName` DATETIME NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_vip_level` (`vip_level`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '会员价格表';
+
 
 drop table if exists  `user_api`;
 
-CREATE TABLE `zm_user`.`user_api` (
+CREATE TABLE `usercenter`.`user_api` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `api_url` VARCHAR(100) NOT NULL COMMENT 'api地址',
   `api_name` VARCHAR(50) NOT NULL COMMENT 'api名称',
@@ -120,7 +183,7 @@ COMMENT = '服务api表';
 
 drop table if exists  `user_search_parameter`;
 
-CREATE TABLE `zm_user`.`user_search_parameter` (
+CREATE TABLE `usercenter`.`user_search_parameter` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `key` VARCHAR(100) NOT NULL COMMENT '字段名',
   `value` VARCHAR(500) NOT NULL COMMENT '值',

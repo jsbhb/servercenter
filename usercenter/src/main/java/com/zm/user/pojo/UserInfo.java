@@ -49,11 +49,25 @@ public class UserInfo {
 	
 	private String createTime;
 	
+	private String vipTime;
+	
+	private Integer duration;
+	
 	private String updateTime;
 	
 	private String opt;
 	
 	private UserDetail userDetail;
+	
+	private Integer vipLevel;
+
+	public Integer getVipLevel() {
+		return vipLevel;
+	}
+
+	public void setVipLevel(Integer vipLevel) {
+		this.vipLevel = vipLevel;
+	}
 
 	public Integer getId() {
 		return id;
@@ -119,11 +133,27 @@ public class UserInfo {
 		this.pwd = pwd;
 	}
 
+	public String getVipTime() {
+		return vipTime;
+	}
+
+	public void setVipTime(String vipTime) {
+		this.vipTime = vipTime;
+	}
+
+	public Integer getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
+
 	public Integer getParentId() {
 		return parentId;
 	}
 
-	public void setParent_id(Integer parentId) {
+	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
 	}
 
@@ -238,7 +268,8 @@ public class UserInfo {
 				+ ", band=" + band + ", phoneValidate=" + phoneValidate + ", emailValidate=" + emailValidate
 				+ ", status=" + status + ", centerId=" + centerId + ", shopId=" + shopId + ", lastLoginTime="
 				+ lastLoginTime + ", lastLoginIP=" + lastLoginIP + ", ipCity=" + ipCity + ", createTime=" + createTime
-				+ ", updateTime=" + updateTime + ", opt=" + opt + ", userDetail=" + userDetail + "]";
+				+ ", vipTime=" + vipTime + ", duration=" + duration + ", updateTime=" + updateTime + ", opt=" + opt
+				+ ", userDetail=" + userDetail + ", vipLevel=" + vipLevel + "]";
 	}
 	
 }

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.OrderBussinessModel;
+import com.zm.goods.pojo.Pagination;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
 
@@ -35,9 +38,9 @@ public class GoodsController {
 	@Resource
 	GoodsService goodsService;
 
-	@RequestMapping(value = "{version}/goods/big-trade", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/goods", method = RequestMethod.GET)
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res) {
+			Pagination pagination, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
@@ -47,12 +50,20 @@ public class GoodsController {
 		String categoryId = req.getParameter("categoryId");
 		String goodsId = req.getParameter("goodsId");
 		
+		if(type == null){
+			result.setSuccess(false);
+			result.setErrorMsg("参数不全");
+			return result;
+		}
+		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String,Object> param = new HashMap<String,Object>();
 			param.put("type", type);
 			param.put("categoryId", categoryId);
 			param.put("goodsId", goodsId);
-			List<GoodsItem> goodsList = goodsService.listBigTradeGoods(param);
+			pagination.init();
+			param.put("pagination", pagination);
+			List<GoodsItem> goodsList = goodsService.listGoods(param);
 			
 			result.setSuccess(true);
 			result.setObj(goodsList);
@@ -99,6 +110,22 @@ public class GoodsController {
 			
 			result.setSuccess(true);
 			result.setObj(resultMap);
+		}
+		
+		return result;
+	}
+	
+	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
+	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			result = goodsService.getPriceAndDelStock(list, delStock, vip);
+			
 		}
 		
 		return result;

@@ -32,4 +32,6 @@ public interface UserMapper {
 	List<Address> listAddress(Integer userId);
 	
 	UserInfo getUserInfo(Integer userId);
+	
+	UserInfo getVipUser(Map<String,Object> param);
 }

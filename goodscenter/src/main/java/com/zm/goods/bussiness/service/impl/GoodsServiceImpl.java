@@ -16,7 +16,9 @@ import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsSpecs;
+import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
+import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.utils.CommonUtils;
 
 @Service
@@ -31,9 +33,9 @@ public class GoodsServiceImpl implements GoodsService {
 	GoodsMapper goodsMapper;
 
 	@Override
-	public List<GoodsItem> listBigTradeGoods(Map<String, Object> param) {
+	public List<GoodsItem> listGoods(Map<String, Object> param) {
 
-		List<GoodsItem> goodsList = goodsMapper.listBigTradeGoods(param);
+		List<GoodsItem> goodsList = goodsMapper.listGoods(param);
 
 		List<Integer> idList = new ArrayList<Integer>();
 
@@ -76,7 +78,7 @@ public class GoodsServiceImpl implements GoodsService {
 	public Map<String, Object> tradeGoodsDetail(String itemId) {
 		GoodsSpecs specs = goodsMapper.getGoodsSpecs(itemId);
 		getPriceInterval(specs);
-		
+
 		List<Integer> idList = new ArrayList<Integer>();
 		idList.add(specs.getGoodsId());
 		Map<String, Object> parameter = new HashMap<String, Object>();
@@ -90,6 +92,47 @@ public class GoodsServiceImpl implements GoodsService {
 		result.put("specs", specs);
 		result.put("pic", fileList);
 
+		return result;
+	}
+
+	@Override
+	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip) {
+
+		ResultModel result = new ResultModel();
+
+		GoodsSpecs specs = null;
+		Double totalAmount = 0.0;
+		for (OrderBussinessModel model : list) {
+			specs = goodsMapper.getGoodsSpecs(model.getItemId());
+			for (GoodsPrice price : specs.getPriceList()) {
+				boolean flag = model.getQuantity() > price.getMin()
+						&& (model.getQuantity() < price.getMax() || price.getMax() == null);
+				if (flag) {
+					if (model.getDeliveryPlace() != null) {
+						if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
+							totalAmount += model.getQuantity() * (vip ? price.getVipPrice() : price.getPrice());
+						}
+					} else {
+						totalAmount += model.getQuantity() * (vip ? price.getVipPrice() : price.getPrice());
+					}
+				}
+			}
+		}
+
+		if (delStock) {
+			// TODO 用线程池对每个itemID加锁？
+			synchronized (totalAmount) {
+				for (OrderBussinessModel model : list) {
+
+				}
+			}
+			result.setSuccess(false);
+			result.setErrorMsg("库存不足");
+			return result;
+		}
+
+		result.setSuccess(true);
+		result.setObj(totalAmount);
 		return result;
 	}
 

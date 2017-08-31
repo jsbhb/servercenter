@@ -35,12 +35,13 @@
 		from order_base o left join order_detail od on o.order_id =
 		od.order_id left join order_goods og on o.order_id = og.order_id
 		where o.user_id = #{userId,jdbcType = INTEGER} and od.order_flag =
-		#{orderFlag,jdbcType = INTEGER}
+		#{orderFlag,jdbcType = INTEGER} and is_del = 0
 		<if test="status != null and status != ''">
 			and o.status = #{status,jdbcType = INTEGER}
 		</if>
-		<if test="status == null or status == ''">
-			and o.status != 8
+		order by o.create_time desc
+		<if test="pagination != null">
+			limit #{pagination.startRow},#{pagination.numPerPage}
 		</if>
 	</select>
 
@@ -76,13 +77,22 @@
 
 	<update id="removeUserOrder" parameterType="Object">
 		update order_base set
-		status = 8 where order_id = #{orderId,jdbcType = VARCHAR} and user_id
+		is_del = 1 where order_id = #{orderId,jdbcType = VARCHAR} and user_id
 		= #{userId,jdbcType = INTEGER}
 	</update>
 
 	<update id="confirmUserOrder" parameterType="Object">
 		update order_base
 		set status = 6 where order_id = #{orderId,jdbcType = VARCHAR} and
-		user_id = #{userId,jdbcType = INTEGER}
+		user_id = #{userId,jdbcType = INTEGER} 
 	</update>
+	
+	<update id="updateOrderStatusByOrderId" parameterType="Object">
+		update order_base
+		set status = #{status,jdbcType = INTEGER} where order_id = #{orderId,jdbcType = VARCHAR} 
+	</update>
+	
+	<select id="getClientIdByOrderId" parameterType="Object" resultType="java.lang.Integer">
+		select regional_center_id from order_base where order_id = #{orderId}
+	</select>
 </mapper>

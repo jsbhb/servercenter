@@ -41,11 +41,22 @@
 		</association>
 	</resultMap>
 	
+	<resultMap type="com.zm.user.pojo.UserInfo" id="vipUser">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="create_time" property="vipTime" jdbcType="VARCHAR" />
+		<result column="vip_level" property="vipLevel" jdbcType="INTEGER" />
+		<result column="duration" property="duration" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="getVipUser" parameterType="Object" resultMap="vipUser">
+		select vip_level,duration,create_time from user_vip where user_id = #{userId} and center_id = #{centerId} and status = 1
+	</select>
+	
 	<select id="getUserInfo" parameterType="Object" resultMap="userInfo">
 		select u.id,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.register_shop_id,
 		u.register_center_id,u.last_login_time,u.ipcity,ud.id as detail_id,ud.type,ud.name,ud.nick_name,ud.company,
 		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join  user_detail ud on u.id = ud.user_id 
-		where u.id = #{userId}
+		where u.id = #{userId} 
 	</select>
 
 	<select id="listAddress" parameterType="Object" resultMap="address">

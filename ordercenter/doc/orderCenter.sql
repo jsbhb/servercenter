@@ -14,7 +14,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `combination_id` CHAR(20) NULL COMMENT '订单拆分后的总ID',
   `user_id` INT UNSIGNED NOT NULL,
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
-  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单；8：删除',
+  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单；',
   `regional_center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
   `supplier_id` INT UNSIGNED NULL,
@@ -26,6 +26,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
+  `is_del` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_orderId` (`order_id` ASC),
   INDEX `idx_orderId` (`order_id` ASC),
@@ -36,6 +37,7 @@ CREATE TABLE `zm_order`.`order_base` (
   INDEX `idx_shopId` (`shop_id` ASC),
   INDEX `idx_supplierId` (`supplier_id` ASC),
   INDEX `idx_createTime` (`create_time` ASC),
+  INDEX `idx_is_del` (`id_del` ASC),
   INDEX `idx_expressId` (`express_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单基本信息';

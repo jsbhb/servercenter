@@ -16,11 +16,21 @@ public class GoodsPrice {
 	
 	private Double discount;
 	
+	private String deliveryPlace;
+	
 	private String createTime;
 	
 	private String updateTime;
 	
 	private String opt;
+
+	public String getDeliveryPlace() {
+		return deliveryPlace;
+	}
+
+	public void setDeliveryPlace(String deliveryPlace) {
+		this.deliveryPlace = deliveryPlace;
+	}
 
 	public Integer getId() {
 		return id;
@@ -105,8 +115,8 @@ public class GoodsPrice {
 	@Override
 	public String toString() {
 		return "GoodsPrice [id=" + id + ", itemId=" + itemId + ", min=" + min + ", max=" + max + ", price=" + price
-				+ ", vipPrice=" + vipPrice + ", discount=" + discount + ", createTime=" + createTime + ", updateTime="
-				+ updateTime + ", opt=" + opt + "]";
+				+ ", vipPrice=" + vipPrice + ", discount=" + discount + ", deliveryPlace=" + deliveryPlace
+				+ ", createTime=" + createTime + ", updateTime=" + updateTime + ", opt=" + opt + "]";
 	}
 	
 }
