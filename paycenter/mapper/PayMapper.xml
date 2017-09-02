@@ -13,7 +13,7 @@
 			jdbcType="VARCHAR" />
 	</resultMap>
 
-	<resultMap type="com.zm.pay.pojo.WeixinPayConfig" id="aliconfig">
+	<resultMap type="com.zm.pay.pojo.WeixinPayConfig" id="wxconfig">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="client_id" property="centerId" jdbcType="INTEGER" />
 		<result column="cert_path" property="certPath" jdbcType="VARCHAR" />
@@ -29,7 +29,7 @@
 		alipay_config;
 	</select>
 
-	<select id="listWeixinPayConfig" resultType="com.zm.pay.pojo.WeixinPayConfig">
+	<select id="listWeixinPayConfig" resultMap="wxconfig">
 		select * from
 		wxpay_config;
 	</select>
