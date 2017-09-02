@@ -62,5 +62,5 @@ public interface GoodsService {
 	 */
 	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip);
 	
-	Map<String, Object> listGoodsSpecs(List<Integer> list);
+	Map<String, Object> listGoodsSpecs(List<String> list);
 }

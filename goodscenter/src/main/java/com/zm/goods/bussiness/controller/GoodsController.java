@@ -117,7 +117,7 @@ public class GoodsController {
 	
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.POST)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res,@RequestBody List<Integer> list) {
+			HttpServletResponse res,@RequestBody List<String> list) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求

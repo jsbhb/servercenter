@@ -133,6 +133,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `uk_shoppingcart` (`user_id`,`item_id`,`center_id` ASC),
   INDEX `idx_center_id` (`center_id` ASC),
   INDEX `idx_creati_time` (`creati_time` ASC),
   INDEX `idx_userId` (`user_id` ASC)

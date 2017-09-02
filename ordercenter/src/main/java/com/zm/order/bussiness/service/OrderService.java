@@ -1,5 +1,6 @@
 package com.zm.order.bussiness.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -77,4 +78,5 @@ public interface OrderService {
 	
 	void saveShoppingCart(ShoppingCart cart);
 	
+	List<ShoppingCart> listShoppingCart(Map<String,Object> param);
 }

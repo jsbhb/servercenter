@@ -20,5 +20,5 @@ public interface GoodsMapper {
 	
 	GoodsSpecs getGoodsSpecs(String itemId);
 	
-	List<GoodsSpecs> listGoodsSpecsByItemId(List<Integer> list);
+	List<GoodsSpecs> listGoodsSpecsByItemId(List<String> list);
 }

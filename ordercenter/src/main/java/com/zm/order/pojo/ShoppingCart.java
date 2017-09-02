@@ -1,5 +1,7 @@
 package com.zm.order.pojo;
 
+import com.zm.order.feignclient.model.GoodsSpecs;
+
 public class ShoppingCart {
 
 	private Integer id;
@@ -18,6 +20,26 @@ public class ShoppingCart {
 	
 	private String updateTime;
 	
+	private GoodsSpecs goodsSpecs;
+	
+	private String picPath;
+	
+	public GoodsSpecs getGoodsSpecs() {
+		return goodsSpecs;
+	}
+
+	public void setGoodsSpecs(GoodsSpecs goodsSpecs) {
+		this.goodsSpecs = goodsSpecs;
+	}
+
+	public String getPicPath() {
+		return picPath;
+	}
+
+	public void setPicPath(String picPath) {
+		this.picPath = picPath;
+	}
+
 	public String getGoodsName() {
 		return goodsName;
 	}

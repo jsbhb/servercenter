@@ -97,7 +97,7 @@ public class GoodsServiceImpl implements GoodsService {
 	
 	
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<Integer> list) {
+	public Map<String, Object> listGoodsSpecs(List<String> list) {
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(list);
 
 		List<Integer> idList = new ArrayList<Integer>();

@@ -176,7 +176,7 @@
 		stock.item_id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
-			#{item,jdbcType = INTEGER}
+			#{item,jdbcType = VARCHAR}
 		</foreach>
 	</select>
 
