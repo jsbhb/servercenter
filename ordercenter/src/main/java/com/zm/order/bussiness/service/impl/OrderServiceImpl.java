@@ -16,6 +16,8 @@ import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.feignclient.model.GoodsFile;
+import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.pojo.OrderGoods;
@@ -183,5 +185,46 @@ public class OrderServiceImpl implements OrderService {
 	public void saveShoppingCart(ShoppingCart cart) {
 		
 		orderMapper.saveShoppingCart(cart);
+	}
+
+	@Override
+	public List<ShoppingCart> listShoppingCart(Map<String, Object> param) {
+
+		List<ShoppingCart> list = orderMapper.listShoppingCart(param);
+		
+		List<String> itemIdList = new ArrayList<String>();
+		for(ShoppingCart model : list){
+			itemIdList.add(model.getItemId());
+		}
+		
+		ResultModel result = goodsFeignClient.listGoodsSpecs(1.0, itemIdList);
+		if(result.isSuccess()){
+			Map<String,Object> resultMap = (Map<String, Object>) result.getObj();
+			List<GoodsSpecs> specsList = (List<GoodsSpecs>) resultMap.get("specsList");
+			List<GoodsFile> fileList = (List<GoodsFile>) resultMap.get("pic");
+			
+			for(ShoppingCart model : list){
+				for(GoodsSpecs specs : specsList){
+					if(specs.getItemId().equals(model.getItemId())){
+						model.setGoodsSpecs(specs);
+						break;
+					}
+				}
+			}
+			
+			for(ShoppingCart model : list){
+				for(GoodsFile file : fileList){
+					if(file.getGoodsId().equals(model.getGoodsSpecs().getGoodsId())){
+						model.setPicPath(file.getPath());
+						break;
+					}
+				}
+			}
+			
+		} else {
+			throw new RuntimeException("内部调用商品服务出错");
+		}
+		
+		return list;
 	}
 }

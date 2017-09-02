@@ -213,6 +213,11 @@ public class OrderController {
 			param.put("userId", userId);
 			param.put("centerId", centerId);
 			param.put("pagination", pagination);
+			
+			List<ShoppingCart> list = orderService.listShoppingCart(param);
+			result.setSuccess(true);
+			result.setObj(list);
+			
 		}
 		
 		return result;

@@ -115,9 +115,11 @@
 		insert into
 		order_shopping_cart(user_id,item_id,item_quantity,goods_name,center_id,create_time)
 		values(#{userId},#{itemId},#{quantity},#{goodsName},#{centerId},now())
+		on duplicate key update item_quantity= item_quantity + values(quantity),update_time=now()
 	</insert>
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
-		select * from order_shopping_cart where user_id = #{userId} and center_id = #{centerId}
+		select * from order_shopping_cart where user_id = #{userId} and center_id = #{centerId} order by create_time 
+		limit #{pagination.startRow},#{pagination.numPerPage}
 	</select>
 </mapper>
