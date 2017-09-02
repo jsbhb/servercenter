@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
@@ -53,9 +54,9 @@ public class AccessFilter extends ZuulFilter {
 
 	@Override
 	public Object run() {
-		
+
 		HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(60000);
-		
+
 		RequestContext ctx = RequestContext.getCurrentContext();
 		HttpServletRequest request = ctx.getRequest();
 
@@ -118,20 +119,11 @@ public class AccessFilter extends ZuulFilter {
 	 */
 	private void result(ResponseEntity<ResultPojo> result, RequestContext ctx) {
 
-		if (result != null && result.getBody() != null) {
-			ResultPojo pojo = result.getBody();
-			if (pojo.isSuccess()) {
-				return;
-			}
-
-			ctx.setResponseStatusCode(401);
-			ctx.setResponseBody(pojo.getErrorCode() + "---" + pojo.getErrorMsg());
-
-		} else {
+		if (result.getStatusCode().value() != HttpStatus.SC_OK) {
+			ctx.setSendZuulResponse(false);
 			ctx.setResponseStatusCode(401);
 			ctx.setResponseBody("权限查询失败，请稍后在操作！");
 		}
-		return;
 	}
 
 	@Override
@@ -160,24 +152,23 @@ public class AccessFilter extends ZuulFilter {
 
 		return false;
 	}
-	
-	
+
 	@Bean
 	public CorsFilter corsFilter() {
-	    final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    final CorsConfiguration config = new CorsConfiguration();
-	    config.setAllowCredentials(true);
-	    config.addAllowedOrigin("*");
-	    config.addAllowedHeader("*");
-	    config.addAllowedMethod("OPTIONS");
-	    config.addAllowedMethod("HEAD");
-	    config.addAllowedMethod("GET");
-	    config.addAllowedMethod("PUT");
-	    config.addAllowedMethod("POST");
-	    config.addAllowedMethod("DELETE");
-	    config.addAllowedMethod("PATCH");
-	    source.registerCorsConfiguration("/**", config);
-	    return new CorsFilter(source);
+		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		final CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		config.addAllowedOrigin("*");
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("OPTIONS");
+		config.addAllowedMethod("HEAD");
+		config.addAllowedMethod("GET");
+		config.addAllowedMethod("PUT");
+		config.addAllowedMethod("POST");
+		config.addAllowedMethod("DELETE");
+		config.addAllowedMethod("PATCH");
+		source.registerCorsConfiguration("/**", config);
+		return new CorsFilter(source);
 	}
 
 }

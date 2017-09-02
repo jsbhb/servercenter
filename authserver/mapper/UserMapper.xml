@@ -14,7 +14,7 @@
               U.CREATED_BY CREATEDBY,
               U.LAST_UPDATE_DATE LASTUPDATEDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFROM platUserType
+              U.PLATFORM platUserType
           FROM
               USER U
           WHERE
@@ -34,7 +34,7 @@
               U.CREATED_BY CREATEDBY,
               U.LAST_UPDATE_DATE LASTUPDATEDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFROM platUserType
+              U.PLATFORM platUserType
           FROM
               USER U
           WHERE
@@ -54,7 +54,7 @@
               U.CREATED_BY createdBy,
               U.LAST_UPDATE_DATE lastUpdateDate,
               U.LAST_UPDATED_BY lastUpdatedBy,
-              U.PLATFROM platUserType
+              U.PLATFORM platUserType
           FROM
               USER U
           WHERE
@@ -86,7 +86,7 @@
               U.LAST_UPDATE_DATE lastUpdateDate,
               U.LAST_UPDATED_BY lastUpdatedBy
               U.OPENID openId,
-              U.PLATFROM platUserType
+              U.PLATFORM platUserType
           FROM
               USER U
           WHERE

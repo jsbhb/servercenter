@@ -22,7 +22,13 @@ public class SecurityUserFactory {
 	}
 
 	public static SecurityUserDetail create(UserInfo user) {
-		return new SecurityUserDetail(user.getUserId() + "", user.getUserName(), "", user.getEmail(),
+		return new SecurityUserDetail(user.getUserId() + "", user.getUserName(), user.getPassword(), user.getEmail(),
+				mapToGrantedAuthorities(user.getAuthorities()), user.getLastPasswordResetDate(), user.getUserId(),
+				user.getPlatUserType());
+	}
+	
+	public static SecurityUserDetail createWithOutPassWord(UserInfo user) {
+		return new SecurityUserDetail(user.getUserId() + "", user.getUserName(), user.getEmail(),
 				mapToGrantedAuthorities(user.getAuthorities()), user.getLastPasswordResetDate(), user.getUserId(),
 				user.getPlatUserType());
 	}

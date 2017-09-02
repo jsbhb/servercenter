@@ -48,6 +48,19 @@ public class SecurityUserDetail implements UserDetails {
 		this.platId = platId;
 		this.platUserType = platUserType;
 	}
+	
+	
+	public SecurityUserDetail(String id, String userName, String email,
+			Collection<? extends GrantedAuthority> authorities, Date lastPasswordResetDate, String platId,
+			int platUserType) {
+		this.id = id;
+		this.userName = userName;
+		this.email = email;
+		this.authorities = authorities;
+		this.lastPasswordResetDate = lastPasswordResetDate;
+		this.platId = platId;
+		this.platUserType = platUserType;
+	}
 
 	public String getToken() {
 		return this.token;
