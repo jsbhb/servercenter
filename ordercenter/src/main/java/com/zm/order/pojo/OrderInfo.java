@@ -19,7 +19,7 @@ public class OrderInfo {
 	private Integer expressType;
 
 	// 区域中心ID
-	private Integer regionalCenterId;
+	private Integer centerId;
 
 	private Integer shopId;
 
@@ -93,12 +93,12 @@ public class OrderInfo {
 		this.expressType = expressType;
 	}
 
-	public Integer getRegionalCenterId() {
-		return regionalCenterId;
+	public Integer getCenterId() {
+		return centerId;
 	}
 
-	public void setRegionalCenterId(Integer regionalCenterId) {
-		this.regionalCenterId = regionalCenterId;
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
 	}
 
 	public Integer getShopId() {
@@ -200,8 +200,8 @@ public class OrderInfo {
 	@Override
 	public String toString() {
 		return "OrderInfo [id=" + id + ", orderId=" + orderId + ", combinationId=" + combinationId + ", userId="
-				+ userId + ", status=" + status + ", expressType=" + expressType + ", regionalCenterId="
-				+ regionalCenterId + ", shopId=" + shopId + ", supplierId=" + supplierId + ", tdq=" + tdq
+				+ userId + ", status=" + status + ", expressType=" + expressType + ", centerId="
+				+ centerId + ", shopId=" + shopId + ", supplierId=" + supplierId + ", tdq=" + tdq
 				+ ", carrierKey=" + carrierKey + ", expressId=" + expressId + ", gtime=" + gtime + ", sendTime="
 				+ sendTime + ", createTime=" + createTime + ", updateTime=" + updateTime + ", remark=" + remark
 				+ ", orderDetail=" + orderDetail + ", orderGoodsList=" + orderGoodsList + "]";

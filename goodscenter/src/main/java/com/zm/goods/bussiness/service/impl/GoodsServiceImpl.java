@@ -94,6 +94,30 @@ public class GoodsServiceImpl implements GoodsService {
 
 		return result;
 	}
+	
+	
+	@Override
+	public Map<String, Object> listGoodsSpecs(List<Integer> list) {
+		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(list);
+
+		List<Integer> idList = new ArrayList<Integer>();
+		for(GoodsSpecs model : specsList){
+			idList.add(model.getGoodsId());
+		}
+		
+		Map<String, Object> parameter = new HashMap<String, Object>();
+		parameter.put("list", idList);
+		parameter.put("type", PICTURE_TYPE);
+
+		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
+
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		result.put("specsList", specsList);
+		result.put("pic", fileList);
+
+		return result;
+	}
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip) {

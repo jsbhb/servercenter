@@ -6,6 +6,7 @@ import java.util.Map;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ShoppingCart;
 
 /**  
  * ClassName: OrderMapper <br/>  
@@ -30,7 +31,11 @@ public interface OrderMapper {
 	
 	void confirmUserOrder(Map<String,Object> param);
 	
-	void updateOrderStatusByOrderId(Map<String,Object> param);
+	void updateOrderPayStatusByOrderId(String orderId);
 	
 	int getClientIdByOrderId(String orderId);
+	
+	void saveShoppingCart(ShoppingCart cart);
+	
+	List<ShoppingCart> listShoppingCart(Map<String,Object> param);
 }

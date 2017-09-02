@@ -58,15 +58,18 @@
 			<result column="min" property="min" jdbcType="INTEGER" />
 			<result column="max" property="max" jdbcType="INTEGER" />
 			<result column="price" property="price" jdbcType="NUMERIC" />
-			<result column="delivery_place" property="deliveryPlace" jdbcType="VARCHAR" />
+			<result column="delivery_place" property="deliveryPlace"
+				jdbcType="VARCHAR" />
 			<result column="vip_price" property="vipPrice" jdbcType="NUMERIC" />
 			<result column="discount" property="discount" jdbcType="NUMERIC" />
-			<result column="sub_create_time" property="createTime" jdbcType="VARCHAR" />
-			<result column="sub_update_time" property="updateTime" jdbcType="VARCHAR" />
+			<result column="sub_create_time" property="createTime"
+				jdbcType="VARCHAR" />
+			<result column="sub_update_time" property="updateTime"
+				jdbcType="VARCHAR" />
 			<result column="sub_opt" property="opt" jdbcType="VARCHAR" />
 		</collection>
 	</resultMap>
-	
+
 	<resultMap type="com.zm.goods.pojo.PriceContrast" id="priceConstrast">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
@@ -74,7 +77,8 @@
 		<result column="bj_price" property="bj_price" jdbcType="NUMERIC" />
 		<result column="price" property="price" jdbcType="NUMERIC" />
 		<result column="reserve" property="reserve" jdbcType="NUMERIC" />
-		<result column="contrast_time" property="contrastTime" jdbcType="VARCHAR" />
+		<result column="contrast_time" property="contrastTime"
+			jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
@@ -85,9 +89,11 @@
 		gi.status,gb.goods_name,
 		gb.brand_id,gb.brand,gb.origin from goods_item
 		gi left join goods_base gb on gi.base_id = gb.id
-		left join goods_category_brand gcb on gb.brand_id = gcb.id where 1=1
+		left join
+		goods_category_brand gcb on gb.brand_id = gcb.id where 1=1
 		<if test="type != null and type != ''">
-			and gcb.type = #{type} and gi.type = #{type,jdbcType = INTEGER}
+			and gcb.type = #{type} and gi.type = #{type,jdbcType =
+			INTEGER}
 		</if>
 		<if test="categoryId != null and categoryId != ''">
 			and gcb.third_category = #{categoryId,jdbcType = INTEGER}
@@ -102,23 +108,33 @@
 
 	<select id="listGoodsFile" parameterType="Object" resultMap="goodsFile">
 		select * from goods_file where type = #{type, jdbcType = INTEGER}
-		and goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
+		and
+		goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
 			#{item,jdbcType = INTEGER}
 		</foreach>
 	</select>
 
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.item_id,gs.goods_id as goodsId,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time as sub_create_time,stock.qpqty,
+		select gs.id,gs.item_id,gs.goods_id as
+		goodsId,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.opt,gp.id as
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		as sub_create_time,stock.qpqty,
 		gp.delivery_place,
-		gp.update_time as sub_update_time,gp.opt as sub_opt from goods_specs gs left join goods_price gp on 
-		gs.item_id = gp.item_id left join goods_stock stock on gs.item_id = stock.item_id where gs.goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
+		gp.update_time as
+		sub_update_time,gp.opt as sub_opt from goods_specs gs left join
+		goods_price gp on
+		gs.item_id = gp.item_id left join goods_stock stock
+		on gs.item_id =
+		stock.item_id where gs.goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
 			#{item,jdbcType = INTEGER}
 		</foreach>
 	</select>
-	
+
 	<select id="listPriceContrast" parameterType="Object" resultMap="priceConstrast">
 		select * from goods_price_contrast where item_id = #{itemId}
 		<if test="startTime != null and startTime !=''">
@@ -128,13 +144,40 @@
 			and contrast_time &lt;= #{endTime}
 		</if>
 	</select>
-	
-	<select id="getGoodsSpecs"  parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id as goodsId,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time as sub_create_time,stock.qpqty,
+
+	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
+		select gs.id,gs.info,gs.item_id,gs.goods_id as
+		goodsId,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.opt,gp.id as
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		as sub_create_time,stock.qpqty,
 		gp.delivery_place,
-		gp.update_time as sub_update_time,gp.opt as sub_opt from goods_specs gs left join goods_price gp on 
-		gs.item_id = gp.item_id left join goods_stock stock on gs.item_id = stock.item_id where gs.item_id = #{item_id} 
+		gp.update_time as
+		sub_update_time,gp.opt as sub_opt from goods_specs gs left join
+		goods_price gp on
+		gs.item_id = gp.item_id left join goods_stock stock
+		on gs.item_id =
+		stock.item_id where gs.item_id = #{itemId}
+	</select>
+
+	<select id="listGoodsSpecsByItemId" parameterType="Object"
+		resultMap="goodsSpecs">
+		select gs.id,gs.info,gs.item_id,gs.goods_id as
+		goodsId,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.opt,gp.id as
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		as sub_create_time,stock.qpqty,
+		gp.delivery_place,
+		gp.update_time as
+		sub_update_time,gp.opt as sub_opt from goods_specs gs left join
+		goods_price gp on
+		gs.item_id = gp.item_id left join goods_stock stock
+		on gs.item_id =
+		stock.item_id where gs.item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = INTEGER}
+		</foreach>
 	</select>
 
 </mapper>

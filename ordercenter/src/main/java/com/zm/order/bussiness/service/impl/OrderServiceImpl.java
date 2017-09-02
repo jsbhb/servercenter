@@ -22,6 +22,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.utils.CommonUtils;
 
 /**
@@ -83,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
 			list.add(model);
 			detail.append(goods.getItemName()+"*"+goods.getItemQuantity()+";");
 		}
-		boolean vip = userFeignClient.getVipUser(version, info.getUserId(), info.getRegionalCenterId());
+		boolean vip = userFeignClient.getVipUser(version, info.getUserId(), info.getCenterId());
 		
 		//根据itemID和数量获得金额并扣减库存（除了自营仓需要扣库存，其他不需要）
 		if(Constants.OWN_SUPPLIER.equals(info.getSupplierId())){
@@ -105,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setDetail(detail.toString().substring(0, detail.toString().length()-1));
 		
 		if(Constants.WX_PAY.equals(payType)){
-			Map<String,String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(info.getRegionalCenterId()), type, payModel);
+			Map<String,String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(info.getCenterId()), type, payModel);
 			result.setObj(paymap);
 		}
 		
@@ -162,11 +163,11 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public ResultModel updateOrderStatusByOrderId(Map<String, Object> param) {
+	public ResultModel updateOrderPayStatusByOrderId(String orderId) {
 		
 		ResultModel result = new ResultModel();
 		
-		orderMapper.updateOrderStatusByOrderId(param);
+		orderMapper.updateOrderPayStatusByOrderId(orderId);
 		
 		result.setSuccess(true);
 		return result;
@@ -176,5 +177,11 @@ public class OrderServiceImpl implements OrderService {
 	public Integer getClientIdByOrderId(String orderId) {
 		
 		return orderMapper.getClientIdByOrderId(orderId);
+	}
+
+	@Override
+	public void saveShoppingCart(ShoppingCart cart) {
+		
+		orderMapper.saveShoppingCart(cart);
 	}
 }

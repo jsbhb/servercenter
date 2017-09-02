@@ -19,4 +19,6 @@ public interface GoodsMapper {
 	List<PriceContrast> listPriceContrast(Map<String,Object> param);
 	
 	GoodsSpecs getGoodsSpecs(String itemId);
+	
+	List<GoodsSpecs> listGoodsSpecsByItemId(List<Integer> list);
 }

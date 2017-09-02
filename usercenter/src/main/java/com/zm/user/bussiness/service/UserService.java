@@ -7,6 +7,9 @@ import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
+import com.zm.user.pojo.UserVip;
+import com.zm.user.pojo.VipOrder;
+import com.zm.user.pojo.VipPrice;
 import com.zm.user.wx.ApiResult;
 
 /**  
@@ -133,4 +136,29 @@ public interface UserService {
 	 */
 	boolean getVipUser(Map<String,Object> param);
 	
+	/**  
+	 * saveVipOrder:保存订单并且调用支付. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param param  
+	 * @since JDK 1.7  
+	 */
+	ResultModel saveVipOrder(VipOrder order, Double version, String openId, String payType, String type) throws Exception;
+	
+	/**  
+	 * listVipPrice:获取会员价格信息. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param param  
+	 * @since JDK 1.7  
+	 */
+	List<VipPrice> listVipPrice(Integer centerId);
+	
+	UserVip getVipUserByOrderId(String orderId);
+	
+	void saveUserVip(UserVip userVip);
+	
+	void updateUserVip(UserVip userVip);
+	
+	void updateVipOrder(String orderId);
 }

@@ -115,6 +115,24 @@ public class GoodsController {
 		return result;
 	}
 	
+	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.POST)
+	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res,@RequestBody List<Integer> list) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String,Object> resultMap = goodsService.listGoodsSpecs(list);
+			
+			result.setSuccess(true);
+			result.setObj(resultMap);
+		}
+		
+		return result;
+	}
+	
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip) {

@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.ShoppingCart;
 
 /**  
  * ClassName: OrderService <br/>  
@@ -63,14 +64,17 @@ public interface OrderService {
 	ResultModel confirmUserOrder(Map<String,Object> param);
 	
 	/**  
-	 * updateOrder:更新订单状态. <br/>  
+	 * updateOrderPayStatusByOrderId:更新订单状态为已支付. <br/>  
 	 *  
 	 * @author wqy  
 	 * @param orderId
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultModel updateOrderStatusByOrderId(Map<String,Object> param);
+	ResultModel updateOrderPayStatusByOrderId(String orderId);
 	
 	Integer getClientIdByOrderId(String orderId);
+	
+	void saveShoppingCart(ShoppingCart cart);
+	
 }

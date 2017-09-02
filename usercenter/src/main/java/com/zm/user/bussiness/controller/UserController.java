@@ -25,6 +25,9 @@ import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
+import com.zm.user.pojo.UserVip;
+import com.zm.user.pojo.VipOrder;
+import com.zm.user.pojo.VipPrice;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
@@ -93,8 +96,8 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> param = new HashMap<String, Object>();
-			
+			Map<String, Object> param = new HashMap<String, Object>();
+
 			param.put("userId", userId);
 			param.put("centerId", centerId);
 			UserInfo info = userService.getUserInfo(param);
@@ -324,7 +327,7 @@ public class UserController {
 
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/user/vip/{centerId}/{userId}", method = RequestMethod.GET)
 	public boolean getVipUser(@PathVariable("version") Double version, HttpServletResponse res,
 			@PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
@@ -334,8 +337,8 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> param = new HashMap<String, Object>();
-			
+			Map<String, Object> param = new HashMap<String, Object>();
+
 			param.put("userId", userId);
 			param.put("centerId", centerId);
 			return userService.getVipUser(param);
@@ -343,5 +346,133 @@ public class UserController {
 
 		return false;
 	}
+
+	@RequestMapping(value = "{version}/user/vip-order", method = RequestMethod.POST)
+	public ResultModel saveVipOrder(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @RequestBody VipOrder vipOrder) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		String payType = req.getParameter("payType");
+		String type = req.getParameter("type");
+		String openId = req.getParameter("openId");
+		
+		if(payType == null || type == null){
+			result.setSuccess(false);
+			result.setErrorMsg("参数不全");
+			return result;
+		}
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			if(!vipOrder.checkAttr()){
+				result.setSuccess(false);
+				result.setErrorMsg("参数不全");
+				return result;
+			}
+			
+			try {
+				result = userService.saveVipOrder(vipOrder, version, openId, payType, type);
+			} catch (Exception e) {
+				result.setSuccess(false);
+				result.setErrorMsg("微服务出错");
+				e.printStackTrace();
+			}
+			
+		}
+
+		return result;
+	}
+	
+	
+	@RequestMapping(value = "{version}/user/vip-price/{centerId}", method = RequestMethod.GET)
+	public ResultModel getVipPrice(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @PathVariable("centerId") Integer centerId) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			List<VipPrice> list = userService.listVipPrice(centerId);
+			result.setSuccess(true);
+			result.setObj(list);
+			
+		}
+
+		return result;
+	}
+	
+	@RequestMapping(value = "{version}/user/getVipUser/{orderId}", method = RequestMethod.GET)
+	public UserVip getVipUserByOrderId(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @PathVariable("orderId") String orderId) {
+
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			return userService.getVipUserByOrderId(orderId);
+			
+		}
+
+		return null;
+	}
+	
+	@RequestMapping(value = "{version}/user/uservip", method = RequestMethod.POST)
+	public ResultModel saveUserVip(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @RequestBody UserVip userVip) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			userService.saveUserVip(userVip);
+			result.setSuccess(true);
+		}
+
+		return result;
+	}
+	
+	
+	@RequestMapping(value = "{version}/user/updateUservip", method = RequestMethod.POST)
+	public ResultModel updateUserVip(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @RequestBody UserVip userVip) {
+
+		ResultModel result = new ResultModel();
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			userService.updateUserVip(userVip);
+			result.setSuccess(true);
+		}
+
+		return result;
+	}
+	
+	
+	@RequestMapping(value = "{version}/user/updateVipOrder/{orderId}", method = RequestMethod.PUT)
+	public boolean updateVipOrder(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @PathVariable("orderId") String orderId) {
+
+		// 设置允许跨域请求
+		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			userService.updateVipOrder(orderId);
+			return true;
+		}
+
+		return false;
+	}
+
 
 }

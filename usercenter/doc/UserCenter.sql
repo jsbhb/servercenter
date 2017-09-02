@@ -19,8 +19,8 @@ CREATE TABLE `usercenter`.`user` (
   `is_phone_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '手机是否验证',
   `is_email_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '邮箱是否验证',
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '用户状态',
-  `register_center_id` INT UNSIGNED NULL COMMENT '注册区域中心ID',
-  `register_shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
+  `center_id` INT UNSIGNED NULL COMMENT '注册区域中心ID',
+  `shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
   `create_time` DATETIME NULL COMMENT '注册时间', 
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` DATETIME NULL COMMENT '操作人',
@@ -29,6 +29,8 @@ CREATE TABLE `usercenter`.`user` (
   `ipcity` VARCHAR(20) NULL COMMENT 'IP所属城市',
   PRIMARY KEY (`id`),
   INDEX `idx_account` (`account`),
+  INDEX `idx_center_id` (`center_id`),
+  INDEX `idx_shop_id` (`shop_id`),
   INDEX `idx_phone` (`phone`),
   INDEX `idx_email` (`email`),
   INDEX `idx_wechat` (`wechat`),
@@ -53,11 +55,32 @@ CREATE TABLE `usercenter`.`user_vip` (
   `vip_level` TINYINT UNSIGNED NOT NULL COMMENT 'vip等级',
   `status` TINYINT UNSIGNED NOT NULL COMMENT '是否有效0：否；1：是',
   `create_time` DATETIME NOT NULL COMMENT '成为vip时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   INDEX `idx_user_id` (`user_id`),
-  INDEX `idx_center_id` (`center_id`),
+  INDEX `idx_status` (`status`),
+  INDEX `idx_center_id` (`center_id`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '用户会员表';
+
+
+drop table if exists  `user_vip_order`;
+
+CREATE TABLE `usercenter`.`user_vip_order` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `order_id` char(21) NOT NULL COMMENT '订单号',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
+  `vip_price_id` INT UNSIGNED NOT NULL COMMENT 'vip价格ID',
+  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已支付',
+  `create_time` DATETIME NOT NULL COMMENT '成为vip时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_order_id` (`order_id`),
+  INDEX `idx_vip_price_id` (`vip_price_id`),
+  INDEX `idx_status` (`status`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '用户会员订单表';
 
 
 drop table if exists  `user_detail`;
@@ -76,7 +99,7 @@ CREATE TABLE `usercenter`.`user_detail` (
   `sex` TINYINT UNSIGNED NOT NULL COMMENT '用户性别',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
@@ -98,7 +121,7 @@ CREATE TABLE `usercenter`.`address` (
   `is_default` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '默认地址',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `address_user_id` (`user_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '收货地址表';
@@ -115,7 +138,7 @@ CREATE TABLE `usercenter`.`collection` (
   `type_url` VARCHAR(200) NOT NULL COMMENT '宝贝链接',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `collection_user_id` (`user_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '用户收藏表';
@@ -130,7 +153,7 @@ CREATE TABLE `usercenter`.`regional_center` (
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_platform_id` (`platform_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '区域中心表';
@@ -145,7 +168,7 @@ CREATE TABLE `usercenter`.`regional_shop` (
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_regional_id` (`regional_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '区域中心子店铺表';
@@ -162,9 +185,9 @@ CREATE TABLE `usercenter`.`vip_price` (
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `idx_vip_level` (`vip_level`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+  INDEX `idx_center_id` (`center_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '会员价格表';
 
 
@@ -176,7 +199,7 @@ CREATE TABLE `usercenter`.`user_api` (
   `api_name` VARCHAR(50) NOT NULL COMMENT 'api名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '服务api表';
 
@@ -191,7 +214,7 @@ CREATE TABLE `usercenter`.`user_search_parameter` (
   `type` Int NOT NULL COMMENT '1只读；2读写；3读写删',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `optName` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '检索字段表';
 

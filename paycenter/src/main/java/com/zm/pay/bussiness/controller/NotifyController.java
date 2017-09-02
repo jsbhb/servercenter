@@ -20,19 +20,25 @@ import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.LogFeignClient;
 import com.zm.pay.feignclient.OrderFeignClient;
+import com.zm.pay.feignclient.UserFeignClient;
+import com.zm.pay.feignclient.model.UserVip;
+import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 
 @RestController
 public class NotifyController {
-	
+
 	@Resource
 	RedisTemplate<String, ?> redisTemplate;
-	
+
 	@Resource
 	LogFeignClient logFeignClient;
-	
+
 	@Resource
 	OrderFeignClient orderFeignClient;
+
+	@Resource
+	UserFeignClient userFeignClient;
 
 	@RequestMapping(value = "/payMng/wxPayReturn" ,method = RequestMethod.GET)
 	public void wxNotify(HttpServletRequest req,HttpServletResponse res) throws Exception{
@@ -51,8 +57,16 @@ public class NotifyController {
         Map<String, String> notifyMap = WXPayUtil.xmlToMap(sb.toString());  // 转换成map
         
         String orderId = notifyMap.get("out_trade_no");
-        
-        Integer clientId = orderFeignClient.getClientIdByOrderId(orderId, 1.0);
+        Integer clientId = null;
+        UserVip user = null;
+        if(orderId != null && orderId.startsWith("GX")){
+        	clientId = orderFeignClient.getClientIdByOrderId(orderId, 1.0);
+        }
+        if(orderId != null && orderId.startsWith("VIP")){
+        	user = userFeignClient.getClientIdByOrderId(orderId, 1.0);
+        	clientId = user.getCenterId();
+        }
+       
         
         WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue().get(clientId + Constants.WX_PAY);
   
@@ -64,22 +78,39 @@ public class NotifyController {
             // 进行处理。
         	// 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户侧订单状态从退款改成支付成功
         	if("SUCCESS".equals((String)notifyMap.get("result_code"))){
-        		//通知微信.异步确认成功.必写.不然会一直通知后台.八次之后就认为交易失败了.  
-                resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>"  
-                        + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";  
+        		if(orderId.startsWith("GX")){
+        			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(1.0, orderId);
+        			//TODO 发送第三方？
+        			if(result.isSuccess()){
+        				//通知微信.异步确认成功.必写.不然会一直通知后台.八次之后就认为交易失败了.  
+        				resXml = getWXCallBackMsg("SUCCESS", "OK");
+        			} else {
+        				resXml = getWXCallBackMsg("FAIL", "失败");
+        			}
+        		}
+        		if(orderId.startsWith("VIP")){
+        			userFeignClient.updateVipOrder(1.0, orderId);
+        			boolean flag = userFeignClient.getVipUser(1.0, user.getUserId(), clientId);
+        			if(flag){
+        				userFeignClient.updateUserVip(1.0, user);
+        			} else {
+        				userFeignClient.saveUserVip(1.0, user);
+        			}
+        			resXml = getWXCallBackMsg("SUCCESS", "OK");
+        		}
+                
         	} else {
         		
-        		resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"  
-                        + "<return_msg><![CDATA[失败]]></return_msg>" + "</xml> ";  
+        		resXml = getWXCallBackMsg("FAIL", "失败");
         	}
         	
         }
         else {
-        	 resXml = "<xml>" + "<return_code><![CDATA[FAIL]]></return_code>"  
-                     + "<return_msg><![CDATA[验签失败]]></return_msg>" + "</xml> ";  
+        	
+        	 resXml = getWXCallBackMsg("FAIL", "验签失败");
         }
         
-      //------------------------------  
+        //------------------------------  
         //处理业务完毕  
         //------------------------------  
         BufferedOutputStream out = new BufferedOutputStream(  
@@ -88,5 +119,10 @@ public class NotifyController {
         out.flush();  
         out.close();  
     }
-          
+
+	private String getWXCallBackMsg(String success, String msg) {
+		return "<xml>" + "<return_code><![CDATA[" + success + "]]></return_code>" + "<return_msg><![CDATA[" + msg
+				+ "]]></return_msg>" + "</xml> ";
+	}
+
 }

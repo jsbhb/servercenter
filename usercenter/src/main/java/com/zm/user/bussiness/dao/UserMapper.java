@@ -6,6 +6,9 @@ import java.util.Map;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
+import com.zm.user.pojo.UserVip;
+import com.zm.user.pojo.VipOrder;
+import com.zm.user.pojo.VipPrice;
 
 public interface UserMapper {
 
@@ -33,5 +36,19 @@ public interface UserMapper {
 	
 	UserInfo getUserInfo(Integer userId);
 	
-	UserInfo getVipUser(Map<String,Object> param);
+	UserVip getVipUser(Map<String,Object> param);
+	
+	List<VipPrice> listVipPrice(Integer centerId);
+	
+	VipPrice getVipPrice(Integer id);
+	
+	void saveVipOrder(VipOrder order);
+	
+	UserVip getVipUserByOrderId(String orderId);
+	
+	void saveVipUser(UserVip userVip);
+	
+	void updateUserVip(UserVip userVip);
+	
+	void updateVipOrder(String orderId);
 }

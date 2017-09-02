@@ -1,0 +1,93 @@
+package com.zm.order.pojo;
+
+public class ShoppingCart {
+
+	private Integer id;
+	
+	private Integer userId;
+	
+	private String itemId;
+	
+	private Integer quantity;
+
+	private Integer centerId;
+	
+	private String goodsName;
+	
+	private String createTime;
+	
+	private String updateTime;
+	
+	public String getGoodsName() {
+		return goodsName;
+	}
+
+	public void setGoodsName(String goodsName) {
+		this.goodsName = goodsName;
+	}
+
+	public Integer getCenterId() {
+		return centerId;
+	}
+
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
+	public String getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	@Override
+	public String toString() {
+		return "ShoppingCart [id=" + id + ", userId=" + userId + ", itemId=" + itemId + ", quantity=" + quantity
+				+ ", centerId=" + centerId + ", goodsName=" + goodsName + ", createTime=" + createTime + ", updateTime="
+				+ updateTime + "]";
+	}
+	
+	
+}

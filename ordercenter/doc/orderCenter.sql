@@ -14,8 +14,8 @@ CREATE TABLE `zm_order`.`order_base` (
   `combination_id` CHAR(20) NULL COMMENT '订单拆分后的总ID',
   `user_id` INT UNSIGNED NOT NULL,
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
-  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单；',
-  `regional_center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
+  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单；8：删除',
+  `center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
   `supplier_id` INT UNSIGNED NULL,
   `tdq` TINYINT UNSIGNED NOT NULL DEFAULT 0,
@@ -26,18 +26,16 @@ CREATE TABLE `zm_order`.`order_base` (
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
-  `is_del` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_orderId` (`order_id` ASC),
   INDEX `idx_orderId` (`order_id` ASC),
   INDEX `idx_combinationId` (`combination_id` ASC),
   INDEX `idx_userId` (`user_id` ASC),
   INDEX `idx_status` (`status` ASC),
-  INDEX `idx_regionalCenterId` (`regional_center_id` ASC),
+  INDEX `idx_regionalCenterId` (`center_id` ASC),
   INDEX `idx_shopId` (`shop_id` ASC),
   INDEX `idx_supplierId` (`supplier_id` ASC),
   INDEX `idx_createTime` (`create_time` ASC),
-  INDEX `idx_is_del` (`id_del` ASC),
   INDEX `idx_expressId` (`express_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单基本信息';
@@ -126,17 +124,17 @@ drop table if exists  `zm_order`.`order_shopping_cart`;
 
 CREATE TABLE `zm_order`.`order_shopping_cart` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` INT UNSIGNED NULL,
+  `user_id` INT UNSIGNED NOT NULL,
   `item_id` VARCHAR(100) NOT NULL,
-  `sku` VARCHAR(50) NULL,
-  `item_name` VARCHAR(100) NULL,
-  `item_info` VARCHAR(200) NULL,
-  `item_code` VARCHAR(100) NULL,
+  `center_id` INT UNSIGNED NOT NULL,
   `item_quantity` INT UNSIGNED NOT NULL,
+  `goods_name` VARCHAR(200) NOT NULL,
   `creati_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
   PRIMARY KEY (`id`),
+  INDEX `idx_center_id` (`center_id` ASC),
+  INDEX `idx_creati_time` (`creati_time` ASC),
   INDEX `idx_userId` (`user_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '购物车';

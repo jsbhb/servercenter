@@ -1,4 +1,4 @@
-package com.zm.goods.pojo;
+package com.zm.order.feignclient.model;
 
 import java.util.List;
 
@@ -40,6 +40,16 @@ public class GoodsSpecs {
 	private Integer stock;
 	
 	private List<GoodsPrice> priceList;
+	
+	private String picPath;
+
+	public String getPicPath() {
+		return picPath;
+	}
+
+	public void setPicPath(String picPath) {
+		this.picPath = picPath;
+	}
 
 	public Integer getStock() {
 		return stock;
@@ -155,10 +165,10 @@ public class GoodsSpecs {
 
 	@Override
 	public String toString() {
-		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId
-				+ ", itemCode=" + itemCode + ", sku=" + sku + ", promotion=" + promotion + ", info=" + info
-				+ ", createTime=" + createTime + ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice="
-				+ minPrice + ", maxPrice=" + maxPrice + ", stock=" + stock + ", priceList=" + priceList + "]";
+		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + ", itemCode=" + itemCode
+				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
+				+ ", stock=" + stock + ", priceList=" + priceList + ", picPath=" + picPath + "]";
 	}
 	
 }

@@ -61,4 +61,6 @@ public interface GoodsService {
 	 * @since JDK 1.7  
 	 */
 	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip);
+	
+	Map<String, Object> listGoodsSpecs(List<Integer> list);
 }

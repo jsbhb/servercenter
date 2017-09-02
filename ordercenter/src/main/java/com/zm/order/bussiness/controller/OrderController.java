@@ -24,6 +24,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.utils.JSONUtil;
 
 /**
@@ -49,12 +50,12 @@ public class OrderController {
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
-		
+
 		String payType = req.getParameter("payType");
 		String type = req.getParameter("type");
 		String openId = req.getParameter("openId");
-		
-		if(payType == null || type == null){
+
+		if (payType == null || type == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
@@ -156,21 +157,16 @@ public class OrderController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/order/status/{orderId}", method = RequestMethod.PUT)
-	public ResultModel updateOrderStatusByOrderId(@PathVariable("version") Double version, Integer status,
+	@RequestMapping(value = "{version}/order/alread-pay/{orderId}", method = RequestMethod.PUT)
+	public ResultModel updateOrderPayStatusByOrderId(@PathVariable("version") Double version,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		Map<String, Object> param = new HashMap<String, Object>();
-
-		param.put("status", status);
-		param.put("orderId", orderId);
-
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = orderService.updateOrderStatusByOrderId(param);
+			result = orderService.updateOrderPayStatusByOrderId(orderId);
 		}
 
 		return result;
@@ -179,19 +175,54 @@ public class OrderController {
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
 	public Integer getClientIdByOrderId(@PathVariable("orderId") String orderId,
 			@PathVariable("version") Double version) {
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Integer clientId = orderService.getClientIdByOrderId(orderId);
-			
+
 			return clientId;
 		}
 		return null;
 	}
 
+	@RequestMapping(value = "{version}/order/shoping-cart", method = RequestMethod.POST)
+	public ResultModel saveShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @RequestBody ShoppingCart cart) {
+
+		ResultModel result = new ResultModel();
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			orderService.saveShoppingCart(cart);
+			result.setSuccess(true);
+		}
+		
+		return result;
+		
+	}
+	
+	
+	@RequestMapping(value = "{version}/order/shoping-cart/{centerId}/{userId}", method = RequestMethod.GET)
+	public ResultModel listShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			Pagination pagination) {
+
+		ResultModel result = new ResultModel();
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String,Object> param = new HashMap<String, Object>();
+			pagination.init();
+			param.put("userId", userId);
+			param.put("centerId", centerId);
+			param.put("pagination", pagination);
+		}
+		
+		return result;
+		
+	}
+
 	public static void main(String[] args) {
 		OrderInfo info = new OrderInfo();
 		info.setCombinationId("123GXS");
-		info.setRegionalCenterId(0);
+		info.setCenterId(0);
 		info.setUserId(1);
 		info.setSupplierId(1);
 		info.setExpressType(1);
