@@ -22,6 +22,18 @@ public class WeixinPayConfig implements WXPayConfig {
 	private Integer httpConnectTimeoutMs;
 
 	private Integer httpReadTimeoutMs;
+	
+	private Integer centerId;
+
+
+	public Integer getCenterId() {
+		return centerId;
+	}
+
+
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
+	}
 
 
 	public InputStream getCertStream() {

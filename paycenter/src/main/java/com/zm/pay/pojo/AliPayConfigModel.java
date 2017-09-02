@@ -4,7 +4,7 @@ public class AliPayConfigModel {
 
 	private Integer id;
 	
-	private Integer clientId;
+	private Integer centerId;
 	//合作者ID
 	private String pid;
 	//应用ID
@@ -22,12 +22,13 @@ public class AliPayConfigModel {
 		this.id = id;
 	}
 
-	public Integer getClientId() {
-		return clientId;
+
+	public Integer getCenterId() {
+		return centerId;
 	}
 
-	public void setClientId(Integer clientId) {
-		this.clientId = clientId;
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
 	}
 
 	public String getPid() {
@@ -64,7 +65,7 @@ public class AliPayConfigModel {
 
 	@Override
 	public String toString() {
-		return "AliPayConfigModel [id=" + id + ", clientId=" + clientId + ", pid=" + pid + ", appId=" + appId
+		return "AliPayConfigModel [id=" + id + ", centerId=" + centerId + ", pid=" + pid + ", appId=" + appId
 				+ ", rsaPrivateKey=" + rsaPrivateKey + ", rsaPublicKey=" + rsaPublicKey + "]";
 	}
 	
