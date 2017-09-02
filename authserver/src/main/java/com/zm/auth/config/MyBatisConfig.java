@@ -23,7 +23,7 @@ import com.alibaba.druid.pool.DruidDataSourceFactory;
 *  
 */
 @Configuration
-@MapperScan(basePackages="com.zm.gateway.mapper")
+@MapperScan(basePackages="com.zm.auth.mapper")
 public class MyBatisConfig {
 
     @Autowired
