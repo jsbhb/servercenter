@@ -54,7 +54,7 @@
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
 	</resultMap>
 
-	<resultMap type="com.zm.user.pojo.UserInfo" id="vipPrice">
+	<resultMap type="com.zm.user.pojo.VipPrice" id="vipPrice">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
 		<result column="vip_level" property="vipLevel" jdbcType="INTEGER" />
@@ -166,7 +166,7 @@
 			</if>
 			update_time = now()
 		</set>
-		where id = #{id, jdbcType = INTEGER}
+		where id = #{id, jdbcType = INTEGER} and user_id = #{userId, jdbcType = INTEGER}
 	</update>
 
 	<insert id="saveUserDetail" parameterType="Object">

@@ -156,26 +156,18 @@ public class UserController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/user/address", method = RequestMethod.DELETE)
+	@RequestMapping(value = "{version}/user/address/{userId}/{id}", method = RequestMethod.DELETE)
 	public ResultModel removeAddress(@PathVariable("version") Double version, HttpServletResponse res,
-			HttpServletRequest req) {
+			@PathVariable("userId") Integer userId, @PathVariable("id") Integer id, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		String userId = req.getParameter("userId");
-		String id = req.getParameter("id");
 		Map<String, Object> param = new HashMap<String, Object>();
 
-		try {
-			param.put("userId", Integer.valueOf(userId));
-			param.put("id", Integer.valueOf(id));
-		} catch (NumberFormatException e) {
-			result.setSuccess(false);
-			result.setErrorMsg("参数有误");
-			return result;
-		}
+		param.put("userId", userId);
+		param.put("id", id);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			userService.removeAddress(param);
@@ -246,20 +238,18 @@ public class UserController {
 
 	private final String localPath = "upload/headImg/";
 	// 图片放后台
-	private final String Backstage = "1";
+	private final Integer Backstage = 1;
 	// 图片放阿里云OSS
-	private final String OSS = "2";
+	private final Integer OSS = 2;
 
-	@RequestMapping(value = "{version}/user/uploadHeadImg", method = RequestMethod.POST)
-	public ResultModel uploadDeclFile(@PathVariable("version") Double version,
-			@RequestParam("headImg") MultipartFile headImg, HttpServletRequest req, HttpServletResponse res)
-					throws Exception {
+	@RequestMapping(value = "{version}/user/{userId}/{type}/uploadHeadImg", method = RequestMethod.POST)
+	public ResultModel uploadDeclFile(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+			@PathVariable("type") Integer type, @RequestParam("headImg") MultipartFile headImg, HttpServletRequest req,
+			HttpServletResponse res) throws Exception {
 
 		ResultModel result = new ResultModel();
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		String userId = req.getParameter("userId");
-		String type = req.getParameter("type");
 		if (headImg.isEmpty()) {
 			result.setSuccess(false);
 			result.setErrorMsg("没有文件信息");
@@ -358,21 +348,21 @@ public class UserController {
 		String payType = req.getParameter("payType");
 		String type = req.getParameter("type");
 		String openId = req.getParameter("openId");
-		
-		if(payType == null || type == null){
+
+		if (payType == null || type == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
 		}
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
-			if(!vipOrder.checkAttr()){
+
+			if (!vipOrder.checkAttr()) {
 				result.setSuccess(false);
 				result.setErrorMsg("参数不全");
 				return result;
 			}
-			
+
 			try {
 				result = userService.saveVipOrder(vipOrder, version, openId, payType, type);
 			} catch (Exception e) {
@@ -380,13 +370,12 @@ public class UserController {
 				result.setErrorMsg("微服务出错");
 				e.printStackTrace();
 			}
-			
+
 		}
 
 		return result;
 	}
-	
-	
+
 	@RequestMapping(value = "{version}/user/vip-price/{centerId}", method = RequestMethod.GET)
 	public ResultModel getVipPrice(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("centerId") Integer centerId) {
@@ -396,16 +385,16 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			List<VipPrice> list = userService.listVipPrice(centerId);
 			result.setSuccess(true);
 			result.setObj(list);
-			
+
 		}
 
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/user/getVipUser/{orderId}", method = RequestMethod.GET)
 	public UserVip getVipUserByOrderId(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("orderId") String orderId) {
@@ -414,14 +403,14 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			return userService.getVipUserByOrderId(orderId);
-			
+
 		}
 
 		return null;
 	}
-	
+
 	@RequestMapping(value = "{version}/user/uservip", method = RequestMethod.POST)
 	public ResultModel saveUserVip(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @RequestBody UserVip userVip) {
@@ -431,15 +420,14 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			userService.saveUserVip(userVip);
 			result.setSuccess(true);
 		}
 
 		return result;
 	}
-	
-	
+
 	@RequestMapping(value = "{version}/user/updateUservip", method = RequestMethod.POST)
 	public ResultModel updateUserVip(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @RequestBody UserVip userVip) {
@@ -449,15 +437,14 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			userService.updateUserVip(userVip);
 			result.setSuccess(true);
 		}
 
 		return result;
 	}
-	
-	
+
 	@RequestMapping(value = "{version}/user/updateVipOrder/{orderId}", method = RequestMethod.PUT)
 	public boolean updateVipOrder(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("orderId") String orderId) {
@@ -466,13 +453,12 @@ public class UserController {
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			userService.updateVipOrder(orderId);
 			return true;
 		}
 
 		return false;
 	}
-
 
 }
