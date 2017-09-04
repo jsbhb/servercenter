@@ -79,7 +79,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/check", method = RequestMethod.GET)
+	@RequestMapping(value = "/check", method = RequestMethod.POST)
 	public ResultPojo check(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		try {
 			return new ResultPojo(authService.checkAccount(userInfo));

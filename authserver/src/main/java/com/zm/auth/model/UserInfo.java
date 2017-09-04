@@ -32,10 +32,13 @@ public class UserInfo {
 	 * 
 	 * @param openId2
 	 */
+	
+	public UserInfo(){}
 
 	public UserInfo(String openId) {
 		this.openId = openId;
 	}
+
 
 	public String getUserName() {
 		return userName;

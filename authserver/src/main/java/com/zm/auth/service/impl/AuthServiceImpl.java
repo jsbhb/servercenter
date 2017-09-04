@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
 		userInfo.setAuthorities(asList("ROLE_USER"));
 		userMapper.insert(userInfo);
 
-		SecurityUserDetail userDetail = SecurityUserFactory.create(userInfo);
+		SecurityUserDetail userDetail = SecurityUserFactory.createWithOutPassWord(userInfo);
 
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(JWTUtil.PASSWORD, userInfo.getPassword());
@@ -116,9 +116,10 @@ public class AuthServiceImpl implements AuthService {
 
 			if (userDetail == null) {
 				userMapper.insert(userInfo);
+				userDetail = userInfo;
+				userInfo = null;
 			}
-
-			userDetail.setUserId(userInfo.getUserId());
+			
 
 		} else {
 			String userName = null;
@@ -160,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
 
 		SecurityUserDetail securityUserDetail = SecurityUserFactory.createWithOutPassWord(userDetail);
 
-		userDetail.setToken(JWTUtil.generateToken(claim));
+		securityUserDetail.setToken(JWTUtil.generateToken(claim));
 
 		return securityUserDetail;
 	}
