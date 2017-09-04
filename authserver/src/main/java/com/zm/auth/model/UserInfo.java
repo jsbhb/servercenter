@@ -25,6 +25,17 @@ public class UserInfo {
 	private String token;
 	private String openId;
 	private int platUserType;
+	private int loginType;
+
+	/**
+	 * Creates a new instance of UserInfo.
+	 * 
+	 * @param openId2
+	 */
+
+	public UserInfo(String openId) {
+		this.openId = openId;
+	}
 
 	public String getUserName() {
 		return userName;
@@ -145,4 +156,13 @@ public class UserInfo {
 	public void setPlatUserType(int platUserType) {
 		this.platUserType = platUserType;
 	}
+
+	public int getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(int loginType) {
+		this.loginType = loginType;
+	}
+
 }

@@ -47,6 +47,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 	@Value("${jwt.tokenHead}")
 	private String tokenHead;
 
+	@Value("${wx_openId_secret}")
+	private String WX_OPENID_SECRET;
+
 	/**
 	 * 
 	 * 实现验证头部是否有令牌信息.
@@ -76,6 +79,21 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 				} else if (claims.containsKey(JWTUtil.USER_NAME)) {
 					userDetails = (SecurityUserDetail) this.userService
 							.loadUserByUsername((String) claims.get(JWTUtil.USER_NAME));
+				} else if (claims.containsKey(JWTUtil.OPEN_ID)) {
+					userDetails = (SecurityUserDetail) this.userService
+							.loadUserByUsername((String) claims.get(JWTUtil.OPEN_ID) + "_" + WX_OPENID_SECRET);
+
+					if (userDetails != null) {
+						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+								userDetails, null, userDetails.getAuthorities());
+						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						logger.info(
+								"authenticated openId " + claims.get(JWTUtil.OPEN_ID) + ", setting security context");
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+					}
+					return;
+				} else {
+					return;
 				}
 
 				if (JWTUtil.validateToken(authToken, userDetails)) {

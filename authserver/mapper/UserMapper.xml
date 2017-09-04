@@ -22,6 +22,23 @@
           AND U.USER_NAME = #{USERNAME}
     </select>
     
+     <select id="queryByOpenId" parameterType="java.lang.String" resultType="userInfo">
+          SELECT
+              U.USER_ID USERID,
+              U.STATUS STATUS,
+              U.CREATION_DATE CREATIONDATE,
+              U.CREATED_BY CREATEDBY,
+              U.OPENID OPENID
+              U.LAST_UPDATE_DATE LASTUPDATEDATE,
+              U.LAST_UPDATED_BY LASTUPDATEDBY,
+              U.PLATFORM PLATUSERTYPE
+          FROM
+              USER U
+          WHERE
+              U.STATUS = 1
+          AND U.OPENID = #{openId}
+    </select>
+    
     <select id="getUserByPlatId" parameterType="java.lang.String" resultType="userInfo">
           SELECT
               U.USER_ID USERID,

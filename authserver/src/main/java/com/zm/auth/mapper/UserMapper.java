@@ -66,4 +66,15 @@ public interface UserMapper {
 	 */
 	public UserInfo getUserByPlatId(String userId);
 
+	/**
+	 * 
+	 * queryByOpenId:根据openId查询用户 <br/>  
+	 *  
+	 * @author hebin  
+	 * @param userInfo
+	 * @return  
+	 * @since JDK 1.7
+	 */
+	public UserInfo queryByOpenId(UserInfo userInfo);
+
 }
