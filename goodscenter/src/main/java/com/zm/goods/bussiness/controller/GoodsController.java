@@ -1,5 +1,6 @@
 package com.zm.goods.bussiness.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,12 +118,14 @@ public class GoodsController {
 	
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.POST)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res,@RequestBody List<String> list) {
+			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
-		
+		String ids = req.getParameter("list");
+		String[] idArr = ids.split(",");
+		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String,Object> resultMap = goodsService.listGoodsSpecs(list);
 			

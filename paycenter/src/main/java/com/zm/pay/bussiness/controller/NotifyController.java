@@ -79,7 +79,8 @@ public class NotifyController {
         	// 注意特殊情况：订单已经退款，但收到了支付结果成功的通知，不应把商户侧订单状态从退款改成支付成功
         	if("SUCCESS".equals((String)notifyMap.get("result_code"))){
         		if(orderId.startsWith("GX")){
-        			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(1.0, orderId);
+        			String payNo = notifyMap.get("transaction_id");
+        			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(1.0, orderId, payNo);
         			//TODO 发送第三方？
         			if(result.isSuccess()){
         				//通知微信.异步确认成功.必写.不然会一直通知后台.八次之后就认为交易失败了.  

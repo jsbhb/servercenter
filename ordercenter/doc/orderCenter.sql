@@ -13,8 +13,9 @@ CREATE TABLE `zm_order`.`order_base` (
   `order_id` CHAR(21) NOT NULL,
   `combination_id` CHAR(20) NULL COMMENT '订单拆分后的总ID',
   `user_id` INT UNSIGNED NOT NULL,
+  `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
-  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单；8：删除',
+  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单',
   `center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
   `supplier_id` INT UNSIGNED NULL,
@@ -26,6 +27,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
+  `is_del` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0:否；1是',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_orderId` (`order_id` ASC),
   INDEX `idx_orderId` (`order_id` ASC),
@@ -36,6 +38,8 @@ CREATE TABLE `zm_order`.`order_base` (
   INDEX `idx_shopId` (`shop_id` ASC),
   INDEX `idx_supplierId` (`supplier_id` ASC),
   INDEX `idx_createTime` (`create_time` ASC),
+  INDEX `idx_orderFlag` (`order_flag` ASC),
+  INDEX `idx_is_del` (`is_del` ASC),
   INDEX `idx_expressId` (`express_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单基本信息';
@@ -46,8 +50,7 @@ drop table if exists  `zm_order`.`order_detail`;
 
 CREATE TABLE `zm_order`.`order_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `order_id` CHAR(21) NOT NULL,
-  `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
+  `order_id` CHAR(21) NOT NULL, 
   `payment` DECIMAL(10,2) NULL,
   `pay_time` DATETIME NULL,
   `post_fee` DECIMAL(10,2) NULL,
@@ -69,8 +72,7 @@ CREATE TABLE `zm_order`.`order_detail` (
   INDEX `idx_orderId` (`order_id` ASC),
   UNIQUE INDEX `uk_payNo` (`pay_no` ASC),
   UNIQUE INDEX `uk_orderId` (`order_id` ASC),
-  INDEX `idx_deliveryPlace` (`delivery_place` ASC),
-  INDEX `idx_orderFlag` (`order_flag` ASC)
+  INDEX `idx_deliveryPlace` (`delivery_place` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单详细信息';
 
@@ -129,7 +131,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   `center_id` INT UNSIGNED NOT NULL,
   `item_quantity` INT UNSIGNED NOT NULL,
   `goods_name` VARCHAR(200) NOT NULL,
-  `creati_time` DATETIME NULL,
+  `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
   PRIMARY KEY (`id`),

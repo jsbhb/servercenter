@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
+import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
@@ -51,7 +51,7 @@ public class OrderController {
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		String payType = req.getParameter("payType");
+		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
 		String openId = req.getParameter("openId");
 
@@ -81,37 +81,22 @@ public class OrderController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/order/{userId}", method = RequestMethod.GET)
-	public ResultModel listUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+	@RequestMapping(value = "{version}/order", method = RequestMethod.GET)
+	public ResultModel listUserOrder(@PathVariable("version") Double version, OrderInfo info,
 			Pagination pagination, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
-		Map<String, Object> param = new HashMap<String, Object>();
-		try {
-			String orderFlag = req.getParameter("orderFlag");
-			String status = req.getParameter("status");
-			if (StringUtils.isEmpty(orderFlag) || userId == null) {
-				result.setSuccess(false);
-				result.setErrorMsg("参数不全");
-				return result;
-			}
-
-			param.put("orderFlag", Integer.valueOf(orderFlag));
-			param.put("userId", userId);
-			if (status != null && !"".equals(status)) {
-				param.put("status", Integer.valueOf(status));
-			}
-		} catch (NumberFormatException e) {
+		if (info.getOrderFlag() == null) {
 			result.setSuccess(false);
-			result.setErrorMsg("参数有误");
+			result.setErrorMsg("参数不全");
 			return result;
 		}
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = orderService.listUserOrder(param, pagination);
+			result = orderService.listUserOrder(info, pagination);
 		}
 
 		return result;
@@ -165,8 +150,13 @@ public class OrderController {
 		// 设置允许跨域请求
 		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
+		String payNo = req.getParameter("payNo");
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = orderService.updateOrderPayStatusByOrderId(orderId);
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("orderId", orderId);
+			param.put("payNo", payNo);
+			result = orderService.updateOrderPayStatusByOrderId(param);
 		}
 
 		return result;
@@ -189,39 +179,83 @@ public class OrderController {
 			HttpServletResponse res, @RequestBody ShoppingCart cart) {
 
 		ResultModel result = new ResultModel();
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			orderService.saveShoppingCart(cart);
 			result.setSuccess(true);
 		}
-		
+
 		return result;
-		
+
 	}
-	
-	
+
 	@RequestMapping(value = "{version}/order/shoping-cart/{centerId}/{userId}", method = RequestMethod.GET)
 	public ResultModel listShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
 			Pagination pagination) {
 
 		ResultModel result = new ResultModel();
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			pagination.init();
 			param.put("userId", userId);
 			param.put("centerId", centerId);
 			param.put("pagination", pagination);
-			
-			List<ShoppingCart> list = orderService.listShoppingCart(param);
+
+			List<ShoppingCart> list = null;
+			try {
+				list = orderService.listShoppingCart(param);
+			} catch (Exception e) {
+				result.setSuccess(false);
+				result.setErrorMsg("后台出错");
+				e.printStackTrace();
+				return result;
+			}
+			result.setSuccess(true);
+			result.setObj(list);
+
+		}
+
+		return result;
+
+	}
+
+	@RequestMapping(value = "{version}/order/statusCount/{centerId}/{userId}", method = RequestMethod.GET)
+	public ResultModel getCountByStatus(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId) {
+
+		ResultModel result = new ResultModel();
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String,Object> param = new HashMap<String, Object>();
+			param.put("userId", userId);
+			param.put("centerId", centerId);
+			List<OrderCount> list = orderService.getCountByStatus(param);
 			result.setSuccess(true);
 			result.setObj(list);
 			
 		}
-		
 		return result;
-		
+
+	}
+	
+	@RequestMapping(value = "{version}/order/shoping-cart/{userId}", method = RequestMethod.DELETE)
+	public ResultModel removeShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @PathVariable("userId") Integer userId) {
+
+		ResultModel result = new ResultModel();
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String ids = req.getParameter("ids");
+			Map<String,Object> param = new HashMap<String, Object>();
+			String[] idArr = ids.split(",");
+			param.put("userId", userId);
+			param.put("idArr", idArr);
+			orderService.removeShoppingCart(param);
+			result.setSuccess(true);
+			
+		}
+		return result;
+
 	}
 
 	public static void main(String[] args) {
@@ -233,25 +267,25 @@ public class OrderController {
 		info.setExpressType(1);
 		info.setTdq(1);
 		OrderDetail detail = new OrderDetail();
-		detail.setOrderFlag(0);
+		info.setOrderFlag(0);
 		detail.setReceiveAddress("asdfasdf");
 		detail.setReceiveArea("fdsafdsa");
 		detail.setReceiveZipCode("123123");
 		detail.setReceiveProvince("ewq1");
 		detail.setReceiveName("test");
-		detail.setOrderFlag(0);
 		detail.setReceivePhone("13456123123");
 		List<OrderGoods> list = new ArrayList<OrderGoods>();
 		OrderGoods goods = new OrderGoods();
-		goods.setItemId("123123123");
-		goods.setActualPrice(1.1);
-		goods.setItemPrice(1.1);
+		goods.setItemId("bl01");
+		goods.setActualPrice(100.00);
+		goods.setItemPrice(100.00);
 		goods.setItemQuantity(1);
 		list.add(goods);
 		info.setOrderDetail(detail);
 		info.setOrderGoodsList(list);
 
 		System.out.println(JSONUtil.toJson(info));
+
 	}
 
 }

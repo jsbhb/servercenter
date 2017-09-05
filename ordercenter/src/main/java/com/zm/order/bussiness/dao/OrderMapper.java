@@ -3,6 +3,7 @@ package com.zm.order.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
@@ -25,7 +26,7 @@ public interface OrderMapper {
 	
 	void saveOrderGoods(List<OrderGoods> goodsList);
 	
-	List<OrderInfo> listOrderByUser(Map<String,Object> param);
+	List<OrderInfo> listOrderByParam(Map<String,Object> param);
 	
 	void removeUserOrder(Map<String,Object> param);
 	
@@ -38,4 +39,10 @@ public interface OrderMapper {
 	void saveShoppingCart(ShoppingCart cart);
 	
 	List<ShoppingCart> listShoppingCart(Map<String,Object> param);
+	
+	void updateOrderDetailPayTime(Map<String,Object> param);
+	
+	List<OrderCount> getCountByStatus(Map<String,Object> param);
+	
+	void removeShoppingCart(Map<String,Object> param);
 }

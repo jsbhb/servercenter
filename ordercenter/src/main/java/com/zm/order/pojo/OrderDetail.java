@@ -15,8 +15,6 @@ public class OrderDetail {
 
 	private String orderId;
 
-	private Integer orderFlag;
-
 	private Integer payType;
 
 	private Double payment;
@@ -65,14 +63,6 @@ public class OrderDetail {
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
-	}
-
-	public Integer getOrderFlag() {
-		return orderFlag;
-	}
-
-	public void setOrderFlag(Integer orderFlag) {
-		this.orderFlag = orderFlag;
 	}
 
 	public Integer getPayType() {
@@ -205,7 +195,7 @@ public class OrderDetail {
 
 	@Override
 	public String toString() {
-		return "OrderDetail [id=" + id + ", orderId=" + orderId + ", orderFlag=" + orderFlag + ", payType=" + payType
+		return "OrderDetail [id=" + id + ", orderId=" + orderId + ", payType=" + payType
 				+ ", payment=" + payment + ", payTime=" + payTime + ", postFee=" + postFee + ", faxFee=" + faxFee
 				+ ", payNo=" + payNo + ", deliveryPlace=" + deliveryPlace + ", carryAddress=" + carryAddress
 				+ ", receiveName=" + receiveName + ", receivePhone=" + receivePhone + ", receiveProvince="

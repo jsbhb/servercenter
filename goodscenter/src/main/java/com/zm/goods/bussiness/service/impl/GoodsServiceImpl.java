@@ -129,8 +129,8 @@ public class GoodsServiceImpl implements GoodsService {
 		for (OrderBussinessModel model : list) {
 			specs = goodsMapper.getGoodsSpecs(model.getItemId());
 			for (GoodsPrice price : specs.getPriceList()) {
-				boolean flag = model.getQuantity() > price.getMin()
-						&& (model.getQuantity() < price.getMax() || price.getMax() == null);
+				boolean flag = model.getQuantity() >= price.getMin()
+						&& (model.getQuantity() <= price.getMax() || price.getMax() == null);
 				if (flag) {
 					if (model.getDeliveryPlace() != null) {
 						if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {

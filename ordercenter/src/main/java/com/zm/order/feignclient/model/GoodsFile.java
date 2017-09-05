@@ -1,6 +1,10 @@
 package com.zm.order.feignclient.model;
 
-public class GoodsFile {
+import java.io.Serializable;
+
+public class GoodsFile implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private Integer id;
 	

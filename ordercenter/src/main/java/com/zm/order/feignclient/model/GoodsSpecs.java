@@ -1,5 +1,6 @@
 package com.zm.order.feignclient.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**  
@@ -11,7 +12,9 @@ import java.util.List;
  * @version   
  * @since JDK 1.7  
  */
-public class GoodsSpecs {
+public class GoodsSpecs implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
 	private Integer id;
 	

@@ -1,8 +1,13 @@
 package com.zm.order.utils;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -55,4 +60,24 @@ public class CommonUtils {
         queue.offer(i);
         return i;
     }
+    
+    
+    public static Object mapToObject(Map<String, Object> map, Class<?> beanClass) throws Exception {    
+        if (map == null)   
+            return null;    
+  
+        Object obj = beanClass.newInstance();  
+  
+        BeanInfo beanInfo = Introspector.getBeanInfo(obj.getClass());    
+        PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();    
+        for (PropertyDescriptor property : propertyDescriptors) {  
+            Method setter = property.getWriteMethod();    
+            if (setter != null) {  
+                setter.invoke(obj, map.get(property.getName()));   
+            }  
+        }  
+  
+        return obj;  
+    }    
+    
 }

@@ -36,7 +36,7 @@
 	</resultMap>
 
 
-	<select id="listOrderByUser" resultMap="orderBase"
+	<select id="listOrderByParam" resultMap="orderBase"
 		parameterType="Object">
 		select o.id,o.order_id,o.status,o.express_type,od.id as
 		detail_id,od.payment,od.post_fee,od.fax_fee,od.carry_address,
@@ -44,11 +44,36 @@
 		goods_id,og.item_name,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from order_base o left join order_detail od on o.order_id =
 		od.order_id left join order_goods og on o.order_id = og.order_id
-		where
-		o.user_id = #{userId,jdbcType = INTEGER} and od.order_flag =
-		#{orderFlag,jdbcType = INTEGER} and is_del = 0
-		<if test="status != null and status != ''">
+		where o.order_flag = #{info.orderFlag,jdbcType = INTEGER} 
+		<if test="info.status != null and info.status != ''">
 			and o.status = #{status,jdbcType = INTEGER}
+		</if>
+		<if test="info.userId != null and info.userId != ''">
+			and o.user_id = #{info.userId} and is_del = 0
+		</if>
+		<if test="info.centerId != null and info.centerId != ''">
+			and o.center_id = #{info.centerId}
+		</if>
+		<if test="info.shopId != null and info.shopId != ''">
+			and o.shop_id = #{info.shopId}
+		</if>
+		<if test="info.combinationId != null and info.combinationId != ''">
+			and o.combination_id = #{info.combinationId}
+		</if>
+		<if test="info.orderId != null and info.orderId != ''">
+			and o.order_id = #{info.orderId}
+		</if>
+		<if test="info.supplierId != null and info.supplierId != ''">
+			and o.supplier_id = #{info.supplierId}
+		</if>
+		<if test="info.expressId != null and info.expressId != ''">
+			and o.express_id = #{info.expressId}
+		</if>
+		<if test="info.startTime != null and info.startTime != ''">
+			and o.create_time &gt;= #{info.startTime}
+		</if>
+		<if test="info.endTime != null and info.endTime != ''">
+			and o.create_time &lt;= #{info.endTime}
 		</if>
 		order by o.create_time desc
 		<if test="pagination != null">
@@ -59,20 +84,20 @@
 
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
-		(order_id,combination_id,user_id,express_type,center_id,shop_id,supplier_id,tdq,
+		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,supplier_id,tdq,
 		carrier_key,express_id,gtime,send_time,create_time,remark)
 		VALUES
-		(#{orderId},#{combinationId},#{userId},#{expressType},#{centerId},#{shopId},#{supplierId},
+		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{supplierId},
 		#{tdq},#{carrierKey},#{expressId},#{gtime},#{sendTime},now(),#{remark})
 	</insert>
 
 	<insert id="saveOrderDetail" parameterType="Object">
 		INSERT INTO
 		order_detail
-		(order_id,order_flag,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,receive_city,
+		(order_id,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,receive_city,
 		receive_area,receive_address,receive_zip_code,create_time,remark)
 		VALUES
-		(#{orderId},#{orderFlag},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
+		(#{orderId},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
 		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},now(),#{remark});
 	</insert>
 
@@ -115,11 +140,30 @@
 		insert into
 		order_shopping_cart(user_id,item_id,item_quantity,goods_name,center_id,create_time)
 		values(#{userId},#{itemId},#{quantity},#{goodsName},#{centerId},now())
-		on duplicate key update item_quantity= item_quantity + values(quantity),update_time=now()
+		on duplicate key update item_quantity= #{quantity} + values(item_quantity),update_time=now()
 	</insert>
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
 		select * from order_shopping_cart where user_id = #{userId} and center_id = #{centerId} order by create_time 
 		limit #{pagination.startRow},#{pagination.numPerPage}
 	</select>
+	
+	<update id="updateOrderDetailPayTime" parameterType="Object" >
+		update order_detail set pay_time = now() 
+		<if test="payNo != null and payNo != ''">
+			,pay_no = #{payNo} 
+		</if>
+		where order_id = #{orderId}
+	</update>
+	
+	<select id="getCountByStatus" parameterType="Object" resultType="com.zm.order.pojo.OrderCount">
+		select status, count(*) as total from order_base where center_id=#{centerId} and user_id = #{userId} group by status
+	</select>
+	
+	<delete id="removeShoppingCart" parameterType="Object">
+		delete from order_shopping_cart where user_id=#{userId} and id in
+		<foreach collection="idArr" separator="," item="item" open="(" close=")">
+			#{item}
+		</foreach>
+	</delete>
 </mapper>

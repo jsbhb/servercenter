@@ -271,7 +271,7 @@
 	</update>
 	
 	<update id="updateVipOrder" parameterType="Object">
-		update user_vip_order set status = 1 where order_id = #{orderId}
+		update user_vip_order set status = 1, pay_time = now() where order_id = #{orderId}
 	</update>
 
 </mapper>
