@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.auth.common.Constants;
 import com.zm.auth.common.JWTUtil;
+import com.zm.auth.common.MethodUtil;
 import com.zm.auth.mapper.UserMapper;
 import com.zm.auth.model.PlatUserType;
 import com.zm.auth.model.SecurityUserDetail;
@@ -47,18 +49,39 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public SecurityUserDetail register(UserInfo userInfo) {
 
-		String userName = userInfo.getUserName();
+		if (userInfo == null) {
+			throw new SecurityException("用户信息未输入！");
+		}
+
+		int loginType = userInfo.getLoginType();
+
+		String userName = null;
+		if (loginType == Constants.LOGIN_PHONE) {
+			userName = userInfo.getPhone();
+		}
+
+		if (loginType == Constants.LOGIN_USER_NAME)
+			userName = userInfo.getUserName();
+
+		if (userName == null || "".equals(userName)) {
+			throw new SecurityException("用户名信息有误，请重新输入！");
+		}
+
 		if (userMapper.getUserByName(userName) != null) {
 			return null;
 		}
-		// BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		// final String rawPassword = userInfo.getPassword();
-		// userInfo.setPassword(encoder.encode(rawPassword));
+
+		if (loginType == Constants.LOGIN_PHONE) {
+			userInfo.setUserName(userName);
+		}
+
+		// 设置密码MD5加密
+		userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 		userInfo.setLastPasswordResetDate(new Date());
 		userInfo.setAuthorities(asList("ROLE_USER"));
 		userMapper.insert(userInfo);
 
-		SecurityUserDetail userDetail = SecurityUserFactory.create(userInfo);
+		SecurityUserDetail userDetail = SecurityUserFactory.createWithOutPassWord(userInfo);
 
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(JWTUtil.PASSWORD, userInfo.getPassword());
@@ -76,36 +99,71 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public SecurityUserDetail login(UserInfo userInfo) {
-		// UsernamePasswordAuthenticationToken upToken = new
-		// UsernamePasswordAuthenticationToken(username, password);
-		// Authentication authentication =
-		// authenticationManager.authenticate(upToken);
-		// SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		int platUserType = userInfo.getPlatUserType();
-
-		if (platUserType == PlatUserType.CONSUMER.getIndex()) {
-			userInfo = userMapper.getUserForLogin(userInfo);
-		} else if (platUserType != 0) {
-			userInfo = userMapper.getUserByPlatId(userInfo.getUserId());
-		}else{
-			return null;
+		if (userInfo == null) {
+			throw new SecurityException("用户信息未输入！");
 		}
 
-		if (userInfo.getUserId() == null || "".equals(userInfo.getUserId())) {
-			return null;
+		int loginType = userInfo.getLoginType();
+
+		UserInfo userDetail = null;
+		if (loginType == Constants.LOGIN_WX) {
+			if (userInfo.getOpenId() == null || "".equals(userInfo.getOpenId())) {
+				throw new SecurityException("未传递openId给后台！");
+			}
+
+			userDetail = userMapper.queryByOpenId(userInfo);
+
+			if (userDetail == null) {
+				userMapper.insert(userInfo);
+				userDetail = userInfo;
+				userInfo = null;
+			}
+			
+
+		} else {
+			String userName = null;
+			if (loginType == Constants.LOGIN_PHONE) {
+				userName = userInfo.getPhone();
+				userInfo.setUserName(userInfo.getPhone());
+			}
+
+			if (loginType == Constants.LOGIN_USER_NAME)
+				userName = userInfo.getUserName();
+
+			if (userName == null || "".equals(userName)) {
+				throw new SecurityException("用户名信息有误，请重新输入！");
+			}
+
+			int platUserType = userInfo.getPlatUserType();
+
+			if (platUserType == PlatUserType.CONSUMER.getIndex()) {
+				String pwd = userInfo.getPassword();
+				userInfo.setPassword(MethodUtil.MD5(pwd));
+				userDetail = userMapper.getUserForLogin(userInfo);
+			} else if (platUserType >= 1 && platUserType < 5) {
+				userDetail = userMapper.getUserByPlatId(userInfo.getUserId());
+			}
+		}
+
+		if (userDetail == null) {
+			throw new SecurityException("登录失败，没有该用户！");
 		}
 
 		Map<String, Object> claim = new HashMap<String, Object>();
-		claim.put(JWTUtil.PASSWORD, userInfo.getPassword());
-		claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
-		userInfo.setAuthorities(asList("ROLE_USER"));
+		if (loginType == Constants.LOGIN_WX) {
+			claim.put(JWTUtil.OPEN_ID, userDetail.getOpenId());
+		} else {
+			claim.put(JWTUtil.PASSWORD, userDetail.getPassword());
+			claim.put(JWTUtil.USER_NAME, userDetail.getUserName());
+		}
+		userDetail.setAuthorities(asList("ROLE_USER"));
 
-		SecurityUserDetail userDetail = SecurityUserFactory.create(userInfo);
+		SecurityUserDetail securityUserDetail = SecurityUserFactory.createWithOutPassWord(userDetail);
 
-		userDetail.setToken(JWTUtil.generateToken(claim));
+		securityUserDetail.setToken(JWTUtil.generateToken(claim));
 
-		return userDetail;
+		return securityUserDetail;
 	}
 
 	@Override
@@ -120,6 +178,39 @@ public class AuthServiceImpl implements AuthService {
 		// }
 		return null;
 
+	}
+
+	/**
+	 * TODO 简单描述该方法的实现功能（可选）.
+	 * 
+	 * @see com.zm.auth.service.AuthService#checkAccount(com.zm.auth.model.UserInfo)
+	 */
+	@Override
+	public boolean checkAccount(UserInfo userInfo) {
+
+		if (userInfo == null) {
+			throw new SecurityException("用户信息未输入！");
+		}
+
+		int loginType = userInfo.getLoginType();
+
+		String userName = null;
+		if (loginType == Constants.LOGIN_PHONE) {
+			userName = userInfo.getPhone();
+		}
+
+		if (loginType == Constants.LOGIN_USER_NAME)
+			userName = userInfo.getUserName();
+
+		if (userName == null || "".equals(userName)) {
+			throw new SecurityException("用户名信息有误，请重新输入！");
+		}
+
+		if (userMapper.getUserByName(userName) != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 }

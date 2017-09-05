@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -31,15 +32,23 @@ public class UserServiceImpl implements UserService {
 	// @Autowired
 	// private RoleService roleService;
 
+	@Value("${wx_openId_secret}")
+	private String WX_OPENID_SECRET;
+
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
 
-		UserInfo userInfo = getUserByName(userName);
-		List<String> roles = new ArrayList<String>();
+		UserInfo userInfo = null;
+		if (userName.endsWith(WX_OPENID_SECRET)) {
+			userInfo = getUserByOpenId(userName.split("_")[0]);
+		} else {
+			userInfo = getUserByName(userName);
+		}
 
 		if (userInfo == null) {
 			throw new UsernameNotFoundException(userName);
 		}
+		List<String> roles = new ArrayList<String>();
 
 		roles.add("ADMIN");
 		roles.add("USER");
@@ -70,6 +79,19 @@ public class UserServiceImpl implements UserService {
 		// return user;
 	}
 
+	/**
+	 * getUserByOpenId:(这里用一句话描述这个方法的作用). <br/>
+	 * 
+	 * @author hebin
+	 * @param string
+	 * @return
+	 * @since JDK 1.7
+	 */
+	@Override
+	public UserInfo getUserByOpenId(String openId) {
+		return userMapper.queryByOpenId(new UserInfo(openId));
+	}
+
 	@Override
 	public UserDetails loadUserByPlatId(String platId) throws UsernameNotFoundException {
 
@@ -89,19 +111,16 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserInfo getUserByName(String userName) {
-		UserInfo userInfo = userMapper.getUserByName(userName);
-		return userInfo;
+		return userMapper.getUserByName(userName);
 	}
 
 	@Override
 	public UserInfo getUserByPhone(String phone) {
-		UserInfo userInfo = userMapper.getUserByPhone(phone);
-		return userInfo;
+		return userMapper.getUserByPhone(phone);
 	}
 
 	@Override
 	public UserInfo getUserByPlatId(String platId) {
-		UserInfo userInfo = userMapper.getUserByPlatId(platId);
-		return userInfo;
+		return userMapper.getUserByPlatId(platId);
 	}
 }

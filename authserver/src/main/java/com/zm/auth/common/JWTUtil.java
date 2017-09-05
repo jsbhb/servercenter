@@ -26,6 +26,8 @@ public class JWTUtil {
 	public final static String USER_NAME = "username";
 
 	public final static String PASSWORD = "password";
+	
+	public final static String OPEN_ID = "openid";
 
 	public final static String PLATFORM_ID = "platid";
 

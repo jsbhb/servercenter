@@ -50,4 +50,15 @@ public interface AuthService {
 	 */
 	String refresh(String oldToken);
 	
+	/**
+	 * 
+	 * check:检验用户名. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param oldToken
+	 * @return  
+	 * @since JDK 1.7
+	 */
+	boolean checkAccount(UserInfo userInfo);
+	
 }

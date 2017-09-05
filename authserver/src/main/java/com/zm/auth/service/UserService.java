@@ -29,24 +29,34 @@ public interface UserService extends UserDetailsService {
 	 */
 	public UserInfo getUserByPhone(String phone);
 
-	/**  
-	 * loadUserByPlatId:根据用户编号获取用户. <br/>  
-	 *  
-	 * @author hebin  
+	/**
+	 * loadUserByPlatId:根据用户编号获取用户. <br/>
+	 * 
+	 * @author hebin
 	 * @param platId
 	 * @return
-	 * @throws UsernameNotFoundException  
-	 * @since JDK 1.7  
+	 * @throws UsernameNotFoundException
+	 * @since JDK 1.7
 	 */
 	UserDetails loadUserByPlatId(String platId) throws UsernameNotFoundException;
 
-	/**  
-	 * getUserByPlatId:(这里用一句话描述这个方法的作用). <br/>  
-	 *  
-	 * @author hebin  
+	/**
+	 * getUserByPlatId:(这里用一句话描述这个方法的作用). <br/>
+	 * 
+	 * @author hebin
 	 * @param platId
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	UserInfo getUserByPlatId(String platId);
+
+	/**
+	 * getUserByOpenId:根据用户openid获取用户信息. <br/>
+	 * 
+	 * @author hebin
+	 * @param openId
+	 * @return
+	 * @since JDK 1.7
+	 */
+	UserInfo getUserByOpenId(String openId);
 }
