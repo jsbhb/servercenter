@@ -5,15 +5,29 @@
 	<resultMap type="com.zm.order.pojo.OrderInfo" id="orderBase">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="carrier_key" property="carrierKey" jdbcType="VARCHAR" />
+		<result column="express_id" property="expressId" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="express_type" property="expressType" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
 			<result column="post_fee" property="postFee" jdbcType="DECIMAL" />
 			<result column="fax_fee" property="faxFee" jdbcType="DECIMAL" />
+			<result column="pay_type" property="payType" jdbcType="INTEGER" />
 			<result column="carry_address" property="carryAddress"
 				jdbcType="VARCHAR" />
+			<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+			<result column="receive_phone" property="receivePhone"
+				jdbcType="VARCHAR" />
+			<result column="receive_province" property="receiveProvince"
+				jdbcType="VARCHAR" />
+			<result column="receive_city" property="receiveCity" jdbcType="VARCHAR" />
+			<result column="receive_area" property="receiveArea"
+				jdbcType="VARCHAR" />
+			<result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
+			<result column="receive_zip_code" property="receiveZipCode" jdbcType="VARCHAR" />
 		</association>
 		<collection ofType="com.zm.order.pojo.OrderGoods" property="orderGoodsList">
 			<id column="goods_id" property="id" jdbcType="INTEGER" />
@@ -38,13 +52,15 @@
 
 	<select id="listOrderByParam" resultMap="orderBase"
 		parameterType="Object">
-		select o.id,o.order_id,o.status,o.express_type,od.id as
-		detail_id,od.payment,od.post_fee,od.fax_fee,od.carry_address,
+		select o.id,o.order_id,o.status,o.express_type,o.carrier_key,o.express_id,o.create_time,od.id as
+		detail_id,od.payment,od.post_fee,od.fax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
+		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,od.payment,
 		og.id as
 		goods_id,og.item_name,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from order_base o left join order_detail od on o.order_id =
 		od.order_id left join order_goods og on o.order_id = og.order_id
-		where o.order_flag = #{info.orderFlag,jdbcType = INTEGER} 
+		where
+		o.order_flag = #{info.orderFlag,jdbcType = INTEGER}
 		<if test="info.status != null and info.status != ''">
 			and o.status = #{status,jdbcType = INTEGER}
 		</if>
@@ -94,10 +110,10 @@
 	<insert id="saveOrderDetail" parameterType="Object">
 		INSERT INTO
 		order_detail
-		(order_id,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,receive_city,
+		(order_id,pay_type,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,receive_city,
 		receive_area,receive_address,receive_zip_code,create_time,remark)
 		VALUES
-		(#{orderId},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
+		(#{orderId},#{payType},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
 		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},now(),#{remark});
 	</insert>
 
@@ -140,29 +156,35 @@
 		insert into
 		order_shopping_cart(user_id,item_id,item_quantity,goods_name,center_id,create_time)
 		values(#{userId},#{itemId},#{quantity},#{goodsName},#{centerId},now())
-		on duplicate key update item_quantity= #{quantity} + values(item_quantity),update_time=now()
+		on duplicate key update item_quantity= #{quantity} +
+		values(item_quantity),update_time=now()
 	</insert>
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
-		select * from order_shopping_cart where user_id = #{userId} and center_id = #{centerId} order by create_time 
-		limit #{pagination.startRow},#{pagination.numPerPage}
+		select * from order_shopping_cart where user_id = #{userId} and
+		center_id = #{centerId} order by create_time
+		limit
+		#{pagination.startRow},#{pagination.numPerPage}
 	</select>
-	
-	<update id="updateOrderDetailPayTime" parameterType="Object" >
-		update order_detail set pay_time = now() 
+
+	<update id="updateOrderDetailPayTime" parameterType="Object">
+		update order_detail set pay_time = now()
 		<if test="payNo != null and payNo != ''">
-			,pay_no = #{payNo} 
+			,pay_no = #{payNo}
 		</if>
 		where order_id = #{orderId}
 	</update>
-	
-	<select id="getCountByStatus" parameterType="Object" resultType="com.zm.order.pojo.OrderCount">
-		select status, count(*) as total from order_base where center_id=#{centerId} and user_id = #{userId} group by status
+
+	<select id="getCountByStatus" parameterType="Object"
+		resultType="com.zm.order.pojo.OrderCount">
+		select status, count(*) as total from order_base where
+		center_id=#{centerId} and user_id = #{userId} group by status
 	</select>
-	
+
 	<delete id="removeShoppingCart" parameterType="Object">
 		delete from order_shopping_cart where user_id=#{userId} and id in
-		<foreach collection="idArr" separator="," item="item" open="(" close=")">
+		<foreach collection="idArr" separator="," item="item" open="("
+			close=")">
 			#{item}
 		</foreach>
 	</delete>
