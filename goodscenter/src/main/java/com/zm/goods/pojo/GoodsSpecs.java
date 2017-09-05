@@ -40,9 +40,29 @@ public class GoodsSpecs implements Serializable{
 	
 	private Double maxPrice;
 	
+	private Double vipMinPrice;
+	
+	private Double vipMaxPrice;
+	
 	private Integer stock;
 	
 	private List<GoodsPrice> priceList;
+
+	public Double getVipMinPrice() {
+		return vipMinPrice;
+	}
+
+	public void setVipMinPrice(Double vipMinPrice) {
+		this.vipMinPrice = vipMinPrice;
+	}
+
+	public Double getVipMaxPrice() {
+		return vipMaxPrice;
+	}
+
+	public void setVipMaxPrice(Double vipMaxPrice) {
+		this.vipMaxPrice = vipMaxPrice;
+	}
 
 	public Integer getStock() {
 		return stock;

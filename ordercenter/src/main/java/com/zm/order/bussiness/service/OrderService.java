@@ -124,4 +124,14 @@ public interface OrderService {
 	 * @since JDK 1.7  
 	 */
 	void removeShoppingCart(Map<String,Object> param);
+	
+	/**  
+	 * countShoppingCart:获取购物车数量. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param param
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Integer countShoppingCart(Map<String,Object> param);
 }

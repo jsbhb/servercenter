@@ -188,4 +188,8 @@
 			#{item}
 		</foreach>
 	</delete>
+	
+	<select id="countShoppingCart" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from order_shopping_cart where center_id = #{centerId} and user_id = #{userId}
+	</select>
 </mapper>

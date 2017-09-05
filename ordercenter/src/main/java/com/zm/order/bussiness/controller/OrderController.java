@@ -82,8 +82,8 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order", method = RequestMethod.GET)
-	public ResultModel listUserOrder(@PathVariable("version") Double version, OrderInfo info,
-			Pagination pagination, HttpServletRequest req, HttpServletResponse res) {
+	public ResultModel listUserOrder(@PathVariable("version") Double version, OrderInfo info, Pagination pagination,
+			HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 		// 设置允许跨域请求
@@ -223,22 +223,23 @@ public class OrderController {
 
 	@RequestMapping(value = "{version}/order/statusCount/{centerId}/{userId}", method = RequestMethod.GET)
 	public ResultModel getCountByStatus(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId,
+			@PathVariable("centerId") Integer centerId) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
 			param.put("centerId", centerId);
 			List<OrderCount> list = orderService.getCountByStatus(param);
 			result.setSuccess(true);
 			result.setObj(list);
-			
+
 		}
 		return result;
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/shoping-cart/{userId}", method = RequestMethod.DELETE)
 	public ResultModel removeShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId) {
@@ -246,13 +247,31 @@ public class OrderController {
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String ids = req.getParameter("ids");
-			Map<String,Object> param = new HashMap<String, Object>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			String[] idArr = ids.split(",");
 			param.put("userId", userId);
 			param.put("idArr", idArr);
 			orderService.removeShoppingCart(param);
 			result.setSuccess(true);
-			
+
+		}
+		return result;
+
+	}
+
+	@RequestMapping(value = "{version}/order/shoping-cart/count/{centerId}/{userId}", method = RequestMethod.GET)
+	public ResultModel countShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @PathVariable("userId") Integer userId,
+			@PathVariable("centerId") Integer centerId) {
+
+		ResultModel result = new ResultModel();
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("userId", userId);
+			param.put("centerId", centerId);
+			Integer count = orderService.countShoppingCart(param);
+			result.setSuccess(true);
+			result.setObj(count);
 		}
 		return result;
 

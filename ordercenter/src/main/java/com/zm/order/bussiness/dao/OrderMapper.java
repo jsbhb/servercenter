@@ -45,4 +45,6 @@ public interface OrderMapper {
 	List<OrderCount> getCountByStatus(Map<String,Object> param);
 	
 	void removeShoppingCart(Map<String,Object> param);
+	
+	int countShoppingCart(Map<String,Object> param);
 }

@@ -216,11 +216,15 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		for (int i = 0; i < priceList.size(); i++) {
 			if (i == 0) {
-				specs.setMinPrice(priceList.get(i).getVipPrice());
+				specs.setMinPrice(priceList.get(i).getPrice());
 				specs.setMaxPrice(priceList.get(i).getPrice());
+				specs.setVipMinPrice(priceList.get(i).getVipPrice());
+				specs.setVipMaxPrice(priceList.get(i).getVipPrice());
 			} else {
-				specs.setMinPrice(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getVipPrice()));
+				specs.setMinPrice(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()));
 				specs.setMaxPrice(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()));
+				specs.setVipMinPrice(CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()));
+				specs.setVipMaxPrice(CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()));
 			}
 		}
 	}

@@ -265,4 +265,9 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.removeShoppingCart(param);
 		
 	}
+
+	@Override
+	public Integer countShoppingCart(Map<String, Object> param) {
+		return orderMapper.countShoppingCart(param);
+	}
 }
