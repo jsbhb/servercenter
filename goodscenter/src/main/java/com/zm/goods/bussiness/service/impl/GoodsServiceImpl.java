@@ -128,6 +128,8 @@ public class GoodsServiceImpl implements GoodsService {
 		Double totalAmount = 0.0;
 		for (OrderBussinessModel model : list) {
 			specs = goodsMapper.getGoodsSpecs(model.getItemId());
+			getPriceInterval(specs);
+			boolean calculation = false;
 			for (GoodsPrice price : specs.getPriceList()) {
 				boolean flag = model.getQuantity() >= price.getMin()
 						&& (model.getQuantity() <= price.getMax() || price.getMax() == null);
@@ -135,11 +137,16 @@ public class GoodsServiceImpl implements GoodsService {
 					if (model.getDeliveryPlace() != null) {
 						if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
 							totalAmount += model.getQuantity() * (vip ? price.getVipPrice() : price.getPrice());
+							calculation = true;
 						}
 					} else {
 						totalAmount += model.getQuantity() * (vip ? price.getVipPrice() : price.getPrice());
+						calculation = true;
 					}
 				}
+			}
+			if(!calculation){
+				totalAmount += model.getQuantity() * (vip ? specs.getVipMinPrice() : specs.getMinPrice());
 			}
 		}
 
