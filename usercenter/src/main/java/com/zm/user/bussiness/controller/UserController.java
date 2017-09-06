@@ -461,4 +461,15 @@ public class UserController {
 		return false;
 	}
 
+	@RequestMapping(value = "{version}/user/is-already-pay/{orderId}", method = RequestMethod.GET)
+	public boolean isAlreadyPay(@PathVariable("version") Double version, @PathVariable("orderId") String orderId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return userService.isAlreadyPay(orderId);
+		}
+		
+		return false;
+	}
+
 }

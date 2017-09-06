@@ -28,4 +28,7 @@ public interface UserFeignClient {
 
 	@RequestMapping(value = "{version}/user/updateVipOrder/{orderId}", method = RequestMethod.PUT)
 	public boolean updateVipOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId);
+	
+	@RequestMapping(value = "{version}/user/is-already-pay/{orderId}", method = RequestMethod.GET)
+	public boolean isAlreadyPay(@PathVariable("version") Double version, @PathVariable("orderId") String orderId);
 }

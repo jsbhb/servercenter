@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
 
 	private static final Integer DEFAULT = 1;
 
+	private static final Integer ALREADY_PAY = 1;
+
 	@Resource
 	UserMapper userMapper;
 
@@ -96,7 +98,8 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
-		logFeignClient.saveLog(packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
+		logFeignClient.saveLog(Constants.FIRST_VERSION,
+				packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
 	}
 
 	@Override
@@ -139,7 +142,7 @@ public class UserServiceImpl implements UserService {
 		userMapper.updateUserPwd(param);
 
 		String content = "用户  \"" + phone + "\"  修改了密码";
-		logFeignClient.saveLog(packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
+		logFeignClient.saveLog(Constants.FIRST_VERSION, packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
 
 	}
 
@@ -210,9 +213,9 @@ public class UserServiceImpl implements UserService {
 					payModel);
 			result.setObj(paymap);
 		}
-		
+
 		userMapper.saveVipOrder(order);
-		
+
 		result.setSuccess(true);
 
 		return result;
@@ -220,31 +223,43 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<VipPrice> listVipPrice(Integer centerId) {
-		
+
 		return userMapper.listVipPrice(centerId);
 	}
 
 	@Override
 	public UserVip getVipUserByOrderId(String orderId) {
-		
+
 		return userMapper.getVipUserByOrderId(orderId);
 	}
 
 	@Override
 	public void saveUserVip(UserVip userVip) {
-		
+
 		userMapper.saveVipUser(userVip);
 	}
 
 	@Override
 	public void updateUserVip(UserVip userVip) {
-		
+
 		userMapper.updateUserVip(userVip);
 	}
 
 	@Override
 	public void updateVipOrder(String orderId) {
 		userMapper.updateVipOrder(orderId);
+	}
+
+	@Override
+	public boolean isAlreadyPay(String orderId) {
+
+		Integer status = userMapper.isAlreadyPay(orderId);
+
+		if (status.equals(ALREADY_PAY)) {
+			return true;
+		}
+
+		return false;
 	}
 
 }

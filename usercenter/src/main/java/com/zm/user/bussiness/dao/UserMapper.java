@@ -51,4 +51,6 @@ public interface UserMapper {
 	void updateUserVip(UserVip userVip);
 	
 	void updateVipOrder(String orderId);
+	
+	int isAlreadyPay(String orderId);
 }

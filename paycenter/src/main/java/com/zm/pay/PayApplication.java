@@ -4,7 +4,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import feign.Retryer;
 
 /**
  * 
@@ -23,5 +26,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class PayApplication {
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(PayApplication.class).web(true).run(args);
+	}
+
+	//feign不进行重试
+	@Bean
+	Retryer feignRetryer() {
+		return Retryer.NEVER_RETRY;
 	}
 }

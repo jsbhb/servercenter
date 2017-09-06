@@ -60,10 +60,10 @@ public class NotifyController {
         Integer clientId = null;
         UserVip user = null;
         if(orderId != null && orderId.startsWith("GX")){
-        	clientId = orderFeignClient.getClientIdByOrderId(orderId, 1.0);
+        	clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
         }
         if(orderId != null && orderId.startsWith("VIP")){
-        	user = userFeignClient.getClientIdByOrderId(orderId, 1.0);
+        	user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
         	clientId = user.getCenterId();
         }
        
@@ -80,7 +80,7 @@ public class NotifyController {
         	if("SUCCESS".equals((String)notifyMap.get("result_code"))){
         		if(orderId.startsWith("GX")){
         			String payNo = notifyMap.get("transaction_id");
-        			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(1.0, orderId, payNo);
+        			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
         			//TODO 发送第三方？
         			if(result.isSuccess()){
         				//通知微信.异步确认成功.必写.不然会一直通知后台.八次之后就认为交易失败了.  
@@ -90,12 +90,14 @@ public class NotifyController {
         			}
         		}
         		if(orderId.startsWith("VIP")){
-        			userFeignClient.updateVipOrder(1.0, orderId);
-        			boolean flag = userFeignClient.getVipUser(1.0, user.getUserId(), clientId);
-        			if(flag){
-        				userFeignClient.updateUserVip(1.0, user);
-        			} else {
-        				userFeignClient.saveUserVip(1.0, user);
+        			if(!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)){
+        				userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
+        				boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
+        				if(flag){
+        					userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
+        				} else {
+        					userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
+        				}
         			}
         			resXml = getWXCallBackMsg("SUCCESS", "OK");
         		}

@@ -161,4 +161,13 @@ public interface UserService {
 	void updateUserVip(UserVip userVip);
 	
 	void updateVipOrder(String orderId);
+	
+	/**  
+	 * isAlreadyPay:支付回调时判断该订单是否已经支付处理完成. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param orderId  
+	 * @since JDK 1.7  
+	 */
+	boolean isAlreadyPay(String orderId);
 }
