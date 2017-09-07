@@ -77,6 +77,9 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public Map<String, Object> tradeGoodsDetail(String itemId) {
 		GoodsSpecs specs = goodsMapper.getGoodsSpecs(itemId);
+		if(specs == null){
+			return null;
+		}
 		getPriceInterval(specs);
 
 		List<Integer> idList = new ArrayList<Integer>();
@@ -99,7 +102,14 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public Map<String, Object> listGoodsSpecs(List<String> list) {
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(list);
-
+		if(specsList == null || specsList.size() == 0){
+			return null;
+		}
+		
+		for(GoodsSpecs specs : specsList){
+			getPriceInterval(specs);
+		}
+		
 		List<Integer> idList = new ArrayList<Integer>();
 		for(GoodsSpecs model : specsList){
 			idList.add(model.getGoodsId());

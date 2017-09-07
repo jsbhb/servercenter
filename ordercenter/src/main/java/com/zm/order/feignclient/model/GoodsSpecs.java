@@ -3,46 +3,66 @@ package com.zm.order.feignclient.model;
 import java.io.Serializable;
 import java.util.List;
 
-/**  
- * ClassName: GoodsSpecs <br/>  
- * Function: 商品规格，包括价格. <br/>   
- * date: Aug 22, 2017 2:17:27 PM <br/>  
- *  
- * @author wqy  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: GoodsSpecs <br/>
+ * Function: 商品规格，包括价格. <br/>
+ * date: Aug 22, 2017 2:17:27 PM <br/>
+ * 
+ * @author wqy
+ * @version
+ * @since JDK 1.7
  */
-public class GoodsSpecs implements Serializable{
-	
+public class GoodsSpecs implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	private Integer id;
-	
+
 	private Integer goodsId;
-	
+
 	private String itemId;
-	
+
 	private String itemCode;
-	
+
 	private String sku;
-	
+
 	private Integer promotion;
-	
+
 	private String info;
-	
+
 	private String createTime;
-	
+
 	private String updateTime;
-	
+
 	private String opt;
-	
+
 	private Double minPrice;
-	
+
 	private Double maxPrice;
-	
+
+	private Double vipMinPrice;
+
+	private Double vipMaxPrice;
+
 	private Integer stock;
-	
+
 	private List<GoodsPrice> priceList;
+
+	public Double getVipMinPrice() {
+		return vipMinPrice;
+	}
+
+	public void setVipMinPrice(Double vipMinPrice) {
+		this.vipMinPrice = vipMinPrice;
+	}
+
+	public Double getVipMaxPrice() {
+		return vipMaxPrice;
+	}
+
+	public void setVipMaxPrice(Double vipMaxPrice) {
+		this.vipMaxPrice = vipMaxPrice;
+	}
 
 	public Integer getStock() {
 		return stock;
@@ -158,10 +178,11 @@ public class GoodsSpecs implements Serializable{
 
 	@Override
 	public String toString() {
-		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId
-				+ ", itemCode=" + itemCode + ", sku=" + sku + ", promotion=" + promotion + ", info=" + info
-				+ ", createTime=" + createTime + ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice="
-				+ minPrice + ", maxPrice=" + maxPrice + ", stock=" + stock + ", priceList=" + priceList + "]";
+		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + ", itemCode=" + itemCode
+				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
+				+ ", vipMinPrice=" + vipMinPrice + ", vipMaxPrice=" + vipMaxPrice + ", stock=" + stock + ", priceList="
+				+ priceList + "]";
 	}
-	
+
 }

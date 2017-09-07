@@ -18,6 +18,6 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list, @RequestParam("delStock") boolean delStock, @RequestParam("vip") boolean vip);
 
-	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.POST)
-	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("list") List<String> list);
+	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
+	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("ids") List<String> list);
 }
