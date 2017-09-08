@@ -212,6 +212,10 @@ public class UserServiceImpl implements UserService {
 			Map<String, String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(price.getCenterId()), type,
 					payModel);
 			result.setObj(paymap);
+		} else {
+			result.setSuccess(false);
+			result.setErrorMsg("请指定正确的支付方式");
+			return result;
 		}
 
 		userMapper.saveVipOrder(order);
