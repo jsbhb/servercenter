@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		if (userMapper.getUserByName(userName) != null) {
-			return null;
+			throw new SecurityException("该用户名名已经存在！");
 		}
 
 		if (loginType == Constants.LOGIN_PHONE) {
