@@ -39,13 +39,11 @@ public class GoodsController {
 	@Resource
 	GoodsService goodsService;
 
-	@RequestMapping(value = "{version}/goods", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods", method = RequestMethod.GET)
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
 		String type = req.getParameter("type");
 		String categoryId = req.getParameter("categoryId");
@@ -78,8 +76,6 @@ public class GoodsController {
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
 		String startTime = req.getParameter("startTime");
 		String endTime = req.getParameter("endTime");
@@ -98,13 +94,11 @@ public class GoodsController {
 		return result;
 	}
 	
-	@RequestMapping(value = "{version}/goods/goodsSpecs/{itemId}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{itemId}", method = RequestMethod.GET)
 	public ResultModel getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String,Object> resultMap = goodsService.tradeGoodsDetail(itemId);
@@ -121,8 +115,6 @@ public class GoodsController {
 			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		String ids = req.getParameter("ids");
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
@@ -141,8 +133,6 @@ public class GoodsController {
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = goodsService.getPriceAndDelStock(list, delStock, vip);

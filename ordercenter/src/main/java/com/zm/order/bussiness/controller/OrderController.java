@@ -48,8 +48,6 @@ public class OrderController {
 			HttpServletResponse res, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
@@ -86,8 +84,6 @@ public class OrderController {
 			HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (info.getOrderFlag() == null) {
 			result.setSuccess(false);
@@ -107,9 +103,6 @@ public class OrderController {
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
-
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("userId", userId);
@@ -127,8 +120,6 @@ public class OrderController {
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		Map<String, Object> param = new HashMap<String, Object>();
 
@@ -147,8 +138,6 @@ public class OrderController {
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String payNo = req.getParameter("payNo");
 

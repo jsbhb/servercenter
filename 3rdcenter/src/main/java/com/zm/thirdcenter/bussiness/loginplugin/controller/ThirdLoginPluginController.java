@@ -32,12 +32,12 @@ public class ThirdLoginPluginController {
 
 	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
 
-	private static final String REDIRECT_URL = "http://0ca50d05.ngrok.io/user/3rdLogin/wxLogin";
+	private static final String REDIRECT_URL = "http://0ca50d05.ngrok.io/auth/user/3rdLogin/wxLogin";
 
 	@Resource
 	RedisTemplate<String, ApiResult> redisTemplate;
 
-	@RequestMapping(value = "{version}/user/3rdLogin/wx", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/user/3rdLogin/wx", method = RequestMethod.GET)
 	public String getRequestCodeUrl(boolean snsapiBase) {
 
 		StringBuffer sb = new StringBuffer();
@@ -55,7 +55,7 @@ public class ThirdLoginPluginController {
 		return authorize_uri + sb.toString();
 	}
 
-	@RequestMapping(value = "user/3rdLogin/wxLogin", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/user/3rdLogin/wxLogin", method = RequestMethod.GET)
 	public ResultModel loginByWechat(HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();

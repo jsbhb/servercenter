@@ -1,6 +1,7 @@
 package com.zm.goods.pojo;
 
 import java.util.List;
+import java.util.Set;
 
 public class GoodsItem extends GoodsBase {
 
@@ -29,12 +30,22 @@ public class GoodsItem extends GoodsBase {
 	private String createTime;
 
 	private String updateTime;
+	
+	private Set<String> specsInfo;
 
 	private String opt;
 
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+
+	public Set<String> getSpecsInfo() {
+		return specsInfo;
+	}
+
+	public void setSpecsInfo(Set<String> specsInfo) {
+		this.specsInfo = specsInfo;
+	}
 
 	public List<GoodsFile> getGoodsFileList() {
 		return goodsFileList;
@@ -166,10 +177,10 @@ public class GoodsItem extends GoodsBase {
 
 	@Override
 	public String toString() {
-		return super.toString() + "GoodsItem [goodsId=" + goodsId + ", supplierId=" + supplierId + ", customGoodsName="
-				+ customGoodsName + ", status=" + status + ", type=" + type + ", popular=" + popular + ", hot=" + hot
-				+ ", good=" + good + ", choice=" + choice + ", indexStatus=" + indexStatus + ", detailPath="
-				+ detailPath + ", createTime=" + createTime + ", updateTime=" + updateTime + ", opt=" + opt
+		return "GoodsItem [goodsId=" + goodsId + ", supplierId=" + supplierId + ", customGoodsName=" + customGoodsName
+				+ ", status=" + status + ", type=" + type + ", popular=" + popular + ", hot=" + hot + ", good=" + good
+				+ ", choice=" + choice + ", indexStatus=" + indexStatus + ", detailPath=" + detailPath + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + ", specsInfo=" + specsInfo + ", opt=" + opt
 				+ ", goodsFileList=" + goodsFileList + ", goodsSpecsList=" + goodsSpecsList + "]";
 	}
 

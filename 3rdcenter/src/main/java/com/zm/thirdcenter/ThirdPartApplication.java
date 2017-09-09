@@ -15,9 +15,9 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
  * @version
  * @since JDK 1.7
  */
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @SpringBootApplication
-//@EnableFeignClients
+@EnableFeignClients
 public class ThirdPartApplication {
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(ThirdPartApplication.class).web(true).run(args);

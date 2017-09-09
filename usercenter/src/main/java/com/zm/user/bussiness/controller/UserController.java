@@ -61,8 +61,6 @@ public class UserController {
 			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 		String account = req.getParameter("account");
 		Map<String, String> param = new HashMap<String, String>();
 		boolean flag = false;
@@ -92,8 +90,6 @@ public class UserController {
 			HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
@@ -113,8 +109,6 @@ public class UserController {
 			@RequestBody Address address, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			userService.saveAddress(address);
@@ -129,8 +123,6 @@ public class UserController {
 			@PathVariable("userId") Integer userId, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			List<Address> list = userService.listAddress(userId);
@@ -146,8 +138,6 @@ public class UserController {
 			@RequestBody Address address, HttpServletRequest req) {
 
 		ResultModel result = null;
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = userService.updateAddress(address);
@@ -161,8 +151,6 @@ public class UserController {
 			@PathVariable("userId") Integer userId, @PathVariable("id") Integer id, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		Map<String, Object> param = new HashMap<String, Object>();
 
@@ -182,8 +170,6 @@ public class UserController {
 			@RequestBody UserDetail detail, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			userService.updateUserDetail(detail);
@@ -198,10 +184,15 @@ public class UserController {
 			@RequestBody UserInfo info, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			if(info.getCenterId() == null || "".equals(info.getCenterId())){
+				result.setErrorMsg("区域中心ID不能为空");
+				result.setSuccess(false);
+				return result;
+			}
+			
 			info.setPhoneValidate(VALIDATE);
 			if (info.getPwd() != null && !"".equals(info.getPwd())) {
 				info.setPwd(EncryptionUtil.MD5(info.getPwd()));
@@ -225,8 +216,6 @@ public class UserController {
 			@RequestBody UserDetail detail, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			userService.saveUserDetail(detail);
@@ -248,7 +237,6 @@ public class UserController {
 			HttpServletResponse res) throws Exception {
 
 		ResultModel result = new ResultModel();
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (headImg.isEmpty()) {
 			result.setSuccess(false);
@@ -288,7 +276,6 @@ public class UserController {
 			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String code = req.getParameter("code");
 		String phone = req.getParameter("phone");
@@ -323,8 +310,6 @@ public class UserController {
 			@PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
 			HttpServletRequest req) {
 
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
@@ -342,8 +327,6 @@ public class UserController {
 			HttpServletRequest req, @RequestBody VipOrder vipOrder) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String payType = req.getParameter("payType");
 		String type = req.getParameter("type");
@@ -381,8 +364,6 @@ public class UserController {
 			HttpServletRequest req, @PathVariable("centerId") Integer centerId) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -399,8 +380,6 @@ public class UserController {
 	public UserVip getVipUserByOrderId(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("orderId") String orderId) {
 
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -416,8 +395,6 @@ public class UserController {
 			HttpServletRequest req, @RequestBody UserVip userVip) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -433,8 +410,6 @@ public class UserController {
 			HttpServletRequest req, @RequestBody UserVip userVip) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -449,8 +424,6 @@ public class UserController {
 	public boolean updateVipOrder(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("orderId") String orderId) {
 
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 

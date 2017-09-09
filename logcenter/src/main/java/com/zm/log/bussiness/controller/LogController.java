@@ -38,7 +38,6 @@ public class LogController {
 
 		ResultModel result = new ResultModel();
 
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			logService.saveLog(info);
@@ -53,7 +52,6 @@ public class LogController {
 
 		ResultModel result = new ResultModel();
 
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		Map<String,String[]> parameter = req.getParameterMap();
 		Map<String,Object> param = new HashMap<String,Object>();
@@ -75,7 +73,6 @@ public class LogController {
 
 		ResultModel result = new ResultModel();
 
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String endTime = req.getParameter("endTime");
 		

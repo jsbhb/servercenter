@@ -36,15 +36,19 @@ public class ThirdPartPhoneController {
 	@Resource
 	RedisTemplate<String, PhoneValidata> redisTemplate;
 
-	@RequestMapping(value = "{version}/third-part/phone", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/{version}/third-part/phone", method = RequestMethod.POST)
 	public ResultModel getPhoneCode(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		// 设置允许跨域请求
-		res.setHeader(Constants.CROSS_DOMAIN, Constants.DOMAIN_NAME);
 
 		String phone = req.getParameter("phone");
+		
+		if(phone == null || "".equals(phone)){
+			result.setErrorMsg("号码为空");
+			result.setSuccess(false);
+			return result;
+		}
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -98,7 +102,7 @@ public class ThirdPartPhoneController {
 
 	}
 
-	@RequestMapping(value = "{version}/third-part/phoneVerify", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/third-part/phoneVerify", method = RequestMethod.GET)
 	public boolean verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone,
 			@RequestParam("code") String code) {
 

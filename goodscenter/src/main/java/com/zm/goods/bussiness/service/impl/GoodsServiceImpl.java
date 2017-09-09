@@ -2,8 +2,10 @@ package com.zm.goods.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -20,6 +22,7 @@ import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.utils.CommonUtils;
+import com.zm.goods.utils.JSONUtil;
 
 @Service
 @Transactional
@@ -46,12 +49,12 @@ public class GoodsServiceImpl implements GoodsService {
 		parameter.put("list", idList);
 		parameter.put("type", PICTURE_TYPE);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
-		List<GoodsSpecs> specsList = null;
+		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(idList);
 		if (param.get("goodsId") != null) {
-			specsList = goodsMapper.listGoodsSpecs(idList);
+			packageGoodsItem(goodsList, fileList, specsList, true);
+		} else {
+			packageGoodsItem(goodsList, fileList, specsList, false);
 		}
-
-		packageGoodsItem(goodsList, fileList, specsList);
 
 		return goodsList;
 	}
@@ -177,7 +180,8 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
-	private void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList) {
+	@SuppressWarnings("unchecked")
+	private void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList, boolean flag) {
 
 		Map<Integer, GoodsItem> goodsMap = new HashMap<Integer, GoodsItem>();
 		if (goodsList == null || goodsList.size() == 0) {
@@ -208,19 +212,34 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		if (specsList != null && specsList.size() > 0) {
+			Map<String,Object> temp = null;
+			Set<String> tempSet = null;
 			for (GoodsSpecs specs : specsList) {
 				item = goodsMap.get(specs.getGoodsId());
 				if (item == null) {
 					continue;
 				}
-				if (item.getGoodsSpecsList() == null) {
-					tempSpecsList = new ArrayList<GoodsSpecs>();
-					tempSpecsList.add(specs);
-					item.setGoodsSpecsList(tempSpecsList);
+				if(flag){
+					if (item.getGoodsSpecsList() == null) {
+						tempSpecsList = new ArrayList<GoodsSpecs>();
+						tempSpecsList.add(specs);
+						item.setGoodsSpecsList(tempSpecsList);
+					} else {
+						item.getGoodsSpecsList().add(specs);
+					}
+					getPriceInterval(specs);
 				} else {
-					item.getGoodsSpecsList().add(specs);
+					temp = JSONUtil.parse(specs.getInfo(), Map.class);
+					for(Map.Entry<String, Object> entry : temp.entrySet()){
+						if(item.getSpecsInfo() == null){
+							tempSet = new HashSet<String>();
+							tempSet.add(entry.getKey());
+							item.setSpecsInfo(tempSet);
+						} else {
+							item.getSpecsInfo().add(entry.getKey());
+						}
+					}
 				}
-				getPriceInterval(specs);
 			}
 		}
 
@@ -245,5 +264,4 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 	}
-
 }
