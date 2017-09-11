@@ -57,11 +57,9 @@ public class ThirdPartPhoneController {
 			PhoneValidata model = redisTemplate.opsForValue().get(phone);
 			if (model == null) {
 
-				boolean flag = SmsSendUtil.sendMessage(code, phone);
+				result = SmsSendUtil.sendMessage(code, phone);
 
-				if (!flag) {
-					result.setSuccess(false);
-					result.setErrorMsg("发送失败");
+				if (!result.isSuccess()) {
 					return result;
 				}
 
@@ -71,7 +69,6 @@ public class ThirdPartPhoneController {
 				model.setTime(System.currentTimeMillis());
 				redisTemplate.opsForValue().set(phone, model, 30L, TimeUnit.MINUTES);
 
-				result.setSuccess(true);
 				return result;
 			} else {
 				if (model.getSendTime() > 5) {
@@ -80,11 +77,9 @@ public class ThirdPartPhoneController {
 					return result;
 				}
 
-				boolean flag = SmsSendUtil.sendMessage(code, phone);
+				result = SmsSendUtil.sendMessage(code, phone);
 
-				if (!flag) {
-					result.setSuccess(false);
-					result.setErrorMsg("发送失败");
+				if (!result.isSuccess()) {
 					return result;
 				}
 
@@ -93,7 +88,6 @@ public class ThirdPartPhoneController {
 				model.setSendTime(model.getSendTime() + 1);
 				model.setTime(System.currentTimeMillis());
 				redisTemplate.opsForValue().set(phone, model, time, TimeUnit.MINUTES);
-				result.setSuccess(true);
 				return result;
 			}
 		}
@@ -103,27 +97,33 @@ public class ThirdPartPhoneController {
 	}
 
 	@RequestMapping(value = "auth/{version}/third-part/phoneVerify", method = RequestMethod.GET)
-	public boolean verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone,
+	public ResultModel verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone,
 			@RequestParam("code") String code) {
 
+		ResultModel result = new ResultModel();
+		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			PhoneValidata model = redisTemplate.opsForValue().get(phone);
 			if (model == null) {
-				return false;
+				result.setSuccess(false);
+				return result;
 			}
 
 			// 2分钟有效
 			if (System.currentTimeMillis() - model.getTime() > EFFECTIVE_TIME) {
-				return false;
+				result.setSuccess(false);
+				return result;
 			}
 
 			code = code == null ? "" : code;
 			if (code.equals(model.getCode())) {
-				return true;
+				result.setSuccess(true);
+				return result;
 			}
 		}
 
-		return false;
+		result.setSuccess(false);
+		return result;
 
 	}
 }

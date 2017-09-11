@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.utils.CommonUtils;
+import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
@@ -35,6 +37,8 @@ public class UserServiceImpl implements UserService {
 
 	private static final Integer ALREADY_PAY = 1;
 
+	private static final Integer VALIDATE = 1;
+
 	@Resource
 	UserMapper userMapper;
 
@@ -43,6 +47,9 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	PayFeignClient payFeignClient;
+
+	@Resource
+	RedisTemplate<String, ApiResult> redisTemplate;
 
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -89,7 +96,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void saveUser(UserInfo info) {
+	public Integer saveUser(UserInfo info) {
+
+		Integer userId = userMapper.getUserIdByUserInfo(info);
+		if(userId != null){
+			return userId;
+		}
+		
+		info.setPhoneValidate(VALIDATE);
+		if (info.getPwd() != null && !"".equals(info.getPwd())) {
+			info.setPwd(EncryptionUtil.MD5(info.getPwd()));
+		}
+
+		if (info.getWechat() != null && !"".equals(info.getWechat())) {
+			ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
+			packageUser(apiResult, info);
+		}
 
 		userMapper.saveUser(info);
 
@@ -99,7 +121,9 @@ public class UserServiceImpl implements UserService {
 
 		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
 		logFeignClient.saveLog(Constants.FIRST_VERSION,
-				packageLog(LogConstants.REGISTER, "注册账号", 1, content, info.getPhone()));
+				packageLog(LogConstants.REGISTER, "注册账号", info.getCenterId(), content, info.getPhone()));
+		
+		return info.getId();
 	}
 
 	@Override
@@ -109,8 +133,7 @@ public class UserServiceImpl implements UserService {
 
 	}
 
-	@Override
-	public void packageUser(ApiResult apiResult, UserInfo info) {
+	private void packageUser(ApiResult apiResult, UserInfo info) {
 
 		info.setWechat(apiResult.get("unionid") + "");
 		UserDetail userDetail = new UserDetail();

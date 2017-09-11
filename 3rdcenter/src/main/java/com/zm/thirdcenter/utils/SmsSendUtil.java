@@ -10,6 +10,7 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.zm.thirdcenter.constants.Constants;
+import com.zm.thirdcenter.pojo.ResultModel;
 
 public class SmsSendUtil {
 
@@ -22,14 +23,16 @@ public class SmsSendUtil {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	public static boolean sendMessage(String code, String phone){
+	public static ResultModel sendMessage(String code, String phone){
+		
+		ResultModel result = new ResultModel();
 		
 		//初始化ascClient需要的几个参数
 		final String product = "Dysmsapi";//短信API产品名称（短信产品名固定，无需修改）
 		final String domain = "dysmsapi.aliyuncs.com";//短信API产品域名（接口地址固定，无需修改）
 		//替换成你的AK
-		final String accessKeyId = "LTAICvlZk7rzrHrr";//你的accessKeyId,参考本文档步骤2
-		final String accessKeySecret = "i7o6z4pO6QhxdJrGOvV9WtZhkYSIYl";//你的accessKeySecret，参考本文档步骤2
+		final String accessKeyId = Constants.ACCESS_KEY_ID;//你的accessKeyId,参考本文档步骤2
+		final String accessKeySecret = Constants.ACCESS_KEY_SECRET;//你的accessKeySecret，参考本文档步骤2
 		//初始化ascClient,暂时不支持多region
 		IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId,
 		accessKeySecret);
@@ -37,7 +40,9 @@ public class SmsSendUtil {
 			DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
 		} catch (ClientException e1) {
 			e1.printStackTrace();
-			return false;
+			result.setErrorMsg("发送业务出错");
+			result.setSuccess(false);
+			return result;
 		}
 		IAcsClient acsClient = new DefaultAcsClient(profile);
 		 //组装请求对象
@@ -69,9 +74,11 @@ public class SmsSendUtil {
 			e.printStackTrace();
 		}
 		if(sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
-			return true;
+			result.setSuccess(true);
+			return result;
 		}
-		
-		return false;
+		result.setSuccess(false);
+		result.setErrorMsg(sendSmsResponse.getMessage());
+		return result;
 	}
 }

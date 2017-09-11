@@ -1,65 +1,80 @@
 package com.zm.user.pojo;
 
-/**  
- * ClassName: UserInfo <br/>  
- * Function: TODO ADD FUNCTION. <br/>   
- * date: Aug 16, 2017 2:22:47 PM <br/>  
- *  
- * @author wqy  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: UserInfo <br/>
+ * Function: TODO ADD FUNCTION. <br/>
+ * date: Aug 16, 2017 2:22:47 PM <br/>
+ * 
+ * @author wqy
+ * @version
+ * @since JDK 1.7
  */
 public class UserInfo {
 
 	private Integer id;
-	
+
+	private Integer platUserType;
+
 	private String account;
-	
+
 	private String phone;
-	
+
 	private String email;
-	
+
 	private String wechat;
-	
+
 	private String qq;
-	
+
 	private String sinaBlog;
-	
+
 	private String pwd;
-	
+
 	private Integer parentId;
-	
+
 	private Integer band;
-	
+
 	private Integer phoneValidate;
-	
+
 	private Integer emailValidate;
-	
+
 	private Integer status;
-	
+
 	private Integer centerId;
-	
+
 	private Integer shopId;
-	
+
 	private String lastLoginTime;
-	
+
 	private String lastLoginIP;
-	
+
 	private String ipCity;
-	
+
 	private String createTime;
-	
+
 	private String vipTime;
-	
+
 	private Integer duration;
-	
+
 	private String updateTime;
-	
+
 	private String opt;
-	
+
 	private UserDetail userDetail;
-	
+
 	private Integer vipLevel;
+
+	public boolean check() {
+		return platUserType != null && (account != null || phone != null || email != null || wechat != null
+				|| qq != null || sinaBlog != null) && centerId != null;
+	}
+
+	public Integer getPlatUserType() {
+		return platUserType;
+	}
+
+	public void setPlatUserType(Integer platUserType) {
+		this.platUserType = platUserType;
+	}
 
 	public Integer getVipLevel() {
 		return vipLevel;
@@ -271,5 +286,5 @@ public class UserInfo {
 				+ ", vipTime=" + vipTime + ", duration=" + duration + ", updateTime=" + updateTime + ", opt=" + opt
 				+ ", userDetail=" + userDetail + ", vipLevel=" + vipLevel + "]";
 	}
-	
+
 }

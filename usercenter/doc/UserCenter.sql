@@ -7,6 +7,7 @@ drop table if exists  `user`;
 
 CREATE TABLE `zm_user`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
   `email` VARCHAR(100) NULL COMMENT '邮箱',
@@ -36,13 +37,14 @@ CREATE TABLE `zm_user`.`user` (
   INDEX `idx_wechat` (`wechat`),
   INDEX `idx_qq` (`qq`),
   INDEX `idx_sina_blog` (`sina_blog`),
+  INDEX `idx_plat_user_type` (`plat_user_type`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `account_UNIQUE` (`account` ASC),
-  UNIQUE INDEX `phone_UNIQUE` (`phone` ASC),
-  UNIQUE INDEX `email_UNIQUE` (`email` ASC),
-  UNIQUE INDEX `wechat_UNIQUE` (`wechat` ASC),
-  UNIQUE INDEX `qq_UNIQUE` (`qq` ASC),
-  UNIQUE INDEX `sina_blog_UNIQUE` (`sina_blog` ASC)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+  UNIQUE INDEX `account_UNIQUE` (`account`, `plat_user_type` ASC),
+  UNIQUE INDEX `phone_UNIQUE` (`phone`,`plat_user_type` ASC),
+  UNIQUE INDEX `email_UNIQUE` (`email`,`plat_user_type` ASC),
+  UNIQUE INDEX `wechat_UNIQUE` (`wechat`,`plat_user_type` ASC),
+  UNIQUE INDEX `qq_UNIQUE` (`qq`,`plat_user_type` ASC),
+  UNIQUE INDEX `sina_blog_UNIQUE` (`sina_blog`,`plat_user_type` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
 COMMENT = '用户表';
 
 drop table if exists  `user_vip`;
@@ -89,7 +91,6 @@ drop table if exists  `user_detail`;
 CREATE TABLE `zm_user`.`user_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `type` TINYINT UNSIGNED NULL COMMENT '用户类型',
   `name` VARCHAR(50) NULL COMMENT '真实姓名',
   `nick_name` VARCHAR(50) NULL COMMENT '用户昵称',
   `head_img` VARCHAR(200) NULL COMMENT '头像地址',
@@ -148,9 +149,10 @@ drop table if exists  `regional_center`;
 
 CREATE TABLE `zm_user`.`regional_center` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `platform_id` INT UNSIGNED NOT NULL COMMENT '平台ID',
-  `type` TINYINT UNSIGNED NOT NULL COMMENT '类型',
+  `center_type` TINYINT UNSIGNED NOT NULL COMMENT '类型',
   `name` VARCHAR(50) NOT NULL COMMENT '名称',
+  `person_in_charge` VARCHAR(50) NOT NULL COMMENT '负责人',
+  `phone` CHAR(11) NOT NULL COMMENT '负责人电话',
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',

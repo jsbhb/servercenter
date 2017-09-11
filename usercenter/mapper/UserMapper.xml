@@ -17,6 +17,8 @@
 
 	<resultMap type="com.zm.user.pojo.UserInfo" id="userInfo">
 		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="plat_user_type" property="platUserType"
+			jdbcType="INTEGER" />
 		<result column="account" property="account" jdbcType="VARCHAR" />
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="email" property="email" jdbcType="VARCHAR" />
@@ -33,7 +35,6 @@
 		<association property="userDetail" javaType="com.zm.user.pojo.UserDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="id" property="userId" jdbcType="INTEGER" />
-			<result column="type" property="type" jdbcType="INTEGER" />
 			<result column="name" property="name" jdbcType="VARCHAR" />
 			<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
 			<result column="company" property="company" jdbcType="VARCHAR" />
@@ -73,9 +74,9 @@
 
 	<select id="getUserInfo" parameterType="Object" resultMap="userInfo">
 		select
-		u.id,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
+		u.id,u.plat_user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
 		u.center_id,u.last_login_time,u.ipcity,ud.id as
-		detail_id,ud.type,ud.name,ud.nick_name,ud.company,
+		detail_id,ud.name,ud.nick_name,ud.company,
 		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join
 		user_detail ud on u.id = ud.user_id
 		where u.id = #{userId}
@@ -166,17 +167,22 @@
 			</if>
 			update_time = now()
 		</set>
-		where id = #{id, jdbcType = INTEGER} and user_id = #{userId, jdbcType = INTEGER}
+		where id = #{id, jdbcType = INTEGER} and user_id = #{userId, jdbcType
+		= INTEGER}
 	</update>
 
 	<insert id="saveUserDetail" parameterType="Object">
 		insert into
-		user_detail(user_id,type,name,nick_name,head_img,company,location,certificates,idnum,sex,create_time)
-		values(#{userId,jdbcType = INTEGER},#{type,jdbcType =INTEGER},
-		#{name,jdbcType = VARCHAR},#{nickName,jdbcType = VARCHAR},
-		#{headImg,jdbcType = VARCHAR},#{company,jdbcType = VARCHAR},
-		#{location,jdbcType = VARCHAR},#{certificates,jdbcType = INTEGER},
-		#{idNum,jdbcType = VARCHAR},#{sex,jdbcType = INTEGER},now())
+		user_detail(user_id,name,nick_name,head_img,company,location,certificates,idnum,sex,create_time)
+		values(#{userId,jdbcType = INTEGER},
+		#{name,jdbcType =
+		VARCHAR},#{nickName,jdbcType = VARCHAR},
+		#{headImg,jdbcType =
+		VARCHAR},#{company,jdbcType = VARCHAR},
+		#{location,jdbcType =
+		VARCHAR},#{certificates,jdbcType = INTEGER},
+		#{idNum,jdbcType =
+		VARCHAR},#{sex,jdbcType = INTEGER},now())
 	</insert>
 
 	<update id="updateUserDetail" parameterType="Object">
@@ -223,12 +229,13 @@
 		= INTEGER}
 	</delete>
 
-	<insert id="saveUser" parameterType="Object">
+	<insert id="saveUser" parameterType="Object" useGeneratedKeys="true"
+		keyProperty="id">
 		insert into
-		user(id,phone,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
+		user(phone,plat_user_type,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
 		shop_id,create_time)
 		values
-		(#{id},#{phone},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
+		(#{phone},#{platUserType},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
 		#{emailValidate},#{centerId},#{shopId},now())
 	</insert>
 
@@ -250,32 +257,62 @@
 	<select id="getVipPrice" parameterType="Object" resultMap="vipPrice">
 		select * from vip_price where id = #{id}
 	</select>
-	
+
 	<insert id="saveVipOrder" parameterType="Object">
-		insert into user_vip_order(order_id, user_id, vip_price_id, create_time) 
+		insert into
+		user_vip_order(order_id, user_id, vip_price_id, create_time)
 		values(#{orderId}, #{userId}, #{vipPriceId}, now())
 	</insert>
-	
-	<select id="getVipUserByOrderId" parameterType="Object" resultMap="vipUser">
-		select vp.center_id,uo.user_id,vp.duration,vp.vip_level from user_vip_order uo left join vip_price vp on uo.vip_price_id = vp.id 
+
+	<select id="getVipUserByOrderId" parameterType="Object"
+		resultMap="vipUser">
+		select vp.center_id,uo.user_id,vp.duration,vp.vip_level from
+		user_vip_order uo left join vip_price vp on uo.vip_price_id = vp.id
 		where uo.order_id = #{orderId}
 	</select>
-	
+
 	<insert id="saveVipUser" parameterType="Object">
-		insert into user_vip(user_id,center_id,duration,vip_level,create_time) 
+		insert into
+		user_vip(user_id,center_id,duration,vip_level,create_time)
 		values(#{userId},#{centerId},#{duration},#{vipLevel},now())
 	</insert>
-	
+
 	<update id="updateVipUser" parameterType="Object">
-		update user_vip set duration = duration + #{duration} where user_id = #{userId} and center_id = #{centerId} and status = 1
+		update user_vip set
+		duration = duration + #{duration} where user_id = #{userId} and
+		center_id = #{centerId} and status = 1
 	</update>
-	
+
 	<update id="updateVipOrder" parameterType="Object">
-		update user_vip_order set status = 1, pay_time = now() where order_id = #{orderId}
+		update user_vip_order
+		set status = 1, pay_time = now() where order_id = #{orderId}
 	</update>
-	
+
 	<select id="isAlreadyPay" parameterType="Object" resultType="java.lang.Integer">
 		select status from user_vip_order where order_id = #{orderId}
+	</select>
+
+	<select id="getUserIdByUserInfo" parameterType="Object"
+		resultType="java.lang.Integer">
+		select id from user where plat_user_type = #{platUserType}
+		<if test="account != null and account != ''">
+			and account = #{account}
+		</if>
+		<if test="phone != null and phone != ''">
+			and phone = #{phone}
+		</if>
+		<if test="email != null and email != ''">
+			and email = #{email}
+		</if>
+		<if test="wechat != null and wechat != ''">
+			and wechat = #{wechat}
+		</if>
+		<if test="qq != null and qq != ''">
+			and qq = #{qq}
+		</if>
+		<if test="sinaBlog != null and sinaBlog != ''">
+			and sinaBlog = #{sinaBlog}
+		</if>
 	</select>
 
 </mapper>

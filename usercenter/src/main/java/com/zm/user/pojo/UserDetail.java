@@ -16,8 +16,6 @@ public class UserDetail {
 	
 	private Integer userId;
 	
-	private Integer type;
-	
 	private String name;
 	
 	private String nickName;
@@ -78,14 +76,6 @@ public class UserDetail {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
-	}
-
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
 	}
 
 	public String getName() {
@@ -154,7 +144,7 @@ public class UserDetail {
 
 	@Override
 	public String toString() {
-		return "UserDetail [id=" + id + ", userId=" + userId + ", type=" + type + ", name=" + name + ", nickName="
+		return "UserDetail [id=" + id + ", userId=" + userId + ", name=" + name + ", nickName="
 				+ nickName + ", company=" + company + ", location=" + location + ", headImg=" + headImg
 				+ ", certificates=" + certificates + ", idNum=" + idNum + ", sex=" + sex + ", createTime=" + createTime
 				+ ", updateTime=" + updateTime + ", opt=" + opt + "]";

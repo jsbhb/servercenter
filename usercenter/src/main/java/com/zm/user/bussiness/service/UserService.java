@@ -95,7 +95,7 @@ public interface UserService {
 	 * @param info  
 	 * @since JDK 1.7  
 	 */
-	void saveUser(UserInfo info);
+	Integer saveUser(UserInfo info);
 	
 	/**  
 	 * saveUserDetail:保存用户详细信息. <br/>  
@@ -105,18 +105,6 @@ public interface UserService {
 	 * @since JDK 1.7  
 	 */
 	void saveUserDetail(UserDetail info);
-	
-	
-	/**  
-	 * packageUser:封装用户微信信息. <br/>  
-	 *  
-	 * @author wqy  
-	 * @param apiResult
-	 * @return  
-	 * @since JDK 1.7  
-	 */
-	void packageUser(ApiResult apiResult,UserInfo info);
-	
 	
 	/**  
 	 * modifyPwd:修改密码. <br/>  

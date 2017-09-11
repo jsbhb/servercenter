@@ -45,16 +45,11 @@ import com.zm.user.wx.ApiResult;
 @RestController
 public class UserController {
 
-	private static final Integer VALIDATE = 1;
-
 	@Resource
 	UserService userService;
 
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
-
-	@Resource
-	RedisTemplate<String, ApiResult> redisTemplate;
 
 	@RequestMapping(value = "{version}/user/userNameVerify", method = RequestMethod.GET)
 	public ResultModel userNameVerify(@PathVariable("version") Double version, HttpServletRequest req,
@@ -179,33 +174,30 @@ public class UserController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/user/register", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/{version}/user/register/{code}", method = RequestMethod.POST)
 	public ResultModel registerUser(@PathVariable("version") Double version, HttpServletResponse res,
-			@RequestBody UserInfo info, HttpServletRequest req) {
+			@RequestBody UserInfo info, @PathVariable("code") String code, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			
-			if(info.getCenterId() == null || "".equals(info.getCenterId())){
-				result.setErrorMsg("区域中心ID不能为空");
+			if(!info.check()){
+				result.setErrorMsg("参数不全");
 				result.setSuccess(false);
 				return result;
 			}
 			
-			info.setPhoneValidate(VALIDATE);
-			if (info.getPwd() != null && !"".equals(info.getPwd())) {
-				info.setPwd(EncryptionUtil.MD5(info.getPwd()));
+			boolean flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
+			if(flag){
+				Integer userId = userService.saveUser(info);
+				result.setObj(userId);
+				result.setSuccess(true);
+			} else {
+				result.setObj(Constants.PHONE_VERIFY_ERROR_CODE);
+				result.setSuccess(false);
+				result.setErrorMsg("验证码错误");
 			}
-
-			if (info.getWechat() != null && !"".equals(info.getWechat())) {
-				ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
-				userService.packageUser(apiResult, info);
-			}
-
-			userService.saveUser(info);
-
-			result.setSuccess(true);
 		}
 
 		return result;

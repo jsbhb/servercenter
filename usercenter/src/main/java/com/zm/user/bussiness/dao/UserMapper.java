@@ -12,7 +12,7 @@ import com.zm.user.pojo.VipPrice;
 
 public interface UserMapper {
 
-	int userNameVerify(Map<String,String> param);
+	Integer userNameVerify(Map<String,String> param);
 	
 	void saveAddress(Address address);
 	
@@ -28,7 +28,7 @@ public interface UserMapper {
 	
 	void removeAddress(Map<String,Object> param);
 	
-	int queryByWechatUnionid(String openId);
+	Integer queryByWechatUnionid(String openId);
 	
 	void updateUserPwd(Map<String,Object> param);
 	
@@ -52,5 +52,7 @@ public interface UserMapper {
 	
 	void updateVipOrder(String orderId);
 	
-	int isAlreadyPay(String orderId);
+	Integer isAlreadyPay(String orderId);
+	
+	Integer getUserIdByUserInfo(UserInfo info);
 }

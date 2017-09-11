@@ -40,7 +40,7 @@ public class PayController {
 		
 		if(return_code.equals("SUCCESS")){
 			String content = "订单号 \"" + model.getOrderId() + "\" 通过微信支付，后台请求成功";
-			logFeignClient.saveLog(CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
+			logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
 		}
 		
 		return result;

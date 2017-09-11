@@ -11,4 +11,8 @@ public class Constants {
 	public static final String SMS_VERIFY_ID = "SMS_89015008";
 	
 	public static final String SMS_SIGN = "老司机";
+	
+	public static final String ACCESS_KEY_ID = "LTAICvlZk7rzrHrr";
+	
+	public static final String ACCESS_KEY_SECRET = "i7o6z4pO6QhxdJrGOvV9WtZhkYSIYl";
 }
