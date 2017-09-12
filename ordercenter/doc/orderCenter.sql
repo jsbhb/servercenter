@@ -131,6 +131,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   `item_id` VARCHAR(100) NOT NULL,
   `center_id` INT UNSIGNED NOT NULL,
   `item_quantity` INT UNSIGNED NOT NULL,
+  `supplier_id` INT UNSIGNED NOT NULL,
   `goods_name` VARCHAR(200) NOT NULL,
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,

@@ -44,6 +44,8 @@
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="item_quantity" property="quantity" jdbcType="INTEGER" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -154,8 +156,8 @@
 
 	<insert id="saveShoppingCart" parameterType="Object">
 		insert into
-		order_shopping_cart(user_id,item_id,item_quantity,goods_name,center_id,create_time)
-		values(#{userId},#{itemId},#{quantity},#{goodsName},#{centerId},now())
+		order_shopping_cart(user_id,item_id,item_quantity,goods_name,supplier_id,center_id,create_time)
+		values(#{userId},#{itemId},#{quantity},#{goodsName},#{supplierId},#{centerId},now())
 		on duplicate key update item_quantity= #{quantity} +
 		values(item_quantity),update_time=now()
 	</insert>

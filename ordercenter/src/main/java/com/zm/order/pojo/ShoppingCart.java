@@ -16,6 +16,8 @@ public class ShoppingCart {
 	
 	private String goodsName;
 	
+	private Integer supplierId;
+	
 	private String createTime;
 	
 	private String updateTime;
@@ -24,6 +26,14 @@ public class ShoppingCart {
 	
 	private String picPath;
 	
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
+
 	public GoodsSpecs getGoodsSpecs() {
 		return goodsSpecs;
 	}
