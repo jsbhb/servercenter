@@ -139,7 +139,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_shoppingcart` (`user_id`,`item_id`,`center_id` ASC),
   INDEX `idx_center_id` (`center_id` ASC),
-  INDEX `idx_creati_time` (`creati_time` ASC),
+  INDEX `idx_create_time` (`create_time` ASC),
   INDEX `idx_userId` (`user_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '购物车';
