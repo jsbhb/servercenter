@@ -35,10 +35,11 @@ public class SecurityUserDetail implements UserDetails {
 	private String token;
 	private int platUserType;
 	private String platId;
+	private int userCenterId;
 
 	public SecurityUserDetail(String id, String userName, String password, String email,
 			Collection<? extends GrantedAuthority> authorities, Date lastPasswordResetDate, String platId,
-			int platUserType) {
+			int platUserType,int userCenterId) {
 		this.id = id;
 		this.userName = userName;
 		this.password = password;
@@ -47,12 +48,13 @@ public class SecurityUserDetail implements UserDetails {
 		this.lastPasswordResetDate = lastPasswordResetDate;
 		this.platId = platId;
 		this.platUserType = platUserType;
+		this.userCenterId = userCenterId;
 	}
 	
 	
 	public SecurityUserDetail(String id, String userName, String email,
 			Collection<? extends GrantedAuthority> authorities, Date lastPasswordResetDate, String platId,
-			int platUserType) {
+			int platUserType,int userCenterId) {
 		this.id = id;
 		this.userName = userName;
 		this.email = email;
@@ -60,6 +62,7 @@ public class SecurityUserDetail implements UserDetails {
 		this.lastPasswordResetDate = lastPasswordResetDate;
 		this.platId = platId;
 		this.platUserType = platUserType;
+		this.userCenterId = userCenterId;
 	}
 
 	public String getToken() {
@@ -136,5 +139,17 @@ public class SecurityUserDetail implements UserDetails {
 	public void setPlatId(String platId) {
 		this.platId = platId;
 	}
+
+
+	public int getUserCenterId() {
+		return userCenterId;
+	}
+
+
+	public void setUserCenterId(int userCenterId) {
+		this.userCenterId = userCenterId;
+	}
+	
+	
 
 }

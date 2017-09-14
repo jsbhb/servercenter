@@ -14,7 +14,8 @@
               U.CREATED_BY CREATEDBY,
               U.LAST_UPDATE_DATE LASTUPDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFORM platUserType
+              U.PLATFORM platUserType,
+              U.USERCENTERID userCenterId
           FROM
               USER U
           WHERE
@@ -31,7 +32,8 @@
               U.OPENID OPENID,
               U.LAST_UPDATE_DATE LASTUPDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFORM PLATUSERTYPE
+              U.PLATFORM PLATUSERTYPE,
+              U.USERCENTERID userCenterId
           FROM
               USER U
           WHERE
@@ -51,7 +53,8 @@
               U.CREATED_BY CREATEDBY,
               U.LAST_UPDATE_DATE LASTUPDATEDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFORM platUserType
+              U.PLATFORM platUserType,
+              U.USERCENTERID userCenterId
           FROM
               USER U
           WHERE
@@ -71,7 +74,8 @@
               U.CREATED_BY createdBy,
               U.LAST_UPDATE_DATE lastUpdateDate,
               U.LAST_UPDATED_BY lastUpdatedBy,
-              U.PLATFORM platUserType
+              U.PLATFORM platUserType,
+			  U.USERCENTERID userCenterId
           FROM
               USER U
           WHERE
@@ -101,9 +105,10 @@
               U.CREATION_DATE creationDate,
               U.CREATED_BY createdBy,
               U.LAST_UPDATE_DATE lastUpdateDate,
-              U.LAST_UPDATED_BY lastUpdatedBy
+              U.LAST_UPDATED_BY lastUpdatedBy,
               U.OPENID openId,
-              U.PLATFORM platUserType
+              U.PLATFORM platUserType,
+              U.USERCENTERID userCenterId
           FROM
               USER U
           WHERE
@@ -113,6 +118,6 @@
     
     <insert id="insert"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
          INSERT INTO USER (
-              USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType})
+              USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
     </insert>
 </mapper>

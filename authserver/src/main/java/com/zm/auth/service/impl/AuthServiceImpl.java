@@ -52,24 +52,33 @@ public class AuthServiceImpl implements AuthService {
 		if (userInfo == null) {
 			throw new SecurityException("用户信息未输入！");
 		}
+		
+		if(userInfo.getUserCenterId() == 0){
+			throw new SecurityException("没用用户中心编号！");
+		}
 
 		int loginType = userInfo.getLoginType();
 
 		String userName = null;
 		if (loginType == Constants.LOGIN_PHONE) {
 			userName = userInfo.getPhone();
+			if (userMapper.getUserByPhone(userName) != null) {
+				throw new SecurityException("该手机号已经存在！");
+			}
 		}
 
-		if (loginType == Constants.LOGIN_USER_NAME)
+		if (loginType == Constants.LOGIN_USER_NAME){
 			userName = userInfo.getUserName();
+			if (userMapper.getUserByName(userName) != null) {
+				throw new SecurityException("该用户名名已经存在！");
+			}			
+		}
 
 		if (userName == null || "".equals(userName)) {
 			throw new SecurityException("用户名信息有误，请重新输入！");
 		}
 
-		if (userMapper.getUserByName(userName) != null) {
-			throw new SecurityException("该用户名名已经存在！");
-		}
+		
 
 		if (loginType == Constants.LOGIN_PHONE) {
 			userInfo.setUserName(userName);

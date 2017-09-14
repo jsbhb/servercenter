@@ -14,6 +14,7 @@ public class UserInfo {
 	private String userName;
 	private String password;
 	private String phone;
+	private int userCenterId;
 	private String email;
 	private Integer status;
 	private Date creationDate;
@@ -168,4 +169,11 @@ public class UserInfo {
 		this.loginType = loginType;
 	}
 
+	public int getUserCenterId() {
+		return userCenterId;
+	}
+
+	public void setUserCenterId(int userCenterId) {
+		this.userCenterId = userCenterId;
+	}
 }
