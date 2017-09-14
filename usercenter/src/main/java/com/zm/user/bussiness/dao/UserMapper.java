@@ -55,4 +55,8 @@ public interface UserMapper {
 	Integer isAlreadyPay(String orderId);
 	
 	Integer getUserIdByUserInfo(UserInfo info);
+	
+	Integer countAddressByUserId(Integer userId);
+	
+	Integer countUserBy3rdLogin(UserInfo info);
 }

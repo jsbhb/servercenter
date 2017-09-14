@@ -10,8 +10,9 @@
 		<result column="area" property="area" jdbcType="VARCHAR" />
 		<result column="address" property="address" jdbcType="VARCHAR" />
 		<result column="zipCode" property="zipCode" jdbcType="VARCHAR" />
-		<result column="receivePhone" property="receivePhone" jdbcType="VARCHAR" />
-		<result column="receiveName" property="receiveName" jdbcType="VARCHAR" />
+		<result column="receive_phone" property="receivePhone"
+			jdbcType="VARCHAR" />
+		<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
 		<result column="is_default" property="setDefault" jdbcType="INTEGER" />
 	</resultMap>
 
@@ -29,6 +30,7 @@
 			jdbcType="INTEGER" />
 		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="last_login_time" property="lastLoginTime"
 			jdbcType="VARCHAR" />
 		<result column="ipcity" property="ipCity" jdbcType="VARCHAR" />
@@ -37,6 +39,7 @@
 			<result column="id" property="userId" jdbcType="INTEGER" />
 			<result column="name" property="name" jdbcType="VARCHAR" />
 			<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+			<result column="location" property="location" jdbcType="VARCHAR" />
 			<result column="company" property="company" jdbcType="VARCHAR" />
 			<result column="head_img" property="headImg" jdbcType="VARCHAR" />
 			<result column="certificates" property="certificates"
@@ -76,7 +79,7 @@
 		select
 		u.id,u.plat_user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
 		u.center_id,u.last_login_time,u.ipcity,ud.id as
-		detail_id,ud.name,ud.nick_name,ud.company,
+		detail_id,ud.name,ud.nick_name,ud.company,ud.location,u.guide_id,
 		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join
 		user_detail ud on u.id = ud.user_id
 		where u.id = #{userId}
@@ -233,10 +236,10 @@
 		keyProperty="id">
 		insert into
 		user(phone,plat_user_type,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
-		shop_id,create_time)
+		shop_id,guide_id,create_time)
 		values
 		(#{phone},#{platUserType},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
-		#{emailValidate},#{centerId},#{shopId},now())
+		#{emailValidate},#{centerId},#{shopId},#{guideId},now())
 	</insert>
 
 
@@ -312,6 +315,27 @@
 		</if>
 		<if test="sinaBlog != null and sinaBlog != ''">
 			and sinaBlog = #{sinaBlog}
+		</if>
+	</select>
+
+	<select id="countAddressByUserId" parameterType="Object"
+		resultType="java.lang.Integer">
+
+		select count(*) from address where user_id = #{userId}
+	</select>
+
+	<select id="countUserBy3rdLogin" parameterType="Object"
+		resultType="java.lang.Integer">
+
+		select count(*) from user where plat_user_type = #{platUserType} 
+		<if test="wechat != null and wechat != ''">
+			and wechat = #{wechat}
+		</if>
+		<if test="qq != null and q != ''">
+			and qq = #{qq}
+		</if>
+		<if test="sinaBlog != null and sinaBlog != ''">
+			and sina_blog = #{sinaBlog}
 		</if>
 	</select>
 

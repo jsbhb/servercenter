@@ -42,6 +42,8 @@ public class UserInfo {
 	private Integer centerId;
 
 	private Integer shopId;
+	
+	private Integer guideId;
 
 	private String lastLoginTime;
 
@@ -66,6 +68,18 @@ public class UserInfo {
 	public boolean check() {
 		return platUserType != null && (account != null || phone != null || email != null || wechat != null
 				|| qq != null || sinaBlog != null) && centerId != null;
+	}
+
+	public boolean check3rdLoginParam() {
+		return platUserType != null && (wechat != null || qq != null || sinaBlog != null);
+	}
+
+	public Integer getGuideId() {
+		return guideId;
+	}
+
+	public void setGuideId(Integer guideId) {
+		this.guideId = guideId;
 	}
 
 	public Integer getPlatUserType() {
@@ -278,13 +292,13 @@ public class UserInfo {
 
 	@Override
 	public String toString() {
-		return "UserInfo [id=" + id + ", account=" + account + ", phone=" + phone + ", email=" + email + ", wechat="
-				+ wechat + ", qq=" + qq + ", sinaBlog=" + sinaBlog + ", pwd=" + pwd + ", parentId=" + parentId
-				+ ", band=" + band + ", phoneValidate=" + phoneValidate + ", emailValidate=" + emailValidate
-				+ ", status=" + status + ", centerId=" + centerId + ", shopId=" + shopId + ", lastLoginTime="
-				+ lastLoginTime + ", lastLoginIP=" + lastLoginIP + ", ipCity=" + ipCity + ", createTime=" + createTime
-				+ ", vipTime=" + vipTime + ", duration=" + duration + ", updateTime=" + updateTime + ", opt=" + opt
-				+ ", userDetail=" + userDetail + ", vipLevel=" + vipLevel + "]";
+		return "UserInfo [id=" + id + ", platUserType=" + platUserType + ", account=" + account + ", phone=" + phone
+				+ ", email=" + email + ", wechat=" + wechat + ", qq=" + qq + ", sinaBlog=" + sinaBlog + ", pwd=" + pwd
+				+ ", parentId=" + parentId + ", band=" + band + ", phoneValidate=" + phoneValidate + ", emailValidate="
+				+ emailValidate + ", status=" + status + ", centerId=" + centerId + ", shopId=" + shopId + ", guideId="
+				+ guideId + ", lastLoginTime=" + lastLoginTime + ", lastLoginIP=" + lastLoginIP + ", ipCity=" + ipCity
+				+ ", createTime=" + createTime + ", vipTime=" + vipTime + ", duration=" + duration + ", updateTime="
+				+ updateTime + ", opt=" + opt + ", userDetail=" + userDetail + ", vipLevel=" + vipLevel + "]";
 	}
 
 }

@@ -10,7 +10,6 @@ import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
-import com.zm.user.wx.ApiResult;
 
 /**  
  * ClassName: UserService <br/>  
@@ -158,4 +157,13 @@ public interface UserService {
 	 * @since JDK 1.7  
 	 */
 	boolean isAlreadyPay(String orderId);
+	
+	/**  
+	 * verifyIsFirst:第三方登录时查询是否第一次. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param info  
+	 * @since JDK 1.7  
+	 */
+	boolean verifyIsFirst(UserInfo info);
 }

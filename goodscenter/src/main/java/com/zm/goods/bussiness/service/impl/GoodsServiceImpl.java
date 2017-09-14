@@ -145,7 +145,7 @@ public class GoodsServiceImpl implements GoodsService {
 			boolean calculation = false;
 			for (GoodsPrice price : specs.getPriceList()) {
 				boolean flag = model.getQuantity() >= price.getMin()
-						&& (model.getQuantity() <= price.getMax() || price.getMax() == null);
+						&& (price.getMax() == null || model.getQuantity() <= price.getMax());
 				if (flag) {
 					if (model.getDeliveryPlace() != null) {
 						if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {

@@ -5,27 +5,32 @@ import com.zm.order.feignclient.model.GoodsSpecs;
 public class ShoppingCart {
 
 	private Integer id;
-	
+
 	private Integer userId;
-	
+
 	private String itemId;
-	
+
 	private Integer quantity;
 
 	private Integer centerId;
-	
+
 	private String goodsName;
-	
+
 	private Integer supplierId;
-	
+
 	private String createTime;
-	
+
 	private String updateTime;
-	
+
 	private GoodsSpecs goodsSpecs;
-	
+
 	private String picPath;
-	
+
+	public boolean check() {
+		return userId != null && itemId != null && quantity != null && centerId != null && goodsName != null
+				&& supplierId != null;
+	}
+
 	public Integer getSupplierId() {
 		return supplierId;
 	}
@@ -120,6 +125,5 @@ public class ShoppingCart {
 				+ ", centerId=" + centerId + ", goodsName=" + goodsName + ", createTime=" + createTime + ", updateTime="
 				+ updateTime + "]";
 	}
-	
-	
+
 }

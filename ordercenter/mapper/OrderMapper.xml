@@ -8,6 +8,9 @@
 		<result column="carrier_key" property="carrierKey" jdbcType="VARCHAR" />
 		<result column="express_id" property="expressId" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="express_type" property="expressType" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
@@ -24,15 +27,18 @@
 			<result column="receive_province" property="receiveProvince"
 				jdbcType="VARCHAR" />
 			<result column="receive_city" property="receiveCity" jdbcType="VARCHAR" />
-			<result column="receive_area" property="receiveArea"
+			<result column="receive_area" property="receiveArea" jdbcType="VARCHAR" />
+			<result column="receive_address" property="receiveAddress"
 				jdbcType="VARCHAR" />
-			<result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
-			<result column="receive_zip_code" property="receiveZipCode" jdbcType="VARCHAR" />
+			<result column="receive_zip_code" property="receiveZipCode"
+				jdbcType="VARCHAR" />
 		</association>
 		<collection ofType="com.zm.order.pojo.OrderGoods" property="orderGoodsList">
 			<id column="goods_id" property="id" jdbcType="INTEGER" />
 			<result column="item_name" property="itemName" jdbcType="VARCHAR" />
-			<result column="item_quantit" property="itemQuantit" jdbcType="INTEGER" />
+			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
 			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
 			<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 			<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
@@ -54,17 +60,25 @@
 
 	<select id="listOrderByParam" resultMap="orderBase"
 		parameterType="Object">
-		select o.id,o.order_id,o.status,o.express_type,o.carrier_key,o.express_id,o.create_time,od.id as
+		select
+		o.id,o.order_id,o.status,o.express_type,o.carrier_key,o.express_id,o.create_time,od.id
+		as
 		detail_id,od.payment,od.post_fee,od.fax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,od.payment,
-		og.id as
-		goods_id,og.item_name,og.item_quantity,og.item_price,og.actual_price,og.item_info
+		o.center_id,o.shop_id,o.guide_id,og.id as
+		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from order_base o left join order_detail od on o.order_id =
 		od.order_id left join order_goods og on o.order_id = og.order_id
 		where
 		o.order_flag = #{info.orderFlag,jdbcType = INTEGER}
-		<if test="info.status != null and info.status != ''">
-			and o.status = #{status,jdbcType = INTEGER}
+		<if test="info.status != null">
+			and o.status = #{info.status,jdbcType = INTEGER}
+		</if>
+		<if test="statusList != null">
+			and o.status in 
+			<foreach collection="statusList" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
 		</if>
 		<if test="info.userId != null and info.userId != ''">
 			and o.user_id = #{info.userId} and is_del = 0
@@ -74,6 +88,9 @@
 		</if>
 		<if test="info.shopId != null and info.shopId != ''">
 			and o.shop_id = #{info.shopId}
+		</if>
+		<if test="info.guideId != null and info.guideId != ''">
+			and o.guide_id = #{info.guideId}
 		</if>
 		<if test="info.combinationId != null and info.combinationId != ''">
 			and o.combination_id = #{info.combinationId}
@@ -102,30 +119,30 @@
 
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
-		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,supplier_id,tdq,
+		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,guide_id,supplier_id,tdq,
 		carrier_key,express_id,gtime,send_time,create_time,remark)
 		VALUES
-		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{supplierId},
+		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
 		#{tdq},#{carrierKey},#{expressId},#{gtime},#{sendTime},now(),#{remark})
 	</insert>
 
 	<insert id="saveOrderDetail" parameterType="Object">
 		INSERT INTO
 		order_detail
-		(order_id,pay_type,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,receive_city,
+		(order_id,pay_type,payment,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,receive_city,
 		receive_area,receive_address,receive_zip_code,create_time,remark)
 		VALUES
-		(#{orderId},#{payType},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
+		(#{orderId},#{payType},#{payment},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
 		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},now(),#{remark});
 	</insert>
 
 	<insert id="saveOrderGoods" parameterType="Object">
 		INSERT INTO
 		order_goods
-		(order_id,item_id,sku,item_name,item_code,item_quantity,item_price,actual_price,create_time,remark)
+		(order_id,item_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.itemId},#{item.sku},#{item.itemName},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},now(),#{item.remark});
+			(#{item.orderId},#{item.itemId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
 		</foreach>
 	</insert>
 
@@ -138,7 +155,7 @@
 	<update id="confirmUserOrder" parameterType="Object">
 		update order_base
 		set status = 6 where order_id = #{orderId,jdbcType = VARCHAR} and
-		user_id = #{userId,jdbcType = INTEGER}
+		user_id = #{userId,jdbcType = INTEGER} and status = 5
 	</update>
 
 	<update id="updateOrderPayStatusByOrderId" parameterType="Object">
@@ -159,7 +176,7 @@
 		order_shopping_cart(user_id,item_id,item_quantity,goods_name,supplier_id,center_id,create_time)
 		values(#{userId},#{itemId},#{quantity},#{goodsName},#{supplierId},#{centerId},now())
 		on duplicate key update item_quantity= #{quantity} +
-		values(item_quantity),update_time=now()
+		item_quantity,update_time=now()
 	</insert>
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
@@ -190,8 +207,23 @@
 			#{item}
 		</foreach>
 	</delete>
-	
-	<select id="countShoppingCart" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from order_shopping_cart where center_id = #{centerId} and user_id = #{userId}
+
+	<select id="countShoppingCart" parameterType="Object"
+		resultType="java.lang.Integer">
+		select count(*) from order_shopping_cart where center_id =
+		#{centerId} and user_id = #{userId}
+	</select>
+
+	<update id="updateOrderCancel" parameterType="Object">
+		update order_base
+		set status = 7 where order_id = #{orderId,jdbcType =
+		VARCHAR}
+	</update>
+
+	<select id="getOrderStatusByOrderId" parameterType="Object"
+		resultType="java.lang.Integer">
+		select status from order_base where order_id =
+		#{orderId,jdbcType =
+		VARCHAR}
 	</select>
 </mapper>

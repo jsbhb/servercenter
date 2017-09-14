@@ -150,6 +150,20 @@ public class OrderController {
 
 		return result;
 	}
+	
+	@RequestMapping(value = "{version}/order/cancel", method = RequestMethod.PUT)
+	public ResultModel orderCancel(@PathVariable("version") Double version,
+			@RequestBody OrderInfo info, HttpServletRequest req, HttpServletResponse res) {
+
+		ResultModel result = new ResultModel();
+
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			result = orderService.orderCancel(info);
+		}
+
+		return result;
+	}
 
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
 	public Integer getClientIdByOrderId(@PathVariable("orderId") String orderId,
@@ -170,6 +184,13 @@ public class OrderController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			if(!cart.check()){
+				result.setSuccess(false);
+				result.setErrorMsg("参数不全");
+				return result;
+			}
+			
 			orderService.saveShoppingCart(cart);
 			result.setSuccess(true);
 		}
@@ -229,13 +250,12 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart/{userId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "{version}/order/shoping-cart/{userId}/{ids}", method = RequestMethod.DELETE)
 	public ResultModel removeShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("ids") String ids) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String ids = req.getParameter("ids");
 			Map<String, Object> param = new HashMap<String, Object>();
 			String[] idArr = ids.split(",");
 			param.put("userId", userId);

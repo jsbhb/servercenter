@@ -134,4 +134,14 @@ public interface OrderService {
 	 * @since JDK 1.7  
 	 */
 	Integer countShoppingCart(Map<String,Object> param);
+	
+	/**  
+	 * orderCancel:订单取消. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param info
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	ResultModel orderCancel(OrderInfo info);
 }

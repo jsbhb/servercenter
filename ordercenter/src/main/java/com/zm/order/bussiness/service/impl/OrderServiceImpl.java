@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
+import com.zm.order.constants.LogConstants;
 import com.zm.order.feignclient.GoodsFeignClient;
+import com.zm.order.feignclient.LogFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.feignclient.model.GoodsFile;
@@ -55,6 +57,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	PayFeignClient payFeignClient;
+	
+	@Resource
+	LogFeignClient logFeignClient;
 
 	@Override
 	public ResultModel saveOrder(OrderInfo info, Double version, String openId, String payType, String type)
@@ -119,9 +124,10 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));
 
 		if (Constants.WX_PAY.equals(payType)) {
-			Map<String, String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(info.getCenterId()), type,
-					payModel);
-			result.setObj(paymap);
+			// Map<String, String> paymap = payFeignClient.wxPay(openId,
+			// Integer.valueOf(info.getCenterId()), type,
+			// payModel);
+			// result.setObj(paymap);
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
@@ -154,7 +160,22 @@ public class OrderServiceImpl implements OrderService {
 			param.put("pagination", pagination);
 		}
 		param.put("info", info);
-
+		//查询待收货订单时用
+		if(info.getStatusArr() != null){
+			String[] tempArr = info.getStatusArr().split(",");
+			List<Integer> statusList = new ArrayList<Integer>();
+			try {
+				for(String status : tempArr){
+					statusList.add(Integer.valueOf(status));
+				}
+				param.put("statusList", statusList);
+			} catch (NumberFormatException e) {
+				result.setSuccess(false);
+				result.setErrorMsg("状态参数出错");
+				return result;
+			}
+		}
+		//end
 		result.setObj(orderMapper.listOrderByParam(param));
 		result.setSuccess(true);
 
@@ -216,12 +237,14 @@ public class OrderServiceImpl implements OrderService {
 			return null;
 		}
 
-		List<String> itemIdList = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
 		for (ShoppingCart model : list) {
-			itemIdList.add(model.getItemId());
+			sb.append(model.getItemId() + ",");
 		}
 
-		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, itemIdList);
+		String ids = sb.substring(0, sb.length() - 1);
+
+		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids);
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
 			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");
@@ -269,5 +292,23 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Integer countShoppingCart(Map<String, Object> param) {
 		return orderMapper.countShoppingCart(param);
+	}
+
+	@Override
+	public ResultModel orderCancel(OrderInfo info) {
+
+		if (Constants.TRADE_ORDER_TYPE.equals(info.getOrderFlag())) {
+			orderMapper.updateOrderCancel(info.getOrderId());
+
+		} else if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+
+			Integer status = orderMapper.getOrderStatusByOrderId(info.getOrderId());
+			//TODO 退单流程，根据status状态
+		}
+		
+		String content = "订单号\""+info.getOrderId()+"\"退单";
+		
+		logFeignClient.saveLog(Constants.FIRST_VERSION,CommonUtils.packageLog(LogConstants.ORDER_CANCEL, "订单退单", info.getCenterId(), content, info.getUserId()+""));
+		return null;
 	}
 }

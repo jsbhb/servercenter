@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,6 @@ import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
-import com.zm.user.wx.ApiResult;
 
 /**
  * ClassName: UserController <br/>
@@ -106,6 +104,11 @@ public class UserController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			if(!address.check()){
+				result.setSuccess(false);
+				result.setErrorMsg("参数不全");
+				return result;
+			}
 			userService.saveAddress(address);
 			result.setSuccess(true);
 		}
@@ -169,11 +172,30 @@ public class UserController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			userService.updateUserDetail(detail);
 			result.setSuccess(true);
+			result.setObj(detail);
 		}
 
 		return result;
 	}
 
+	@RequestMapping(value = "auth/{version}/user/3rdLogin-check", method = RequestMethod.GET)
+	public ResultModel getWechatUser(@PathVariable("version") Double version, HttpServletResponse res,
+			@RequestBody UserInfo info, HttpServletRequest req) {
+
+		ResultModel result = new ResultModel();
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			if(!info.check3rdLoginParam()){
+				result.setErrorMsg("参数不全");
+				result.setSuccess(false);
+				return result;
+			}
+			result.setSuccess(userService.verifyIsFirst(info));
+		}
+
+		return result;
+	}
+	
 	@RequestMapping(value = "auth/{version}/user/register/{code}", method = RequestMethod.POST)
 	public ResultModel registerUser(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody UserInfo info, @PathVariable("code") String code, HttpServletRequest req) {
@@ -212,6 +234,7 @@ public class UserController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			userService.saveUserDetail(detail);
 			result.setSuccess(true);
+			result.setObj(detail);
 		}
 
 		return result;

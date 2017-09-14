@@ -63,6 +63,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void saveAddress(Address address) {
+		
+		Integer total = userMapper.countAddressByUserId(address.getUserId());
+		
+		if(total == null || total == 0){
+			address.setSetDefault(DEFAULT);
+		}
 
 		if (DEFAULT.equals(address.getSetDefault())) {
 			userMapper.updateUndefaultAddress(address.getUserId());
@@ -286,6 +292,15 @@ public class UserServiceImpl implements UserService {
 			return true;
 		}
 
+		return false;
+	}
+
+	@Override
+	public boolean verifyIsFirst(UserInfo info) {
+		Integer count = userMapper.countUserBy3rdLogin(info);
+		if(count == 0){
+			return true;
+		}
 		return false;
 	}
 

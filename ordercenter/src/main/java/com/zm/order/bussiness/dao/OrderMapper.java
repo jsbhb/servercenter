@@ -34,7 +34,7 @@ public interface OrderMapper {
 	
 	void updateOrderPayStatusByOrderId(String orderId);
 	
-	int getClientIdByOrderId(String orderId);
+	Integer getClientIdByOrderId(String orderId);
 	
 	void saveShoppingCart(ShoppingCart cart);
 	
@@ -46,5 +46,9 @@ public interface OrderMapper {
 	
 	void removeShoppingCart(Map<String,Object> param);
 	
-	int countShoppingCart(Map<String,Object> param);
+	Integer countShoppingCart(Map<String,Object> param);
+	
+	void updateOrderCancel(String orderId);
+	
+	Integer getOrderStatusByOrderId(String orderId);
 }

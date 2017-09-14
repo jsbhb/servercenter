@@ -1,5 +1,7 @@
 package com.zm.thirdcenter.bussiness.loginplugin.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -70,7 +72,11 @@ public class ThirdLoginPluginController {
 			if (apiResult.isSucceed()) {
 				redisTemplate.opsForValue().set(apiResult.getStr("unionid"), apiResult, 30L, TimeUnit.MINUTES);
 
-				// TODO 通过权限中心API 把unionid返回给权限中心
+				Map<String,String> resultMap = new HashMap<String,String>();
+				resultMap.put("openid", token.getOpenid());
+				resultMap.put("unionid", apiResult.getStr("unionid"));
+				result.setSuccess(true);
+				result.setObj(resultMap);
 			}
 
 		}

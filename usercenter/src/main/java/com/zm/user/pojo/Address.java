@@ -37,6 +37,11 @@ public class Address {
 
 	private String opt;
 
+	public boolean check() {
+		return province != null && city != null && receivePhone != null && receiveName != null && address != null
+				&& userId != null;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -148,6 +153,5 @@ public class Address {
 				+ ", receiveName=" + receiveName + ", setDefault=" + setDefault + ", createTime=" + createTime
 				+ ", updateTime=" + updateTime + ", opt=" + opt + "]";
 	}
-	
-	
+
 }

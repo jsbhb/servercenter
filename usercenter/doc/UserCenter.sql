@@ -22,6 +22,7 @@ CREATE TABLE `zm_user`.`user` (
   `status` TINYINT UNSIGNED NULL DEFAULT 1 COMMENT '用户状态0：不可用，1正常',
   `center_id` INT UNSIGNED NOT NULL COMMENT '注册区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
+  `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
   `create_time` DATETIME NULL COMMENT '注册时间', 
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` DATETIME NULL COMMENT '操作人',
@@ -31,6 +32,7 @@ CREATE TABLE `zm_user`.`user` (
   PRIMARY KEY (`id`),
   INDEX `idx_account` (`account`),
   INDEX `idx_center_id` (`center_id`),
+  INDEX `idx_guide_id` (`guide_id`),
   INDEX `idx_shop_id` (`shop_id`),
   INDEX `idx_phone` (`phone`),
   INDEX `idx_email` (`email`),
@@ -115,9 +117,9 @@ CREATE TABLE `zm_user`.`address` (
   `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `province` VARCHAR(20) NOT NULL COMMENT '省',
   `city` VARCHAR(20) NOT NULL COMMENT '市',
-  `area` VARCHAR(20) NOT NULL COMMENT '区',
+  `area` VARCHAR(20) NULL COMMENT '区',
   `address` VARCHAR(200) NOT NULL COMMENT '地址',
-  `zipcode` VARCHAR(10) NOT NULL COMMENT '邮编',
+  `zipcode` VARCHAR(10) NULL COMMENT '邮编',
   `receive_phone` VARCHAR(30) NOT NULL COMMENT '手机',
   `receive_name` VARCHAR(50) NOT NULL COMMENT '收货人',
   `is_default` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '默认地址',
@@ -147,34 +149,40 @@ COMMENT = '用户收藏表';
 
 drop table if exists  `regional_center`;
 
-CREATE TABLE `zm_user`.`regional_center` (
+CREATE TABLE `zm_user`.`grade` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `center_type` TINYINT UNSIGNED NOT NULL COMMENT '类型',
-  `name` VARCHAR(50) NOT NULL COMMENT '名称',
+  `parent_id` INT UNSIGNED NULL COMMENT '父级ID',
+  `grade_type` TINYINT UNSIGNED NOT NULL COMMENT '类型0:跨境；1大贸',
+  `grade_name` VARCHAR(50) NOT NULL COMMENT '名称',
   `person_in_charge` VARCHAR(50) NOT NULL COMMENT '负责人',
   `phone` CHAR(11) NOT NULL COMMENT '负责人电话',
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
+  `grade_person_in_charge` INT UNSIGNED NULL COMMENT '负责该等级的负责人userID',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `idx_platform_id` (`platform_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '区域中心表';
+  INDEX `idx_grade_type` (`grade_type`),
+  INDEX `idx_parent_id` (`parent_id`),
+  INDEX `idx_grade_person_in_charge` (`grade_person_in_charge`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '等级表';
 
-drop table if exists  `regional_shop`;
+drop table if exists  `shopping_guide`;
 
-CREATE TABLE `zm_user`.`regional_shop` (
+CREATE TABLE `zm_user`.`shopping_guide` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `regional_id` INT UNSIGNED NOT NULL COMMENT '区域中心ID',
-  `type` TINYINT UNSIGNED NOT NULL COMMENT '类型',
-  `name` VARCHAR(50) NOT NULL COMMENT '名称',
+  `grade_id` INT UNSIGNED NOT NULL COMMENT '等级ID',
+  `grade_name` VARCHAR(50) NOT NULL COMMENT '导购名称',
+  `grade_phone` CHAR(11) NOT NULL COMMENT '导购电话',
+  `grade_person_in_charge` INT UNSIGNED NULL COMMENT '导购的负责人userID',
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `idx_regional_id` (`regional_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '区域中心子店铺表';
+  INDEX `idx_grade_id` (`grade_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '导购表';
 
 
 drop table if exists  `vip_price`;

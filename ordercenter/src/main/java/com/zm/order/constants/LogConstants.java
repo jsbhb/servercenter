@@ -38,4 +38,6 @@ public class LogConstants {
 	
 	//=====================================以下为该服务API_ID======================================
 	
+	public static final Integer ORDER_CANCEL = 1;
+	
 }

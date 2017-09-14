@@ -22,6 +22,8 @@ public class OrderInfo {
 	private Integer centerId;
 
 	private Integer shopId;
+	
+	private Integer guideId;
 
 	private Integer supplierId;
 
@@ -42,6 +44,8 @@ public class OrderInfo {
 	private String remark;
 	
 	private Integer orderFlag;
+	
+	private String statusArr;
 
 	private OrderDetail orderDetail;
 
@@ -50,6 +54,22 @@ public class OrderInfo {
 	private String startTime;
 	
 	private String endTime;
+
+	public Integer getGuideId() {
+		return guideId;
+	}
+
+	public void setGuideId(Integer guideId) {
+		this.guideId = guideId;
+	}
+
+	public String getStatusArr() {
+		return statusArr;
+	}
+
+	public void setStatusArr(String statusArr) {
+		this.statusArr = statusArr;
+	}
 
 	public String getStartTime() {
 		return startTime;
@@ -230,11 +250,12 @@ public class OrderInfo {
 	@Override
 	public String toString() {
 		return "OrderInfo [id=" + id + ", orderId=" + orderId + ", combinationId=" + combinationId + ", userId="
-				+ userId + ", status=" + status + ", expressType=" + expressType + ", centerId="
-				+ centerId + ", shopId=" + shopId + ", supplierId=" + supplierId + ", tdq=" + tdq
+				+ userId + ", status=" + status + ", expressType=" + expressType + ", centerId=" + centerId
+				+ ", shopId=" + shopId + ", guideId=" + guideId + ", supplierId=" + supplierId + ", tdq=" + tdq
 				+ ", carrierKey=" + carrierKey + ", expressId=" + expressId + ", gtime=" + gtime + ", sendTime="
 				+ sendTime + ", createTime=" + createTime + ", updateTime=" + updateTime + ", remark=" + remark
-				+ ", orderDetail=" + orderDetail + ", orderGoodsList=" + orderGoodsList + "]";
+				+ ", orderFlag=" + orderFlag + ", statusArr=" + statusArr + ", orderDetail=" + orderDetail
+				+ ", orderGoodsList=" + orderGoodsList + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
 
 }

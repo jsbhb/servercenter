@@ -86,7 +86,7 @@
 
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id as goodsId, gb.id,gi.goods_name as customGoodsName,
-		gi.status,gb.goods_name,
+		gi.status,gb.goods_name,gi.supplier_id,
 		gb.brand_id,gb.brand,gb.origin from goods_item
 		gi left join goods_base gb on gi.base_id = gb.id
 		left join

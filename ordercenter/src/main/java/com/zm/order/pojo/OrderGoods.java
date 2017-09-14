@@ -22,6 +22,8 @@ public class OrderGoods {
 	
 	private String itemName;
 	
+	private String itemImg;
+	
 	private String itemInfo;
 	
 	private String itemCode;
@@ -33,6 +35,14 @@ public class OrderGoods {
 	private Double actualPrice;
 	
 	private String remark;
+
+	public String getItemImg() {
+		return itemImg;
+	}
+
+	public void setItemImg(String itemImg) {
+		this.itemImg = itemImg;
+	}
 
 	public Integer getId() {
 		return id;
