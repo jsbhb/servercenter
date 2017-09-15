@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.zm.user.pojo.Address;
+import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
@@ -58,5 +59,7 @@ public interface UserMapper {
 	
 	Integer countAddressByUserId(Integer userId);
 	
-	Integer countUserBy3rdLogin(UserInfo info);
+	Integer countWechatBy3rdLogin(ThirdLogin info);
+	
+	void saveWechat(ThirdLogin info);
 }

@@ -68,7 +68,7 @@ public class NotifyController {
         }
        
         
-        WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue().get(clientId + Constants.WX_PAY);
+        WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue().get(Constants.PAY+clientId + Constants.WX_PAY);
   
         WXPay wxpay = new WXPay(config);
 

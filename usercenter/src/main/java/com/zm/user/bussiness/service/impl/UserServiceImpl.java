@@ -19,6 +19,7 @@ import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.feignclient.model.PayModel;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
+import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
@@ -63,10 +64,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void saveAddress(Address address) {
-		
+
 		Integer total = userMapper.countAddressByUserId(address.getUserId());
-		
-		if(total == null || total == 0){
+
+		if (total == null || total == 0) {
 			address.setSetDefault(DEFAULT);
 		}
 
@@ -103,23 +104,31 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Integer saveUser(UserInfo info) {
+		Integer userId = null;
 
-		Integer userId = userMapper.getUserIdByUserInfo(info);
-		if(userId != null){
+		userId = userMapper.getUserIdByUserInfo(info);
+		if (userId != null) {
+			if (info.getWechat() != null) {
+				userMapper.saveWechat(
+						new ThirdLogin(userId, info.getPlatUserType(), info.getWechat(), Constants.WX_LOGIN));
+			}
+
 			return userId;
 		}
-		
+
 		info.setPhoneValidate(VALIDATE);
 		if (info.getPwd() != null && !"".equals(info.getPwd())) {
 			info.setPwd(EncryptionUtil.MD5(info.getPwd()));
 		}
 
+		userMapper.saveUser(info);
+
 		if (info.getWechat() != null && !"".equals(info.getWechat())) {
 			ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
 			packageUser(apiResult, info);
+			userMapper.saveWechat(
+					new ThirdLogin(info.getId(), info.getPlatUserType(), info.getWechat(), Constants.WX_LOGIN));
 		}
-
-		userMapper.saveUser(info);
 
 		if (info.getUserDetail() != null) {
 			userMapper.saveUserDetail(info.getUserDetail());
@@ -128,7 +137,7 @@ public class UserServiceImpl implements UserService {
 		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
 		logFeignClient.saveLog(Constants.FIRST_VERSION,
 				packageLog(LogConstants.REGISTER, "注册账号", info.getCenterId(), content, info.getPhone()));
-		
+
 		return info.getId();
 	}
 
@@ -238,9 +247,9 @@ public class UserServiceImpl implements UserService {
 		payModel.setBody("会员充值");
 
 		if (Constants.WX_PAY.equals(payType)) {
-			Map<String, String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(price.getCenterId()), type,
-					payModel);
-			result.setObj(paymap);
+//			Map<String, String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(price.getCenterId()), type,
+//					payModel);
+//			result.setObj(paymap);
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
@@ -296,10 +305,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean verifyIsFirst(UserInfo info) {
-		Integer count = userMapper.countUserBy3rdLogin(info);
-		if(count == 0){
-			return true;
+	public boolean verifyIsFirst(ThirdLogin info) {
+		if (info.getWechat() != null) {
+			Integer count = userMapper.countWechatBy3rdLogin(info);
+			if (count == 0) {
+				return true;
+			}
+			return false;
 		}
 		return false;
 	}

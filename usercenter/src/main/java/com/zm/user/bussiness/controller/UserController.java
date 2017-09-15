@@ -22,6 +22,7 @@ import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.ThirdPartFeignClient;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
+import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
@@ -178,22 +179,18 @@ public class UserController {
 		return result;
 	}
 
-	@RequestMapping(value = "auth/{version}/user/3rdLogin-check", method = RequestMethod.GET)
-	public ResultModel getWechatUser(@PathVariable("version") Double version, HttpServletResponse res,
-			@RequestBody UserInfo info, HttpServletRequest req) {
-
-		ResultModel result = new ResultModel();
+	@RequestMapping(value = "auth/{version}/user/3rdLogin-check", method = RequestMethod.POST)
+	public boolean get3rdLoginUser(@PathVariable("version") Double version, HttpServletResponse res,
+			@RequestBody ThirdLogin info, HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if(!info.check3rdLoginParam()){
-				result.setErrorMsg("参数不全");
-				result.setSuccess(false);
-				return result;
+			if(!info.check()){
+				throw new RuntimeException("参数不全");
 			}
-			result.setSuccess(userService.verifyIsFirst(info));
+			return userService.verifyIsFirst(info);
 		}
 
-		return result;
+		return false;
 	}
 	
 	@RequestMapping(value = "auth/{version}/user/register/{code}", method = RequestMethod.POST)

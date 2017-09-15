@@ -11,9 +11,6 @@ CREATE TABLE `zm_user`.`user` (
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
   `email` VARCHAR(100) NULL COMMENT '邮箱',
-  `wechat` VARCHAR(100) NULL COMMENT '微信',
-  `qq` VARCHAR(100) NULL COMMENT 'qq',
-  `sina_blog` VARCHAR(100) NULL COMMENT '新浪微博',
   `pwd` VARCHAR(50) NULL COMMENT '密码',
   `parent_id` INT UNSIGNED NULL COMMENT '上级ID',
   `band` TINYINT UNSIGNED NULL COMMENT '分销等级',
@@ -36,18 +33,30 @@ CREATE TABLE `zm_user`.`user` (
   INDEX `idx_shop_id` (`shop_id`),
   INDEX `idx_phone` (`phone`),
   INDEX `idx_email` (`email`),
-  INDEX `idx_wechat` (`wechat`),
-  INDEX `idx_qq` (`qq`),
-  INDEX `idx_sina_blog` (`sina_blog`),
   INDEX `idx_plat_user_type` (`plat_user_type`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `account_UNIQUE` (`account`, `plat_user_type` ASC),
   UNIQUE INDEX `phone_UNIQUE` (`phone`,`plat_user_type` ASC),
-  UNIQUE INDEX `email_UNIQUE` (`email`,`plat_user_type` ASC),
-  UNIQUE INDEX `wechat_UNIQUE` (`wechat`,`plat_user_type` ASC),
-  UNIQUE INDEX `qq_UNIQUE` (`qq`,`plat_user_type` ASC),
-  UNIQUE INDEX `sina_blog_UNIQUE` (`sina_blog`,`plat_user_type` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
+  UNIQUE INDEX `email_UNIQUE` (`email`,`plat_user_type` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
 COMMENT = '用户表';
+
+drop table if exists  `user_wechat`;
+
+CREATE TABLE `zm_user`.`user_wechat` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
+  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
+  `wechat` VARCHAR(100) NOT NULL COMMENT '微信unionid',
+  `attribute` VARCHAR(100) COMMENT '备用',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `awechat_UNIQUE` (`wechat`, `plat_user_type` ASC),
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_wechat` (`wechat`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '微信表';
+
 
 drop table if exists  `user_vip`;
 

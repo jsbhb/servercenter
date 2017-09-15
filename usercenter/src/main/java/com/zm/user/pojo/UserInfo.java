@@ -66,12 +66,7 @@ public class UserInfo {
 	private Integer vipLevel;
 
 	public boolean check() {
-		return platUserType != null && (account != null || phone != null || email != null || wechat != null
-				|| qq != null || sinaBlog != null) && centerId != null;
-	}
-
-	public boolean check3rdLoginParam() {
-		return platUserType != null && (wechat != null || qq != null || sinaBlog != null);
+		return platUserType != null && (account != null || phone != null || email != null) && centerId != null;
 	}
 
 	public Integer getGuideId() {

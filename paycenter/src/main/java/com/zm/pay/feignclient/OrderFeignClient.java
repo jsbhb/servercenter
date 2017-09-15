@@ -16,5 +16,5 @@ public interface OrderFeignClient {
 
 	@RequestMapping(value = "{version}/order/alread-pay/{orderId}", method = RequestMethod.PUT)
 	public ResultModel updateOrderPayStatusByOrderId(@PathVariable("version") Double version,
-			@PathVariable("orderId") String orderId, @RequestParam String payNo);
+			@PathVariable("orderId") String orderId, @RequestParam("payNo") String payNo);
 }

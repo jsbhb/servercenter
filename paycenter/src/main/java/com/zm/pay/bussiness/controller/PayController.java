@@ -32,7 +32,7 @@ public class PayController {
 	public Map<String, String> wxPay(@PathVariable("openId") String openId, @PathVariable("clientId") Integer clientId,
 			@PathVariable("type") String type, @RequestBody PayModel model) throws Exception {
 
-		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue().get(clientId + Constants.WX_PAY);
+		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue().get(Constants.PAY+clientId + Constants.WX_PAY);
 		
 		Map<String,String> result =  WxPayUtils.unifiedOrder(type, config, model, openId);
 		

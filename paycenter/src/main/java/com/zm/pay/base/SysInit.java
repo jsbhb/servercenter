@@ -33,14 +33,14 @@ public class SysInit {
 	private void loadAliPayConfig(){
 		List<AliPayConfigModel> list = payMapper.listAliPayConfig();
 		for(AliPayConfigModel model : list){
-			redisTemplate.opsForValue().set(model.getCenterId()+Constants.ALI_PAY, model);
+			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.ALI_PAY, model);
 		}
 	}
 	
 	private void loadWeixinPayConfig(){
 		List<WeixinPayConfig> list = payMapper.listWeixinPayConfig();
 		for(WeixinPayConfig model : list){
-			redisTemplate.opsForValue().set(model.getCenterId()+Constants.WX_PAY, model);
+			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.WX_PAY, model);
 		}
 	}
 }

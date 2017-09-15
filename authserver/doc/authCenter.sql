@@ -18,14 +18,12 @@ CREATE TABLE `role` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='角色表';
 
 
-drop table if exists  `user`;
-
 CREATE TABLE `user` (
   `USER_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `USER_NAME` varchar(45) NOT NULL COMMENT '用户名',
-  `PASSWORD` varchar(200) NOT NULL,
-  `PHONE` varchar(45) NOT NULL,
-  `EMAIL` varchar(45) NOT NULL,
+  `user_name` varchar(100) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  `phone` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
   `STATUS` int(11) NOT NULL DEFAULT '1' COMMENT '用户状态',
   `CREATION_DATE` datetime NOT NULL COMMENT '创建时间',
   `CREATED_BY` int(11) NOT NULL COMMENT '创建人',
@@ -33,9 +31,11 @@ CREATE TABLE `user` (
   `LAST_UPDATED_BY` int(11) NOT NULL COMMENT '最后修改人',
   `openid` varchar(100) DEFAULT NULL,
   `platform` int(11) DEFAULT NULL,
+  `usercenterid` int(11) NOT NULL,
   PRIMARY KEY (`USER_ID`),
-  UNIQUE KEY `USER_NAME_UNIQUE` (`USER_NAME`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COMMENT='用户表';
+  UNIQUE KEY `USER_NAME_UNIQUE` (`user_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='用户表';
+
 
 
 drop table if exists  `user_role`;

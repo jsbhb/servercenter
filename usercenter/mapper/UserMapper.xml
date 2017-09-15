@@ -235,11 +235,18 @@
 	<insert id="saveUser" parameterType="Object" useGeneratedKeys="true"
 		keyProperty="id">
 		insert into
-		user(phone,plat_user_type,email,account,wechat,qq,sina_blog,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
+		user(phone,plat_user_type,email,account,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
 		shop_id,guide_id,create_time)
 		values
-		(#{phone},#{platUserType},#{email},#{account},#{wechat},#{qq},#{sinaBlog},#{pwd},#{parentId},#{band},#{phoneValidate},
+		(#{phone},#{platUserType},#{email},#{account},#{pwd},#{parentId},#{band},#{phoneValidate},
 		#{emailValidate},#{centerId},#{shopId},#{guideId},now())
+	</insert>
+
+	<insert id="saveWechat" parameterType="Object">
+		insert IGNORE into
+		user_wechat(user_id,plat_user_type,wechat,create_time)
+		values
+		(#{userId},#{platUserType},#{wechat},now())
 	</insert>
 
 
@@ -307,15 +314,6 @@
 		<if test="email != null and email != ''">
 			and email = #{email}
 		</if>
-		<if test="wechat != null and wechat != ''">
-			and wechat = #{wechat}
-		</if>
-		<if test="qq != null and qq != ''">
-			and qq = #{qq}
-		</if>
-		<if test="sinaBlog != null and sinaBlog != ''">
-			and sinaBlog = #{sinaBlog}
-		</if>
 	</select>
 
 	<select id="countAddressByUserId" parameterType="Object"
@@ -324,19 +322,11 @@
 		select count(*) from address where user_id = #{userId}
 	</select>
 
-	<select id="countUserBy3rdLogin" parameterType="Object"
+	<select id="countWechatBy3rdLogin" parameterType="Object"
 		resultType="java.lang.Integer">
 
-		select count(*) from user where plat_user_type = #{platUserType} 
-		<if test="wechat != null and wechat != ''">
-			and wechat = #{wechat}
-		</if>
-		<if test="qq != null and q != ''">
-			and qq = #{qq}
-		</if>
-		<if test="sinaBlog != null and sinaBlog != ''">
-			and sina_blog = #{sinaBlog}
-		</if>
+		select count(*) from user_wechat where plat_user_type =
+		#{platUserType} and wechat = #{wechat}
 	</select>
 
 </mapper>

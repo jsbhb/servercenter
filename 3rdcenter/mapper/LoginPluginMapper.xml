@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.thirdcenter.bussiness.loginplugin.dao.LoginPluginMapper">
+
+	<resultMap type="com.zm.thirdcenter.pojo.WXLoginConfig" id="wxlogin">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="login_type" property="loginType" jdbcType="INTEGER" />
+		<result column="secret" property="secret" jdbcType="VARCHAR" />
+		<result column="app_id" property="appId" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<select id="listWXLoginConfig" resultMap="wxlogin">
+		select * from
+		wxlogin_config;
+	</select>
+</mapper>

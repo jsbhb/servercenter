@@ -1,5 +1,6 @@
 package com.zm.thirdcenter.bussiness.loginplugin.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +20,10 @@ import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsAccessToken;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsAccessTokenApi;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsApi;
 import com.zm.thirdcenter.constants.Constants;
+import com.zm.thirdcenter.feignclient.UserFeignClient;
+import com.zm.thirdcenter.feignclient.model.ThirdLogin;
 import com.zm.thirdcenter.pojo.ResultModel;
+import com.zm.thirdcenter.pojo.WXLoginConfig;
 
 /**
  * ClassName: ThirdLoginPluginController <br/>
@@ -34,24 +39,32 @@ public class ThirdLoginPluginController {
 
 	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
 
-	private static final String REDIRECT_URL = "http://0ca50d05.ngrok.io/auth/user/3rdLogin/wxLogin";
+	private static final String REDIRECT_URL = "http://29ca8896.ngrok.io/3rdcenter/auth/user/3rdLogin/wxLogin";
 
 	@Resource
-	RedisTemplate<String, ApiResult> redisTemplate;
+	RedisTemplate<String, Object> redisTemplate;
+
+	@Resource
+	UserFeignClient userFeignClient;
 
 	@RequestMapping(value = "auth/{version}/user/3rdLogin/wx", method = RequestMethod.GET)
-	public String getRequestCodeUrl(boolean snsapiBase) {
+	public String getRequestCodeUrl(HttpServletRequest req, HttpServletResponse res, @RequestBody WXLoginConfig param) {
+
+		WXLoginConfig config = (WXLoginConfig) redisTemplate.opsForValue()
+				.get(Constants.LOGIN + param.getCenterId() + "" + param.getLoginType());
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("?appid=" + Constants.APPID);
+		sb.append("?appid=" + config.getAppId());
 		sb.append("&redirect_uri=" + REDIRECT_URL);
 		sb.append("&response_type=code");
-		if (snsapiBase) {
+		if (param.isSnsapiBase()) {
 			sb.append("&scope=snsapi_userinfo");
-			sb.append("&state=wx_user#wechat_redirect");
+			sb.append("&state=" + param.getPlatUserType() + "," + param.getCenterId() + "," + param.getLoginType()
+					+ "#wechat_redirect");
 		} else {
 			sb.append("&scope=snsapi_base");
-			sb.append("&state=base#wechat_redirect");
+			sb.append("&state=base" + "," + param.getPlatUserType() + "," + param.getCenterId() + ","
+					+ param.getLoginType() + "#wechat_redirect");
 		}
 
 		return authorize_uri + sb.toString();
@@ -64,17 +77,30 @@ public class ThirdLoginPluginController {
 
 		String code = req.getParameter("code");
 		String state = req.getParameter("state");
-		SnsAccessToken token = SnsAccessTokenApi.getSnsAccessToken(Constants.APPID, Constants.SECRET, code);
+		String[] stateArr = state.split(",");
+		WXLoginConfig config = null;
+		boolean snsapiBase = false;
+		snsapiBase = Arrays.asList(stateArr).contains("base");
+		if (snsapiBase) {
+			config = (WXLoginConfig) redisTemplate.opsForValue().get(Constants.LOGIN + stateArr[2] + "" + stateArr[3]);
+		} else {
+			config = (WXLoginConfig) redisTemplate.opsForValue().get(Constants.LOGIN + stateArr[1] + "" + stateArr[2]);
+		}
+		SnsAccessToken token = SnsAccessTokenApi.getSnsAccessToken(config.getAppId(), config.getSecret(), code);
 
-		if ("wx_user".equals(state)) {
+		if (!snsapiBase) {
 			ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
 
 			if (apiResult.isSucceed()) {
 				redisTemplate.opsForValue().set(apiResult.getStr("unionid"), apiResult, 30L, TimeUnit.MINUTES);
 
-				Map<String,String> resultMap = new HashMap<String,String>();
+				Map<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("openid", token.getOpenid());
 				resultMap.put("unionid", apiResult.getStr("unionid"));
+
+				boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
+						new ThirdLogin(Integer.parseInt(state), apiResult.getStr("unionid"), Constants.WX_LOGIN));
+				resultMap.put("isFirst", flag);
 				result.setSuccess(true);
 				result.setObj(resultMap);
 			}

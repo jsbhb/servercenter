@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
+import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
@@ -165,5 +166,5 @@ public interface UserService {
 	 * @param info  
 	 * @since JDK 1.7  
 	 */
-	boolean verifyIsFirst(UserInfo info);
+	boolean verifyIsFirst(ThirdLogin info);
 }

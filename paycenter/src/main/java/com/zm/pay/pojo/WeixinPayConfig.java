@@ -4,10 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 
 import com.github.wxpay.sdk.WXPayConfig;
 
-public class WeixinPayConfig implements WXPayConfig {
+public class WeixinPayConfig implements WXPayConfig,Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Integer id;
 
 	private byte[] certData;
 
@@ -24,6 +29,15 @@ public class WeixinPayConfig implements WXPayConfig {
 	private Integer httpReadTimeoutMs;
 	
 	private Integer centerId;
+
+	public Integer getId() {
+		return id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 
 	public Integer getCenterId() {
