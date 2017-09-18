@@ -34,7 +34,7 @@ public class WxPayUtils {
 		data.put("time_expire", sdf.format(cal.getTime()));
 		data.put("trade_type", type);
 		if (Constants.JSAPI.equals(type)) {
-			data.put("openId", model.getOpenId());
+			data.put("openid", model.getOpenId());
 		} else if (Constants.MWEB.equals(type) || Constants.APP.equals(type)) {
 			data.put("spbill_create_ip", model.getIP());
 		} else if (Constants.NATIVE.equals(type)) {
@@ -43,6 +43,8 @@ public class WxPayUtils {
 
 		Map<String, String> resp = wxpay.unifiedOrder(data);
 		System.out.println(resp);
+		resp.put("timeStamp", System.currentTimeMillis()/1000 + "");
+		resp.put("signType","MD5");
 		return resp;
 	}
 }
