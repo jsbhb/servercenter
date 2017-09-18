@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.ThirdPartFeignClient;
+import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
@@ -28,6 +29,7 @@ import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
+import com.zm.user.pojo.WeiXinPayConfig;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
 
@@ -105,7 +107,7 @@ public class UserController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if(!address.check()){
+			if (!address.check()) {
 				result.setSuccess(false);
 				result.setErrorMsg("参数不全");
 				return result;
@@ -184,7 +186,7 @@ public class UserController {
 			@RequestBody ThirdLogin info, HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if(!info.check()){
+			if (!info.check()) {
 				throw new RuntimeException("参数不全");
 			}
 			return userService.verifyIsFirst(info);
@@ -192,7 +194,7 @@ public class UserController {
 
 		return false;
 	}
-	
+
 	@RequestMapping(value = "auth/{version}/user/register/{code}", method = RequestMethod.POST)
 	public ResultModel registerUser(@PathVariable("version") Double version, HttpServletResponse res,
 			@RequestBody UserInfo info, @PathVariable("code") String code, HttpServletRequest req) {
@@ -200,15 +202,15 @@ public class UserController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
-			if(!info.check()){
+
+			if (!info.check()) {
 				result.setErrorMsg("参数不全");
 				result.setSuccess(false);
 				return result;
 			}
-			
+
 			boolean flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
-			if(flag){
+			if (flag) {
 				Integer userId = userService.saveUser(info);
 				result.setObj(userId);
 				result.setSuccess(true);
@@ -322,7 +324,6 @@ public class UserController {
 			@PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
 			HttpServletRequest req) {
 
-
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 
@@ -342,9 +343,21 @@ public class UserController {
 
 		String payType = req.getParameter("payType");
 		String type = req.getParameter("type");
-		String openId = req.getParameter("openId");
+		AbstractPayConfig payConfig = null;
+		if (Constants.WX_PAY.equals(payType)) {
+			String openId = req.getParameter("openId");
+			if(Constants.JSAPI.equals(type)){
+				if(openId == null || "".equals(openId)){
+					result.setSuccess(false);
+					result.setErrorMsg("请使用微信授权登录");
+					return result;
+				}
+			}
+			String ip = req.getRemoteAddr();
+			payConfig = new WeiXinPayConfig(openId, ip);
+		}
 
-		if (payType == null || type == null) {
+		if (payType == null || type == null || "".equals(type) || "".equals(payType)) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
@@ -359,7 +372,7 @@ public class UserController {
 			}
 
 			try {
-				result = userService.saveVipOrder(vipOrder, version, openId, payType, type);
+				result = userService.saveVipOrder(vipOrder, payType, type, payConfig);
 			} catch (Exception e) {
 				result.setSuccess(false);
 				result.setErrorMsg("微服务出错");
@@ -391,7 +404,6 @@ public class UserController {
 	@RequestMapping(value = "{version}/user/getVipUser/{orderId}", method = RequestMethod.GET)
 	public UserVip getVipUserByOrderId(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("orderId") String orderId) {
-
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -436,7 +448,6 @@ public class UserController {
 	public boolean updateVipOrder(@PathVariable("version") Double version, HttpServletResponse res,
 			HttpServletRequest req, @PathVariable("orderId") String orderId) {
 
-
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			userService.updateVipOrder(orderId);
@@ -453,7 +464,7 @@ public class UserController {
 
 			return userService.isAlreadyPay(orderId);
 		}
-		
+
 		return false;
 	}
 

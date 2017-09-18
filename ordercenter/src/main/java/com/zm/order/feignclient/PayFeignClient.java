@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.zm.order.feignclient.model.PayModel;
 
-
 @FeignClient("paycenter")
 public interface PayFeignClient {
 
-	@RequestMapping(value = "wxpay/{type}/{clientId}/{openId}", method = RequestMethod.POST)
-	public Map<String, String> wxPay(@PathVariable("openId") String openId, @PathVariable("clientId") Integer clientId,
-			@PathVariable("type") String type, @RequestBody PayModel model) throws Exception;
+	@RequestMapping(value = "wxpay/{type}/{clientId}", method = RequestMethod.POST)
+	public Map<String, String> wxPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+			@RequestBody PayModel model) throws Exception;
 }

@@ -24,26 +24,31 @@ public class PayController {
 
 	@Resource
 	RedisTemplate<String, ?> redisTemplate;
-	
+
 	@Resource
 	LogFeignClient logFeignClient;
 
-	@RequestMapping(value = "wxpay/{type}/{clientId}/{openId}", method = RequestMethod.POST)
-	public Map<String, String> wxPay(@PathVariable("openId") String openId, @PathVariable("clientId") Integer clientId,
-			@PathVariable("type") String type, @RequestBody PayModel model) throws Exception {
+	@RequestMapping(value = "wxpay/{type}/{clientId}", method = RequestMethod.POST)
+	public Map<String, String> wxPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+			@RequestBody PayModel model) throws Exception {
 
-		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue().get(Constants.PAY+clientId + Constants.WX_PAY);
+		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
+				.get(Constants.PAY + clientId + Constants.WX_PAY);
 		
-		Map<String,String> result =  WxPayUtils.unifiedOrder(type, config, model, openId);
-		
-		String return_code = (String)result.get("return_code");
-		
-		if(return_code.equals("SUCCESS")){
+		config.setHttpConnectTimeoutMs(5000);
+		config.setHttpReadTimeoutMs(5000);
+
+		Map<String, String> result = WxPayUtils.unifiedOrder(type, config, model);
+
+		String return_code = (String) result.get("return_code");
+
+		if (return_code.equals("SUCCESS")) {
 			String content = "订单号 \"" + model.getOrderId() + "\" 通过微信支付，后台请求成功";
-			logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
+			logFeignClient.saveLog(Constants.FIRST_VERSION,
+					CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
 		}
-		
+
 		return result;
 	}
-	
+
 }

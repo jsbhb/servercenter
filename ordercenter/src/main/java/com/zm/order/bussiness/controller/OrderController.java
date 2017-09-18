@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
+import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -25,6 +26,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.WeiXinPayConfig;
 import com.zm.order.utils.JSONUtil;
 
 /**
@@ -51,7 +53,19 @@ public class OrderController {
 
 		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
-		String openId = req.getParameter("openId");
+		AbstractPayConfig payConfig = null;
+		if(Constants.WX_PAY.equals(payType)){
+			String openId = req.getParameter("openId");
+			if(Constants.JSAPI.equals(type)){
+				if(openId == null || "".equals(openId)){
+					result.setSuccess(false);
+					result.setErrorMsg("请使用微信授权登录");
+					return result;
+				}
+			}
+			String ip = req.getRemoteAddr();
+			payConfig = new WeiXinPayConfig(openId, ip);
+		}
 
 		if (payType == null || type == null) {
 			result.setSuccess(false);
@@ -62,7 +76,7 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			try {
-				result = orderService.saveOrder(orderInfo, version, openId, payType, type);
+				result = orderService.saveOrder(orderInfo, payType, type, payConfig);
 			} catch (DataIntegrityViolationException e) {
 				e.printStackTrace();
 				result.setSuccess(false);
@@ -150,13 +164,12 @@ public class OrderController {
 
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/order/cancel", method = RequestMethod.PUT)
-	public ResultModel orderCancel(@PathVariable("version") Double version,
-			@RequestBody OrderInfo info, HttpServletRequest req, HttpServletResponse res) {
+	public ResultModel orderCancel(@PathVariable("version") Double version, @RequestBody OrderInfo info,
+			HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.orderCancel(info);
@@ -184,13 +197,13 @@ public class OrderController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
-			if(!cart.check()){
+
+			if (!cart.check()) {
 				result.setSuccess(false);
 				result.setErrorMsg("参数不全");
 				return result;
 			}
-			
+
 			orderService.saveShoppingCart(cart);
 			result.setSuccess(true);
 		}

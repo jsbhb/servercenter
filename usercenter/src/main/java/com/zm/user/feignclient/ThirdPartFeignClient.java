@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("3rdcenter")
 public interface ThirdPartFeignClient {
 
-	@RequestMapping(value="{version}/third-part/phoneVerify", method=RequestMethod.GET)
+	@RequestMapping(value="auth/{version}/third-part/phoneVerify", method=RequestMethod.GET)
 	boolean verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone, @RequestParam("code") String code);
 }

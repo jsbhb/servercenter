@@ -40,7 +40,7 @@ public class NotifyController {
 	@Resource
 	UserFeignClient userFeignClient;
 
-	@RequestMapping(value = "/payMng/wxPayReturn" ,method = RequestMethod.GET)
+	@RequestMapping(value = "payMng/wxPayReturn" ,method = RequestMethod.GET)
 	public void wxNotify(HttpServletRequest req,HttpServletResponse res) throws Exception{
 		//读取参数  
         InputStream inputStream ;  

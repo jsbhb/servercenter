@@ -17,6 +17,7 @@ import com.zm.user.feignclient.LogFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
 import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.feignclient.model.PayModel;
+import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
@@ -25,6 +26,7 @@ import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
+import com.zm.user.pojo.WeiXinPayConfig;
 import com.zm.user.utils.CommonUtils;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
@@ -50,7 +52,7 @@ public class UserServiceImpl implements UserService {
 	PayFeignClient payFeignClient;
 
 	@Resource
-	RedisTemplate<String, ApiResult> redisTemplate;
+	RedisTemplate<String, String> redisTemplate;
 
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -124,7 +126,7 @@ public class UserServiceImpl implements UserService {
 		userMapper.saveUser(info);
 
 		if (info.getWechat() != null && !"".equals(info.getWechat())) {
-			ApiResult apiResult = redisTemplate.opsForValue().get(info.getWechat());
+			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
 			packageUser(apiResult, info);
 			userMapper.saveWechat(
 					new ThirdLogin(info.getId(), info.getPlatUserType(), info.getWechat(), Constants.WX_LOGIN));
@@ -232,7 +234,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResultModel saveVipOrder(VipOrder order, Double version, String openId, String payType, String type)
+	public ResultModel saveVipOrder(VipOrder order, String payType, String type, AbstractPayConfig payConfig)
 			throws Exception {
 		ResultModel result = new ResultModel();
 
@@ -243,13 +245,15 @@ public class UserServiceImpl implements UserService {
 
 		PayModel payModel = new PayModel();
 		payModel.setOrderId(orderId);
-		payModel.setTotalAmount((price.getPrice() * 100) + "");
+		payModel.setTotalAmount((int)(price.getPrice() * 100) + "");
 		payModel.setBody("会员充值");
 
 		if (Constants.WX_PAY.equals(payType)) {
-//			Map<String, String> paymap = payFeignClient.wxPay(openId, Integer.valueOf(price.getCenterId()), type,
-//					payModel);
-//			result.setObj(paymap);
+			WeiXinPayConfig weiXinPayConfig = (WeiXinPayConfig) payConfig;
+			payModel.setOpenId(weiXinPayConfig.getOpenId());
+			payModel.setIP(weiXinPayConfig.getIp());
+			Map<String, String> paymap = payFeignClient.wxPay(Integer.valueOf(price.getCenterId()), type, payModel);
+			result.setObj(paymap);
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");

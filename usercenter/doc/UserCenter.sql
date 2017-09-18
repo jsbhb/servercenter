@@ -156,7 +156,7 @@ CREATE TABLE `zm_user`.`collection` (
   INDEX `collection_user_id` (`user_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '用户收藏表';
 
-drop table if exists  `regional_center`;
+drop table if exists  `grade`;
 
 CREATE TABLE `zm_user`.`grade` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',

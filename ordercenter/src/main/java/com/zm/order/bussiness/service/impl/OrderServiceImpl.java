@@ -23,12 +23,14 @@ import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
+import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.WeiXinPayConfig;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.JSONUtil;
 
@@ -57,12 +59,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	PayFeignClient payFeignClient;
-	
+
 	@Resource
 	LogFeignClient logFeignClient;
 
 	@Override
-	public ResultModel saveOrder(OrderInfo info, Double version, String openId, String payType, String type)
+	public ResultModel saveOrder(OrderInfo info, String payType, String type, AbstractPayConfig payConfig)
 			throws DataIntegrityViolationException, Exception {
 		ResultModel result = new ResultModel();
 		if (info == null) {
@@ -96,13 +98,13 @@ public class OrderServiceImpl implements OrderService {
 			list.add(model);
 			detail.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
 		}
-		boolean vip = userFeignClient.getVipUser(version, info.getUserId(), info.getCenterId());
+		boolean vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
 
 		// 根据itemID和数量获得金额并扣减库存（除了自营仓需要扣库存，其他不需要）
 		if (Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
-			result = goodsFeignClient.getPriceAndDelStock(version, list, true, vip);
+			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip);
 		} else {
-			result = goodsFeignClient.getPriceAndDelStock(version, list, false, vip);
+			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip);
 		}
 
 		if (!result.isSuccess()) {
@@ -124,10 +126,11 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));
 
 		if (Constants.WX_PAY.equals(payType)) {
-			// Map<String, String> paymap = payFeignClient.wxPay(openId,
-			// Integer.valueOf(info.getCenterId()), type,
-			// payModel);
-			// result.setObj(paymap);
+			WeiXinPayConfig weiXinPayConfig = (WeiXinPayConfig) payConfig;
+			payModel.setOpenId(weiXinPayConfig.getOpenId());
+			payModel.setIP(weiXinPayConfig.getIp());
+			Map<String, String> paymap = payFeignClient.wxPay(Integer.valueOf(info.getCenterId()), type, payModel);
+			result.setObj(paymap);
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
@@ -160,12 +163,12 @@ public class OrderServiceImpl implements OrderService {
 			param.put("pagination", pagination);
 		}
 		param.put("info", info);
-		//查询待收货订单时用
-		if(info.getStatusArr() != null){
+		// 查询待收货订单时用
+		if (info.getStatusArr() != null) {
 			String[] tempArr = info.getStatusArr().split(",");
 			List<Integer> statusList = new ArrayList<Integer>();
 			try {
-				for(String status : tempArr){
+				for (String status : tempArr) {
 					statusList.add(Integer.valueOf(status));
 				}
 				param.put("statusList", statusList);
@@ -175,7 +178,7 @@ public class OrderServiceImpl implements OrderService {
 				return result;
 			}
 		}
-		//end
+		// end
 		result.setObj(orderMapper.listOrderByParam(param));
 		result.setSuccess(true);
 
@@ -303,12 +306,13 @@ public class OrderServiceImpl implements OrderService {
 		} else if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 
 			Integer status = orderMapper.getOrderStatusByOrderId(info.getOrderId());
-			//TODO 退单流程，根据status状态
+			// TODO 退单流程，根据status状态
 		}
-		
-		String content = "订单号\""+info.getOrderId()+"\"退单";
-		
-		logFeignClient.saveLog(Constants.FIRST_VERSION,CommonUtils.packageLog(LogConstants.ORDER_CANCEL, "订单退单", info.getCenterId(), content, info.getUserId()+""));
+
+		String content = "订单号\"" + info.getOrderId() + "\"退单";
+
+		logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL, "订单退单",
+				info.getCenterId(), content, info.getUserId() + ""));
 		return null;
 	}
 }

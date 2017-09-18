@@ -1,4 +1,4 @@
-package com.zm.thirdcenter.pojo;
+package com.zm.order.feignclient.model;
 
 import java.io.Serializable;
 

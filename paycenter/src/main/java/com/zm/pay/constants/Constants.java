@@ -6,9 +6,15 @@ public class Constants {
 
 	public static final String FEE_TYPE = "CNY";
 
-	public static final String WX_NOTIFY_URL = "";
+	public static final String WX_NOTIFY_URL = "http://b419a81c.ngrok.io/payMng/wxPayReturn";
 
 	public static final String JSAPI = "JSAPI";
+	
+	public static final String MWEB = "MWEB";
+	
+	public static final String APP = "APP";
+	
+	public static final String NATIVE = "NATIVE";
 
 	public static final Integer HTTPCONNECTTIMEOUTMS = 5000;
 

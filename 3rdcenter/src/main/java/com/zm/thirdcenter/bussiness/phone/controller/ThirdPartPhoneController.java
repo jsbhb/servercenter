@@ -97,33 +97,27 @@ public class ThirdPartPhoneController {
 	}
 
 	@RequestMapping(value = "auth/{version}/third-part/phoneVerify", method = RequestMethod.GET)
-	public ResultModel verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone,
+	public boolean verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone,
 			@RequestParam("code") String code) {
 
-		ResultModel result = new ResultModel();
-		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			PhoneValidata model = redisTemplate.opsForValue().get(phone);
 			if (model == null) {
-				result.setSuccess(false);
-				return result;
+				return false;
 			}
 
 			// 2分钟有效
 			if (System.currentTimeMillis() - model.getTime() > EFFECTIVE_TIME) {
-				result.setSuccess(false);
-				return result;
+				return false;
 			}
 
 			code = code == null ? "" : code;
 			if (code.equals(model.getCode())) {
-				result.setSuccess(true);
-				return result;
+				return true;
 			}
 		}
 
-		result.setSuccess(false);
-		return result;
+		return false;
 
 	}
 }

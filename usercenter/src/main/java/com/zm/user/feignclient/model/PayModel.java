@@ -12,6 +12,28 @@ public class PayModel {
 	
 	private String detail;
 	
+	//微信相关
+	private String openId;
+	
+	private String IP;
+	//end
+	
+	public String getIP() {
+		return IP;
+	}
+
+	public void setIP(String iP) {
+		IP = iP;
+	}
+
+	public String getOpenId() {
+		return openId;
+	}
+
+	public void setOpenId(String openId) {
+		this.openId = openId;
+	}
+
 	public String getDetail() {
 		return detail;
 	}
