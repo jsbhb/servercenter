@@ -253,6 +253,11 @@ public class UserServiceImpl implements UserService {
 			payModel.setOpenId(weiXinPayConfig.getOpenId());
 			payModel.setIP(weiXinPayConfig.getIp());
 			Map<String, String> paymap = payFeignClient.wxPay(Integer.valueOf(price.getCenterId()), type, payModel);
+			if("false".equals(paymap.get("success"))){
+				result.setSuccess(true);
+				result.setErrorMsg("支付失败");
+				return result;
+			}
 			result.setObj(paymap);
 		} else {
 			result.setSuccess(false);

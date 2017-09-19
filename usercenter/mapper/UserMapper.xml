@@ -287,7 +287,7 @@
 		values(#{userId},#{centerId},#{duration},#{vipLevel},now())
 	</insert>
 
-	<update id="updateVipUser" parameterType="Object">
+	<update id="updateUserVip" parameterType="Object">
 		update user_vip set
 		duration = duration + #{duration} where user_id = #{userId} and
 		center_id = #{centerId} and status = 1

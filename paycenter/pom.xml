@@ -83,5 +83,18 @@
 			<version>0.0.3</version>
 		</dependency>
 		
+		<!-- 支付宝 -->
+		<dependency>
+			<groupId>com.alipay</groupId>
+			<artifactId>alipay-trade-sdk</artifactId>
+			<version>20161215</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alipay</groupId>
+			<artifactId>core</artifactId>
+			<version>2.1</version>
+		</dependency>
+		
 	</dependencies>
 </project>

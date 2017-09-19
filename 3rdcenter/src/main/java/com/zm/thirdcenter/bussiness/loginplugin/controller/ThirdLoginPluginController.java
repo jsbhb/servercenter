@@ -99,19 +99,15 @@ public class ThirdLoginPluginController {
 				ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
 
 				if (apiResult.isSucceed()) {
-//					redisTemplate.opsForValue().set(apiResult.getStr("unionid"), apiResult.getJson(), 30L, TimeUnit.MINUTES);
+					redisTemplate.opsForValue().set(apiResult.getStr("unionid"), apiResult.getJson(), 30L, TimeUnit.MINUTES);
 					
-					redisTemplate.opsForValue().set(token.getOpenid(), apiResult.getJson(), 30L, TimeUnit.MINUTES);
-
 					Map<String, Object> resultMap = new HashMap<String, Object>();
 					resultMap.put("openid", token.getOpenid());
 					resultMap.put("unionid", apiResult.getStr("unionid"));
 
-//					boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
-//							new ThirdLogin(Integer.parseInt(stateArr[0]), apiResult.getStr("unionid"), Constants.WX_LOGIN));
-					
 					boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
-							new ThirdLogin(Integer.parseInt(stateArr[0]), token.getOpenid(), Constants.WX_LOGIN));
+							new ThirdLogin(Integer.parseInt(stateArr[0]), apiResult.getStr("unionid"), Constants.WX_LOGIN));
+					
 					resultMap.put("isFirst", flag);
 					result.setSuccess(true);
 					result.setObj(resultMap);
