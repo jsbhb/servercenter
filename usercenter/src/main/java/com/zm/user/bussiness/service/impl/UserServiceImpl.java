@@ -28,6 +28,7 @@ import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.pojo.WeiXinPayConfig;
 import com.zm.user.utils.CommonUtils;
+import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
@@ -133,6 +134,7 @@ public class UserServiceImpl implements UserService {
 		}
 
 		if (info.getUserDetail() != null) {
+			info.getUserDetail().setNickName(EmojiFilter.emojiChange(info.getUserDetail().getNickName()));
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
 

@@ -30,6 +30,7 @@ import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.pojo.WeiXinPayConfig;
+import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.RegularUtil;
 
@@ -173,6 +174,7 @@ public class UserController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			detail.setNickName(EmojiFilter.emojiChange(detail.getNickName()));
 			userService.updateUserDetail(detail);
 			result.setSuccess(true);
 			result.setObj(detail);
