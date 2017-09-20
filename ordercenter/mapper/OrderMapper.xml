@@ -197,7 +197,7 @@
 	<select id="getCountByStatus" parameterType="Object"
 		resultType="com.zm.order.pojo.OrderCount">
 		select status, count(*) as total from order_base where
-		center_id=#{centerId} and user_id = #{userId} group by status
+		center_id=#{centerId} and user_id = #{userId} and is_del = 0 group by status
 	</select>
 
 	<delete id="removeShoppingCart" parameterType="Object">
