@@ -1,6 +1,5 @@
 package com.zm.order.bussiness.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +20,11 @@ import com.zm.order.constants.Constants;
 import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
-import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.WeiXinPayConfig;
-import com.zm.order.utils.JSONUtil;
 
 /**
  * ClassName: OrderController <br/>
@@ -54,10 +51,10 @@ public class OrderController {
 		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
 		AbstractPayConfig payConfig = null;
-		if(Constants.WX_PAY.equals(payType)){
+		if (Constants.WX_PAY.equals(payType)) {
 			String openId = req.getParameter("openId");
-			if(Constants.JSAPI.equals(type)){
-				if(openId == null || "".equals(openId)){
+			if (Constants.JSAPI.equals(type)) {
+				if (openId == null || "".equals(openId)) {
 					result.setSuccess(false);
 					result.setErrorMsg("请使用微信授权登录");
 					return result;
@@ -299,33 +296,41 @@ public class OrderController {
 
 	}
 
-	public static void main(String[] args) {
-		OrderInfo info = new OrderInfo();
-		info.setCombinationId("123GXS");
-		info.setCenterId(0);
-		info.setUserId(1);
-		info.setSupplierId(1);
-		info.setExpressType(1);
-		info.setTdq(1);
-		OrderDetail detail = new OrderDetail();
-		info.setOrderFlag(0);
-		detail.setReceiveAddress("asdfasdf");
-		detail.setReceiveArea("fdsafdsa");
-		detail.setReceiveZipCode("123123");
-		detail.setReceiveProvince("ewq1");
-		detail.setReceiveName("test");
-		detail.setReceivePhone("13456123123");
-		List<OrderGoods> list = new ArrayList<OrderGoods>();
-		OrderGoods goods = new OrderGoods();
-		goods.setItemId("bl01");
-		goods.setActualPrice(100.00);
-		goods.setItemPrice(100.00);
-		goods.setItemQuantity(1);
-		list.add(goods);
-		info.setOrderDetail(detail);
-		info.setOrderGoodsList(list);
+	@RequestMapping(value = "{version}/order/pay/{orderId}", method = RequestMethod.GET)
+	public OrderInfo getOrderByOrderIdForPay(@PathVariable("version") Double version,
+			@PathVariable("orderId") String orderId) {
 
-		System.out.println(JSONUtil.toJson(info));
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.getOrderByOrderIdForPay(orderId);
+		}
+
+		return null;
+
+	}
+
+	@RequestMapping(value = "{version}/order/payType", method = RequestMethod.POST)
+	public boolean updateOrderPayType(@PathVariable("version") Double version, @RequestBody OrderDetail detail) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.updateOrderPayType(detail);
+		}
+
+		return false;
+
+	}
+	
+	@RequestMapping(value = "{version}/order/close/{orderId}", method = RequestMethod.PUT)
+	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			orderService.closeOrder(orderId);
+			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
 
 	}
 

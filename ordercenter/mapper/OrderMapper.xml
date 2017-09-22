@@ -8,6 +8,7 @@
 		<result column="carrier_key" property="carrierKey" jdbcType="VARCHAR" />
 		<result column="express_id" property="expressId" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
 		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
@@ -38,7 +39,8 @@
 			<result column="item_name" property="itemName" jdbcType="VARCHAR" />
 			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
 			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
-			<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
+			<result column="item_quantity" property="itemQuantity"
+				jdbcType="INTEGER" />
 			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
 			<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 			<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
@@ -61,10 +63,10 @@
 	<select id="listOrderByParam" resultMap="orderBase"
 		parameterType="Object">
 		select
-		o.id,o.order_id,o.status,o.express_type,o.carrier_key,o.express_id,o.create_time,od.id
+		o.id,o.order_id,o.status,o.express_type,o.carrier_key,o.express_id,o.supplier_id,o.create_time,od.id
 		as
 		detail_id,od.payment,od.post_fee,od.fax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
-		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,od.payment,
+		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,
 		o.center_id,o.shop_id,o.guide_id,og.id as
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from order_base o left join order_detail od on o.order_id =
@@ -75,8 +77,9 @@
 			and o.status = #{info.status,jdbcType = INTEGER}
 		</if>
 		<if test="statusList != null">
-			and o.status in 
-			<foreach collection="statusList" open="(" close=")" item="item" separator=",">
+			and o.status in
+			<foreach collection="statusList" open="(" close=")" item="item"
+				separator=",">
 				#{item}
 			</foreach>
 		</if>
@@ -197,7 +200,8 @@
 	<select id="getCountByStatus" parameterType="Object"
 		resultType="com.zm.order.pojo.OrderCount">
 		select status, count(*) as total from order_base where
-		center_id=#{centerId} and user_id = #{userId} and is_del = 0 group by status
+		center_id=#{centerId} and user_id = #{userId} and is_del = 0 group by
+		status
 	</select>
 
 	<delete id="removeShoppingCart" parameterType="Object">
@@ -226,4 +230,26 @@
 		#{orderId,jdbcType =
 		VARCHAR}
 	</select>
+
+	<select id="getOrderByOrderId" parameterType="Object" resultMap="orderBase">
+		select
+		o.id,o.order_id,o.status,o.supplier_id,od.id as
+		detail_id,od.payment,od.post_fee,od.fax_fee,
+		od.pay_type,o.center_id,og.id as
+		goods_id,og.item_id,og.item_name,og.item_quantity,og.item_price,og.actual_price
+		from order_base o left join order_detail od on o.order_id =od.order_id
+		left join order_goods og on o.order_id = og.order_id where o.order_id
+		= #{orderId}
+	</select>
+
+
+	<update id="updateOrderPayType" parameterType="Object">
+		update
+		order_detail set pay_type = #{payType} where order_id = #{orderId}
+	</update>
+
+	<update id="updateOrderClose" parameterType="Object">
+		update
+		order_base set status = 8 where order_id = #{orderId}
+	</update>
 </mapper>

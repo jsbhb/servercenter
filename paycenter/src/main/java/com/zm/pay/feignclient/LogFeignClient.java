@@ -11,6 +11,12 @@ import com.zm.pay.pojo.ResultModel;
 @FeignClient("logcenter")
 public interface LogFeignClient {
 
+	/**
+	 * @fun 保存日志
+	 * @param version
+	 * @param logInfo
+	 * @return
+	 */
 	@RequestMapping(value="{version}/log", method = RequestMethod.POST)
 	ResultModel saveLog(@PathVariable("version")Double version, LogInfo logInfo);
 }

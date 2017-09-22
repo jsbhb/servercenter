@@ -15,7 +15,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `user_id` INT UNSIGNED NOT NULL,
   `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
-  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单',
+  `status` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单;8、超时取消',
   `center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',

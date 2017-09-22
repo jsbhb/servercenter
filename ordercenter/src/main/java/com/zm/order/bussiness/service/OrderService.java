@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.OrderCount;
+import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
@@ -145,4 +146,34 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	ResultModel orderCancel(OrderInfo info);
+	
+	/**
+	 * getOrderByOrderIdForPay:支付中心根据订单号获取订单. <br/>
+	 * 
+	 * @author wqy
+	 * @param info
+	 * @return
+	 * @since JDK 1.7
+	 */
+	OrderInfo getOrderByOrderIdForPay(String orderId);
+	
+	/**
+	 * updateOrderPayType:更新支付方式. <br/>
+	 * 
+	 * @author wqy
+	 * @param info
+	 * @return
+	 * @since JDK 1.7
+	 */
+	boolean updateOrderPayType(OrderDetail detail);
+	
+	/**
+	 * closeOrder:关闭订单. <br/>
+	 * 
+	 * @author wqy
+	 * @param orderId
+	 * @return
+	 * @since JDK 1.7
+	 */
+	boolean closeOrder(String orderId);
 }

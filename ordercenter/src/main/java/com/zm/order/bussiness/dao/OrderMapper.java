@@ -51,4 +51,10 @@ public interface OrderMapper {
 	void updateOrderCancel(String orderId);
 	
 	Integer getOrderStatusByOrderId(String orderId);
+	
+	OrderInfo getOrderByOrderId(String orderId);
+	
+	void updateOrderPayType(OrderDetail detail);
+	
+	void updateOrderClose(String orderId);
 }

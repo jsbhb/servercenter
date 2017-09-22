@@ -1,17 +1,20 @@
 package com.zm.pay.utils.wx;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alipay.demo.trade.utils.ZxingUtils;
 import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 
 public class WxPayUtils {
-
+	
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
 	public static Map<String, String> unifiedOrder(String type, WeixinPayConfig config, PayModel model)
@@ -46,4 +49,34 @@ public class WxPayUtils {
 		System.out.println(resp);
 		return resp;
 	}
+	
+	public static  void packageReturnParameter(Integer clientId, String type, PayModel model, WeixinPayConfig config,
+			Map<String, String> resp, Map<String, String> result) throws Exception {
+		
+		//封装支付信息给前台
+		if(Constants.NATIVE.equals(type)){
+			String urlCode = (String) resp.get("code_url");  
+		    // 需要修改为运行机器上的路径
+		    String path = System.getProperty("user.dir")+"\\resource\\public";
+		    File newFile = new File(path);
+			if (!newFile.exists()) {
+				newFile.mkdirs();
+			}
+		    String filePath = String.format(path+"/qr-%s.png",
+		    		model.getOrderId());
+		    ZxingUtils.getQRCodeImge(urlCode, 256, filePath);
+		    result.put("qrFile", "http://192.168.199.194:8888/qr-"+model.getOrderId() + ".png");
+		} else if(Constants.JSAPI.equals(type)){
+			result.put("timeStamp", System.currentTimeMillis() / 1000 + "");
+			result.put("package", "prepay_id="+resp.get("prepay_id"));
+			result.put("appId", config.getAppID());
+			result.put("nonceStr", resp.get("nonce_str"));
+			result.put("signType", "MD5");
+			String sign = WXPayUtil.generateSignature(result, config.getKey());
+			result.put("paySign", sign);
+		}
+		result.put("success", "true");
+	}
+	
+	
 }

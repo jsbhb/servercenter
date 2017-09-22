@@ -25,6 +25,7 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.OrderCount;
+import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
@@ -306,13 +307,41 @@ public class OrderServiceImpl implements OrderService {
 		} else if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 
 			Integer status = orderMapper.getOrderStatusByOrderId(info.getOrderId());
-			// TODO 退单流程，根据status状态
+			if(Constants.ORDER_DELIVER.equals(status)){
+				//已发货，不能退单
+			}
+			// TODO 退单流程，根据status状态，库存处理，资金处理
 		}
 
 		String content = "订单号\"" + info.getOrderId() + "\"退单";
 
 		logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL, "订单退单",
 				info.getCenterId(), content, info.getUserId() + ""));
-		return null;
+		
+		return new ResultModel(true, null);
+	}
+
+	@Override
+	public OrderInfo getOrderByOrderIdForPay(String orderId) {
+
+		return orderMapper.getOrderByOrderId(orderId);
+	}
+
+	@Override
+	public boolean updateOrderPayType(OrderDetail detail) {
+		
+		orderMapper.updateOrderPayType(detail);
+		return true;
+	}
+
+	@Override
+	public boolean closeOrder(String orderId) {
+		
+		orderMapper.updateOrderClose(orderId);
+		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+		if(Constants.OWN_SUPPLIER.equals(info.getSupplierId())){
+			//TODO 库存回滚
+		}
+		return false;
 	}
 }

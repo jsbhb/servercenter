@@ -6,14 +6,14 @@ public class Constants {
 
 	public static final String FEE_TYPE = "CNY";
 
-	public static final String WX_NOTIFY_URL = "http://2923a431.ngrok.io/paycenter/auth/payMng/wxPayReturn";
+	public static final String WX_NOTIFY_URL = "http://43607843.ngrok.io/paycenter/auth/payMng/wxPayReturn";
 
 	public static final String JSAPI = "JSAPI";
-	
+
 	public static final String MWEB = "MWEB";
-	
+
 	public static final String APP = "APP";
-	
+
 	public static final String NATIVE = "NATIVE";
 
 	public static final Integer HTTPCONNECTTIMEOUTMS = 5000;
@@ -23,11 +23,23 @@ public class Constants {
 	public static final String CREATE_IP = "127.0.0.1";
 
 	// *********************各支付类型******************************/
-	
-	public static final String PAY = "PAY";//前缀，和登录config分开
-	
-	public static final String WX_PAY = "1";
 
-	public static final String ALI_PAY = "2";
+	public static final String PAY = "PAY";// 前缀，和登录config分开
+
+	public static final Integer WX_PAY = 1;
+
+	public static final Integer ALI_PAY = 2;
+
+	// *********************订单状态******************************/
+
+	public static final Integer ORDER_INIT = 0;// 初始
+	public static final Integer ORDER_PAY = 1;// 已付款
+	public static final Integer ORDER_TO_WAREHOUSE = 2;// 已发仓库
+	public static final Integer ORDER_CUSTOMS = 3;// 已报海关
+	public static final Integer ORDER_DZFX = 4;// 单证放行
+	public static final Integer ORDER_DELIVER = 5;// 已发货
+	public static final Integer ORDER_COMPLETE = 6;// 已收货订单完成
+	public static final Integer ORDER_CANCEL = 7;// 退单
+	public static final Integer ORDER_CLOSE = 8;// 交易关闭
 
 }
