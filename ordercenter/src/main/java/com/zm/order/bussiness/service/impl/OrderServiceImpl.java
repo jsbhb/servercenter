@@ -121,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		PayModel payModel = new PayModel();
-		payModel.setBody("中国供销-购物订单");
+		payModel.setBody("购物订单");
 		payModel.setOrderId(orderId);
 		payModel.setTotalAmount(totalAmount);
 		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));

@@ -47,9 +47,10 @@ public class PayServiceImpl implements PayService{
 		Map<String, String> resp = WxPayUtils.unifiedOrder(type, config, model);
 
 		String return_code = (String) resp.get("return_code");
+		String result_code = (String) resp.get("result_code");
 		Map<String, String> result = new HashMap<String, String>();
 
-		if ("SUCCESS".equals(return_code)) {
+		if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
 			String content = "订单号 \"" + model.getOrderId() + "\" 通过微信支付" + type + "，后台请求成功";
 			logFeignClient.saveLog(Constants.FIRST_VERSION,
 					CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
@@ -57,6 +58,9 @@ public class PayServiceImpl implements PayService{
 			WxPayUtils.packageReturnParameter(clientId, type, model, config, resp, result);
 		} else {
 			result.put("success", "false");
+			if("SUCCESS".equals(return_code)){
+				result.put("errorMsg", (String) resp.get("err_code_des"));
+			}
 		}
 		return result;
 	}
