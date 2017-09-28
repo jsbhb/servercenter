@@ -41,5 +41,8 @@ public class Constants {
 	public static final Integer ORDER_COMPLETE = 6;// 已收货订单完成
 	public static final Integer ORDER_CANCEL = 7;// 退单
 	public static final Integer ORDER_CLOSE = 8;// 交易关闭
-
+	
+	
+	// *********************支付有效时间******************************/
+	public static final Integer PAY_EFFECTIVE_TIME_HOUR = 24;
 }

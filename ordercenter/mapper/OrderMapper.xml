@@ -233,7 +233,7 @@
 
 	<select id="getOrderByOrderId" parameterType="Object" resultMap="orderBase">
 		select
-		o.id,o.order_id,o.status,o.supplier_id,od.id as
+		o.id,o.order_id,o.status,o.supplier_id,o.create_time,od.id as
 		detail_id,od.payment,od.post_fee,od.fax_fee,
 		od.pay_type,o.center_id,og.id as
 		goods_id,og.item_id,og.item_name,og.item_quantity,og.item_price,og.actual_price
@@ -252,4 +252,8 @@
 		update
 		order_base set status = 8 where order_id = #{orderId}
 	</update>
+	
+	<select id="listTimeOutOrderIds" resultType="java.lang.String">
+		select order_id from order_base where create_time &lt;= #{time} and status = 0
+	</select>
 </mapper>

@@ -168,7 +168,7 @@ public interface OrderService {
 	boolean updateOrderPayType(OrderDetail detail);
 	
 	/**
-	 * closeOrder:关闭订单. <br/>
+	 * closeOrder:付款时如果订单超时关闭. <br/>
 	 * 
 	 * @author wqy
 	 * @param orderId
@@ -176,4 +176,14 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	boolean closeOrder(String orderId);
+	
+	/**
+	 * closeOrder:定时器关闭超时订单. <br/>
+	 * 
+	 * @author wqy
+	 * @param orderId
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void timeTaskcloseOrder();
 }

@@ -327,6 +327,20 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			orderService.closeOrder(orderId);
+			return new ResultModel(true, "");
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+	
+	
+	@RequestMapping(value = "{version}/order/close", method = RequestMethod.GET)
+	public ResultModel timeTaskcloseOrder(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			orderService.timeTaskcloseOrder();
 			return new ResultModel(true, null);
 		}
 

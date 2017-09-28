@@ -19,10 +19,13 @@ import com.zm.pay.feignclient.model.OrderGoods;
 import com.zm.pay.feignclient.model.OrderInfo;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.ResultModel;
+import com.zm.pay.utils.DateUtils;
 
 @RestController
 public class PayController {
-
+	
+	private static final Long time = (Constants.PAY_EFFECTIVE_TIME_HOUR - 1) * 3600000L;//支付有效期前一小时交易关闭
+	
 	@Resource
 	OrderFeignClient orderFeignClient;
 	
@@ -53,6 +56,13 @@ public class PayController {
 			if (Constants.ORDER_CANCEL.equals(info.getStatus())) {
 				throw new RuntimeException("该订单已经超时关闭");
 			}
+			//判断订单是否超时
+			if(DateUtils.judgeDate(info.getCreateTime(), time)){
+				orderFeignClient.closeOrder(version, orderId);
+				throw new RuntimeException("该订单已经超时关闭");
+			}
+			
+			//end
 			//封装支付信息
 			PayModel model = new PayModel();
 			model.setBody("购物订单");

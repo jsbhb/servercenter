@@ -57,4 +57,6 @@ public interface OrderMapper {
 	void updateOrderPayType(OrderDetail detail);
 	
 	void updateOrderClose(String orderId);
+	
+	List<String> listTimeOutOrderIds(String time);
 }

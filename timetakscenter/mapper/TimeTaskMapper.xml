@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.timetask.bussiness.dao.TimeTaskMapper">
+
+	<resultMap type="com.zm.timetask.pojo.TimeTaskModel" id="timetask">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="job_name" property="jobName" jdbcType="VARCHAR" />
+		<result column="job_group" property="jobGroup" jdbcType="VARCHAR" />
+		<result column="job_status" property="status" jdbcType="INTEGER" />
+		<result column="cron_expression" property="cronExpression"
+			jdbcType="VARCHAR" />
+		<result column="concurrent" property="concurrent" jdbcType="INTEGER" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="target_object" property="targetObject"
+			jdbcType="VARCHAR" />
+		<result column="target_method" property="targetMethod"
+			jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="listTimeTask" resultMap="timetask">
+		select * from schedulejob;
+	</select>
+
+	<select id="getTimeTaskById" resultMap="timetask">
+		select * from schedulejob
+		where id = #{id}
+	</select>
+
+	<insert id="saveTimeTask" parameterType="Object">
+		insert into
+		schedulejob(job_name,job_status,cron_expression,concurrent,description,job_group,target_object,
+		target_method,create_time,opt)
+		values(#{jobName},#{status},#{cronExpression},#{concurrent},#{description},#{jobGroup},#{targetObject},
+		#{targetMethod},now(),#{opt})
+	</insert>
+
+	<update id="stopTimeTask" parameterType="Object">
+		update schedulejob set
+		job_status = 0,update_time = now() where id = #{id}
+	</update>
+
+	<update id="startTimeTask" parameterType="Object">
+		update schedulejob set
+		job_status = 1,update_time = now() where id = #{id}
+	</update>
+
+	<update id="updateTimeTask" parameterType="Object">
+		update schedulejob
+		<set>
+			<if test="cronExpression != null and cronExpression != ''">
+				cron_expression = #{cronExpression},
+			</if>
+			<if test="concurrent != null and concurrent != ''">
+				concurrent = #{concurrent},
+			</if>
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+
+
+</mapper>

@@ -33,7 +33,7 @@ public class WxPayUtils {
 		// 支付时间设定为5分钟
 		Calendar cal = Calendar.getInstance();
 		data.put("time_start", sdf.format(cal.getTime()));
-		cal.add(Calendar.HOUR, 24);
+		cal.add(Calendar.HOUR, Constants.PAY_EFFECTIVE_TIME_HOUR);
 		data.put("time_expire", sdf.format(cal.getTime()));
 		data.put("trade_type", type);
 		if (Constants.JSAPI.equals(type)) {

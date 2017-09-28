@@ -1,6 +1,7 @@
 package com.zm.order.bussiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.WeiXinPayConfig;
 import com.zm.order.utils.CommonUtils;
+import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 
 /**
@@ -342,6 +344,15 @@ public class OrderServiceImpl implements OrderService {
 		if(Constants.OWN_SUPPLIER.equals(info.getSupplierId())){
 			//TODO 库存回滚
 		}
-		return false;
+		return true;
+	}
+
+	@Override
+	public void timeTaskcloseOrder() {
+		String time = DateUtils.getTime(Calendar.DATE, -1);
+		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
+		for(String orderId : orderIdList){
+			closeOrder(orderId);
+		}
 	}
 }
