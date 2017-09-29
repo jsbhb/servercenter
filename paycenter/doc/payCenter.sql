@@ -13,6 +13,7 @@ CREATE TABLE `zm_payment`.`alipay_config` (
   `center_id` INT UNSIGNED NOT NULL,
   `pid` char(16) NOT NULL COMMENT '合作者身份ID',
   `app_id` char(32) NOT NULL COMMENT 'appID',
+  `app_key` char(50) NOT NULL COMMENT 'MD5Key',
   `rsa_private_key` varchar(1000) NOT NULL COMMENT 'rsa私钥',
   `rsa_public_key` varchar(1000) NOT NULL COMMENT 'rsa公钥',  
   PRIMARY KEY (`id`)

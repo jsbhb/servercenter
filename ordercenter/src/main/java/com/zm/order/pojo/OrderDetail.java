@@ -26,6 +26,8 @@ public class OrderDetail {
 	private String faxFee;
 
 	private String payNo;
+	
+	private Integer customStatus;
 
 	// 发货地
 	private String deliveryPlace;
@@ -48,6 +50,14 @@ public class OrderDetail {
 	private String receiveZipCode;
 
 	private String remark;
+
+	public Integer getCustomStatus() {
+		return customStatus;
+	}
+
+	public void setCustomStatus(Integer customStatus) {
+		this.customStatus = customStatus;
+	}
 
 	public Integer getId() {
 		return id;

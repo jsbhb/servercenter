@@ -14,9 +14,48 @@ public class AliPayConfigModel implements Serializable{
 	//应用ID
 	private String appId;
 	
+	private String key;
+	
 	private String rsaPrivateKey;
 	
 	private String rsaPublicKey;
+	
+	private String signType;
+	
+	private String charset;
+
+	public void initParameter(){
+		if(signType == null){
+			signType = "MD5";
+		}
+		if(charset == null){
+			charset = "utf-8";
+		}
+	}
+	
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getSignType() {
+		return signType;
+	}
+
+	public void setSignType(String signType) {
+		this.signType = signType;
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
 
 	public Integer getId() {
 		return id;

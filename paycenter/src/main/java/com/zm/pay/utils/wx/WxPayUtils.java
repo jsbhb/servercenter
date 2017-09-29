@@ -6,17 +6,32 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.alipay.demo.trade.utils.ZxingUtils;
+import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
+import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.utils.CommonUtils;
+import com.zm.pay.utils.ZxingUtils;
+import com.zm.pay.utils.ali.AliPayUtils;
 
 public class WxPayUtils {
 	
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
+	private static final String CUSTOM_URL = "https://api.mch.weixin.qq.com/cgi-bin/mch/customs/customdeclareorder";
+	
+	private static final Integer CONNECT_TIMEOUTMS = 5000;
+	private static final Integer READ_TIMEOUTMS = 5000;
+	
+	private static Logger logger = LoggerFactory.getLogger(WxPayUtils.class);
+	
+	//统一下单接口
 	public static Map<String, String> unifiedOrder(String type, WeixinPayConfig config, PayModel model)
 			throws Exception {
 
@@ -46,10 +61,29 @@ public class WxPayUtils {
 		}
 
 		Map<String, String> resp = wxpay.unifiedOrder(data);
-		System.out.println(resp);
+		logger.info(resp.toString());
 		return resp;
 	}
 	
+	//报关接口
+	public static Map<String,String> acquireCustom(WeixinPayConfig config, CustomModel custom) throws Exception{
+		
+		WXPay wxpay = new WXPay(config);
+		
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("out_trade_no", custom.getOutRequestNo());
+		data.put("transaction_id", custom.getPayNo());
+		data.put("customs", Constants.CUSTOMS_PLACE);
+		data.put("mch_customs_no", Constants.MERCHANT_CUSTOMS_CODE);
+		
+		data = wxpay.fillRequestData(data);
+		String res = wxpay.requestWithoutCert(CUSTOM_URL, data, CONNECT_TIMEOUTMS, READ_TIMEOUTMS);
+		logger.info(res);
+		
+		return CommonUtils.xmlToMap(res);
+	}
+	
+	//分装微信支付返回结果
 	public static  void packageReturnParameter(Integer clientId, String type, PayModel model, WeixinPayConfig config,
 			Map<String, String> resp, Map<String, String> result) throws Exception {
 		
@@ -78,5 +112,10 @@ public class WxPayUtils {
 		result.put("success", "true");
 	}
 	
+	
+	public static void main(String[] args) throws DocumentException {
+		String s = "<xml><appid>wx2421b1c4370ec43b</appid><customs>ZHENGZHOU_BS</customs><mch_customs_no>D00411</mch_customs_no><mch_id>1262544101</mch_id><order_fee>13110</order_fee><out_trade_no>15112496832609</out_trade_no><product_fee>13110</product_fee><sign>8FF6CEF879FB9555CD580222E671E9D4</sign><transaction_id>1006930610201511241751403478</transaction_id><transport_fee>0</transport_fee><fee_type>CNY</fee_type><sub_order_no>15112496832609001</sub_order_no></xml>";
+		System.out.println(CommonUtils.xmlToMap(s));
+	}
 	
 }
