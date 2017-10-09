@@ -47,6 +47,15 @@
 		</collection>
 	</resultMap>
 
+	<resultMap type="com.zm.order.pojo.CustomModel" id="customModel">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="outRequestNo" jdbcType="VARCHAR" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="pay_type" property="payType" jdbcType="INTEGER" />
+		<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
+		<result column="payment" property="amount" jdbcType="VARCHAR" />
+	</resultMap>
+
 	<resultMap type="com.zm.order.pojo.ShoppingCart" id="shoppingCart">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
@@ -58,6 +67,14 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 	</resultMap>
+
+	<select id="listPayCustomOrder" resultMap="customModel">
+		select
+		o.id,o.order_id,od.pay_no,od.payment,o.center_id,od.pay_type from
+		order_base o left join order_detail od on o.order_id =
+		od.order_id
+		where o.status = 1 and o.order_flag = 0 and o.supplier_id = 1
+	</select>
 
 
 	<select id="listOrderByParam" resultMap="orderBase"
@@ -155,19 +172,6 @@
 		= #{userId,jdbcType = INTEGER}
 	</update>
 
-	<update id="confirmUserOrder" parameterType="Object">
-		update order_base
-		set status = 6 where order_id = #{orderId,jdbcType = VARCHAR} and
-		user_id = #{userId,jdbcType = INTEGER} and status = 5
-	</update>
-
-	<update id="updateOrderPayStatusByOrderId" parameterType="Object">
-		update
-		order_base
-		set status = 1 where order_id = #{orderId,jdbcType =
-		VARCHAR} and status = 0
-	</update>
-
 	<select id="getClientIdByOrderId" parameterType="Object"
 		resultType="java.lang.Integer">
 		select center_id from order_base where order_id =
@@ -218,12 +222,6 @@
 		#{centerId} and user_id = #{userId}
 	</select>
 
-	<update id="updateOrderCancel" parameterType="Object">
-		update order_base
-		set status = 7 where order_id = #{orderId,jdbcType =
-		VARCHAR}
-	</update>
-
 	<select id="getOrderStatusByOrderId" parameterType="Object"
 		resultType="java.lang.Integer">
 		select status from order_base where order_id =
@@ -248,12 +246,42 @@
 		order_detail set pay_type = #{payType} where order_id = #{orderId}
 	</update>
 
+	<!-- 更新订单状态部分 -->
 	<update id="updateOrderClose" parameterType="Object">
 		update
-		order_base set status = 8 where order_id = #{orderId}
+		order_base set
+		status = 9 where order_id = #{orderId}
 	</update>
-	
+
+	<update id="updatePayCustom" parameterType="Object">
+		update
+		order_base set
+		status = 2 where order_id = #{orderId} and status = 1
+	</update>
+
+	<update id="updateOrderCancel" parameterType="Object">
+		update order_base
+		set status = 8 where order_id = #{orderId,jdbcType =
+		VARCHAR}
+	</update>
+
+	<update id="updateOrderPayStatusByOrderId" parameterType="Object">
+		update
+		order_base
+		set status = 1 where order_id = #{orderId,jdbcType =
+		VARCHAR} and status = 0
+	</update>
+
+	<update id="confirmUserOrder" parameterType="Object">
+		update order_base
+		set status = 7 where order_id = #{orderId,jdbcType = VARCHAR} and
+		user_id = #{userId,jdbcType = INTEGER} and status = 6
+	</update>
+
+	<!-- 更新订单状态END -->
+
 	<select id="listTimeOutOrderIds" resultType="java.lang.String">
-		select order_id from order_base where create_time &lt;= #{time} and status = 0
+		select order_id from
+		order_base where create_time &lt;= #{time} and status = 0
 	</select>
 </mapper>

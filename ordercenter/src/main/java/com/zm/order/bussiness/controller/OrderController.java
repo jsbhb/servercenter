@@ -320,7 +320,7 @@ public class OrderController {
 		return false;
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/close/{orderId}", method = RequestMethod.PUT)
 	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId) {
 
@@ -333,14 +333,38 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
-	
-	
+
 	@RequestMapping(value = "{version}/order/close", method = RequestMethod.GET)
 	public ResultModel timeTaskcloseOrder(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			orderService.timeTaskcloseOrder();
+			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/order/paycustom", method = RequestMethod.GET)
+	public ResultModel payCustom(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, orderService.listPayCustomOrder());
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/order/paycustom/{orderId}", method = RequestMethod.POST)
+	public ResultModel updatePayCustom(@PathVariable("version") Double version,
+			@PathVariable("orderId") String orderId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			orderService.updatePayCustom(orderId);
 			return new ResultModel(true, null);
 		}
 

@@ -3,6 +3,7 @@ package com.zm.order.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -59,4 +60,8 @@ public interface OrderMapper {
 	void updateOrderClose(String orderId);
 	
 	List<String> listTimeOutOrderIds(String time);
+	
+	List<CustomModel> listPayCustomOrder();
+	
+	void updatePayCustom(String orderId);
 }

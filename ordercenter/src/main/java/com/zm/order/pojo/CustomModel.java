@@ -1,4 +1,4 @@
-package com.zm.pay.pojo;
+package com.zm.order.pojo;
 
 public class CustomModel {
 	

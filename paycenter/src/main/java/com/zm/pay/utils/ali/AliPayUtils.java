@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dom4j.DocumentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
@@ -15,8 +13,6 @@ import com.zm.pay.utils.ali.util.AlipaySubmit;
 
 public class AliPayUtils {
 	
-	private static Logger logger = LoggerFactory.getLogger(AliPayUtils.class);
-
 	//支付宝报关接口
 	public static Map<String,String> acquireCustom(AliPayConfigModel config, CustomModel custom) throws DocumentException {
 		config.initParameter();
@@ -34,7 +30,6 @@ public class AliPayUtils {
 
 		// 建立请求
 		String sHtmlText = AlipaySubmit.buildRequest(config, sParaTemp, "get", "确认");
-		logger.info(sHtmlText);
 		
 		return CommonUtils.xmlToMap(sHtmlText);
 	}

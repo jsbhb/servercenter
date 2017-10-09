@@ -25,6 +25,7 @@ import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.pojo.AbstractPayConfig;
+import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -309,8 +310,8 @@ public class OrderServiceImpl implements OrderService {
 		} else if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 
 			Integer status = orderMapper.getOrderStatusByOrderId(info.getOrderId());
-			if(Constants.ORDER_DELIVER.equals(status)){
-				//已发货，不能退单
+			if (Constants.ORDER_DELIVER.equals(status)) {
+				// 已发货，不能退单
 			}
 			// TODO 退单流程，根据status状态，库存处理，资金处理
 		}
@@ -319,7 +320,7 @@ public class OrderServiceImpl implements OrderService {
 
 		logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL, "订单退单",
 				info.getCenterId(), content, info.getUserId() + ""));
-		
+
 		return new ResultModel(true, null);
 	}
 
@@ -331,18 +332,18 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public boolean updateOrderPayType(OrderDetail detail) {
-		
+
 		orderMapper.updateOrderPayType(detail);
 		return true;
 	}
 
 	@Override
 	public boolean closeOrder(String orderId) {
-		
+
 		orderMapper.updateOrderClose(orderId);
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-		if(Constants.OWN_SUPPLIER.equals(info.getSupplierId())){
-			//TODO 库存回滚
+		if (Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
+			// TODO 库存回滚
 		}
 		return true;
 	}
@@ -351,8 +352,19 @@ public class OrderServiceImpl implements OrderService {
 	public void timeTaskcloseOrder() {
 		String time = DateUtils.getTime(Calendar.DATE, -1);
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
-		for(String orderId : orderIdList){
+		for (String orderId : orderIdList) {
 			closeOrder(orderId);
 		}
+	}
+
+	@Override
+	public List<CustomModel> listPayCustomOrder() {
+
+		return orderMapper.listPayCustomOrder();
+	}
+
+	@Override
+	public void updatePayCustom(String orderId) {
+		orderMapper.updatePayCustom(orderId);
 	}
 }

@@ -17,18 +17,19 @@ import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.model.OrderDetail;
 import com.zm.pay.feignclient.model.OrderGoods;
 import com.zm.pay.feignclient.model.OrderInfo;
+import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.utils.DateUtils;
 
 @RestController
 public class PayController {
-	
-	private static final Long time = (Constants.PAY_EFFECTIVE_TIME_HOUR - 1) * 3600000L;//支付有效期前一小时交易关闭
-	
+
+	private static final Long time = (Constants.PAY_EFFECTIVE_TIME_HOUR - 1) * 3600000L;// 支付有效期前一小时交易关闭
+
 	@Resource
 	OrderFeignClient orderFeignClient;
-	
+
 	@Resource
 	PayService payService;
 
@@ -41,7 +42,6 @@ public class PayController {
 		return result;
 	}
 
-
 	@RequestMapping(value = "{version}/pay/{payType}/{type}/{orderId}", method = RequestMethod.POST)
 	public ResultModel pay(@PathVariable("orderId") String orderId, @PathVariable("version") Double version,
 			@PathVariable("type") String type, @PathVariable("payType") Integer payType, HttpServletRequest req)
@@ -53,55 +53,64 @@ public class PayController {
 			if (info == null) {
 				throw new RuntimeException("没有对应订单");
 			}
-			if (Constants.ORDER_CANCEL.equals(info.getStatus())) {
+			if (Constants.ORDER_CLOSE.equals(info.getStatus())) {
 				throw new RuntimeException("该订单已经超时关闭");
 			}
-			//判断订单是否超时
-			if(DateUtils.judgeDate(info.getCreateTime(), time)){
+			if (Constants.ORDER_CANCEL.equals(info.getStatus())) {
+				throw new RuntimeException("该订单已经退单");
+			}
+			// 判断订单是否超时
+			if (DateUtils.judgeDate(info.getCreateTime(), time)) {
 				orderFeignClient.closeOrder(version, orderId);
 				throw new RuntimeException("该订单已经超时关闭");
 			}
-			
-			//end
-			//封装支付信息
+
+			// end
+			// 封装支付信息
 			PayModel model = new PayModel();
 			model.setBody("购物订单");
 			model.setOrderId(info.getOrderId());
 			model.setTotalAmount((int) (info.getOrderDetail().getPayment() * 100) + "");
 			StringBuilder sb = new StringBuilder();
-			for(OrderGoods goods : info.getOrderGoodsList()){
+			for (OrderGoods goods : info.getOrderGoodsList()) {
 				sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
 			}
 			model.setDetail(sb.toString().substring(0, sb.toString().length() - 1));
-			//end
+			// end
 			if (Constants.ALI_PAY.equals(payType)) {
 
 			}
-			
-			//微信支付
+
+			// 微信支付
 			if (Constants.WX_PAY.equals(payType)) {
 				if (Constants.JSAPI.equals(type)) {
 					if (req.getParameter("openId") == null || "".equals(req.getParameter("openId"))) {
 						throw new RuntimeException("请先用微信授权登录");
 					}
 				}
-				//微信特定参数
+				// 微信特定参数
 				model.setIP(req.getRemoteAddr());
 				model.setOpenId(req.getParameter("openId"));
 				Map<String, String> result = payService.weiXinPay(info.getCenterId(), type, model);
-				
-				if(!Constants.WX_PAY.equals(info.getOrderDetail().getPayType())){
+
+				if (!Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
 					OrderDetail detail = new OrderDetail();
 					detail.setPayType(Constants.WX_PAY);
 					detail.setOrderId(info.getOrderId());
 					orderFeignClient.updateOrderPayType(version, detail);
 				}
-				
+
 				return new ResultModel(result);
 			}
 		}
 
 		return null;
+	}
+
+	@RequestMapping(value = "pay/paycustom", method = RequestMethod.POST)
+	public boolean payCustom(@RequestBody CustomModel model) throws Exception {
+
+		return payService.payCustom(model);
 	}
 
 }

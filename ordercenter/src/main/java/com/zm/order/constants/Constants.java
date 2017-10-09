@@ -21,12 +21,13 @@ public class Constants {
 
 	public static final Integer ORDER_INIT = 0;// 初始
 	public static final Integer ORDER_PAY = 1;// 已付款
-	public static final Integer ORDER_TO_WAREHOUSE = 2;// 已发仓库
-	public static final Integer ORDER_CUSTOMS = 3;// 已报海关
-	public static final Integer ORDER_DZFX = 4;// 单证放行
-	public static final Integer ORDER_DELIVER = 5;// 已发货
-	public static final Integer ORDER_COMPLETE = 6;// 已收货订单完成
-	public static final Integer ORDER_CANCEL = 7;// 退单
-	public static final Integer ORDER_CLOSE = 8;// 交易关闭
+	public static final Integer ORDER_PAY_CUSTOMS = 2;// 支付单报关
+	public static final Integer ORDER_TO_WAREHOUSE = 3;// 已发仓库
+	public static final Integer ORDER_CUSTOMS = 4;// 已报海关
+	public static final Integer ORDER_DZFX = 5;// 单证放行
+	public static final Integer ORDER_DELIVER = 6;// 已发货
+	public static final Integer ORDER_COMPLETE = 7;// 已收货订单完成
+	public static final Integer ORDER_CANCEL = 8;// 退单
+	public static final Integer ORDER_CLOSE = 9;// 交易关闭
 
 }

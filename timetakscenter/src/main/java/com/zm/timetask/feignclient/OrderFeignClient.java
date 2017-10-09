@@ -17,4 +17,21 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/close", method = RequestMethod.GET)
 	public ResultModel timeTaskcloseOrder(@PathVariable("version") Double version);
+
+	/**
+	 * @fun 获取需要支付报关的订单
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/paycustom", method = RequestMethod.GET)
+	public ResultModel payCustom(@PathVariable("version") Double version);
+
+	/**
+	 * @fun 修改订单状态为支付报关
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/paycustom/{orderId}", method = RequestMethod.POST)
+	public ResultModel updatePayCustom(@PathVariable("version") Double version,
+			@PathVariable("orderId") String orderId);
 }

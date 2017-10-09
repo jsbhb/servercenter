@@ -15,7 +15,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `user_id` INT UNSIGNED NOT NULL,
   `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
-  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：已发仓库；3：已报海关；4：单证放行；5：已发货；6：已收货；7：退单;8、超时取消',
+  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消',
   `center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
@@ -58,7 +58,6 @@ CREATE TABLE `zm_order`.`order_detail` (
   `post_fee` DECIMAL(10,2) NULL,
   `fax_fee` DECIMAL(10,2) NULL,
   `pay_no` VARCHAR(100) NULL,
-  `custom_status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '是否推送海关报关：0：否；1：是',
   `delivery_place` VARCHAR(50)  NULL,
   `carry_address` VARCHAR(200)  NULL COMMENT '自提地址',
   `receive_name` VARCHAR(50)  NULL,
@@ -75,7 +74,6 @@ CREATE TABLE `zm_order`.`order_detail` (
   INDEX `idx_orderId` (`order_id` ASC),
   UNIQUE INDEX `uk_payNo` (`pay_no` ASC),
   UNIQUE INDEX `uk_orderId` (`order_id` ASC),
-  INDEX `idx_customStatus` (`custom_status` ASC),
   INDEX `idx_deliveryPlace` (`delivery_place` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单详细信息';

@@ -1,4 +1,4 @@
-package com.zm.pay.pojo;
+package com.zm.timetask.pojo;
 
 public class CustomModel {
 	

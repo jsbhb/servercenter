@@ -2,6 +2,7 @@ package com.zm.pay.bussiness.service;
 
 import java.util.Map;
 
+import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 
 /**
@@ -15,5 +16,12 @@ import com.zm.pay.pojo.PayModel;
  */
 public interface PayService {
 
-	Map<String,String> weiXinPay(Integer clientId, String type, PayModel model) throws Exception;
+	Map<String, String> weiXinPay(Integer clientId, String type, PayModel model) throws Exception;
+
+	/**
+	 * @fun 支付报关
+	 * @param model
+	 * @return
+	 */
+	boolean payCustom(CustomModel model) throws Exception;
 }

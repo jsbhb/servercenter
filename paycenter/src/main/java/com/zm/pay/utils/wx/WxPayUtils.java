@@ -18,7 +18,6 @@ import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.ZxingUtils;
-import com.zm.pay.utils.ali.AliPayUtils;
 
 public class WxPayUtils {
 	
