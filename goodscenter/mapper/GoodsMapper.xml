@@ -90,13 +90,16 @@
 		gb.brand_id,gb.brand,gb.origin from goods_item
 		gi left join goods_base gb on gi.base_id = gb.id
 		left join
-		goods_category_brand gcb on gb.brand_id = gcb.id where 1=1
+		goods_category_brand gcb on gb.brand_id = gcb.id where 1=1 and status = 1
 		<if test="type != null and type != ''">
 			and gcb.type = #{type} and gi.type = #{type,jdbcType =
 			INTEGER}
 		</if>
 		<if test="categoryId != null and categoryId != ''">
 			and gcb.third_category = #{categoryId,jdbcType = INTEGER}
+		</if>
+		<if test="centerId != null and centerId != ''">
+			and gi.center_id = #{centerId,jdbcType = INTEGER}
 		</if>
 		<if test="goodsId != null and goodsId != ''">
 			and gi.id = #{goodsId, jdbcType = INTEGER}

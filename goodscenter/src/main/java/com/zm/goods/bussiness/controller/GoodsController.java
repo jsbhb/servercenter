@@ -35,7 +35,7 @@ import com.zm.goods.pojo.ResultModel;
 
 @RestController
 public class GoodsController {
-	
+
 	@Resource
 	GoodsService goodsService;
 
@@ -44,72 +44,82 @@ public class GoodsController {
 			Pagination pagination, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		
+
 		String type = req.getParameter("type");
 		String categoryId = req.getParameter("categoryId");
 		String goodsId = req.getParameter("goodsId");
-		
-		if(type == null){
+		String centerId = req.getParameter("centerId");
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		if (type == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
 		}
-		
+
+		if (Constants.BIG_TRADE.equals(type)) {
+			if (centerId == null || "".equals(centerId)) {
+				result.setSuccess(false);
+				result.setErrorMsg("参数不全");
+				return result;
+			}
+			param.put("centerId", centerId);
+		}
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> param = new HashMap<String,Object>();
 			param.put("type", type);
 			param.put("categoryId", categoryId);
 			param.put("goodsId", goodsId);
 			pagination.init();
 			param.put("pagination", pagination);
 			List<GoodsItem> goodsList = goodsService.listGoods(param);
-			
+
 			result.setSuccess(true);
 			result.setObj(goodsList);
 		}
-		
+
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
 	public ResultModel listPriceConstrast(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
 		ResultModel result = new ResultModel();
-		
+
 		String startTime = req.getParameter("startTime");
 		String endTime = req.getParameter("endTime");
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> param = new HashMap<String,Object>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("itemId", itemId);
 			param.put("startTime", startTime);
 			param.put("endTime", endTime);
 			List<PriceContrast> list = goodsService.listPriceContrast(param);
-			
+
 			result.setSuccess(true);
 			result.setObj(list);
 		}
-		
+
 		return result;
 	}
-	
+
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{itemId}", method = RequestMethod.GET)
 	public ResultModel getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
 		ResultModel result = new ResultModel();
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> resultMap = goodsService.tradeGoodsDetail(itemId);
-			
+			Map<String, Object> resultMap = goodsService.tradeGoodsDetail(itemId);
+
 			result.setSuccess(true);
 			result.setObj(resultMap);
 		}
-		
+
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
@@ -119,26 +129,26 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String,Object> resultMap = goodsService.listGoodsSpecs(list);
-			
+			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list);
+
 			result.setSuccess(true);
 			result.setObj(resultMap);
 		}
-		
+
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip) {
 
 		ResultModel result = new ResultModel();
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = goodsService.getPriceAndDelStock(list, delStock, vip);
-			
+
 		}
-		
+
 		return result;
 	}
 }
