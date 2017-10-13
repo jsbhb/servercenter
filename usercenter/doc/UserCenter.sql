@@ -7,7 +7,7 @@ drop table if exists  `user`;
 
 CREATE TABLE `zm_user`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
+  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型1:海外购、大贸，2、区域中心；3、店铺；4、导购、5消费者',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
   `email` VARCHAR(100) NULL COMMENT '邮箱',
@@ -182,9 +182,9 @@ drop table if exists  `shopping_guide`;
 CREATE TABLE `zm_user`.`shopping_guide` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `grade_id` INT UNSIGNED NOT NULL COMMENT '等级ID',
-  `grade_name` VARCHAR(50) NOT NULL COMMENT '导购名称',
-  `grade_phone` CHAR(11) NOT NULL COMMENT '导购电话',
-  `grade_person_in_charge` INT UNSIGNED NULL COMMENT '导购的负责人userID',
+  `guide_name` VARCHAR(50) NOT NULL COMMENT '导购名称',
+  `guide_phone` CHAR(11) NOT NULL COMMENT '导购电话',
+  `guide_person_in_charge` INT UNSIGNED NULL COMMENT '导购的负责人userID',
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',

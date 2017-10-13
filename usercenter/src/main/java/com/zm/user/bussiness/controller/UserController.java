@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,7 @@ import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.ThirdPartFeignClient;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
+import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
@@ -468,6 +470,17 @@ public class UserController {
 		}
 
 		return false;
+	}
+	
+	@RequestMapping(value = "{version}/user/grade/save", method = RequestMethod.POST)
+	public ResultModel saveGrade(@PathVariable("version") Double version, @RequestBody Grade grade) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(userService.saveGrade(grade), null);
+		}
+
+		return new ResultModel(false, "版本错误");
 	}
 
 }

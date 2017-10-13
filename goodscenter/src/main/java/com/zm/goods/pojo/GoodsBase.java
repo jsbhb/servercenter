@@ -4,7 +4,7 @@ public class GoodsBase {
 
 	private Integer id;
 	
-	private Integer brandId;
+	private String brandId;
 	
 	private String goodsName;
 	
@@ -12,7 +12,15 @@ public class GoodsBase {
 	
 	private String origin;
 	
-	private Double taxrate;
+	private Double tariff;
+	
+	private Double exciseTax;
+	
+	private Double incrementTax;
+	
+	private String hscode;
+	
+	private String encode;
 	
 	private String unit;
 	
@@ -22,6 +30,46 @@ public class GoodsBase {
 	
 	private String opt;
 
+	public Double getTariff() {
+		return tariff;
+	}
+
+	public void setTariff(Double tariff) {
+		this.tariff = tariff;
+	}
+
+	public Double getExciseTax() {
+		return exciseTax;
+	}
+
+	public void setExciseTax(Double exciseTax) {
+		this.exciseTax = exciseTax;
+	}
+
+	public Double getIncrementTax() {
+		return incrementTax;
+	}
+
+	public void setIncrementTax(Double incrementTax) {
+		this.incrementTax = incrementTax;
+	}
+
+	public String getHscode() {
+		return hscode;
+	}
+
+	public void setHscode(String hscode) {
+		this.hscode = hscode;
+	}
+
+	public String getEncode() {
+		return encode;
+	}
+
+	public void setEncode(String encode) {
+		this.encode = encode;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -30,11 +78,11 @@ public class GoodsBase {
 		this.id = id;
 	}
 
-	public Integer getBrandId() {
+	public String getBrandId() {
 		return brandId;
 	}
 
-	public void setBrandId(Integer brandId) {
+	public void setBrandId(String brandId) {
 		this.brandId = brandId;
 	}
 
@@ -60,14 +108,6 @@ public class GoodsBase {
 
 	public void setOrigin(String origin) {
 		this.origin = origin;
-	}
-
-	public Double getTaxrate() {
-		return taxrate;
-	}
-
-	public void setTaxrate(Double taxrate) {
-		this.taxrate = taxrate;
 	}
 
 	public String getUnit() {
@@ -105,8 +145,9 @@ public class GoodsBase {
 	@Override
 	public String toString() {
 		return "GoodsBase [id=" + id + ", brandId=" + brandId + ", goodsName=" + goodsName + ", brand=" + brand
-				+ ", origin=" + origin + ", taxrate=" + taxrate + ", unit=" + unit + ", createTime=" + createTime
-				+ ", updateTime=" + updateTime + ", opt=" + opt + "]";
+				+ ", origin=" + origin + ", tariff=" + tariff + ", exciseTax=" + exciseTax + ", incrementTax="
+				+ incrementTax + ", hscode=" + hscode + ", encode=" + encode + ", unit=" + unit + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + ", opt=" + opt + "]";
 	}
 	
 }

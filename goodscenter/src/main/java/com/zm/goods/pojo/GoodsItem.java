@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Set;
 
 public class GoodsItem extends GoodsBase {
+	
+	private Integer id;
 
-	private Integer goodsId;
+	private String goodsId;
 
 	private Integer supplierId;
 
@@ -39,6 +41,14 @@ public class GoodsItem extends GoodsBase {
 
 	private List<GoodsSpecs> goodsSpecsList;
 
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public Set<String> getSpecsInfo() {
 		return specsInfo;
 	}
@@ -63,11 +73,11 @@ public class GoodsItem extends GoodsBase {
 		this.goodsSpecsList = goodsSpecsList;
 	}
 
-	public Integer getGoodsId() {
+	public String getGoodsId() {
 		return goodsId;
 	}
 
-	public void setGoodsId(Integer goodsId) {
+	public void setGoodsId(String goodsId) {
 		this.goodsId = goodsId;
 	}
 

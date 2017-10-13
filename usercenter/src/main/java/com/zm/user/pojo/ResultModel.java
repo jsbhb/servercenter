@@ -16,6 +16,19 @@ public class ResultModel {
 	private String errorMsg;
 	private boolean success;
 	private Object obj;
+	
+	public ResultModel(){}
+	
+	public ResultModel(boolean flag, Object obj){
+		this.success = flag;
+		this.obj = obj;
+	}
+	
+	public ResultModel(boolean flag, String errorMsg){
+		this.success = flag;
+		this.errorMsg = errorMsg;
+	}
+	
 	public String getErrorCode() {
 		return errorCode;
 	}

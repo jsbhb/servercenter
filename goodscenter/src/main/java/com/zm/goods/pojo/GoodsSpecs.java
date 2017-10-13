@@ -18,7 +18,7 @@ public class GoodsSpecs implements Serializable{
 
 	private Integer id;
 	
-	private Integer goodsId;
+	private String goodsId;
 	
 	private String itemId;
 	
@@ -27,6 +27,8 @@ public class GoodsSpecs implements Serializable{
 	private String sku;
 	
 	private Integer promotion;
+	
+	private Double discount;
 	
 	private String info;
 	
@@ -47,6 +49,14 @@ public class GoodsSpecs implements Serializable{
 	private Integer stock;
 	
 	private List<GoodsPrice> priceList;
+
+	public Double getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
 
 	public Double getVipMinPrice() {
 		return vipMinPrice;
@@ -80,11 +90,11 @@ public class GoodsSpecs implements Serializable{
 		this.id = id;
 	}
 
-	public Integer getGoodsId() {
+	public String getGoodsId() {
 		return goodsId;
 	}
 
-	public void setGoodsId(Integer goodsId) {
+	public void setGoodsId(String goodsId) {
 		this.goodsId = goodsId;
 	}
 

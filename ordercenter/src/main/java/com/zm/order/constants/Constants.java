@@ -29,5 +29,15 @@ public class Constants {
 	public static final Integer ORDER_COMPLETE = 7;// 已收货订单完成
 	public static final Integer ORDER_CANCEL = 8;// 退单
 	public static final Integer ORDER_CLOSE = 9;// 交易关闭
+	
+	
+	// *********************活动范围，获取是否有全场活动******************************/
+	public static final Integer ACTIVE_AREA = 1;//活动范围：全场
+	
+	// *********************活动类型******************************/
+	public static final Integer FULL_CUT = 1;//满减
+	
+	public static final Integer FULL_DISCOUNT = 2;//满打折
+	
 
 }

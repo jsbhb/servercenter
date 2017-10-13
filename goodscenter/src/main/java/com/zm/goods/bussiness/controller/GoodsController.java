@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.Pagination;
 import com.zm.goods.pojo.PriceContrast;
@@ -51,22 +53,19 @@ public class GoodsController {
 		String centerId = req.getParameter("centerId");
 		Map<String, Object> param = new HashMap<String, Object>();
 
-		if (type == null) {
+		if (type == null || centerId == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
 		}
 
-		if (Constants.BIG_TRADE.equals(type)) {
-			if (centerId == null || "".equals(centerId)) {
-				result.setSuccess(false);
-				result.setErrorMsg("参数不全");
-				return result;
+		if (Constants.FIRST_VERSION.equals(version)) {
+			if (Constants.O2O_CENTERID.equals(centerId) || Constants.BIG_TRADE_CENTERID.equals(centerId)) {
+				param.put("centerId", "");
+			} else {
+				param.put("centerId", "_" + centerId);
 			}
 			param.put("centerId", centerId);
-		}
-
-		if (Constants.FIRST_VERSION.equals(version)) {
 			param.put("type", type);
 			param.put("categoryId", categoryId);
 			param.put("goodsId", goodsId);
@@ -89,10 +88,16 @@ public class GoodsController {
 
 		String startTime = req.getParameter("startTime");
 		String endTime = req.getParameter("endTime");
+		String centerId = req.getParameter("centerId");
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("itemId", itemId);
+			if (Constants.O2O_CENTERID.equals(centerId) || Constants.BIG_TRADE_CENTERID.equals(centerId)) {
+				param.put("centerId", "");
+			} else {
+				param.put("centerId", "_" + centerId);
+			}
 			param.put("startTime", startTime);
 			param.put("endTime", endTime);
 			List<PriceContrast> list = goodsService.listPriceContrast(param);
@@ -104,14 +109,15 @@ public class GoodsController {
 		return result;
 	}
 
-	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{itemId}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{centerId}/{itemId}", method = RequestMethod.GET)
 	public ResultModel getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("itemId") String itemId) {
+			HttpServletResponse res, @PathVariable("itemId") String itemId,
+			@PathVariable("centerId") Integer centerId) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.tradeGoodsDetail(itemId);
+			Map<String, Object> resultMap = goodsService.tradeGoodsDetail(itemId, centerId);
 
 			result.setSuccess(true);
 			result.setObj(resultMap);
@@ -126,10 +132,11 @@ public class GoodsController {
 
 		ResultModel result = new ResultModel();
 		String ids = req.getParameter("ids");
+		String centerId = req.getParameter("centerId");
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list);
+			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId);
 
 			result.setSuccess(true);
 			result.setObj(resultMap);
@@ -140,15 +147,100 @@ public class GoodsController {
 
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip) {
+			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip,
+			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = goodsService.getPriceAndDelStock(list, delStock, vip);
-
+			result = goodsService.getPriceAndDelStock(list, delStock, vip, centerId, orderFlag);
 		}
 
 		return result;
+	}
+
+	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)
+	public ResultModel getActivity(@PathVariable("version") Double version,
+			@RequestParam(value = "type", required = false) Integer type,
+			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("typeStatus", typeStatus);
+			if (!Constants.ACTIVE_AREA.equals(typeStatus)) {
+				param.put("type", type);
+			}
+			if (Constants.O2O_CENTERID.equals(centerId) || Constants.BIG_TRADE_CENTERID.equals(centerId)) {
+				param.put("centerId", "");
+			} else {
+				param.put("centerId", "_" + centerId);
+			}
+
+			return new ResultModel(true, goodsService.getActivity(param));
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/goods/modular/{centerId}/{page}", method = RequestMethod.GET)
+	public ResultModel getModular(@PathVariable("version") Double version, @PathVariable("page") String page,
+			@PathVariable("centerId") Integer centerId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, goodsService.getModular(page, centerId));
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/goods/modulardata/{centerId}/{page}", method = RequestMethod.POST)
+	public ResultModel getModularData(@PathVariable("version") Double version, @RequestBody Layout layout,
+			@PathVariable("page") String page, @PathVariable("centerId") Integer centerId, HttpServletRequest req) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, goodsService.getModularData(page, layout, centerId));
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/goods/table/{centerId}", method = RequestMethod.POST)
+	public ResultModel createTable(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			goodsService.createTable(centerId);
+			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/goods/active/start/{centerId}/{activeId}", method = RequestMethod.POST)
+	public ResultModel startActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
+			@PathVariable("centerId") Integer centerId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			goodsService.updateActiveStart(centerId,activeId);
+			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/active/end/{centerId}/{activeId}", method = RequestMethod.POST)
+	public ResultModel endActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
+			@PathVariable("centerId") Integer centerId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			goodsService.updateActiveEnd(centerId,activeId);
+			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
 	}
 }

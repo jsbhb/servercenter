@@ -20,6 +20,7 @@ import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.LogFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.feignclient.model.Activity;
 import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
@@ -34,6 +35,7 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.WeiXinPayConfig;
+import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
@@ -104,18 +106,49 @@ public class OrderServiceImpl implements OrderService {
 		}
 		boolean vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
 
+		result = goodsFeignClient.getActivity(Constants.FIRST_VERSION, null, Constants.ACTIVE_AREA, info.getCenterId());
+		if (!result.isSuccess()) {
+			result.setErrorMsg("获取活动信息失败");
+			return result;
+		}
+
+		Activity activity = null;
+
+		if (result.getObj() != null) {
+			activity = (Activity) result.getObj();
+		}
+
 		// 根据itemID和数量获得金额并扣减库存（除了自营仓需要扣库存，其他不需要）
 		if (Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
-			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip);
+			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip, info.getCenterId(),
+					info.getOrderFlag());
 		} else {
-			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip);
+			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip, info.getCenterId(),
+					info.getOrderFlag());
 		}
 
 		if (!result.isSuccess()) {
 			return result;
 		}
 
-		String totalAmount = (int) ((Double) result.getObj() * 100) + "";
+		Double amount = (Double) result.getObj();
+		String totalAmount = "";
+
+		if (activity != null) {
+			if (Constants.FULL_CUT.equals(activity.getType())) {
+				if (amount > activity.getConditionPrice()) {
+					amount = CalculationUtils.sub(amount, activity.getDiscount());
+				}
+			}
+			if (Constants.FULL_DISCOUNT.equals(activity.getType())) {
+				if (amount > activity.getConditionPrice()) {
+					Double discount = CalculationUtils.div(activity.getDiscount(), 10.0);
+					amount = CalculationUtils.mul(amount, discount);
+				}
+			}
+		}
+
+		totalAmount = (int) (amount * 100) + "";
 
 		if (!totalAmount.equals(localAmount + "")) {
 			result.setErrorMsg("价格前后台不一致");
@@ -251,7 +284,8 @@ public class OrderServiceImpl implements OrderService {
 
 		String ids = sb.substring(0, sb.length() - 1);
 
-		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids);
+		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids,
+				(Integer) param.get("centerId"));
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
 			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");

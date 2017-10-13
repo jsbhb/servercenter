@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
+import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
@@ -168,4 +169,13 @@ public interface UserService {
 	 * @since JDK 1.7
 	 */
 	boolean verifyIsFirst(ThirdLogin info);
+
+	/**
+	 * saveGrade:新增区域中心. <br/>
+	 * 
+	 * @author wqy
+	 * @param grade
+	 * @since JDK 1.7
+	 */
+	boolean saveGrade(Grade grade);
 }

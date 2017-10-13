@@ -71,4 +71,16 @@ public class TimeTaskController {
 		}
 		return null;
 	}
+
+	@RequestMapping(value = "{version}/timetask/createActive/{centerId}/{activeId}/{startTime}/{endTime}", method = RequestMethod.POST)
+	public ResultModel createActive(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@PathVariable("activeId") Integer activeId, @PathVariable("startTime") String startTime,
+			@PathVariable("endTime") String endTime) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			timeTaskService.createActive(centerId, activeId, startTime, endTime);
+			return new ResultModel(true);
+		}
+		return null;
+	}
 }

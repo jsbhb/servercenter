@@ -4,8 +4,8 @@
 
 
 	<resultMap type="com.zm.goods.pojo.GoodsItem" id="goodsItem">
-		<id column="goodsId" property="goodsId" jdbcType="INTEGER" />
 		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="customGoodsName" property="customGoodsName"
 			jdbcType="VARCHAR" />
@@ -20,17 +20,22 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
-		<result column="brand_id" property="brandId" jdbcType="INTEGER" />
+		<result column="brand_id" property="brandId" jdbcType="VARCHAR" />
 		<result column="goodsName" property="goodsName" jdbcType="VARCHAR" />
 		<result column="brand" property="brand" jdbcType="VARCHAR" />
 		<result column="origin" property="origin" jdbcType="VARCHAR" />
-		<result column="taxrate" property="taxrate" jdbcType="NUMERIC" />
+		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="increment_tax" property="incrementTax"
+			jdbcType="NUMERIC" />
+		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
+		<result column="encode" property="encode" jdbcType="VARCHAR" />
 		<result column="unit" property="unit" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<resultMap type="com.zm.goods.pojo.GoodsFile" id="goodsFile">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		<result column="path" property="path" jdbcType="VARCHAR" />
 		<result column="suffix" property="suffix" jdbcType="VARCHAR" />
 		<result column="storeType" property="storeType" jdbcType="INTEGER" />
@@ -42,11 +47,12 @@
 
 	<resultMap type="com.zm.goods.pojo.GoodsSpecs" id="goodsSpecs">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="goodsId" property="goodsId" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
 		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
+		<result column="discount" property="discount" jdbcType="NUMERIC" />
 		<result column="info" property="info" jdbcType="VARCHAR" />
 		<result column="qpqty" property="stock" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
@@ -61,7 +67,6 @@
 			<result column="delivery_place" property="deliveryPlace"
 				jdbcType="VARCHAR" />
 			<result column="vip_price" property="vipPrice" jdbcType="NUMERIC" />
-			<result column="discount" property="discount" jdbcType="NUMERIC" />
 			<result column="sub_create_time" property="createTime"
 				jdbcType="VARCHAR" />
 			<result column="sub_update_time" property="updateTime"
@@ -84,25 +89,105 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 
+	<resultMap type="com.zm.goods.pojo.Activity" id="activity">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="layout_id" property="layoutId" jdbcType="INTEGER" />
+		<result column="type_status" property="typeStatus" jdbcType="INTEGER" />
+		<result column="condition_price" property="conditionPrice"
+			jdbcType="NUMERIC" />
+		<result column="discount" property="discount" jdbcType="NUMERIC" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="attr" property="attr" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="start_time" property="startTime" jdbcType="VARCHAR" />
+		<result column="end_time" property="endTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.Layout" id="layout">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="page" property="page" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="config" property="config" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="is_show" property="show" jdbcType="INTEGER" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ActivityData" id="activityData">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="activity_id" property="activeId" jdbcType="INTEGER" />
+		<result column="href" property="href" jdbcType="VARCHAR" />
+		<result column="picPath" property="picPath" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+		<result column="discount" property="discount" jdbcType="NUMERIC" />
+		<result column="attr" property="attr" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.PopularizeDict" id="dict">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="layout_id" property="layoutId" jdbcType="INTEGER" />
+		<result column="picPath" property="picPath" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="enname" property="enname" jdbcType="VARCHAR" />
+		<result column="first_category" property="firstCategory" jdbcType="INTEGER" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.DictData" id="dictData">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="dictId" property="dictId" jdbcType="INTEGER" />
+		<result column="href" property="href" jdbcType="VARCHAR" />
+		<result column="picPath" property="picPath" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="specs" property="specs" jdbcType="VARCHAR" />
+		<result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+		<result column="price" property="price" jdbcType="NUMERIC" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getActivity" parameterType="Object" resultMap="activity">
+		select * from activity${centerId} where type_status = #{typeStatus} and status =
+		1
+		<if test="type != null">
+			and type = #{type}
+		</if>
+	</select>
+	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
-		select gi.id as goodsId, gb.id,gi.goods_name as customGoodsName,
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,
 		gi.status,gb.goods_name,gi.supplier_id,
-		gb.brand_id,gb.brand,gb.origin from goods_item
-		gi left join goods_base gb on gi.base_id = gb.id
-		left join
-		goods_category_brand gcb on gb.brand_id = gcb.id where 1=1 and status = 1
+		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		from goods_item${centerId}
+		gi left join
+		goods_category_brand${centerId} gcb on gi.brand_id =
+		gcb.brand_id left join
+		goods_base${centerId}
+		gb on gi.base_id = gb.id where 1=1 and
+		status = 1
 		<if test="type != null and type != ''">
 			and gcb.type = #{type} and gi.type = #{type,jdbcType =
 			INTEGER}
 		</if>
 		<if test="categoryId != null and categoryId != ''">
-			and gcb.third_category = #{categoryId,jdbcType = INTEGER}
-		</if>
-		<if test="centerId != null and centerId != ''">
-			and gi.center_id = #{centerId,jdbcType = INTEGER}
+			and gcb.third_category = #{categoryId,jdbcType = VARCHAR}
 		</if>
 		<if test="goodsId != null and goodsId != ''">
-			and gi.id = #{goodsId, jdbcType = INTEGER}
+			and gi.goods_id = #{goodsId, jdbcType = VARCHAR}
 		</if>
 		<if test="goodsId == null or goodsId == ''">
 			limit #{pagination.startRow} , #{pagination.numPerPage}
@@ -110,36 +195,73 @@
 	</select>
 
 	<select id="listGoodsFile" parameterType="Object" resultMap="goodsFile">
-		select * from goods_file where type = #{type, jdbcType = INTEGER}
+		select * from goods_file${centerId} where type = #{type, jdbcType = INTEGER}
 		and
 		goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
-			#{item,jdbcType = INTEGER}
+			#{item,jdbcType = VARCHAR}
 		</foreach>
 	</select>
-
+	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.item_id,gs.goods_id as
-		goodsId,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		select
+		gs.id,gs.item_id,gs.goods_id,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.opt,gp.id as
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		as sub_create_time,
+		gp.delivery_place,
+		gp.update_time as
+		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
+		goods_price${centerId} gp on
+		gs.item_id = gp.item_id  where gs.goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</select>
+	
+	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
+		select gs.id,gs.info,gs.item_id,gs.goods_id,
+		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
 		as sub_create_time,stock.qpqty,
 		gp.delivery_place,
 		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_specs gs left join
-		goods_price gp on
-		gs.item_id = gp.item_id left join goods_stock stock
+		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
+		goods_price${centerId} gp on
+		gs.item_id = gp.item_id left join 
+		<if test="orderFlag == 0">
+			goods_stock stock
+		</if>
+		<if test="orderFlag == 1 or orderFlag == 2">
+			goods_stock${centerId} stock
+		</if>
 		on gs.item_id =
-		stock.item_id where gs.goods_id in
+		stock.item_id where gs.item_id = #{itemId}
+	</select>
+	
+	<select id="listGoodsSpecsByItemId" parameterType="Object"
+		resultMap="goodsSpecs">
+		select gs.id,gs.info,gs.item_id,gs.goods_id ,
+		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.opt,gp.id as
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		as sub_create_time,
+		gp.delivery_place,
+		gp.update_time as
+		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
+		goods_price${centerId} gp on
+		gs.item_id = gp.item_id  where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
-			#{item,jdbcType = INTEGER}
+			#{item,jdbcType = VARCHAR}
 		</foreach>
 	</select>
-
+	
 	<select id="listPriceContrast" parameterType="Object" resultMap="priceConstrast">
-		select * from goods_price_contrast where item_id = #{itemId}
+		select * from goods_price_contrast${centerId} where item_id = #{itemId}
 		<if test="startTime != null and startTime !=''">
 			and contrast_time &gt;= #{startTime}
 		</if>
@@ -148,39 +270,345 @@
 		</if>
 	</select>
 
-	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id as
-		goodsId,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
-		as sub_create_time,stock.qpqty,
-		gp.delivery_place,
-		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_specs gs left join
-		goods_price gp on
-		gs.item_id = gp.item_id left join goods_stock stock
-		on gs.item_id =
-		stock.item_id where gs.item_id = #{itemId}
-	</select>
+	<!-- 建表语句 -->
+	<update id="createGoodsItem" parameterType="java.lang.Integer">
 
-	<select id="listGoodsSpecsByItemId" parameterType="Object"
-		resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id as
-		goodsId,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
-		as sub_create_time,stock.qpqty,
-		gp.delivery_place,
-		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_specs gs left join
-		goods_price gp on
-		gs.item_id = gp.item_id left join goods_stock stock
-		on gs.item_id =
-		stock.item_id where gs.item_id in
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item,jdbcType = VARCHAR}
-		</foreach>
+		CREATE TABLE IF NOT EXISTS goods_item_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
+		  brand_id VARCHAR(100) NOT NULL COMMENT '品牌ID',
+		  supplier_id int UNSIGNED NULL COMMENT '商家ID',
+		  base_id int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
+		  goods_name VARCHAR(100) NOT NULL COMMENT '商品名称',
+		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
+		  type tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
+		  center_id tinyint UNSIGNED NULL COMMENT '大贸运营公司ID',
+		  is_popular tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
+		  is_hot tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
+		  is_good tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否精选0：否，1是',
+		  is_choice tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否渠道商品0：否，1是',
+		  is_free_postfee tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包邮0：否，1是',
+		  detail_path VARCHAR(100) NULL COMMENT '详情地址',
+		  index_status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否创建lucene0：否，1是',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX id_UNIQUE (id ASC),
+		  UNIQUE INDEX goodsId_UNIQUE (goods_id ASC),
+		  INDEX idx_brand_id (brand_id),
+		  INDEX idx_supplier_id (supplier_id),
+		  INDEX idx_center_id (center_id),
+		  INDEX idx_base_id (base_id),
+		  INDEX idx_status (status),
+		  INDEX idx_type (type),
+		  INDEX idx_is_popular (is_popular),
+		  INDEX idx_is_hot (is_hot),
+		  INDEX idx_is_good (is_good),
+		  INDEX idx_is_choice (is_choice)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '供应商商品基本信息表';
+	</update>
+		
+	<update id="createGoodsFile" parameterType="java.lang.Integer">
+		CREATE TABLE IF NOT EXISTS goods_file_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
+		  path VARCHAR(100) NULL COMMENT '文件路径',
+		  suffix CHAR(5) NULL COMMENT '后缀',
+		  store_type tinyint UNSIGNED NULL COMMENT '存储类型',
+		  type tinyint UNSIGNED NULL COMMENT '存储类型',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX id_UNIQUE (id ASC),
+		  INDEX idx_goods_id (goods_id),
+		  INDEX idx_suffix (suffix),
+		  INDEX idx_store_type (store_type),
+		  INDEX idx_type (type)
+		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '供应商商品文件表';
+	</update>
+	
+	<update id="createFirstCategory" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_first_category_${centerId}(
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  first_id VARCHAR(100) NOT NULL COMMENT '一级分类ID',
+		  name VARCHAR(100) NULL COMMENT '一级分类名称',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  UNIQUE INDEX id_UNIQUE (first_id ASC),
+		  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '供应商商品一级分类表';
+	</update>
+		
+	<update id="createSecondCategory" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_second_categroy_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  second_id VARCHAR(100) NOT NULL COMMENT '二级分类ID',
+		  first_id VARCHAR(100) NOT NULL COMMENT 'first_id',
+		  name VARCHAR(100) NULL COMMENT '二级分类名称',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX id_UNIQUE (second_id ASC),
+		  INDEX goods_second_categroy_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '供应商商品二级分类表';
+	</update>
+		
+	<update id="createThirdCategory" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_third_category_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  third_id VARCHAR(100) NOT NULL COMMENT '三级分类ID',
+		  second_id int NOT NULL COMMENT 'second_id',
+		  name VARCHAR(100) NULL COMMENT '三级分类名称',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX id_UNIQUE (third_id ASC),
+		  INDEX goods_third_category_second_id (second_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '供应商商品三级分类表';
+	</update>
+		
+	<update id="createBrand" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_category_brand_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  brand_id VARCHAR(100) NULL COMMENT '品牌名称',
+		  brand VARCHAR(100) NULL COMMENT '品牌名称',
+		  type tinyint UNSIGNED NOT NULL COMMENT '0:大贸；1：跨境',
+		  first_category VARCHAR(100) NOT NULL COMMENT '一级分类id',
+		  first_name VARCHAR(100) NULL COMMENT '一级分类名称',
+		  second_category VARCHAR(100) NOT NULL COMMENT '二级分类id',
+		  second_name VARCHAR(100) NULL COMMENT '二级分类名称',
+		  third_category VARCHAR(100) NOT NULL COMMENT '三级分类id',
+		  third_name VARCHAR(100) NULL COMMENT '三级分类名称',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX id_UNIQUE (brand_id ASC),
+		  INDEX goods_category_brand_brand (brand),
+		  INDEX idx_first_category (first_category),
+		  INDEX idx_type (type), 
+		  INDEX idx_second_category (second_category),
+		  INDEX idx_third_category (third_category)
+		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '商品分类品牌表';
+	</update>
+		
+	<update id="createGoodsSpecs" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_specs_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
+		  item_id varchar(50) NOT NULL COMMENT '供销内部商品ID',
+		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
+		  sku VARCHAR(100) NULL COMMENT 'sku信息',
+		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
+		  discount decimal(10,2) NULL COMMENT '促销折扣',
+		  info VARCHAR(1000) NULL COMMENT '规格信息',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_goods_id (goods_id),
+		  INDEX idx_item_id (item_id), 
+		  INDEX idx_is_promotion (is_promotion),
+		  INDEX idx_sku (sku)
+		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '商品规格表';
+	</update>
+		
+	<update id="createGoodsPrice" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_price_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  item_id varchar(50) NOT NULL COMMENT '商品ID',
+		  min int UNSIGNED NULL COMMENT '最小数量',
+		  max int UNSIGNED NULL COMMENT '最大数量',
+		  price decimal(10,2) NULL DEFAULT 0.0 COMMENT '价格',
+		  vip_price decimal(10,2) NULL COMMENT '会员价格',
+		  delivery_place varchar(20) NULL COMMENT '发货地',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_item_id (item_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '商品价格表';
+	</update>
+		
+	<update id="createGoodsStock" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS goods_stock_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  item_id varchar(50) NOT NULL COMMENT '内部商品ID',
+		  qpqty int UNSIGNED NULL COMMENT '良品数量', 
+		  sjqty int UNSIGNED NULL COMMENT '上架数量', 
+		  defqty int UNSIGNED NULL COMMENT '次品数量',
+		  frozenqty int UNSIGNED NULL COMMENT '冻结数量',
+		  lockedqty int UNSIGNED NULL COMMENT '锁定数量',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_item_id (item_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '商品库存表';
+	</update>
+		
+	<update id="createLayout" parameterType="java.lang.Integer">
+		
+		CREATE TABLE IF NOT EXISTS layout_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  page varchar(50) NOT NULL COMMENT '页面名称',
+		  code varchar(50) NOT NULL COMMENT '模块ID',
+		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：普通模块；1：活动模块；',
+		  is_show tinyint UNSIGNED NULL DEFAULT 0 COMMENT '是否显示 0：否；1：是', 
+		  config varchar(100) NULL COMMENT '模块配置',
+		  description VARCHAR(450) NULL COMMENT '描述',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_code (code),
+		  INDEX idx_page (page)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '布局表';
+	</update>
+		
+	<update id="createPopularizeDict" parameterType="java.lang.Integer">	
+		
+		CREATE TABLE IF NOT EXISTS popularize_dict_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  layout_id int UNSIGNED NOT NULL COMMENT '布局ID',
+		  name VARCHAR(50) NULL COMMENT '名称',
+		  enname VARCHAR(50) NULL COMMENT '英文名称',
+		  first_category int UNSIGNED NULL COMMENT '一级分类id',
+		  picPath VARCHAR(300) NULL COMMENT '图片地址',
+		  description VARCHAR(450) NULL COMMENT '描述',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_page (page),
+		  UNIQUE INDEX uq_layout_id (layout_id),
+		  INDEX idx_code (code)
+		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '推广字典';
+	</update>
+		
+	<update id="createPopularizeData" parameterType="java.lang.Integer">	
+		
+		CREATE TABLE IF NOT EXISTS popularize_data_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  dictId int UNSIGNED NOT NULL COMMENT '字典ID',
+		  href VARCHAR(300) NULL COMMENT '跳转地址',
+		  picPath VARCHAR(300) NULL COMMENT '图片地址',
+		  title VARCHAR(50) NULL COMMENT '名称',
+		  specs VARCHAR(50) NULL COMMENT '规格',
+		  description VARCHAR(450) NULL COMMENT '描述',
+		  price DECIMAL(10,2) NULL COMMENT '商品价格',
+		  goodsId  int UNSIGNED NULL COMMENT '商品ID',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_dictId (dictId)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '推广数据';
+	</update>
+		
+	<update id="createActivity" parameterType="java.lang.Integer">		
+	
+		CREATE TABLE IF NOT EXISTS activity_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  layout_id int UNSIGNED NOT NULL COMMENT '布局ID',
+		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：限时促销；1：满减；2：满打折',
+		  type_status tinyint UNSIGNED NULL DEFAULT 0 COMMENT '类型：0：特定区域；1：全场；',
+		  condition_price DECIMAL(10,2) NULL COMMENT '满多少条件',
+		  discount decimal(10,2) NULL COMMENT '促销折扣',
+		  status tinyint UNSIGNED NULL DEFAULT 0 COMMENT '状态0:结束；1：正常',
+		  attr VARCHAR(50) NULL COMMENT '备用字段',
+		  description VARCHAR(450) NULL COMMENT '描述',
+		  start_time DATETIME NULL COMMENT '开始时间',
+		  end_time DATETIME NULL COMMENT '结束时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX uq_layout_id (layout_id),
+		  INDEX idx_type (type)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '活动列表';
+	</update>
+		
+	<update id="createActivityData" parameterType="java.lang.Integer">		
+		CREATE TABLE IF NOT EXISTS activity_data_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  activity_id int UNSIGNED NOT NULL COMMENT '活动ID',
+		  href VARCHAR(300) NULL COMMENT '跳转地址',
+		  picPath VARCHAR(300) NULL COMMENT '图片地址',
+		  title VARCHAR(50) NULL COMMENT '名称',
+		  goods_id VARCHAR(100) NULL COMMENT '商品ID',
+		  discount decimal(10,2) NULL COMMENT '促销折扣',
+		  attr VARCHAR(50) NULL COMMENT '备用字段',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_activity_id (activity_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '活动数据';
+	</update>
+	
+	<update id="createPriceContrast" parameterType="java.lang.Integer">	
+		CREATE TABLE IF NOT EXISTS goods_price_contrast_${centerId} (
+		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  item_id varchar(50) NOT NULL COMMENT '内部商品ID',
+		  sh_price decimal(10,2) NOT NULL COMMENT '上海价格',
+		  bj_price decimal(10,2) NOT NULL COMMENT '北京价格',
+		  price decimal(10,2) NOT NULL COMMENT '自己价格',
+		  reserve decimal(10,2) NULL COMMENT '备用',
+		  contrast_time varchar(15) NOT NULL COMMENT '比较时间',
+		  create_time DATETIME NULL COMMENT '创建时间',
+		  update_time DATETIME NULL COMMENT '更新时间',
+		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  PRIMARY KEY (id),
+		  INDEX idx_item_id (item_id),
+		  UNIQUE INDEX uq_contrast_time (contrast_time,item_id ASC)
+		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '商品价格对比表';
+	
+	</update>	
+
+	<!-- 建表语句END -->
+	
+	<select id="listLayout" parameterType="Object" resultMap="layout">
+		select * from layout${centerId} where page = #{page} and is_show = 1;
 	</select>
+	
+	<select id="listActiveData" parameterType="Object"  resultMap = "activityData">
+		select * from activity_data${centerId} where activity_id = #{activeId} limit 5;
+	</select>
+	
+	<select id="getActivityByLayoutId" parameterType="Object" resultMap="activity">
+		select * from activity${centerId} where layout_id = #{layoutId}
+	</select>
+	
+	<select id="getDictByLayoutId" parameterType="Object" resultMap="dict">
+		select * from popularize_dict${centerId} where layout_id = #{layoutId}
+	</select>
+	
+	<select id="listDictData" parameterType="Object"  resultMap = "dictData">
+		select * from popularize_data${centerId} where dictId = #{dictId}
+	</select>
+	
+	<update id="updateActivitiesStart">
+		update activity${centerId} set status = 1 where status = 0 and id = #{activeId}
+	</update>
+	
+	<update id="updateActivitiesEnd">
+		update activity${centerId} set status = 2 where status = 1 and id = #{activeId}
+	</update>
 
 </mapper>

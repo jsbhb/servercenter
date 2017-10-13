@@ -19,6 +19,7 @@ import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.feignclient.model.PayModel;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
+import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
@@ -247,7 +248,7 @@ public class UserServiceImpl implements UserService {
 
 		PayModel payModel = new PayModel();
 		payModel.setOrderId(orderId);
-		payModel.setTotalAmount((int)(price.getPrice() * 100) + "");
+		payModel.setTotalAmount((int) (price.getPrice() * 100) + "");
 		payModel.setBody("会员充值");
 
 		if (Constants.WX_PAY.equals(payType)) {
@@ -255,7 +256,7 @@ public class UserServiceImpl implements UserService {
 			payModel.setOpenId(weiXinPayConfig.getOpenId());
 			payModel.setIP(weiXinPayConfig.getIp());
 			Map<String, String> paymap = payFeignClient.wxPay(Integer.valueOf(price.getCenterId()), type, payModel);
-			if("false".equals(paymap.get("success"))){
+			if ("false".equals(paymap.get("success"))) {
 				result.setSuccess(true);
 				result.setErrorMsg("支付失败");
 				return result;
@@ -325,6 +326,30 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean saveGrade(Grade grade) {
+		userMapper.saveGrade(grade);
+		UserInfo user = new UserInfo();
+		//设置区域中心ID,店铺ID，导购ID
+		if (grade.getCenterId() == null) {//说明新建的是区域中心
+			user.setPlatUserType(Constants.CENTER);
+			user.setCenterId(grade.getId());
+		} else {
+			if(grade.getShopId() == null){//说明新建的是店铺
+				user.setPlatUserType(Constants.SHOP);
+				user.setCenterId(grade.getCenterId());
+				user.setShopId(grade.getId());
+			} else {//说明新建的是导购
+				user.setPlatUserType(Constants.SHOPPING_GUIDE);
+				user.setCenterId(grade.getCenterId());
+				user.setShopId(grade.getShopId());
+				user.setGuideId(grade.getId());
+			}
+			
+		}
+		return true;
 	}
 
 }

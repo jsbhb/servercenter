@@ -13,7 +13,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `order_id` CHAR(21) NOT NULL,
   `combination_id` CHAR(20) NULL COMMENT '订单拆分后的总ID',
   `user_id` INT UNSIGNED NOT NULL,
-  `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1一般贸易',
+  `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1：大贸;2：一般贸易',
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消',
   `center_id` INT UNSIGNED NULL COMMENT '区域中心ID',

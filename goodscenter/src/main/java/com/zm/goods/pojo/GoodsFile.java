@@ -8,7 +8,7 @@ public class GoodsFile implements Serializable{
 
 	private Integer id;
 	
-	private Integer goodsId;
+	private String goodsId;
 	
 	private String path;
 	
@@ -32,11 +32,11 @@ public class GoodsFile implements Serializable{
 		this.id = id;
 	}
 
-	public Integer getGoodsId() {
+	public String getGoodsId() {
 		return goodsId;
 	}
 
-	public void setGoodsId(Integer goodsId) {
+	public void setGoodsId(String goodsId) {
 		this.goodsId = goodsId;
 	}
 

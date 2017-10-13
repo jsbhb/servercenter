@@ -3,25 +3,23 @@ package com.zm.goods.pojo;
 public class GoodsPrice {
 
 	private Integer id;
-	
+
 	private String itemId;
-	
+
 	private Integer min;
-	
+
 	private Integer max;
-	
+
 	private Double price;
-	
+
 	private Double vipPrice;
-	
-	private Double discount;
-	
+
 	private String deliveryPlace;
-	
+
 	private String createTime;
-	
+
 	private String updateTime;
-	
+
 	private String opt;
 
 	public String getDeliveryPlace() {
@@ -80,14 +78,6 @@ public class GoodsPrice {
 		this.vipPrice = vipPrice;
 	}
 
-	public Double getDiscount() {
-		return discount;
-	}
-
-	public void setDiscount(Double discount) {
-		this.discount = discount;
-	}
-
 	public String getCreateTime() {
 		return createTime;
 	}
@@ -115,8 +105,8 @@ public class GoodsPrice {
 	@Override
 	public String toString() {
 		return "GoodsPrice [id=" + id + ", itemId=" + itemId + ", min=" + min + ", max=" + max + ", price=" + price
-				+ ", vipPrice=" + vipPrice + ", discount=" + discount + ", deliveryPlace=" + deliveryPlace
-				+ ", createTime=" + createTime + ", updateTime=" + updateTime + ", opt=" + opt + "]";
+				+ ", vipPrice=" + vipPrice + ", deliveryPlace=" + deliveryPlace + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + ", opt=" + opt + "]";
 	}
-	
+
 }

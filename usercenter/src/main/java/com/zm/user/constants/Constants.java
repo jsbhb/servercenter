@@ -26,5 +26,20 @@ public class Constants {
 	public static final Integer QQ_LOGIN = 2;
 
 	public static final Integer SINABLOG_LOGIN = 3;
+	
+	// *********************区域中心ID,O2O=1;大贸=2******************************/
 
+	public static final Integer O2O_CENTER_ID = 1;
+	
+	public static final Integer BIG_TRADE_CENTER_ID = 2;
+	
+	// *********************用户类型******************************/
+	
+	public static final Integer COOP = 1;
+	
+	public static final Integer CENTER = 2;
+	
+	public static final Integer SHOP = 3;
+	
+	public static final Integer SHOPPING_GUIDE = 4;
 }

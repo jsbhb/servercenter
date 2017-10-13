@@ -16,8 +16,16 @@ import com.zm.order.pojo.ResultModel;
 public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
-	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list, @RequestParam("delStock") boolean delStock, @RequestParam("vip") boolean vip);
+	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version,
+			@RequestBody List<OrderBussinessModel> list, @RequestParam("delStock") boolean delStock,
+			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
+			@RequestParam("orderFlag") Integer orderFlag);
 
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
-	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("ids") String ids);
+	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("ids") String ids,
+			@RequestParam("centerId") Integer centerId);
+
+	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)
+	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,
+			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId);
 }
