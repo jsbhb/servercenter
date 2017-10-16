@@ -177,23 +177,6 @@ CREATE TABLE `zm_user`.`grade` (
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '等级表';
 
-drop table if exists  `shopping_guide`;
-
-CREATE TABLE `zm_user`.`shopping_guide` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `grade_id` INT UNSIGNED NOT NULL COMMENT '等级ID',
-  `guide_name` VARCHAR(50) NOT NULL COMMENT '导购名称',
-  `guide_phone` CHAR(11) NOT NULL COMMENT '导购电话',
-  `guide_person_in_charge` INT UNSIGNED NULL COMMENT '导购的负责人userID',
-  `attribute` VARCHAR(200) NULL COMMENT '备用字段',
-  `create_time` DATETIME NULL COMMENT '创建时间',
-  `update_time` DATETIME NULL COMMENT '更新时间',
-  `opt` VARCHAR(50) NULL COMMENT '操作人',
-  PRIMARY KEY (`id`),
-  INDEX `idx_grade_id` (`grade_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '导购表';
-
-
 drop table if exists  `vip_price`;
 
 CREATE TABLE `zm_user`.`vip_price` (

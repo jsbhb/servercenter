@@ -177,5 +177,5 @@ public interface UserService {
 	 * @param grade
 	 * @since JDK 1.7
 	 */
-	boolean saveGrade(Grade grade);
+	Map<String,Object> saveGrade(Grade grade);
 }

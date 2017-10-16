@@ -350,8 +350,8 @@ public class UserController {
 		AbstractPayConfig payConfig = null;
 		if (Constants.WX_PAY.equals(payType)) {
 			String openId = req.getParameter("openId");
-			if(Constants.JSAPI.equals(type)){
-				if(openId == null || "".equals(openId)){
+			if (Constants.JSAPI.equals(type)) {
+				if (openId == null || "".equals(openId)) {
 					result.setSuccess(false);
 					result.setErrorMsg("请使用微信授权登录");
 					return result;
@@ -471,13 +471,15 @@ public class UserController {
 
 		return false;
 	}
-	
+
 	@RequestMapping(value = "{version}/user/grade/save", method = RequestMethod.POST)
 	public ResultModel saveGrade(@PathVariable("version") Double version, @RequestBody Grade grade) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(userService.saveGrade(grade), null);
+			Map<String, Object> result = userService.saveGrade(grade);
+
+			return new ResultModel(true, result);
 		}
 
 		return new ResultModel(false, "版本错误");
