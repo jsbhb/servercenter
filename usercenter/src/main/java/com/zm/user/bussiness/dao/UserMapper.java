@@ -65,4 +65,6 @@ public interface UserMapper {
 	void saveWechat(ThirdLogin info);
 	
 	void saveGrade(Grade grade);
+	
+	List<Integer> listCenterId();
 }

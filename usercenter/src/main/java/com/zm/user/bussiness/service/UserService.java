@@ -178,4 +178,13 @@ public interface UserService {
 	 * @since JDK 1.7
 	 */
 	Map<String,Object> saveGrade(Grade grade);
+
+	/**
+	 * getCenterId:获取所有区域中心ID. <br/>
+	 * 
+	 * @author wqy
+	 * @param 
+	 * @since JDK 1.7
+	 */
+	List<Integer> getCenterId();
 }

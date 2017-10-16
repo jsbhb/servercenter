@@ -32,4 +32,12 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/active/end/{centerId}/{activeId}", method = RequestMethod.POST)
 	public ResultModel endActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
 			@PathVariable("centerId") Integer centerId);
+	
+	/**
+	 * @fun 获取已经结束的活动
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/endactive", method = RequestMethod.GET)
+	public ResultModel getEndActive(@PathVariable("version") Double version);
 }

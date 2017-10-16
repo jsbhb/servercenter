@@ -378,4 +378,10 @@ public class UserServiceImpl implements UserService {
 		return result;
 	}
 
+	@Override
+	public List<Integer> getCenterId() {
+		
+		return userMapper.listCenterId();
+	}
+
 }

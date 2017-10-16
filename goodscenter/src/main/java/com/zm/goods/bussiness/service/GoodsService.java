@@ -133,4 +133,14 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	void updateActiveEnd(Integer centerId, Integer activeId);
+
+	/**
+	 * getEndActive:获取已经结束的活动. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<Map<String, Object>> getEndActive();
 }

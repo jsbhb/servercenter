@@ -484,5 +484,18 @@ public class UserController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/user/center", method = RequestMethod.GET)
+	public ResultModel getCenterId(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			List<Integer> result = userService.getCenterId();
+
+			return new ResultModel(true, result);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 
 }

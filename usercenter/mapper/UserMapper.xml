@@ -335,5 +335,9 @@
 		VALUES (#{parent_id},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
 		#{gradePersonInCharge},now(),#{opt})
 	</insert>
+	
+	<select id="listCenterId" resultType="java.lang.Integer">
+		select id from grade where parent_id in(1,2);
+	</select>
 
 </mapper>

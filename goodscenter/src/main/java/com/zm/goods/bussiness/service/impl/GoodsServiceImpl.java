@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
@@ -39,6 +40,9 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	GoodsMapper goodsMapper;
+
+	@Resource
+	UserFeignClient userFeignClient;
 
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param) {
@@ -344,16 +348,16 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public void updateActiveStart(Integer centerId, Integer activeId) {
-		Map<String,Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		judgeCenterId(centerId, param);
 		param.put("activeId", activeId);
 		goodsMapper.updateActivitiesStart(param);
-		
+
 	}
 
 	@Override
 	public void updateActiveEnd(Integer centerId, Integer activeId) {
-		Map<String,Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		judgeCenterId(centerId, param);
 		param.put("activeId", activeId);
 		goodsMapper.updateActivitiesEnd(param);
@@ -403,6 +407,24 @@ public class GoodsServiceImpl implements GoodsService {
 				}
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Map<String, Object>> getEndActive() {
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		Map<String, Object> temp = null;
+		ResultModel resultModel = userFeignClient.getCenterId(Constants.FIRST_VERSION);
+		if (resultModel.isSuccess()) {
+			List<Integer> list = (List<Integer>) resultModel.getObj();
+			for (Integer centerId : list) {
+				temp = new HashMap<String, Object>();
+				List<Integer> activeIdList = goodsMapper.listEndActiveId(centerId);
+				temp.put(centerId + "", activeIdList);
+				result.add(temp);
+			}
+		}
+		return result;
 	}
 
 }

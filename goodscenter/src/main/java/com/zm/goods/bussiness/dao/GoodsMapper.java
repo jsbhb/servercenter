@@ -75,4 +75,6 @@ public interface GoodsMapper {
 	
 	void updateActivitiesEnd(Map<String,Object> param);
 	
+	List<Integer> listEndActiveId(@Param("centerId")Integer centerId);
+	
 }

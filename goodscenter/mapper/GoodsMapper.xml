@@ -610,5 +610,9 @@
 	<update id="updateActivitiesEnd">
 		update activity${centerId} set status = 2 where status = 1 and id = #{activeId}
 	</update>
+	
+	<select id="listEndActiveId" parameterType="Object" resultType="java.lang.Integer">
+		select id from activity${centerId} where status = 3
+	</select>
 
 </mapper>

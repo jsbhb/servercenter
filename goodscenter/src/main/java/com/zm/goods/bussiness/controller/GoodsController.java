@@ -243,4 +243,15 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/goods/endactive", method = RequestMethod.GET)
+	public ResultModel getEndActive(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			List<Map<String,Object>> list = goodsService.getEndActive();
+			return new ResultModel(true, list);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

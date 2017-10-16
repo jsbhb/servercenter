@@ -125,7 +125,6 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 				scheduler.pauseTrigger(triggerKey);// 停止触发器
 				scheduler.unscheduleJob(triggerKey);// 移除触发器
 				scheduler.deleteJob(jobKey);// 移除任务
-				scheduler.deleteJob(jobKey);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
