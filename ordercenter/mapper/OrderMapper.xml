@@ -284,4 +284,42 @@
 		select order_id from
 		order_base where create_time &lt;= #{time} and status = 0
 	</select>
+	
+	<!-- 创建邮费表 -->
+	<update id="createExpressFee" parameterType="java.lang.Integer">
+		CREATE TABLE IF NOT EXISTS express_fee_${centerId} (
+		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		  express_key VARCHAR(45) NOT NULL,
+		  name VARCHAR(45) NOT NULL COMMENT '名称',
+		  fee decimal(10,2) NOT NULL COMMENT '默认费用',
+		  weight int UNSIGNED NOT NULL COMMENT '默认重量',
+		  heavy_fee decimal(10,2) NOT NULL COMMENT '续重费用',
+		  include_province VARCHAR(1000) NULL COMMENT '包含省份',
+		  attr VARCHAR(100) NULL COMMENT '备用',
+		  create_time DATETIME NULL,
+		  update_time DATETIME NULL,
+		  opt VARCHAR(20) NULL,
+		  PRIMARY KEY (id)
+		  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '快递费用设置';
+	</update>
+	
+	<update id="createFreeExpressFee" parameterType="java.lang.Integer">
+		CREATE TABLE IF NOT EXISTS free_express_fee_${centerId} (
+		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		  condition_fee decimal(10,2) NOT NULL COMMENT '包邮条件费用',
+		  attr VARCHAR(100) NULL COMMENT '备用',
+		  attr1 VARCHAR(100) NULL COMMENT '备用',
+		  create_time DATETIME NULL,
+		  update_time DATETIME NULL,
+		  opt VARCHAR(20) NULL,
+		  PRIMARY KEY (id)
+		  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		COMMENT = '包邮条件';
+	</update>
+	<!-- end -->
+	
+	<select id="getFreePostFee" parameterType = "Object" resultType="java.lang.Double">
+		select condition_fee from free_express_fee${id}
+	</select>
 </mapper>

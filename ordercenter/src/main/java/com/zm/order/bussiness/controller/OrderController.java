@@ -25,6 +25,7 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.WeiXinPayConfig;
+import com.zm.order.pojo.dto.PostFee;
 
 /**
  * ClassName: OrderController <br/>
@@ -365,6 +366,35 @@ public class OrderController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			orderService.updatePayCustom(orderId);
+			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/order/postfee", method = RequestMethod.POST)
+	public ResultModel getPostFee(@PathVariable("version") Double version, @RequestBody PostFee postFee) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			Double fee = orderService.getPostFee(postFee);
+
+			return new ResultModel(true, fee);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
+	@RequestMapping(value = "{version}/order/table/{centerId}", method = RequestMethod.POST)
+	public ResultModel createTable(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			orderService.createTable(centerId);
+
 			return new ResultModel(true, null);
 		}
 

@@ -10,6 +10,7 @@
 		<result column="customGoodsName" property="customGoodsName"
 			jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="is_popular" property="popular" jdbcType="INTEGER" />
 		<result column="is_hot" property="hot" jdbcType="INTEGER" />
@@ -21,7 +22,7 @@
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 		<result column="brand_id" property="brandId" jdbcType="VARCHAR" />
-		<result column="goodsName" property="goodsName" jdbcType="VARCHAR" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
 		<result column="brand" property="brand" jdbcType="VARCHAR" />
 		<result column="origin" property="origin" jdbcType="VARCHAR" />
 		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
@@ -93,6 +94,7 @@
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="layout_id" property="layoutId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="type_status" property="typeStatus" jdbcType="INTEGER" />
 		<result column="condition_price" property="conditionPrice"
 			jdbcType="NUMERIC" />
@@ -135,8 +137,11 @@
 	<resultMap type="com.zm.goods.pojo.PopularizeDict" id="dict">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="layout_id" property="layoutId" jdbcType="INTEGER" />
-		<result column="picPath" property="picPath" jdbcType="VARCHAR" />
+		<result column="picPath1" property="picPath1" jdbcType="VARCHAR" />
+		<result column="picPath2" property="picPath2" jdbcType="VARCHAR" />
+		<result column="picPath3" property="picPath3" jdbcType="VARCHAR" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="enname" property="enname" jdbcType="VARCHAR" />
 		<result column="first_category" property="firstCategory" jdbcType="INTEGER" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
@@ -170,13 +175,13 @@
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,
-		gi.status,gb.goods_name,gi.supplier_id,
+		gi.status,gb.goods_name,gi.supplier_id,gi.weight,
 		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
 		gi left join
 		goods_category_brand${centerId} gcb on gi.brand_id =
 		gcb.brand_id left join
-		goods_base${centerId}
+		goods_base
 		gb on gi.base_id = gb.id where 1=1 and
 		status = 1
 		<if test="type != null and type != ''">
@@ -208,7 +213,7 @@
 		select
 		gs.id,gs.item_id,gs.goods_id,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,
 		gp.delivery_place,
 		gp.update_time as
@@ -225,7 +230,7 @@
 		select gs.id,gs.info,gs.item_id,gs.goods_id,
 		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,stock.qpqty,
 		gp.delivery_place,
 		gp.update_time as
@@ -247,7 +252,7 @@
 		select gs.id,gs.info,gs.item_id,gs.goods_id ,
 		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gp.discount,gp.create_time
+		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,
 		gp.delivery_place,
 		gp.update_time as
@@ -280,9 +285,9 @@
 		  supplier_id int UNSIGNED NULL COMMENT '商家ID',
 		  base_id int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
 		  goods_name VARCHAR(100) NOT NULL COMMENT '商品名称',
+		  weight int UNSIGNED NOT NULL COMMENT '商品重量（克）',
 		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  type tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
-		  center_id tinyint UNSIGNED NULL COMMENT '大贸运营公司ID',
 		  is_popular tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
 		  is_hot tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
 		  is_good tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否精选0：否，1是',
@@ -298,7 +303,6 @@
 		  UNIQUE INDEX goodsId_UNIQUE (goods_id ASC),
 		  INDEX idx_brand_id (brand_id),
 		  INDEX idx_supplier_id (supplier_id),
-		  INDEX idx_center_id (center_id),
 		  INDEX idx_base_id (base_id),
 		  INDEX idx_status (status),
 		  INDEX idx_type (type),
@@ -431,7 +435,7 @@
 		CREATE TABLE IF NOT EXISTS goods_price_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  item_id varchar(50) NOT NULL COMMENT '商品ID',
-		  min int UNSIGNED NULL COMMENT '最小数量',
+		  min int UNSIGNED NULL DEFAULT 0 COMMENT '最小数量',
 		  max int UNSIGNED NULL COMMENT '最大数量',
 		  price decimal(10,2) NULL DEFAULT 0.0 COMMENT '价格',
 		  vip_price decimal(10,2) NULL COMMENT '会员价格',
@@ -487,17 +491,18 @@
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  layout_id int UNSIGNED NOT NULL COMMENT '布局ID',
 		  name VARCHAR(50) NULL COMMENT '名称',
+		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：新品；1：特推；2：渠道；3精选；4：普通分类',
 		  enname VARCHAR(50) NULL COMMENT '英文名称',
 		  first_category int UNSIGNED NULL COMMENT '一级分类id',
-		  picPath VARCHAR(300) NULL COMMENT '图片地址',
+		  picPath1 VARCHAR(300) NULL COMMENT '图片地址',
+		  picPath2 VARCHAR(300) NULL COMMENT '图片地址',
+  		  picPath3 VARCHAR(300) NULL COMMENT '图片地址',
 		  description VARCHAR(450) NULL COMMENT '描述',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
-		  INDEX idx_page (page),
-		  UNIQUE INDEX uq_layout_id (layout_id),
-		  INDEX idx_code (code)
+		  UNIQUE INDEX uq_layout_id (layout_id)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '推广字典';
 	</update>
@@ -527,6 +532,7 @@
 		CREATE TABLE IF NOT EXISTS activity_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  layout_id int UNSIGNED NOT NULL COMMENT '布局ID',
+		  name VARCHAR(50) NULL COMMENT '活动名称',
 		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：限时促销；1：满减；2：满打折',
 		  type_status tinyint UNSIGNED NULL DEFAULT 0 COMMENT '类型：0：特定区域；1：全场；',
 		  condition_price DECIMAL(10,2) NULL COMMENT '满多少条件',
@@ -584,7 +590,7 @@
 	<!-- 建表语句END -->
 	
 	<select id="listLayout" parameterType="Object" resultMap="layout">
-		select * from layout${centerId} where page = #{page} and is_show = 1;
+		select * from layout${centerId} where page = #{page} and is_show = 1 
 	</select>
 	
 	<select id="listActiveData" parameterType="Object"  resultMap = "activityData">
@@ -613,6 +619,47 @@
 	
 	<select id="listEndActiveId" parameterType="Object" resultType="java.lang.Integer">
 		select id from activity${centerId} where status = 3
+	</select>
+	
+	<!-- Lucene -->
+	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
+		select gi.id, gi.status, gi.goods_id, gi.create_time, gi.weight, gi.goods_name as customGoodsName ,gcb.brand ,gb.origin
+		from goods_item${centerId} gi left join goods_category_brand${centerId} gcb on gi.brand_id = gcb.brand_id 
+		left join goods_base gb on gi.base_id = gb.id
+		where index_status = 0
+	</select>
+	
+	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
+		select gs.info,gp.id as price_id, gp.price, gs.discount from goods_specs${centerId} gs left join
+		goods_price${centerId} gp on
+		gs.item_id = gp.item_id  where gs.goods_id = #{goodsId}
+	</select>
+	
+	<update id="updateLuceneStatus" parameterType="Object">
+		update goods_item${centerId} set index_status = 1 where index_status = 0;
+	</update>
+	
+	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,
+		gi.status,gi.supplier_id,gi.weight,
+		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		from goods_item${centerId}
+		gi left join
+		goods_category_brand${centerId} gcb on gi.brand_id =
+		gcb.brand_id left join
+		goods_base
+		gb on gi.base_id = gb.id where gi.goods_id in
+		<foreach item="id" index="index" collection="list" open="("
+			separator="," close=")">
+			#{id}
+		</foreach>
+		<if test="sortList != null and sortList != ''">
+			order by 
+			<foreach item="sort" index="index" collection="sortList" open=""
+				separator="," close="">
+				${sort.sortField} ${sort.sortRule} 
+			</foreach>
+		</if>
 	</select>
 
 </mapper>

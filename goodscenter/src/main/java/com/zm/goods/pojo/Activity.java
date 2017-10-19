@@ -9,6 +9,10 @@ public class Activity {
 
 	private Integer id;
 	
+	private String code;
+	
+	private String name;
+	
 	private Integer layoutId;
 	
 	private Integer type;//0:限时特推；1：满多少打几折；2：满多少减多少
@@ -30,6 +34,22 @@ public class Activity {
 	private String endTime;
 	
 	private String opt;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	public Integer getLayoutId() {
 		return layoutId;
@@ -218,6 +238,5 @@ public class Activity {
 				+ conditionPrice + ", discount=" + discount + ", status=" + status + ", attr=" + attr + ", description="
 				+ description + ", startTime=" + startTime + ", endTime=" + endTime + ", opt=" + opt + "]";
 	}
-	
 	
 }

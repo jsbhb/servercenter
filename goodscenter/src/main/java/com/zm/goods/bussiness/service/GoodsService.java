@@ -10,6 +10,10 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.base.Pagination;
+import com.zm.goods.pojo.base.SortModelList;
+import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.vo.PageModule;
 
 public interface GoodsService {
 
@@ -41,7 +45,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<GoodsFile> listGoodsFile(Integer goodsId);
+	List<GoodsFile> listGoodsCookFile(String goodsId);
 
 	/**
 	 * listBigTradeGoods:获取大贸海蒸鲜商品购买也信息. <br/>
@@ -72,7 +76,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, String centerId);
+	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId);
 
 	/**
 	 * getActivity:获取活动信息. <br/>
@@ -112,7 +116,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Map<Object, Object> getModularData(String page, Layout layout, Integer centerId);
+	List<PageModule> getModularData(String page, Layout layout, Integer centerId);
 
 	/**
 	 * updateActiveStart:开始活动. <br/>
@@ -142,5 +146,25 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<Map<String, Object>> getEndActive();
+	Map<String, Object> getEndActive();
+	
+	/**
+	 * createGoodsLucene:创建商品lucene索引数据. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void createGoodsLucene(Integer centerId);
+
+	/**
+	 * queryMember:商城搜索lucene. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination);
 }

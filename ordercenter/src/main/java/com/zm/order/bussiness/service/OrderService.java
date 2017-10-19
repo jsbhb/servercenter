@@ -13,6 +13,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.dto.PostFee;
 
 /**
  * ClassName: OrderService <br/>
@@ -207,4 +208,24 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	void updatePayCustom(String orderId);
+
+	/**
+	 * getPostFee:获取订单邮费. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Double getPostFee(PostFee postFee);
+
+	/**
+	 * createTable:创建邮费数据表. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void createTable(Integer centerId);
 }

@@ -35,6 +35,7 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.WeiXinPayConfig;
+import com.zm.order.pojo.dto.PostFee;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
@@ -400,5 +401,32 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void updatePayCustom(String orderId) {
 		orderMapper.updatePayCustom(orderId);
+	}
+
+	@Override
+	public Double getPostFee(PostFee postFee) {
+		Double conditionFee = orderMapper.getFreePostFee(judgeCenterId(postFee.getCenterId()));
+		if(conditionFee == null){
+			
+		} else {
+			
+		}
+		return null;
+	}
+
+	@Override
+	public void createTable(Integer centerId) {
+		orderMapper.createExpressFee(centerId);
+		orderMapper.createFreeExpressFee(centerId);
+	}
+	
+	private String judgeCenterId(Integer id) {
+		String centerId;
+		if (Constants.BIG_TRADE_CENTERID.equals(id) || Constants.O2O_CENTERID.equals(id)) {
+			centerId = "";
+		} else {
+			centerId = "_" + id;
+		}
+		return centerId;
 	}
 }

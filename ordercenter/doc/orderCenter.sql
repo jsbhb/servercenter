@@ -203,3 +203,54 @@ CREATE TABLE `zm_order`.`order_search_parameter` (
   INDEX `idx_apiName` (`api_name` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单字段表';
+
+
+
+drop table if exists  `zm_order`.`express`;
+
+CREATE TABLE `zm_order`.`express` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `express_key` VARCHAR(45) NOT NULL,
+  `express_name` VARCHAR(45) NOT NULL COMMENT '快递公司名称',
+  `default_fee` decimal(10,2) NOT NULL COMMENT '默认费用',
+  `attr` VARCHAR(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(20) NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uk_express_key` (`express_key` ASC),
+  INDEX `idx_express_key` (`express_key` ASC)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '快递公司';
+
+drop table if exists  `zm_order`.`express_fee`;
+
+CREATE TABLE `zm_order`.`express_fee` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `express_key` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(45) NOT NULL COMMENT '名称',
+  `fee` decimal(10,2) NOT NULL COMMENT '默认费用',
+  `weight` int UNSIGNED NOT NULL COMMENT '默认重量',
+  `heavy_fee` decimal(10,2) NOT NULL COMMENT '续重费用',
+  `include_province` VARCHAR(1000) NULL COMMENT '包含省份',
+  `attr` VARCHAR(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(20) NULL,
+  PRIMARY KEY (`id`)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '快递费用设置';
+
+drop table if exists  `zm_order`.`express_fee`;
+
+CREATE TABLE `zm_order`.`free_express_fee` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `condition_fee` decimal(10,2) NOT NULL COMMENT '包邮条件费用',
+  `attr` VARCHAR(100) NULL COMMENT '备用',
+  `attr1` VARCHAR(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(20) NULL,
+  PRIMARY KEY (`id`)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '包邮条件';

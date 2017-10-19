@@ -39,5 +39,11 @@ public class Constants {
 	
 	public static final Integer FULL_DISCOUNT = 2;//满打折
 	
+	//*******************区域中心ID**********************
+	
+	public static final Integer O2O_CENTERID = 1;
+	
+	public static final Integer BIG_TRADE_CENTERID = 2;
+	
 
 }

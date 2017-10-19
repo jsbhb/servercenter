@@ -3,6 +3,8 @@ package com.zm.order.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
@@ -64,4 +66,10 @@ public interface OrderMapper {
 	List<CustomModel> listPayCustomOrder();
 	
 	void updatePayCustom(String orderId);
+	
+	void createFreeExpressFee(@Param("centerId") Integer centerId);
+	
+	void createExpressFee(@Param("centerId") Integer centerId);
+	
+	Double getFreePostFee(@Param("id") String id);
 }

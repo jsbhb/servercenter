@@ -16,6 +16,7 @@ import com.zm.user.constants.Constants;
 import com.zm.user.constants.LogConstants;
 import com.zm.user.feignclient.GoodsFeignClient;
 import com.zm.user.feignclient.LogFeignClient;
+import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
 import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.feignclient.model.PayModel;
@@ -51,6 +52,9 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	LogFeignClient logFeignClient;
+	
+	@Resource
+	OrderFeignClient orderFeignClient;
 
 	@Resource
 	PayFeignClient payFeignClient;
@@ -374,6 +378,8 @@ public class UserServiceImpl implements UserService {
 		
 		if(flag){
 			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
+			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
+			
 		}
 		return result;
 	}

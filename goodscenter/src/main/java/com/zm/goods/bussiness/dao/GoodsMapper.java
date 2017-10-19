@@ -75,6 +75,14 @@ public interface GoodsMapper {
 	
 	void updateActivitiesEnd(Map<String,Object> param);
 	
-	List<Integer> listEndActiveId(@Param("centerId")Integer centerId);
+	List<Integer> listEndActiveId(@Param("centerId")String centerId);
+	
+	List<GoodsItem> listGoodsForLucene(@Param("centerId")String centerId);
+	
+	List<GoodsSpecs> listSpecsForLucene(Map<String,Object> param);
+	
+	void updateLuceneStatus(@Param("centerId")String centerId);
+
+	List<GoodsItem> queryGoodsItem(Map<String, Object> searchParm);
 	
 }

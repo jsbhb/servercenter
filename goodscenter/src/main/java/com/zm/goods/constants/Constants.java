@@ -18,4 +18,15 @@ public class Constants {
 	
 	public static final Integer ACTIVE_MODEL = 1;//活动模块
 	
+	//********************LUCENE*************************
+	public static final String TOTAL = "total";
+	
+	public static final String ID_LIST = "idList";
+	
+	public static final String HIGHLIGHTER_MODEL = "highlighterModel";
+	
+	public static final String BRAND = "brand";
+	
+	public static final String ORIGIN = "origin";
+	
 }

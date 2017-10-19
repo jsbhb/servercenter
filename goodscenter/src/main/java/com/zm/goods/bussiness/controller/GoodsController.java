@@ -21,9 +21,11 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
-import com.zm.goods.pojo.Pagination;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.base.Pagination;
+import com.zm.goods.pojo.base.SortModelList;
+import com.zm.goods.pojo.dto.GoodsSearch;
 
 /**
  * ClassName: GoodsController <br/>
@@ -40,6 +42,19 @@ public class GoodsController {
 
 	@Resource
 	GoodsService goodsService;
+
+	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
+	public ResultModel listGoods(@PathVariable("version") Double version, Pagination pagination,
+			GoodsSearch searchModel, SortModelList sortList) {
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
+			return new ResultModel(true, resultMap);
+		}
+		
+		return new ResultModel(false,"版本错误");
+
+	}
 
 	@RequestMapping(value = "auth/{version}/goods", method = RequestMethod.GET)
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
@@ -132,7 +147,8 @@ public class GoodsController {
 
 		ResultModel result = new ResultModel();
 		String ids = req.getParameter("ids");
-		String centerId = req.getParameter("centerId");
+		Integer centerId = Integer.valueOf(req.getParameter("centerId"));
+		
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -225,31 +241,43 @@ public class GoodsController {
 			@PathVariable("centerId") Integer centerId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			goodsService.updateActiveStart(centerId,activeId);
+			goodsService.updateActiveStart(centerId, activeId);
 			return new ResultModel(true, null);
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/active/end/{centerId}/{activeId}", method = RequestMethod.POST)
 	public ResultModel endActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
 			@PathVariable("centerId") Integer centerId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			goodsService.updateActiveEnd(centerId,activeId);
+			goodsService.updateActiveEnd(centerId, activeId);
 			return new ResultModel(true, null);
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/endactive", method = RequestMethod.GET)
 	public ResultModel getEndActive(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			List<Map<String,Object>> list = goodsService.getEndActive();
-			return new ResultModel(true, list);
+			Map<String, Object> result = goodsService.getEndActive();
+			return new ResultModel(true, result);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/createlucene", method = RequestMethod.GET)
+	public ResultModel createLucene(@PathVariable("version") Double version, @RequestParam("centerId") Integer centerId){
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			goodsService.createGoodsLucene(centerId);
+			return new ResultModel(true, null);
 		}
 
 		return new ResultModel(false, "版本错误");

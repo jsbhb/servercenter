@@ -29,8 +29,8 @@ public class ActivityTimeTaskJob {
 	public void removeActiveTimeTask() throws Exception {
 		ResultModel resultModel = goodsFeignClient.getEndActive(Constants.FIRST_VERSION);
 		if (resultModel.isSuccess()) {
-			List<Map<String, Object>> list = (List<Map<String, Object>>) resultModel.getObj();
-			for (Map<String, Object> map : list) {
+			Map<String, Object> map = (Map<String, Object>) resultModel.getObj();
+			if (map != null ) {
 				for (Map.Entry<String, Object> entry : map.entrySet()) {
 					List<Integer> activeIdList = (List<Integer>) entry.getValue();
 					if (activeIdList != null && activeIdList.size() > 0) {

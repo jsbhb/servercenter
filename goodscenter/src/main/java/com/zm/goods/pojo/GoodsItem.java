@@ -12,6 +12,8 @@ public class GoodsItem extends GoodsBase {
 	private Integer supplierId;
 
 	private String customGoodsName;
+	
+	private Integer weight;
 
 	private Integer status;
 
@@ -36,10 +38,38 @@ public class GoodsItem extends GoodsBase {
 	private Set<String> specsInfo;
 
 	private String opt;
-
+	
+	private Double price;
+	
+	private Double realPrice;
+	
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+
+	public Integer getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Integer weight) {
+		this.weight = weight;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
+	public Double getRealPrice() {
+		return realPrice;
+	}
+
+	public void setRealPrice(Double realPrice) {
+		this.realPrice = realPrice;
+	}
 
 	public Integer getId() {
 		return id;
