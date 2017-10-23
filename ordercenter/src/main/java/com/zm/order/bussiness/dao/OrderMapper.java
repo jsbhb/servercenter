@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.zm.order.pojo.CustomModel;
+import com.zm.order.pojo.Express;
+import com.zm.order.pojo.ExpressFee;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -72,4 +74,10 @@ public interface OrderMapper {
 	void createExpressFee(@Param("centerId") Integer centerId);
 	
 	Double getFreePostFee(@Param("id") String id);
+	
+	ExpressFee getExpressFee(Map<String,Object> param);
+	
+	Double getDefaultFee(@Param("carrierKey") String carrierKey);
+	
+	List<Express> listExpress();
 }

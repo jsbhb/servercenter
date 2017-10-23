@@ -22,6 +22,8 @@ public class GoodsItem extends GoodsBase {
 	private Integer popular;
 
 	private Integer hot;
+	
+	private Integer fresh;
 
 	private Integer good;
 
@@ -43,9 +45,27 @@ public class GoodsItem extends GoodsBase {
 	
 	private Double realPrice;
 	
+	private String thirdCategory;
+	
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+
+	public Integer getFresh() {
+		return fresh;
+	}
+
+	public void setFresh(Integer fresh) {
+		this.fresh = fresh;
+	}
+
+	public String getThirdCategory() {
+		return thirdCategory;
+	}
+
+	public void setThirdCategory(String thirdCategory) {
+		this.thirdCategory = thirdCategory;
+	}
 
 	public Integer getWeight() {
 		return weight;

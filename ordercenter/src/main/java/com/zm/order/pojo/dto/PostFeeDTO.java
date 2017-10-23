@@ -1,6 +1,6 @@
 package com.zm.order.pojo.dto;
 
-public class PostFee {
+public class PostFeeDTO {
 
 	private Double price;
 	
@@ -11,6 +11,15 @@ public class PostFee {
 	private Integer weight;
 	
 	private Integer centerId;
+	
+	public PostFeeDTO(){}
+	
+	public PostFeeDTO(Double price,String province, Integer weight, Integer centerId){
+		this.price = price;
+		this.province = province;
+		this.weight = weight;
+		this.centerId = centerId;
+	}
 
 	public Integer getCenterId() {
 		return centerId;

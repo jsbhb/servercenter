@@ -14,6 +14,9 @@ import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
+import com.zm.goods.pojo.Tax;
+import com.zm.goods.pojo.vo.GoodsIndustryModel;
+import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 public interface GoodsMapper {
 
@@ -84,5 +87,13 @@ public interface GoodsMapper {
 	void updateLuceneStatus(@Param("centerId")String centerId);
 
 	List<GoodsItem> queryGoodsItem(Map<String, Object> searchParm);
+	
+	List<GoodsIndustryModel> queryGoodsCategory(@Param("centerId")String centerId);
+	
+	Tax getTax(Map<String,Object> param);
+	
+	List<WarehouseModel> listWarehouse(Map<String,Object> param);
+	
+	void updateStock(Map<String,Object> param);
 	
 }

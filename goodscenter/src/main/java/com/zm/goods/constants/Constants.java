@@ -29,4 +29,8 @@ public class Constants {
 	
 	public static final String ORIGIN = "origin";
 	
+	//*********************订单类型*********************
+	
+	public static final Integer O2O_ORDER = 0;
+	
 }

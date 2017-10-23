@@ -14,9 +14,11 @@
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="is_popular" property="popular" jdbcType="INTEGER" />
 		<result column="is_hot" property="hot" jdbcType="INTEGER" />
+		<result column="is_new" property="fresh" jdbcType="INTEGER" />
 		<result column="is_good" property="good" jdbcType="INTEGER" />
 		<result column="is_choice" property="choice" jdbcType="INTEGER" />
 		<result column="detail_path" property="detailPath" jdbcType="VARCHAR" />
+		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
 		<result column="index_status" property="indexStatus" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -53,6 +55,7 @@
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
 		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="discount" property="discount" jdbcType="NUMERIC" />
 		<result column="info" property="info" jdbcType="VARCHAR" />
 		<result column="qpqty" property="stock" jdbcType="INTEGER" />
@@ -100,6 +103,8 @@
 			jdbcType="NUMERIC" />
 		<result column="discount" property="discount" jdbcType="NUMERIC" />
 		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="href" property="href" jdbcType="VARCHAR" />
+		<result column="picPath" property="picPath" jdbcType="VARCHAR" />
 		<result column="attr" property="attr" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
 		<result column="start_time" property="startTime" jdbcType="VARCHAR" />
@@ -141,6 +146,7 @@
 		<result column="picPath2" property="picPath2" jdbcType="VARCHAR" />
 		<result column="picPath3" property="picPath3" jdbcType="VARCHAR" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="href" property="href" jdbcType="VARCHAR" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="enname" property="enname" jdbcType="VARCHAR" />
 		<result column="first_category" property="firstCategory" jdbcType="INTEGER" />
@@ -164,6 +170,48 @@
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.vo.GoodsIndustryModel" id="goodsIndustry">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<id column="first_id" property="firstId" jdbcType="VARCHAR" />
+		<result column="industryName" property="industryName" jdbcType="VARCHAR" />
+		<collection ofType="com.zm.goods.pojo.vo.GoodsCategoryModel" property="dictList">
+			<id column="dictid" property="id" jdbcType="INTEGER" />
+			<id column="second_id" property="secondId" jdbcType="VARCHAR" />
+			<result column="dictName" property="dictName" jdbcType="VARCHAR" />
+			<collection property="entryList" ofType = "com.zm.goods.pojo.vo.GoodsCategoryEnteryModel">
+				<id column="entryId" property="id" jdbcType="INTEGER" />
+				<id column="third_id" property="thirdId" jdbcType="VARCHAR" />
+				<result column="entryName" property="entryName" jdbcType="VARCHAR" />
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.Tax" id="tax">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC" />
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.processWarehouse.model.WarehouseModel" id="stockModel">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="sjqty" property="sjqty" jdbcType="INTEGER" />
+		<result column="frozenqty" property="frozenqty" jdbcType="INTEGER" />
+		<result column="lockedqty" property="lockedqty" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="getTax" parameterType="Object" resultMap="tax">
+		select gi.excise_tax,gb.increment_tax from goods_specs${centerId} gs left join goods_item${centerId} gi on 
+		gs.goods_id = gi.goods_id left join goods_base gb on gi.base_id = gb.id
+	</select>
+	
+	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
+		select gfc.id,gfc.name as industryName,gfc.first_id,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
+		gtc.id as entryId,gtc.name as entryName ,gtc.third_id
+		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.first_id = gsc.first_id 
+		left join goods_third_category${centerId} gtc on gsc.second_id = gtc.second_id order by gfc.id
+	</select>
 
 	<select id="getActivity" parameterType="Object" resultMap="activity">
 		select * from activity${centerId} where type_status = #{typeStatus} and status =
@@ -176,7 +224,7 @@
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,
 		gi.status,gb.goods_name,gi.supplier_id,gi.weight,
-		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gi.brand_id,gcb.brand,gb.origin,gi.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
 		gi left join
 		goods_category_brand${centerId} gcb on gi.brand_id =
@@ -185,11 +233,10 @@
 		gb on gi.base_id = gb.id where 1=1 and
 		status = 1
 		<if test="type != null and type != ''">
-			and gcb.type = #{type} and gi.type = #{type,jdbcType =
-			INTEGER}
+			gi.type = #{type,jdbcType = INTEGER}
 		</if>
 		<if test="categoryId != null and categoryId != ''">
-			and gcb.third_category = #{categoryId,jdbcType = VARCHAR}
+			and gi.third_category = #{categoryId,jdbcType = VARCHAR}
 		</if>
 		<if test="goodsId != null and goodsId != ''">
 			and gi.goods_id = #{goodsId, jdbcType = VARCHAR}
@@ -227,7 +274,7 @@
 	</select>
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id,
+		select gs.id,gs.info,gs.item_id,gs.goods_id,gi.weight,
 		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
@@ -244,7 +291,7 @@
 			goods_stock${centerId} stock
 		</if>
 		on gs.item_id =
-		stock.item_id where gs.item_id = #{itemId}
+		stock.item_id left join goods_item${centerId} gi on gs.goods_id = gi.goods_id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
@@ -288,8 +335,10 @@
 		  weight int UNSIGNED NOT NULL COMMENT '商品重量（克）',
 		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  type tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
+		  third_category VARCHAR(100) NOT NULL COMMENT '三级分类id',
 		  is_popular tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
 		  is_hot tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
+		  is_new tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
 		  is_good tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否精选0：否，1是',
 		  is_choice tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否渠道商品0：否，1是',
 		  is_free_postfee tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包邮0：否，1是',
@@ -301,6 +350,7 @@
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX id_UNIQUE (id ASC),
 		  UNIQUE INDEX goodsId_UNIQUE (goods_id ASC),
+		  INDEX idx_third_category (third_category),
 		  INDEX idx_brand_id (brand_id),
 		  INDEX idx_supplier_id (supplier_id),
 		  INDEX idx_base_id (base_id),
@@ -308,6 +358,7 @@
 		  INDEX idx_type (type),
 		  INDEX idx_is_popular (is_popular),
 		  INDEX idx_is_hot (is_hot),
+		  INDEX idx_is_new (is_new),
 		  INDEX idx_is_good (is_good),
 		  INDEX idx_is_choice (is_choice)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品基本信息表';
@@ -386,23 +437,13 @@
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  brand_id VARCHAR(100) NULL COMMENT '品牌名称',
 		  brand VARCHAR(100) NULL COMMENT '品牌名称',
-		  type tinyint UNSIGNED NOT NULL COMMENT '0:大贸；1：跨境',
-		  first_category VARCHAR(100) NOT NULL COMMENT '一级分类id',
-		  first_name VARCHAR(100) NULL COMMENT '一级分类名称',
-		  second_category VARCHAR(100) NOT NULL COMMENT '二级分类id',
-		  second_name VARCHAR(100) NULL COMMENT '二级分类名称',
-		  third_category VARCHAR(100) NOT NULL COMMENT '三级分类id',
-		  third_name VARCHAR(100) NULL COMMENT '三级分类名称',
+		  attr VARCHAR(100) NULL COMMENT '备用',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX id_UNIQUE (brand_id ASC),
-		  INDEX goods_category_brand_brand (brand),
-		  INDEX idx_first_category (first_category),
-		  INDEX idx_type (type), 
-		  INDEX idx_second_category (second_category),
-		  INDEX idx_third_category (third_category)
+		  INDEX goods_category_brand_brand (brand)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '商品分类品牌表';
 	</update>
@@ -491,6 +532,7 @@
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  layout_id int UNSIGNED NOT NULL COMMENT '布局ID',
 		  name VARCHAR(50) NULL COMMENT '名称',
+		  href VARCHAR(300) NULL COMMENT '跳转地址',
 		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：新品；1：特推；2：渠道；3精选；4：普通分类',
 		  enname VARCHAR(50) NULL COMMENT '英文名称',
 		  first_category int UNSIGNED NULL COMMENT '一级分类id',
@@ -533,11 +575,13 @@
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  layout_id int UNSIGNED NOT NULL COMMENT '布局ID',
 		  name VARCHAR(50) NULL COMMENT '活动名称',
+		  href VARCHAR(300) NULL COMMENT '跳转地址',
 		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：限时促销；1：满减；2：满打折',
 		  type_status tinyint UNSIGNED NULL DEFAULT 0 COMMENT '类型：0：特定区域；1：全场；',
 		  condition_price DECIMAL(10,2) NULL COMMENT '满多少条件',
 		  discount decimal(10,2) NULL COMMENT '促销折扣',
 		  status tinyint UNSIGNED NULL DEFAULT 0 COMMENT '状态0:结束；1：正常',
+		  picPath VARCHAR(200) NULL COMMENT '图片地址',
 		  attr VARCHAR(50) NULL COMMENT '备用字段',
 		  description VARCHAR(450) NULL COMMENT '描述',
 		  start_time DATETIME NULL COMMENT '开始时间',
@@ -640,19 +684,21 @@
 	</update>
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
-		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,
-		gi.status,gi.supplier_id,gi.weight,
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
+		gi.status,gi.supplier_id,gi.weight,gi.create_time,
 		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
 		gi left join
 		goods_category_brand${centerId} gcb on gi.brand_id =
 		gcb.brand_id left join
 		goods_base
-		gb on gi.base_id = gb.id where gi.goods_id in
+		gb on gi.base_id = gb.id left join goods_specs${centerId} gs on gi.goods_id = gs.goods_id 
+		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
 			#{id}
 		</foreach>
+		group by gi.goods_id
 		<if test="sortList != null and sortList != ''">
 			order by 
 			<foreach item="sort" index="index" collection="sortList" open=""
@@ -661,5 +707,25 @@
 			</foreach>
 		</if>
 	</select>
+	
+	<select id="listWarehouse" parameterType="Object" resultMap = "stockModel">
+		select * from goods_stock${centerId} where item_id in
+		<foreach item="item" index="index" collection="list" open="("
+				separator="," close=")">
+				#{item}
+		</foreach>
+	</select>
+	
+	<update id="updateStock" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update goods_stock${centerId}
+			<set>
+				sjqty = ifnull(sjqty,0) - #{item.frozenqty},
+				frozenqty = ifnull(frozenqty,0) + #{item.frozenqty}
+			</set>
+			where item_id = #{item.itemId}
+		</foreach>
+	</update>
 
 </mapper>

@@ -13,6 +13,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
 
 public interface GoodsService {
@@ -167,4 +168,14 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination);
+
+	/**
+	 * loadIndexNavigation:获取导航栏. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<GoodsIndustryModel> loadIndexNavigation(Integer centerId);
 }

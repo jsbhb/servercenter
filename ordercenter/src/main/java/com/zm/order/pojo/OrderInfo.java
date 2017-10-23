@@ -29,10 +29,6 @@ public class OrderInfo {
 
 	private Integer tdq;
 
-	private String carrierKey;
-
-	private String expressId;
-
 	private String gtime;
 
 	private String sendTime;
@@ -50,6 +46,8 @@ public class OrderInfo {
 	private OrderDetail orderDetail;
 
 	private List<OrderGoods> orderGoodsList;
+	
+	private List<OrderExpress> orderExpressList;
 	
 	private String startTime;
 	
@@ -175,22 +173,6 @@ public class OrderInfo {
 		this.tdq = tdq;
 	}
 
-	public String getCarrierKey() {
-		return carrierKey;
-	}
-
-	public void setCarrierKey(String carrierKey) {
-		this.carrierKey = carrierKey;
-	}
-
-	public String getExpressId() {
-		return expressId;
-	}
-
-	public void setExpressId(String expressId) {
-		this.expressId = expressId;
-	}
-
 	public String getGtime() {
 		return gtime;
 	}
@@ -247,15 +229,23 @@ public class OrderInfo {
 		this.orderGoodsList = orderGoodsList;
 	}
 
+	public List<OrderExpress> getOrderExpressList() {
+		return orderExpressList;
+	}
+
+	public void setOrderExpressList(List<OrderExpress> orderExpressList) {
+		this.orderExpressList = orderExpressList;
+	}
+
 	@Override
 	public String toString() {
 		return "OrderInfo [id=" + id + ", orderId=" + orderId + ", combinationId=" + combinationId + ", userId="
 				+ userId + ", status=" + status + ", expressType=" + expressType + ", centerId=" + centerId
 				+ ", shopId=" + shopId + ", guideId=" + guideId + ", supplierId=" + supplierId + ", tdq=" + tdq
-				+ ", carrierKey=" + carrierKey + ", expressId=" + expressId + ", gtime=" + gtime + ", sendTime="
-				+ sendTime + ", createTime=" + createTime + ", updateTime=" + updateTime + ", remark=" + remark
-				+ ", orderFlag=" + orderFlag + ", statusArr=" + statusArr + ", orderDetail=" + orderDetail
-				+ ", orderGoodsList=" + orderGoodsList + ", startTime=" + startTime + ", endTime=" + endTime + "]";
+				+ ", gtime=" + gtime + ", sendTime=" + sendTime + ", createTime=" + createTime + ", updateTime="
+				+ updateTime + ", remark=" + remark + ", orderFlag=" + orderFlag + ", statusArr=" + statusArr
+				+ ", orderDetail=" + orderDetail + ", orderGoodsList=" + orderGoodsList + ", orderExpressList="
+				+ orderExpressList + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
 
 }

@@ -26,10 +26,13 @@ import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
+import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.CommonUtils;
 import com.zm.goods.utils.JSONUtil;
@@ -49,6 +52,9 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	UserFeignClient userFeignClient;
+	
+	@Resource
+	ProcessWarehouse processWarehouse;
 
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param) {
@@ -162,6 +168,8 @@ public class GoodsServiceImpl implements GoodsService {
 			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
+		Map<String,Object> map = new HashMap<String,Object>();
+		Map<Tax,Double> taxMap = new HashMap<Tax,Double>(); 
 
 		Map<String, Object> param = new HashMap<String, Object>();
 		String id = judgeCenterId(centerId);
@@ -169,41 +177,76 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("orderFlag", orderFlag);
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
-		for (OrderBussinessModel model : list) {
-
-			param.put("itemId", model.getItemId());
-			specs = goodsMapper.getGoodsSpecs(param);
-			getPriceInterval(specs);
-			boolean calculation = false;
-			for (GoodsPrice price : specs.getPriceList()) {
-				boolean flag = model.getQuantity() >= price.getMin()
-						&& (price.getMax() == null || model.getQuantity() <= price.getMax());
-				if (flag) {
-					if (model.getDeliveryPlace() != null) {
-						if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
-							totalAmount += model.getQuantity() * (vip
-									? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
-							calculation = true;
-						}
-					} else {
-						totalAmount += model.getQuantity()
-								* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
-						calculation = true;
-					}
+		Integer weight = 0;
+		if(Constants.O2O_ORDER.equals(orderFlag)){
+			for (OrderBussinessModel model : list){
+				param.put("itemId", model.getItemId());
+				Tax tax = goodsMapper.getTax(param);
+				specs = goodsMapper.getGoodsSpecs(param);
+				weight += specs.getWeight() * model.getQuantity();
+				if(taxMap.get(tax) == null){
+					Double amount = 0.0;
+					amount = getAmount(vip, specs, model);
+					taxMap.put(tax, amount);
+				} else {
+					taxMap.put(tax, taxMap.get(tax)+getAmount(vip, specs, model));
 				}
 			}
-			if (!calculation) {
-				totalAmount += model.getQuantity() * (vip ? specs.getVipMinPrice() : specs.getMinPrice());
+			map.put("tax", taxMap);
+			for(Map.Entry<Tax, Double> entry : taxMap.entrySet()){
+				totalAmount += entry.getValue();
+			}
+		} else {
+			for (OrderBussinessModel model : list) {
+				
+				param.put("itemId", model.getItemId());
+				specs = goodsMapper.getGoodsSpecs(param);
+				weight += specs.getWeight() * model.getQuantity();
+				totalAmount += getAmount(vip, specs, model);
 			}
 		}
 
 		if (delStock) {
-			// TODO 用线程池对每个itemID加锁？
+			boolean enough = processWarehouse.processWarehouse(centerId, orderFlag, list);
+			if(!enough){
+				result.setSuccess(false);
+				result.setErrorMsg("库存不足");
+				return result;
+			}
 		}
 
+		map.put("weight", weight);
+		map.put("totalAmount", totalAmount);
 		result.setSuccess(true);
-		result.setObj(totalAmount);
+		result.setObj(map);
 		return result;
+	}
+
+	private Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model) {
+		Double totalAmount = 0.0;
+		getPriceInterval(specs);
+		boolean calculation = false;
+		for (GoodsPrice price : specs.getPriceList()) {
+			boolean flag = model.getQuantity() >= price.getMin()
+					&& (price.getMax() == null || model.getQuantity() <= price.getMax());
+			if (flag) {
+				if (model.getDeliveryPlace() != null) {
+					if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
+						totalAmount += model.getQuantity() * (vip
+								? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
+						calculation = true;
+					}
+				} else {
+					totalAmount += model.getQuantity()
+							* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
+					calculation = true;
+				}
+			}
+		}
+		if (!calculation) {
+			totalAmount += model.getQuantity() * (vip ? specs.getVipMinPrice() : specs.getMinPrice());
+		}
+		return totalAmount;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -563,6 +606,13 @@ public class GoodsServiceImpl implements GoodsService {
 		resultMap.put(Constants.ORIGIN, luceneMap.get(Constants.ORIGIN));
 
 		return resultMap;
+	}
+
+	@Override
+	public List<GoodsIndustryModel> loadIndexNavigation(Integer centerId) {
+		String id = judgeCenterId(centerId);
+
+		return goodsMapper.queryGoodsCategory(id);
 	}
 
 }

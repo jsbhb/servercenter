@@ -21,6 +21,8 @@ public class Activity {
 	
 	private Double conditionPrice;
 	
+	private String picPath;
+	
 	private Double discount;
 	
 	private Integer status;
@@ -34,6 +36,24 @@ public class Activity {
 	private String endTime;
 	
 	private String opt;
+	
+	private String href;
+
+	public String getHref() {
+		return href;
+	}
+
+	public void setHref(String href) {
+		this.href = href;
+	}
+
+	public String getPicPath() {
+		return picPath;
+	}
+
+	public void setPicPath(String picPath) {
+		this.picPath = picPath;
+	}
 
 	public String getName() {
 		return name;

@@ -17,6 +17,7 @@
 		<module>3rdcenter</module>
 		<module>paycenter</module>
 		<module>timetakscenter</module>
+		<module>suppliercenter</module>
 	</modules>
 	
 	<parent>

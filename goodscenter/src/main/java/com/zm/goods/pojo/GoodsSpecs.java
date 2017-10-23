@@ -32,6 +32,8 @@ public class GoodsSpecs implements Serializable{
 	
 	private String info;
 	
+	private Integer weight;
+	
 	private String createTime;
 	
 	private String updateTime;
@@ -49,6 +51,14 @@ public class GoodsSpecs implements Serializable{
 	private Integer stock;
 	
 	private List<GoodsPrice> priceList;
+
+	public Integer getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Integer weight) {
+		this.weight = weight;
+	}
 
 	public Double getDiscount() {
 		return discount;

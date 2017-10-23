@@ -7,13 +7,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.CustomModel;
+import com.zm.order.pojo.Express;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
-import com.zm.order.pojo.dto.PostFee;
+import com.zm.order.pojo.dto.PostFeeDTO;
 
 /**
  * ClassName: OrderService <br/>
@@ -217,7 +218,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Double getPostFee(PostFee postFee);
+	Double getPostFee(PostFeeDTO postFee);
 
 	/**
 	 * createTable:创建邮费数据表. <br/>
@@ -228,4 +229,14 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	void createTable(Integer centerId);
+
+	/**
+	 * listExpress:获取快递公司. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<Express> listExpress();
 }

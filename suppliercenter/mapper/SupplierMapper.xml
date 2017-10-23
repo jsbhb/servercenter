@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.supplier.bussiness.dao.SupplierMapper">
+
+	<resultMap type="com.zm.supplier.pojo.Express" id="express">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+		<result column="express_name" property="expressName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="listExpressBySupplierId" parameterType="Object" resultMap="express">
+		select * from supplier_express where supplier_id = #{supplierId}
+	</select>
+</mapper>

@@ -27,6 +27,8 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.CustomModel;
+import com.zm.order.pojo.Express;
+import com.zm.order.pojo.ExpressFee;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -34,8 +36,9 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.Tax;
 import com.zm.order.pojo.WeiXinPayConfig;
-import com.zm.order.pojo.dto.PostFee;
+import com.zm.order.pojo.dto.PostFeeDTO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
@@ -70,6 +73,7 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	LogFeignClient logFeignClient;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, AbstractPayConfig payConfig)
 			throws DataIntegrityViolationException, Exception {
@@ -120,11 +124,11 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 根据itemID和数量获得金额并扣减库存（除了自营仓需要扣库存，其他不需要）
-		if (Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
-			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip, info.getCenterId(),
+		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag()) && !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
+			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip, info.getCenterId(),
 					info.getOrderFlag());
 		} else {
-			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip, info.getCenterId(),
+			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip, info.getCenterId(),
 					info.getOrderFlag());
 		}
 
@@ -132,9 +136,11 @@ public class OrderServiceImpl implements OrderService {
 			return result;
 		}
 
-		Double amount = (Double) result.getObj();
-		String totalAmount = "";
+		Map<String, Object> priceAndWeightMap = (Map<String, Object>) result.getObj();
 
+		Double amount = (Double) priceAndWeightMap.get("totalAmount");
+
+		// 是否有活动
 		if (activity != null) {
 			if (Constants.FULL_CUT.equals(activity.getType())) {
 				if (amount > activity.getConditionPrice()) {
@@ -149,7 +155,38 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 
-		totalAmount = (int) (amount * 100) + "";
+		// 计算邮费(自提不算邮费)
+		Double postFee = 0.0;
+		if (Constants.EXPRESS.equals(info.getExpressType())) {
+			String province = info.getOrderDetail().getReceiveProvince();
+			Integer weight = (Integer) priceAndWeightMap.get("weight");
+			PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId());
+			postFee = getPostFee(post);
+		}
+
+		// 计算税费
+		Double taxFee = 0.0;
+		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+			Map<Tax, Double> map = (Map<Tax, Double>) priceAndWeightMap.get("tax");
+			for (Map.Entry<Tax, Double> entry : map.entrySet()) {
+				Tax tax = entry.getKey();
+				Double fee = entry.getValue();
+				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, amount), postFee);
+				if (tax.getExciseTax() != null) {
+					Double exciseTax = CalculationUtils.mul(CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
+							CalculationUtils.sub(1.0, tax.getExciseTax())), tax.getExciseTax());
+					Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
+							tax.getIncrementTax());
+					taxFee += CalculationUtils.mul(CalculationUtils.add(incremTax, exciseTax), 0.7);
+				} else {
+					taxFee += CalculationUtils.mul(
+							CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()), 0.7);
+				}
+			}
+		}
+
+		amount = CalculationUtils.add(amount, taxFee, postFee);
+		String totalAmount = (int) (amount * 100) + "";
 
 		if (!totalAmount.equals(localAmount + "")) {
 			result.setErrorMsg("价格前后台不一致");
@@ -404,14 +441,29 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Double getPostFee(PostFee postFee) {
-		Double conditionFee = orderMapper.getFreePostFee(judgeCenterId(postFee.getCenterId()));
-		if(conditionFee == null){
-			
+	public Double getPostFee(PostFeeDTO postFee) {
+		String id = judgeCenterId(postFee.getCenterId());
+		Double conditionFee = orderMapper.getFreePostFee(id);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("id", id);
+		if (conditionFee != null && postFee.getPrice() >= conditionFee) {
+			return 0.0;
 		} else {
-			
+			param.put("province", postFee.getProvince());
+			ExpressFee expressFee = orderMapper.getExpressFee(param);
+			if (expressFee != null) {
+				if (postFee.getWeight() > expressFee.getWeight()) {
+					Double weight = Math.ceil(CalculationUtils
+							.div(CalculationUtils.sub(postFee.getWeight(), expressFee.getWeight()), 1000.0));
+					return CalculationUtils.add(expressFee.getFee(),
+							CalculationUtils.mul(expressFee.getHeavyFee(), weight));
+				} else {
+					return expressFee.getFee();
+				}
+			} else {
+				return orderMapper.getDefaultFee(postFee.getExpressKey());
+			}
 		}
-		return null;
 	}
 
 	@Override
@@ -419,7 +471,7 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.createExpressFee(centerId);
 		orderMapper.createFreeExpressFee(centerId);
 	}
-	
+
 	private String judgeCenterId(Integer id) {
 		String centerId;
 		if (Constants.BIG_TRADE_CENTERID.equals(id) || Constants.O2O_CENTERID.equals(id)) {
@@ -428,5 +480,10 @@ public class OrderServiceImpl implements OrderService {
 			centerId = "_" + id;
 		}
 		return centerId;
+	}
+
+	@Override
+	public List<Express> listExpress() {
+		return orderMapper.listExpress();
 	}
 }

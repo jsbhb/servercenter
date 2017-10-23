@@ -21,8 +21,6 @@ CREATE TABLE `zm_order`.`order_base` (
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
   `supplier_id` INT UNSIGNED NULL,
   `tdq` TINYINT UNSIGNED NOT NULL DEFAULT 0,
-  `carrier_key` VARCHAR(50) NULL,
-  `express_id` VARCHAR(50) NULL,
   `gtime` DATETIME NULL,
   `send_time` DATETIME NULL,
   `create_time` DATETIME NULL,
@@ -40,8 +38,7 @@ CREATE TABLE `zm_order`.`order_base` (
   INDEX `idx_supplierId` (`supplier_id` ASC),
   INDEX `idx_createTime` (`create_time` ASC),
   INDEX `idx_orderFlag` (`order_flag` ASC),
-  INDEX `idx_is_del` (`is_del` ASC),
-  INDEX `idx_expressId` (`express_id` ASC)
+  INDEX `idx_is_del` (`is_del` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单基本信息';
 
@@ -58,6 +55,7 @@ CREATE TABLE `zm_order`.`order_detail` (
   `post_fee` DECIMAL(10,2) NULL,
   `fax_fee` DECIMAL(10,2) NULL,
   `pay_no` VARCHAR(100) NULL,
+  `return_pay_no` VARCHAR(100) NULL COMMENT '退款时的交易流水号',
   `delivery_place` VARCHAR(50)  NULL,
   `carry_address` VARCHAR(200)  NULL COMMENT '自提地址',
   `receive_name` VARCHAR(50)  NULL,
@@ -77,6 +75,23 @@ CREATE TABLE `zm_order`.`order_detail` (
   INDEX `idx_deliveryPlace` (`delivery_place` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单详细信息';
+
+drop table if exists  `zm_order`.`order_express`;
+
+CREATE TABLE `zm_order`.`order_express` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `order_id` CHAR(21) NOT NULL,
+  `express_key` VARCHAR(50) NULL,
+  `express_name` VARCHAR(50) NULL,
+  `express_id` VARCHAR(50) NULL,
+  `attr` VARCHAR(50) NULL,
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `remark` VARCHAR(200) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_orderId` (`order_id` ASC)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '订单物流信息';
 
 
 

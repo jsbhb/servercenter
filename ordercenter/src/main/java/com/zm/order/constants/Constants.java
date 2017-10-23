@@ -6,10 +6,6 @@ public class Constants {
 
 	public static final Integer OWN_SUPPLIER = 1;// 自营仓ID
 
-	public static final Integer O2O_ORDER_TYPE = 0;
-
-	public static final Integer TRADE_ORDER_TYPE = 1;
-
 	// *********************各支付类型******************************/
 	public static final String WX_PAY = "1";
 
@@ -44,6 +40,18 @@ public class Constants {
 	public static final Integer O2O_CENTERID = 1;
 	
 	public static final Integer BIG_TRADE_CENTERID = 2;
+	
+	
+	//*******************快递方式******************
+	public static final Integer EXPRESS = 0;
+	
+	public static final Integer OWN_CARRIER = 1;
+	
+	//*********************订单类型*********************
+	
+	public static final Integer O2O_ORDER_TYPE = 0;
+
+	public static final Integer TRADE_ORDER_TYPE = 1;
 	
 
 }

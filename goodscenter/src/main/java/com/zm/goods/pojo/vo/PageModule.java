@@ -23,6 +23,8 @@ public class PageModule {
 	private Integer type;//0限时抢购，1：全场。。
 	
 	private Integer activiey;//0:普通模块；1：活动模块
+	
+	private String href;
 
 	private String picPath1;
 
@@ -31,6 +33,12 @@ public class PageModule {
 	private String picPath3;
 
 	private String description;
+	
+	private String startTime;
+	
+	private String endTime;
+	
+	private Integer status;
 
 	private List<ModuleData> moduleDataList;
 
@@ -49,6 +57,10 @@ public class PageModule {
 		this.layoutId = activity.getLayoutId();
 		this.activiey = 1;
 		this.type = activity.getType();
+		this.startTime = activity.getStartTime();
+		this.endTime = activity.getEndTime();
+		this.status = activity.getStatus();
+		this.picPath1 = activity.getPicPath();
 		List<ModuleData> moduleDataList = new ArrayList<ModuleData>();
 		if (dataList != null) {
 			for (ActivityData data : dataList) {
@@ -80,6 +92,38 @@ public class PageModule {
 		}
 		this.moduleDataList = moduleDataList;
 
+	}
+
+	public String getHref() {
+		return href;
+	}
+
+	public void setHref(String href) {
+		this.href = href;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	public Integer getType() {

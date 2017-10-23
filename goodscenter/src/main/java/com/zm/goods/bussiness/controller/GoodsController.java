@@ -282,4 +282,15 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/goods/navigation", method = RequestMethod.GET)
+	public ResultModel loadIndexNavigation(@PathVariable("version") Double version, @RequestParam("centerId") Integer centerId){
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			return new ResultModel(true, goodsService.loadIndexNavigation(centerId));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }
