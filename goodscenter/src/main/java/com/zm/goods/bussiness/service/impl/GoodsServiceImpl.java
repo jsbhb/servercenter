@@ -563,9 +563,17 @@ public class GoodsServiceImpl implements GoodsService {
 			for (GoodsSpecs specs : specsList) {
 				temp.put(specs.getGoodsId(), specs);
 			}
+			Set<String> specsSet = null;
 			for (GoodsItem model : goodsList) {
 				GoodsSpecs specs = temp.get(model.getGoodsId());
 				if (specs != null) {
+					String specsInfo = specs.getInfo();
+					specsSet = new HashSet<>();
+					Map<String,String> specsMap = JSONUtil.parse(specsInfo, Map.class);
+					for(Map.Entry<String, String> entry : specsMap.entrySet()){
+						specsSet.add(entry.getValue());
+					}
+					model.setSpecsInfo(specsSet);
 					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
 						Double discount = 0.0;
 						if (Constants.PROMOTION.equals(specs.getPromotion())) {
