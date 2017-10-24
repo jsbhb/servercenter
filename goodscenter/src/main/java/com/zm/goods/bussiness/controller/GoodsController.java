@@ -311,4 +311,19 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	/**
+	 * @fun 获取限时抢购商品
+	 */
+	@RequestMapping(value = "{version}/goods/timelimit/{centerId}", method = RequestMethod.GET)
+	public ResultModel getTimelimitGoods(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, goodsService.getTimelimitGoods(centerId));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

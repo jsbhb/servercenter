@@ -32,6 +32,7 @@ import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
+import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.CommonUtils;
@@ -633,6 +634,12 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		param.put("list", list);
 		goodsMapper.updateStockBack(param);
+	}
+
+	@Override
+	public List<TimeLimitActive> getTimelimitGoods(Integer centerId) {
+		String id = judgeCenterId(centerId);
+		return null;
 	}
 
 }

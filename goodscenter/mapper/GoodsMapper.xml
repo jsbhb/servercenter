@@ -175,17 +175,32 @@
 	
 	<resultMap type="com.zm.goods.pojo.vo.GoodsIndustryModel" id="goodsIndustry">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<id column="first_id" property="firstId" jdbcType="VARCHAR" />
+		<result column="first_id" property="firstId" jdbcType="VARCHAR" />
 		<result column="industryName" property="industryName" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.goods.pojo.vo.GoodsCategoryModel" property="dictList">
 			<id column="dictid" property="id" jdbcType="INTEGER" />
-			<id column="second_id" property="secondId" jdbcType="VARCHAR" />
+			<result column="second_id" property="secondId" jdbcType="VARCHAR" />
 			<result column="dictName" property="dictName" jdbcType="VARCHAR" />
 			<collection property="entryList" ofType = "com.zm.goods.pojo.vo.GoodsCategoryEnteryModel">
 				<id column="entryId" property="id" jdbcType="INTEGER" />
-				<id column="third_id" property="thirdId" jdbcType="VARCHAR" />
+				<result column="third_id" property="thirdId" jdbcType="VARCHAR" />
 				<result column="entryName" property="entryName" jdbcType="VARCHAR" />
 			</collection>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.vo.TimeLimitActive" id="timelimitActive">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="VARCHAR" />
+		<result column="end_time" property="endTime" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<collection ofType="com.zm.goods.pojo.vo.TimeLimitActiveData" property="dataList">
+			<id column="dataId" property="id" jdbcType="INTEGER" />
+			<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
+			<result column="goodsName" property="goodsName" jdbcType="VARCHAR" />
+			<result column="picPath" property="picPath" jdbcType="VARCHAR" />
+			<result column="price" property="price" jdbcType="NUMERIC" />
+			<result column="discount" property="discount" jdbcType="NUMERIC" />
 		</collection>
 	</resultMap>
 	
@@ -742,5 +757,9 @@
 			where item_id = #{item.itemId}
 		</foreach>
 	</update>
+	
+	<select id="listLimitTimeData" parameterType="Object" resultMap="timelimitActive">
+		select ac.status,ac.start_time,ac.end_time, acd.goods_id,acd.discount,acd.picPath
+	</select>
 
 </mapper>

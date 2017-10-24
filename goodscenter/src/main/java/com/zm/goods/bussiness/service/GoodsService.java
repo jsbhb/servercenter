@@ -15,6 +15,7 @@ import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
+import com.zm.goods.pojo.vo.TimeLimitActive;
 
 public interface GoodsService {
 
@@ -188,4 +189,14 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	void stockBack(List<OrderBussinessModel> list, Integer centerId, Integer orderFlag);
+
+	/**
+	 * getTimelimitGoods:获取限时抢购商品. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<TimeLimitActive> getTimelimitGoods(Integer centerId);
 }
