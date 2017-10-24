@@ -48,9 +48,19 @@ public class GoodsSpecs implements Serializable{
 	
 	private Double vipMaxPrice;
 	
+	private Integer status;
+	
 	private Integer stock;
 	
 	private List<GoodsPrice> priceList;
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 	public Integer getWeight() {
 		return weight;

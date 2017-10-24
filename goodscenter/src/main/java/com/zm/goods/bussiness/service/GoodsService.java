@@ -178,4 +178,14 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	List<GoodsIndustryModel> loadIndexNavigation(Integer centerId);
+
+	/**
+	 * stockBack:库存回滚. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void stockBack(List<OrderBussinessModel> list, Integer centerId, Integer orderFlag);
 }

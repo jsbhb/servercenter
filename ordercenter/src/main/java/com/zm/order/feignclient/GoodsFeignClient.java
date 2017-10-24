@@ -28,4 +28,8 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)
 	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,
 			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId);
+
+	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
+	public ResultModel stockBack(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
+			@RequestParam("centerId") Integer centerId, @RequestParam("orderFlag") Integer orderFlag);
 }

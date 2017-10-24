@@ -54,6 +54,8 @@
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="discount" property="discount" jdbcType="NUMERIC" />
@@ -222,7 +224,7 @@
 	</select>
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
-		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
 		gi.status,gb.goods_name,gi.supplier_id,gi.weight,
 		gi.brand_id,gcb.brand,gb.origin,gi.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
@@ -296,7 +298,7 @@
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id ,
+		select gs.id,gs.info,gs.item_id,gs.goods_id , gs.status,
 		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
@@ -305,7 +307,7 @@
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
 		goods_price${centerId} gp on
-		gs.item_id = gp.item_id  where gs.item_id in
+		gs.item_id = gp.item_id left join goods_item${centerId} gi on gs.goods_id=gi.goods_id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -332,6 +334,7 @@
 		  supplier_id int UNSIGNED NULL COMMENT '商家ID',
 		  base_id int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
 		  goods_name VARCHAR(100) NOT NULL COMMENT '商品名称',
+		  description VARCHAR(450) NULL COMMENT '描述',
 		  weight int UNSIGNED NOT NULL COMMENT '商品重量（克）',
 		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  type tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
@@ -723,6 +726,18 @@
 			<set>
 				sjqty = ifnull(sjqty,0) - #{item.frozenqty},
 				frozenqty = ifnull(frozenqty,0) + #{item.frozenqty}
+			</set>
+			where item_id = #{item.itemId}
+		</foreach>
+	</update>
+	
+	<update id="updateStockBack" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update goods_stock${centerId}
+			<set>
+				sjqty = ifnull(sjqty,0) + #{item.quantity},
+				frozenqty = ifnull(frozenqty,0) - #{item.quantity}
 			</set>
 			where item_id = #{item.itemId}
 		</foreach>

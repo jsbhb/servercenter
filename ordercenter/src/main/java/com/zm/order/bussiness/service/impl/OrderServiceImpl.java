@@ -414,8 +414,20 @@ public class OrderServiceImpl implements OrderService {
 
 		orderMapper.updateOrderClose(orderId);
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-		if (Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
+		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag()) && !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
+			
+		} else {
 			// TODO 库存回滚
+			List<OrderGoods> goodsList = info.getOrderGoodsList();
+			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+			OrderBussinessModel model = null;
+			for(OrderGoods goods : goodsList){
+				model = new OrderBussinessModel();
+				model.setItemId(goods.getItemId());
+				model.setQuantity(goods.getItemQuantity());
+				list.add(model);
+			}
+			goodsFeignClient.stockBack(Constants.FIRST_VERSION, list, info.getCenterId(), info.getOrderFlag());
 		}
 		return true;
 	}

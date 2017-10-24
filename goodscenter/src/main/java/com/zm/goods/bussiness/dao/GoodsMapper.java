@@ -96,4 +96,6 @@ public interface GoodsMapper {
 	
 	void updateStock(Map<String,Object> param);
 	
+	void updateStockBack(Map<String,Object> param);
+	
 }

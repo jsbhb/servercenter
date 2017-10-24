@@ -46,13 +46,13 @@ public class GoodsController {
 	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
 	public ResultModel listGoods(@PathVariable("version") Double version, Pagination pagination,
 			GoodsSearch searchModel, SortModelList sortList) {
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
 			return new ResultModel(true, resultMap);
 		}
-		
-		return new ResultModel(false,"版本错误");
+
+		return new ResultModel(false, "版本错误");
 
 	}
 
@@ -148,7 +148,7 @@ public class GoodsController {
 		ResultModel result = new ResultModel();
 		String ids = req.getParameter("ids");
 		Integer centerId = Integer.valueOf(req.getParameter("centerId"));
-		
+
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -270,10 +270,11 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/createlucene", method = RequestMethod.GET)
-	public ResultModel createLucene(@PathVariable("version") Double version, @RequestParam("centerId") Integer centerId){
-		
+	public ResultModel createLucene(@PathVariable("version") Double version,
+			@RequestParam("centerId") Integer centerId) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			goodsService.createGoodsLucene(centerId);
@@ -282,13 +283,30 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/navigation", method = RequestMethod.GET)
-	public ResultModel loadIndexNavigation(@PathVariable("version") Double version, @RequestParam("centerId") Integer centerId){
-		
+	public ResultModel loadIndexNavigation(@PathVariable("version") Double version,
+			@RequestParam("centerId") Integer centerId) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			return new ResultModel(true, goodsService.loadIndexNavigation(centerId));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 库存回滚
+	 */
+	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
+	public ResultModel stockBack(@PathVariable("version") Double version, Integer centerId,
+			@RequestBody List<OrderBussinessModel> list, Integer orderFlag) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			goodsService.stockBack(list, centerId, orderFlag);
+			return new ResultModel(true, null);
 		}
 
 		return new ResultModel(false, "版本错误");
