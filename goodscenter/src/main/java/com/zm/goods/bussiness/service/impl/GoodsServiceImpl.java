@@ -52,7 +52,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	UserFeignClient userFeignClient;
-	
+
 	@Resource
 	ProcessWarehouse processWarehouse;
 
@@ -168,8 +168,8 @@ public class GoodsServiceImpl implements GoodsService {
 			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
-		Map<String,Object> map = new HashMap<String,Object>();
-		Map<Tax,Double> taxMap = new HashMap<Tax,Double>(); 
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();
 
 		Map<String, Object> param = new HashMap<String, Object>();
 		String id = judgeCenterId(centerId);
@@ -178,27 +178,27 @@ public class GoodsServiceImpl implements GoodsService {
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
 		Integer weight = 0;
-		if(Constants.O2O_ORDER.equals(orderFlag)){
-			for (OrderBussinessModel model : list){
+		if (Constants.O2O_ORDER.equals(orderFlag)) {
+			for (OrderBussinessModel model : list) {
 				param.put("itemId", model.getItemId());
 				Tax tax = goodsMapper.getTax(param);
 				specs = goodsMapper.getGoodsSpecs(param);
 				weight += specs.getWeight() * model.getQuantity();
-				if(taxMap.get(tax) == null){
+				if (taxMap.get(tax) == null) {
 					Double amount = 0.0;
 					amount = getAmount(vip, specs, model);
 					taxMap.put(tax, amount);
 				} else {
-					taxMap.put(tax, taxMap.get(tax)+getAmount(vip, specs, model));
+					taxMap.put(tax, taxMap.get(tax) + getAmount(vip, specs, model));
 				}
 			}
 			map.put("tax", taxMap);
-			for(Map.Entry<Tax, Double> entry : taxMap.entrySet()){
+			for (Map.Entry<Tax, Double> entry : taxMap.entrySet()) {
 				totalAmount += entry.getValue();
 			}
 		} else {
 			for (OrderBussinessModel model : list) {
-				
+
 				param.put("itemId", model.getItemId());
 				specs = goodsMapper.getGoodsSpecs(param);
 				weight += specs.getWeight() * model.getQuantity();
@@ -208,7 +208,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 		if (delStock) {
 			boolean enough = processWarehouse.processWarehouse(centerId, orderFlag, list);
-			if(!enough){
+			if (!enough) {
 				result.setSuccess(false);
 				result.setErrorMsg("库存不足");
 				return result;
@@ -232,8 +232,8 @@ public class GoodsServiceImpl implements GoodsService {
 			if (flag) {
 				if (model.getDeliveryPlace() != null) {
 					if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
-						totalAmount += model.getQuantity() * (vip
-								? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
+						totalAmount += model.getQuantity()
+								* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
 						calculation = true;
 					}
 				} else {
@@ -563,9 +563,17 @@ public class GoodsServiceImpl implements GoodsService {
 			for (GoodsSpecs specs : specsList) {
 				temp.put(specs.getGoodsId(), specs);
 			}
+			Set<String> specsSet = null;
 			for (GoodsItem model : goodsList) {
 				GoodsSpecs specs = temp.get(model.getGoodsId());
 				if (specs != null) {
+					String specsInfo = specs.getInfo();
+					specsSet = new HashSet<>();
+					Map<String, String> specsMap = JSONUtil.parse(specsInfo, Map.class);
+					for (Map.Entry<String, String> entry : specsMap.entrySet()) {
+						specsSet.add(entry.getValue());
+					}
+					model.setSpecsInfo(specsSet);
 					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
 						Double discount = 0.0;
 						if (Constants.PROMOTION.equals(specs.getPromotion())) {
@@ -613,6 +621,18 @@ public class GoodsServiceImpl implements GoodsService {
 		String id = judgeCenterId(centerId);
 
 		return goodsMapper.queryGoodsCategory(id);
+	}
+
+	@Override
+	public void stockBack(List<OrderBussinessModel> list, Integer centerId, Integer orderFlag) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		if (Constants.O2O_ORDER.equals(orderFlag)) {
+			param.put("centerId", "");
+		} else {
+			param.put("centerId", "_" + centerId);
+		}
+		param.put("list", list);
+		goodsMapper.updateStockBack(param);
 	}
 
 }

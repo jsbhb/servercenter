@@ -36,6 +36,7 @@ CREATE TABLE `zm_goods`.`goods_item` (
   `supplier_id` int UNSIGNED NULL COMMENT '商家ID',
   `base_id` int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
   `goods_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
+  `description` VARCHAR(450) NULL COMMENT '描述',
   `weight` int UNSIGNED NOT NULL COMMENT '商品重量（克）',
   `excise_tax` DECIMAL(5,2) NULL COMMENT '消费税',
   `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',

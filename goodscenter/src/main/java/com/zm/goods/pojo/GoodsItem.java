@@ -13,6 +13,8 @@ public class GoodsItem extends GoodsBase {
 
 	private String customGoodsName;
 	
+	private String description;
+	
 	private Integer weight;
 
 	private Integer status;
@@ -50,6 +52,14 @@ public class GoodsItem extends GoodsBase {
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	public Integer getFresh() {
 		return fresh;

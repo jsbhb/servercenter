@@ -7,7 +7,7 @@ drop table if exists  `user`;
 
 CREATE TABLE `zm_user`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型1:海外购、大贸，2、区域中心；3、店铺；4、导购、5消费者',
+  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型0:admin,1:海外购、大贸，2、区域中心；3、店铺；4、导购、5消费者',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
   `email` VARCHAR(100) NULL COMMENT '邮箱',
@@ -220,4 +220,9 @@ CREATE TABLE `zm_user`.`user_search_parameter` (
   `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '检索字段表';
+
+
+INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('1', '0', '跨境O2O', 'admin', '13456789012', now());
+INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('2', '1', '大贸', 'admin', '13456789012', now());
+INSERT INTO `zm_user`.`user` (`id`, `plat_user_type`, `account`, `phone`, `is_phone_validate`, `center_id`, `create_time`) VALUES ('1', '0', 'admin', '15957456456', '1', '0', now());
 

@@ -29,6 +29,8 @@ public class GoodsSpecs implements Serializable {
 	private Integer promotion;
 
 	private String info;
+	
+	private Integer status;
 
 	private String createTime;
 
@@ -47,6 +49,14 @@ public class GoodsSpecs implements Serializable {
 	private Integer stock;
 
 	private List<GoodsPrice> priceList;
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 	public Double getVipMinPrice() {
 		return vipMinPrice;
