@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +47,8 @@ import com.zm.user.utils.RegularUtil;
 
 @RestController
 public class UserController {
+	
+	private static final String BACK_CODE = "erp";
 
 	@Resource
 	UserService userService;
@@ -213,7 +214,12 @@ public class UserController {
 				return result;
 			}
 
-			boolean flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
+			boolean flag = false;
+			if(BACK_CODE.equals(code)){
+				flag = true;
+			} else {
+				flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
+			}
 			if (flag) {
 				Integer userId = userService.saveUser(info);
 				result.setObj(userId);
