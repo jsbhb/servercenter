@@ -41,6 +41,8 @@ CREATE TABLE `zm_goods`.`goods_item` (
   `excise_tax` DECIMAL(5,2) NULL COMMENT '消费税',
   `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
   `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
+  `first_category` VARCHAR(100) NOT NULL COMMENT '一级分类id',
+  `second_category` VARCHAR(100) NOT NULL COMMENT '二级分类id',
   `third_category` VARCHAR(100) NOT NULL COMMENT '三级分类id',
   `is_popular` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
   `is_new` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
@@ -242,6 +244,7 @@ CREATE TABLE `zm_goods`.`layout` (
   `page` varchar(50) NOT NULL COMMENT '页面名称',
   `code` varchar(50) NOT NULL COMMENT '模块ID',
   `type` tinyint UNSIGNED NOT NULL COMMENT '类型：0：普通模块；1：活动模块；',
+  `page_type` tinyint UNSIGNED NOT NULL COMMENT '类型：0：PC；1：手机；',
   `is_show` tinyint UNSIGNED NULL DEFAULT 0 COMMENT '是否显示 0：否；1：是', 
   `config` varchar(100) NULL COMMENT '模块配置',
   `description` VARCHAR(450) NULL COMMENT '描述',
@@ -250,6 +253,7 @@ CREATE TABLE `zm_goods`.`layout` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_code` (`code`),
+  INDEX `idx_page_type` (`page_type`),
   INDEX `idx_page` (`page`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '布局表';
 
@@ -315,6 +319,8 @@ CREATE TABLE `zm_goods`.`activity` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uq_layout_id` (`layout_id`),
+  INDEX `idx_type_status` (`type_status`),
+  INDEX `idx_status` (`status`),
   INDEX `idx_type` (`type`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '活动列表';
 
@@ -326,12 +332,15 @@ CREATE TABLE `zm_goods`.`activity_data` (
   `picPath` VARCHAR(300) NULL COMMENT '图片地址',
   `title` VARCHAR(50) NULL COMMENT '名称',
   `goods_id` VARCHAR(100) NULL COMMENT '商品ID',
+  `goods_name` VARCHAR(100) NULL COMMENT '商品名称',
+  `price` decimal(10,2) NULL COMMENT '价格',
   `discount` decimal(10,2) NULL COMMENT '促销折扣',
   `attr` VARCHAR(50) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
+  INDEX `idx_goods_id` (`goods_id`),
   INDEX `idx_activity_id` (`activity_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '活动数据';
 

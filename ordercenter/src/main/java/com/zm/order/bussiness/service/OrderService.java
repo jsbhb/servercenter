@@ -3,9 +3,10 @@ package com.zm.order.bussiness.service;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.dao.DataIntegrityViolationException;
 
-import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.OrderCount;
@@ -37,7 +38,7 @@ public interface OrderService {
 	 * @throws Exception
 	 * @since JDK 1.7
 	 */
-	ResultModel saveOrder(OrderInfo info, String payType, String type, AbstractPayConfig payConfig)
+	ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req, String createType)
 			throws DataIntegrityViolationException, Exception;
 
 	/**

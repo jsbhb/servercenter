@@ -26,6 +26,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.vo.TimeLimitActive;
 
 /**
  * ClassName: GoodsController <br/>
@@ -63,7 +64,9 @@ public class GoodsController {
 		ResultModel result = new ResultModel();
 
 		String type = req.getParameter("type");
-		String categoryId = req.getParameter("categoryId");
+		String secondCategory = req.getParameter("secondCategory");
+		String firstCategory = req.getParameter("firstCategory");
+		String thirdCategory = req.getParameter("thirdCategory");
 		String goodsId = req.getParameter("goodsId");
 		String centerId = req.getParameter("centerId");
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -82,7 +85,9 @@ public class GoodsController {
 			}
 			param.put("centerId", centerId);
 			param.put("type", type);
-			param.put("categoryId", categoryId);
+			param.put("secondCategory", secondCategory);
+			param.put("firstCategory", firstCategory);
+			param.put("thirdCategory", thirdCategory);
 			param.put("goodsId", goodsId);
 			pagination.init();
 			param.put("pagination", pagination);
@@ -164,12 +169,12 @@ public class GoodsController {
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip,
-			Integer centerId, Integer orderFlag) {
+			Integer centerId, Integer orderFlag, String createType) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = goodsService.getPriceAndDelStock(list, delStock, vip, centerId, orderFlag);
+			result = goodsService.getPriceAndDelStock(list, delStock, vip, centerId, orderFlag, createType);
 		}
 
 		return result;
@@ -199,12 +204,12 @@ public class GoodsController {
 
 	}
 
-	@RequestMapping(value = "{version}/goods/modular/{centerId}/{page}", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/goods/modular/{centerId}/{page}/{pageType}", method = RequestMethod.GET)
 	public ResultModel getModular(@PathVariable("version") Double version, @PathVariable("page") String page,
-			@PathVariable("centerId") Integer centerId) {
+			@PathVariable("centerId") Integer centerId, @PathVariable("pageType") Integer pageType) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(true, goodsService.getModular(page, centerId));
+			return new ResultModel(true, goodsService.getModular(page, centerId, pageType));
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -321,9 +326,31 @@ public class GoodsController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(true, goodsService.getTimelimitGoods(centerId));
+			List<TimeLimitActive> list = goodsService.getTimelimitGoods(centerId);
+			if (list == null) {
+				return new ResultModel(true, "目前没有正在进行或即将开始的限时抢购活动");
+			}
+
+			return new ResultModel(true, list);
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	/**
+	 * @fun 获取有特殊属性的商品
+	 * 
+	 */
+	@RequestMapping(value = "{version}/goods/specialgoods/{centerId}/{type}", method = RequestMethod.GET)
+	public ResultModel getSpecialGoods(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @PathVariable("type") Integer type) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, goodsService.listSpecialGoods(centerId, type));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 }

@@ -53,5 +53,7 @@ public class Constants {
 
 	public static final Integer TRADE_ORDER_TYPE = 1;
 	
+	//*********************限时抢购下单*********************
+	public static final String TIMELIMIT_ORDER = "timelimit";
 
 }

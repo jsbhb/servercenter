@@ -20,7 +20,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -30,6 +29,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -84,8 +84,11 @@ public class GoodsLucene extends AbstractLucene {
 
 			doc.add(new TextField("specs", model.getSpecs() == null ? "" : model.getSpecs(), Store.YES));
 
-			doc.add(new TextField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
+			doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
 			doc.add(new StringField("status", model.getStatus() == null ? "0" : model.getStatus() + "", Store.NO));
+			doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
+			doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
+			doc.add(new StringField("thirdCategory", model.getThirdCategory().trim(), Store.NO));
 			doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
 			doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
 					Store.NO));
@@ -104,7 +107,6 @@ public class GoodsLucene extends AbstractLucene {
 		try {
 			indexWriter.commit();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -115,13 +117,23 @@ public class GoodsLucene extends AbstractLucene {
 		Document doc = new Document();
 
 		for (Map.Entry<String, String> entry : param.entrySet()) {
-
+			if ("goodsName".equals(entry.getKey())) {
+				TextField commodityName = new TextField("goodsName", entry.getValue() == null ? "" : entry.getValue(),
+						Store.YES);
+				doc.add(commodityName);
+			} else if ("specs".equals(entry.getKey()) || "brand".equals(entry.getKey())
+					|| "origin".equals(entry.getKey())) {
+				doc.add(new StringField(entry.getKey(), entry.getValue() == null ? "" : entry.getValue() + "",
+						Store.YES));
+			} else {
+				doc.add(new StringField(entry.getKey(), entry.getValue() == null ? "" : entry.getValue() + "",
+						Store.NO));
+			}
 		}
 		try {
 			indexWriter.updateDocument(new Term("goodsId", param.get("goodsId")), doc);
 			indexWriter.commit();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -185,21 +197,19 @@ public class GoodsLucene extends AbstractLucene {
 			try {
 				pd = new PropertyDescriptor(field.getName(), clazz);
 			} catch (IntrospectionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			Method getMethod = pd.getReadMethod();// 获得get方法
 			try {
 				o = getMethod.invoke(commodityInfo);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if (o != null) {
 				if ("brand".equals(field.getName()) || "origin".equals(field.getName())
 						|| "status".equals(field.getName())) {
 					accuratePara.put(field.getName(), o + "");
-				} else if ("goodsName".equals(field.getName())) {
+				} else if (!"centerId".equals(field.getName())) {
 					keyWordsList.add(o + "");
 					filedsList.add(field.getName());
 				}
@@ -232,10 +242,15 @@ public class GoodsLucene extends AbstractLucene {
 	}
 
 	@Override
-	public BooleanQuery packageQuery(List<String> keyWordsList, List<String> filedsList) throws IOException {
+	public Query packageQuery(List<String> keyWordsList, List<String> filedsList) throws IOException {
 		BooleanQuery query = new BooleanQuery();
 		TokenStream stream = null;
 		for (int i = 0; i < keyWordsList.size(); i++) {
+			if (filedsList.get(i).contains("Category")) {
+				Term tm = new Term(filedsList.get(i), keyWordsList.get(i));
+				Query termQuery = new TermQuery(tm);
+				return termQuery;
+			}
 			BooleanQuery query1 = new BooleanQuery();
 
 			stream = analyzer.tokenStream(filedsList.get(i), new StringReader(keyWordsList.get(i)));
@@ -303,8 +318,14 @@ public class GoodsLucene extends AbstractLucene {
 	}
 
 	@Override
-	public void deleteIndex(String id) {
-		// TODO Auto-generated method stub
+	public void deleteIndex(String goodsId) {
+		try {
+			indexWriter.deleteDocuments(new Term("goodsId", goodsId));
+			indexWriter.commit();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
 
 	}
 

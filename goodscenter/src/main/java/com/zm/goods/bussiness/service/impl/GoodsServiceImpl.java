@@ -33,6 +33,7 @@ import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
 import com.zm.goods.pojo.vo.TimeLimitActive;
+import com.zm.goods.pojo.vo.TimeLimitActiveData;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.CommonUtils;
@@ -166,7 +167,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip,
-			Integer centerId, Integer orderFlag) {
+			Integer centerId, Integer orderFlag, String createType) {
 
 		ResultModel result = new ResultModel();
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -179,18 +180,22 @@ public class GoodsServiceImpl implements GoodsService {
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
 		Integer weight = 0;
+		Double discount = null;
 		if (Constants.O2O_ORDER.equals(orderFlag)) {
 			for (OrderBussinessModel model : list) {
 				param.put("itemId", model.getItemId());
 				Tax tax = goodsMapper.getTax(param);
 				specs = goodsMapper.getGoodsSpecs(param);
+				if(Constants.TIMELIMIT_ORDER.equals(createType)){
+					discount = goodsMapper.getDiscount(param);
+				}
 				weight += specs.getWeight() * model.getQuantity();
 				if (taxMap.get(tax) == null) {
 					Double amount = 0.0;
-					amount = getAmount(vip, specs, model);
+					amount = getAmount(vip, specs, model, discount);
 					taxMap.put(tax, amount);
 				} else {
-					taxMap.put(tax, taxMap.get(tax) + getAmount(vip, specs, model));
+					taxMap.put(tax, taxMap.get(tax) + getAmount(vip, specs, model, discount));
 				}
 			}
 			map.put("tax", taxMap);
@@ -202,8 +207,11 @@ public class GoodsServiceImpl implements GoodsService {
 
 				param.put("itemId", model.getItemId());
 				specs = goodsMapper.getGoodsSpecs(param);
+				if(Constants.TIMELIMIT_ORDER.equals(createType)){
+					discount = goodsMapper.getDiscount(param);
+				}
 				weight += specs.getWeight() * model.getQuantity();
-				totalAmount += getAmount(vip, specs, model);
+				totalAmount += getAmount(vip, specs, model, discount);
 			}
 		}
 
@@ -223,10 +231,19 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
-	private Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model) {
+	private Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion) {
 		Double totalAmount = 0.0;
 		getPriceInterval(specs);
 		boolean calculation = false;
+		Double discount = 10.0;
+		if(promotion == null){
+			if (Constants.PROMOTION.equals(specs.getPromotion())) {
+				discount = specs.getDiscount();
+			}
+			discount = CalculationUtils.div(discount, 10.0);
+		} else {
+			discount = promotion;
+		}
 		for (GoodsPrice price : specs.getPriceList()) {
 			boolean flag = model.getQuantity() >= price.getMin()
 					&& (price.getMax() == null || model.getQuantity() <= price.getMax());
@@ -236,18 +253,21 @@ public class GoodsServiceImpl implements GoodsService {
 						totalAmount += model.getQuantity()
 								* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
 						calculation = true;
+						break;
 					}
 				} else {
 					totalAmount += model.getQuantity()
 							* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
 					calculation = true;
+					break;
 				}
 			}
 		}
 		if (!calculation) {
 			totalAmount += model.getQuantity() * (vip ? specs.getVipMinPrice() : specs.getMinPrice());
 		}
-		return totalAmount;
+		
+		return CalculationUtils.mul(totalAmount, discount);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -323,11 +343,12 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public List<Layout> getModular(String page, Integer centerId) {
+	public List<Layout> getModular(String page, Integer centerId, Integer pageType) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		String id = judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("page", page);
+		param.put("pageType", pageType);
 		return goodsMapper.listLayout(param);
 	}
 
@@ -374,13 +395,19 @@ public class GoodsServiceImpl implements GoodsService {
 	private void packageData(Map<String, Object> param, List<PageModule> result, Layout temp) {
 		param.put("layoutId", temp.getId());
 		if (Constants.ACTIVE_MODEL.equals(temp.getType())) {
-			Activity activity = goodsMapper.getActivityByLayoutId(param);
-			if (activity == null) {
+			List<Activity> activityList = goodsMapper.listActivityByLayoutId(param);
+			if (activityList == null) {
 				return;
 			}
-			param.put("activeId", activity.getId());
-			activity.setCode(temp.getCode());
-			result.add(new PageModule(activity, goodsMapper.listActiveData(param)));
+			for (Activity activity : activityList) {
+				if (Constants.ACTIVE_START.equals(activity.getStatus())
+						|| Constants.ACTIVE_UNSTART.equals(activity.getStatus())) {
+					param.put("activeId", activity.getId());
+					activity.setCode(temp.getCode());
+					result.add(new PageModule(activity, goodsMapper.listActiveData(param)));
+					break;
+				}
+			}
 		} else {
 			PopularizeDict dict = goodsMapper.getDictByLayoutId(param);
 			if (dict == null) {
@@ -492,6 +519,9 @@ public class GoodsServiceImpl implements GoodsService {
 			searchModel.setBrand(item.getBrand());
 			searchModel.setStatus(item.getStatus());
 			searchModel.setOrigin(item.getOrigin());
+			searchModel.setFirstCategory(item.getFirstCategory());
+			searchModel.setThirdCategory(item.getThirdCategory());
+			searchModel.setSecondCategory(item.getSecondCategory());
 			searchModel.setGoodsName(item.getCustomGoodsName());
 			param.put("goodsId", item.getGoodsId());
 			param.put("centerId", centerId);
@@ -639,7 +669,28 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public List<TimeLimitActive> getTimelimitGoods(Integer centerId) {
 		String id = judgeCenterId(centerId);
-		return null;
+		List<TimeLimitActive> list = goodsMapper.listLimitTimeData(id);
+		if (list == null || list.size() == 0) {
+			return null;
+		}
+		for (TimeLimitActive active : list) {
+			if (active.getDataList() != null && active.getDataList().size() > 0) {
+				for (TimeLimitActiveData data : active.getDataList()) {
+					data.setRealPrice(
+							CalculationUtils.mul(data.getPrice(), CalculationUtils.div(data.getDiscount(), 10.0)));
+				}
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
+		String id = judgeCenterId(centerId);;
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", id);
+		param.put("type", type);
+		return goodsMapper.listSpecialGoods(param);
 	}
 
 }

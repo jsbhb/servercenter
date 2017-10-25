@@ -18,6 +18,11 @@ public class Constants {
 	
 	public static final Integer ACTIVE_MODEL = 1;//活动模块
 	
+	//*********************活动状态************************
+	public static final Integer ACTIVE_START = 1;
+	
+	public static final Integer ACTIVE_UNSTART = 0;
+	
 	//********************LUCENE*************************
 	public static final String TOTAL = "total";
 	
@@ -32,5 +37,8 @@ public class Constants {
 	//*********************订单类型*********************
 	
 	public static final Integer O2O_ORDER = 0;
+	
+	//*********************限时抢购下单*********************
+	public static final String TIMELIMIT_ORDER = "timelimit";
 	
 }

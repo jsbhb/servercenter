@@ -20,6 +20,36 @@ public class GoodsSearch {
 	
 	private Integer status;
 	
+	private String thirdCategory;
+	
+	private String secondCategory;
+	
+	private String firstCategory;
+	
+	public String getThirdCategory() {
+		return thirdCategory;
+	}
+
+	public void setThirdCategory(String thirdCategory) {
+		this.thirdCategory = thirdCategory;
+	}
+
+	public String getSecondCategory() {
+		return secondCategory;
+	}
+
+	public void setSecondCategory(String secondCategory) {
+		this.secondCategory = secondCategory;
+	}
+
+	public String getFirstCategory() {
+		return firstCategory;
+	}
+
+	public void setFirstCategory(String firstCategory) {
+		this.firstCategory = firstCategory;
+	}
+
 	public String getOrigin() {
 		return origin;
 	}

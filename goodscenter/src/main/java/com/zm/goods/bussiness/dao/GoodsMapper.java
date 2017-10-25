@@ -16,6 +16,7 @@ import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
+import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 public interface GoodsMapper {
@@ -66,7 +67,7 @@ public interface GoodsMapper {
 	
 	List<Layout> listLayout(Map<String,Object> param);
 	
-	Activity getActivityByLayoutId(Map<String,Object> param);
+	List<Activity> listActivityByLayoutId(Map<String,Object> param);
 	
 	List<ActivityData> listActiveData(Map<String,Object> param);
 	
@@ -97,5 +98,11 @@ public interface GoodsMapper {
 	void updateStock(Map<String,Object> param);
 	
 	void updateStockBack(Map<String,Object> param);
+	
+	List<TimeLimitActive> listLimitTimeData(@Param("centerId")String centerId);
+	
+	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
+	
+	Double getDiscount(Map<String,Object> param);
 	
 }

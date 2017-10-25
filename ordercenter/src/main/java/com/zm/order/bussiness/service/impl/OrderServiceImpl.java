@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -75,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel saveOrder(OrderInfo info, String payType, String type, AbstractPayConfig payConfig)
+	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req, String createType)
 			throws DataIntegrityViolationException, Exception {
 		ResultModel result = new ResultModel();
 		if (info == null) {
@@ -94,6 +95,20 @@ public class OrderServiceImpl implements OrderService {
 			return result;
 		}
 
+		AbstractPayConfig payConfig = null;
+		if (Constants.WX_PAY.equals(payType)) {
+			String openId = req.getParameter("openId");
+			if (Constants.JSAPI.equals(type)) {
+				if (openId == null || "".equals(openId)) {
+					result.setSuccess(false);
+					result.setErrorMsg("请使用微信授权登录");
+					return result;
+				}
+			}
+			String ip = req.getRemoteAddr();
+			payConfig = new WeiXinPayConfig(openId, ip);
+		}
+
 		String orderId = CommonUtils.getOrderId(info.getOrderFlag() + "");
 
 		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
@@ -109,37 +124,41 @@ public class OrderServiceImpl implements OrderService {
 			list.add(model);
 			detail.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
 		}
-		boolean vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
 
-		result = goodsFeignClient.getActivity(Constants.FIRST_VERSION, null, Constants.ACTIVE_AREA, info.getCenterId());
-		if (!result.isSuccess()) {
-			result.setErrorMsg("获取活动信息失败");
-			return result;
-		}
-
+		Map<String, Object> priceAndWeightMap = null;
+		Double amount = 0.0;
+		boolean vip = false;
 		Activity activity = null;
 
-		if (result.getObj() != null) {
-			activity = (Activity) result.getObj();
-		}
+		if (!Constants.TIMELIMIT_ORDER.equals(createType)) {// 限时抢购订单
+			// 获取该用户是否是VIP
+			vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
+			// 获取全场活动
+			result = goodsFeignClient.getActivity(Constants.FIRST_VERSION, null, Constants.ACTIVE_AREA,
+					info.getCenterId());
+			if (!result.isSuccess()) {
+				result.setErrorMsg("获取活动信息失败");
+				return result;
+			}
 
-		// 根据itemID和数量获得金额并扣减库存（除了自营仓需要扣库存，其他不需要）
-		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag()) && !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
+			if (result.getObj() != null) {
+				activity = (Activity) result.getObj();
+			}
+		}
+		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
+		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())
+				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
 			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip, info.getCenterId(),
-					info.getOrderFlag());
+					info.getOrderFlag(), createType);
 		} else {
 			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip, info.getCenterId(),
-					info.getOrderFlag());
+					info.getOrderFlag(), createType);
 		}
-
 		if (!result.isSuccess()) {
 			return result;
 		}
-
-		Map<String, Object> priceAndWeightMap = (Map<String, Object>) result.getObj();
-
-		Double amount = (Double) priceAndWeightMap.get("totalAmount");
-
+		priceAndWeightMap = (Map<String, Object>) result.getObj();
+		amount = (Double) priceAndWeightMap.get("totalAmount");
 		// 是否有活动
 		if (activity != null) {
 			if (Constants.FULL_CUT.equals(activity.getType())) {
@@ -414,14 +433,14 @@ public class OrderServiceImpl implements OrderService {
 
 		orderMapper.updateOrderClose(orderId);
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag()) && !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
-			
+		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())
+				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
+
 		} else {
-			// TODO 库存回滚
 			List<OrderGoods> goodsList = info.getOrderGoodsList();
 			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
 			OrderBussinessModel model = null;
-			for(OrderGoods goods : goodsList){
+			for (OrderGoods goods : goodsList) {
 				model = new OrderBussinessModel();
 				model.setItemId(goods.getItemId());
 				model.setQuantity(goods.getItemQuantity());

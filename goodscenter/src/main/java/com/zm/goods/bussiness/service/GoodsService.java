@@ -68,7 +68,7 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip, Integer centerId,
-			Integer orderFlag);
+			Integer orderFlag, String createType);
 
 	/**
 	 * listGoodsSpecs:获取规格信息. <br/>
@@ -98,7 +98,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<Layout> getModular(String page, Integer centerId);
+	List<Layout> getModular(String page, Integer centerId, Integer pageType);
 
 	/**
 	 * createTable:创建区域中心数据表. <br/>
@@ -199,4 +199,15 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	List<TimeLimitActive> getTimelimitGoods(Integer centerId);
+
+	/**
+	 * listSpecialGoods:获取特殊属性商品. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<GoodsItem> listSpecialGoods(Integer centerId, Integer type);
+
 }

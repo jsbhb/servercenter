@@ -253,7 +253,7 @@ public abstract class AbstractLucene {
 	 * @return BooleanQuery
 	 * @since JDK 1.7
 	 */
-	public abstract BooleanQuery packageQuery(List<String> keyWordsList, List<String> filedsList) throws IOException ;
+	public abstract Query packageQuery(List<String> keyWordsList, List<String> filedsList) throws IOException ;
 	
 
 	/**
@@ -297,7 +297,7 @@ public abstract class AbstractLucene {
 
 		Map<String, Object> result = new HashMap<String, Object>(16);
 
-		BooleanQuery query = packageQuery(keyWordsList, filedsList);
+		Query query = packageQuery(keyWordsList, filedsList);
 
 		// 封装排序参数
 		Sort sort = renderSortParameter(sortList);

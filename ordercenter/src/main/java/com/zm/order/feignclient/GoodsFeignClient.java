@@ -19,7 +19,7 @@ public interface GoodsFeignClient {
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version,
 			@RequestBody List<OrderBussinessModel> list, @RequestParam("delStock") boolean delStock,
 			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
-			@RequestParam("orderFlag") Integer orderFlag);
+			@RequestParam("orderFlag") Integer orderFlag,@RequestParam("createType") String createType);
 
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("ids") String ids,

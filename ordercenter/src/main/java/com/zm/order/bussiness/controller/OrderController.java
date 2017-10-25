@@ -17,14 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
-import com.zm.order.pojo.AbstractPayConfig;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
-import com.zm.order.pojo.WeiXinPayConfig;
 import com.zm.order.pojo.dto.PostFeeDTO;
 
 /**
@@ -51,19 +49,7 @@ public class OrderController {
 
 		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
-		AbstractPayConfig payConfig = null;
-		if (Constants.WX_PAY.equals(payType)) {
-			String openId = req.getParameter("openId");
-			if (Constants.JSAPI.equals(type)) {
-				if (openId == null || "".equals(openId)) {
-					result.setSuccess(false);
-					result.setErrorMsg("请使用微信授权登录");
-					return result;
-				}
-			}
-			String ip = req.getRemoteAddr();
-			payConfig = new WeiXinPayConfig(openId, ip);
-		}
+		String createType = req.getParameter("createType");
 
 		if (payType == null || type == null) {
 			result.setSuccess(false);
@@ -74,7 +60,7 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			try {
-				result = orderService.saveOrder(orderInfo, payType, type, payConfig);
+				result = orderService.saveOrder(orderInfo, payType, type, req, createType);
 			} catch (DataIntegrityViolationException e) {
 				e.printStackTrace();
 				result.setSuccess(false);
@@ -90,7 +76,7 @@ public class OrderController {
 		}
 		return result;
 	}
-
+	
 	@RequestMapping(value = "{version}/order", method = RequestMethod.GET)
 	public ResultModel listUserOrder(@PathVariable("version") Double version, OrderInfo info, Pagination pagination,
 			HttpServletRequest req, HttpServletResponse res) {

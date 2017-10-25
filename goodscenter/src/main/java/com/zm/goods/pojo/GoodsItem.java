@@ -49,9 +49,37 @@ public class GoodsItem extends GoodsBase {
 	
 	private String thirdCategory;
 	
+	private String secondCategory;
+	
+	private String firstCategory;
+	
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+
+	public String getThirdCategory() {
+		return thirdCategory;
+	}
+
+	public void setThirdCategory(String thirdCategory) {
+		this.thirdCategory = thirdCategory;
+	}
+
+	public String getSecondCategory() {
+		return secondCategory;
+	}
+
+	public void setSecondCategory(String secondCategory) {
+		this.secondCategory = secondCategory;
+	}
+
+	public String getFirstCategory() {
+		return firstCategory;
+	}
+
+	public void setFirstCategory(String firstCategory) {
+		this.firstCategory = firstCategory;
+	}
 
 	public String getDescription() {
 		return description;
@@ -69,13 +97,6 @@ public class GoodsItem extends GoodsBase {
 		this.fresh = fresh;
 	}
 
-	public String getThirdCategory() {
-		return thirdCategory;
-	}
-
-	public void setThirdCategory(String thirdCategory) {
-		this.thirdCategory = thirdCategory;
-	}
 
 	public Integer getWeight() {
 		return weight;
