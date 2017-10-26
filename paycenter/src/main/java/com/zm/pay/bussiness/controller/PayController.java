@@ -19,6 +19,7 @@ import com.zm.pay.feignclient.model.OrderGoods;
 import com.zm.pay.feignclient.model.OrderInfo;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
+import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.utils.DateUtils;
 
@@ -37,9 +38,32 @@ public class PayController {
 	public Map<String, String> wxPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
 			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
 
-		Map<String, String> result = payService.weiXinPay(clientId, type, model);
+		return payService.weiXinPay(clientId, type, model);
 
-		return result;
+	}
+	
+	@RequestMapping(value = "alipay/{type}/{clientId}", method = RequestMethod.POST)
+	public String aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
+
+		return payService.aliPay(clientId, type, model);
+
+	}
+	
+	@RequestMapping(value = "alipay/refund/{clientId}", method = RequestMethod.POST)
+	public Map<String,Object> aliRefundPay(@PathVariable("clientId") Integer clientId,
+			@RequestBody RefundPayModel model) throws Exception {
+
+		return payService.aliRefundPay(clientId, model);
+
+	}
+	
+	@RequestMapping(value = "wx/refund/{clientId}", method = RequestMethod.POST)
+	public boolean wxRefundPay(@PathVariable("clientId") Integer clientId,
+			@RequestBody RefundPayModel model) throws Exception {
+
+		return payService.wxRefundPay(clientId, model);
+
 	}
 
 	@RequestMapping(value = "{version}/pay/{payType}/{type}/{orderId}", method = RequestMethod.POST)
@@ -64,7 +88,6 @@ public class PayController {
 				orderFeignClient.closeOrder(version, orderId);
 				throw new RuntimeException("该订单已经超时关闭");
 			}
-
 			// end
 			// 封装支付信息
 			PayModel model = new PayModel();
@@ -78,7 +101,13 @@ public class PayController {
 			model.setDetail(sb.toString().substring(0, sb.toString().length() - 1));
 			// end
 			if (Constants.ALI_PAY.equals(payType)) {
-
+				if (!Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {
+					OrderDetail detail = new OrderDetail();
+					detail.setPayType(Constants.ALI_PAY);
+					detail.setOrderId(info.getOrderId());
+					orderFeignClient.updateOrderPayType(version, detail);
+				}
+				return new ResultModel(payService.aliPay(info.getCenterId(), type, model));
 			}
 
 			// 微信支付

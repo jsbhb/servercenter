@@ -26,7 +26,7 @@ import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
-import com.zm.order.pojo.AbstractPayConfig;
+import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
@@ -38,7 +38,6 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.Tax;
-import com.zm.order.pojo.WeiXinPayConfig;
 import com.zm.order.pojo.dto.PostFeeDTO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
@@ -95,9 +94,9 @@ public class OrderServiceImpl implements OrderService {
 			return result;
 		}
 
-		AbstractPayConfig payConfig = null;
+		String openId = null;
 		if (Constants.WX_PAY.equals(payType)) {
-			String openId = req.getParameter("openId");
+			openId = req.getParameter("openId");
 			if (Constants.JSAPI.equals(type)) {
 				if (openId == null || "".equals(openId)) {
 					result.setSuccess(false);
@@ -105,8 +104,6 @@ public class OrderServiceImpl implements OrderService {
 					return result;
 				}
 			}
-			String ip = req.getRemoteAddr();
-			payConfig = new WeiXinPayConfig(openId, ip);
 		}
 
 		String orderId = CommonUtils.getOrderId(info.getOrderFlag() + "");
@@ -220,11 +217,12 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));
 
 		if (Constants.WX_PAY.equals(payType)) {
-			WeiXinPayConfig weiXinPayConfig = (WeiXinPayConfig) payConfig;
-			payModel.setOpenId(weiXinPayConfig.getOpenId());
-			payModel.setIP(weiXinPayConfig.getIp());
-			Map<String, String> paymap = payFeignClient.wxPay(Integer.valueOf(info.getCenterId()), type, payModel);
+			payModel.setOpenId(openId);
+			payModel.setIP(req.getRemoteAddr());
+			Map<String, String> paymap = payFeignClient.wxPay(info.getCenterId(), type, payModel);
 			result.setObj(paymap);
+		} else if (Constants.ALI_PAY.equals(payType)) {
+			result.setObj(payFeignClient.aliPay(info.getCenterId(), type, payModel));
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
@@ -393,18 +391,37 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public ResultModel orderCancel(OrderInfo info) {
+	public ResultModel orderCancel(String orderId) throws Exception {
 
-		if (Constants.TRADE_ORDER_TYPE.equals(info.getOrderFlag())) {
-			orderMapper.updateOrderCancel(info.getOrderId());
+		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
 
-		} else if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()) {// TODO
+																	// 如果再发送第三方过程中退款？？？？
+				RefundPayModel model = new RefundPayModel(info.getOrderId(), info.getOrderDetail().getPayNo(),
+						info.getOrderDetail().getPayment() + "", "正常退款");
+				boolean flag = false;
+				if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {
+					Map<String,Object> result =  payFeignClient.aliRefundPay(info.getCenterId(), model);
+					if((Boolean) result.get("success")){
+						flag = true;
+					}else{
+						return new ResultModel(false, result.get("errorMsg"));
+					}
+				} else {
+					return new ResultModel(false, "暂只支持支付宝退款");
+				}
 
-			Integer status = orderMapper.getOrderStatusByOrderId(info.getOrderId());
-			if (Constants.ORDER_DELIVER.equals(status)) {
-				// 已发货，不能退单
+				if (flag) {
+					orderMapper.updateOrderCancel(orderId);
+					stockBack(info);
+				} 
+
+			} else {
+				// TODO 发送仓库确认是否可以退单
 			}
-			// TODO 退单流程，根据status状态，库存处理，资金处理
+		} else {
+
 		}
 
 		String content = "订单号\"" + info.getOrderId() + "\"退单";
@@ -437,18 +454,22 @@ public class OrderServiceImpl implements OrderService {
 				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
 
 		} else {
-			List<OrderGoods> goodsList = info.getOrderGoodsList();
-			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
-			OrderBussinessModel model = null;
-			for (OrderGoods goods : goodsList) {
-				model = new OrderBussinessModel();
-				model.setItemId(goods.getItemId());
-				model.setQuantity(goods.getItemQuantity());
-				list.add(model);
-			}
-			goodsFeignClient.stockBack(Constants.FIRST_VERSION, list, info.getCenterId(), info.getOrderFlag());
+			stockBack(info);
 		}
 		return true;
+	}
+
+	private void stockBack(OrderInfo info) {
+		List<OrderGoods> goodsList = info.getOrderGoodsList();
+		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+		OrderBussinessModel model = null;
+		for (OrderGoods goods : goodsList) {
+			model = new OrderBussinessModel();
+			model.setItemId(goods.getItemId());
+			model.setQuantity(goods.getItemQuantity());
+			list.add(model);
+		}
+		goodsFeignClient.stockBack(Constants.FIRST_VERSION, list, info.getCenterId(), info.getOrderFlag());
 	}
 
 	@Override

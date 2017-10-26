@@ -3,6 +3,8 @@ package com.zm.pay.constants;
 public class Constants {
 
 	public static final Double FIRST_VERSION = 1.0;
+	
+	//****************************微信支付参数*******************************
 
 	public static final String FEE_TYPE = "CNY";
 
@@ -54,4 +56,10 @@ public class Constants {
 	public static final String CUSTOMS_PLACE = "NINGBO";//海关编号
 	public static final String CUSTOMS_SERVICE = "alipay.acquire.customs";//报关接口
 	public static final String CUSTOMS_QUERY_SERVICE = "alipay.overseas.acquire.customs.query";//报关接口
+	
+	//********************支付宝支付参数*****************************
+	public static final String ALI_NOTIFY_URL = "";
+	public static final String ALI_RETURN_URL = "";
+	public static final String SCAN_CODE = "scanCode";//扫码支付
+	public static final String SCAN_CODE_SERVICE = "create_direct_pay_by_user";//扫码支付接口名
 }

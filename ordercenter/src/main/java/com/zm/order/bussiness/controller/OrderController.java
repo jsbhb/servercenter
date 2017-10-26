@@ -149,17 +149,19 @@ public class OrderController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/order/cancel", method = RequestMethod.PUT)
-	public ResultModel orderCancel(@PathVariable("version") Double version, @RequestBody OrderInfo info,
+	@RequestMapping(value = "{version}/order/cancel", method = RequestMethod.POST)
+	public ResultModel orderCancel(@PathVariable("version") Double version, String orderId,
 			HttpServletRequest req, HttpServletResponse res) {
 
-		ResultModel result = new ResultModel();
-
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = orderService.orderCancel(info);
+			try {
+				return orderService.orderCancel(orderId);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
-		return result;
+		return new ResultModel(false, "error");
 	}
 
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)

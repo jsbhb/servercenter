@@ -15,6 +15,7 @@ import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
+import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.ZxingUtils;
@@ -60,6 +61,26 @@ public class WxPayUtils {
 		}
 
 		Map<String, String> resp = wxpay.unifiedOrder(data);
+		logger.info(resp.toString());
+		return resp;
+	}
+	
+	
+	//微信退款接口
+	public static Map<String, String> wxRefundPay(WeixinPayConfig config, RefundPayModel model) throws Exception{
+		WXPay wxpay = new WXPay(config);
+
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("transaction_id", model.getPayNo());
+		data.put("out_trade_no", model.getOrderId());
+		data.put("out_refund_no", model.getOrderId());
+		data.put("fee_type", Constants.FEE_TYPE);
+		data.put("total_fee", Double.valueOf(model.getAmount()) * 100 + "");
+		data.put("refund_fee", Double.valueOf(model.getAmount()) * 100 + "");
+		data.put("refund_fee_type", "CNY");
+		data.put("refund_desc", model.getReason());
+		
+		Map<String, String> resp = wxpay.refund(data);
 		logger.info(resp.toString());
 		return resp;
 	}

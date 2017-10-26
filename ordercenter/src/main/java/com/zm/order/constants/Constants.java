@@ -49,9 +49,11 @@ public class Constants {
 	
 	//*********************订单类型*********************
 	
-	public static final Integer O2O_ORDER_TYPE = 0;
+	public static final Integer O2O_ORDER_TYPE = 0;//跨境
 
-	public static final Integer TRADE_ORDER_TYPE = 1;
+	public static final Integer TRADE_ORDER_TYPE = 1;//大贸
+	
+	public static final Integer GENERAL_TRADE = 2;//一般贸易
 	
 	//*********************限时抢购下单*********************
 	public static final String TIMELIMIT_ORDER = "timelimit";

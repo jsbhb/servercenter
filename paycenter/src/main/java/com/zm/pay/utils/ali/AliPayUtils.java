@@ -4,17 +4,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.CustomModel;
+import com.zm.pay.pojo.PayModel;
+import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.ali.util.AlipaySubmit;
 
 public class AliPayUtils {
-	
-	//支付宝报关接口
-	public static Map<String,String> acquireCustom(AliPayConfigModel config, CustomModel custom) throws DocumentException {
+
+	private static Logger logger = LoggerFactory.getLogger(AliPayUtils.class);
+
+	// 支付宝报关接口
+	public static Map<String, String> acquireCustom(AliPayConfigModel config, CustomModel custom)
+			throws DocumentException {
 		config.initParameter();
 		// 把请求参数打包成数组
 		Map<String, String> sParaTemp = new HashMap<String, String>();
@@ -30,7 +42,59 @@ public class AliPayUtils {
 
 		// 建立请求
 		String sHtmlText = AlipaySubmit.buildRequest(config, sParaTemp, "get", "确认");
-		
+
 		return CommonUtils.xmlToMap(sHtmlText);
+	}
+
+	// 支付宝支付接口
+	public static String aliPay(String type, AliPayConfigModel config, PayModel model) {
+
+		// 把请求参数打包成数组
+		config.initParameter();
+		Map<String, String> sParaTemp = new HashMap<String, String>();
+		if (Constants.SCAN_CODE.equals(type)) {
+			sParaTemp.put("service", Constants.SCAN_CODE_SERVICE);
+			sParaTemp.put("payment_type", "1");// 扫码支付默认1
+		}
+
+		sParaTemp.put("partner", config.getPid());
+		sParaTemp.put("seller_id", config.getPid());
+		sParaTemp.put("_input_charset", config.getCharset());
+		sParaTemp.put("notify_url", Constants.ALI_NOTIFY_URL);
+		sParaTemp.put("return_url", Constants.ALI_RETURN_URL);
+		sParaTemp.put("anti_phishing_key", "");// 防钓鱼时间戳
+		sParaTemp.put("exter_invoke_ip", "");
+		sParaTemp.put("out_trade_no", model.getOrderId());
+		sParaTemp.put("subject", model.getSubject());
+		sParaTemp.put("total_fee", model.getTotalAmount());
+		sParaTemp.put("body", model.getBody());
+
+		// 建立请求
+		return AlipaySubmit.buildRequest(config, sParaTemp, "get", "确认");
+	}
+
+	private static final String ALI_API_GATEWAY = "https://openapi.alipay.com/gateway.do";
+
+	// 支付宝退款接口
+	public static Map<String,Object> aliRefundPay(AliPayConfigModel config, RefundPayModel model) throws AlipayApiException {
+		AlipayClient alipayClient = new DefaultAlipayClient(ALI_API_GATEWAY, config.getAppId(),
+				config.getRsaPrivateKey(), "json", "utf-8", config.getRsaPublicKey(), "RSA2");
+		AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+		request.setBizContent(model.getBizContent());
+		AlipayTradeRefundResponse response = alipayClient.execute(request);
+		Map<String,Object> result = new HashMap<String, Object>();
+		
+		if (response.isSuccess()) {
+			result.put("success", true);
+			return result;
+		} else {
+			logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
+					+ response.getSubMsg());
+			result.put("success", false);
+			result.put("errorMsg", response.getMsg());
+			result.put("errorSubMsg", response.getSubCode());
+			return result;
+		}
+		
 	}
 }

@@ -83,12 +83,19 @@
 			<version>0.0.3</version>
 		</dependency>
 
-		<!-- 支付宝 生成二维码 -->
+		<!-- 支付宝 -->
 		<dependency>
 			<groupId>com.alipay</groupId>
 			<artifactId>core</artifactId>
 			<version>2.1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.alipay</groupId>
+			<artifactId>sdk</artifactId>
+			<version>20171023143759</version>
+		</dependency>
+		
 
 		<!-- httpclient -->
 		<dependency>

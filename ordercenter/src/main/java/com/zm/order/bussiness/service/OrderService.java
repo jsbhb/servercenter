@@ -149,7 +149,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ResultModel orderCancel(OrderInfo info);
+	ResultModel orderCancel(String orderId) throws Exception;
 
 	/**
 	 * getOrderByOrderIdForPay:支付中心根据订单号获取订单. <br/>

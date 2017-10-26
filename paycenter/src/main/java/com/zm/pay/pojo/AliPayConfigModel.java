@@ -1,7 +1,11 @@
 package com.zm.pay.pojo;
 
 import java.io.Serializable;
-
+/**
+ * 支付宝支付 除了退款不支持MD5用RSA，其他用MD5
+ * @author user
+ *
+ */
 public class AliPayConfigModel implements Serializable{
 
 	private static final long serialVersionUID = 1L;
