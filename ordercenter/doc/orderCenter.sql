@@ -56,6 +56,7 @@ CREATE TABLE `zm_order`.`order_detail` (
   `fax_fee` DECIMAL(10,2) NULL,
   `pay_no` VARCHAR(100) NULL,
   `return_pay_no` VARCHAR(100) NULL COMMENT '退款时的交易流水号',
+  `return_pay_time` DATETIME NULL,
   `delivery_place` VARCHAR(50)  NULL,
   `carry_address` VARCHAR(200)  NULL COMMENT '自提地址',
   `receive_name` VARCHAR(50)  NULL,

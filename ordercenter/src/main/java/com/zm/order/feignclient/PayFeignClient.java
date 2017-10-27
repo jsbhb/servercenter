@@ -25,4 +25,8 @@ public interface PayFeignClient {
 	@RequestMapping(value = "alipay/{type}/{clientId}", method = RequestMethod.POST)
 	public String aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
 			@RequestBody PayModel model) throws Exception;
+	
+	@RequestMapping(value = "wx/refund/{clientId}", method = RequestMethod.POST)
+	public Map<String, Object> wxRefundPay(@PathVariable("clientId") Integer clientId,
+			@RequestBody RefundPayModel model) throws Exception;
 }

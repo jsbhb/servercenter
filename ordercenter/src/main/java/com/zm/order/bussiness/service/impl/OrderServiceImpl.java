@@ -400,28 +400,27 @@ public class OrderServiceImpl implements OrderService {
 																	// 如果再发送第三方过程中退款？？？？
 				RefundPayModel model = new RefundPayModel(info.getOrderId(), info.getOrderDetail().getPayNo(),
 						info.getOrderDetail().getPayment() + "", "正常退款");
-				boolean flag = false;
+				Map<String,Object> result = new HashMap<String, Object>();
 				if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {
-					Map<String,Object> result =  payFeignClient.aliRefundPay(info.getCenterId(), model);
-					if((Boolean) result.get("success")){
-						flag = true;
-					}else{
-						return new ResultModel(false, result.get("errorMsg"));
-					}
-				} else {
-					return new ResultModel(false, "暂只支持支付宝退款");
+					result =  payFeignClient.aliRefundPay(info.getCenterId(), model);
 				}
-
-				if (flag) {
+				if(Constants.WX_PAY.equals(info.getOrderDetail().getPayType())){
+					result =  payFeignClient.wxRefundPay(info.getCenterId(), model);
+				}
+				if((Boolean) result.get("success")){
+					OrderDetail detail = new OrderDetail();
+					detail.setOrderId(orderId);
+					detail.setReturnPayNo((String)result.get("returnPayNo"));
 					orderMapper.updateOrderCancel(orderId);
 					stockBack(info);
-				} 
-
+				}else{
+					return new ResultModel(false, result.get("errorMsg"));
+				}
 			} else {
-				// TODO 发送仓库确认是否可以退单
+				// TODO 发送仓库确认是否可以退单 
 			}
 		} else {
-
+			//TODO 大贸和一般贸易
 		}
 
 		String content = "订单号\"" + info.getOrderId() + "\"退单";
@@ -537,5 +536,10 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<Express> listExpress() {
 		return orderMapper.listExpress();
+	}
+
+	@Override
+	public void updateRefundPayNo(OrderDetail detail) {
+		orderMapper.updateRefundPayNo(detail);
 	}
 }

@@ -80,4 +80,6 @@ public interface OrderMapper {
 	Double getDefaultFee(@Param("carrierKey") String carrierKey);
 	
 	List<Express> listExpress();
+
+	void updateRefundPayNo(OrderDetail detail);
 }

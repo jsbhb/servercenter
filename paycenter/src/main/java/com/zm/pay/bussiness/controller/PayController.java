@@ -59,7 +59,7 @@ public class PayController {
 	}
 	
 	@RequestMapping(value = "wx/refund/{clientId}", method = RequestMethod.POST)
-	public boolean wxRefundPay(@PathVariable("clientId") Integer clientId,
+	public Map<String, Object> wxRefundPay(@PathVariable("clientId") Integer clientId,
 			@RequestBody RefundPayModel model) throws Exception {
 
 		return payService.wxRefundPay(clientId, model);

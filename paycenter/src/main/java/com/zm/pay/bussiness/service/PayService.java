@@ -45,5 +45,5 @@ public interface PayService {
 	 * @param model
 	 * @return
 	 */
-	boolean wxRefundPay(Integer clientId, RefundPayModel model) throws Exception;
+	Map<String, Object> wxRefundPay(Integer clientId, RefundPayModel model) throws Exception;
 }

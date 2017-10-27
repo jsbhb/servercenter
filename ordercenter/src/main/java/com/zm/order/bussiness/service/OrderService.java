@@ -240,4 +240,14 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	List<Express> listExpress();
+	
+	/**
+	 * updateRefundPayNo:更新退款交易单号. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void updateRefundPayNo(OrderDetail detail);
 }

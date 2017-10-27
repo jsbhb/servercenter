@@ -217,6 +217,14 @@
 		</if>
 		where order_id = #{orderId}
 	</update>
+	
+	<update id="updateRefundPayNo" parameterType="Object">
+		update order_detail set return_pay_time = now()
+		<if test="returnPayNo != null and returnPayNo != ''">
+			,return_pay_no = #{returnPayNo}
+		</if>
+		where order_id = #{orderId}
+	</update>
 
 	<select id="getCountByStatus" parameterType="Object"
 		resultType="com.zm.order.pojo.OrderCount">

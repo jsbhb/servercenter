@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dom4j.DocumentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -21,8 +19,6 @@ import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.ali.util.AlipaySubmit;
 
 public class AliPayUtils {
-
-	private static Logger logger = LoggerFactory.getLogger(AliPayUtils.class);
 
 	// 支付宝报关接口
 	public static Map<String, String> acquireCustom(AliPayConfigModel config, CustomModel custom)
@@ -76,25 +72,12 @@ public class AliPayUtils {
 	private static final String ALI_API_GATEWAY = "https://openapi.alipay.com/gateway.do";
 
 	// 支付宝退款接口
-	public static Map<String,Object> aliRefundPay(AliPayConfigModel config, RefundPayModel model) throws AlipayApiException {
+	public static AlipayTradeRefundResponse aliRefundPay(AliPayConfigModel config, RefundPayModel model) throws AlipayApiException {
 		AlipayClient alipayClient = new DefaultAlipayClient(ALI_API_GATEWAY, config.getAppId(),
 				config.getRsaPrivateKey(), "json", "utf-8", config.getRsaPublicKey(), "RSA2");
 		AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
 		request.setBizContent(model.getBizContent());
-		AlipayTradeRefundResponse response = alipayClient.execute(request);
-		Map<String,Object> result = new HashMap<String, Object>();
-		
-		if (response.isSuccess()) {
-			result.put("success", true);
-			return result;
-		} else {
-			logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
-					+ response.getSubMsg());
-			result.put("success", false);
-			result.put("errorMsg", response.getMsg());
-			result.put("errorSubMsg", response.getSubCode());
-			return result;
-		}
+		return  alipayClient.execute(request);
 		
 	}
 }

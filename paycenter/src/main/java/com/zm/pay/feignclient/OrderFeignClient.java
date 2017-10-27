@@ -61,4 +61,5 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/close/{orderId}", method = RequestMethod.PUT)
 	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId);
+	
 }

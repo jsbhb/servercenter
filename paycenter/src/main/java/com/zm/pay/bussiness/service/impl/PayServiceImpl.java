@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.constants.LogConstants;
@@ -110,48 +111,63 @@ public class PayServiceImpl implements PayService {
 		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝支付" + type + "，后台请求成功";
 		logFeignClient.saveLog(Constants.FIRST_VERSION,
 				CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝支付", clientId, content, ""));
-		
+
 		return AliPayUtils.aliPay(type, config, model);
 	}
 
 	@Override
-	public Map<String,Object> aliRefundPay(Integer clientId, RefundPayModel model) throws AlipayApiException {
+	public Map<String, Object> aliRefundPay(Integer clientId, RefundPayModel model) throws AlipayApiException {
 		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
-		
-		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝退款，后台请求成功";
-		logFeignClient.saveLog(Constants.FIRST_VERSION,
-				CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝退款", clientId, content, ""));
-		
-		return AliPayUtils.aliRefundPay(config, model);
+
+		AlipayTradeRefundResponse response = AliPayUtils.aliRefundPay(config, model);
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		if (response.isSuccess()) {
+			String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝退款，后台请求成功";
+			logFeignClient.saveLog(Constants.FIRST_VERSION,
+					CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝退款", clientId, content, ""));
+			result.put("success", true);
+			result.put("returnPayNo", response.getTradeNo());
+		} else {
+			logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
+					+ response.getSubMsg());
+			result.put("success", false);
+			result.put("errorMsg", response.getMsg());
+			result.put("errorSubMsg", response.getSubCode());
+		}
+
+		return result;
 	}
 
 	@Override
-	public boolean wxRefundPay(Integer clientId, RefundPayModel model) throws Exception {
+	public Map<String, Object> wxRefundPay(Integer clientId, RefundPayModel model) throws Exception {
 		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
 
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);
-		
+
 		Map<String, String> resp = WxPayUtils.wxRefundPay(config, model);
-		
+
 		String return_code = (String) resp.get("return_code");
 		String result_code = (String) resp.get("result_code");
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, Object> result = new HashMap<String, Object>();
 
 		if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
+			result.put("success", true);
+			result.put("returnPayNo", resp.get("refund_id"));
 			String content = "订单号 \"" + model.getOrderId() + "\" 通过微信退款，后台请求成功";
 			logFeignClient.saveLog(Constants.FIRST_VERSION,
 					CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
 		} else {
-			result.put("success", "false");
+			result.put("success", false);
 			if ("SUCCESS".equals(return_code)) {
 				result.put("errorMsg", (String) resp.get("err_code_des"));
 			}
 		}
-		
-		return false;
+
+		return result;
 	}
 
 }

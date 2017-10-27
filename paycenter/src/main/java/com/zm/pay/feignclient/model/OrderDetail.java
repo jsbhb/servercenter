@@ -26,6 +26,8 @@ public class OrderDetail {
 	private String faxFee;
 
 	private String payNo;
+	
+	private String returnPayNo;
 
 	// 发货地
 	private String deliveryPlace;
@@ -48,6 +50,14 @@ public class OrderDetail {
 	private String receiveZipCode;
 
 	private String remark;
+
+	public String getReturnPayNo() {
+		return returnPayNo;
+	}
+
+	public void setReturnPayNo(String returnPayNo) {
+		this.returnPayNo = returnPayNo;
+	}
 
 	public Integer getId() {
 		return id;

@@ -27,6 +27,8 @@ public class OrderDetail {
 
 	private String payNo;
 	
+	private String returnPayNo;
+	
 	private Integer customStatus;
 
 	// 发货地
@@ -50,6 +52,14 @@ public class OrderDetail {
 	private String receiveZipCode;
 
 	private String remark;
+
+	public String getReturnPayNo() {
+		return returnPayNo;
+	}
+
+	public void setReturnPayNo(String returnPayNo) {
+		this.returnPayNo = returnPayNo;
+	}
 
 	public Integer getCustomStatus() {
 		return customStatus;
