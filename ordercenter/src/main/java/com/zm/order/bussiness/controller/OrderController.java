@@ -25,6 +25,12 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.dto.PostFeeDTO;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 /**
  * ClassName: OrderController <br/>
  * Function: TODO ADD FUNCTION. <br/>
@@ -36,12 +42,19 @@ import com.zm.order.pojo.dto.PostFeeDTO;
  */
 
 @RestController
+@Api("订单类相关API")
 public class OrderController {
 
 	@Resource
 	OrderService orderService;
-
+	
+	@ApiOperation("创建订单接口") 
 	@RequestMapping(value = "{version}/order", method = RequestMethod.POST)
+	@ApiImplicitParams({  
+        @ApiImplicitParam(paramType="query",name="type",dataType="String",required=true,value="支付模式，如公众号支付JSAPI"),  
+        @ApiImplicitParam(paramType="query",name="createType",dataType="String",required=true,value="创建渠道，普通：\"\",限时抢购：timelimit"),  
+        @ApiImplicitParam(paramType="path",name="version",dataType="Double",required=true,value="版本号，默认1.0") 
+	})  
 	public ResultModel createOrder(@PathVariable("version") Double version, @RequestBody OrderInfo orderInfo,
 			HttpServletResponse res, HttpServletRequest req) {
 

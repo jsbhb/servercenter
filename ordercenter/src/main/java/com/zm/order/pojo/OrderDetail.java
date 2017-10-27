@@ -1,5 +1,8 @@
 package com.zm.order.pojo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * ClassName: OrderDetail <br/>
  * Function: TODO ADD FUNCTION. <br/>
@@ -9,20 +12,25 @@ package com.zm.order.pojo;
  * @version
  * @since JDK 1.7
  */
+@ApiModel(value="orderDetail", description="订单详细信息")
 public class OrderDetail {
 
 	private Integer id;
 
 	private String orderId;
 
+	@ApiModelProperty(value="支付类型1:微信；2支付宝", dataType="Integer", required=true)
 	private Integer payType;
 
+	@ApiModelProperty(value="支付总金额", dataType="Double", required=true)
 	private Double payment;
 
 	private String payTime;
 
+	@ApiModelProperty(value="邮费", dataType="Double", required=true)
 	private Double postFee;
 
+	@ApiModelProperty(value="税费", dataType="Double", required=true)
 	private String faxFee;
 
 	private String payNo;
@@ -32,23 +40,32 @@ public class OrderDetail {
 	private Integer customStatus;
 
 	// 发货地
+	@ApiModelProperty(value="发货地（波龙项目）", dataType="String", required=false)
 	private String deliveryPlace;
 
 	// 自提地址
+	@ApiModelProperty(value="自提地址（波龙项目）", dataType="String", required=false)
 	private String carryAddress;
 
+	@ApiModelProperty(value="收货人姓名", dataType="String", required=true)
 	private String receiveName;
 
+	@ApiModelProperty(value="收货人电话", dataType="String", required=true)
 	private String receivePhone;
 
+	@ApiModelProperty(value="收货人省份", dataType="String", required=true)
 	private String receiveProvince;
 
+	@ApiModelProperty(value="收货人城市", dataType="String", required=true)
 	private String receiveCity;
 
+	@ApiModelProperty(value="收货人区(有则传)", dataType="String", required=false)
 	private String receiveArea;
 
+	@ApiModelProperty(value="收货人详细地址", dataType="String", required=true)
 	private String receiveAddress;
 
+	@ApiModelProperty(value="收货人邮编", dataType="String", required=false)
 	private String receiveZipCode;
 
 	private String remark;

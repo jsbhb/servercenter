@@ -2,6 +2,10 @@ package com.zm.order.pojo;
 
 import java.util.List;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value="orderInfo", description = "订单实体类")
 public class OrderInfo {
 
 	private Integer id;
@@ -9,24 +13,32 @@ public class OrderInfo {
 	private String orderId;
 
 	// 订单拆分时提供一个总ID
+	@ApiModelProperty(value = "不同供应商拆单时，产生的统一订单号", dataType="string", example="123",required = false)
 	private String combinationId;
 
+	@ApiModelProperty(value = "用户ID",dataType="integer", required = true)
 	private Integer userId;
 
 	private Integer status;
 
+	@ApiModelProperty(value = "快递方式0：快递；1：自提",dataType="integer", required = true)
 	// 物流、自提
 	private Integer expressType;
 
+	@ApiModelProperty(value = "该客户端ID",dataType="integer", required = true)
 	// 区域中心ID
 	private Integer centerId;
 
+	@ApiModelProperty(value = "店铺ID,店铺下单必传",dataType="integer", required = false)
 	private Integer shopId;
 	
+	@ApiModelProperty(value = "导购ID",dataType="integer", required = false)
 	private Integer guideId;
 
+	@ApiModelProperty(value = "供应商ID",dataType="integer", required = true)
 	private Integer supplierId;
 
+	@ApiModelProperty(value = "商品条数",dataType="integer", required = true)
 	private Integer tdq;
 
 	private String gtime;
@@ -39,12 +51,15 @@ public class OrderInfo {
 
 	private String remark;
 	
+	@ApiModelProperty(value = "订单类型0:跨境；1：大贸;2：一般贸易",dataType="integer", required = true)
 	private Integer orderFlag;
 	
 	private String statusArr;
 
+	@ApiModelProperty(value = "订单详细信息",dataType="com.zm.order.pojo.OrderDetail", required = true)
 	private OrderDetail orderDetail;
 
+	@ApiModelProperty(value = "订单商品信息",dataType="java.util.List", required = true)
 	private List<OrderGoods> orderGoodsList;
 	
 	private List<OrderExpress> orderExpressList;
