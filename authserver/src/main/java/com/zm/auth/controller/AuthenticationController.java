@@ -1,5 +1,7 @@
 package com.zm.auth.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +23,7 @@ import com.zm.auth.model.ResultPojo;
 public class AuthenticationController {
 
 	@RequestMapping(value = "/authentication", method = RequestMethod.GET)
-	public ResultPojo authentication() throws AuthenticationException {
+	public ResultPojo authentication(HttpServletRequest request) throws AuthenticationException {
 		return new ResultPojo(null);
 	}
 }

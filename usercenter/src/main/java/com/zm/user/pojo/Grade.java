@@ -1,4 +1,5 @@
 package com.zm.user.pojo;
+
 /**
  * @fun 登级表，相当于区域中心表
  * @author user
@@ -7,30 +8,34 @@ package com.zm.user.pojo;
 public class Grade {
 
 	private Integer id;
-	
+
 	private Integer parentId;
-	
+
+	private String parentGradeName;
+
 	private Integer centerId;
-	
+
 	private Integer shopId;
-	
+
 	private Integer gradeType;
-	
+
 	private String gradeName;
-	
+
 	private String personInCharge;
-	
+
 	private String phone;
-	
+
 	private String attribute;
-	
-	private Integer gradePersonInCharge;//负责该区域中心的人
-	
+
+	private Integer gradePersonInCharge;// 负责该区域中心的人
+
 	private String createTime;
-	
+
 	private String updateTime;
-	
+
 	private String opt;
+
+	private String company;
 
 	public Integer getCenterId() {
 		return centerId;
@@ -62,6 +67,14 @@ public class Grade {
 
 	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
+	}
+
+	public String getParentGradeName() {
+		return parentGradeName;
+	}
+
+	public void setParentGradeName(String parentGradeName) {
+		this.parentGradeName = parentGradeName;
 	}
 
 	public Integer getGradeType() {
@@ -135,6 +148,13 @@ public class Grade {
 	public void setOpt(String opt) {
 		this.opt = opt;
 	}
-	
-	
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
 }

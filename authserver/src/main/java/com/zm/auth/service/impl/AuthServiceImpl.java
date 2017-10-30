@@ -140,13 +140,14 @@ public class AuthServiceImpl implements AuthService {
 			if (loginType == Constants.LOGIN_USER_NAME)
 				userName = userInfo.getUserName();
 
-			if (userName == null || "".equals(userName)) {
-				throw new SecurityException("用户名信息有误，请重新输入！");
-			}
-
 			int platUserType = userInfo.getPlatUserType();
 
 			if (platUserType == PlatUserType.CONSUMER.getIndex()) {
+				
+				if (userName == null || "".equals(userName)) {
+					throw new SecurityException("用户名信息有误，请重新输入！");
+				}
+				
 				String pwd = userInfo.getPassword();
 				userInfo.setPassword(MethodUtil.MD5(pwd));
 				userDetail = userMapper.getUserForLogin(userInfo);

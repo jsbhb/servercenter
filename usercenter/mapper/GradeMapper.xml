@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.user.bussiness.dao.GradeMapper">
+	<resultMap type="com.zm.user.pojo.Grade" id="grade">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="parent_grade_name" property="parentGradeName" jdbcType="VARCHAR" />
+		<result column="grade_type" property="gradeType" jdbcType="INTEGER" />
+		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+		<result column="person_in_charge" property="personInCharge" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="attribute" property="attribute" jdbcType="VARCHAR" />
+		<result column="grade_person_in_charge" property="gradePersonInCharge" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="company" property="company" jdbcType="VARCHAR" />
+	</resultMap>
+	
+
+	<select id="selectForPage" parameterType="Object" resultMap="grade">
+		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id
+		<if test="id > 0">
+			and a.id = #{id}
+		</if>
+		<if test="gradeName != null and gradeName != ''">
+			and a.gradeName like CONCAT('%',#{gradeName},'%') 
+		</if>
+		<if test="company != null and company != ''">
+			and a.company like CONCAT('%',#{company},'%') 
+		</if>
+	</select>
+
+
+</mapper>
