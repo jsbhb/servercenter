@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import feign.Retryer;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * 
@@ -19,10 +20,11 @@ import feign.Retryer;
  * @version
  * @since JDK 1.7
  */
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @SpringBootApplication
 @EnableFeignClients
 @EnableTransactionManagement
+@EnableSwagger2
 public class PayApplication {
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(PayApplication.class).web(true).run(args);

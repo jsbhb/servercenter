@@ -1,5 +1,7 @@
 package com.zm.order.pojo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**  
  * ClassName: ResultPojo <br/>  
@@ -10,11 +12,16 @@ package com.zm.order.pojo;
  * @version   
  * @since JDK 1.7  
  */
+@ApiModel
 public class ResultModel {
 
+	@ApiModelProperty(value="错误码")
 	private String errorCode;
+	@ApiModelProperty(value="错误信息")
 	private String errorMsg;
+	@ApiModelProperty(value="是否成功")
 	private boolean success;
+	@ApiModelProperty(value="返回对象")
 	private Object obj;
 	
 	public ResultModel(){}
@@ -28,6 +35,7 @@ public class ResultModel {
 		this.success = success;
 		this.errorMsg = errorMsg;
 	}
+	
 	public String getErrorCode() {
 		return errorCode;
 	}

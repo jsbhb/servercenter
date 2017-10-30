@@ -35,10 +35,10 @@ import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
+import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.Tax;
-import com.zm.order.pojo.dto.PostFeeDTO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
@@ -391,9 +391,12 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public ResultModel orderCancel(String orderId) throws Exception {
+	public ResultModel orderCancel(Integer userId,String orderId) throws Exception {
 
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+		if(info == null || !userId.equals(info.getUserId())){
+			return new ResultModel(false, "该订单号不是您的订单号");
+		}
 
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()) {// TODO
@@ -444,11 +447,16 @@ public class OrderServiceImpl implements OrderService {
 		return true;
 	}
 
+	
+	private static final Integer DEFAULT_USER_ID = -1; 
 	@Override
-	public boolean closeOrder(String orderId) {
+	public boolean closeOrder(Integer userId, String orderId) {
 
-		orderMapper.updateOrderClose(orderId);
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+		if(!DEFAULT_USER_ID.equals(userId) && (info == null || !userId.equals(info.getUserId()))){
+			return false;
+		}
+		orderMapper.updateOrderClose(orderId);
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())
 				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
 
@@ -476,7 +484,7 @@ public class OrderServiceImpl implements OrderService {
 		String time = DateUtils.getTime(Calendar.DATE, -1);
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
 		for (String orderId : orderIdList) {
-			closeOrder(orderId);
+			closeOrder(DEFAULT_USER_ID, orderId);
 		}
 	}
 

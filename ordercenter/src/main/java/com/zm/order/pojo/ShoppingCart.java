@@ -2,6 +2,9 @@ package com.zm.order.pojo;
 
 import com.zm.order.feignclient.model.GoodsSpecs;
 
+import io.swagger.annotations.ApiModel;
+
+@ApiModel
 public class ShoppingCart {
 
 	private Integer id;

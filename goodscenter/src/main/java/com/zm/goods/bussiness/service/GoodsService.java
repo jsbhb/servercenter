@@ -118,7 +118,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<PageModule> getModularData(String page, Layout layout, Integer centerId);
+	List<PageModule> getModularData(Integer pageType, String page, Layout layout, Integer centerId);
 
 	/**
 	 * updateActiveStart:开始活动. <br/>

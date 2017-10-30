@@ -13,9 +13,9 @@ import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
+import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
-import com.zm.order.pojo.dto.PostFeeDTO;
 
 /**
  * ClassName: OrderService <br/>
@@ -149,7 +149,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ResultModel orderCancel(String orderId) throws Exception;
+	ResultModel orderCancel(Integer userId, String orderId) throws Exception;
 
 	/**
 	 * getOrderByOrderIdForPay:支付中心根据订单号获取订单. <br/>
@@ -179,7 +179,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	boolean closeOrder(String orderId);
+	boolean closeOrder(Integer userId, String orderId);
 
 	/**
 	 * closeOrder:定时器关闭超时订单. <br/>

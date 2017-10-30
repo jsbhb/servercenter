@@ -23,7 +23,14 @@ import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.utils.DateUtils;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
+
 @RestController
+@Api(value = "支付服务接口", description = "支付服务接口")
 public class PayController {
 
 	private static final Long time = (Constants.PAY_EFFECTIVE_TIME_HOUR - 1) * 3600000L;// 支付有效期前一小时交易关闭
@@ -35,30 +42,34 @@ public class PayController {
 	PayService payService;
 
 	@RequestMapping(value = "wxpay/{type}/{clientId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public Map<String, String> wxPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
 			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
 
 		return payService.weiXinPay(clientId, type, model);
 
 	}
-	
+
 	@RequestMapping(value = "alipay/{type}/{clientId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public String aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
 			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
 
 		return payService.aliPay(clientId, type, model);
 
 	}
-	
+
 	@RequestMapping(value = "alipay/refund/{clientId}", method = RequestMethod.POST)
-	public Map<String,Object> aliRefundPay(@PathVariable("clientId") Integer clientId,
+	@ApiIgnore
+	public Map<String, Object> aliRefundPay(@PathVariable("clientId") Integer clientId,
 			@RequestBody RefundPayModel model) throws Exception {
 
 		return payService.aliRefundPay(clientId, model);
 
 	}
-	
+
 	@RequestMapping(value = "wx/refund/{clientId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public Map<String, Object> wxRefundPay(@PathVariable("clientId") Integer clientId,
 			@RequestBody RefundPayModel model) throws Exception {
 
@@ -67,6 +78,12 @@ public class PayController {
 	}
 
 	@RequestMapping(value = "{version}/pay/{payType}/{type}/{orderId}", method = RequestMethod.POST)
+	@ApiOperation(value = "付款接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "payType", dataType = "Integer", required = true, value = "付款方式1微信，2支付宝"),
+			@ApiImplicitParam(paramType = "path", name = "type", dataType = "String", required = true, value = "支付模式，如公众号支付JSAPI"),
+			@ApiImplicitParam(paramType = "path", name = "orderId", dataType = "String", required = true, value = "订单号") })
 	public ResultModel pay(@PathVariable("orderId") String orderId, @PathVariable("version") Double version,
 			@PathVariable("type") String type, @PathVariable("payType") Integer payType, HttpServletRequest req)
 					throws Exception {
@@ -137,6 +154,7 @@ public class PayController {
 	}
 
 	@RequestMapping(value = "pay/paycustom", method = RequestMethod.POST)
+	@ApiIgnore
 	public boolean payCustom(@RequestBody CustomModel model) throws Exception {
 
 		return payService.payCustom(model);

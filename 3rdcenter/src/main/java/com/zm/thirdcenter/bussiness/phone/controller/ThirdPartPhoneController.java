@@ -19,6 +19,12 @@ import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.utils.CommonUtil;
 import com.zm.thirdcenter.utils.SmsSendUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * ClassName: ThirdPartPhoneController <br/>
  * Function: 第三方服务-手机服务. <br/>
@@ -29,6 +35,7 @@ import com.zm.thirdcenter.utils.SmsSendUtil;
  * @since JDK 1.7
  */
 @RestController
+@Api(value="手机验证码接口",description="手机验证码")
 public class ThirdPartPhoneController {
 
 	private final Long EFFECTIVE_TIME = 2 * 60 * 1000L;
@@ -37,6 +44,10 @@ public class ThirdPartPhoneController {
 	RedisTemplate<String, PhoneValidata> redisTemplate;
 
 	@RequestMapping(value = "auth/{version}/third-part/phone", method = RequestMethod.POST)
+	@ApiOperation(value = "获取短信验证码接口", produces = "application/json;utf-8")
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "query", name = "phone", dataType = "String", required = true, value = "手机号码")})
 	public ResultModel getPhoneCode(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
@@ -97,6 +108,7 @@ public class ThirdPartPhoneController {
 	}
 
 	@RequestMapping(value = "auth/{version}/third-part/phoneVerify", method = RequestMethod.GET)
+	@ApiIgnore
 	public boolean verifyPhoneCode(@PathVariable("version") Double version, @RequestParam("phone") String phone,
 			@RequestParam("code") String code) {
 

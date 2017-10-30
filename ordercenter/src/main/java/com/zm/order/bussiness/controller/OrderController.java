@@ -21,15 +21,15 @@ import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
+import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
-import com.zm.order.pojo.dto.PostFeeDTO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * ClassName: OrderController <br/>
@@ -42,19 +42,18 @@ import io.swagger.annotations.ApiParam;
  */
 
 @RestController
-@Api("订单类相关API")
+@Api(value="订单类相关API",description="订单类相关API")
 public class OrderController {
 
 	@Resource
 	OrderService orderService;
-	
-	@ApiOperation("创建订单接口") 
-	@RequestMapping(value = "{version}/order", method = RequestMethod.POST)
-	@ApiImplicitParams({  
-        @ApiImplicitParam(paramType="query",name="type",dataType="String",required=true,value="支付模式，如公众号支付JSAPI"),  
-        @ApiImplicitParam(paramType="query",name="createType",dataType="String",required=true,value="创建渠道，普通：\"\",限时抢购：timelimit"),  
-        @ApiImplicitParam(paramType="path",name="version",dataType="Double",required=true,value="版本号，默认1.0") 
-	})  
+
+	@ApiOperation(value = "创建订单接口", response = ResultModel.class)
+	@RequestMapping(value = "{version}/order", method = RequestMethod.POST, produces = "application/json;utf-8")
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "query", name = "type", dataType = "String", required = true, value = "支付模式，如公众号支付JSAPI"),
+			@ApiImplicitParam(paramType = "query", name = "createType", dataType = "String", required = true, value = "创建渠道，普通：\"\",限时抢购：timelimit"),
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel createOrder(@PathVariable("version") Double version, @RequestBody OrderInfo orderInfo,
 			HttpServletResponse res, HttpServletRequest req) {
 
@@ -89,8 +88,11 @@ public class OrderController {
 		}
 		return result;
 	}
-	
+
 	@RequestMapping(value = "{version}/order", method = RequestMethod.GET)
+	@ApiOperation(value = "获取订单接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel listUserOrder(@PathVariable("version") Double version, OrderInfo info, Pagination pagination,
 			HttpServletRequest req, HttpServletResponse res) {
 
@@ -110,6 +112,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/{userId}/{orderId}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "用户删除订单接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "orderId", dataType = "String", required = true, value = "订单ID") })
 	public ResultModel removeUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
@@ -127,6 +134,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/confirm/{userId}/{orderId}", method = RequestMethod.PUT)
+	@ApiOperation(value = "用户确认订单接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "orderId", dataType = "String", required = true, value = "订单ID") })
 	public ResultModel confirmUserOrder(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
@@ -145,6 +157,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/alread-pay/{orderId}", method = RequestMethod.PUT)
+	@ApiIgnore
 	public ResultModel updateOrderPayStatusByOrderId(@PathVariable("version") Double version,
 			@PathVariable("orderId") String orderId, HttpServletRequest req, HttpServletResponse res) {
 
@@ -162,13 +175,18 @@ public class OrderController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/order/cancel", method = RequestMethod.POST)
-	public ResultModel orderCancel(@PathVariable("version") Double version, String orderId,
-			HttpServletRequest req, HttpServletResponse res) {
+	@RequestMapping(value = "{version}/order/cancel/{userId}/{orderId}", method = RequestMethod.POST)
+	@ApiOperation(value = "用户取消订单接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "orderId", dataType = "String", required = true, value = "订单ID") })
+	public ResultModel orderCancel(@PathVariable("version") Double version, @PathVariable("orderId") String orderId,
+			@PathVariable("userId") Integer userId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				return orderService.orderCancel(orderId);
+				return orderService.orderCancel(userId, orderId);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -178,6 +196,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
+	@ApiIgnore
 	public Integer getClientIdByOrderId(@PathVariable("orderId") String orderId,
 			@PathVariable("version") Double version) {
 
@@ -189,7 +208,10 @@ public class OrderController {
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/order/shoping-cart", method = RequestMethod.POST,produces = "application/json;utf-8")
+	@ApiOperation(value = "保存用户购物车接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"), })
 	public ResultModel saveShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody ShoppingCart cart) {
 
@@ -212,6 +234,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/shoping-cart/{centerId}/{userId}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取用户购物车接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel listShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
 			Pagination pagination) {
@@ -244,6 +271,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/statusCount/{centerId}/{userId}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取订单各个状态数量接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getCountByStatus(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId,
 			@PathVariable("centerId") Integer centerId) {
@@ -263,6 +295,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/shoping-cart/{userId}/{ids}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "获取订单各个状态数量接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "ids", dataType = "String", required = true, value = "id,多个用‘，’隔开") })
 	public ResultModel removeShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("ids") String ids) {
 
@@ -281,6 +318,11 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/shoping-cart/count/{centerId}/{userId}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取购物车数量接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel countShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId,
 			@PathVariable("centerId") Integer centerId) {
@@ -299,6 +341,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/pay/{orderId}", method = RequestMethod.GET)
+	@ApiIgnore
 	public OrderInfo getOrderByOrderIdForPay(@PathVariable("version") Double version,
 			@PathVariable("orderId") String orderId) {
 
@@ -311,7 +354,8 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/payType", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/order/payType", method = RequestMethod.POST,produces = "application/json;utf-8")
+	@ApiIgnore
 	public boolean updateOrderPayType(@PathVariable("version") Double version, @RequestBody OrderDetail detail) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -323,12 +367,18 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/close/{orderId}", method = RequestMethod.PUT)
-	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId) {
+	@RequestMapping(value = "{version}/order/close/{userId}/{orderId}", method = RequestMethod.PUT)
+	@ApiOperation(value = "未付款时关闭订单接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "orderId", dataType = "String", required = true, value = "订单ID") })
+	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId,
+			@PathVariable("userId") Integer userId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			orderService.closeOrder(orderId);
+			orderService.closeOrder(userId, orderId);
 			return new ResultModel(true, "");
 		}
 
@@ -337,6 +387,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/close", method = RequestMethod.GET)
+	@ApiIgnore
 	public ResultModel timeTaskcloseOrder(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -350,6 +401,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/paycustom", method = RequestMethod.GET)
+	@ApiIgnore
 	public ResultModel payCustom(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -362,6 +414,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/paycustom/{orderId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel updatePayCustom(@PathVariable("version") Double version,
 			@PathVariable("orderId") String orderId) {
 
@@ -374,7 +427,10 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/postfee", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/order/postfee", method = RequestMethod.POST,produces = "application/json;utf-8")
+	@ApiOperation(value = "获取运费接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel getPostFee(@PathVariable("version") Double version, @RequestBody PostFeeDTO postFee) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -389,6 +445,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "{version}/order/table/{centerId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel createTable(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId) {
 
@@ -402,8 +459,9 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/express", method = RequestMethod.GET)
+	@ApiIgnore
 	public ResultModel listExpress(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {

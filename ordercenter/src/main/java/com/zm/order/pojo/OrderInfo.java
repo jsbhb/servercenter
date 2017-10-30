@@ -5,7 +5,7 @@ import java.util.List;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value="orderInfo", description = "订单实体类")
+@ApiModel
 public class OrderInfo {
 
 	private Integer id;
@@ -13,32 +13,32 @@ public class OrderInfo {
 	private String orderId;
 
 	// 订单拆分时提供一个总ID
-	@ApiModelProperty(value = "不同供应商拆单时，产生的统一订单号", dataType="string", example="123",required = false)
+	@ApiModelProperty(value = "不同供应商拆单时，产生的统一订单号", dataType="string")
 	private String combinationId;
 
-	@ApiModelProperty(value = "用户ID",dataType="integer", required = true)
+	@ApiModelProperty(value = "用户ID",dataType="integer")
 	private Integer userId;
 
 	private Integer status;
 
-	@ApiModelProperty(value = "快递方式0：快递；1：自提",dataType="integer", required = true)
+	@ApiModelProperty(value = "快递方式0：快递；1：自提",dataType="integer")
 	// 物流、自提
 	private Integer expressType;
 
-	@ApiModelProperty(value = "该客户端ID",dataType="integer", required = true)
+	@ApiModelProperty(value = "该客户端ID",dataType="integer")
 	// 区域中心ID
 	private Integer centerId;
 
-	@ApiModelProperty(value = "店铺ID,店铺下单必传",dataType="integer", required = false)
+	@ApiModelProperty(value = "店铺ID,店铺下单必传",dataType="integer")
 	private Integer shopId;
 	
-	@ApiModelProperty(value = "导购ID",dataType="integer", required = false)
+	@ApiModelProperty(value = "导购ID",dataType="integer")
 	private Integer guideId;
 
-	@ApiModelProperty(value = "供应商ID",dataType="integer", required = true)
+	@ApiModelProperty(value = "供应商ID",dataType="integer")
 	private Integer supplierId;
 
-	@ApiModelProperty(value = "商品条数",dataType="integer", required = true)
+	@ApiModelProperty(value = "商品条数",dataType="integer")
 	private Integer tdq;
 
 	private String gtime;
@@ -51,15 +51,15 @@ public class OrderInfo {
 
 	private String remark;
 	
-	@ApiModelProperty(value = "订单类型0:跨境；1：大贸;2：一般贸易",dataType="integer", required = true)
+	@ApiModelProperty(value = "订单类型0:跨境；1：大贸;2：一般贸易",dataType="integer")
 	private Integer orderFlag;
 	
 	private String statusArr;
 
-	@ApiModelProperty(value = "订单详细信息",dataType="com.zm.order.pojo.OrderDetail", required = true)
+	@ApiModelProperty(value = "订单详细信息",dataType="com.zm.order.pojo.OrderDetail")
 	private OrderDetail orderDetail;
 
-	@ApiModelProperty(value = "订单商品信息",dataType="java.util.List", required = true)
+	@ApiModelProperty(value = "订单商品信息",dataType="java.util.List")
 	private List<OrderGoods> orderGoodsList;
 	
 	private List<OrderExpress> orderExpressList;

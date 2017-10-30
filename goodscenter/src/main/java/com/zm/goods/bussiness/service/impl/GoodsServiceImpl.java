@@ -372,12 +372,13 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public List<PageModule> getModularData(String page, Layout layout, Integer centerId) {
+	public List<PageModule> getModularData(Integer pageType, String page, Layout layout, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		List<PageModule> result = new ArrayList<PageModule>();
 		String id = judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("page", page);
+		param.put("pageType", pageType);
 		if (layout.getId() == null) {
 			List<Layout> layoutList = goodsMapper.listLayout(param);
 			if (layoutList != null && layoutList.size() > 0) {

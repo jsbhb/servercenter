@@ -26,6 +26,12 @@ import com.zm.thirdcenter.feignclient.model.ThirdLogin;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * ClassName: ThirdLoginPluginController <br/>
  * Function: 第三方登录. <br/>
@@ -36,6 +42,7 @@ import com.zm.thirdcenter.pojo.WXLoginConfig;
  * @since JDK 1.7
  */
 @RestController
+@Api(value="第三方登录插件",description="第三方登录插件")
 public class ThirdLoginPluginController {
 
 	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
@@ -47,6 +54,9 @@ public class ThirdLoginPluginController {
 	UserFeignClient userFeignClient;
 
 	@RequestMapping(value = "auth/{version}/user/3rdLogin/wx", method = RequestMethod.POST)
+	@ApiOperation(value = "获取微信登录url接口", produces = "application/json;utf-8")
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public String getRequestCodeUrl(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody WXLoginConfig param) {
 
@@ -75,6 +85,7 @@ public class ThirdLoginPluginController {
 	}
 
 	@RequestMapping(value = "auth/{version}/user/3rdLogin/wxLogin", method = RequestMethod.GET)
+	@ApiIgnore
 	public ResultModel loginByWechat(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 

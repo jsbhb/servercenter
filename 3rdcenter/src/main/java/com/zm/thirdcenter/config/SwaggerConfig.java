@@ -1,4 +1,4 @@
-package com.zm.order.config;
+package com.zm.thirdcenter.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 public class SwaggerConfig {
 
-	public static final String SWAGGER_SCAN_BASE_PACKAGE = "com.zm.order";
+	public static final String SWAGGER_SCAN_BASE_PACKAGE = "com.zm.thirdcenter";
     public static final String VERSION = "1.0.0";
     
     @Bean
@@ -28,8 +28,8 @@ public class SwaggerConfig {
     }
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("订单类内部接口文档")//设置文档的标题
-            .description("订单类内部服务文档")//设置文档的描述->1.Overview
+            .title("第三方内部接口文档")//设置文档的标题
+            .description("第三方内部服务文档")//设置文档的描述->1.Overview
             .version(VERSION)//设置文档的版本信息-> 1.1 Version information
             .contact(new Contact("", "", ""))//设置文档的联系方式->1.2 Contact information
             .termsOfServiceUrl("")//设置文档的License信息->1.3 License information

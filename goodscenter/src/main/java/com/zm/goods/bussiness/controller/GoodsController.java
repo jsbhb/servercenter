@@ -28,6 +28,12 @@ import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.TimeLimitActive;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
+
 /**
  * ClassName: GoodsController <br/>
  * Function: TODO ADD FUNCTION. <br/>
@@ -39,12 +45,16 @@ import com.zm.goods.pojo.vo.TimeLimitActive;
  */
 
 @RestController
+@Api(value = "商品服务中心内部接口", description = "商品服务中心内部接口")
 public class GoodsController {
 
 	@Resource
 	GoodsService goodsService;
 
 	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
+	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel listGoods(@PathVariable("version") Double version, Pagination pagination,
 			GoodsSearch searchModel, SortModelList sortList) {
 
@@ -58,15 +68,15 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "auth/{version}/goods", method = RequestMethod.GET)
+	@ApiOperation(value = "搜索商品接口(根据goodsId)", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 
 		String type = req.getParameter("type");
-		String secondCategory = req.getParameter("secondCategory");
-		String firstCategory = req.getParameter("firstCategory");
-		String thirdCategory = req.getParameter("thirdCategory");
 		String goodsId = req.getParameter("goodsId");
 		String centerId = req.getParameter("centerId");
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -85,9 +95,6 @@ public class GoodsController {
 			}
 			param.put("centerId", centerId);
 			param.put("type", type);
-			param.put("secondCategory", secondCategory);
-			param.put("firstCategory", firstCategory);
-			param.put("thirdCategory", thirdCategory);
 			param.put("goodsId", goodsId);
 			pagination.init();
 			param.put("pagination", pagination);
@@ -101,6 +108,13 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
+	@ApiOperation(value = "商品价格比价接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "itemId", dataType = "String", required = true, value = "商品唯一编码itemId"),
+			@ApiImplicitParam(paramType = "query", name = "startTime", dataType = "String", required = false, value = "开始时间"),
+			@ApiImplicitParam(paramType = "query", name = "endTime", dataType = "String", required = false, value = "结束时间"),
+			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel listPriceConstrast(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId) {
 
@@ -130,6 +144,11 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{centerId}/{itemId}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取单个商品规格接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "itemId", dataType = "String", required = true, value = "商品唯一编码itemId"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("itemId") String itemId,
 			@PathVariable("centerId") Integer centerId) {
@@ -147,6 +166,11 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
+	@ApiOperation(value = "获取多个商品规格接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "query", name = "itemIds", dataType = "String", required = true, value = "商品唯一编码itemId,以逗号隔开"),
+			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
@@ -167,6 +191,7 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip,
 			Integer centerId, Integer orderFlag, String createType) {
@@ -181,6 +206,12 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)
+	@ApiOperation(value = "获取活动接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "query", name = "typeStatus", dataType = "Integer", required = true, value = "活动范围，1全场，0特定区域"),
+			@ApiImplicitParam(paramType = "query", name = "type", dataType = "Integer", required = false, value = "活动类型：0：限时抢购；1：满减，2满打折"),
+			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getActivity(@PathVariable("version") Double version,
 			@RequestParam(value = "type", required = false) Integer type,
 			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId) {
@@ -205,6 +236,12 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/modular/{centerId}/{page}/{pageType}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取模块布局接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "page", dataType = "String", required = true, value = "页面"),
+			@ApiImplicitParam(paramType = "path", name = "pageType", dataType = "Integer", required = true, value = "页面类型：0：PC；1：手机"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getModular(@PathVariable("version") Double version, @PathVariable("page") String page,
 			@PathVariable("centerId") Integer centerId, @PathVariable("pageType") Integer pageType) {
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -216,12 +253,19 @@ public class GoodsController {
 
 	}
 
-	@RequestMapping(value = "{version}/goods/modulardata/{centerId}/{page}", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/modulardata/{centerId}/{page}/{pageType}", method = RequestMethod.POST, produces = "application/json;utf-8")
+	@ApiOperation(value = "获取模块和数据接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "page", dataType = "String", required = true, value = "页面"),
+			@ApiImplicitParam(paramType = "path", name = "pageType", dataType = "Integer", required = true, value = "页面类型：0：PC；1：手机"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getModularData(@PathVariable("version") Double version, @RequestBody Layout layout,
-			@PathVariable("page") String page, @PathVariable("centerId") Integer centerId, HttpServletRequest req) {
+			@PathVariable("page") String page, @PathVariable("centerId") Integer centerId,
+			@PathVariable("pageType") Integer pageType) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(true, goodsService.getModularData(page, layout, centerId));
+			return new ResultModel(true, goodsService.getModularData(pageType, page, layout, centerId));
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -229,6 +273,7 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/table/{centerId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel createTable(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -242,6 +287,7 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/active/start/{centerId}/{activeId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel startActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
 			@PathVariable("centerId") Integer centerId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -254,6 +300,7 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/active/end/{centerId}/{activeId}", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel endActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
 			@PathVariable("centerId") Integer centerId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -266,6 +313,7 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/endactive", method = RequestMethod.GET)
+	@ApiIgnore
 	public ResultModel getEndActive(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -277,6 +325,10 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/createlucene", method = RequestMethod.GET)
+	@ApiOperation(value = "创建lucene接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel createLucene(@PathVariable("version") Double version,
 			@RequestParam("centerId") Integer centerId) {
 
@@ -290,6 +342,10 @@ public class GoodsController {
 	}
 
 	@RequestMapping(value = "{version}/goods/navigation", method = RequestMethod.GET)
+	@ApiOperation(value = "获取首页分类接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel loadIndexNavigation(@PathVariable("version") Double version,
 			@RequestParam("centerId") Integer centerId) {
 
@@ -305,6 +361,7 @@ public class GoodsController {
 	 * @fun 库存回滚
 	 */
 	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
+	@ApiIgnore
 	public ResultModel stockBack(@PathVariable("version") Double version, Integer centerId,
 			@RequestBody List<OrderBussinessModel> list, Integer orderFlag) {
 
@@ -321,6 +378,10 @@ public class GoodsController {
 	 * @fun 获取限时抢购商品
 	 */
 	@RequestMapping(value = "{version}/goods/timelimit/{centerId}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取限时抢购数据接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getTimelimitGoods(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId) {
 
@@ -342,6 +403,11 @@ public class GoodsController {
 	 * 
 	 */
 	@RequestMapping(value = "{version}/goods/specialgoods/{centerId}/{type}", method = RequestMethod.GET)
+	@ApiOperation(value = "获取特殊属性商品接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "type", dataType = "type", required = true, value = "页面类型：0：新品；1：特推，2渠道，3精选"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getSpecialGoods(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId, @PathVariable("type") Integer type) {
 

@@ -1,5 +1,8 @@
-package com.zm.order.pojo.dto;
+package com.zm.order.pojo;
 
+import io.swagger.annotations.ApiModel;
+
+@ApiModel
 public class PostFeeDTO {
 
 	private Double price;

@@ -33,6 +33,8 @@ import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.ali.util.AlipayNotify;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 @RestController
 public class NotifyController {
 
@@ -51,6 +53,7 @@ public class NotifyController {
 	private Logger logger = LoggerFactory.getLogger(NotifyController.class);
 
 	@RequestMapping(value = "auth/payMng/wxPayReturn", method = RequestMethod.POST)
+	@ApiIgnore
 	public void wxNotify(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		logger.info("微信NOTIFY回调");
 		// 读取参数
@@ -140,6 +143,7 @@ public class NotifyController {
 	// return_url
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("auth/payMng/payReturn")
+	@ApiIgnore
 	public void payReturn(HttpServletRequest req, HttpServletResponse res) {
 		logger.info("支付宝RETURN回调");
 		try {
@@ -215,6 +219,7 @@ public class NotifyController {
 	// notify_url
 	@SuppressWarnings("rawtypes")
 	@RequestMapping("auth/payMng/payNotify")
+	@ApiIgnore
 	public void payNotify(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		logger.info("支付宝NOTIFY回调");
 		PrintWriter pw = res.getWriter();
