@@ -19,9 +19,9 @@
 	
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
-		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id
+		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where 1=1
 		<if test="id > 0">
-			and a.id = #{id}
+			and (a.id = #{id} or a.parent_id = #{id})
 		</if>
 		<if test="gradeName != null and gradeName != ''">
 			and a.gradeName like CONCAT('%',#{gradeName},'%') 

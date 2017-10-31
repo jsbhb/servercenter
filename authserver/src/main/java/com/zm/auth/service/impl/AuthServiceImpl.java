@@ -52,8 +52,8 @@ public class AuthServiceImpl implements AuthService {
 		if (userInfo == null) {
 			throw new SecurityException("用户信息未输入！");
 		}
-		
-		if(userInfo.getUserCenterId() == 0){
+
+		if (userInfo.getUserCenterId() == 0) {
 			throw new SecurityException("没用用户中心编号！");
 		}
 
@@ -67,25 +67,26 @@ public class AuthServiceImpl implements AuthService {
 			}
 		}
 
-		if (loginType == Constants.LOGIN_USER_NAME){
+		if (loginType == Constants.LOGIN_USER_NAME) {
 			userName = userInfo.getUserName();
 			if (userMapper.getUserByName(userName) != null) {
 				throw new SecurityException("该用户名名已经存在！");
-			}			
+			}
 		}
 
-		if (userName == null || "".equals(userName)) {
-			throw new SecurityException("用户名信息有误，请重新输入！");
-		}
+		if (loginType != Constants.LOGIN_PLATID) {
+			// 设置密码MD5加密
+			userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
+			if (userName == null || "".equals(userName)) {
+				throw new SecurityException("用户名信息有误，请重新输入！");
+			}
 
-		
+		}
 
 		if (loginType == Constants.LOGIN_PHONE) {
 			userInfo.setUserName(userName);
 		}
 
-		// 设置密码MD5加密
-		userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 		userInfo.setLastPasswordResetDate(new Date());
 		userInfo.setAuthorities(asList("ROLE_USER"));
 		userMapper.insert(userInfo);
@@ -116,6 +117,7 @@ public class AuthServiceImpl implements AuthService {
 		int loginType = userInfo.getLoginType();
 
 		UserInfo userDetail = null;
+		Map<String, Object> claim = new HashMap<String, Object>();
 		if (loginType == Constants.LOGIN_WX) {
 			if (userInfo.getOpenId() == null || "".equals(userInfo.getOpenId())) {
 				throw new SecurityException("未传递openId给后台！");
@@ -128,31 +130,32 @@ public class AuthServiceImpl implements AuthService {
 				userDetail = userInfo;
 				userInfo = null;
 			}
-			
+
+			claim.put(JWTUtil.OPEN_ID, userDetail.getOpenId());
 
 		} else {
-			String userName = null;
 			if (loginType == Constants.LOGIN_PHONE) {
-				userName = userInfo.getPhone();
+				claim.put(JWTUtil.USER_NAME, userInfo.getPhone());
 				userInfo.setUserName(userInfo.getPhone());
 			}
 
 			if (loginType == Constants.LOGIN_USER_NAME)
-				userName = userInfo.getUserName();
+				claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
+
+			if (loginType == Constants.LOGIN_PLATID) {
+				claim.put(JWTUtil.PLATFORM_ID, userInfo.getUserId());
+				userDetail = userMapper.getUserByPlatId(userInfo.getUserId());
+			}
 
 			int platUserType = userInfo.getPlatUserType();
 
 			if (platUserType == PlatUserType.CONSUMER.getIndex()) {
-				
-				if (userName == null || "".equals(userName)) {
-					throw new SecurityException("用户名信息有误，请重新输入！");
-				}
-				
-				String pwd = userInfo.getPassword();
-				userInfo.setPassword(MethodUtil.MD5(pwd));
+
+				claim.put(JWTUtil.PASSWORD, MethodUtil.MD5(userInfo.getPassword()));
+				claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
+
+				userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 				userDetail = userMapper.getUserForLogin(userInfo);
-			} else if (platUserType >= 1 && platUserType < 5) {
-				userDetail = userMapper.getUserByPlatId(userInfo.getUserId());
 			}
 		}
 
@@ -160,19 +163,9 @@ public class AuthServiceImpl implements AuthService {
 			throw new SecurityException("登录失败，没有该用户！");
 		}
 
-		Map<String, Object> claim = new HashMap<String, Object>();
-		if (loginType == Constants.LOGIN_WX) {
-			claim.put(JWTUtil.OPEN_ID, userDetail.getOpenId());
-		} else {
-			claim.put(JWTUtil.PASSWORD, userDetail.getPassword());
-			claim.put(JWTUtil.USER_NAME, userDetail.getUserName());
-		}
 		userDetail.setAuthorities(asList("ROLE_USER"));
-
 		SecurityUserDetail securityUserDetail = SecurityUserFactory.createWithOutPassWord(userDetail);
-
 		securityUserDetail.setToken(JWTUtil.generateToken(claim));
-
 		return securityUserDetail;
 	}
 

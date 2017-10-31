@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDetails loadUserByPlatId(String platId) throws UsernameNotFoundException {
 
-		UserInfo userInfo = getUserByName(platId);
+		UserInfo userInfo = getUserByPlatId(platId);
 		List<String> roles = new ArrayList<String>();
 
 		if (userInfo == null) {

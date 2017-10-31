@@ -347,9 +347,9 @@
 
 	<insert id="saveGrade" parameterType="grade" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,
-		create_time,opt)
+		create_time,opt,company)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},now(),#{opt})
+		#{gradePersonInCharge},now(),#{opt},#{company})
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">

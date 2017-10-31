@@ -377,8 +377,8 @@ public class UserServiceImpl implements UserService {
 		result.put("userId", user.getId());
 		
 		if(flag){
-			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
+//			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
+//			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 			
 		}
 		return result;

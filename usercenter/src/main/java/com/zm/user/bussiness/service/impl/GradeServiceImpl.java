@@ -15,27 +15,26 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.service.GradeService;
-import com.zm.user.common.Pagination;
 import com.zm.user.pojo.Grade;
 
-/**  
- * ClassName: GradeServiceImpl <br/>  
- * Function: 分级管理实现类. <br/>   
- * date: Oct 29, 2017 7:58:30 PM <br/>  
- *  
- * @author hebin  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: GradeServiceImpl <br/>
+ * Function: 分级管理实现类. <br/>
+ * date: Oct 29, 2017 7:58:30 PM <br/>
+ * 
+ * @author hebin
+ * @version
+ * @since JDK 1.7
  */
 @Service
-public class GradeServiceImpl implements GradeService{
+public class GradeServiceImpl implements GradeService {
 
 	@Resource
 	GradeMapper<Grade> gradeMapper;
-	
+
 	@Override
-	public Page<Grade> queryForPagination(Pagination pagination,Grade grade) {
-		PageHelper.startPage(pagination.getCurrentPage(), pagination.getNumPerPage(), true);
+	public Page<Grade> queryForPagination(Grade grade) {
+		PageHelper.startPage(grade.getCurrentPage(), grade.getNumPerPage(), true);
 		return gradeMapper.selectForPage(grade);
 	}
 

@@ -1,11 +1,13 @@
 package com.zm.user.pojo;
 
+import com.zm.user.common.Pagination;
+
 /**
  * @fun 登级表，相当于区域中心表
  * @author user
  *
  */
-public class Grade {
+public class Grade extends Pagination{
 
 	private Integer id;
 

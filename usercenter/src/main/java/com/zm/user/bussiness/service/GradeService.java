@@ -1,7 +1,6 @@
 package com.zm.user.bussiness.service;
 
 import com.github.pagehelper.Page;
-import com.zm.user.common.Pagination;
 import com.zm.user.pojo.Grade;
 
 /**
@@ -25,5 +24,5 @@ public interface GradeService {
 	 * @return  
 	 * @since JDK 1.7
 	 */
-	Page<Grade> queryForPagination(Pagination pagination,Grade grade);
+	Page<Grade> queryForPagination(Grade grade);
 }

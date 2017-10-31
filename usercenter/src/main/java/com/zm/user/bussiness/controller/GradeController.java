@@ -8,6 +8,7 @@
 package com.zm.user.bussiness.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,12 +39,14 @@ public class GradeController {
 	GradeService gradeService;
 
 	@RequestMapping(value = "{version}/grade/queryForPage", method = RequestMethod.POST)
-	public ResultModel queryForPage(@PathVariable("version") Double version, @RequestBody Pagination pagination) {
+	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody Grade grade) {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
+				
 
-				Page<Grade> grades = gradeService.queryForPagination(pagination, null);
+				Page<Grade> grades = gradeService.queryForPagination(grade);
 				return new ResultModel(true, grades, new Pagination(grades));
 			}
 
