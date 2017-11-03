@@ -34,6 +34,8 @@ public class GoodsSpecs implements Serializable{
 	
 	private Integer weight;
 	
+	private Double exciseTax;
+	
 	private String createTime;
 	
 	private String updateTime;
@@ -52,7 +54,25 @@ public class GoodsSpecs implements Serializable{
 	
 	private Integer stock;
 	
+	private Double incrementTax;
+	
 	private List<GoodsPrice> priceList;
+
+	public Double getIncrementTax() {
+		return incrementTax;
+	}
+
+	public void setIncrementTax(Double incrementTax) {
+		this.incrementTax = incrementTax;
+	}
+
+	public Double getExciseTax() {
+		return exciseTax;
+	}
+
+	public void setExciseTax(Double exciseTax) {
+		this.exciseTax = exciseTax;
+	}
 
 	public Integer getStatus() {
 		return status;

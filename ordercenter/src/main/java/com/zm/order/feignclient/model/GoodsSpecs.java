@@ -47,8 +47,38 @@ public class GoodsSpecs implements Serializable {
 	private Double vipMaxPrice;
 
 	private Integer stock;
+	
+	private Double incrementTax;
+	
+	private Integer weight;
+	
+	private Double exciseTax;
 
 	private List<GoodsPrice> priceList;
+
+	public Integer getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Integer weight) {
+		this.weight = weight;
+	}
+
+	public Double getExciseTax() {
+		return exciseTax;
+	}
+
+	public void setExciseTax(Double exciseTax) {
+		this.exciseTax = exciseTax;
+	}
+
+	public Double getIncrementTax() {
+		return incrementTax;
+	}
+
+	public void setIncrementTax(Double incrementTax) {
+		this.incrementTax = incrementTax;
+	}
 
 	public Integer getStatus() {
 		return status;

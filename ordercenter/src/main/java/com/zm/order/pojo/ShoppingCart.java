@@ -20,6 +20,8 @@ public class ShoppingCart {
 	private String goodsName;
 
 	private Integer supplierId;
+	
+	private String supplierName;
 
 	private String createTime;
 
@@ -32,6 +34,14 @@ public class ShoppingCart {
 	public boolean check() {
 		return userId != null && itemId != null && quantity != null && centerId != null && goodsName != null
 				&& supplierId != null;
+	}
+
+	public String getSupplierName() {
+		return supplierName;
+	}
+
+	public void setSupplierName(String supplierName) {
+		this.supplierName = supplierName;
 	}
 
 	public Integer getSupplierId() {

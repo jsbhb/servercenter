@@ -7,8 +7,22 @@
 		<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
 		<result column="express_name" property="expressName" jdbcType="VARCHAR" />
 	</resultMap>
+
+	<resultMap type="com.zm.supplier.pojo.SupplierInterface" id="supplierinf">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="target_object" property="targetObject" jdbcType="VARCHAR" />
+		<result column="pid" property="appKey" jdbcType="VARCHAR" />
+		<result column="key" property="appSecret" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="listExpressBySupplierId" parameterType="Object"
+		resultMap="express">
+		select * from supplier_express where supplier_id =
+		#{supplierId}
+	</select>
 	
-	<select id="listExpressBySupplierId" parameterType="Object" resultMap="express">
-		select * from supplier_express where supplier_id = #{supplierId}
+	<select id="listSupplierInterface" resultMap="supplierinf">
+		select * from supplier_interface
 	</select>
 </mapper>

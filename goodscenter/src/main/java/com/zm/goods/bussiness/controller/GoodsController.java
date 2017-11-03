@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,8 +56,8 @@ public class GoodsController {
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
-	public ResultModel listGoods(@PathVariable("version") Double version, Pagination pagination,
-			GoodsSearch searchModel, SortModelList sortList) {
+	public ResultModel listGoods(@PathVariable("version") Double version,@ModelAttribute Pagination pagination,
+			@ModelAttribute GoodsSearch searchModel,@ModelAttribute SortModelList sortList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
@@ -67,21 +68,21 @@ public class GoodsController {
 
 	}
 
-	@RequestMapping(value = "auth/{version}/goods", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/{centerId}/goods", method = RequestMethod.GET)
 	@ApiOperation(value = "搜索商品接口(根据goodsId)", response = ResultModel.class)
 	@ApiImplicitParams({
-			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID"),
+			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
-			Pagination pagination, HttpServletResponse res) {
+			Pagination pagination, @PathVariable("centerId") Integer centerId) {
 
 		ResultModel result = new ResultModel();
 
-		String type = req.getParameter("type");
 		String goodsId = req.getParameter("goodsId");
-		String centerId = req.getParameter("centerId");
 		Map<String, Object> param = new HashMap<String, Object>();
 
-		if (type == null || centerId == null) {
+		if (centerId == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
@@ -93,8 +94,6 @@ public class GoodsController {
 			} else {
 				param.put("centerId", "_" + centerId);
 			}
-			param.put("centerId", centerId);
-			param.put("type", type);
 			param.put("goodsId", goodsId);
 			pagination.init();
 			param.put("pagination", pagination);
@@ -122,7 +121,7 @@ public class GoodsController {
 
 		String startTime = req.getParameter("startTime");
 		String endTime = req.getParameter("endTime");
-		String centerId = req.getParameter("centerId");
+		Integer centerId = Integer.valueOf(req.getParameter("centerId"));
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
@@ -175,7 +174,7 @@ public class GoodsController {
 			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		String ids = req.getParameter("ids");
+		String ids = req.getParameter("itemIds");
 		Integer centerId = Integer.valueOf(req.getParameter("centerId"));
 
 		String[] idArr = ids.split(",");

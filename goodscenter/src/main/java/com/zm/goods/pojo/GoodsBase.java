@@ -10,11 +10,7 @@ public class GoodsBase {
 	
 	private String brand;
 	
-	private String origin;
-	
 	private Double tariff;
-	
-	private Double exciseTax;
 	
 	private Double incrementTax;
 	
@@ -36,14 +32,6 @@ public class GoodsBase {
 
 	public void setTariff(Double tariff) {
 		this.tariff = tariff;
-	}
-
-	public Double getExciseTax() {
-		return exciseTax;
-	}
-
-	public void setExciseTax(Double exciseTax) {
-		this.exciseTax = exciseTax;
 	}
 
 	public Double getIncrementTax() {
@@ -102,14 +90,6 @@ public class GoodsBase {
 		this.brand = brand;
 	}
 
-	public String getOrigin() {
-		return origin;
-	}
-
-	public void setOrigin(String origin) {
-		this.origin = origin;
-	}
-
 	public String getUnit() {
 		return unit;
 	}
@@ -142,12 +122,4 @@ public class GoodsBase {
 		this.opt = opt;
 	}
 
-	@Override
-	public String toString() {
-		return "GoodsBase [id=" + id + ", brandId=" + brandId + ", goodsName=" + goodsName + ", brand=" + brand
-				+ ", origin=" + origin + ", tariff=" + tariff + ", exciseTax=" + exciseTax + ", incrementTax="
-				+ incrementTax + ", hscode=" + hscode + ", encode=" + encode + ", unit=" + unit + ", createTime="
-				+ createTime + ", updateTime=" + updateTime + ", opt=" + opt + "]";
-	}
-	
 }

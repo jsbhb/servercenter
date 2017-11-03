@@ -21,6 +21,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
   `supplier_id` INT UNSIGNED NULL,
   `tdq` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `weight` INT UNSIGNED NOT NULL DEFAULT 0,
   `gtime` DATETIME NULL,
   `send_time` DATETIME NULL,
   `create_time` DATETIME NULL,
@@ -51,9 +52,13 @@ CREATE TABLE `zm_order`.`order_detail` (
   `order_id` CHAR(21) NOT NULL, 
   `pay_type` TINYINT UNSIGNED NOT NULL COMMENT '1:微信；2支付宝',
   `payment` DECIMAL(10,2) NULL,
+  `dis_amount` DECIMAL(10,2) NULL,
   `pay_time` DATETIME NULL,
   `post_fee` DECIMAL(10,2) NULL,
-  `fax_fee` DECIMAL(10,2) NULL,
+  `tax_fee` DECIMAL(10,2) NULL COMMENT '总税额',
+  `tariff_tax` DECIMAL(10,2) NULL COMMENT '关税',
+  `increment_tax` DECIMAL(10,2) NULL COMMENT '增值税',
+  `excise_tax` DECIMAL(10,2) NULL COMMENT '消费税',
   `pay_no` VARCHAR(100) NULL,
   `return_pay_no` VARCHAR(100) NULL COMMENT '退款时的交易流水号',
   `return_pay_time` DATETIME NULL,
@@ -77,11 +82,13 @@ CREATE TABLE `zm_order`.`order_detail` (
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单详细信息';
 
-drop table if exists  `zm_order`.`order_express`;
+drop table if exists  `zm_order`.`third_order_info`;
 
-CREATE TABLE `zm_order`.`order_express` (
+CREATE TABLE `zm_order`.`third_order_info` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(21) NOT NULL,
+  `third_order_id` VARCHAR(50) NULL,
+  `status` TINYINT UNSIGNED NULL,
   `express_key` VARCHAR(50) NULL,
   `express_name` VARCHAR(50) NULL,
   `express_id` VARCHAR(50) NULL,
@@ -92,7 +99,7 @@ CREATE TABLE `zm_order`.`order_express` (
   PRIMARY KEY (`id`),
   INDEX `idx_orderId` (`order_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '订单物流信息';
+COMMENT = '第三方仓库订单信息';
 
 
 
@@ -150,6 +157,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   `center_id` INT UNSIGNED NOT NULL,
   `item_quantity` INT UNSIGNED NOT NULL,
   `supplier_id` INT UNSIGNED NOT NULL,
+  `supplier_name` VARCHAR(100) NOT NULL,
   `goods_name` VARCHAR(200) NOT NULL,
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
@@ -257,7 +265,7 @@ CREATE TABLE `zm_order`.`express_fee` (
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '快递费用设置';
 
-drop table if exists  `zm_order`.`express_fee`;
+drop table if exists  `zm_order`.`free_express_fee`;
 
 CREATE TABLE `zm_order`.`free_express_fee` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

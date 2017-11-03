@@ -65,6 +65,10 @@ public class GoodsServiceImpl implements GoodsService {
 
 		List<String> idList = new ArrayList<String>();
 
+		if(goodsList == null || goodsList.size() == 0){
+			return null;
+		}
+		
 		for (GoodsItem item : goodsList) {
 			idList.add(item.getGoodsId());
 		}
@@ -192,16 +196,14 @@ public class GoodsServiceImpl implements GoodsService {
 				weight += specs.getWeight() * model.getQuantity();
 				if (taxMap.get(tax) == null) {
 					Double amount = 0.0;
-					amount = getAmount(vip, specs, model, discount);
+					amount = getAmount(vip, specs, model, 10.0);
 					taxMap.put(tax, amount);
 				} else {
-					taxMap.put(tax, taxMap.get(tax) + getAmount(vip, specs, model, discount));
+					taxMap.put(tax, taxMap.get(tax) + getAmount(vip, specs, model, 10.0));
 				}
+				totalAmount += getAmount(vip, specs, model, discount);
 			}
 			map.put("tax", taxMap);
-			for (Map.Entry<Tax, Double> entry : taxMap.entrySet()) {
-				totalAmount += entry.getValue();
-			}
 		} else {
 			for (OrderBussinessModel model : list) {
 

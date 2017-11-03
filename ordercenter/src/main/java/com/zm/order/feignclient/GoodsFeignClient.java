@@ -22,7 +22,7 @@ public interface GoodsFeignClient {
 			@RequestParam("orderFlag") Integer orderFlag,@RequestParam("createType") String createType);
 
 	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
-	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("ids") String ids,
+	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
 			@RequestParam("centerId") Integer centerId);
 
 	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)

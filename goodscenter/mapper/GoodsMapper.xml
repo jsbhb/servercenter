@@ -7,10 +7,10 @@
 		<result column="id" property="id" jdbcType="INTEGER" />
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
 		<result column="customGoodsName" property="customGoodsName"
 			jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
-		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="is_popular" property="popular" jdbcType="INTEGER" />
 		<result column="is_hot" property="hot" jdbcType="INTEGER" />
@@ -30,7 +30,6 @@
 		<result column="brand" property="brand" jdbcType="VARCHAR" />
 		<result column="origin" property="origin" jdbcType="VARCHAR" />
 		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
-		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
 		<result column="increment_tax" property="incrementTax"
 			jdbcType="NUMERIC" />
 		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
@@ -53,11 +52,14 @@
 	<resultMap type="com.zm.goods.pojo.GoodsSpecs" id="goodsSpecs">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="increment_tax" property="incrementTax"
+			jdbcType="NUMERIC" />
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
-		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="specsStatus" property="status" jdbcType="INTEGER" />
 		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="discount" property="discount" jdbcType="NUMERIC" />
@@ -221,8 +223,8 @@
 	</resultMap>
 	
 	<select id="getTax" parameterType="Object" resultMap="tax">
-		select gi.excise_tax,gb.increment_tax from goods_specs${centerId} gs left join goods_item${centerId} gi on 
-		gs.goods_id = gi.goods_id left join goods_base gb on gi.base_id = gb.id
+		select gs.excise_tax,gb.increment_tax from goods_specs${centerId} gs left join goods_item${centerId} gi on 
+		gs.goods_id = gi.goods_id left join goods_base gb on gi.base_id = gb.id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
@@ -242,8 +244,8 @@
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
-		gi.status,gb.goods_name,gi.supplier_id,gi.weight,
-		gi.brand_id,gcb.brand,gb.origin,gi.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gi.status,gb.goods_name,gi.supplier_id,gi.type,gi.supplier_name,
+		gi.brand_id,gcb.brand,gi.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
 		gi left join
 		goods_category_brand${centerId} gcb on gi.brand_id =
@@ -286,7 +288,7 @@
 		gs.id,gs.item_id,gs.goods_id,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,
+		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gs.weight,
 		gp.delivery_place,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
@@ -299,12 +301,12 @@
 	</select>
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id,gi.weight,
-		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		select gs.id,gs.info,gs.item_id,gs.goods_id,
+		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,gs.excise_tax,gs.weight,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,stock.qpqty,
-		gp.delivery_place,
+		gp.delivery_place,gs.status as specsStatus,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
 		goods_price${centerId} gp on
@@ -312,7 +314,7 @@
 		<if test="orderFlag == 0">
 			goods_stock stock
 		</if>
-		<if test="orderFlag == 1 or orderFlag == 2">
+		<if test="orderFlag == 1 or orderFlag == 2 or orderFlag == null">
 			goods_stock${centerId} stock
 		</if>
 		on gs.item_id =
@@ -321,16 +323,17 @@
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id , gs.status,
+		select gs.id,gs.info,gs.item_id,gs.goods_id , gi.status,
 		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,
-		gp.delivery_place,
+		as sub_create_time, gs.status as specsStatus,gs.excise_tax,gs.weight,
+		gp.delivery_place,gb.increment_tax,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
 		goods_price${centerId} gp on
-		gs.item_id = gp.item_id left join goods_item${centerId} gi on gs.goods_id=gi.goods_id where gs.item_id in
+		gs.item_id = gp.item_id left join goods_item${centerId} gi on gs.goods_id=gi.goods_id 
+		left join goods_base gb on gi.base_id = gb.id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -355,10 +358,11 @@
 		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
 		  brand_id VARCHAR(100) NOT NULL COMMENT '品牌ID',
 		  supplier_id int UNSIGNED NULL COMMENT '商家ID',
+		  supplier_name VARCHAR(100) NULL COMMENT '商家名称',
 		  base_id int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
 		  goods_name VARCHAR(100) NOT NULL COMMENT '商品名称',
 		  description VARCHAR(450) NULL COMMENT '描述',
-		  weight int UNSIGNED NOT NULL COMMENT '商品重量（克）',
+		  origin VARCHAR(100) NULL COMMENT '原产国',
 		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  type tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
 		  first_category VARCHAR(100) NOT NULL COMMENT '一级分类id',
@@ -484,7 +488,10 @@
 		  item_id varchar(50) NOT NULL COMMENT '供销内部商品ID',
 		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
 		  sku VARCHAR(100) NULL COMMENT 'sku信息',
+		  weight int UNSIGNED NOT NULL COMMENT '商品重量（克）',
+  		  excise_tax DECIMAL(5,2) NULL COMMENT '消费税',
 		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
+		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  discount decimal(10,2) NULL COMMENT '促销折扣',
 		  info VARCHAR(1000) NULL COMMENT '规格信息',
 		  create_time DATETIME NULL COMMENT '创建时间',
@@ -702,10 +709,9 @@
 	
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
-		select gi.id, gi.status, gi.goods_id, gi.create_time, gi.weight, gi.goods_name as customGoodsName ,
-		gcb.brand ,gb.origin, gi.third_category,gi.second_category,gi.first_category
+		select gi.id, gi.status, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,
+		gcb.brand ,gi.origin, gi.third_category,gi.second_category,gi.first_category
 		from goods_item${centerId} gi left join goods_category_brand${centerId} gcb on gi.brand_id = gcb.brand_id 
-		left join goods_base gb on gi.base_id = gb.id
 		where index_status = 0
 	</select>
 	
@@ -721,8 +727,8 @@
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
-		gi.status,gi.supplier_id,gi.weight,gi.create_time,
-		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gi.status,gi.supplier_id,gs.weight,gi.create_time,gi.type,gi.supplier_name,
+		gi.brand_id,gcb.brand,gi.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
 		gi left join
 		goods_category_brand${centerId} gcb on gi.brand_id =
@@ -784,8 +790,8 @@
 	
 	<select id="listSpecialGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
-		gi.status,gi.supplier_id,gi.weight,gi.create_time,
-		gi.brand_id,gcb.brand,gb.origin,gb.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gi.status,gi.supplier_id,gs.weight,gi.create_time,gi.type,gi.supplier_name,
+		gi.brand_id,gcb.brand,gi.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods_item${centerId}
 		gi left join
 		goods_category_brand${centerId} gcb on gi.brand_id =

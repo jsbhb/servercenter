@@ -10,13 +10,13 @@ public class GoodsItem extends GoodsBase {
 	private String goodsId;
 
 	private Integer supplierId;
+	
+	private String supplierName;
 
 	private String customGoodsName;
 	
 	private String description;
 	
-	private Integer weight;
-
 	private Integer status;
 
 	private Integer type;
@@ -28,6 +28,8 @@ public class GoodsItem extends GoodsBase {
 	private Integer fresh;
 
 	private Integer good;
+	
+	private String origin;
 
 	private Integer choice;
 
@@ -56,6 +58,22 @@ public class GoodsItem extends GoodsBase {
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public String getSupplierName() {
+		return supplierName;
+	}
+
+	public void setSupplierName(String supplierName) {
+		this.supplierName = supplierName;
+	}
 
 	public String getThirdCategory() {
 		return thirdCategory;
@@ -95,15 +113,6 @@ public class GoodsItem extends GoodsBase {
 
 	public void setFresh(Integer fresh) {
 		this.fresh = fresh;
-	}
-
-
-	public Integer getWeight() {
-		return weight;
-	}
-
-	public void setWeight(Integer weight) {
-		this.weight = weight;
 	}
 
 	public Double getPrice() {

@@ -1,9 +1,7 @@
 package com.zm.pay.utils;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Attribute;
@@ -11,8 +9,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
 
 import com.zm.pay.constants.LogConstants;
 import com.zm.pay.feignclient.model.LogInfo;
@@ -45,6 +41,7 @@ public class CommonUtils {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void parseNode(Map<String, String> result, Element node) {
 		if (!(node.getTextTrim().equals(""))) {
 			Attribute attr = node.attribute("name");

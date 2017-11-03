@@ -173,32 +173,45 @@ public class OrderServiceImpl implements OrderService {
 
 		// 计算邮费(自提不算邮费)
 		Double postFee = 0.0;
+		Integer weight = (Integer) priceAndWeightMap.get("weight");
 		if (Constants.EXPRESS.equals(info.getExpressType())) {
 			String province = info.getOrderDetail().getReceiveProvince();
-			Integer weight = (Integer) priceAndWeightMap.get("weight");
 			PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId());
 			postFee = getPostFee(post);
 		}
 
 		// 计算税费
 		Double taxFee = 0.0;
+		Double totalExciseTax = 0.0;
+		Double totalIncremTax = 0.0;
+		Double unDiscountAmount = 0.0;
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 			Map<Tax, Double> map = (Map<Tax, Double>) priceAndWeightMap.get("tax");
+			
+			for (Map.Entry<Tax, Double> entry : map.entrySet()){
+				unDiscountAmount += entry.getValue();
+			}
 			for (Map.Entry<Tax, Double> entry : map.entrySet()) {
 				Tax tax = entry.getKey();
 				Double fee = entry.getValue();
-				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, amount), postFee);
+				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount), postFee);
 				if (tax.getExciseTax() != null) {
 					Double exciseTax = CalculationUtils.mul(CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
 							CalculationUtils.sub(1.0, tax.getExciseTax())), tax.getExciseTax());
+					totalExciseTax += CalculationUtils.mul(exciseTax,0.7);
 					Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
 							tax.getIncrementTax());
-					taxFee += CalculationUtils.mul(CalculationUtils.add(incremTax, exciseTax), 0.7);
+					totalIncremTax += CalculationUtils.mul(incremTax,0.7);
 				} else {
-					taxFee += CalculationUtils.mul(
-							CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()), 0.7);
+					totalIncremTax += CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax());
 				}
 			}
+			taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
+		}
+		
+		Double disAmount = 0.0;
+		if(unDiscountAmount > 0){
+			disAmount = CalculationUtils.sub(unDiscountAmount, amount);
 		}
 
 		amount = CalculationUtils.add(amount, taxFee, postFee);
@@ -230,10 +243,17 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		info.setOrderId(orderId);
+		info.setWeight(weight);
 		info.getOrderDetail().setOrderId(orderId);
 
 		orderMapper.saveOrder(info);
 
+		info.getOrderDetail().setPostFee(postFee);
+		info.getOrderDetail().setTaxFee(taxFee);
+		info.getOrderDetail().setIncrementTax(totalIncremTax);
+		info.getOrderDetail().setExciseTax(totalExciseTax);
+		info.getOrderDetail().setTariffTax(0.0);
+		info.getOrderDetail().setDisAmount(disAmount);
 		orderMapper.saveOrderDetail(info.getOrderDetail());
 
 		for (OrderGoods goods : info.getOrderGoodsList()) {

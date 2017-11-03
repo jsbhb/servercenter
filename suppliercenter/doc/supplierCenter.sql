@@ -42,7 +42,7 @@ drop table if exists  `zm_supplier`.`supplier_interface`;
 CREATE TABLE `zm_supplier`.`supplier_interface` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `supplier_id` BIGINT UNSIGNED NOT NULL,
-  `target_object` VARCHAR(50) NOT NULL COMMENT '目标类（方法都统一）',
+  `target_object` VARCHAR(50) NOT NULL COMMENT '目标类',
   `pid` VARCHAR(100) NOT NULL COMMENT '第三方秘钥',
   `key` VARCHAR(100) NOT NULL COMMENT '第三方秘钥',
   `attr` VARCHAR(100) NULL COMMENT '备用',
