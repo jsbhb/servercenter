@@ -228,8 +228,8 @@
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
 		select gfc.id,gfc.name as industryName,gsc.id as dictid,gsc.name as dictName,
 		gtc.id as entryId,gtc.name as entryName 
-		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.first_id = gsc.first_id 
-		left join goods_third_category${centerId} gtc on gsc.second_id = gtc.second_id order by gfc.id
+		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.id = gsc.first_id 
+		left join goods_third_category${centerId} gtc on gsc.id = gtc.second_id order by gfc.id
 	</select>
 
 	<select id="getActivity" parameterType="Object" resultMap="activity">
@@ -243,14 +243,13 @@
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
 		gi.status,g.supplier_id,g.type,g.supplier_name,
-		g.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
-		gi left join goods g on gi.goods_id = g.goods_id left join 
-		goods_category_brand gcb on g.brand_id =
-		gcb.brand_id left join
+		gi left join goods g on gi.goods_id = g.goods_id left join
 		base
-		gb on g.base_id = gb.id where 1=1 and
-		status = 1
+		gb on g.base_id = gb.id left join 
+		goods_category_brand gcb on gb.brand_id =
+		gcb.id  where 1=1 
 		<if test="type != null and type != ''">
 			g.type = #{type,jdbcType = INTEGER}
 		</if>
@@ -332,7 +331,7 @@
 		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
-		left join base gb on gi.base_id = gb.id where gs.item_id in
+		left join base gb on g.base_id = gb.id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -673,7 +672,7 @@
 		from goods${centerId}
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.brand_id 
+		gcb.id 
 		left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i on gs.item_id=i.item_id 
 		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
@@ -735,7 +734,7 @@
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.brand_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
+		gcb.id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
 		on gs.item_id = i.item_id 
 		left join goods_price${centerId} gp on gs.item_id = gp.item_id where 1=1
 		<if test="type == 0">
