@@ -15,8 +15,13 @@
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 		<result column="company" property="company" jdbcType="VARCHAR" />
+		<result column="person_in_charge_id" property="personInChargeId" jdbcType="INTEGER" />
 	</resultMap>
 	
+	
+	<select id="selectById" parameterType="Object" resultMap="grade">
+		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where a.id = #{id} or a.parent_id = #{id}
+	</select>
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
 		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where 1=1
@@ -30,6 +35,5 @@
 			and a.company like CONCAT('%',#{company},'%') 
 		</if>
 	</select>
-
 
 </mapper>

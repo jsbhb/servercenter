@@ -24,6 +24,8 @@ public class Grade extends Pagination{
 	private String gradeName;
 
 	private String personInCharge;
+	
+	private int personInChargeId;
 
 	private String phone;
 
@@ -159,4 +161,11 @@ public class Grade extends Pagination{
 		this.company = company;
 	}
 
+	public int getPersonInChargeId() {
+		return personInChargeId;
+	}
+
+	public void setPersonInChargeId(int personInChargeId) {
+		this.personInChargeId = personInChargeId;
+	}
 }

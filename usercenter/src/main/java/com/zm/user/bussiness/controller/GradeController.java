@@ -44,10 +44,29 @@ public class GradeController {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
-				
 
 				Page<Grade> grades = gradeService.queryForPagination(grade);
 				return new ResultModel(true, grades, new Pagination(grades));
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/grade/query", method = RequestMethod.POST)
+	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody Grade grade) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				if (grade.getId() == 0) {
+					return new ResultModel(false, "没有编号信息");
+				}
+
+				Grade result = gradeService.queryById(grade.getId());
+				return new ResultModel(true, result);
 			}
 
 			return new ResultModel(false, "版本错误");

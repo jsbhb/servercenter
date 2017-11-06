@@ -376,6 +376,10 @@ public class UserServiceImpl implements UserService {
 		userMapper.saveUserDetail(detail);
 		result.put("userId", user.getId());
 		
+		grade.setPersonInChargeId(user.getId());
+		
+		userMapper.updatePersonInChargeId(grade);
+		
 		if(flag){
 //			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 //			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());

@@ -67,4 +67,13 @@ public interface UserMapper {
 	void saveGrade(Grade grade);
 	
 	List<Integer> listCenterId();
+
+	/**  
+	 * updatePersonInChargeId:更新分级表负责人id. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id  
+	 * @since JDK 1.7  
+	 */
+	void updatePersonInChargeId(Grade grade);
 }
