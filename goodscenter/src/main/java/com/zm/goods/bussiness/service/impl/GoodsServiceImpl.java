@@ -65,10 +65,10 @@ public class GoodsServiceImpl implements GoodsService {
 
 		List<String> idList = new ArrayList<String>();
 
-		if(goodsList == null || goodsList.size() == 0){
+		if (goodsList == null || goodsList.size() == 0) {
 			return null;
 		}
-		
+
 		for (GoodsItem item : goodsList) {
 			idList.add(item.getGoodsId());
 		}
@@ -190,7 +190,7 @@ public class GoodsServiceImpl implements GoodsService {
 				param.put("itemId", model.getItemId());
 				Tax tax = goodsMapper.getTax(param);
 				specs = goodsMapper.getGoodsSpecs(param);
-				if(Constants.TIMELIMIT_ORDER.equals(createType)){
+				if (Constants.TIMELIMIT_ORDER.equals(createType)) {
 					discount = goodsMapper.getDiscount(param);
 				}
 				weight += specs.getWeight() * model.getQuantity();
@@ -209,7 +209,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 				param.put("itemId", model.getItemId());
 				specs = goodsMapper.getGoodsSpecs(param);
-				if(Constants.TIMELIMIT_ORDER.equals(createType)){
+				if (Constants.TIMELIMIT_ORDER.equals(createType)) {
 					discount = goodsMapper.getDiscount(param);
 				}
 				weight += specs.getWeight() * model.getQuantity();
@@ -238,7 +238,7 @@ public class GoodsServiceImpl implements GoodsService {
 		getPriceInterval(specs);
 		boolean calculation = false;
 		Double discount = 10.0;
-		if(promotion == null){
+		if (promotion == null) {
 			if (Constants.PROMOTION.equals(specs.getPromotion())) {
 				discount = specs.getDiscount();
 			}
@@ -268,7 +268,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if (!calculation) {
 			totalAmount += model.getQuantity() * (vip ? specs.getVipMinPrice() : specs.getMinPrice());
 		}
-		
+
 		return CalculationUtils.mul(totalAmount, discount);
 	}
 
@@ -357,14 +357,12 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void createTable(Integer centerId) {
 		goodsMapper.createGoodsItem(centerId);
+		goodsMapper.createGoods(centerId);
 		goodsMapper.createGoodsFile(centerId);
 		goodsMapper.createFirstCategory(centerId);
 		goodsMapper.createSecondCategory(centerId);
 		goodsMapper.createThirdCategory(centerId);
-		goodsMapper.createBrand(centerId);
-		goodsMapper.createGoodsSpecs(centerId);
 		goodsMapper.createGoodsPrice(centerId);
-		goodsMapper.createGoodsStock(centerId);
 		goodsMapper.createLayout(centerId);
 		goodsMapper.createPopularizeDict(centerId);
 		goodsMapper.createPopularizeData(centerId);
@@ -534,19 +532,13 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 			searchList.add(searchModel);
 		}
-		AbstractLucene lucene = LuceneFactory
-				.get((id == Constants.BIG_TRADE_CENTERID || id == Constants.O2O_CENTERID) ? 1 : id);
+		AbstractLucene lucene = LuceneFactory.get(id);
 		lucene.writerIndex(searchList);
 		goodsMapper.updateLuceneStatus(centerId);
 	}
 
 	private String judgeCenterId(Integer id) {
-		String centerId;
-		if (Constants.BIG_TRADE_CENTERID.equals(id) || Constants.O2O_CENTERID.equals(id)) {
-			centerId = "";
-		} else {
-			centerId = "_" + id;
-		}
+		String centerId = "_" + id;
 		return centerId;
 	}
 
@@ -689,7 +681,8 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
-		String id = judgeCenterId(centerId);;
+		String id = judgeCenterId(centerId);
+		;
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", id);
 		param.put("type", type);

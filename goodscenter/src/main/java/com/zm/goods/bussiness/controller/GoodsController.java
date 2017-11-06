@@ -89,11 +89,7 @@ public class GoodsController {
 		}
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if (Constants.O2O_CENTERID.equals(centerId) || Constants.BIG_TRADE_CENTERID.equals(centerId)) {
-				param.put("centerId", "");
-			} else {
-				param.put("centerId", "_" + centerId);
-			}
+			param.put("centerId", "_" + centerId);
 			param.put("goodsId", goodsId);
 			pagination.init();
 			param.put("pagination", pagination);
@@ -126,11 +122,7 @@ public class GoodsController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("itemId", itemId);
-			if (Constants.O2O_CENTERID.equals(centerId) || Constants.BIG_TRADE_CENTERID.equals(centerId)) {
-				param.put("centerId", "");
-			} else {
-				param.put("centerId", "_" + centerId);
-			}
+			param.put("centerId", "_" + centerId);
 			param.put("startTime", startTime);
 			param.put("endTime", endTime);
 			List<PriceContrast> list = goodsService.listPriceContrast(param);
@@ -221,11 +213,7 @@ public class GoodsController {
 			if (!Constants.ACTIVE_AREA.equals(typeStatus)) {
 				param.put("type", type);
 			}
-			if (Constants.O2O_CENTERID.equals(centerId) || Constants.BIG_TRADE_CENTERID.equals(centerId)) {
-				param.put("centerId", "");
-			} else {
-				param.put("centerId", "_" + centerId);
-			}
+			param.put("centerId", "_" + centerId);
 
 			return new ResultModel(true, goodsService.getActivity(param));
 		}

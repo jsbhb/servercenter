@@ -12,10 +12,6 @@ public class Constants {
 	
 	public static final Integer ACTIVE_AREA = 1;//活动范围：全场
 	
-	public static final Integer O2O_CENTERID = 1;
-	
-	public static final Integer BIG_TRADE_CENTERID = 2;
-	
 	public static final Integer ACTIVE_MODEL = 1;//活动模块
 	
 	//*********************活动状态************************

@@ -11,19 +11,9 @@ public class GoodsCategoryModel {
 
 	private Integer id;
 	
-	private String secondId;
-	
 	private String dictName;
 	
 	private List<GoodsCategoryEnteryModel> entryList;
-
-	public String getSecondId() {
-		return secondId;
-	}
-
-	public void setSecondId(String secondId) {
-		this.secondId = secondId;
-	}
 
 	public Integer getId() {
 		return id;

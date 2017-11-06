@@ -35,7 +35,7 @@ public interface GoodsMapper {
 	
 	Activity getActivity(Map<String,Object> param);
 	
-	void createGoodsItem(@Param("centerId")Integer centerId);
+	void createGoods(@Param("centerId")Integer centerId);
 	
 	void createGoodsFile(@Param("centerId")Integer centerId);
 	
@@ -45,13 +45,9 @@ public interface GoodsMapper {
 	
 	void createThirdCategory(@Param("centerId")Integer centerId);
 	
-	void createBrand(@Param("centerId")Integer centerId);
-	
-	void createGoodsSpecs(@Param("centerId")Integer centerId);
+	void createGoodsItem(@Param("centerId")Integer centerId);
 	
 	void createGoodsPrice(@Param("centerId")Integer centerId);
-	
-	void createGoodsStock(@Param("centerId")Integer centerId);
 	
 	void createLayout(@Param("centerId")Integer centerId);
 	

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +43,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 
 @RestController
-@Api(value="订单类相关API",description="订单类相关API")
+@Api(value = "订单类相关API", description = "订单类相关API")
 public class OrderController {
 
 	@Resource
@@ -93,12 +94,12 @@ public class OrderController {
 	@ApiOperation(value = "获取订单接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
-	public ResultModel listUserOrder(@PathVariable("version") Double version, OrderInfo info, Pagination pagination,
-			HttpServletRequest req, HttpServletResponse res) {
+	public ResultModel listUserOrder(@PathVariable("version") Double version, @ModelAttribute OrderInfo info,
+			@ModelAttribute Pagination pagination, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 
-		if (info.getOrderFlag() == null) {
+		if (info.getUserId() == null || info.getCenterId() == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数不全");
 			return result;
@@ -208,7 +209,7 @@ public class OrderController {
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart", method = RequestMethod.POST,produces = "application/json;utf-8")
+	@RequestMapping(value = "{version}/order/shoping-cart", method = RequestMethod.POST, produces = "application/json;utf-8")
 	@ApiOperation(value = "保存用户购物车接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"), })
@@ -354,7 +355,7 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/payType", method = RequestMethod.POST,produces = "application/json;utf-8")
+	@RequestMapping(value = "{version}/order/payType", method = RequestMethod.POST, produces = "application/json;utf-8")
 	@ApiIgnore
 	public boolean updateOrderPayType(@PathVariable("version") Double version, @RequestBody OrderDetail detail) {
 
@@ -427,7 +428,7 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/postfee", method = RequestMethod.POST,produces = "application/json;utf-8")
+	@RequestMapping(value = "{version}/order/postfee", method = RequestMethod.POST, produces = "application/json;utf-8")
 	@ApiOperation(value = "获取运费接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })

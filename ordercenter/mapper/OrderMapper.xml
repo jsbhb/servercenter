@@ -107,16 +107,18 @@
 	<select id="listOrderByParam" resultMap="orderBase"
 		parameterType="Object">
 		select
-		o.id,o.order_id,o.status,o.express_type,o.supplier_id,o.create_time,oe.id as orderExpress_id od.id
+		o.id,o.order_id,o.status,o.express_type,o.supplier_id,o.create_time,oe.id as orderExpress_id, od.id
 		as detail_id,od.payment,od.post_fee,od.fax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		oe.express_key,oe.express_name,oe.express_id,
 		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,
 		o.center_id,o.shop_id,o.guide_id,og.id as
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from order_base o left join order_detail od on o.order_id =
-		od.order_id left join order_goods og on o.order_id = og.order_id left join order_express oe on oe.order_id = o.order_id
-		where
-		o.order_flag = #{info.orderFlag,jdbcType = INTEGER}
+		od.order_id left join order_goods og on o.order_id = og.order_id left join third_order_info oe on oe.order_id = o.order_id
+		where 1=1 
+		<if test="info.status != null">
+			and o.order_flag = #{info.orderFlag,jdbcType = INTEGER}
+		</if>
 		<if test="info.status != null">
 			and o.status = #{info.status,jdbcType = INTEGER}
 		</if>

@@ -179,15 +179,12 @@
 	
 	<resultMap type="com.zm.goods.pojo.vo.GoodsIndustryModel" id="goodsIndustry">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="first_id" property="firstId" jdbcType="VARCHAR" />
 		<result column="industryName" property="industryName" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.goods.pojo.vo.GoodsCategoryModel" property="dictList">
 			<id column="dictid" property="id" jdbcType="INTEGER" />
-			<result column="second_id" property="secondId" jdbcType="VARCHAR" />
 			<result column="dictName" property="dictName" jdbcType="VARCHAR" />
 			<collection property="entryList" ofType = "com.zm.goods.pojo.vo.GoodsCategoryEnteryModel">
 				<id column="entryId" property="id" jdbcType="INTEGER" />
-				<result column="third_id" property="thirdId" jdbcType="VARCHAR" />
 				<result column="entryName" property="entryName" jdbcType="VARCHAR" />
 			</collection>
 		</collection>
@@ -223,13 +220,14 @@
 	</resultMap>
 	
 	<select id="getTax" parameterType="Object" resultMap="tax">
-		select gs.excise_tax,gb.increment_tax from goods_specs${centerId} gs left join goods_item${centerId} gi on 
-		gs.goods_id = gi.goods_id left join goods_base gb on gi.base_id = gb.id where gs.item_id = #{itemId}
+		select gs.excise_tax,gb.increment_tax from goods_item${centerId} gs left join goods${centerId} gi on 
+		gs.goods_id = gi.goods_id left join goods g on gi.goods_id=g.goods_id 
+		left join base gb on g.base_id = gb.id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
-		select gfc.id,gfc.name as industryName,gfc.first_id,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
-		gtc.id as entryId,gtc.name as entryName ,gtc.third_id
+		select gfc.id,gfc.name as industryName,gsc.id as dictid,gsc.name as dictName,
+		gtc.id as entryId,gtc.name as entryName 
 		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.first_id = gsc.first_id 
 		left join goods_third_category${centerId} gtc on gsc.second_id = gtc.second_id order by gfc.id
 	</select>
@@ -244,26 +242,26 @@
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
-		gi.status,gb.goods_name,gi.supplier_id,gi.type,gi.supplier_name,
-		gi.brand_id,gcb.brand,gi.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
-		from goods_item${centerId}
-		gi left join
-		goods_category_brand${centerId} gcb on gi.brand_id =
+		gi.status,g.supplier_id,g.type,g.supplier_name,
+		g.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		from goods${centerId}
+		gi left join goods g on gi.goods_id = g.goods_id left join 
+		goods_category_brand gcb on g.brand_id =
 		gcb.brand_id left join
-		goods_base
-		gb on gi.base_id = gb.id where 1=1 and
+		base
+		gb on g.base_id = gb.id where 1=1 and
 		status = 1
 		<if test="type != null and type != ''">
-			gi.type = #{type,jdbcType = INTEGER}
+			g.type = #{type,jdbcType = INTEGER}
 		</if>
 		<if test="thirdCategory != null and thirdCategory != ''">
-			and gi.third_category = #{thirdCategory,jdbcType = VARCHAR}
+			and gb.third_category = #{thirdCategory,jdbcType = VARCHAR}
 		</if>
 		<if test="firstCategory != null and firstCategory != ''">
-			and gi.first_category = #{firstCategory,jdbcType = VARCHAR}
+			and gb.first_category = #{firstCategory,jdbcType = VARCHAR}
 		</if>
 		<if test="secondCategory != null and secondCategory != ''">
-			and gi.second_category = #{secondCategory,jdbcType = VARCHAR}
+			and gb.second_category = #{secondCategory,jdbcType = VARCHAR}
 		</if>
 		<if test="goodsId != null and goodsId != ''">
 			and gi.goods_id = #{goodsId, jdbcType = VARCHAR}
@@ -285,14 +283,14 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select
-		gs.id,gs.item_id,gs.goods_id,gs.info,gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gs.weight,
+		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,
 		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
-		goods_price${centerId} gp on
+		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id 
+		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id  where gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
@@ -301,39 +299,40 @@
 	</select>
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id,
-		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,gs.excise_tax,gs.weight,
+		select gs.id,gi.info,gs.item_id,gs.goods_id,
+		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,gs.excise_tax,gi.weight,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,stock.qpqty,
+		as sub_create_time,
+		<if test="type == 2">
+			stock.lockedqty as qpqty,
+		</if>
+		<if test="type == 1">
+			stock.fxqty as qpqty,
+		</if>
 		gp.delivery_place,gs.status as specsStatus,
 		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
-		goods_price${centerId} gp on
+		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
+		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id left join 
-		<if test="orderFlag == 0">
-			goods_stock stock
-		</if>
-		<if test="orderFlag == 1 or orderFlag == 2 or orderFlag == null">
-			goods_stock${centerId} stock
-		</if>
+		goods_stock stock
 		on gs.item_id =
-		stock.item_id left join goods_item${centerId} gi on gs.goods_id = gi.goods_id where gs.item_id = #{itemId}
+		stock.item_id left join goods g on gs.goods_id = g.goods_id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gs.info,gs.item_id,gs.goods_id , gi.status,
-		gs.item_code,gs.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		select gs.id,gi.info,gs.item_id,gs.goods_id , g.status,
+		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time, gs.status as specsStatus,gs.excise_tax,gs.weight,
+		as sub_create_time, gs.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,gb.increment_tax,
 		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_specs${centerId} gs left join
-		goods_price${centerId} gp on
-		gs.item_id = gp.item_id left join goods_item${centerId} gi on gs.goods_id=gi.goods_id 
-		left join goods_base gb on gi.base_id = gb.id where gs.item_id in
+		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
+		left join goods_price${centerId} gp on
+		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
+		left join base gb on gi.base_id = gb.id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -351,23 +350,14 @@
 	</select>
 
 	<!-- 建表语句 -->
-	<update id="createGoodsItem" parameterType="java.lang.Integer">
+	<update id="createGoods" parameterType="java.lang.Integer">
 
-		CREATE TABLE IF NOT EXISTS goods_item_${centerId} (
+		CREATE TABLE IF NOT EXISTS goods_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
-		  brand_id VARCHAR(100) NOT NULL COMMENT '品牌ID',
-		  supplier_id int UNSIGNED NULL COMMENT '商家ID',
-		  supplier_name VARCHAR(100) NULL COMMENT '商家名称',
-		  base_id int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
+		  goods_id VARCHAR(50) NOT NULL COMMENT '商品ID',
 		  goods_name VARCHAR(100) NOT NULL COMMENT '商品名称',
 		  description VARCHAR(450) NULL COMMENT '描述',
-		  origin VARCHAR(100) NULL COMMENT '原产国',
-		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
-		  type tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
-		  first_category VARCHAR(100) NOT NULL COMMENT '一级分类id',
-  		  second_category VARCHAR(100) NOT NULL COMMENT '二级分类id',
-		  third_category VARCHAR(100) NOT NULL COMMENT '三级分类id',
+		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：下架，1：上架',
 		  is_popular tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
 		  is_hot tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
 		  is_new tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
@@ -382,18 +372,13 @@
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX id_UNIQUE (id ASC),
 		  UNIQUE INDEX goodsId_UNIQUE (goods_id ASC),
-		  INDEX idx_third_category (third_category),
-		  INDEX idx_brand_id (brand_id),
-		  INDEX idx_supplier_id (supplier_id),
-		  INDEX idx_base_id (base_id),
 		  INDEX idx_status (status),
-		  INDEX idx_type (type),
 		  INDEX idx_is_popular (is_popular),
 		  INDEX idx_is_hot (is_hot),
 		  INDEX idx_is_new (is_new),
 		  INDEX idx_is_good (is_good),
 		  INDEX idx_is_choice (is_choice)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-		COMMENT = '供应商商品基本信息表';
+		COMMENT = '商品表';
 	</update>
 		
 	<update id="createGoodsFile" parameterType="java.lang.Integer">
@@ -421,12 +406,10 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_first_category_${centerId}(
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  first_id VARCHAR(100) NOT NULL COMMENT '一级分类ID',
 		  name VARCHAR(100) NULL COMMENT '一级分类名称',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
-		  UNIQUE INDEX id_UNIQUE (first_id ASC),
 		  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品一级分类表';
 	</update>
@@ -435,14 +418,12 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_second_categroy_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  second_id VARCHAR(100) NOT NULL COMMENT '二级分类ID',
-		  first_id VARCHAR(100) NOT NULL COMMENT 'first_id',
+		  first_id int UNSIGNED NOT NULL COMMENT 'first_id',
 		  name VARCHAR(100) NULL COMMENT '二级分类名称',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
-		  UNIQUE INDEX id_UNIQUE (second_id ASC),
 		  INDEX goods_second_categroy_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品二级分类表';
 	</update>
@@ -451,57 +432,34 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_third_category_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  third_id VARCHAR(100) NOT NULL COMMENT '三级分类ID',
-		  second_id int NOT NULL COMMENT 'second_id',
+		  second_id int UNSIGNED NOT NULL COMMENT 'second_id',
 		  name VARCHAR(100) NULL COMMENT '三级分类名称',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
-		  UNIQUE INDEX id_UNIQUE (third_id ASC),
 		  INDEX goods_third_category_second_id (second_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品三级分类表';
 	</update>
 		
-	<update id="createBrand" parameterType="java.lang.Integer">
+	<update id="createGoodsItem" parameterType="java.lang.Integer">
 		
-		CREATE TABLE IF NOT EXISTS goods_category_brand_${centerId} (
-		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  brand_id VARCHAR(100) NULL COMMENT '品牌名称',
-		  brand VARCHAR(100) NULL COMMENT '品牌名称',
-		  attr VARCHAR(100) NULL COMMENT '备用',
-		  create_time DATETIME NULL COMMENT '创建时间',
-		  update_time DATETIME NULL COMMENT '更新时间',
-		  opt VARCHAR(20) NULL COMMENT '操作人',
-		  PRIMARY KEY (id),
-		  UNIQUE INDEX id_UNIQUE (brand_id ASC),
-		  INDEX goods_category_brand_brand (brand)
-		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-		COMMENT = '商品分类品牌表';
-	</update>
-		
-	<update id="createGoodsSpecs" parameterType="java.lang.Integer">
-		
-		CREATE TABLE IF NOT EXISTS goods_specs_${centerId} (
+		CREATE TABLE IF NOT EXISTS goods_item_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
 		  item_id varchar(50) NOT NULL COMMENT '供销内部商品ID',
 		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
-		  sku VARCHAR(100) NULL COMMENT 'sku信息',
-		  weight int UNSIGNED NOT NULL COMMENT '商品重量（克）',
   		  excise_tax DECIMAL(5,2) NULL COMMENT '消费税',
 		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
 		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  discount decimal(10,2) NULL COMMENT '促销折扣',
-		  info VARCHAR(1000) NULL COMMENT '规格信息',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
 		  INDEX idx_goods_id (goods_id),
 		  INDEX idx_item_id (item_id), 
-		  INDEX idx_is_promotion (is_promotion),
-		  INDEX idx_sku (sku)
+		  INDEX idx_is_promotion (is_promotion)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '商品规格表';
 	</update>
@@ -522,24 +480,6 @@
 		  PRIMARY KEY (id),
 		  INDEX idx_item_id (item_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '商品价格表';
-	</update>
-		
-	<update id="createGoodsStock" parameterType="java.lang.Integer">
-		
-		CREATE TABLE IF NOT EXISTS goods_stock_${centerId} (
-		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  item_id varchar(50) NOT NULL COMMENT '内部商品ID',
-		  qpqty int UNSIGNED NULL COMMENT '良品数量', 
-		  sjqty int UNSIGNED NULL COMMENT '上架数量', 
-		  defqty int UNSIGNED NULL COMMENT '次品数量',
-		  frozenqty int UNSIGNED NULL COMMENT '冻结数量',
-		  lockedqty int UNSIGNED NULL COMMENT '锁定数量',
-		  create_time DATETIME NULL COMMENT '创建时间',
-		  update_time DATETIME NULL COMMENT '更新时间',
-		  opt VARCHAR(20) NULL COMMENT '操作人',
-		  PRIMARY KEY (id),
-		  INDEX idx_item_id (item_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-		COMMENT = '商品库存表';
 	</update>
 		
 	<update id="createLayout" parameterType="java.lang.Integer">
@@ -710,31 +650,31 @@
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
 		select gi.id, gi.status, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,
-		gcb.brand ,gi.origin, gi.third_category,gi.second_category,gi.first_category
-		from goods_item${centerId} gi left join goods_category_brand${centerId} gcb on gi.brand_id = gcb.brand_id 
-		where index_status = 0
+		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
+		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
+		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.id 
+		where gi.index_status = 0;
 	</select>
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
-		select gs.info,gp.id as price_id, gp.price, gs.discount from goods_specs${centerId} gs left join
+		select gi.info,gp.id as price_id, gp.price, gs.discount from goods_item${centerId} gs left join
 		goods_price${centerId} gp on
-		gs.item_id = gp.item_id  where gs.goods_id = #{goodsId}
+		gs.item_id = gp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId}
 	</select>
 	
 	<update id="updateLuceneStatus" parameterType="Object">
-		update goods_item${centerId} set index_status = 1 where index_status = 0;
+		update goods${centerId} set index_status = 1 where index_status = 0;
 	</update>
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
-		gi.status,gi.supplier_id,gs.weight,gi.create_time,gi.type,gi.supplier_name,
-		gi.brand_id,gcb.brand,gi.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
-		from goods_item${centerId}
-		gi left join
-		goods_category_brand${centerId} gcb on gi.brand_id =
-		gcb.brand_id left join
-		goods_base
-		gb on gi.base_id = gb.id left join goods_specs${centerId} gs on gi.goods_id = gs.goods_id 
+		gi.status,g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
+		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		from goods${centerId}
+		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
+		goods_category_brand gcb on gb.brand_id =
+		gcb.brand_id 
+		left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i on gs.item_id=i.item_id 
 		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
@@ -751,7 +691,7 @@
 	</select>
 	
 	<select id="listWarehouse" parameterType="Object" resultMap = "stockModel">
-		select * from goods_stock${centerId} where item_id in
+		select * from goods_stock where item_id in
 		<foreach item="item" index="index" collection="list" open="("
 				separator="," close=")">
 				#{item}
@@ -761,7 +701,7 @@
 	<update id="updateStock" parameterType="Object">
 		<foreach collection="list" item="item" index="index" open=""
 			close="" separator=";">
-			update goods_stock${centerId}
+			update goods_stock
 			<set>
 				sjqty = ifnull(sjqty,0) - #{item.frozenqty},
 				frozenqty = ifnull(frozenqty,0) + #{item.frozenqty}
@@ -773,7 +713,7 @@
 	<update id="updateStockBack" parameterType="Object">
 		<foreach collection="list" item="item" index="index" open=""
 			close="" separator=";">
-			update goods_stock${centerId}
+			update goods_stock
 			<set>
 				sjqty = ifnull(sjqty,0) + #{item.quantity},
 				frozenqty = ifnull(frozenqty,0) - #{item.quantity}
@@ -790,14 +730,13 @@
 	
 	<select id="listSpecialGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
-		gi.status,gi.supplier_id,gs.weight,gi.create_time,gi.type,gi.supplier_name,
-		gi.brand_id,gcb.brand,gi.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
-		from goods_item${centerId}
-		gi left join
-		goods_category_brand${centerId} gcb on gi.brand_id =
-		gcb.brand_id left join
-		goods_base
-		gb on gi.base_id = gb.id left join goods_specs${centerId} gs on gi.goods_id = gs.goods_id 
+		gi.status,g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
+		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		from goods${centerId}
+		gi left join goods g on gi.goods_id = g.goods_id left join base gb on g.base_id=gb.id left join 
+		goods_category_brand gcb on gb.brand_id =
+		gcb.brand_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
+		on gs.item_id = i.item_id 
 		left join goods_price${centerId} gp on gs.item_id = gp.item_id where 1=1
 		<if test="type == 0">
 			and gi.is_new = 1
@@ -809,7 +748,7 @@
 	 
 	<select id="getDiscount" parameterType="Object" resultType="java.lang.Double">
 		select acd.discount from activity_data${centerId} acd left join goods_item${centerId} gi 
-		on acd.goods_id = gi.goods_id left join goods_specs${centerId} gs on gi.goods_id = gs.goods_id 
+		on acd.goods_id = gi.goods_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id 
 		where gs.item_id = #{itemId}
 	</select>
 

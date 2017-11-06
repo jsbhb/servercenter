@@ -1,7 +1,6 @@
 package com.zm.order.pojo;
 
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 /**  
  * ClassName: OrderGoods <br/>  
@@ -19,31 +18,22 @@ public class OrderGoods {
 	
 	private String orderId;
 	
-	@ApiModelProperty(value="商品唯一ID", dataType="String", required=true)
 	private String itemId;
 	
-	@ApiModelProperty(value="跨境商品sku", dataType="String", required=false)
 	private String sku;
 	
-	@ApiModelProperty(value="商品名称", dataType="String", required=true)
 	private String itemName;
 	
-	@ApiModelProperty(value="图片地址", dataType="String", required=true)
 	private String itemImg;
 	
-	@ApiModelProperty(value="商品规格", dataType="String", required=true)
 	private String itemInfo;
 	
-	@ApiModelProperty(value="供应商自有编码(跨境商品)", dataType="String", required=false)
 	private String itemCode;
 	
-	@ApiModelProperty(value="商品数量", dataType="Integer", required=true)
 	private Integer itemQuantity;
 	
-	@ApiModelProperty(value="商品价格", dataType="Double", required=true)
 	private Double itemPrice;
 	
-	@ApiModelProperty(value="商品实际数量", dataType="Double", required=true)
 	private Double actualPrice;
 	
 	private String remark;

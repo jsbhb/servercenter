@@ -11,19 +11,9 @@ public class GoodsIndustryModel {
  
 	private Integer id;
 	
-	private String firstId;
-	
 	private String industryName;
 	
 	private List<GoodsCategoryModel> dictList;
-
-	public String getFirstId() {
-		return firstId;
-	}
-
-	public void setFirstId(String firstId) {
-		this.firstId = firstId;
-	}
 
 	public Integer getId() {
 		return id;

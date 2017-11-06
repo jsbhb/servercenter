@@ -11,16 +11,6 @@ public class GoodsCategoryEnteryModel {
 	
 	private String entryName;
 	
-	private String thirdId;
-	
-	public String getThirdId() {
-		return thirdId;
-	}
-
-	public void setThirdId(String thirdId) {
-		this.thirdId = thirdId;
-	}
-
 	public Integer getId() {
 		return id;
 	}

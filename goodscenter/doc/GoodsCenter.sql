@@ -3,11 +3,11 @@ CREATE SCHEMA `zm_goods` ;
 
 use zm_goods;
 
-drop table if exists  `goods_base`;
+drop table if exists  `base`;
 
-CREATE TABLE `zm_goods`.`goods_base` (
+CREATE TABLE `zm_goods`.`base` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `brand_id` VARCHAR(100) NOT NULL COMMENT '品牌ID',
+  `brand_id` int UNSIGNED NOT NULL COMMENT '品牌ID',
   `goods_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
   `brand` VARCHAR(100) NOT NULL COMMENT '商品品牌',
   `increment_tax` DECIMAL(5,2) NULL COMMENT '增值税',
@@ -15,34 +15,36 @@ CREATE TABLE `zm_goods`.`goods_base` (
   `unit` VARCHAR(30) NOT NULL COMMENT '单位',
   `hscode` VARCHAR(50) NULL COMMENT 'HSCODE',
   `encode` VARCHAR(50) NULL COMMENT '条形码',
+  `first_category` int UNSIGNED NOT NULL COMMENT '一级分类id',
+  `second_category` int UNSIGNED NOT NULL COMMENT '二级分类id',
+  `third_category` int UNSIGNED NOT NULL COMMENT '三级分类id',
+  `center_id` int UNSIGNED NOT NULL COMMENT '区域中心ID',
   `create_time` DATETIME NULL COMMENT '注册时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `idx_brand` (`brand`),
-  INDEX `idx_brand_id` (`brand_id`),
-  INDEX `idx_origin` (`origin`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '商品信息管理表';
+  INDEX `idx_first_category` (`first_category`),
+  INDEX `idx_second_category` (`second_category`),
+  INDEX `idx_third_category` (`third_category`),
+  INDEX `idx_brand_id` (`brand_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '商品基本信息管理表';
 
 
-drop table if exists  `goods_item`;
+drop table if exists  `goods`;
 
-CREATE TABLE `zm_goods`.`goods_item` (
+CREATE TABLE `zm_goods`.`goods` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `goods_id` VARCHAR(100) NOT NULL COMMENT '商品ID',
-  `brand_id` VARCHAR(100) NOT NULL COMMENT '品牌ID',
+  `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
   `supplier_id` int UNSIGNED NULL COMMENT '商家ID',
   `supplier_name` VARCHAR(100) NULL COMMENT '商家名称',
   `base_id` int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
   `goods_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
   `description` VARCHAR(450) NULL COMMENT '描述',
   `origin` VARCHAR(100) NULL COMMENT '原产国',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
+  `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：初始，1：可用；2：可分销',
   `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
-  `first_category` VARCHAR(100) NOT NULL COMMENT '一级分类id',
-  `second_category` VARCHAR(100) NOT NULL COMMENT '二级分类id',
-  `third_category` VARCHAR(100) NOT NULL COMMENT '三级分类id',
   `is_popular` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
   `is_new` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
   `is_good` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否精选0：否，1是',
@@ -56,10 +58,7 @@ CREATE TABLE `zm_goods`.`goods_item` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `goodsId_UNIQUE` (`goods_id` ASC),
-  INDEX `idx_brand_id` (`brand_id`),
   INDEX `idx_supplier_id` (`supplier_id`),
-  INDEX `idx_third_category` (`third_category`),
   INDEX `idx_base_id` (`base_id`),
   INDEX `idx_status` (`status`),
   INDEX `idx_index_status` (`index_status`),
@@ -68,7 +67,7 @@ CREATE TABLE `zm_goods`.`goods_item` (
   INDEX `idx_is_new` (`is_new`),
   INDEX `idx_is_hot` (`is_hot`),
   INDEX `idx_is_good` (`is_good`),
-  INDEX `idx_is_choice` (`is_choice`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+  INDEX `idx_is_choice` (`is_choice`)) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品基本信息表';
 
 
@@ -76,7 +75,7 @@ drop table if exists  `goods_file`;
 
 CREATE TABLE `zm_goods`.`goods_file` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `goods_id` VARCHAR(100) NOT NULL COMMENT '商品ID',
+  `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
   `path` VARCHAR(100) NULL COMMENT '文件路径',
   `suffix` CHAR(5) NULL COMMENT '后缀',
   `store_type` tinyint UNSIGNED NOT NULL COMMENT '存储类型',
@@ -98,12 +97,10 @@ drop table if exists  `goods_first_category`;
 
 CREATE TABLE `zm_goods`.`goods_first_category` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `first_id` VARCHAR(100) NOT NULL COMMENT '一级分类ID',
   `name` VARCHAR(100) NULL COMMENT '一级分类名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
-  UNIQUE INDEX `id_UNIQUE` (`first_id` ASC),
   PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品一级分类表';
 
@@ -112,14 +109,12 @@ drop table if exists  `goods_second_categroy`;
 
 CREATE TABLE `zm_goods`.`goods_second_categroy` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `second_id` VARCHAR(100) NOT NULL COMMENT '二级分类ID',
-  `first_id` VARCHAR(100) NOT NULL COMMENT 'first_id',
+  `first_id` int UNSIGNED NOT NULL COMMENT 'first_id',
   `name` VARCHAR(100) NULL COMMENT '二级分类名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`second_id` ASC),
   INDEX `goods_second_categroy_first_id` (`first_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品二级分类表';
 
@@ -128,14 +123,12 @@ drop table if exists  `goods_third_category`;
 
 CREATE TABLE `zm_goods`.`goods_third_category` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `third_id` VARCHAR(100) NOT NULL COMMENT '三级分类ID',
-  `second_id` int NOT NULL COMMENT 'second_id',
+  `second_id` int UNSIGNED NOT NULL COMMENT 'second_id',
   `name` VARCHAR(100) NULL COMMENT '三级分类名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`third_id` ASC),
   INDEX `goods_third_category_second_id` (`second_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品三级分类表';
 
@@ -144,28 +137,28 @@ drop table if exists  `goods_category_brand`;
 
 CREATE TABLE `zm_goods`.`goods_category_brand` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `brand_id` VARCHAR(100) NULL COMMENT '品牌名称',
   `brand` VARCHAR(100) NULL COMMENT '品牌名称',
   `attr` VARCHAR(100) NULL COMMENT '备用',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`brand_id` ASC),
   INDEX `goods_category_brand_brand` (`brand`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品品牌表';
 
 
-drop table if exists  `goods_specs`;
+drop table if exists  `goods_item`;
 
-CREATE TABLE `zm_goods`.`goods_specs` (
+CREATE TABLE `zm_goods`.`goods_item` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `goods_id` VARCHAR(100) NOT NULL COMMENT '商品ID',
-  `item_id` varchar(50) NOT NULL COMMENT '供销内部商品ID',
+  `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
+  `item_id` VARCHAR(50) NOT NULL COMMENT 'itemID',
   `item_code` varchar(50) NOT NULL COMMENT '商家自有编码',
   `sku` VARCHAR(100) NULL COMMENT 'sku信息',
   `weight` int UNSIGNED NOT NULL COMMENT '商品重量（克）',
+  `proxy_price` decimal(10,2) NOT NULL COMMENT '代理价格',
+  `fxprice` decimal(10,2) NOT NULL COMMENT '分销价格',
   `excise_tax` DECIMAL(5,2) NULL COMMENT '消费税',
   `is_promotion` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
   `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
@@ -176,18 +169,17 @@ CREATE TABLE `zm_goods`.`goods_specs` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_goods_id` (`goods_id`),
-  INDEX `idx_item_id` (`item_id`), 
   INDEX `idx_is_promotion` (`is_promotion`),
   INDEX `idx_sku` (`sku`)
-  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '商品规格表';
+  ) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8 
+COMMENT = '商品item表';
 
 
 drop table if exists  `goods_price_contrast`;
 
 CREATE TABLE `zm_goods`.`goods_price_contrast` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `item_id` varchar(50) NOT NULL COMMENT '内部商品ID',
+  `item_id` VARCHAR(50) NOT NULL COMMENT 'itemID',
   `sh_price` decimal(10,2) NOT NULL COMMENT '上海价格',
   `bj_price` decimal(10,2) NOT NULL COMMENT '北京价格',
   `price` decimal(10,2) NOT NULL COMMENT '自己价格',
@@ -207,7 +199,7 @@ drop table if exists  `goods_price`;
 
 CREATE TABLE `zm_goods`.`goods_price` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `item_id` varchar(50) NOT NULL COMMENT '商品ID',
+  `item_id` VARCHAR(50) NOT NULL COMMENT 'itemID',
   `min` int UNSIGNED NULL DEFAULT 0 COMMENT '最小数量',
   `max` int UNSIGNED NULL COMMENT '最大数量',
   `price` decimal(10,2) NULL DEFAULT 0.0 COMMENT '价格',
@@ -225,9 +217,9 @@ drop table if exists  `goods_stock`;
 
 CREATE TABLE `zm_goods`.`goods_stock` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `item_id` varchar(50) NOT NULL COMMENT '内部商品ID',
+  `item_id` VARCHAR(50) NOT NULL COMMENT 'itemID',
   `qpqty` int UNSIGNED NULL COMMENT '良品数量', 
-  `sjqty` int UNSIGNED NULL COMMENT '上架数量', 
+  `fxqty` int UNSIGNED NULL COMMENT '分销数量', 
   `defqty` int UNSIGNED NULL COMMENT '次品数量',
   `frozenqty` int UNSIGNED NULL COMMENT '冻结数量',
   `lockedqty` int UNSIGNED NULL COMMENT '锁定数量',
@@ -293,7 +285,7 @@ CREATE TABLE `zm_goods`.`popularize_data` (
   `specs` VARCHAR(50) NULL COMMENT '规格',
   `description` VARCHAR(450) NULL COMMENT '描述',
   `price` DECIMAL(10,2) NULL COMMENT '商品价格',
-  `goodsId`  int UNSIGNED NULL COMMENT '商品ID',
+  `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
@@ -333,7 +325,7 @@ CREATE TABLE `zm_goods`.`activity_data` (
   `href` VARCHAR(300) NULL COMMENT '跳转地址',
   `picPath` VARCHAR(300) NULL COMMENT '图片地址',
   `title` VARCHAR(50) NULL COMMENT '名称',
-  `goods_id` VARCHAR(100) NULL COMMENT '商品ID',
+  `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
   `goods_name` VARCHAR(100) NULL COMMENT '商品名称',
   `price` decimal(10,2) NULL COMMENT '价格',
   `discount` decimal(10,2) NULL COMMENT '促销折扣',
