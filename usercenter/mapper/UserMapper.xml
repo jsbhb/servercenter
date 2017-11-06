@@ -16,6 +16,7 @@
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 		<result column="company" property="company" jdbcType="VARCHAR" />
+		<result column="person_in_charge_id" property="personInChargeId" jdbcType="INTEGER" />
 	</resultMap>
 
 	<resultMap type="com.zm.user.pojo.Address" id="address">
@@ -355,5 +356,9 @@
 	<select id="listCenterId" resultType="java.lang.Integer">
 		select id from grade where parent_id in(1,2);
 	</select>
+	
+	<update id="updatePersonInChargeId" parameterType="Object">
+		update grade set person_in_charge_id = #{personInChargeId} where id = #{id} 
+	</update>
 
 </mapper>

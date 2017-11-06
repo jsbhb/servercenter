@@ -25,4 +25,14 @@ public interface GradeService {
 	 * @since JDK 1.7
 	 */
 	Page<Grade> queryForPagination(Grade grade);
+
+	/**  
+	 * queryById:根据编号查询. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Grade queryById(Integer id);
 }

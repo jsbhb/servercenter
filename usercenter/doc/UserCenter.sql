@@ -171,6 +171,7 @@ CREATE TABLE `zm_user`.`grade` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(50) NULL COMMENT '操作人',
   `company` varchar(50) DEFAULT NULL,
+  `person_in_charge_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `idx_grade_type` (`grade_type`),
   INDEX `idx_parent_id` (`parent_id`),

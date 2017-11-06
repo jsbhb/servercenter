@@ -38,4 +38,9 @@ public class GradeServiceImpl implements GradeService {
 		return gradeMapper.selectForPage(grade);
 	}
 
+	@Override
+	public Grade queryById(Integer id) {
+		return gradeMapper.selectById(id);
+	}
+
 }

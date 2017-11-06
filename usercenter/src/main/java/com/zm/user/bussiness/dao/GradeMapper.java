@@ -31,5 +31,16 @@ public interface GradeMapper<T> {
 	 * @since JDK 1.7
 	 */
 	Page<T> selectForPage(Grade grade);
+	
+	/**
+	 * 
+	 * selectById:根据编号查询. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id
+	 * @return  
+	 * @since JDK 1.7
+	 */
+	Grade selectById(int id);
 
 }
