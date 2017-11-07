@@ -56,8 +56,8 @@ public class GoodsController {
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
-	public ResultModel listGoods(@PathVariable("version") Double version,@ModelAttribute Pagination pagination,
-			@ModelAttribute GoodsSearch searchModel,@ModelAttribute SortModelList sortList) {
+	public ResultModel listGoods(@PathVariable("version") Double version, @ModelAttribute Pagination pagination,
+			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
@@ -73,7 +73,7 @@ public class GoodsController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID"),
-			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID")})
+			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId) {
 
@@ -349,13 +349,28 @@ public class GoodsController {
 	 */
 	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
 	@ApiIgnore
-	public ResultModel stockBack(@PathVariable("version") Double version, Integer centerId,
-			@RequestBody List<OrderBussinessModel> list, Integer orderFlag) {
+	public ResultModel stockBack(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
+			Integer orderFlag) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			goodsService.stockBack(list, centerId, orderFlag);
+			goodsService.stockBack(list, orderFlag);
 			return new ResultModel(true, null);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	/**
+	 * @fun 库存判断
+	 */
+	@RequestMapping(value = "{version}/goods/stockjudge", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel stockJudge(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			return goodsService.stockJudge(list);
 		}
 
 		return new ResultModel(false, "版本错误");

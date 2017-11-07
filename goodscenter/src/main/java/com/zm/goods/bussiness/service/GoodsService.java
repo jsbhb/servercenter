@@ -188,7 +188,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	void stockBack(List<OrderBussinessModel> list, Integer centerId, Integer orderFlag);
+	void stockBack(List<OrderBussinessModel> list, Integer orderFlag);
 
 	/**
 	 * getTimelimitGoods:获取限时抢购商品. <br/>
@@ -209,5 +209,16 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	List<GoodsItem> listSpecialGoods(Integer centerId, Integer type);
+
+	
+	/**
+	 * stockJudge:库存判断（支付时第三方仓库）. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	ResultModel stockJudge(List<OrderBussinessModel> list);
 
 }

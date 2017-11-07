@@ -52,7 +52,7 @@ CREATE TABLE `zm_order`.`order_detail` (
   `order_id` CHAR(21) NOT NULL, 
   `pay_type` TINYINT UNSIGNED NOT NULL COMMENT '1:微信；2支付宝',
   `payment` DECIMAL(10,2) NULL,
-  `dis_amount` DECIMAL(10,2) NULL,
+  `dis_amount` DECIMAL(10,2) NULL COMMENT '优惠价格',
   `pay_time` DATETIME NULL,
   `post_fee` DECIMAL(10,2) NULL,
   `tax_fee` DECIMAL(10,2) NULL COMMENT '总税额',

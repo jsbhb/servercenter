@@ -475,12 +475,7 @@ public class OrderServiceImpl implements OrderService {
 			return false;
 		}
 		orderMapper.updateOrderClose(orderId);
-		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())
-				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
-
-		} else {
-			stockBack(info);
-		}
+		stockBack(info);
 		return true;
 	}
 
@@ -494,7 +489,7 @@ public class OrderServiceImpl implements OrderService {
 			model.setQuantity(goods.getItemQuantity());
 			list.add(model);
 		}
-		goodsFeignClient.stockBack(Constants.FIRST_VERSION, list, info.getCenterId(), info.getOrderFlag());
+		goodsFeignClient.stockBack(Constants.FIRST_VERSION, list, info.getOrderFlag());
 	}
 
 	@Override

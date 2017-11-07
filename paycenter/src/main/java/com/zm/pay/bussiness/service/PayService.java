@@ -2,10 +2,13 @@ package com.zm.pay.bussiness.service;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.alipay.api.AlipayApiException;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
+import com.zm.pay.pojo.ResultModel;
 
 /**
  * ClassName: PayService <br/>
@@ -46,4 +49,12 @@ public interface PayService {
 	 * @return
 	 */
 	Map<String, Object> wxRefundPay(Integer clientId, RefundPayModel model) throws Exception;
+	
+	/**
+	 * 支付接口
+	 * 
+	 * @return ResultModel
+	 */
+	ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
+			throws Exception;
 }

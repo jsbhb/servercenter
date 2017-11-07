@@ -216,7 +216,15 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		if (delStock) {
-			boolean enough = processWarehouse.processWarehouse(centerId, orderFlag, list);
+			boolean enough = processWarehouse.processWarehouse(orderFlag, list);
+			if (!enough) {
+				result.setSuccess(false);
+				result.setErrorMsg("库存不足");
+				return result;
+			}
+		} else {
+			//TODO 调用第三方库存接口，更新库存数据
+			boolean enough = processWarehouse.processWarehouse(orderFlag, list);
 			if (!enough) {
 				result.setSuccess(false);
 				result.setErrorMsg("库存不足");
@@ -650,14 +658,10 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public void stockBack(List<OrderBussinessModel> list, Integer centerId, Integer orderFlag) {
+	public void stockBack(List<OrderBussinessModel> list, Integer orderFlag) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		if (Constants.O2O_ORDER.equals(orderFlag)) {
-			param.put("centerId", "");
-		} else {
-			param.put("centerId", "_" + centerId);
-		}
 		param.put("list", list);
+		param.put("orderFlag", orderFlag);
 		goodsMapper.updateStockBack(param);
 	}
 
@@ -665,14 +669,33 @@ public class GoodsServiceImpl implements GoodsService {
 	public List<TimeLimitActive> getTimelimitGoods(Integer centerId) {
 		String id = judgeCenterId(centerId);
 		List<TimeLimitActive> list = goodsMapper.listLimitTimeData(id);
+		Map<String, Object> searchParm = new HashMap<String, Object>();
 		if (list == null || list.size() == 0) {
 			return null;
 		}
 		for (TimeLimitActive active : list) {
 			if (active.getDataList() != null && active.getDataList().size() > 0) {
+				List<String> idList = new ArrayList<String>();
 				for (TimeLimitActiveData data : active.getDataList()) {
-					data.setRealPrice(
-							CalculationUtils.mul(data.getPrice(), CalculationUtils.div(data.getDiscount(), 10.0)));
+					idList.add(data.getGoodsId());
+				}
+				searchParm.put("list", idList);
+				searchParm.put("centerId", id);
+				List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
+				Map<String, GoodsSpecs> temp = new HashMap<String, GoodsSpecs>();
+				for (GoodsSpecs specs : specsList) {
+					temp.put(specs.getGoodsId(), specs);
+				}
+				for (TimeLimitActiveData data : active.getDataList()) {
+					GoodsSpecs specs = temp.get(data.getGoodsId());
+					if (specs != null) {
+						if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
+							Double discount = specs.getDiscount() == null ? 10.0 : specs.getDiscount();
+							discount = CalculationUtils.div(discount, 10.0);
+							data.setPrice(specs.getPriceList().get(0).getPrice());
+							data.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));
+						}
+					}
 				}
 			}
 		}
@@ -687,6 +710,12 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("centerId", id);
 		param.put("type", type);
 		return goodsMapper.listSpecialGoods(param);
+	}
+
+	@Override
+	public ResultModel stockJudge(List<OrderBussinessModel> list) {
+		// TODO 调用第三方接口，更新库存、冻结库存，判断库存
+		return null;
 	}
 
 }

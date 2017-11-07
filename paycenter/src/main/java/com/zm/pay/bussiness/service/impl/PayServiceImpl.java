@@ -1,9 +1,12 @@
 package com.zm.pay.bussiness.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +18,21 @@ import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.constants.LogConstants;
+import com.zm.pay.feignclient.GoodsFeignClient;
 import com.zm.pay.feignclient.LogFeignClient;
+import com.zm.pay.feignclient.OrderFeignClient;
+import com.zm.pay.feignclient.model.OrderBussinessModel;
+import com.zm.pay.feignclient.model.OrderDetail;
+import com.zm.pay.feignclient.model.OrderGoods;
+import com.zm.pay.feignclient.model.OrderInfo;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
+import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CommonUtils;
+import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
 import com.zm.pay.utils.wx.WxPayUtils;
 
@@ -38,10 +49,16 @@ import com.zm.pay.utils.wx.WxPayUtils;
 public class PayServiceImpl implements PayService {
 
 	@Resource
+	OrderFeignClient orderFeignClient;
+
+	@Resource
 	LogFeignClient logFeignClient;
 
 	@Resource
 	RedisTemplate<String, ?> redisTemplate;
+	
+	@Resource
+	GoodsFeignClient goodsFeignClient;
 
 	private Logger logger = LoggerFactory.getLogger(PayServiceImpl.class);
 
@@ -168,6 +185,93 @@ public class PayServiceImpl implements PayService {
 		}
 
 		return result;
+	}
+
+	private static final Long time = (Constants.PAY_EFFECTIVE_TIME_HOUR - 1) * 3600000L;// 支付有效期前一小时交易关闭
+	private static final Integer O2O_ORDER = 0;
+	private static final Integer OWN_SUPPLIER = 1;
+
+	@Override
+	public ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
+			throws Exception {
+
+		OrderInfo info = orderFeignClient.getOrderByOrderIdForPay(version, orderId);
+		if (info == null) {
+			throw new RuntimeException("没有对应订单");
+		}
+		if (Constants.ORDER_CLOSE.equals(info.getStatus())) {
+			throw new RuntimeException("该订单已经超时关闭");
+		}
+		if (Constants.ORDER_CANCEL.equals(info.getStatus())) {
+			throw new RuntimeException("该订单已经退单");
+		}
+		// 判断订单是否超时
+		if (DateUtils.judgeDate(info.getCreateTime(), time)) {
+			orderFeignClient.closeOrder(version, orderId);
+			throw new RuntimeException("该订单已经超时关闭");
+		}
+		
+		//如果是跨境第三方仓库的，需要同步库存并判断库存
+		if(O2O_ORDER.equals(info.getOrderFlag()) && !OWN_SUPPLIER.equals(info.getSupplierId())){
+			OrderBussinessModel model = null;
+			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+			for(OrderGoods goods : info.getOrderGoodsList()){
+				model = new OrderBussinessModel();
+				model.setItemId(goods.getItemId());
+				model.setQuantity(goods.getItemQuantity());
+				model.setOrderId(info.getOrderId());
+				model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
+				list.add(model);
+			}
+			ResultModel result = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, list);
+			if(result == null || !result.isSuccess()){
+				return result;
+			}
+		}
+
+		// 封装支付信息
+		PayModel model = new PayModel();
+		model.setBody("购物订单");
+		model.setOrderId(info.getOrderId());
+		model.setTotalAmount((int) (info.getOrderDetail().getPayment() * 100) + "");
+		StringBuilder sb = new StringBuilder();
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
+		}
+		model.setDetail(sb.toString().substring(0, sb.toString().length() - 1));
+		// end
+		if (Constants.ALI_PAY.equals(payType)) {
+			if (!Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {
+				OrderDetail detail = new OrderDetail();
+				detail.setPayType(Constants.ALI_PAY);
+				detail.setOrderId(info.getOrderId());
+				orderFeignClient.updateOrderPayType(version, detail);
+			}
+			return new ResultModel(aliPay(info.getCenterId(), type, model));
+		}
+
+		// 微信支付
+		if (Constants.WX_PAY.equals(payType)) {
+			if (Constants.JSAPI.equals(type)) {
+				if (req.getParameter("openId") == null || "".equals(req.getParameter("openId"))) {
+					throw new RuntimeException("请先用微信授权登录");
+				}
+			}
+			// 微信特定参数
+			model.setIP(req.getRemoteAddr());
+			model.setOpenId(req.getParameter("openId"));
+			Map<String, String> result = weiXinPay(info.getCenterId(), type, model);
+
+			if (!Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+				OrderDetail detail = new OrderDetail();
+				detail.setPayType(Constants.WX_PAY);
+				detail.setOrderId(info.getOrderId());
+				orderFeignClient.updateOrderPayType(version, detail);
+			}
+
+			return new ResultModel(result);
+		}
+		return null;
 	}
 
 }

@@ -6,7 +6,7 @@ public class WarehouseModel {
 
 	private String itemId;
 	
-	private Integer sjqty;
+	private Integer fxqty;
 	
 	private Integer frozenqty;
 	
@@ -28,12 +28,12 @@ public class WarehouseModel {
 		this.itemId = itemId;
 	}
 
-	public Integer getSjqty() {
-		return sjqty;
+	public Integer getFxqty() {
+		return fxqty;
 	}
 
-	public void setSjqty(Integer sjqty) {
-		this.sjqty = sjqty;
+	public void setFxqty(Integer fxqty) {
+		this.fxqty = fxqty;
 	}
 
 	public Integer getFrozenqty() {

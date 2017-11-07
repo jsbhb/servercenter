@@ -31,5 +31,5 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
 	public ResultModel stockBack(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
-			@RequestParam("centerId") Integer centerId, @RequestParam("orderFlag") Integer orderFlag);
+			@RequestParam("orderFlag") Integer orderFlag);
 }
