@@ -50,6 +50,14 @@ public class GoodsSpecs implements Serializable{
 	
 	private Double vipMaxPrice;
 	
+	private Double realMinPrice;
+	
+	private Double realMaxPrice;
+	
+	private Double realVipMinPrice;
+	
+	private Double realVipMaxPrice;
+	
 	private Integer status;
 	
 	private Integer stock;
@@ -57,6 +65,38 @@ public class GoodsSpecs implements Serializable{
 	private Double incrementTax;
 	
 	private List<GoodsPrice> priceList;
+
+	public Double getRealMinPrice() {
+		return realMinPrice;
+	}
+
+	public void setRealMinPrice(Double realMinPrice) {
+		this.realMinPrice = realMinPrice;
+	}
+
+	public Double getRealMaxPrice() {
+		return realMaxPrice;
+	}
+
+	public void setRealMaxPrice(Double realMaxPrice) {
+		this.realMaxPrice = realMaxPrice;
+	}
+
+	public Double getRealVipMinPrice() {
+		return realVipMinPrice;
+	}
+
+	public void setRealVipMinPrice(Double realVipMinPrice) {
+		this.realVipMinPrice = realVipMinPrice;
+	}
+
+	public Double getRealVipMaxPrice() {
+		return realVipMaxPrice;
+	}
+
+	public void setRealVipMaxPrice(Double realVipMaxPrice) {
+		this.realVipMaxPrice = realVipMaxPrice;
+	}
 
 	public Double getIncrementTax() {
 		return incrementTax;

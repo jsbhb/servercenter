@@ -97,6 +97,8 @@ CREATE TABLE `zm_order`.`third_order_info` (
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `uk_orderIdThirdOrderId` (`order_id`,`third_order_id` ASC),
+  UNIQUE INDEX `uk_expressId` (`express_id` ASC),
   INDEX `idx_orderId` (`order_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '第三方仓库订单信息';

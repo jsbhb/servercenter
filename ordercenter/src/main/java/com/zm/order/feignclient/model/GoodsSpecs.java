@@ -29,7 +29,7 @@ public class GoodsSpecs implements Serializable {
 	private Integer promotion;
 
 	private String info;
-	
+
 	private Integer status;
 
 	private String createTime;
@@ -46,15 +46,55 @@ public class GoodsSpecs implements Serializable {
 
 	private Double vipMaxPrice;
 
+	private Double realMinPrice;
+
+	private Double realMaxPrice;
+
+	private Double realVipMinPrice;
+
+	private Double realVipMaxPrice;
+
 	private Integer stock;
-	
+
 	private Double incrementTax;
-	
+
 	private Integer weight;
-	
+
 	private Double exciseTax;
 
 	private List<GoodsPrice> priceList;
+
+	public Double getRealMinPrice() {
+		return realMinPrice;
+	}
+
+	public void setRealMinPrice(Double realMinPrice) {
+		this.realMinPrice = realMinPrice;
+	}
+
+	public Double getRealMaxPrice() {
+		return realMaxPrice;
+	}
+
+	public void setRealMaxPrice(Double realMaxPrice) {
+		this.realMaxPrice = realMaxPrice;
+	}
+
+	public Double getRealVipMinPrice() {
+		return realVipMinPrice;
+	}
+
+	public void setRealVipMinPrice(Double realVipMinPrice) {
+		this.realVipMinPrice = realVipMinPrice;
+	}
+
+	public Double getRealVipMaxPrice() {
+		return realVipMaxPrice;
+	}
+
+	public void setRealVipMaxPrice(Double realVipMaxPrice) {
+		this.realVipMaxPrice = realVipMaxPrice;
+	}
 
 	public Integer getWeight() {
 		return weight;

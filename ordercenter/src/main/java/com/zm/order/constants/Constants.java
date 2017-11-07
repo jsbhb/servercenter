@@ -55,7 +55,4 @@ public class Constants {
 	
 	public static final Integer GENERAL_TRADE = 2;//一般贸易
 	
-	//*********************限时抢购下单*********************
-	public static final String TIMELIMIT_ORDER = "timelimit";
-
 }

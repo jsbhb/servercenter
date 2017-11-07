@@ -73,7 +73,7 @@ public class GoodsController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID"),
-			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID") })
+			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID")})
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId) {
 
@@ -185,12 +185,12 @@ public class GoodsController {
 	@ApiIgnore
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip,
-			Integer centerId, Integer orderFlag, String createType) {
+			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = goodsService.getPriceAndDelStock(list, delStock, vip, centerId, orderFlag, createType);
+			result = goodsService.getPriceAndDelStock(list, delStock, vip, centerId, orderFlag);
 		}
 
 		return result;

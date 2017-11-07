@@ -327,8 +327,6 @@ CREATE TABLE `zm_goods`.`activity_data` (
   `title` VARCHAR(50) NULL COMMENT '名称',
   `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
   `goods_name` VARCHAR(100) NULL COMMENT '商品名称',
-  `price` decimal(10,2) NULL COMMENT '价格',
-  `discount` decimal(10,2) NULL COMMENT '促销折扣',
   `attr` VARCHAR(50) NULL COMMENT '备用字段',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',

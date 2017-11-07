@@ -99,6 +99,4 @@ public interface GoodsMapper {
 	
 	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
 	
-	Double getDiscount(Map<String,Object> param);
-	
 }

@@ -8,8 +8,6 @@ public class Constants {
 	
 	public static final Integer CROSS_BORDER = 1;//跨境
 	
-	public static final Integer PROMOTION = 1;//促销
-	
 	public static final Integer ACTIVE_AREA = 1;//活动范围：全场
 	
 	public static final Integer ACTIVE_MODEL = 1;//活动模块
@@ -33,8 +31,5 @@ public class Constants {
 	//*********************订单类型*********************
 	
 	public static final Integer O2O_ORDER = 0;
-	
-	//*********************限时抢购下单*********************
-	public static final String TIMELIMIT_ORDER = "timelimit";
 	
 }

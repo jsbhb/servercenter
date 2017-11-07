@@ -138,7 +138,6 @@
 		<result column="picPath" property="picPath" jdbcType="VARCHAR" />
 		<result column="title" property="title" jdbcType="VARCHAR" />
 		<result column="goods_id" property="goodsId" jdbcType="INTEGER" />
-		<result column="discount" property="discount" jdbcType="NUMERIC" />
 		<result column="attr" property="attr" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -197,7 +196,7 @@
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<collection ofType="com.zm.goods.pojo.vo.TimeLimitActiveData" property="dataList">
 			<id column="dataId" property="id" jdbcType="INTEGER" />
-			<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
+			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 			<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
 			<result column="picPath" property="picPath" jdbcType="VARCHAR" />
 			<result column="price" property="price" jdbcType="NUMERIC" />
@@ -287,10 +286,19 @@
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,
+		<if test="goodsType == 2 or goodsType == 0">
+			stock.lockedqty as qpqty,
+		</if>
+		<if test="goodsType == 1">
+			stock.fxqty as qpqty,
+		</if>
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id 
 		left join goods_price${centerId} gp on
-		gs.item_id = gp.item_id  where gs.goods_id in
+		gs.item_id = gp.item_id left join 
+		goods_stock stock
+		on gs.item_id =
+		stock.item_id where gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -303,10 +311,10 @@
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,
-		<if test="type == 2">
+		<if test="goodsType == 2 or goodsType == 0">
 			stock.lockedqty as qpqty,
 		</if>
-		<if test="type == 1">
+		<if test="goodsType == 1">
 			stock.fxqty as qpqty,
 		</if>
 		gp.delivery_place,gs.status as specsStatus,
@@ -580,8 +588,6 @@
 		  title VARCHAR(50) NULL COMMENT '名称',
 		  goods_id VARCHAR(100) NULL COMMENT '商品ID',
 		  goods_name VARCHAR(100) NULL COMMENT '商品名称',
-  		  price decimal(10,2) NULL COMMENT '价格',
-		  discount decimal(10,2) NULL COMMENT '促销折扣',
 		  attr VARCHAR(50) NULL COMMENT '备用字段',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
@@ -743,12 +749,6 @@
 		<if test="type == 1">
 			and gi.is_popular = 1
 		</if>
-	</select>
-	 
-	<select id="getDiscount" parameterType="Object" resultType="java.lang.Double">
-		select acd.discount from activity_data${centerId} acd left join goods_item${centerId} gi 
-		on acd.goods_id = gi.goods_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id 
-		where gs.item_id = #{itemId}
 	</select>
 
 </mapper>

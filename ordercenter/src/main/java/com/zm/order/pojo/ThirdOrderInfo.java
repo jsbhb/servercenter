@@ -1,6 +1,6 @@
 package com.zm.order.pojo;
 
-public class OrderExpress {
+public class ThirdOrderInfo {
 
 	private Integer id;
 	
@@ -8,9 +8,29 @@ public class OrderExpress {
 	
 	private String expressKey;
 	
+	private String thirdOrderId;
+	
+	private Integer status;
+	
 	private String expressName;
 	
 	private String expressId;
+
+	public String getThirdOrderId() {
+		return thirdOrderId;
+	}
+
+	public void setThirdOrderId(String thirdOrderId) {
+		this.thirdOrderId = thirdOrderId;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 	public Integer getId() {
 		return id;

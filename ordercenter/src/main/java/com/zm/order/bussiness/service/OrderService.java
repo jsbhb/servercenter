@@ -38,7 +38,7 @@ public interface OrderService {
 	 * @throws Exception
 	 * @since JDK 1.7
 	 */
-	ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req, String createType)
+	ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception;
 
 	/**

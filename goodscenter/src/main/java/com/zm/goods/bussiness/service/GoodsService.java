@@ -68,7 +68,7 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip, Integer centerId,
-			Integer orderFlag, String createType);
+			Integer orderFlag);
 
 	/**
 	 * listGoodsSpecs:获取规格信息. <br/>

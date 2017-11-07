@@ -52,7 +52,7 @@ public class OrderInfo {
 
 	private List<OrderGoods> orderGoodsList;
 	
-	private List<OrderExpress> orderExpressList;
+	private List<ThirdOrderInfo> orderExpressList;
 	
 	private String startTime;
 	
@@ -242,11 +242,11 @@ public class OrderInfo {
 		this.orderGoodsList = orderGoodsList;
 	}
 
-	public List<OrderExpress> getOrderExpressList() {
+	public List<ThirdOrderInfo> getOrderExpressList() {
 		return orderExpressList;
 	}
 
-	public void setOrderExpressList(List<OrderExpress> orderExpressList) {
+	public void setOrderExpressList(List<ThirdOrderInfo> orderExpressList) {
 		this.orderExpressList = orderExpressList;
 	}
 

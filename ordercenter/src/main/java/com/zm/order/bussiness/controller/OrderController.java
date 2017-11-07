@@ -53,7 +53,6 @@ public class OrderController {
 	@RequestMapping(value = "{version}/order", method = RequestMethod.POST, produces = "application/json;utf-8")
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "query", name = "type", dataType = "String", required = true, value = "支付模式，如公众号支付JSAPI"),
-			@ApiImplicitParam(paramType = "query", name = "createType", dataType = "String", required = true, value = "创建渠道，普通：\"\",限时抢购：timelimit"),
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel createOrder(@PathVariable("version") Double version, @RequestBody OrderInfo orderInfo,
 			HttpServletResponse res, HttpServletRequest req) {
@@ -62,7 +61,6 @@ public class OrderController {
 
 		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
-		String createType = req.getParameter("createType");
 
 		if (payType == null || type == null) {
 			result.setSuccess(false);
@@ -73,7 +71,7 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			try {
-				result = orderService.saveOrder(orderInfo, payType, type, req, createType);
+				result = orderService.saveOrder(orderInfo, payType, type, req);
 			} catch (DataIntegrityViolationException e) {
 				e.printStackTrace();
 				result.setSuccess(false);

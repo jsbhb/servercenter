@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req, String createType)
+	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
 		ResultModel result = new ResultModel();
 		if (info == null) {
@@ -127,29 +127,26 @@ public class OrderServiceImpl implements OrderService {
 		boolean vip = false;
 		Activity activity = null;
 
-		if (!Constants.TIMELIMIT_ORDER.equals(createType)) {// 限时抢购订单
-			// 获取该用户是否是VIP
-			vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
-			// 获取全场活动
-			result = goodsFeignClient.getActivity(Constants.FIRST_VERSION, null, Constants.ACTIVE_AREA,
-					info.getCenterId());
-			if (!result.isSuccess()) {
-				result.setErrorMsg("获取活动信息失败");
-				return result;
-			}
+		// 获取该用户是否是VIP
+		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
+		// 获取全场活动
+		result = goodsFeignClient.getActivity(Constants.FIRST_VERSION, null, Constants.ACTIVE_AREA, info.getCenterId());
+		if (!result.isSuccess()) {
+			result.setErrorMsg("获取活动信息失败");
+			return result;
+		}
 
-			if (result.getObj() != null) {
-				activity = (Activity) result.getObj();
-			}
+		if (result.getObj() != null) {
+			activity = (Activity) result.getObj();
 		}
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())
 				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
 			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip, info.getCenterId(),
-					info.getOrderFlag(), createType);
+					info.getOrderFlag());
 		} else {
 			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip, info.getCenterId(),
-					info.getOrderFlag(), createType);
+					info.getOrderFlag());
 		}
 		if (!result.isSuccess()) {
 			return result;
@@ -187,8 +184,8 @@ public class OrderServiceImpl implements OrderService {
 		Double unDiscountAmount = 0.0;
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 			Map<Tax, Double> map = (Map<Tax, Double>) priceAndWeightMap.get("tax");
-			
-			for (Map.Entry<Tax, Double> entry : map.entrySet()){
+
+			for (Map.Entry<Tax, Double> entry : map.entrySet()) {
 				unDiscountAmount += entry.getValue();
 			}
 			for (Map.Entry<Tax, Double> entry : map.entrySet()) {
@@ -198,19 +195,20 @@ public class OrderServiceImpl implements OrderService {
 				if (tax.getExciseTax() != null) {
 					Double exciseTax = CalculationUtils.mul(CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
 							CalculationUtils.sub(1.0, tax.getExciseTax())), tax.getExciseTax());
-					totalExciseTax += CalculationUtils.mul(exciseTax,0.7);
+					totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
 					Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
 							tax.getIncrementTax());
-					totalIncremTax += CalculationUtils.mul(incremTax,0.7);
+					totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
 				} else {
-					totalIncremTax += CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax());
+					totalIncremTax += CalculationUtils.mul(CalculationUtils.add(fee, subPostFee),
+							tax.getIncrementTax());
 				}
 			}
 			taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 		}
-		
+
 		Double disAmount = 0.0;
-		if(unDiscountAmount > 0){
+		if (unDiscountAmount > 0) {
 			disAmount = CalculationUtils.sub(unDiscountAmount, amount);
 		}
 
@@ -411,10 +409,10 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public ResultModel orderCancel(Integer userId,String orderId) throws Exception {
+	public ResultModel orderCancel(Integer userId, String orderId) throws Exception {
 
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-		if(info == null || !userId.equals(info.getUserId())){
+		if (info == null || !userId.equals(info.getUserId())) {
 			return new ResultModel(false, "该订单号不是您的订单号");
 		}
 
@@ -423,27 +421,27 @@ public class OrderServiceImpl implements OrderService {
 																	// 如果再发送第三方过程中退款？？？？
 				RefundPayModel model = new RefundPayModel(info.getOrderId(), info.getOrderDetail().getPayNo(),
 						info.getOrderDetail().getPayment() + "", "正常退款");
-				Map<String,Object> result = new HashMap<String, Object>();
+				Map<String, Object> result = new HashMap<String, Object>();
 				if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {
-					result =  payFeignClient.aliRefundPay(info.getCenterId(), model);
+					result = payFeignClient.aliRefundPay(info.getCenterId(), model);
 				}
-				if(Constants.WX_PAY.equals(info.getOrderDetail().getPayType())){
-					result =  payFeignClient.wxRefundPay(info.getCenterId(), model);
+				if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+					result = payFeignClient.wxRefundPay(info.getCenterId(), model);
 				}
-				if((Boolean) result.get("success")){
+				if ((Boolean) result.get("success")) {
 					OrderDetail detail = new OrderDetail();
 					detail.setOrderId(orderId);
-					detail.setReturnPayNo((String)result.get("returnPayNo"));
+					detail.setReturnPayNo((String) result.get("returnPayNo"));
 					orderMapper.updateOrderCancel(orderId);
 					stockBack(info);
-				}else{
+				} else {
 					return new ResultModel(false, result.get("errorMsg"));
 				}
 			} else {
-				// TODO 发送仓库确认是否可以退单 
+				// TODO 发送仓库确认是否可以退单
 			}
 		} else {
-			//TODO 大贸和一般贸易
+			// TODO 大贸和一般贸易
 		}
 
 		String content = "订单号\"" + info.getOrderId() + "\"退单";
@@ -467,13 +465,13 @@ public class OrderServiceImpl implements OrderService {
 		return true;
 	}
 
-	
-	private static final Integer DEFAULT_USER_ID = -1; 
+	private static final Integer DEFAULT_USER_ID = -1;
+
 	@Override
 	public boolean closeOrder(Integer userId, String orderId) {
 
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-		if(!DEFAULT_USER_ID.equals(userId) && (info == null || !userId.equals(info.getUserId()))){
+		if (!DEFAULT_USER_ID.equals(userId) && (info == null || !userId.equals(info.getUserId()))) {
 			return false;
 		}
 		orderMapper.updateOrderClose(orderId);

@@ -77,10 +77,12 @@ public class GoodsServiceImpl implements GoodsService {
 		parameter.put("type", PICTURE_TYPE);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		parameter.put("centerId", param.get("centerId"));
-		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 		if (param.get("goodsId") != null) {
+			parameter.put("goodsType", goodsList.get(0).getType());
+			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			packageGoodsItem(goodsList, fileList, specsList, true);
 		} else {
+			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			packageGoodsItem(goodsList, fileList, specsList, false);
 		}
 
@@ -116,7 +118,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if (specs == null) {
 			return null;
 		}
-		getPriceInterval(specs);
+		getPriceInterval(specs, specs.getDiscount());
 
 		List<String> idList = new ArrayList<String>();
 		idList.add(specs.getGoodsId());
@@ -146,7 +148,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		for (GoodsSpecs specs : specsList) {
-			getPriceInterval(specs);
+			getPriceInterval(specs, specs.getDiscount());
 		}
 
 		List<String> idList = new ArrayList<String>();
@@ -171,7 +173,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip,
-			Integer centerId, Integer orderFlag, String createType) {
+			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -190,9 +192,7 @@ public class GoodsServiceImpl implements GoodsService {
 				param.put("itemId", model.getItemId());
 				Tax tax = goodsMapper.getTax(param);
 				specs = goodsMapper.getGoodsSpecs(param);
-				if (Constants.TIMELIMIT_ORDER.equals(createType)) {
-					discount = goodsMapper.getDiscount(param);
-				}
+				discount = specs.getDiscount();
 				weight += specs.getWeight() * model.getQuantity();
 				if (taxMap.get(tax) == null) {
 					Double amount = 0.0;
@@ -209,9 +209,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 				param.put("itemId", model.getItemId());
 				specs = goodsMapper.getGoodsSpecs(param);
-				if (Constants.TIMELIMIT_ORDER.equals(createType)) {
-					discount = goodsMapper.getDiscount(param);
-				}
+				discount = specs.getDiscount();
 				weight += specs.getWeight() * model.getQuantity();
 				totalAmount += getAmount(vip, specs, model, discount);
 			}
@@ -235,15 +233,10 @@ public class GoodsServiceImpl implements GoodsService {
 
 	private Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion) {
 		Double totalAmount = 0.0;
-		getPriceInterval(specs);
+		getPriceInterval(specs, promotion);
 		boolean calculation = false;
 		Double discount = 10.0;
-		if (promotion == null) {
-			if (Constants.PROMOTION.equals(specs.getPromotion())) {
-				discount = specs.getDiscount();
-			}
-			discount = CalculationUtils.div(discount, 10.0);
-		} else {
+		if (promotion != null) {
 			discount = promotion;
 		}
 		for (GoodsPrice price : specs.getPriceList()) {
@@ -305,8 +298,9 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		if (specsList != null && specsList.size() > 0) {
-			Map<String, Object> temp = null;
+			Map<String, String> temp = null;
 			Set<String> tempSet = null;
+			Double discount = null;
 			for (GoodsSpecs specs : specsList) {
 				item = goodsMap.get(specs.getGoodsId());
 				if (item == null) {
@@ -320,13 +314,14 @@ public class GoodsServiceImpl implements GoodsService {
 					} else {
 						item.getGoodsSpecsList().add(specs);
 					}
-					getPriceInterval(specs);
+					discount = specs.getDiscount();
+					getPriceInterval(specs, discount);
 				} else {
 					temp = JSONUtil.parse(specs.getInfo(), Map.class);
-					for (Map.Entry<String, Object> entry : temp.entrySet()) {
+					for (Map.Entry<String, String> entry : temp.entrySet()) {
 						if (item.getSpecsInfo() == null) {
 							tempSet = new HashSet<String>();
-							tempSet.add(entry.getKey());
+							tempSet.add(entry.getValue());
 							item.setSpecsInfo(tempSet);
 						} else {
 							item.getSpecsInfo().add(entry.getKey());
@@ -441,37 +436,47 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	// 封装价格区间
-	private void getPriceInterval(GoodsSpecs specs) {
+	private void getPriceInterval(GoodsSpecs specs, Double discountParam) {
 		List<GoodsPrice> priceList = specs.getPriceList();
 		if (priceList == null) {
 			return;
 		}
 		Double discount = 10.0;
-		if (Constants.PROMOTION.equals(specs.getPromotion())) {
-			discount = specs.getDiscount();
+		if (discountParam != null) {
+			discount = discountParam;
 		}
 		discount = CalculationUtils.div(discount, 10.0);
 		for (int i = 0; i < priceList.size(); i++) {
 			if (i == 0) {
-				specs.setMinPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
-				specs.setMaxPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
+				specs.setMinPrice(priceList.get(i).getPrice());
+				specs.setMaxPrice(priceList.get(i).getPrice());
+				specs.setRealMinPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
+				specs.setRealMaxPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
 				if (priceList.get(i).getVipPrice() != null) {
-					specs.setVipMinPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
-					specs.setVipMaxPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
+					specs.setVipMinPrice(priceList.get(i).getVipPrice());
+					specs.setVipMaxPrice(priceList.get(i).getVipPrice());
+					specs.setRealVipMinPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
+					specs.setRealVipMaxPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
 				}
 
 			} else {
-				specs.setMinPrice(CalculationUtils
+				specs.setRealMinPrice(CalculationUtils
 						.mul(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()), discount));
-				specs.setMaxPrice(CalculationUtils
+				specs.setMinPrice(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()));
+				specs.setRealMaxPrice(CalculationUtils
 						.mul(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()), discount));
+				specs.setMaxPrice(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()));
 				if (priceList.get(i).getVipPrice() != null) {
-					specs.setVipMinPrice(CalculationUtils.mul(
+					specs.setRealVipMinPrice(CalculationUtils.mul(
 							CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()),
 							discount));
-					specs.setVipMaxPrice(CalculationUtils.mul(
+					specs.setVipMinPrice(
+							CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()));
+					specs.setRealVipMaxPrice(CalculationUtils.mul(
 							CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()),
 							discount));
+					specs.setVipMaxPrice(
+							CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()));
 				}
 			}
 		}
@@ -601,15 +606,10 @@ public class GoodsServiceImpl implements GoodsService {
 					}
 					model.setSpecsInfo(specsSet);
 					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
-						Double discount = 0.0;
-						if (Constants.PROMOTION.equals(specs.getPromotion())) {
-							discount = CalculationUtils.div(specs.getDiscount(), 10.0);
-							model.setPrice(specs.getPriceList().get(0).getPrice());
-							model.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));
-						} else {
-							model.setPrice(specs.getPriceList().get(0).getPrice());
-							model.setRealPrice(specs.getPriceList().get(0).getPrice());
-						}
+						Double discount = specs.getDiscount() == null ? 10.0 : specs.getDiscount();
+						discount = CalculationUtils.div(discount, 10.0);
+						model.setPrice(specs.getPriceList().get(0).getPrice());
+						model.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));
 					}
 				}
 			}

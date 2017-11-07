@@ -14,8 +14,6 @@ public class ActivityData {
 	
 	private String goodsId;
 	
-	private Double discount;
-	
 	private String attr;
 	
 	private String createTime;
@@ -70,14 +68,6 @@ public class ActivityData {
 
 	public void setGoodsId(String goodsId) {
 		this.goodsId = goodsId;
-	}
-
-	public Double getDiscount() {
-		return discount;
-	}
-
-	public void setDiscount(Double discount) {
-		this.discount = discount;
 	}
 
 	public String getAttr() {
