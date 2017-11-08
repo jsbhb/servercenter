@@ -40,6 +40,10 @@ public class Grade extends Pagination{
 	private String opt;
 
 	private String company;
+	
+	public Grade(){
+		super();
+	}
 
 	public Integer getCenterId() {
 		return centerId;

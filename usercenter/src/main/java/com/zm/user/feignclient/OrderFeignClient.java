@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.zm.user.pojo.ResultModel;
+import com.zm.user.common.ResultModel;
 
 @FeignClient("ordercenter")
 public interface OrderFeignClient {

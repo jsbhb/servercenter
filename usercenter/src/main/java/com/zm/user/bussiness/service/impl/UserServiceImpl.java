@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
+import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.constants.LogConstants;
 import com.zm.user.feignclient.GoodsFeignClient;
@@ -23,7 +24,6 @@ import com.zm.user.feignclient.model.PayModel;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.Grade;
-import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;

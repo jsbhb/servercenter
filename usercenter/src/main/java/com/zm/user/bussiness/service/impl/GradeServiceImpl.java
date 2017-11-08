@@ -10,6 +10,7 @@ package com.zm.user.bussiness.service.impl;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -27,6 +28,7 @@ import com.zm.user.pojo.Grade;
  * @since JDK 1.7
  */
 @Service
+@Transactional
 public class GradeServiceImpl implements GradeService {
 
 	@Resource

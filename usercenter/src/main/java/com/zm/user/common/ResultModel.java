@@ -1,4 +1,4 @@
-package com.zm.user.pojo;
+package com.zm.user.common;
 
 import com.zm.user.common.Pagination;
 

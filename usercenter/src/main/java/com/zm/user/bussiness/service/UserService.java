@@ -3,10 +3,10 @@ package com.zm.user.bussiness.service;
 import java.util.List;
 import java.util.Map;
 
+import com.zm.user.common.ResultModel;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.Grade;
-import com.zm.user.pojo.ResultModel;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;

@@ -20,21 +20,21 @@ public class SysInit {
 
 	@Resource
 	SupplierMapper supplierMapper;
-	
+
 	@PostConstruct
-	public void init(){
-		
+	public void init() {
+
 		loadSupplierInfConfig();
-		
+
 	}
-	
-	private void loadSupplierInfConfig(){
+
+	private void loadSupplierInfConfig() {
 		List<SupplierInterface> list = supplierMapper.listSupplierInterface();
-		if(list == null){
+		if (list == null) {
 			return;
 		}
-		for(SupplierInterface model : list){
-			redisTemplate.opsForValue().set(Constants.SUPPLIER_INTERFACE+model.getSupplierId(), model);
+		for (SupplierInterface model : list) {
+			redisTemplate.opsForValue().set(Constants.SUPPLIER_INTERFACE + model.getSupplierId(), model);
 		}
 	}
 }

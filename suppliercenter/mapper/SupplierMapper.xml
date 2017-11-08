@@ -15,6 +15,27 @@
 		<result column="pid" property="appKey" jdbcType="VARCHAR" />
 		<result column="key" property="appSecret" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.supplier.pojo.SupplierEntity" id="supplier">
+		<id column="id" property="id"/>
+		<result column="type" property="type"/>
+		<result column="supplier_name" property="supplierName" />
+		<result column="country" property="country"/>
+		<result column="province" property="province"/>
+		<result column="city" property="city"/>
+		<result column="area" property="area"/>
+		<result column="address" property="address"/>
+		<result column="operator" property="operator"/>
+		<result column="phone" property="phone"/>
+		<result column="mobile" property="mobile"/>
+		<result column="fax" property="fax"/>
+		<result column="email" property="email"/>
+		<result column="qq" property="qq"/>
+		<result column="enter_time" property="enterTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<result column="is_delete" property="isDelete"/>
+	</resultMap>
 
 	<select id="listExpressBySupplierId" parameterType="Object"
 		resultMap="express">
@@ -22,7 +43,31 @@
 		#{supplierId}
 	</select>
 	
+	<select id="selectById" parameterType="Object" resultMap="supplier">
+		select * from supplier_base where id = #{id} 
+	</select>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="supplier">
+		select * from supplier_base where 1=1 
+		<if test="supplierName!=null and supplierName!=''">
+			and supplier_name like concat('%',#{supplierName},'%') 
+		</if>
+		<if test="id > 0">
+			and id = #{id} 
+		</if>
+	</select>
+	
 	<select id="listSupplierInterface" resultMap="supplierinf">
 		select * from supplier_interface
 	</select>
+	
+	<insert id="insert" parameterType="Object">
+		insert into
+		supplier_base value
+		(#{id},0,#{supplierName},0,
+		#{country},#{province},#{city},#{area},#{address},
+		#{operator},#{phone},#{mobile},#{fax},#{email},#{qq},
+		now(),now(),#{opt},0)
+	</insert>
+	
 </mapper>

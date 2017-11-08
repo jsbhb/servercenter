@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.zm.user.common.ResultModel;
 import com.zm.user.feignclient.model.LogInfo;
-import com.zm.user.pojo.ResultModel;
 
 @FeignClient("logcenter")
 public interface LogFeignClient {

@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.pagehelper.Page;
 import com.zm.user.bussiness.service.GradeService;
 import com.zm.user.common.Pagination;
+import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.pojo.Grade;
-import com.zm.user.pojo.ResultModel;
 
 /**
  * ClassName: GradeController <br/>
@@ -57,15 +57,15 @@ public class GradeController {
 
 	@RequestMapping(value = "{version}/grade/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody Grade grade) {
+			@RequestBody Grade pagination) {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
-				if (grade.getId() == 0) {
+				if (pagination.getId() == 0) {
 					return new ResultModel(false, "没有编号信息");
 				}
 
-				Grade result = gradeService.queryById(grade.getId());
+				Grade result = gradeService.queryById(pagination.getId());
 				return new ResultModel(true, result);
 			}
 
