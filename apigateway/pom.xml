@@ -58,4 +58,16 @@
 		<!--rest请求end -->
 	</dependencies>
 	
+	<build>
+		<resources>
+            <resource>
+                <directory>resource</directory>
+                <targetPath>BOOT-INF/classes/</targetPath>
+                <includes>
+                    <include>**/*.html</include>
+                </includes>
+            </resource>
+        </resources>
+	</build>
+	
 </project>

@@ -88,6 +88,14 @@
 					<include>**/*.xml</include>
 				</includes>
 			</resource>
+			
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>BOOT-INF/classes/</targetPath>
+				<includes>
+					<include>quartz.properties</include>
+				</includes>
+			</resource>
 		</resources>
 	</build>
 </project>
