@@ -102,7 +102,7 @@ public class GoodsController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
 	@ApiOperation(value = "商品价格比价接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -156,7 +156,7 @@ public class GoodsController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	@ApiOperation(value = "获取多个商品规格接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -196,7 +196,7 @@ public class GoodsController {
 		return result;
 	}
 
-	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
 	@ApiOperation(value = "获取活动接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -222,7 +222,7 @@ public class GoodsController {
 
 	}
 
-	@RequestMapping(value = "{version}/goods/modular/{centerId}/{page}/{pageType}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/modular/{centerId}/{page}/{pageType}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取模块布局接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -240,7 +240,7 @@ public class GoodsController {
 
 	}
 
-	@RequestMapping(value = "{version}/goods/modulardata/{centerId}/{page}/{pageType}", method = RequestMethod.POST, produces = "application/json;utf-8")
+	@RequestMapping(value = "auth/{version}/goods/modulardata/{centerId}/{page}/{pageType}", method = RequestMethod.POST, produces = "application/json;utf-8")
 	@ApiOperation(value = "获取模块和数据接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -328,7 +328,7 @@ public class GoodsController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/goods/navigation", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/navigation", method = RequestMethod.GET)
 	@ApiOperation(value = "获取首页分类接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -379,7 +379,7 @@ public class GoodsController {
 	/**
 	 * @fun 获取限时抢购商品
 	 */
-	@RequestMapping(value = "{version}/goods/timelimit/{centerId}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/timelimit/{centerId}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取限时抢购数据接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
@@ -404,7 +404,7 @@ public class GoodsController {
 	 * @fun 获取有特殊属性的商品
 	 * 
 	 */
-	@RequestMapping(value = "{version}/goods/specialgoods/{centerId}/{type}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/specialgoods/{centerId}/{type}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取特殊属性商品接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
