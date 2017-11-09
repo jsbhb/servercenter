@@ -90,13 +90,18 @@
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 		</dependency>
-		
+
 		<!-- pageHelper -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper</artifactId>
 			<version>3.2.3</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 	</dependencies>
-	
+
 </project>
