@@ -104,4 +104,15 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<resources>
+			<resource>
+				<directory>mapper</directory>
+				<targetPath>BOOT-INF/classes/</targetPath>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 </project>
