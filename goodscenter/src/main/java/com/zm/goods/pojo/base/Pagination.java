@@ -21,6 +21,9 @@ public class Pagination {
 		this.endRow = this.currentPage * this.numPerPage;
 	}
 
+	public Pagination() {
+	}
+
 	public Pagination webPageConverter(Page<?> page) {
 		this.setTotalPages(page.getPages());
 		this.setTotalRows(page.getTotal());
@@ -29,10 +32,10 @@ public class Pagination {
 	}
 
 	public Pagination webListConverter() {
-		if(this.totalRows == null){
+		if (this.totalRows == null) {
 			this.totalRows = 0L;
 		}
-		if(this.totalRows % this.numPerPage == 0){
+		if (this.totalRows % this.numPerPage == 0) {
 			this.totalPages = (int) (this.totalRows / this.numPerPage);
 		} else {
 			this.totalPages = (int) (this.totalRows / this.numPerPage) + 1;
