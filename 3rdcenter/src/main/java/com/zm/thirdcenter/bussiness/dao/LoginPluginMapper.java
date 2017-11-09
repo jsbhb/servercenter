@@ -1,4 +1,4 @@
-package com.zm.thirdcenter.bussiness.loginplugin.dao;
+package com.zm.thirdcenter.bussiness.dao;
 
 import java.util.List;
 
