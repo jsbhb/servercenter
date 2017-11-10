@@ -1,5 +1,8 @@
 package com.zm.thirdcenter.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,21 +14,39 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration  
-@EnableAutoConfiguration  
+@EnableAutoConfiguration 
+@ConfigurationProperties(prefix="spring.redis")
 public class RedisConfig {
+	
+	@Value("${spring.redis.host}")
+	private String hostName;
+	
+	@Value("${spring.redis.port}")
+	private String port;
+	
+	@Value("${spring.redis.password}")
+	private String password;
+	
+	Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
 	@Bean
-	@ConfigurationProperties(prefix = "spring.redis")
 	public JedisPoolConfig getRedisConfig() {
 		JedisPoolConfig config = new JedisPoolConfig();
+		config.setMaxIdle(200);
+		config.setMaxTotal(300);
+		config.setTestOnBorrow(false);
+		config.setTestOnReturn(false);
 		return config;
 	}
 
 	@Bean
-	@ConfigurationProperties(prefix = "spring.redis")
 	public JedisConnectionFactory getConnectionFactory() {
 		JedisConnectionFactory factory = new JedisConnectionFactory();
 		JedisPoolConfig config = getRedisConfig();
+		logger.info("hostName:"+hostName+",port:"+port+",password:"+password);
+		factory.setHostName(hostName);
+		factory.setPort(Integer.valueOf(port));
+		factory.setPassword(password);
 		factory.setPoolConfig(config);
 		return factory;
 	}
