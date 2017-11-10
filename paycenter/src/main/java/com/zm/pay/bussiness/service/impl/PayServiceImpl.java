@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
@@ -121,15 +122,30 @@ public class PayServiceImpl implements PayService {
 	}
 
 	@Override
-	public String aliPay(Integer clientId, String type, PayModel model) throws Exception {
+	public Map<String,Object> aliPay(Integer clientId, String type, PayModel model) throws Exception {
 		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
 		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝支付" + type + "，后台请求成功";
-		logFeignClient.saveLog(Constants.FIRST_VERSION,
-				CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝支付", clientId, content, ""));
-
-		return AliPayUtils.aliPay(type, config, model);
+		Map<String,Object> result = new HashMap<String, Object>();
+		
+		if (Constants.SCAN_CODE.equals(type)) {
+			AlipayTradePrecreateResponse response = AliPayUtils.precreate(config, model);
+			if (response.isSuccess()){
+				logFeignClient.saveLog(Constants.FIRST_VERSION,
+						CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝支付", clientId, content, ""));
+				result.put("success", true);
+				result.put("urlCode", response.getQrCode());
+			} else {
+				logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
+						+ response.getSubMsg());
+				result.put("success", false);
+				result.put("errorMsg", response.getMsg());
+				result.put("errorSubMsg", response.getSubMsg());
+			}
+		}
+		
+		return null;
 	}
 
 	@Override
@@ -151,7 +167,7 @@ public class PayServiceImpl implements PayService {
 					+ response.getSubMsg());
 			result.put("success", false);
 			result.put("errorMsg", response.getMsg());
-			result.put("errorSubMsg", response.getSubCode());
+			result.put("errorSubMsg", response.getSubMsg());
 		}
 
 		return result;

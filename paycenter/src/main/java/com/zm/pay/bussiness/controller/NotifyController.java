@@ -142,7 +142,7 @@ public class NotifyController {
 
 	// return_url
 	@SuppressWarnings("rawtypes")
-	@RequestMapping("auth/payMng/payReturn")
+	@RequestMapping(value = "auth/payMng/payReturn" ,method = RequestMethod.GET)
 	@ApiIgnore
 	public void payReturn(HttpServletRequest req, HttpServletResponse res) {
 		logger.info("支付宝RETURN回调");
@@ -218,7 +218,7 @@ public class NotifyController {
 
 	// notify_url
 	@SuppressWarnings("rawtypes")
-	@RequestMapping("auth/payMng/payNotify")
+	@RequestMapping(value = "auth/payMng/payNotify" ,method = RequestMethod.POST)
 	@ApiIgnore
 	public void payNotify(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		logger.info("支付宝NOTIFY回调");

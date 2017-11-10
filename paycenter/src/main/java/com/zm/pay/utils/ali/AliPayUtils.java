@@ -8,7 +8,9 @@ import org.dom4j.DocumentException;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
@@ -72,12 +74,22 @@ public class AliPayUtils {
 	private static final String ALI_API_GATEWAY = "https://openapi.alipay.com/gateway.do";
 
 	// 支付宝退款接口
-	public static AlipayTradeRefundResponse aliRefundPay(AliPayConfigModel config, RefundPayModel model) throws AlipayApiException {
+	public static AlipayTradeRefundResponse aliRefundPay(AliPayConfigModel config, RefundPayModel model)
+			throws AlipayApiException {
 		AlipayClient alipayClient = new DefaultAlipayClient(ALI_API_GATEWAY, config.getAppId(),
 				config.getRsaPrivateKey(), "json", "utf-8", config.getRsaPublicKey(), "RSA2");
 		AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
 		request.setBizContent(model.getBizContent());
-		return  alipayClient.execute(request);
-		
+		return alipayClient.execute(request);
+
+	}
+
+	public static AlipayTradePrecreateResponse precreate(AliPayConfigModel config, PayModel model) throws AlipayApiException {
+		AlipayClient alipayClient = new DefaultAlipayClient(ALI_API_GATEWAY, config.getAppId(),
+				config.getRsaPrivateKey(), "json", "utf-8", config.getRsaPublicKey(), "RSA2");
+		AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();
+		request.setNotifyUrl(Constants.ALI_NOTIFY_URL);
+		request.setBizContent(model.getBizContent());
+		return alipayClient.execute(request);
 	}
 }

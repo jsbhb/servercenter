@@ -1,6 +1,5 @@
 package com.zm.pay.utils.wx;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CommonUtils;
-import com.zm.pay.utils.ZxingUtils;
 
 public class WxPayUtils {
 	
@@ -110,16 +108,7 @@ public class WxPayUtils {
 		//封装支付信息给前台
 		if(Constants.NATIVE.equals(type)){
 			String urlCode = (String) resp.get("code_url");  
-		    // 需要修改为运行机器上的路径
-		    String path = System.getProperty("user.dir")+"\\resource\\public";
-		    File newFile = new File(path);
-			if (!newFile.exists()) {
-				newFile.mkdirs();
-			}
-		    String filePath = String.format(path+"/qr-%s.png",
-		    		model.getOrderId());
-		    ZxingUtils.getQRCodeImge(urlCode, 256, filePath);
-		    result.put("qrFile", "http://192.168.199.194:8888/qr-"+model.getOrderId() + ".png");
+		    result.put("urlCode", urlCode);
 		} else if(Constants.JSAPI.equals(type)){
 			result.put("timeStamp", System.currentTimeMillis() / 1000 + "");
 			result.put("package", "prepay_id="+resp.get("prepay_id"));

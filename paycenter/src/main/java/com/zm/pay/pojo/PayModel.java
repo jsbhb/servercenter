@@ -3,21 +3,26 @@ package com.zm.pay.pojo;
 public class PayModel {
 
 	private String body;
-	
+
 	private String subject;
-	
+
 	private String totalAmount;
-	
+
 	private String orderId;
-	
+
 	private String detail;
-	
-	//微信相关
+
+	// 微信相关
 	private String openId;
-	
+
 	private String IP;
-	//end
-	
+	// end
+
+	public String getBizContent() {
+		return "{" + "\"out_trade_no\":" + orderId + "," + "\"total_amount\":" + totalAmount + "," + "\"subject\":"
+				+ subject + "," + "\"body\":" + body + "," + "\"timeout_express\":\"15m\"}";
+	}
+
 	public String getIP() {
 		return IP;
 	}
@@ -73,6 +78,5 @@ public class PayModel {
 	public void setTotalAmount(String totalAmount) {
 		this.totalAmount = totalAmount;
 	}
-	
-	
+
 }

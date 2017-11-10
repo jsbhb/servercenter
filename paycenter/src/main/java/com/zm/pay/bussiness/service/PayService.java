@@ -30,7 +30,7 @@ public interface PayService {
 	 */
 	boolean payCustom(CustomModel model) throws Exception;
 
-	String aliPay(Integer clientId, String type, PayModel model) throws Exception;
+	Map<String,Object> aliPay(Integer clientId, String type, PayModel model) throws Exception;
 
 	/**
 	 * 阿里 退款接口

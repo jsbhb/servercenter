@@ -43,7 +43,7 @@ public class PayController {
 
 	@RequestMapping(value = "alipay/{type}/{clientId}", method = RequestMethod.POST)
 	@ApiIgnore
-	public String aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+	public Map<String,Object> aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
 			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
 
 		return payService.aliPay(clientId, type, model);
