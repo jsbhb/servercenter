@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dom4j.DocumentException;
 import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.OrderInfo;
@@ -16,7 +15,6 @@ import com.zm.supplier.util.ButtJointMessageUtils;
 import com.zm.supplier.util.DateUtil;
 import com.zm.supplier.util.HttpClientUtil;
 import com.zm.supplier.util.SignUtil;
-import com.zm.supplier.util.XmlUtil;
 
 @Component
 public class TianTianButtJoint extends AbstractSupplierButtJoint {
