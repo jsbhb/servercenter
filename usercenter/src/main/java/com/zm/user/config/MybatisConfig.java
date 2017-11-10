@@ -1,11 +1,14 @@
 package com.zm.user.config;
 
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ibatis.io.VFS;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
+
+import com.github.pagehelper.PageHelper;
 
 @Configuration
 public class MybatisConfig {
@@ -35,8 +40,9 @@ public class MybatisConfig {
 		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		sessionFactory.setMapperLocations(resolver.getResources(properties.mapperLocations));
 
-//		sessionFactory
-//				.setConfigLocation(new PathMatchingResourcePatternResolver().getResource(properties.configLocation));
+		// sessionFactory
+		// .setConfigLocation(new
+		// PathMatchingResourcePatternResolver().getResource(properties.configLocation));
 
 		SqlSessionFactory resultSessionFactory = sessionFactory.getObject();
 
@@ -45,8 +51,19 @@ public class MybatisConfig {
 		log.info("*************************sqlSessionFactory:successs:" + resultSessionFactory
 				+ "***********************" + properties);
 
+		sessionFactory.setPlugins(new Interceptor[] { getPageHelper() });
+
 		return resultSessionFactory;
 
+	}
+
+	@Bean
+	public PageHelper getPageHelper() {
+		PageHelper pageHelper = new PageHelper();
+		Properties properties = new Properties();
+		properties.setProperty("dialect", "mysql");
+		pageHelper.setProperties(properties);
+		return pageHelper;
 	}
 
 	@Bean(destroyMethod = "close", name = "dataSource")

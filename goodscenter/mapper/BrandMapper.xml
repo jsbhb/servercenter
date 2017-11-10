@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.BrandMapper">
+
+	
+	<resultMap type="com.zm.goods.pojo.BrandEntity" id="entity">
+		<id column="id" property="id"/>
+		<result column="brand_id" property="brandId"/>
+		<result column="brand" property="brand" />
+		<result column="attr" property="attr"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+
+	
+	<select id="selectById" parameterType="Object" resultMap="entity">
+		select * from goods_category_brand where id = #{id} 
+	</select>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="entity">
+		select * from goods_category_brand where 1=1 
+		<if test="brand!=null and brand!=''">
+			and brand like concat('%',#{brand},'%') 
+		</if>
+		<if test="id > 0">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	<insert id="insert" parameterType="Object">
+		insert into
+		goods_category_brand value
+		(#{id},#{brandId},#{brand},#{attr},now(),now(),#{opt})
+	</insert>
+	
+</mapper>
