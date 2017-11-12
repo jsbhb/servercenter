@@ -346,7 +346,7 @@
 		#{platUserType} and wechat = #{wechat}
 	</select>
 
-	<insert id="saveGrade" parameterType="grade" useGeneratedKeys="true" keyProperty="id">
+	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,
 		create_time,opt,company)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
