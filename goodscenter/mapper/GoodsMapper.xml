@@ -284,7 +284,7 @@
 		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gi.weight,
+		as sub_create_time,g.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,
 		<if test="goodsType == 2 or goodsType == 0">
 			stock.lockedqty as qpqty,
@@ -298,7 +298,7 @@
 		gs.item_id = gp.item_id left join 
 		goods_stock stock
 		on gs.item_id =
-		stock.item_id where gs.goods_id in
+		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id where gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -317,29 +317,29 @@
 		<if test="goodsType == 1">
 			stock.fxqty as qpqty,
 		</if>
-		gp.delivery_place,gs.status as specsStatus,
+		gp.delivery_place,g.status as specsStatus,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id left join 
 		goods_stock stock
 		on gs.item_id =
-		stock.item_id left join goods g on gs.goods_id = g.goods_id where gs.item_id = #{itemId}
+		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gi.info,gs.item_id,gs.goods_id , g.status,
+		select gs.id,gi.info,gs.item_id,gs.goods_id , gc.status as specsStatus,
 		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time, gs.status as specsStatus,gs.excise_tax,gi.weight,
+		as sub_create_time, gs.excise_tax,gi.weight,
 		gp.delivery_place,gb.increment_tax,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
-		left join base gb on g.base_id = gb.id where gs.item_id in
+		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -458,7 +458,7 @@
 		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
   		  excise_tax DECIMAL(5,2) NULL COMMENT '消费税',
 		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
-		  status tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
+		  status tinyint UNSIGNED NULL COMMENT '商品状态0：停售，1：在售',
 		  discount decimal(10,2) NULL COMMENT '促销折扣',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
