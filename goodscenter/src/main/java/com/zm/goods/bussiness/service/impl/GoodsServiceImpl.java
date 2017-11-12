@@ -75,8 +75,8 @@ public class GoodsServiceImpl implements GoodsService {
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		parameter.put("list", idList);
 		parameter.put("type", PICTURE_TYPE);
-		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		parameter.put("centerId", param.get("centerId"));
+		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		if (param.get("goodsId") != null) {
 			parameter.put("goodsType", goodsList.get(0).getType());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);

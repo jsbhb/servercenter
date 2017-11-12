@@ -8,13 +8,13 @@ public class Constants {
 
 	public static final String SECRET = "e33330f7005b1dc56fea21d8d76db1cb";
 
-	public static final String SMS_VERIFY_ID = "SMS_89015008";
+	public static final String SMS_VERIFY_ID = "SMS_109750258";
 
-	public static final String SMS_SIGN = "老司机";
+	public static final String SMS_SIGN = "阿里云短信测试专用";
 
-	public static final String ACCESS_KEY_ID = "LTAICvlZk7rzrHrr";
+	public static final String ACCESS_KEY_ID = "LTAIzBKHpqjzUCdg";
 
-	public static final String ACCESS_KEY_SECRET = "i7o6z4pO6QhxdJrGOvV9WtZhkYSIYl";
+	public static final String ACCESS_KEY_SECRET = "pGTDnxXWkJ52jZ3bdgvizM5XhUwcLN";
 
 	// *********************第三方登录类型******************************/
 
