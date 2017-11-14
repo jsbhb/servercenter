@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsBaseMapper">
+
+	
+	<resultMap type="com.zm.goods.pojo.GoodsBaseEntity" id="entity">
+		<id column="id" property="id"/>
+		<result column="brand_id" property="brandId"/>
+		<result column="goods_name" property="goodsName" />
+		<result column="brand" property="brand"/>
+		<result column="increment_tax" property="incrementTax"/>
+		<result column="tariff" property="tariff"/>
+		<result column="unit" property="unit"/>
+		<result column="hscode" property="hscode"/>
+		<result column="encode" property="encode"/>
+		<result column="first_category" property="firstCatalogId"/>
+		<result column="second_category" property="secondCatalogId"/>
+		<result column="third_category" property="thirdCatalogId"/>
+		<result column="center_id" property="centerId"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<select id="selectById" parameterType="Object" resultMap="entity">
+		select * from base where id = #{id} 
+	</select>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="entity">
+		select * from base where 1=1 
+		<if test="goodsName!=null and goodsName!=''">
+			and goods_name like concat('%',#{goodsName},'%') 
+		</if>
+		<if test="brand!=null and brand!=''">
+			and brand like concat('%',#{brand},'%') 
+		</if>
+		<if test="hscode!=null and hscode!=''">
+			and hscode like concat('%',#{hscode},'%') 
+		</if>
+		<if test="hscode!=null and hscode!=''">
+			and hscode like concat('%',#{hscode},'%') 
+		</if>
+		<if test="firstCatalogId!=null and firstCatalogId!=''">
+			and first_category = #{} 
+		</if>
+		<if test="id > 0">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	<insert id="insert" parameterType="Object">
+		insert into base value
+		(#{id},#{brandId},#{goodsName},#{brand},#{incrementTax},#{tariff},#{unit},#{hscode},#{encode},#{firstCatalogId},#{secondCatalogId}
+		,#{thirdCatalogId},#{centerId},now(),now(),#{opt})
+	</insert>
+	
+</mapper>

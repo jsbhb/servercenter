@@ -7,21 +7,19 @@
  */
 package com.zm.goods.bussiness.dao;
 
-import java.util.List;
-
 import com.github.pagehelper.Page;
-import com.zm.goods.pojo.BrandEntity;
+import com.zm.goods.pojo.GoodsBaseEntity;
 
 /**
- * ClassName: BrandMapper <br/>
- * Function: TODO ADD FUNCTION. <br/>
+ * ClassName: GoodsBaseMapper <br/>
+ * Function: 基础商品持久层实体. <br/>
  * date: Nov 9, 2017 8:48:41 PM <br/>
  * 
  * @author hebin
  * @version
  * @since JDK 1.7
  */
-public interface BrandMapper {
+public interface GoodsBaseMapper {
 
 	/**
 	 * selectForPage:(这里用一句话描述这个方法的作用). <br/>
@@ -31,7 +29,7 @@ public interface BrandMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Page<BrandEntity> selectForPage(BrandEntity entity);
+	Page<GoodsBaseEntity> selectForPage(GoodsBaseEntity entity);
 
 	/**
 	 * selectById:(这里用一句话描述这个方法的作用). <br/>
@@ -41,7 +39,7 @@ public interface BrandMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	BrandEntity selectById(int id);
+	GoodsBaseEntity selectById(int id);
 
 	/**
 	 * insert:(这里用一句话描述这个方法的作用). <br/>
@@ -50,15 +48,6 @@ public interface BrandMapper {
 	 * @param entity
 	 * @since JDK 1.7
 	 */
-	void insert(BrandEntity entity);
-
-	/**
-	 * selectAll:检索所有品牌. <br/>
-	 * 
-	 * @author hebin
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<BrandEntity> selectAll();
+	void insert(GoodsBaseEntity entity);
 
 }
