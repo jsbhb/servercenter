@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
@@ -13,6 +14,7 @@ import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.ThirdOrderInfo;
 
 /**  
  * ClassName: OrderMapper <br/>  
@@ -82,4 +84,16 @@ public interface OrderMapper {
 	List<Express> listExpress();
 
 	void updateRefundPayNo(OrderDetail detail);
+
+	List<OrderInfo> listOrderForSendToTTWarehouse();
+	
+	List<OrderInfo> listOrderForSendToOtherWarehouse();
+
+	void saveThirdOrder(List<SendOrderResult> list);
+
+	void updateOrderSendToWarehouse(String orderId);
+
+	void updateThirdOrderInfo(List<ThirdOrderInfo> list);
+
+	void updateOrderStatusByThirdStatus(ThirdOrderInfo thirdOrderInfo);
 }

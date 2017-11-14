@@ -10,7 +10,7 @@ public class SignUtil {
 
 	public static String TianTianSign(String msg, String appSecret, String date){
 		String toSignStr = msg+appSecret+date;
-		String sign = Base64.encodeBase64(DigestUtils.md5(toSignStr)).toString().toUpperCase();
+		String sign = new String(Base64.encodeBase64(DigestUtils.md5(toSignStr))).toUpperCase();
 		try {
 			return URLEncoder.encode(sign, "utf-8");
 		} catch (UnsupportedEncodingException e) {

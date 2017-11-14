@@ -1,20 +1,12 @@
 package com.zm.supplier.pojo;
 
-public class SendOrderResult {
+public class OrderIdAndSupplierId {
 
 	private String orderId;
 	
 	private String thirdOrderId;
 	
 	private Integer supplierId;
-
-	public Integer getSupplierId() {
-		return supplierId;
-	}
-
-	public void setSupplierId(Integer supplierId) {
-		this.supplierId = supplierId;
-	}
 
 	public String getOrderId() {
 		return orderId;
@@ -32,9 +24,13 @@ public class SendOrderResult {
 		this.thirdOrderId = thirdOrderId;
 	}
 
-	@Override
-	public String toString() {
-		return "SendOrderResult [orderId=" + orderId + ", thirdOrderId=" + thirdOrderId + "]";
+	public Integer getSupplierId() {
+		return supplierId;
 	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
+	
 	
 }

@@ -7,10 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
+import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
+import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
@@ -240,7 +242,7 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	List<Express> listExpress();
-	
+
 	/**
 	 * updateRefundPayNo:更新退款交易单号. <br/>
 	 * 
@@ -250,4 +252,34 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	void updateRefundPayNo(OrderDetail detail);
+
+	/**
+	 * listOrderForSendToWarehouse:获取支付报关已经完成的订单. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<OrderInfo> listOrderForSendToWarehouse();
+
+	/**
+	 * saveThirdOrder:保存第三方订单号. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void saveThirdOrder(List<SendOrderResult> list);
+
+	/**
+	 * checkOrderStatus:查询第三方订单状态. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list);
 }

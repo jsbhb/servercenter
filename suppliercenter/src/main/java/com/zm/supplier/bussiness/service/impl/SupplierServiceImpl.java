@@ -1,27 +1,26 @@
 package com.zm.supplier.bussiness.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Resource;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.supplier.bussiness.component.WarehouseThreadPool;
 import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.bussiness.service.SupplierService;
-import com.zm.supplier.constants.Constants;
-import com.zm.supplier.feignclient.UserFeignClient;
 import com.zm.supplier.pojo.Express;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
+import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SupplierEntity;
-import com.zm.supplier.pojo.SupplierInterface;
-import com.zm.supplier.pojo.UserInfo;
-import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
-import com.zm.supplier.util.SpringContextUtil;
 
 @Service
 @Transactional
@@ -31,10 +30,7 @@ public class SupplierServiceImpl implements SupplierService {
 	SupplierMapper supplierMapper;
 
 	@Resource
-	UserFeignClient userFeignClient;
-
-	@Resource
-	RedisTemplate<String, SupplierInterface> redisTemplate;
+	WarehouseThreadPool warehouseThreadPool;
 
 	@Override
 	public List<Express> listExpressBySupplierId(Integer supplierId) {
@@ -42,19 +38,10 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 
 	@Override
-	public Map<String, Object> sendOrder(OrderInfo info) {
-		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
-		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
-		return null;
-	}
-
-	private AbstractSupplierButtJoint getTargetInterface(Integer supplierId) {
-		SupplierInterface inf = redisTemplate.opsForValue().get(Constants.SUPPLIER_INTERFACE + supplierId);
-		AbstractSupplierButtJoint buttJoint = (AbstractSupplierButtJoint) SpringContextUtil
-				.getBean(inf.getTargetObject());
-		buttJoint.setAppKey(inf.getAppKey());
-		buttJoint.setAppSecret(inf.getAppSecret());
-		return buttJoint;
+	public void sendOrder(List<OrderInfo> infoList) {
+//		for (OrderInfo info : infoList) {
+			warehouseThreadPool.sendOrder(null);
+//		}
 	}
 
 	@Override
@@ -71,6 +58,32 @@ public class SupplierServiceImpl implements SupplierService {
 	@Override
 	public SupplierEntity queryById(int id) {
 		return supplierMapper.selectById(id);
+	}
+
+	@Override
+	public List<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> list) {
+		Map<Integer, List<OrderIdAndSupplierId>> param = new HashMap<Integer, List<OrderIdAndSupplierId>>();
+		List<OrderIdAndSupplierId> tempList = null;
+		List<OrderStatus> resultList = new ArrayList<OrderStatus>();
+		for(OrderIdAndSupplierId model : list){
+			if(param.get(model.getSupplierId()) == null){
+				tempList = new ArrayList<OrderIdAndSupplierId>();
+				tempList.add(model);
+				param.put(model.getSupplierId(), tempList);
+			} else {
+				param.get(model.getSupplierId()).add(model);
+			}
+		}
+		CountDownLatch  countDownLatch = new CountDownLatch(param.size());
+		for(Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()){
+			resultList.addAll(warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey(), countDownLatch));
+		}
+		try {
+			countDownLatch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return resultList;
 	}
 
 }

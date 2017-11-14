@@ -1,6 +1,5 @@
 package com.zm.supplier.util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +69,7 @@ public class XmlUtil {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static <T> Map<String, Object> parseXml(String xml, Class<T> clazz) throws Exception {
+	public static <T> List<T> parseXml(String xml, Class<T> clazz) throws Exception {
 		Document doc = DocumentHelper.parseText(xml);
 		Map<String, String> confMap = ConfUtils.getConfMap();
 		Element root = doc.getRootElement();
@@ -78,17 +77,15 @@ public class XmlUtil {
 		if (flag) {
 			Object obj = clazz.newInstance();
 			List list = new ArrayList();
-			Map<String, Object> result = new HashMap<String, Object>();
-			result.put("obj", list);
-			parseNode(root, clazz, confMap, result, obj);
-			return result;
+			parseNode(root, clazz, confMap, list, obj);
+			return list;
 		}
 		return null;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static <T> void parseNode(Element node, Class<T> clazz, Map<String, String> confMap,
-			Map<String, Object> result, Object obj) throws Exception {
+			List list, Object obj) throws Exception {
 
 		if (!(node.getTextTrim().equals(""))) {
 			String nodeName = node.getName();
@@ -99,7 +96,6 @@ public class XmlUtil {
 					getMethod = clazz.getMethod("get" + fieldName);
 					Object o = getMethod.invoke(obj);
 					if (o != null) {
-						List list = (List) result.get("obj");
 						list.add(obj);
 						obj = clazz.newInstance();
 					}
@@ -117,7 +113,7 @@ public class XmlUtil {
 		Iterator<Element> iterator = node.elementIterator();
 		while (iterator.hasNext()) {
 			Element e = iterator.next();
-			parseNode(e, clazz, confMap, result, obj);
+			parseNode(e, clazz, confMap, list, obj);
 		}
 	}
 

@@ -247,6 +247,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if (promotion != null) {
 			discount = promotion;
 		}
+		discount = CalculationUtils.div(discount, 10.0);
 		for (GoodsPrice price : specs.getPriceList()) {
 			boolean flag = model.getQuantity() >= price.getMin()
 					&& (price.getMax() == null || model.getQuantity() <= price.getMax());

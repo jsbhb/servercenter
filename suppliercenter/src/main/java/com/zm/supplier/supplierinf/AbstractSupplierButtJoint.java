@@ -1,12 +1,15 @@
 package com.zm.supplier.supplierinf;
 
-import java.util.Map;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zm.supplier.pojo.OrderInfo;
+import com.zm.supplier.pojo.OrderStatus;
+import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.UserInfo;
+import com.zm.supplier.util.XmlUtil;
 
 public abstract class AbstractSupplierButtJoint {
 	
@@ -19,10 +22,17 @@ public abstract class AbstractSupplierButtJoint {
 	
 	protected Logger logger = LoggerFactory.getLogger(AbstractSupplierButtJoint.class);
 	
-	
-	public <T> Map<String, Object> renderResult(String result, String format, Class<T> clazz){
+	/**
+	 * @fun 返回key为obj，value为calss实体类的list集合
+	 * @param result
+	 * @param format
+	 * @param clazz
+	 * @return
+	 * @throws Exception
+	 */
+	public <T> List<T> renderResult(String result, String format, Class<T> clazz) throws Exception{
 		if(XML.equalsIgnoreCase(format)){
-			
+			return XmlUtil.parseXml(result, clazz);
 		}else if(JSON.equalsIgnoreCase(format)){
 			
 		}
@@ -35,7 +45,15 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param user
 	 * @return
 	 */
-	public abstract Map<String, Object> sendOrder(OrderInfo info, UserInfo user);
+	public abstract List<SendOrderResult> sendOrder(OrderInfo info, UserInfo user);
+	
+
+	/**
+	 * @fun 获取订单状态
+	 * @param orderId
+	 * @return
+	 */
+	public abstract List<OrderStatus> checkOrderStatus(List<String> orderIds);
 
 	public String getAppKey() {
 		return appKey;

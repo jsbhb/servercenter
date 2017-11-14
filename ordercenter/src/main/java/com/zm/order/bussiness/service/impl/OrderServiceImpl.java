@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import com.zm.order.constants.LogConstants;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.LogFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
+import com.zm.order.feignclient.SupplierFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.feignclient.model.Activity;
 import com.zm.order.feignclient.model.GoodsFile;
@@ -27,22 +29,28 @@ import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.feignclient.model.RefundPayModel;
+import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
+import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.OrderStatus;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.Tax;
+import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
+import com.zm.order.utils.ExpressContrast;
 import com.zm.order.utils.JSONUtil;
+import com.zm.order.utils.StatusContrast;
 
 /**
  * ClassName: OrderServiceImpl <br/>
@@ -72,6 +80,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	LogFeignClient logFeignClient;
+
+	@Resource
+	RedisTemplate<String, Object> redisTemplate;
+	
+	@Resource
+	SupplierFeignClient supplierFeignClient;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -183,18 +197,19 @@ public class OrderServiceImpl implements OrderService {
 		Double totalIncremTax = 0.0;
 		Double unDiscountAmount = 0.0;
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
-			Map<Tax, Double> map = (Map<Tax, Double>) priceAndWeightMap.get("tax");
+			Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
 
-			for (Map.Entry<Tax, Double> entry : map.entrySet()) {
+			for (Map.Entry<String, Double> entry : map.entrySet()) {
 				unDiscountAmount += entry.getValue();
 			}
-			for (Map.Entry<Tax, Double> entry : map.entrySet()) {
-				Tax tax = entry.getKey();
+			for (Map.Entry<String, Double> entry : map.entrySet()) {
+				Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
 				Double fee = entry.getValue();
-				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount), postFee);
+				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
 				if (tax.getExciseTax() != null) {
-					Double exciseTax = CalculationUtils.mul(CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
-							CalculationUtils.sub(1.0, tax.getExciseTax())), tax.getExciseTax());
+					Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
+							CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
+					Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
 					totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
 					Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
 							tax.getIncrementTax());
@@ -213,6 +228,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		amount = CalculationUtils.add(amount, taxFee, postFee);
+		amount = CalculationUtils.round(2, amount);
 		String totalAmount = (int) (amount * 100) + "";
 
 		if (!totalAmount.equals(localAmount + "")) {
@@ -416,9 +432,15 @@ public class OrderServiceImpl implements OrderService {
 			return new ResultModel(false, "该订单号不是您的订单号");
 		}
 
+		if (info.getStatus() >= Constants.ORDER_DELIVER) {
+			return new ResultModel(false, "该订单不能退单，请联系客服");
+		}
+
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
-			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()) {// TODO
-																	// 如果再发送第三方过程中退款？？？？
+			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()) {
+				if (redisTemplate.opsForValue().get(orderId) != null) {// 是否正在发送给第三方
+					return new ResultModel(false, "该订单正在发送给保税仓，请稍后重试");
+				}
 				RefundPayModel model = new RefundPayModel(info.getOrderId(), info.getOrderDetail().getPayNo(),
 						info.getOrderDetail().getPayment() + "", "正常退款");
 				Map<String, Object> result = new HashMap<String, Object>();
@@ -434,20 +456,20 @@ public class OrderServiceImpl implements OrderService {
 					detail.setReturnPayNo((String) result.get("returnPayNo"));
 					orderMapper.updateOrderCancel(orderId);
 					stockBack(info);
+					String content = "订单号\"" + info.getOrderId() + "\"退单";
+
+					logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL,
+							"订单退单", info.getCenterId(), content, info.getUserId() + ""));
 				} else {
 					return new ResultModel(false, result.get("errorMsg"));
 				}
 			} else {
 				// TODO 发送仓库确认是否可以退单
+				return new ResultModel(false, "已发仓库，退款请联系客服");
 			}
 		} else {
 			// TODO 大贸和一般贸易
 		}
-
-		String content = "订单号\"" + info.getOrderId() + "\"退单";
-
-		logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL, "订单退单",
-				info.getCenterId(), content, info.getUserId() + ""));
 
 		return new ResultModel(true, null);
 	}
@@ -546,11 +568,7 @@ public class OrderServiceImpl implements OrderService {
 
 	private String judgeCenterId(Integer id) {
 		String centerId;
-		if (Constants.BIG_TRADE_CENTERID.equals(id) || Constants.O2O_CENTERID.equals(id)) {
-			centerId = "";
-		} else {
-			centerId = "_" + id;
-		}
+		centerId = "_" + id;
 		return centerId;
 	}
 
@@ -562,5 +580,63 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void updateRefundPayNo(OrderDetail detail) {
 		orderMapper.updateRefundPayNo(detail);
+	}
+
+	@Override
+	public List<OrderInfo> listOrderForSendToWarehouse() {
+
+		List<OrderInfo> list = new ArrayList<OrderInfo>();
+		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+		return list;
+	}
+
+	@Override
+	public void saveThirdOrder(List<SendOrderResult> list) {
+		orderMapper.saveThirdOrder(list);
+		orderMapper.updateOrderSendToWarehouse(list.get(0).getOrderId());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
+		ResultModel result = supplierFeignClient.checkOrderStatus(Constants.FIRST_VERSION, list);
+		if(result.isSuccess()){
+			List<OrderStatus> statusList = (List<OrderStatus>) result.getObj();
+			ThirdOrderInfo thirdOrder = null;
+			List<ThirdOrderInfo> tempList = null;
+			Map<String, List<ThirdOrderInfo>> param = new HashMap<String, List<ThirdOrderInfo>>();
+			for(OrderStatus orderStatus : statusList){
+				if(param.get(orderStatus.getOrderId()) == null){
+					tempList = new ArrayList<ThirdOrderInfo>();
+					thirdOrder = toThirdOrder(orderStatus);
+					tempList.add(thirdOrder);
+					param.put(orderStatus.getOrderId(), tempList);
+				} else {
+					thirdOrder = toThirdOrder(orderStatus);
+					param.get(orderStatus.getOrderId()).add(thirdOrder);
+				}
+			}
+			
+			for(Map.Entry<String, List<ThirdOrderInfo>> entry : param.entrySet()){
+				orderMapper.updateThirdOrderInfo(entry.getValue());
+				orderMapper.updateOrderStatusByThirdStatus(entry.getValue().get(0));
+			}
+			return new ResultModel(true, "");
+		} else {
+			return result;
+		}
+	}
+
+	private ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {
+		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
+		thirdOrder.setExpressId(orderStatus.getExpressId());
+		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
+		thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
+		thirdOrder.setStatus(orderStatus.getStatus());
+		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getStatus()));
+		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
+		thirdOrder.setOrderId(orderStatus.getOrderId());
+		return thirdOrder;
 	}
 }

@@ -394,4 +394,10 @@ public class UserServiceImpl implements UserService {
 		return userMapper.listCenterId();
 	}
 
+	@Override
+	public UserInfo getUserIdentityId(Integer userId) {
+		
+		return userMapper.getUserIdentityId(userId);
+	}
+
 }

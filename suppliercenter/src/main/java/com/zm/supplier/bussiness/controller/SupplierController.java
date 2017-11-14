@@ -1,5 +1,7 @@
 package com.zm.supplier.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,6 +16,7 @@ import com.zm.supplier.bussiness.service.SupplierService;
 import com.zm.supplier.common.Pagination;
 import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
 
@@ -44,22 +47,23 @@ public class SupplierController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/supplier/save", method = RequestMethod.POST)
 	public ResultModel save(@PathVariable("version") Double version, @RequestBody SupplierEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			try{
+			try {
 				supplierService.saveSupplier(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			}
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/supplier/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody SupplierEntity entity) {
@@ -81,10 +85,24 @@ public class SupplierController {
 	}
 
 	@RequestMapping(value = "{version}/supplier/sendOrder", method = RequestMethod.POST)
-	public ResultModel sendOrder(@PathVariable("version") Double version, @RequestBody OrderInfo info) {
+	public ResultModel sendOrder(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, supplierService.sendOrder(info));
+
+			supplierService.sendOrder(null);
+			return new ResultModel(true, "");
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
+	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
+			@RequestBody List<OrderIdAndSupplierId> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			return new ResultModel(true, supplierService.checkOrderStatus(list));
 		}
 
 		return new ResultModel(false, "版本错误");

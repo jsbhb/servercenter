@@ -1,18 +1,19 @@
 package com.zm.supplier.bussiness.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.supplier.pojo.Express;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
+import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SupplierEntity;
 
 public interface SupplierService {
 
 	List<Express> listExpressBySupplierId(Integer supplierId);
 
-	Map<String, Object> sendOrder(OrderInfo info);
+	void sendOrder(List<OrderInfo> infoList);
 
 	/**  
 	 * queryByPage:查询分页效果. <br/>  
@@ -42,4 +43,14 @@ public interface SupplierService {
 	 * @since JDK 1.7  
 	 */
 	SupplierEntity queryById(int id);
+
+	/**  
+	 * checkOrderStatus:查询订单状态. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param id
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> list);
 }

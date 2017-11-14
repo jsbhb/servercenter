@@ -1,4 +1,4 @@
-package com.zm.supplier.pojo;
+package com.zm.order.feignclient.model;
 
 public class SendOrderResult {
 

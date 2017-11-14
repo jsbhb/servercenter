@@ -26,6 +26,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -55,60 +56,28 @@ public class HttpClientUtil {
 
 			connManager.setMaxTotal(1000);// 设置整个连接池最大连接数 根据自己的场景决定
 			connManager.setDefaultMaxPerRoute(connManager.getMaxTotal());
-			httpclient = wrapClient(new DefaultHttpClient());
+			httpclient = HttpClients.custom().setConnectionManager(connManager).build();
 		} catch (Exception e) {
 			logger.error("NoSuchAlgorithmException", e);
 		}
 	}
 
-	public static void closeConnections() {
-		if (logger.isInfoEnabled()) {
-			logger.info("release start connect count:=" + connManager.getTotalStats().getAvailable());
-		}
-		// Close expired connections
-		connManager.closeExpiredConnections();
-		// Optionally, close connections
-		// that have been idle longer than readTimeout*2 MILLISECONDS
-		connManager.closeIdleConnections(connectTimeout * 2, TimeUnit.MILLISECONDS);
 
-		if (logger.isInfoEnabled()) {
-			logger.info("release end connect count:=" + connManager.getTotalStats().getAvailable());
-		}
+	 public static void closeConnections() {
+         if (logger.isInfoEnabled()) {
+         	logger.info("release start connect count:=" + connManager.getTotalStats().getAvailable());
+         }
+         // Close expired connections
+         connManager.closeExpiredConnections();
+         // Optionally, close connections
+         // that have been idle longer than readTimeout*2 MILLISECONDS
+         connManager.closeIdleConnections(connectTimeout * 2, TimeUnit.MILLISECONDS);
 
-	}
+         if (logger.isInfoEnabled()) {
+         	logger.info("release end connect count:=" + connManager.getTotalStats().getAvailable());
+         }
 
-	private static CloseableHttpClient wrapClient(HttpClient base) {
-		try {
-			SSLContext ctx = SSLContext.getInstance("TLS");
-			X509TrustManager tm = new X509TrustManager() {
-				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-
-				@Override
-				public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-					// TODO Auto-generated method stub
-
-				}
-
-			};
-			ctx.init(null, new TrustManager[] { tm }, null);
-			SSLSocketFactory ssf = new SSLSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-			SchemeRegistry registry = new SchemeRegistry();
-			registry.register(new Scheme("https", 443, ssf));
-			ThreadSafeClientConnManager mgr = new ThreadSafeClientConnManager(registry);
-			return new DefaultHttpClient(mgr, base.getParams());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
+ }
 
 	/**
 	 * 默认超时为5S 发送 get请求
@@ -283,6 +252,7 @@ public class HttpClientUtil {
 
 		} catch (Exception e) {
 			httpPost.abort();
+			e.printStackTrace();
 			logger.error("http post error " + e.getMessage());
 			return null;
 			// 关闭连接,释放资源

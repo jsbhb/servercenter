@@ -62,5 +62,12 @@ public class Tax {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "{\"id\":" + id + ", \"exciseTax\":" + exciseTax + ", \"incrementTax\":" + incrementTax + "}";
+	}
+	
+	
 	
 }

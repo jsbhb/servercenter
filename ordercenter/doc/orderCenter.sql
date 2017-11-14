@@ -15,7 +15,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `user_id` INT UNSIGNED NOT NULL,
   `order_flag` TINYINT UNSIGNED NOT NULL COMMENT '0:跨境；1：大贸;2：一般贸易',
   `express_type` TINYINT UNSIGNED NOT NULL COMMENT '0：快递；1：自提',
-  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消',
+  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消;99异常状态，详细信息见third_order_info status',
   `center_id` INT UNSIGNED NULL COMMENT '区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '单店ID',
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
@@ -88,7 +88,8 @@ CREATE TABLE `zm_order`.`third_order_info` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(21) NOT NULL,
   `third_order_id` VARCHAR(50) NULL,
-  `status` TINYINT UNSIGNED NULL,
+  `supplier_id` INT UNSIGNED NULL,
+  `status` VARCHAR(50) NULL,
   `express_key` VARCHAR(50) NULL,
   `express_name` VARCHAR(50) NULL,
   `express_id` VARCHAR(50) NULL,
@@ -98,8 +99,11 @@ CREATE TABLE `zm_order`.`third_order_info` (
   `remark` VARCHAR(200) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_orderIdThirdOrderId` (`order_id`,`third_order_id` ASC),
+  UNIQUE INDEX `uk_supIdThirdOrderId` (`supplier_id`,`third_order_id` ASC),
   UNIQUE INDEX `uk_expressId` (`express_id` ASC),
-  INDEX `idx_orderId` (`order_id` ASC)
+  INDEX `idx_orderId` (`order_id` ASC),
+  INDEX `idx_third_order_id` (`third_order_id` ASC),
+  INDEX `idx_supplier_id` (`supplier_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '第三方仓库订单信息';
 

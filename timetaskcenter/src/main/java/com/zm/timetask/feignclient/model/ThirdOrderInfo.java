@@ -1,4 +1,4 @@
-package com.zm.order.pojo;
+package com.zm.timetask.feignclient.model;
 
 public class ThirdOrderInfo {
 
@@ -10,9 +10,7 @@ public class ThirdOrderInfo {
 	
 	private String thirdOrderId;
 	
-	private String status;
-	
-	private Integer orderStatus;
+	private Integer status;
 	
 	private String expressName;
 	
@@ -21,14 +19,6 @@ public class ThirdOrderInfo {
 	private String mftNo;
 	
 	private String remark;
-
-	public Integer getOrderStatus() {
-		return orderStatus;
-	}
-
-	public void setOrderStatus(Integer orderStatus) {
-		this.orderStatus = orderStatus;
-	}
 
 	public String getMftNo() {
 		return mftNo;
@@ -54,11 +44,11 @@ public class ThirdOrderInfo {
 		this.thirdOrderId = thirdOrderId;
 	}
 
-	public String getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 

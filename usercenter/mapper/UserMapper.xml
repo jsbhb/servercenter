@@ -360,5 +360,13 @@
 	<update id="updatePersonInChargeId" parameterType="Object">
 		update grade set person_in_charge_id = #{personInChargeId} where id = #{id} 
 	</update>
+	
+	<select id="getUserIdentityId" parameterType="Object" resultMap="userInfo">
+		select
+		u.id,u.account,u.phone,ud.id as
+		detail_id,ud.name,ud.certificates,ud.idNum from user u left join
+		user_detail ud on u.id = ud.user_id
+		where u.id = #{userId}
+	</select>
 
 </mapper>

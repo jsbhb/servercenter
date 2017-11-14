@@ -47,7 +47,7 @@ import com.zm.user.utils.RegularUtil;
 
 @RestController
 public class UserController {
-	
+
 	private static final String BACK_CODE = "erp";
 
 	@Resource
@@ -215,7 +215,7 @@ public class UserController {
 			}
 
 			boolean flag = false;
-			if(BACK_CODE.equals(code)){
+			if (BACK_CODE.equals(code)) {
 				flag = true;
 			} else {
 				flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
@@ -490,7 +490,7 @@ public class UserController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/user/center", method = RequestMethod.GET)
 	public ResultModel getCenterId(@PathVariable("version") Double version) {
 
@@ -502,6 +502,17 @@ public class UserController {
 		}
 
 		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/user/identity/{userId}", method = RequestMethod.GET)
+	public UserInfo getUserIdentityId(@PathVariable("version") Double version, @PathVariable("userId") Integer userId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return userService.getUserIdentityId(userId);
+		}
+
+		return null;
 	}
 
 }

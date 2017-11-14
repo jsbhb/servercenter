@@ -34,4 +34,12 @@ public interface OrderFeignClient {
 	@RequestMapping(value = "{version}/order/paycustom/{orderId}", method = RequestMethod.POST)
 	public ResultModel updatePayCustom(@PathVariable("version") Double version,
 			@PathVariable("orderId") String orderId);
+	
+	/**
+	 * @fun 获取可以发送仓库的订单
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
+	public ResultModel alreadyPay(@PathVariable("version") Double version);
 }

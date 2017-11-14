@@ -21,11 +21,11 @@ public interface GoodsFeignClient {
 			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
 			@RequestParam("orderFlag") Integer orderFlag);
 
-	@RequestMapping(value = "{version}/goods/goodsSpecs", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
 			@RequestParam("centerId") Integer centerId);
 
-	@RequestMapping(value = "{version}/goods/active", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
 	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,
 			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId);
 

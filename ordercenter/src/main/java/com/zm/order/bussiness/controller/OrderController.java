@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
+import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
@@ -81,7 +83,7 @@ public class OrderController {
 			} catch (Exception e) {
 				e.printStackTrace();
 				result.setSuccess(false);
-				result.setErrorMsg("微服务出现问题");
+				result.setErrorMsg(e.getMessage());
 				return result;
 			}
 		}
@@ -256,7 +258,7 @@ public class OrderController {
 				list = orderService.listShoppingCart(param);
 			} catch (Exception e) {
 				result.setSuccess(false);
-				result.setErrorMsg("后台出错");
+				result.setErrorMsg(e.getMessage());
 				e.printStackTrace();
 				return result;
 			}
@@ -466,6 +468,47 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			return new ResultModel(true, orderService.listExpress());
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+	
+	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
+	@ApiIgnore
+	public ResultModel alreadyPay(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, orderService.listOrderForSendToWarehouse());
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+	
+	@RequestMapping(value = "{version}/order/saveThirdOrder", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel saveThirdOrder(@PathVariable("version") Double version,@RequestBody List<SendOrderResult> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			orderService.saveThirdOrder(list);
+			return new ResultModel(true, "");
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+	
+	@RequestMapping(value = "{version}/order/checkOrderStatus", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
+			@RequestBody List<OrderIdAndSupplierId> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			return orderService.checkOrderStatus(list);
 		}
 
 		return new ResultModel(false, "版本错误");

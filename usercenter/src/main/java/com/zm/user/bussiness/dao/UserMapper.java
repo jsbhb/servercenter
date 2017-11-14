@@ -76,4 +76,6 @@ public interface UserMapper {
 	 * @since JDK 1.7  
 	 */
 	void updatePersonInChargeId(Grade grade);
+
+	UserInfo getUserIdentityId(Integer userId);
 }

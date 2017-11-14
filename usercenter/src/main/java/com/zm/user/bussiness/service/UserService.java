@@ -187,4 +187,13 @@ public interface UserService {
 	 * @since JDK 1.7
 	 */
 	List<Integer> getCenterId();
+
+	/**
+	 * getUserIdentityId:获取用户身份证信息. <br/>
+	 * 
+	 * @author wqy
+	 * @param 
+	 * @since JDK 1.7
+	 */
+	UserInfo getUserIdentityId(Integer userId);
 }
