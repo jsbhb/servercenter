@@ -85,11 +85,11 @@ public class SupplierController {
 	}
 
 	@RequestMapping(value = "{version}/supplier/sendOrder", method = RequestMethod.POST)
-	public ResultModel sendOrder(@PathVariable("version") Double version) {
+	public ResultModel sendOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> infoList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			supplierService.sendOrder(null);
+			supplierService.sendOrder(infoList);
 			return new ResultModel(true, "");
 		}
 

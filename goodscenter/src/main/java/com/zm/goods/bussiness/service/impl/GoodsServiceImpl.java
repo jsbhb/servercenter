@@ -223,7 +223,7 @@ public class GoodsServiceImpl implements GoodsService {
 				return result;
 			}
 		} else {
-			//TODO 调用第三方库存接口，更新库存数据
+			// TODO 调用第三方库存接口，更新库存数据
 			boolean enough = processWarehouse.processWarehouse(orderFlag, list);
 			if (!enough) {
 				result.setSuccess(false);
@@ -244,7 +244,7 @@ public class GoodsServiceImpl implements GoodsService {
 		getPriceInterval(specs, promotion);
 		boolean calculation = false;
 		Double discount = 10.0;
-		if (promotion != null) {
+		if (promotion != null && promotion != 0.0) {
 			discount = promotion;
 		}
 		discount = CalculationUtils.div(discount, 10.0);
@@ -451,7 +451,7 @@ public class GoodsServiceImpl implements GoodsService {
 			return;
 		}
 		Double discount = 10.0;
-		if (discountParam != null) {
+		if (discountParam != null && discountParam != 0.0) {
 			discount = discountParam;
 		}
 		discount = CalculationUtils.div(discount, 10.0);
@@ -607,12 +607,16 @@ public class GoodsServiceImpl implements GoodsService {
 			for (GoodsItem model : goodsList) {
 				GoodsSpecs specs = temp.get(model.getGoodsId());
 				if (specs != null) {
-					String specsInfo = specs.getInfo();
+					// String specsInfo = specs.getInfo();
 					specsSet = new HashSet<>();
-					Map<String, String> specsMap = JSONUtil.parse(specsInfo, Map.class);
-					for (Map.Entry<String, String> entry : specsMap.entrySet()) {
-						specsSet.add(entry.getValue());
-					}
+					// if(specsInfo != null){
+					// Map<String, String> specsMap = JSONUtil.parse(specsInfo,
+					// Map.class);
+					// for (Map.Entry<String, String> entry :
+					// specsMap.entrySet()) {
+					// specsSet.add(entry.getValue());
+					// }
+					// }
 					model.setSpecsInfo(specsSet);
 					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
 						Double discount = specs.getDiscount() == null ? 10.0 : specs.getDiscount();

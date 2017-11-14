@@ -41,9 +41,9 @@ public class WarehouseThreadPool {
 
 	@Async("myAsync")
 	public void sendOrder(OrderInfo info) {
-		AbstractSupplierButtJoint buttJoint = getTargetInterface(1);
-//		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
-		List<SendOrderResult> list = buttJoint.sendOrder(info, null);
+		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
+		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
+		List<SendOrderResult> list = buttJoint.sendOrder(info, user);
 		if(list == null){
 			return;
 		}

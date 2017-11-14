@@ -39,9 +39,9 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Override
 	public void sendOrder(List<OrderInfo> infoList) {
-//		for (OrderInfo info : infoList) {
-			warehouseThreadPool.sendOrder(null);
-//		}
+		for (OrderInfo info : infoList) {
+			warehouseThreadPool.sendOrder(info);
+		}
 	}
 
 	@Override
@@ -65,8 +65,8 @@ public class SupplierServiceImpl implements SupplierService {
 		Map<Integer, List<OrderIdAndSupplierId>> param = new HashMap<Integer, List<OrderIdAndSupplierId>>();
 		List<OrderIdAndSupplierId> tempList = null;
 		List<OrderStatus> resultList = new ArrayList<OrderStatus>();
-		for(OrderIdAndSupplierId model : list){
-			if(param.get(model.getSupplierId()) == null){
+		for (OrderIdAndSupplierId model : list) {
+			if (param.get(model.getSupplierId()) == null) {
 				tempList = new ArrayList<OrderIdAndSupplierId>();
 				tempList.add(model);
 				param.put(model.getSupplierId(), tempList);
@@ -74,9 +74,13 @@ public class SupplierServiceImpl implements SupplierService {
 				param.get(model.getSupplierId()).add(model);
 			}
 		}
-		CountDownLatch  countDownLatch = new CountDownLatch(param.size());
-		for(Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()){
-			resultList.addAll(warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey(), countDownLatch));
+		CountDownLatch countDownLatch = new CountDownLatch(param.size());
+		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
+			List<OrderStatus> temp = warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey(),
+					countDownLatch);
+			if (temp != null) {
+				resultList.addAll(temp);
+			}
 		}
 		try {
 			countDownLatch.await();

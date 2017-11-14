@@ -36,7 +36,8 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 	@Override
 	public List<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, CUSTOMER);// 报文
-		String url = "nredi/base/api/service?method=order.query";
+		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";
+//		String url = "nredi/base/api/service?method=order.query";
 		return (List<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
 	}
 	
