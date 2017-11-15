@@ -1,7 +1,5 @@
 package com.zm.goods.bussiness.controller;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,10 +10,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
-import com.zm.goods.bussiness.service.BrandService;
+import com.zm.goods.bussiness.service.GoodsBaseService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.BrandEntity;
+import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.ResultModel;
 
 /**
@@ -29,28 +28,28 @@ import com.zm.goods.pojo.ResultModel;
  */
 
 @RestController
-public class BrandController {
+public class GoodsBaseController {
 
 	@Resource
-	BrandService brandService;
+	GoodsBaseService goodsBaseService;
 
-	@RequestMapping(value = "{version}/goods/brand/queryForPage", method = RequestMethod.POST)
-	public ResultModel queryForPage(@PathVariable("version") Double version, @RequestBody BrandEntity entity) {
+	@RequestMapping(value = "{version}/goods/base/queryForPage", method = RequestMethod.POST)
+	public ResultModel queryForPage(@PathVariable("version") Double version, @RequestBody GoodsBaseEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Page<BrandEntity> page = brandService.queryByPage(entity);
+			Page<GoodsBaseEntity> page = goodsBaseService.queryByPage(entity);
 			return new ResultModel(true, page, new Pagination(page));
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
 	
-	@RequestMapping(value = "{version}/goods/brand/save", method = RequestMethod.POST)
-	public ResultModel save(@PathVariable("version") Double version, @RequestBody BrandEntity entity) {
+	@RequestMapping(value = "{version}/goods/base/save", method = RequestMethod.POST)
+	public ResultModel save(@PathVariable("version") Double version, @RequestBody GoodsBaseEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try{
-				brandService.saveBrand(entity);
+				goodsBaseService.saveEntity(entity);
 				return new ResultModel(true, "");
 			}catch(Exception e){
 				return new ResultModel(false, e.getMessage());			}
@@ -59,7 +58,7 @@ public class BrandController {
 		return new ResultModel(false, "版本错误");
 	}
 	
-	@RequestMapping(value = "{version}/goods/brand/query", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/base/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody BrandEntity entity) {
 
@@ -69,22 +68,7 @@ public class BrandController {
 					return new ResultModel(false, "没有编号信息");
 				}
 
-				BrandEntity result = brandService.queryById(entity.getId());
-				return new ResultModel(true, result);
-			}
-
-			return new ResultModel(false, "版本错误");
-		} catch (Exception e) {
-			return new ResultModel(false, e.getMessage());
-		}
-	}
-	
-	@RequestMapping(value = "{version}/goods/brand/queryAll", method = RequestMethod.POST)
-	public ResultModel queryAll(HttpServletRequest request, @PathVariable("version") Double version) {
-
-		try {
-			if (Constants.FIRST_VERSION.equals(version)) {
-				List<BrandEntity> result = brandService.queryAll();
+				GoodsBaseEntity result = goodsBaseService.queryById(entity.getId());
 				return new ResultModel(true, result);
 			}
 

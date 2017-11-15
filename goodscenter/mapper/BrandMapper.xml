@@ -18,6 +18,10 @@
 		select * from goods_category_brand where id = #{id} 
 	</select>
 	
+	<select id="selectAll" parameterType="Object" resultMap="entity">
+		select * from goods_category_brand
+	</select>
+	
 	<select id="selectForPage" parameterType="Object" resultMap="entity">
 		select * from goods_category_brand where 1=1 
 		<if test="brand!=null and brand!=''">

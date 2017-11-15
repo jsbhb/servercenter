@@ -7,6 +7,8 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -46,6 +48,11 @@ public class BrandServiceImpl implements BrandService {
 	@Override
 	public void saveBrand(BrandEntity entity) {
 		brandMapper.insert(entity);
+	}
+
+	@Override
+	public List<BrandEntity> queryAll() {
+		return brandMapper.selectAll();
 	}
 
 }

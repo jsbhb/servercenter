@@ -7,7 +7,7 @@ drop table if exists  `base`;
 
 CREATE TABLE `zm_goods`.`base` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `brand_id` int UNSIGNED NOT NULL COMMENT '品牌ID',
+  `brand_id` varchar(100)  NOT NULL COMMENT '品牌ID',
   `goods_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
   `brand` VARCHAR(100) NOT NULL COMMENT '商品品牌',
   `increment_tax` DECIMAL(5,2) NULL COMMENT '增值税',
@@ -15,9 +15,9 @@ CREATE TABLE `zm_goods`.`base` (
   `unit` VARCHAR(30) NOT NULL COMMENT '单位',
   `hscode` VARCHAR(50) NULL COMMENT 'HSCODE',
   `encode` VARCHAR(50) NULL COMMENT '条形码',
-  `first_category` int UNSIGNED NOT NULL COMMENT '一级分类id',
-  `second_category` int UNSIGNED NOT NULL COMMENT '二级分类id',
-  `third_category` int UNSIGNED NOT NULL COMMENT '三级分类id',
+  `first_category` varchar(100) NOT NULL COMMENT '一级分类id',
+  `second_category` varchar(100) NOT NULL COMMENT '二级分类id',
+  `third_category` varchar(100) NOT NULL COMMENT '三级分类id',
   `center_id` int UNSIGNED NOT NULL COMMENT '区域中心ID',
   `create_time` DATETIME NULL COMMENT '注册时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
@@ -97,11 +97,14 @@ drop table if exists  `goods_first_category`;
 
 CREATE TABLE `zm_goods`.`goods_first_category` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `first_id` varchar(100) NOT NULL COMMENT '一级分类ID',
   `name` VARCHAR(100) NULL COMMENT '一级分类名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
-  PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+  PRIMARY KEY (`id`),
+  INDEX 'idx_first_id' (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1
+  DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品一级分类表';
 
 
@@ -109,13 +112,15 @@ drop table if exists  `goods_second_categroy`;
 
 CREATE TABLE `zm_goods`.`goods_second_categroy` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `first_id` int UNSIGNED NOT NULL COMMENT 'first_id',
+  `first_id` varchar(100) NOT NULL COMMENT 'first_id',
+  `second_id` varchar(100) NOT NULL COMMENT 'first_id',
   `name` VARCHAR(100) NULL COMMENT '二级分类名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `goods_second_categroy_first_id` (`first_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+  INDEX `idx_second_id` (`second_id`),
+   INDEX `goods_second_categroy_first_id` (`first_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品二级分类表';
 
 
@@ -123,12 +128,14 @@ drop table if exists  `goods_third_category`;
 
 CREATE TABLE `zm_goods`.`goods_third_category` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `second_id` int UNSIGNED NOT NULL COMMENT 'second_id',
+  `second_id` varchar(100) NOT NULL COMMENT 'second_id',
+  `third_id` varchar(100) NOT NULL COMMENT 'second_id',
   `name` VARCHAR(100) NULL COMMENT '三级分类名称',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
+  INDEX `idx_third_id` (`third_id`),
   INDEX `goods_third_category_second_id` (`second_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品三级分类表';
 
@@ -261,7 +268,7 @@ CREATE TABLE `zm_goods`.`popularize_dict` (
   `href` VARCHAR(300) NULL COMMENT '跳转地址',
   `type` tinyint UNSIGNED NOT NULL COMMENT '类型：0：新品；1：特推；2：渠道；3精选；4：普通分类',
   `enname` VARCHAR(50) NULL COMMENT '英文名称',
-  `first_category` int UNSIGNED NULL COMMENT '一级分类id',
+  `first_category` varchar(100) NULL COMMENT '一级分类id',
   `picPath1` VARCHAR(300) NULL COMMENT '图片地址',
   `picPath2` VARCHAR(300) NULL COMMENT '图片地址',
   `picPath3` VARCHAR(300) NULL COMMENT '图片地址',

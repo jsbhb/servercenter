@@ -7,21 +7,19 @@
  */
 package com.zm.goods.bussiness.service;
 
-import java.util.List;
-
 import com.github.pagehelper.Page;
-import com.zm.goods.pojo.BrandEntity;
+import com.zm.goods.pojo.GoodsBaseEntity;
 
 /**
- * ClassName: BrandService <br/>
- * Function: TODO ADD FUNCTION. <br/>
+ * ClassName: GoodsBaseService <br/>
+ * Function: 基础商品服务类. <br/>
  * date: Nov 9, 2017 8:37:03 PM <br/>
  * 
  * @author hebin
  * @version
  * @since JDK 1.7
  */
-public interface BrandService {
+public interface GoodsBaseService {
 
 	/**
 	 * queryByPage:分页查询品牌信息. <br/>
@@ -31,7 +29,7 @@ public interface BrandService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Page<BrandEntity> queryByPage(BrandEntity entity);
+	Page<GoodsBaseEntity> queryByPage(GoodsBaseEntity entity);
 
 	/**
 	 * queryById:根据编号查询品牌. <br/>
@@ -41,7 +39,7 @@ public interface BrandService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	BrandEntity queryById(int id);
+	GoodsBaseEntity queryById(int id);
 
 	/**
 	 * saveBrand:保存品牌. <br/>
@@ -50,15 +48,6 @@ public interface BrandService {
 	 * @param entity
 	 * @since JDK 1.7
 	 */
-	void saveBrand(BrandEntity entity);
-
-	/**
-	 * queryAll:查询所有品牌. <br/>
-	 * 
-	 * @author hebin
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<BrandEntity> queryAll();
+	void saveEntity(GoodsBaseEntity entity);
 
 }
