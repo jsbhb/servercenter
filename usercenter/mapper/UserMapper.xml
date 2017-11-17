@@ -232,6 +232,18 @@
 			<if test="headImg != null and headImg == 'null'">
 				head_img = NULL,
 			</if>
+			<if test="name != null and name != 'null'">
+				name = #{name},
+			</if>
+			<if test="name != null and name == 'null'">
+				name = NULL,
+			</if>
+			<if test="idNum != null and idNum != 'null'">
+				idnum = #{idNum},
+			</if>
+			<if test="idNum != null and idNum == 'null'">
+				idnum = NULL,
+			</if>
 			<if test="sex != null and sex != -101">
 				sex = #{sex},
 			</if>
