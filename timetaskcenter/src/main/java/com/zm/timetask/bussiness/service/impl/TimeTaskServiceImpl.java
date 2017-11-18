@@ -108,7 +108,7 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("启动任务出错");
+//			throw new RuntimeException("启动任务出错");
 		}
 	}
 

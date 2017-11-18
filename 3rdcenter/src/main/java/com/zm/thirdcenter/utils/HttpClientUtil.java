@@ -26,6 +26,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 public class HttpClientUtil {
 	private final static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 	private static PoolingHttpClientConnectionManager connManager = null;
+	private static CloseableHttpClient httpsclient = null;
 	private static CloseableHttpClient httpclient = null;
 	public final static int connectTimeout = 50000;
 
@@ -57,7 +59,8 @@ public class HttpClientUtil {
 
 			connManager.setMaxTotal(1000);// 设置整个连接池最大连接数 根据自己的场景决定
 			connManager.setDefaultMaxPerRoute(connManager.getMaxTotal());
-			httpclient = wrapClient(new DefaultHttpClient());
+			httpsclient = wrapClient(new DefaultHttpClient());
+			httpclient = HttpClients.custom().setConnectionManager(connManager).build();
 		} catch (Exception e) {
 			logger.error("NoSuchAlgorithmException", e);
 		}
@@ -114,7 +117,7 @@ public class HttpClientUtil {
 
 	/**
 	 * 默认超时为5S 发送 get请求
-	 * 
+	 * @fun 微信htpps请求
 	 * @param params
 	 * @return
 	 */
@@ -152,7 +155,7 @@ public class HttpClientUtil {
 
 			logger.info("executing request uri：" + httpGet.getURI());
 
-			response = httpclient.execute(httpGet);
+			response = httpsclient.execute(httpGet);
 
 			// 如果连接状态异常，则直接关闭
 			if (response.getStatusLine().getStatusCode() != 200) {
@@ -192,6 +195,12 @@ public class HttpClientUtil {
 		return resultStr;
 	}
 
+	/**
+	 * @fun 微信https请求
+	 * @param url
+	 * @param jsonStr
+	 * @return
+	 */
 	public static String post(String url, String jsonStr) {
 		String resultStr = "";
 		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
@@ -208,7 +217,7 @@ public class HttpClientUtil {
 			httpPost.setEntity(stringEntity);
 			httpPost.setConfig(requestConfig);
 			logger.info("executing request uri：" + httpPost.getURI());
-			response = httpclient.execute(httpPost);
+			response = httpsclient.execute(httpPost);
 
 			// 如果连接状态异常，则直接关闭
 			if (response.getStatusLine().getStatusCode() != 200) {
@@ -224,6 +233,68 @@ public class HttpClientUtil {
 
 		} catch (Exception e) {
 			httpPost.abort();
+			logger.error("http post error " + e.getMessage());
+			return null;
+			// 关闭连接,释放资源
+		} finally {
+			try {
+				if (entity != null) {
+					EntityUtils.consume(entity);// 关闭
+				}
+				if (response != null) {
+					response.close();
+				}
+				if (httpPost != null) {
+					// 关闭连接,释放资源
+					httpPost.releaseConnection();
+				}
+
+			} catch (Exception e) {
+				logger.error("http post error " + e.getMessage());
+			}
+
+		}
+		return resultStr;
+	}
+	
+	public static String post(String url, Map<String, String> params) {
+		String resultStr = "";
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+		// 创建httppost
+		HttpPost httpPost = new HttpPost(url);
+		// 创建参数队列
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		// 绑定到请求 Entry
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+		}
+
+		UrlEncodedFormEntity uefEntity;
+		HttpEntity entity = null;
+		CloseableHttpResponse response = null;
+		try {
+			uefEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
+			logger.info("executing request params" + formParams.toString());
+			httpPost.setEntity(uefEntity);
+			httpPost.setConfig(requestConfig);
+			logger.info("executing request uri：" + httpPost.getURI());
+			response = httpclient.execute(httpPost);
+			// 如果连接状态异常，则直接关闭
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logger.info("httpclient 访问异常 ");
+				httpPost.abort();
+				return null;
+			}
+			entity = response.getEntity();
+			if (entity != null) {
+				resultStr = EntityUtils.toString(entity, "UTF-8");
+				logger.info(" httpClient response string " + resultStr);
+			}
+
+		} catch (Exception e) {
+			httpPost.abort();
+			e.printStackTrace();
 			logger.error("http post error " + e.getMessage());
 			return null;
 			// 关闭连接,释放资源

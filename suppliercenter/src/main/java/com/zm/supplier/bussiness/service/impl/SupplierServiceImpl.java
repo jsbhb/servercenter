@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.Resource;
 
@@ -19,7 +18,6 @@ import com.zm.supplier.bussiness.service.SupplierService;
 import com.zm.supplier.pojo.Express;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
-import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SupplierEntity;
 
 @Service
@@ -61,10 +59,9 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 
 	@Override
-	public List<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> list) {
+	public void checkOrderStatus(List<OrderIdAndSupplierId> list) {
 		Map<Integer, List<OrderIdAndSupplierId>> param = new HashMap<Integer, List<OrderIdAndSupplierId>>();
 		List<OrderIdAndSupplierId> tempList = null;
-		List<OrderStatus> resultList = new ArrayList<OrderStatus>();
 		for (OrderIdAndSupplierId model : list) {
 			if (param.get(model.getSupplierId()) == null) {
 				tempList = new ArrayList<OrderIdAndSupplierId>();
@@ -74,20 +71,9 @@ public class SupplierServiceImpl implements SupplierService {
 				param.get(model.getSupplierId()).add(model);
 			}
 		}
-		CountDownLatch countDownLatch = new CountDownLatch(param.size());
 		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
-			List<OrderStatus> temp = warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey(),
-					countDownLatch);
-			if (temp != null) {
-				resultList.addAll(temp);
-			}
+			warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
 		}
-		try {
-			countDownLatch.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		return resultList;
 	}
 
 }

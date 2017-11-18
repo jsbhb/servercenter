@@ -33,13 +33,13 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-		sb.append("17000"); // 店铺代码
+		sb.append("11612"); // 店铺代码
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
 		sb.append(3105); // 海关关区北仑保税区
 		sb.append("</hgArea>\n");
 		sb.append("<orderFrom>");
-		sb.append("0000"); // 购物网站代码
+		sb.append("GXHZ"); // 购物网站代码
 		sb.append("</orderFrom>\n");
 		sb.append("<busOrderNo>");
 		sb.append(info.getOrderId()); // 订单号
@@ -163,7 +163,7 @@ public class ButtJointMessageUtils {
 		sb.append("find"); // 操做类型
 		sb.append("</methodType>\n");
 		sb.append("<rule>");
-		sb.append("0"); // 查询规则0:鑫海订单号，1能容订单号
+		sb.append("1"); // 查询规则0:鑫海订单号，1能容订单号
 		sb.append("</rule>\n");
 		sb.append("<busCode>");
 		sb.append(customer); // 客户编码

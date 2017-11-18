@@ -18,6 +18,7 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.ThirdOrderInfo;
 
 /**
  * ClassName: OrderService <br/>
@@ -281,5 +282,15 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list);
+	void checkOrderStatus(List<OrderIdAndSupplierId> list);
+
+	/**
+	 * changeOrderStatusByThirdWarehouse:根据第三方订单状态修改本地状态. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list);
 }

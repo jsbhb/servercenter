@@ -38,7 +38,6 @@ import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
-import com.zm.order.pojo.OrderStatus;
 import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
@@ -48,9 +47,7 @@ import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
-import com.zm.order.utils.ExpressContrast;
 import com.zm.order.utils.JSONUtil;
-import com.zm.order.utils.StatusContrast;
 
 /**
  * ClassName: OrderServiceImpl <br/>
@@ -83,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
-	
+
 	@Resource
 	SupplierFeignClient supplierFeignClient;
 
@@ -597,46 +594,14 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.updateOrderSendToWarehouse(list.get(0).getOrderId());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
-		ResultModel result = supplierFeignClient.checkOrderStatus(Constants.FIRST_VERSION, list);
-		if(result.isSuccess()){
-			List<OrderStatus> statusList = (List<OrderStatus>) result.getObj();
-			ThirdOrderInfo thirdOrder = null;
-			List<ThirdOrderInfo> tempList = null;
-			Map<String, List<ThirdOrderInfo>> param = new HashMap<String, List<ThirdOrderInfo>>();
-			for(OrderStatus orderStatus : statusList){
-				if(param.get(orderStatus.getOrderId()) == null){
-					tempList = new ArrayList<ThirdOrderInfo>();
-					thirdOrder = toThirdOrder(orderStatus);
-					tempList.add(thirdOrder);
-					param.put(orderStatus.getOrderId(), tempList);
-				} else {
-					thirdOrder = toThirdOrder(orderStatus);
-					param.get(orderStatus.getOrderId()).add(thirdOrder);
-				}
-			}
-			
-			for(Map.Entry<String, List<ThirdOrderInfo>> entry : param.entrySet()){
-				orderMapper.updateThirdOrderInfo(entry.getValue());
-				orderMapper.updateOrderStatusByThirdStatus(entry.getValue().get(0));
-			}
-			return new ResultModel(true, "");
-		} else {
-			return result;
-		}
+	public void checkOrderStatus(List<OrderIdAndSupplierId> list) {
+		supplierFeignClient.checkOrderStatus(Constants.FIRST_VERSION, list);
 	}
 
-	private ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {
-		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
-		thirdOrder.setExpressId(orderStatus.getExpressId());
-		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
-		thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
-		thirdOrder.setStatus(orderStatus.getStatus());
-		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getStatus()));
-		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
-		thirdOrder.setOrderId(orderStatus.getOrderId());
-		return thirdOrder;
+	@Override
+	public void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list) {
+		orderMapper.updateThirdOrderInfo(list);
+		orderMapper.updateOrderStatusByThirdStatus(list.get(0));
 	}
 }

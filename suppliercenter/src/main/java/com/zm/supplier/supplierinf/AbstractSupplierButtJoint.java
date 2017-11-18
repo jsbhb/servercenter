@@ -1,6 +1,7 @@
 package com.zm.supplier.supplierinf;
 
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @return
 	 * @throws Exception
 	 */
-	public <T> List<T> renderResult(String result, String format, Class<T> clazz) throws Exception{
+	public <T> Set<T> renderResult(String result, String format, Class<T> clazz) throws Exception{
 		if(XML.equalsIgnoreCase(format)){
 			return XmlUtil.parseXml(result, clazz);
 		}else if(JSON.equalsIgnoreCase(format)){
@@ -45,7 +46,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param user
 	 * @return
 	 */
-	public abstract List<SendOrderResult> sendOrder(OrderInfo info, UserInfo user);
+	public abstract Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user);
 	
 
 	/**
@@ -53,7 +54,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param orderId
 	 * @return
 	 */
-	public abstract List<OrderStatus> checkOrderStatus(List<String> orderIds);
+	public abstract Set<OrderStatus> checkOrderStatus(List<String> orderIds);
 
 	public String getAppKey() {
 		return appKey;

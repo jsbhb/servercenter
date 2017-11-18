@@ -5,6 +5,7 @@
 	<resultMap type="com.zm.order.pojo.OrderInfo" id="orderBase">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
@@ -22,6 +23,8 @@
 			<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
 			<result column="tariff_tax" property="tariffTax" jdbcType="DECIMAL" />
 			<result column="increment_tax" property="incrementTax" jdbcType="DECIMAL" />
+			<result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+			<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
 			<result column="excise_tax" property="exciseTax" jdbcType="DECIMAL" />
 			<result column="pay_type" property="payType" jdbcType="INTEGER" />
 			<result column="carry_address" property="carryAddress"
@@ -110,7 +113,7 @@
 		select
 		o.id,o.order_id,o.status,o.express_type,o.supplier_id,o.create_time,oe.id as orderExpress_id, od.id
 		as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
-		oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus,
+		oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus,od.pay_time,od.pay_no,
 		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,
 		o.center_id,o.shop_id,o.guide_id,og.id as
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
@@ -177,11 +180,11 @@
 		INSERT INTO
 		order_detail
 		(order_id,pay_type,payment,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,
-		receive_city,receive_area,receive_address,receive_zip_code,
+		receive_city,receive_area,receive_address,receive_zip_code,post_fee,
 		tax_fee,tariff_tax,increment_tax,excise_tax,create_time,remark,dis_amount)
 		VALUES
 		(#{orderId},#{payType},#{payment},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
-		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},now(),#{remark},#{disAmount});
+		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{postFee},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},now(),#{remark},#{disAmount});
 	</insert>
 
 	<insert id="saveOrderGoods" parameterType="Object">
@@ -390,24 +393,24 @@
 	<!-- 获取发第三方仓库的订单 -->
 	<select id="listOrderForSendToTTWarehouse" resultMap="orderBase">
 		select
-		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,od.id as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id
+		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address 
 		from order_base o left join order_detail od on o.order_id =od.order_id 
-		left join order_goods og on o.order_id = og.order_id where o.status=2 and supplier_id=1 and orderFlag=0 limit 10
+		left join order_goods og on o.order_id = og.order_id where o.status=2 and supplier_id=1 and order_flag=0 limit 10
 	</select>
 	
 	<select id="listOrderForSendToOtherWarehouse" resultMap="orderBase">
 		select
-		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,od.id as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id
+		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address 
 		from order_base o left join order_detail od on o.order_id =od.order_id 
-		left join order_goods og on o.order_id = og.order_id where o.status=1 and supplier_id !=1 and orderFlag=0 limit 10
+		left join order_goods og on o.order_id = og.order_id where o.status=1 and supplier_id !=1 and order_flag=0 limit 10
 	</select>
 	
 	<!-- end -->
@@ -418,7 +421,7 @@
 		(order_id,third_order_id,supplier_id,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.thirdOrderId},#{supplierId},now())
+			(#{item.orderId},#{item.thirdOrderId},#{item.supplierId},now())
 		</foreach>
 	</insert>
 	

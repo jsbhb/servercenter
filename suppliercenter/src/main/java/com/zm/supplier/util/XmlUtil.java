@@ -3,9 +3,11 @@ package com.zm.supplier.util;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -13,6 +15,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
+import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 
 public class XmlUtil {
@@ -68,8 +71,8 @@ public class XmlUtil {
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static <T> List<T> parseXml(String xml, Class<T> clazz) throws Exception {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> Set<T> parseXml(String xml, Class<T> clazz) throws Exception {
 		Document doc = DocumentHelper.parseText(xml);
 		Map<String, String> confMap = ConfUtils.getConfMap();
 		Element root = doc.getRootElement();
@@ -78,13 +81,18 @@ public class XmlUtil {
 			Object obj = clazz.newInstance();
 			List list = new ArrayList();
 			parseNode(root, clazz, confMap, list, obj);
-			return list;
+			Set set = new HashSet();
+			for(Object o : list){
+				set.add(o);
+			}
+			list.clear();
+			return set;
 		}
 		return null;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static <T> void parseNode(Element node, Class<T> clazz, Map<String, String> confMap,
+	private static <T> Object parseNode(Element node, Class<T> clazz, Map<String, String> confMap,
 			List list, Object obj) throws Exception {
 
 		if (!(node.getTextTrim().equals(""))) {
@@ -96,12 +104,12 @@ public class XmlUtil {
 					getMethod = clazz.getMethod("get" + fieldName);
 					Object o = getMethod.invoke(obj);
 					if (o != null) {
-						list.add(obj);
 						obj = clazz.newInstance();
 					}
 					String value = node.getTextTrim();
 					Method method = clazz.getMethod("set" + fieldName,String.class);
 					method.invoke(obj, value);
+					list.add(obj);
 				} catch (NoSuchMethodException e) {
 
 				} catch (SecurityException e) {
@@ -113,12 +121,13 @@ public class XmlUtil {
 		Iterator<Element> iterator = node.elementIterator();
 		while (iterator.hasNext()) {
 			Element e = iterator.next();
-			parseNode(e, clazz, confMap, list, obj);
+			obj = parseNode(e, clazz, confMap, list, obj);
 		}
+		return obj;
 	}
 
 	public static void main(String[] args) throws Exception {
-		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><response><code></code><result>success</result><message></message><serialno></serialno><orderNos><no><busOrderNo>hwj4737262</busOrderNo><orderNo>PD146639611435211</orderNo></no><no><busOrderNo>hwj2828282</busOrderNo><orderNo>PD146639611448612</orderNo></no></orderNos></response>";
-		System.out.println(parseXml(xml, SendOrderResult.class));
+		String xml = "<response><result>success</result><code>S200</code><message>订单查询成功</message><orderProcess><process><orderNo>EO151101736421215</orderNo><orderStatus>审单未通过</orderStatus><orderFailDesc>验证参数异常/售价不能低于1%.商品有:[名称=测试奶粉,productID=3105166008N0000001]/</orderFailDesc><logisticsCode>TTKDEX</logisticsCode><recTime>2017-11-18 23:02:44</recTime><hgPros/></process></orderProcess><totalCount>1</totalCount></response>";
+		System.out.println(parseXml(xml, OrderStatus.class));
 	}
 }

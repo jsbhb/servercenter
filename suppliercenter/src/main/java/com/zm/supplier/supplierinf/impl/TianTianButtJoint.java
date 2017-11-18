@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -25,23 +26,23 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 	private static final String CUSTOMER = "aa001";
 
 	@Override
-	public List<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
+	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 
 		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, CUSTOMER);// 报文
 		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.create";
 //		String url = "nredi/base/api/service?method=order.create";
-		return (List<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class);
+		return (Set<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class);
 	}
 
 	@Override
-	public List<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, CUSTOMER);// 报文
 		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";
 //		String url = "nredi/base/api/service?method=order.query";
-		return (List<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
+		return (Set<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
 	}
 	
-	private <T> List<T> sendTianTianWarehouse(String url, String msg, Class<T> clazz){
+	private <T> Set<T> sendTianTianWarehouse(String url, String msg, Class<T> clazz){
 		String date = DateUtil.getDateString(new Date(), "yyyy-MM-dd HH:mm:ss");
 		String sign = SignUtil.TianTianSign(msg, appSecret, date);// 签名
 		Map<String, String> param = new HashMap<String, String>();

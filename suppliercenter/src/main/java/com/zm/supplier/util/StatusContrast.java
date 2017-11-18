@@ -1,4 +1,4 @@
-package com.zm.order.utils;
+package com.zm.supplier.util;
 
 import java.util.HashMap;
 import java.util.Map;

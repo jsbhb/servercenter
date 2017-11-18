@@ -27,6 +27,7 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
+import com.zm.order.pojo.ThirdOrderInfo;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -489,29 +490,42 @@ public class OrderController {
 	
 	@RequestMapping(value = "{version}/order/saveThirdOrder", method = RequestMethod.POST)
 	@ApiIgnore
-	public ResultModel saveThirdOrder(@PathVariable("version") Double version,@RequestBody List<SendOrderResult> list) {
+	public boolean saveThirdOrder(@PathVariable("version") Double version,@RequestBody List<SendOrderResult> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			orderService.saveThirdOrder(list);
-			return new ResultModel(true, "");
+			return true;
+		}
+
+		throw new RuntimeException("版本错误");
+
+	}
+	
+	@RequestMapping(value = "{version}/order/checkOrderStatus", method = RequestMethod.POST)
+	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
+			@RequestBody List<OrderIdAndSupplierId> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			orderService.checkOrderStatus(list);
+			return new ResultModel(true, "正在同步状态");
 		}
 
 		return new ResultModel(false, "版本错误");
 
 	}
 	
-	@RequestMapping(value = "{version}/order/checkOrderStatus", method = RequestMethod.POST)
-	@ApiIgnore
-	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
-			@RequestBody List<OrderIdAndSupplierId> list) {
+	@RequestMapping(value = "{version}/order/changeOrderStatusByThirdWarehouse", method = RequestMethod.POST)
+	public boolean changeOrderStatusByThirdWarehouse(@PathVariable("version") Double version,
+			@RequestBody List<ThirdOrderInfo> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
-			return orderService.checkOrderStatus(list);
+			orderService.changeOrderStatusByThirdWarehouse(list);
+			return true;
 		}
 
-		return new ResultModel(false, "版本错误");
+		return false;
 
 	}
+	
 }

@@ -2,7 +2,7 @@ package com.zm.supplier.bussiness.component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.feignclient.OrderFeignClient;
 import com.zm.supplier.feignclient.UserFeignClient;
@@ -21,9 +20,12 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.SupplierInterface;
+import com.zm.supplier.pojo.ThirdOrderInfo;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
+import com.zm.supplier.util.ExpressContrast;
 import com.zm.supplier.util.SpringContextUtil;
+import com.zm.supplier.util.StatusContrast;
 
 @Component
 public class WarehouseThreadPool {
@@ -43,15 +45,15 @@ public class WarehouseThreadPool {
 	public void sendOrder(OrderInfo info) {
 		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
 		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
-		List<SendOrderResult> list = buttJoint.sendOrder(info, user);
-		if(list == null){
+		Set<SendOrderResult> set = buttJoint.sendOrder(info, user);
+		if (set == null || set.size() == 0) {
 			return;
 		}
-		for(SendOrderResult model : list){
+		for (SendOrderResult model : set) {
 			model.setSupplierId(info.getSupplierId());
 		}
-		ResultModel model = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, list);
-		if (model.isSuccess()) {
+		boolean flag = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);
+		if (flag) {
 			redisTemplate.delete(info.getOrderId());
 		} else {
 			logger.info("订单号：" + info.getOrderId() + "===============发送成功，更新出错==============");
@@ -59,30 +61,45 @@ public class WarehouseThreadPool {
 	}
 
 	@Async("myAsync")
-	public List<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList, Integer supplierId,
-			CountDownLatch countDownLatch) {
+	public void checkOrderStatus(List<OrderIdAndSupplierId> orderList, Integer supplierId) {
 		try {
 			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
 			List<String> orderIds = new ArrayList<String>();
-			for(OrderIdAndSupplierId model : orderList){
+			for (OrderIdAndSupplierId model : orderList) {
 				orderIds.add(model.getThirdOrderId());
 			}
-			List<OrderStatus> list = buttJoint.checkOrderStatus(orderIds);
-			for(OrderStatus orderStatus : list){
-				for(OrderIdAndSupplierId model : orderList){
-					if(orderStatus.getThirdOrderId().equals(model.getThirdOrderId())){
+			Set<OrderStatus> set = buttJoint.checkOrderStatus(orderIds);
+			for (OrderStatus orderStatus : set) {
+				for (OrderIdAndSupplierId model : orderList) {
+					if (orderStatus.getThirdOrderId().equals(model.getThirdOrderId())) {
 						orderStatus.setOrderId(model.getOrderId());
 					}
 				}
 			}
-			return list;
+			List<ThirdOrderInfo> list = new ArrayList<ThirdOrderInfo>();
+			ThirdOrderInfo thirdOrder = null;
+			for(OrderStatus orderStatus : set){
+				thirdOrder = toThirdOrder(orderStatus);
+				list.add(thirdOrder);
+			}
+			orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return null;
-		} finally {
-			countDownLatch.countDown();
-		}
-		
+		} 
+
+	}
+	
+	private ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {
+		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
+		thirdOrder.setExpressId(orderStatus.getExpressId());
+		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
+		thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
+		thirdOrder.setStatus(orderStatus.getStatus());
+		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getStatus()));
+		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
+		thirdOrder.setOrderId(orderStatus.getOrderId());
+		return thirdOrder;
 	}
 
 	private AbstractSupplierButtJoint getTargetInterface(Integer supplierId) {

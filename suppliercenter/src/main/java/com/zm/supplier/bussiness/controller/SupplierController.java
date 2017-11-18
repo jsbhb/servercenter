@@ -97,14 +97,12 @@ public class SupplierController {
 	}
 
 	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
-	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
+	public void checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			
-			return new ResultModel(true, supplierService.checkOrderStatus(list));
+			supplierService.checkOrderStatus(list);
 		}
-
-		return new ResultModel(false, "版本错误");
 	}
 }
