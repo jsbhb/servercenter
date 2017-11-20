@@ -44,6 +44,9 @@ public class WarehouseThreadPool {
 	@Async("myAsync")
 	public void sendOrder(OrderInfo info) {
 		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
+		if(buttJoint == null){
+			return;
+		}
 		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
 		Set<SendOrderResult> set = buttJoint.sendOrder(info, user);
 		if (set == null || set.size() == 0) {
@@ -64,6 +67,9 @@ public class WarehouseThreadPool {
 	public void checkOrderStatus(List<OrderIdAndSupplierId> orderList, Integer supplierId) {
 		try {
 			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
+			if(buttJoint == null){
+				return;
+			}
 			List<String> orderIds = new ArrayList<String>();
 			for (OrderIdAndSupplierId model : orderList) {
 				orderIds.add(model.getThirdOrderId());

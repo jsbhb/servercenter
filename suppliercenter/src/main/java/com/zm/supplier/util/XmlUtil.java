@@ -1,11 +1,9 @@
 package com.zm.supplier.util;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +13,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 
 public class XmlUtil {
@@ -79,21 +76,22 @@ public class XmlUtil {
 		boolean flag = parseNode(root, confMap);
 		if (flag) {
 			Object obj = clazz.newInstance();
-			List list = new ArrayList();
-			parseNode(root, clazz, confMap, list, obj);
+			Method method = clazz.getMethod("setUniquId", Long.class);
+			method.invoke(obj, System.currentTimeMillis());
+			Map<Long, Object> map = new HashMap<Long, Object>();
+			parseNode(root, clazz, confMap, map, obj);
 			Set set = new HashSet();
-			for(Object o : list){
-				set.add(o);
+			for (Map.Entry<Long, Object> entry : map.entrySet()) {
+				set.add(entry.getValue());
 			}
-			list.clear();
 			return set;
 		}
 		return null;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	private static <T> Object parseNode(Element node, Class<T> clazz, Map<String, String> confMap,
-			List list, Object obj) throws Exception {
+			Map<Long, Object> map, Object obj) throws Exception {
 
 		if (!(node.getTextTrim().equals(""))) {
 			String nodeName = node.getName();
@@ -103,13 +101,21 @@ public class XmlUtil {
 				try {
 					getMethod = clazz.getMethod("get" + fieldName);
 					Object o = getMethod.invoke(obj);
+
 					if (o != null) {
 						obj = clazz.newInstance();
+						Long uniquId = System.currentTimeMillis();
+						Method method = clazz.getMethod("setUniquId", Long.class);
+						method.invoke(obj, uniquId);
 					}
 					String value = node.getTextTrim();
-					Method method = clazz.getMethod("set" + fieldName,String.class);
+					Method method = clazz.getMethod("set" + fieldName, String.class);
 					method.invoke(obj, value);
-					list.add(obj);
+					getMethod = clazz.getMethod("getUniquId");
+					Long tem = (Long) getMethod.invoke(obj);
+					if (!map.containsKey(tem)) {
+						map.put(tem, obj);
+					}
 				} catch (NoSuchMethodException e) {
 
 				} catch (SecurityException e) {
@@ -121,13 +127,13 @@ public class XmlUtil {
 		Iterator<Element> iterator = node.elementIterator();
 		while (iterator.hasNext()) {
 			Element e = iterator.next();
-			obj = parseNode(e, clazz, confMap, list, obj);
+			obj = parseNode(e, clazz, confMap, map, obj);
 		}
 		return obj;
 	}
 
 	public static void main(String[] args) throws Exception {
-		String xml = "<response><result>success</result><code>S200</code><message>订单查询成功</message><orderProcess><process><orderNo>EO151101736421215</orderNo><orderStatus>审单未通过</orderStatus><orderFailDesc>验证参数异常/售价不能低于1%.商品有:[名称=测试奶粉,productID=3105166008N0000001]/</orderFailDesc><logisticsCode>TTKDEX</logisticsCode><recTime>2017-11-18 23:02:44</recTime><hgPros/></process></orderProcess><totalCount>1</totalCount></response>";
-		System.out.println(parseXml(xml, OrderStatus.class));
+		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><response><result>success</result><code></code><message></message><serialno></serialno><orderNos><no><busOrderNo>hwj4737262</busOrderNo><orderNo>PD146639611435211</orderNo></no><no><busOrderNo>hwj2828282</busOrderNo><orderNo>PD146639611448612</orderNo></no></orderNos></response>";
+		System.out.println(parseXml(xml, SendOrderResult.class));
 	}
 }

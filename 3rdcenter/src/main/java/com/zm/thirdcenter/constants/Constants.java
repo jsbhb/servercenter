@@ -25,5 +25,7 @@ public class Constants {
 	public static final Integer QQ_LOGIN = 2;
 	
 	public static final Integer SINABLOG_LOGIN = 3;
+	
+	public static final String CARRIER = "carrier";//快递公司对应的编码
 
 }

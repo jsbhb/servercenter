@@ -705,18 +705,18 @@
 	
 	<update id="updateStock" parameterType="Object">
 		<foreach collection="list" item="item" index="index" open=""
-			close="" separator=";">
+			close=";" separator=";" >
 			update goods_stock
 			<set>
-				<if test="orderFlag == 0">
-					fxqty = ifnull(fxqty,0) - #{item.frozenqty},
-				</if>
-				<if test="orderFlag == 1 or orderFlag == 2">
-					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty},
-				</if>
-				frozenqty = ifnull(frozenqty,0) + #{item.frozenqty}
+<!-- 				<if test="orderFlag == 0"> -->
+					fxqty = fxqty - 1
+<!-- 				</if> -->
+<!-- 				<if test="orderFlag == 1 or orderFlag == 2"> -->
+<!-- 					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty}, -->
+<!-- 				</if> -->
+<!-- 				frozenqty = frozenqty + 1 -->
 			</set>
-			where item_id = #{item.itemId}
+			where item_id = #{item.itemId, jdbcType=VARCHAR}
 		</foreach>
 	</update>
 	

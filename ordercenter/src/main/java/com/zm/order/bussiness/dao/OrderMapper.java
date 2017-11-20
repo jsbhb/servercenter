@@ -96,4 +96,6 @@ public interface OrderMapper {
 	void updateThirdOrderInfo(List<ThirdOrderInfo> list);
 
 	void updateOrderStatusByThirdStatus(ThirdOrderInfo thirdOrderInfo);
+	
+	Integer queryCountOrderInfo(Map<String,Object> param);
 }

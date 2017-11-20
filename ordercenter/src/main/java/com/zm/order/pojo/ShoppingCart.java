@@ -26,6 +26,8 @@ public class ShoppingCart {
 	private String createTime;
 
 	private String updateTime;
+	
+	private Integer type;
 
 	private GoodsSpecs goodsSpecs;
 
@@ -34,6 +36,14 @@ public class ShoppingCart {
 	public boolean check() {
 		return userId != null && itemId != null && quantity != null && centerId != null && goodsName != null
 				&& supplierId != null;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	public String getSupplierName() {

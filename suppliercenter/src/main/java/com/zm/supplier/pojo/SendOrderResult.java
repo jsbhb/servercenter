@@ -1,12 +1,22 @@
 package com.zm.supplier.pojo;
 
 public class SendOrderResult {
+	
+	private Long uniquId;
 
 	private String orderId;
 	
 	private String thirdOrderId;
 	
 	private Integer supplierId;
+
+	public Long getUniquId() {
+		return uniquId;
+	}
+
+	public void setUniquId(Long uniquId) {
+		this.uniquId = uniquId;
+	}
 
 	public Integer getSupplierId() {
 		return supplierId;

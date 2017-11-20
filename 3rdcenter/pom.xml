@@ -111,6 +111,13 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
+		
+		<!-- excel -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -122,6 +129,14 @@
                     <include>**/*.xml</include>
                 </includes>
             </resource>
+            
+            <resource>
+				<directory>resource</directory>
+				<targetPath>BOOT-INF/classes/</targetPath>
+				<includes>
+					<include>ExpressCode.xls</include>
+				</includes>
+			</resource>
         </resources>
 	</build>
 

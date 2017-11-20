@@ -302,7 +302,14 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 		// end
-		result.setObj(orderMapper.listOrderByParam(param));
+		Integer count = orderMapper.queryCountOrderInfo(param);
+		pagination.setTotalRows(count.longValue());
+		pagination.webListConverter();
+		List<OrderInfo> list = orderMapper.listOrderByParam(param);
+		Map<String,Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("pagination", pagination);
+		resultMap.put("orderList", list);
+		result.setObj(resultMap);
 		result.setSuccess(true);
 
 		return result;
@@ -429,12 +436,13 @@ public class OrderServiceImpl implements OrderService {
 			return new ResultModel(false, "该订单号不是您的订单号");
 		}
 
-		if (info.getStatus() >= Constants.ORDER_DELIVER) {
-			return new ResultModel(false, "该订单不能退单，请联系客服");
+		if (info.getStatus() >= Constants.ORDER_DELIVER && !Constants.ORDER_EXCEPTION.equals(info.getStatus())) {
+			return new ResultModel(false, "该订单已发货或已完成，请联系客服");
 		}
 
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
-			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()) {
+			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()
+					&& !Constants.ORDER_EXCEPTION.equals(info.getStatus())) {
 				if (redisTemplate.opsForValue().get(orderId) != null) {// 是否正在发送给第三方
 					return new ResultModel(false, "该订单正在发送给保税仓，请稍后重试");
 				}
@@ -513,7 +521,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void timeTaskcloseOrder() {
-		String time = DateUtils.getTime(Calendar.DATE, -1);
+		String time = DateUtils.getTime(Calendar.MINUTE, -5);
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
 		for (String orderId : orderIdList) {
 			closeOrder(DEFAULT_USER_ID, orderId);

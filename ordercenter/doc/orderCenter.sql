@@ -161,6 +161,7 @@ CREATE TABLE `zm_order`.`order_shopping_cart` (
   `user_id` INT UNSIGNED NOT NULL,
   `item_id` VARCHAR(100) NOT NULL,
   `center_id` INT UNSIGNED NOT NULL,
+  `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
   `item_quantity` INT UNSIGNED NOT NULL,
   `supplier_id` INT UNSIGNED NOT NULL,
   `supplier_name` VARCHAR(100) NOT NULL,
