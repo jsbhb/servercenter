@@ -251,7 +251,7 @@
 		base
 		gb on g.base_id = gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.id  where 1=1 
+		gcb.brand_id  where 1=1 
 		<if test="type != null and type != ''">
 			g.type = #{type,jdbcType = INTEGER}
 		</if>
@@ -669,7 +669,7 @@
 		select gi.id, gi.status, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
-		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.id 
+		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
 		where gi.index_status = 0;
 	</select>
 	
@@ -690,7 +690,7 @@
 		from goods${centerId}
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.id 
+		gcb.brand_id 
 		left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i on gs.item_id=i.item_id 
 		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
@@ -762,7 +762,7 @@
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
+		gcb.brand_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
 		on gs.item_id = i.item_id 
 		left join goods_price${centerId} gp on gs.item_id = gp.item_id where 1=1
 		<if test="type == 0">

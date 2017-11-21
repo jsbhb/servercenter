@@ -147,12 +147,15 @@ drop table if exists  `goods_category_brand`;
 
 CREATE TABLE `zm_goods`.`goods_category_brand` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `brand_id` varchar(100)  NOT NULL COMMENT '品牌ID',
   `brand` VARCHAR(100) NULL COMMENT '品牌名称',
   `attr` VARCHAR(100) NULL COMMENT '备用',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `brand_id_UNIQUE` (`brand_id` ASC),
+  INDEX `idx_brand_id` (`brand_id`),
   INDEX `goods_category_brand_brand` (`brand`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品品牌表';
