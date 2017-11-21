@@ -12,7 +12,7 @@ public class PopularizeDict {
 	
 	private String enname;
 	
-	private Integer firstCategory;
+	private String firstCategory;
 	
 	private Integer type;
 	
@@ -88,11 +88,11 @@ public class PopularizeDict {
 		this.enname = enname;
 	}
 
-	public Integer getFirstCategory() {
+	public String getFirstCategory() {
 		return firstCategory;
 	}
 
-	public void setFirstCategory(Integer firstCategory) {
+	public void setFirstCategory(String firstCategory) {
 		this.firstCategory = firstCategory;
 	}
 

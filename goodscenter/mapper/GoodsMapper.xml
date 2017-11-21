@@ -154,7 +154,7 @@
 		<result column="href" property="href" jdbcType="VARCHAR" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="enname" property="enname" jdbcType="VARCHAR" />
-		<result column="first_category" property="firstCategory" jdbcType="INTEGER" />
+		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -177,13 +177,16 @@
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.vo.GoodsIndustryModel" id="goodsIndustry">
-		<id column="id" property="id" jdbcType="INTEGER" />
+		<id column="id" property="firstId" jdbcType="INTEGER" />
+		<result column="first_id" property="id" jdbcType="VARCHAR" />
 		<result column="industryName" property="industryName" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.goods.pojo.vo.GoodsCategoryModel" property="dictList">
-			<id column="dictid" property="id" jdbcType="INTEGER" />
+			<id column="dictid" property="secondId" jdbcType="INTEGER" />
+			<result column="second_id" property="id" jdbcType="VARCHAR" />
 			<result column="dictName" property="dictName" jdbcType="VARCHAR" />
 			<collection property="entryList" ofType = "com.zm.goods.pojo.vo.GoodsCategoryEnteryModel">
-				<id column="entryId" property="id" jdbcType="INTEGER" />
+				<id column="entryId" property="thirdId" jdbcType="INTEGER" />
+				<result column="third_id" property="id" jdbcType="VARCHAR" />
 				<result column="entryName" property="entryName" jdbcType="VARCHAR" />
 			</collection>
 		</collection>
@@ -225,10 +228,10 @@
 	</select>
 	
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
-		select gfc.id,gfc.name as industryName,gsc.id as dictid,gsc.name as dictName,
-		gtc.id as entryId,gtc.name as entryName 
-		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.id = gsc.first_id 
-		left join goods_third_category${centerId} gtc on gsc.id = gtc.second_id order by gfc.id
+		select gfc.id,gfc.first_id,gfc.name as industryName,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
+		gtc.id as entryId,gtc.name as entryName,gtc.third_id  
+		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.first_id = gsc.first_id 
+		left join goods_third_category${centerId} gtc on gsc.second_id = gtc.second_id order by gfc.id
 	</select>
 
 	<select id="getActivity" parameterType="Object" resultMap="activity">
@@ -413,11 +416,14 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_first_category_${centerId}(
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  first_id varchar(100) NOT NULL COMMENT '一级分类ID',
 		  name VARCHAR(100) NULL COMMENT '一级分类名称',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
-		  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		  PRIMARY KEY (id),
+		  UNIQUE INDEX first_id_UNIQUE (first_id ASC),
+		  INDEX idx_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品一级分类表';
 	</update>
 		
@@ -425,13 +431,16 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_second_categroy_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  first_id int UNSIGNED NOT NULL COMMENT 'first_id',
+		  first_id varchar(100) NOT NULL COMMENT '一级分类ID',
+		  second_id varchar(100) NOT NULL COMMENT 'first_id',
 		  name VARCHAR(100) NULL COMMENT '二级分类名称',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
-		  INDEX goods_second_categroy_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+		  UNIQUE INDEX second_id_UNIQUE (second_id ASC),
+		  INDEX idx_second_id (second_id),
+   		  INDEX goods_second_categroy_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品二级分类表';
 	</update>
 		
@@ -439,12 +448,15 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_third_category_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-		  second_id int UNSIGNED NOT NULL COMMENT 'second_id',
+		  second_id varchar(100) NOT NULL COMMENT 'second_id',
+		  third_id varchar(100) NOT NULL COMMENT 'second_id',
 		  name VARCHAR(100) NULL COMMENT '三级分类名称',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
+		  INDEX idx_third_id (third_id),
+		  UNIQUE INDEX third_id_UNIQUE (third_id ASC),
 		  INDEX goods_third_category_second_id (second_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品三级分类表';
 	</update>
@@ -519,7 +531,7 @@
 		  href VARCHAR(300) NULL COMMENT '跳转地址',
 		  type tinyint UNSIGNED NOT NULL COMMENT '类型：0：新品；1：特推；2：渠道；3精选；4：普通分类',
 		  enname VARCHAR(50) NULL COMMENT '英文名称',
-		  first_category int UNSIGNED NULL COMMENT '一级分类id',
+		  first_category varchar(100) NULL COMMENT '一级分类id',
 		  picPath1 VARCHAR(300) NULL COMMENT '图片地址',
 		  picPath2 VARCHAR(300) NULL COMMENT '图片地址',
   		  picPath3 VARCHAR(300) NULL COMMENT '图片地址',

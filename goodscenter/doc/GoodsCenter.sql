@@ -103,7 +103,8 @@ CREATE TABLE `zm_goods`.`goods_first_category` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX 'idx_first_id' (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1
+  UNIQUE INDEX `first_id_UNIQUE` (`first_id` ASC),
+  INDEX `idx_first_id` (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1
   DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品一级分类表';
 
@@ -120,6 +121,7 @@ CREATE TABLE `zm_goods`.`goods_second_categroy` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_second_id` (`second_id`),
+  UNIQUE INDEX `second_id_UNIQUE` (`second_id` ASC),
    INDEX `goods_second_categroy_first_id` (`first_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品二级分类表';
 
@@ -136,6 +138,7 @@ CREATE TABLE `zm_goods`.`goods_third_category` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `idx_third_id` (`third_id`),
+  UNIQUE INDEX `third_id_UNIQUE` (`third_id` ASC),
   INDEX `goods_third_category_second_id` (`second_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商商品三级分类表';
 

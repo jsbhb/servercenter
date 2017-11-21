@@ -9,17 +9,26 @@ import java.util.List;
  */
 public class GoodsCategoryModel {
 
-	private Integer id;
+	private String id;
+	
+	private Integer secondId;
 	
 	private String dictName;
 	
 	private List<GoodsCategoryEnteryModel> entryList;
+	
+	public Integer getSecondId() {
+		return secondId;
+	}
 
-	public Integer getId() {
+	public void setSecondId(Integer secondId) {
+		this.secondId = secondId;
+	}
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

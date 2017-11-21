@@ -7,15 +7,25 @@ package com.zm.goods.pojo.vo;
  */
 public class GoodsCategoryEnteryModel {
 
-	private Integer id;
+	private String id;
+	
+	private Integer thirdId;
 	
 	private String entryName;
 	
-	public Integer getId() {
+	public Integer getThirdId() {
+		return thirdId;
+	}
+
+	public void setThirdId(Integer thirdId) {
+		this.thirdId = thirdId;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

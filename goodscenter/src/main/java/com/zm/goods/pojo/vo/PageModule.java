@@ -18,7 +18,7 @@ public class PageModule {
 
 	private String enname;
 
-	private Integer firstCategory;
+	private String firstCategory;
 	
 	private Integer type;//0限时抢购，1：全场。。
 	
@@ -174,11 +174,11 @@ public class PageModule {
 		this.enname = enname;
 	}
 
-	public Integer getFirstCategory() {
+	public String getFirstCategory() {
 		return firstCategory;
 	}
 
-	public void setFirstCategory(Integer firstCategory) {
+	public void setFirstCategory(String firstCategory) {
 		this.firstCategory = firstCategory;
 	}
 
