@@ -113,3 +113,4 @@ CREATE TABLE `zm_supplier`.`supplier_search_parameter` (
 COMMENT = '供应商字段表';
 
 INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `enter_time`) VALUES ('1', '0', '天天仓', '中国', '浙江', '宁波', '北仑', now());
+INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `enter_time`) VALUES ('2', '0', '粮油仓', '中国', '浙江', '杭州', '杭州', now());

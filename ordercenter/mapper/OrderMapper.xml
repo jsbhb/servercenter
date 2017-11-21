@@ -163,8 +163,8 @@
 			limit #{pagination.startRow},#{pagination.numPerPage}
 		</if>
 		) o left join order_detail od on o.order_id =
-		od.order_id left join order_goods og on o.order_id = og.order_id left join third_order_info oe on oe.order_id = o.order_id
-		
+		od.order_id left join order_goods og on o.order_id = og.order_id left join third_order_info oe 
+		on oe.order_id = o.order_id order by o.create_time desc
 	</select>
 	
 	<select id="queryCountOrderInfo" parameterType="Object" resultType="java.lang.Integer">
