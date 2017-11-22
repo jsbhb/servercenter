@@ -212,8 +212,8 @@ public class OrderServiceImpl implements OrderService {
 							tax.getIncrementTax());
 					totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
 				} else {
-					totalIncremTax += CalculationUtils.mul(CalculationUtils.add(fee, subPostFee),
-							tax.getIncrementTax());
+					totalIncremTax += CalculationUtils.mul(CalculationUtils.mul(CalculationUtils.add(fee, subPostFee),
+							tax.getIncrementTax()),0.7);
 				}
 			}
 			taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
