@@ -98,5 +98,7 @@ public interface GoodsMapper {
 	List<TimeLimitActive> listLimitTimeData(@Param("centerId")String centerId);
 	
 	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
+
+	String getGoodsIdByItemId(String itemId);
 	
 }

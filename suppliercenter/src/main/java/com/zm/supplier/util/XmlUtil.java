@@ -53,8 +53,12 @@ public class XmlUtil {
 		if (!(node.getTextTrim().equals(""))) {
 			String nodeName = node.getName();
 			String value = node.getTextTrim();
-			if (value.equals(confMap.get(nodeName))) {
-				return true;
+			String localValue = confMap.get(nodeName) == null ? "" : confMap.get(nodeName);
+			String[] strs = localValue.split(",");
+			for(String s : strs){
+				if (value.equals(s)) {
+					return true;
+				}
 			}
 		}
 		Iterator<Element> iterator = node.elementIterator();
@@ -133,7 +137,7 @@ public class XmlUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><response><result>success</result><code></code><message></message><serialno></serialno><orderNos><no><busOrderNo>hwj4737262</busOrderNo><orderNo>PD146639611435211</orderNo></no><no><busOrderNo>hwj2828282</busOrderNo><orderNo>PD146639611448612</orderNo></no></orderNos></response>";
+		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><o><fbatchIds class=\"array\"><e type=\"string\">TXQS101003778-MBS07866-B-4</e><e type=\"string\">TXQS101003778-MBS04487-B-2</e></fbatchIds><items class=\"array\"><e class=\"object\"><buy_num type=\"number\">2</buy_num><freight_amount type=\"number\">0</freight_amount><goods_order type=\"string\">OA35114226249246197</goods_order><order_status type=\"string\">2</order_status><price type=\"number\">9500</price><sku_id type=\"string\">MBS07866-B</sku_id></e><e class=\"object\"><buy_num type=\"number\">5</buy_num><freight_amount type=\"number\">1000</freight_amount><goods_order type=\"string\">OA35114226249338342</goods_order><order_status type=\"string\">2</order_status><price type=\"number\">22000</price><sku_id type=\"string\">MBS04487-B</sku_id></e></items><merchant_order_no type=\"string\">GX10010012121102</merchant_order_no><order_no type=\"string\">PA35114226249117065</order_no><order_status type=\"string\">2</order_status><real_pay_amount type=\"string\">130000</real_pay_amount><ret_code type=\"string\">000000</ret_code><ret_msg type=\"string\">交易成功！</ret_msg><sign type=\"string\">c4b8e9c8f4745ea9aead700566963cc8</sign><sign_type type=\"string\">MD5</sign_type><status type=\"number\">2</status><total_all_amount type=\"string\">130000</total_all_amount><total_freight type=\"string\">1000</total_freight></o>";
 		System.out.println(parseXml(xml, SendOrderResult.class));
 	}
 }

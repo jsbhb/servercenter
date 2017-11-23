@@ -1,11 +1,18 @@
 package com.zm.supplier.util;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
+import com.zm.supplier.supplierinf.model.LianYouOrder;
+import com.zm.supplier.supplierinf.model.OutOrderGoods;
+import com.zm.supplier.supplierinf.model.XinYunGetOrderStatus;
+import com.zm.supplier.supplierinf.model.XinYunGoods;
+import com.zm.supplier.supplierinf.model.XinYunOrder;
 
 public class ButtJointMessageUtils {
 
@@ -170,7 +177,7 @@ public class ButtJointMessageUtils {
 		sb.append("</busCode>\n");
 		sb.append("</head>\n");
 		sb.append("<body>\n");
-		for(String orderId : orderIds){
+		for (String orderId : orderIds) {
 			sb.append("<orderNo>");
 			sb.append(orderId); // 订单号
 			sb.append("</orderNo>\n");
@@ -178,5 +185,78 @@ public class ButtJointMessageUtils {
 		sb.append("</body>\n");
 		sb.append("</request>\n");
 		return sb.toString();
+	}
+
+	public static String getLiangYouOrderMsg(OrderInfo info, UserInfo user) {
+		try {
+
+			LianYouOrder order = new LianYouOrder();
+			order.setAddress(URLEncoder.encode(info.getOrderDetail().getReceiveAddress(), "utf-8"));
+			order.setCity(URLEncoder.encode(info.getOrderDetail().getReceiveCity(), "utf-8"));
+			order.setConsignee(URLEncoder.encode(info.getOrderDetail().getReceiveName(), "utf-8"));
+			order.setCounty(URLEncoder.encode(info.getOrderDetail().getReceiveArea(), "utf-8"));
+			order.setImId(URLEncoder.encode(user.getUserDetail().getIdNum(), "utf-8"));
+			order.setOrder_sn(URLEncoder.encode(info.getOrderId(), "utf-8"));
+			order.setOut_order_sn(URLEncoder.encode(info.getOrderId(), "utf-8"));
+			order.setPhoneMob(URLEncoder.encode(info.getOrderDetail().getReceivePhone(), "utf-8"));
+			order.setProvince(URLEncoder.encode(info.getOrderDetail().getReceiveProvince(), "utf-8"));
+			order.setRealName(URLEncoder.encode(user.getUserDetail().getName(), "utf-8"));
+			List<OutOrderGoods> list = new ArrayList<OutOrderGoods>();
+			OutOrderGoods outOrderGoods = null;
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				outOrderGoods = new OutOrderGoods();
+				outOrderGoods.setGoods_name(URLEncoder.encode(goods.getItemName(), "utf-8"));
+				outOrderGoods.setOnly_sku(goods.getSku());
+				outOrderGoods.setQuantity(goods.getItemQuantity());
+				list.add(outOrderGoods);
+			}
+			order.setOutOrderGoods(list);
+
+			return JSONUtil.toJson(order);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static String getXinYunOrderMsg(OrderInfo info, UserInfo user, String appKey, String secret) {
+
+		XinYunOrder order = new XinYunOrder();
+		order.setAccept_name(user.getUserDetail().getName());
+		order.setAddress(info.getOrderDetail().getReceiveAddress());
+		order.setArea(info.getOrderDetail().getReceiveArea());
+		order.setCard_id(user.getUserDetail().getIdNum());
+		order.setCity(info.getOrderDetail().getReceiveCity());
+		order.setMerchant_order_no(info.getOrderId());
+		order.setMessage(info.getRemark());
+		order.setMobile(info.getOrderDetail().getReceivePhone());
+		order.setTelphone(info.getOrderDetail().getReceivePhone());
+		order.setOpcode("add_order");
+		order.setPost_code(info.getOrderDetail().getReceiveZipCode());
+		order.setProvince(info.getOrderDetail().getReceiveProvince());
+		order.setMerchant_id(appKey);
+		List<XinYunGoods> list = new ArrayList<XinYunGoods>();
+		XinYunGoods xinYunGoods = null;
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			xinYunGoods = new XinYunGoods();
+			xinYunGoods.setSku_id(goods.getSku());
+			xinYunGoods.setQuantity(goods.getItemQuantity() + "");
+			list.add(xinYunGoods);
+		}
+		order.setItems(list);
+
+		String sign = SignUtil.XinYunSing(JSONUtil.toJson(order), secret);
+		order.setSign(sign);
+
+		return JSONUtil.toJson(order);
+	}
+	
+	public static String getXinYunOrderStatusMsg(String orderId, String appKey, String secret) {
+		XinYunGetOrderStatus orderStatus = new XinYunGetOrderStatus();
+		orderStatus.setMerchant_id(appKey);
+		orderStatus.setOrder_no(orderId);
+		String sign = SignUtil.XinYunSing(JSONUtil.toJson(orderStatus), secret);
+		orderStatus.setSign(sign);
+		return JSONUtil.toJson(orderStatus);
 	}
 }

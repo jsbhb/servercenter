@@ -26,6 +26,7 @@ import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ExpressContrast;
 import com.zm.supplier.util.SpringContextUtil;
 import com.zm.supplier.util.StatusContrast;
+import com.zm.supplier.util.StatusTOChiness;
 
 @Component
 public class WarehouseThreadPool {
@@ -44,7 +45,7 @@ public class WarehouseThreadPool {
 	@Async("myAsync")
 	public void sendOrder(OrderInfo info) {
 		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
-		if(buttJoint == null){
+		if (buttJoint == null) {
 			return;
 		}
 		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
@@ -54,6 +55,7 @@ public class WarehouseThreadPool {
 		}
 		for (SendOrderResult model : set) {
 			model.setSupplierId(info.getSupplierId());
+			model.setOrderId(info.getOrderId());
 		}
 		boolean flag = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);
 		if (flag) {
@@ -67,7 +69,7 @@ public class WarehouseThreadPool {
 	public void checkOrderStatus(List<OrderIdAndSupplierId> orderList, Integer supplierId) {
 		try {
 			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
-			if(buttJoint == null){
+			if (buttJoint == null) {
 				return;
 			}
 			List<String> orderIds = new ArrayList<String>();
@@ -79,30 +81,32 @@ public class WarehouseThreadPool {
 				for (OrderIdAndSupplierId model : orderList) {
 					if (orderStatus.getThirdOrderId().equals(model.getThirdOrderId())) {
 						orderStatus.setOrderId(model.getOrderId());
+						orderStatus.setSupplierId(supplierId);
 					}
 				}
 			}
 			List<ThirdOrderInfo> list = new ArrayList<ThirdOrderInfo>();
 			ThirdOrderInfo thirdOrder = null;
-			for(OrderStatus orderStatus : set){
+			for (OrderStatus orderStatus : set) {
 				thirdOrder = toThirdOrder(orderStatus);
 				list.add(thirdOrder);
 			}
 			orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
-			
+
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-		} 
+		}
 
 	}
-	
+
 	private ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {
 		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
 		thirdOrder.setExpressId(orderStatus.getExpressId());
 		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
 		thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
-		thirdOrder.setStatus(orderStatus.getStatus());
-		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getStatus()));
+		String CNStatus = StatusTOChiness.get(orderStatus.getSupplierId() + orderStatus.getStatus());
+		thirdOrder.setStatus(CNStatus == null ? orderStatus.getStatus() : CNStatus);
+		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + orderStatus.getStatus()));
 		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
 		thirdOrder.setOrderId(orderStatus.getOrderId());
 		return thirdOrder;

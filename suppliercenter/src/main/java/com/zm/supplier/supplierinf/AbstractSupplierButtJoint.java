@@ -6,10 +6,12 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.UserInfo;
+import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.XmlUtil;
 
 public abstract class AbstractSupplierButtJoint {
@@ -35,11 +37,12 @@ public abstract class AbstractSupplierButtJoint {
 		if(XML.equalsIgnoreCase(format)){
 			return XmlUtil.parseXml(result, clazz);
 		}else if(JSON.equalsIgnoreCase(format)){
-			
+			return JSONUtil.toObject(result, clazz);
 		}
 		return null;
 	}
-
+	
+	
 	/**
 	 * @fun 发送订单给第三方
 	 * @param info
@@ -55,6 +58,14 @@ public abstract class AbstractSupplierButtJoint {
 	 * @return
 	 */
 	public abstract Set<OrderStatus> checkOrderStatus(List<String> orderIds);
+	
+	/**
+	 * @fun 发送订单给第三方
+	 * @param info
+	 * @param user
+	 * @return
+	 */
+	public abstract Set<CheckStockModel> checkStock(List<CheckStockModel> list);
 
 	public String getAppKey() {
 		return appKey;

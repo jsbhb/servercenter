@@ -772,5 +772,9 @@
 			and gi.is_popular = 1
 		</if>
 	</select>
+	
+	<select id="getGoodsIdByItemId" parameterType="Object" resultType="java.lang.String">
+		select goods_id from goods_item where item_id = #{itemId}
+	</select>
 
 </mapper>

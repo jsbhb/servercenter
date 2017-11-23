@@ -61,6 +61,11 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param) {
 
+		if(param.get("itemId") != null){
+			String goodsId = goodsMapper.getGoodsIdByItemId((String)param.get("itemId"));
+			param.put("goodsId", goodsId);
+		}
+		
 		List<GoodsItem> goodsList = goodsMapper.listGoods(param);
 
 		List<String> idList = new ArrayList<String>();

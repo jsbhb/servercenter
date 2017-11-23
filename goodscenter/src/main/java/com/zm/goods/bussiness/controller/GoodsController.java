@@ -73,13 +73,20 @@ public class GoodsController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID"),
-			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID") })
+			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID"),
+			@ApiImplicitParam(paramType = "query", name = "itemId", dataType = "String", required = false, value = "itemID")})
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId) {
 
 		ResultModel result = new ResultModel();
 
 		String goodsId = req.getParameter("goodsId");
+		String itemId = req.getParameter("itemId");
+		if(goodsId != null && itemId != null){
+			result.setSuccess(false);
+			result.setErrorMsg("参数错误");
+			return result;
+		}
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		if (centerId == null) {
@@ -91,6 +98,7 @@ public class GoodsController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			param.put("centerId", "_" + centerId);
 			param.put("goodsId", goodsId);
+			param.put("itemId", itemId);
 			pagination.init();
 			param.put("pagination", pagination);
 			List<GoodsItem> goodsList = goodsService.listGoods(param);
@@ -360,16 +368,17 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	/**
 	 * @fun 库存判断
 	 */
 	@RequestMapping(value = "{version}/goods/stockjudge", method = RequestMethod.POST)
 	@ApiIgnore
-	public ResultModel stockJudge(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list) {
+	public ResultModel stockJudge(@PathVariable("version") Double version,
+			@RequestBody List<OrderBussinessModel> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			return goodsService.stockJudge(list);
 		}
 

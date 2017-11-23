@@ -87,17 +87,17 @@ public class ExpressController {
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws IOException {
 		ExpressController api = new ExpressController();
-		Map<String,String> carrierMap = new HashMap<String,String>();
+//		Map<String,String> carrierMap = new HashMap<String,String>();
 //		System.out.println(new ClassPathResource("ExpressCode.xls").getURL().getPath());
-		List<CarrierModel> list = ExcelUtil.instance().getCache(new ClassPathResource("ExpressCode.xls").getURL().getPath());
-		for(CarrierModel model : list){
-			carrierMap.put(model.getCarrierName(), model.getCarrierID());
-		}
-		CacheMap.getCache().put(Constants.CARRIER, carrierMap);
+//		List<CarrierModel> list = ExcelUtil.instance().getCache(new ClassPathResource("ExpressCode.xls").getURL().getPath());
+//		for(CarrierModel model : list){
+//			carrierMap.put(model.getCarrierName(), model.getCarrierID());
+//		}
+//		CacheMap.getCache().put(Constants.CARRIER, carrierMap);
 		try {
-			Map<String,String> carrierMap1 = (Map<String, String>) CacheMap.getCache().getData().get(Constants.CARRIER);
-        	String carrierID = carrierMap1.get("韵达快递");//获取快递公司编码
-			String result = api.getOrderTracesByJson(carrierID, "3841160557387");
+//			Map<String,String> carrierMap1 = (Map<String, String>) CacheMap.getCache().getData().get(Constants.CARRIER);
+//        	String carrierID = carrierMap1.get("申通快递");//获取快递公司编码
+			String result = api.getOrderTracesByJson("STO", "3344704220602");
 			System.out.print(result);
 			RoteModel model = JSONUtil.parse(result, RoteModel.class);
 			System.out.println("\n");

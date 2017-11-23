@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -40,6 +41,11 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";
 //		String url = "nredi/base/api/service?method=order.query";
 		return (Set<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
+	}
+	
+	@Override
+	public Set<CheckStockModel> checkStock(List<CheckStockModel> list) {
+		return null;
 	}
 	
 	private <T> Set<T> sendTianTianWarehouse(String url, String msg, Class<T> clazz){

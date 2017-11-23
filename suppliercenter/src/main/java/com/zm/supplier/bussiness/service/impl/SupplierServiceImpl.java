@@ -57,6 +57,8 @@ public class SupplierServiceImpl implements SupplierService {
 	public SupplierEntity queryById(int id) {
 		return supplierMapper.selectById(id);
 	}
+	
+	private static final Integer XINYUN_WAREHOUSE = 3;
 
 	@Override
 	public void checkOrderStatus(List<OrderIdAndSupplierId> list) {
@@ -72,7 +74,16 @@ public class SupplierServiceImpl implements SupplierService {
 			}
 		}
 		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
-			warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
+			if(XINYUN_WAREHOUSE.equals(entry.getKey())){
+				List<OrderIdAndSupplierId> temp = null;
+				for(OrderIdAndSupplierId model : entry.getValue()){
+					temp = new ArrayList<OrderIdAndSupplierId>();
+					temp.add(model);
+					warehouseThreadPool.checkOrderStatus(temp, entry.getKey());
+				}
+			}else{
+				warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
+			}
 		}
 	}
 

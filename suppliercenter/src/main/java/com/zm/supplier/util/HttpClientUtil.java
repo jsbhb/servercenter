@@ -146,6 +146,75 @@ public class HttpClientUtil {
 		}
 		return resultStr;
 	}
+	
+	/**
+	 * 默认超时为5S 发送 get请求
+	 * 
+	 * @param params
+	 * @return
+	 */
+	public static String get(String url, String param) {
+		String resultStr = "";
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+
+		HttpGet httpGet = null;
+		HttpEntity entity = null;
+		CloseableHttpResponse response = null;
+
+		try {
+
+			if (param != null && !param.isEmpty()) {
+				// 创建get请求
+				httpGet = new HttpGet(url + "&" + param);
+			} else {
+				// 创建get请求
+				httpGet = new HttpGet(url);
+			}
+
+			httpGet.setConfig(requestConfig);
+
+			logger.info("executing request uri：" + httpGet.getURI());
+
+			response = httpclient.execute(httpGet);
+
+			// 如果连接状态异常，则直接关闭
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logger.info("httpclient 访问异常 ");
+				httpGet.abort();
+				return null;
+			}
+			entity = response.getEntity();
+			if (entity != null) {
+				resultStr = EntityUtils.toString(entity, "UTF-8");
+				logger.info(" httpClient response string " + resultStr);
+			}
+
+		} catch (Exception e) {
+			httpGet.abort();
+			logger.error("http get error " + e.getMessage());
+			return null;
+			// 关闭连接,释放资源
+		} finally {
+			try {
+				if (entity != null) {
+					EntityUtils.consume(entity);// 关闭
+				}
+				if (response != null) {
+					response.close();
+				}
+				if (httpGet != null) {
+					// 关闭连接,释放资源
+					httpGet.releaseConnection();
+				}
+
+			} catch (Exception e) {
+				logger.error("http get error " + e.getMessage());
+			}
+
+		}
+		return resultStr;
+	}
 
 	public static String post(String url, String jsonStr) {
 		String resultStr = "";
