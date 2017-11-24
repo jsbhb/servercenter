@@ -34,15 +34,14 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**  
- * ClassName: HttpClientUtil <br/>  
- * Function: TODO ADD FUNCTION. <br/>   
- * date: Aug 18, 2017 4:00:11 PM <br/>  
- *  
- * @author wqy  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: HttpClientUtil <br/>
+ * Function: TODO ADD FUNCTION. <br/>
+ * date: Aug 18, 2017 4:00:11 PM <br/>
+ * 
+ * @author wqy
+ * @version
+ * @since JDK 1.7
  */
 @SuppressWarnings("deprecation")
 public class HttpClientUtil {
@@ -50,8 +49,7 @@ public class HttpClientUtil {
 	private static PoolingHttpClientConnectionManager connManager = null;
 	private static CloseableHttpClient httpsclient = null;
 	private static CloseableHttpClient httpclient = null;
-	public final static int connectTimeout = 50000;
-
+	public final static int connectTimeout = 100000;
 
 	static {
 		try {
@@ -117,6 +115,7 @@ public class HttpClientUtil {
 
 	/**
 	 * 默认超时为5S 发送 get请求
+	 * 
 	 * @fun 微信htpps请求
 	 * @param params
 	 * @return
@@ -256,7 +255,7 @@ public class HttpClientUtil {
 		}
 		return resultStr;
 	}
-	
+
 	public static String post(String url, Map<String, String> params) {
 		String resultStr = "";
 		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)

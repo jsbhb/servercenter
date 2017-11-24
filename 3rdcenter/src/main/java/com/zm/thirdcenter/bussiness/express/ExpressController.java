@@ -3,7 +3,6 @@ package com.zm.thirdcenter.bussiness.express;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,10 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.thirdcenter.cache.CacheMap;
 import com.zm.thirdcenter.constants.Constants;
-import com.zm.thirdcenter.pojo.CarrierModel;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.pojo.RoteModel;
-import com.zm.thirdcenter.utils.ExcelUtil;
 import com.zm.thirdcenter.utils.HttpClientUtil;
 import com.zm.thirdcenter.utils.JSONUtil;
 
@@ -48,6 +44,10 @@ public class ExpressController {
 				Map<String,String> carrierMap = (Map<String, String>) CacheMap.getCache().getData().get(Constants.CARRIER);
 	        	String carrierID = carrierMap.get(carrierName);//获取快递公司编码
 				String result = getOrderTracesByJson(carrierID, expressID);
+				if(result == null){
+					model.setSuccess(false);
+					return model;
+				}
 				RoteModel rote = JSONUtil.parse(result, RoteModel.class);
 				model.setObj(rote);
 				model.setSuccess(true);

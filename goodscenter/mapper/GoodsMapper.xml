@@ -286,7 +286,7 @@
 		select
 		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
+		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,g.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,
 		<if test="goodsType == 2 or goodsType == 0">
@@ -301,7 +301,8 @@
 		gs.item_id = gp.item_id left join 
 		goods_stock stock
 		on gs.item_id =
-		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id where gs.goods_id in
+		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id left join goods_price bgp on 
+		gp.base_price_id = bgp.id where gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -312,7 +313,7 @@
 		select gs.id,gi.info,gs.item_id,gs.goods_id,
 		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,gs.excise_tax,gi.weight,
 		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
+		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,
 		<if test="goodsType == 2 or goodsType == 0">
 			stock.lockedqty as qpqty,
@@ -327,7 +328,8 @@
 		gs.item_id = gp.item_id left join 
 		goods_stock stock
 		on gs.item_id =
-		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id where gs.item_id = #{itemId}
+		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id left join goods_price bgp on 
+		gp.base_price_id = bgp.id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
@@ -335,14 +337,16 @@
 		select gs.id,gi.info,gs.item_id,gs.goods_id , gc.status as specsStatus,
 		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
-		price_id,gp.min,gp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
+		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time, gs.excise_tax,gi.weight,
 		gp.delivery_place,gb.increment_tax,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
-		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id where gs.item_id in
+		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id 
+		left join goods_price bgp on 
+		gp.base_price_id = bgp.id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -487,9 +491,8 @@
 		
 		CREATE TABLE IF NOT EXISTS goods_price_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+		  base_price_id int UNSIGNED NOT NULL COMMENT '主站后台价格ID',
 		  item_id varchar(50) NOT NULL COMMENT '商品ID',
-		  min int UNSIGNED NULL DEFAULT 0 COMMENT '最小数量',
-		  max int UNSIGNED NULL COMMENT '最大数量',
 		  price decimal(10,2) NULL DEFAULT 0.0 COMMENT '价格',
 		  vip_price decimal(10,2) NULL COMMENT '会员价格',
 		  delivery_place varchar(20) NULL COMMENT '发货地',
@@ -497,6 +500,7 @@
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
+		  INDEX idx_base_price_id (base_price_id),
 		  INDEX idx_item_id (item_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '商品价格表';
 	</update>

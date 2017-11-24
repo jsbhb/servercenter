@@ -200,11 +200,21 @@ public class GoodsServiceImpl implements GoodsService {
 				discount = specs.getDiscount();
 				weight += specs.getWeight() * model.getQuantity();
 				if (taxMap.get(tax) == null) {
-					Double amount = 0.0;
-					amount = getAmount(vip, specs, model, 10.0);
+					Double amount = getAmount(vip, specs, model, 10.0);
+					if(amount == null){
+						result.setSuccess(false);
+						result.setErrorMsg("购买数量不在指定范围内");
+						return result; 
+					}
 					taxMap.put(tax, amount);
 				} else {
-					taxMap.put(tax, taxMap.get(tax) + getAmount(vip, specs, model, 10.0));
+					Double amount = getAmount(vip, specs, model, 10.0);
+					if(amount == null){
+						result.setSuccess(false);
+						result.setErrorMsg("购买数量不在指定范围内");
+						return result; 
+					}
+					taxMap.put(tax, taxMap.get(tax) + amount);
 				}
 				totalAmount += getAmount(vip, specs, model, discount);
 			}
@@ -216,7 +226,13 @@ public class GoodsServiceImpl implements GoodsService {
 				specs = goodsMapper.getGoodsSpecs(param);
 				discount = specs.getDiscount();
 				weight += specs.getWeight() * model.getQuantity();
-				totalAmount += getAmount(vip, specs, model, discount);
+				Double amount = getAmount(vip, specs, model, discount);
+				if(amount == null){
+					result.setSuccess(false);
+					result.setErrorMsg("购买数量不在指定范围内");
+					return result; 
+				}
+				totalAmount += amount;
 			}
 		}
 
@@ -273,7 +289,7 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 		if (!calculation) {
-			totalAmount += model.getQuantity() * (vip ? specs.getVipMinPrice() : specs.getMinPrice());
+			return null;
 		}
 
 		return CalculationUtils.mul(totalAmount, discount);

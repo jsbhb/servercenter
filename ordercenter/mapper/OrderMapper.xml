@@ -363,7 +363,7 @@
 	<update id="updateOrderSendToWarehouse" parameterType="Object">
 		update
 		order_base set
-		status = 3 where order_id = #{orderId} and status = 2
+		status = 3 where order_id = #{orderId} and status in (1,2)
 	</update>
 	
 	<update id="updateOrderStatusByThirdStatus" parameterType="Object">
