@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -65,7 +66,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param user
 	 * @return
 	 */
-	public abstract Set<CheckStockModel> checkStock(List<CheckStockModel> list);
+	public abstract Set<CheckStockModel> checkStock(List<OrderBussinessModel> list);
 
 	public String getAppKey() {
 		return appKey;

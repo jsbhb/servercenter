@@ -16,6 +16,7 @@ import com.zm.supplier.bussiness.component.WarehouseThreadPool;
 import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.bussiness.service.SupplierService;
 import com.zm.supplier.pojo.Express;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
@@ -85,6 +86,12 @@ public class SupplierServiceImpl implements SupplierService {
 				warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
 			}
 		}
+	}
+
+	@Override
+	public void checkStock(List<OrderBussinessModel> list, Integer supplierId) {
+		
+		warehouseThreadPool.checkStock(list, supplierId);
 	}
 
 }

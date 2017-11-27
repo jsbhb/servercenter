@@ -24,6 +24,7 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
@@ -74,7 +75,7 @@ public class GoodsController {
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID"),
 			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID"),
-			@ApiImplicitParam(paramType = "query", name = "itemId", dataType = "String", required = false, value = "itemID")})
+			@ApiImplicitParam(paramType = "query", name = "itemId", dataType = "String", required = false, value = "itemID") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId) {
 
@@ -82,7 +83,7 @@ public class GoodsController {
 
 		String goodsId = req.getParameter("goodsId");
 		String itemId = req.getParameter("itemId");
-		if(goodsId != null && itemId != null){
+		if (goodsId != null && itemId != null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数错误");
 			return result;
@@ -192,13 +193,13 @@ public class GoodsController {
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	@ApiIgnore
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, boolean delStock, boolean vip,
+			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
 			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = goodsService.getPriceAndDelStock(list, delStock, vip, centerId, orderFlag);
+			result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag);
 		}
 
 		return result;
@@ -372,14 +373,15 @@ public class GoodsController {
 	/**
 	 * @fun 库存判断
 	 */
-	@RequestMapping(value = "{version}/goods/stockjudge", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/stockjudge/{orderFlag}/{supplierId}", method = RequestMethod.POST)
 	@ApiIgnore
 	public ResultModel stockJudge(@PathVariable("version") Double version,
+			@PathVariable("supplierId") Integer supplierId, @PathVariable("orderFlag") Integer orderFlag,
 			@RequestBody List<OrderBussinessModel> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return goodsService.stockJudge(list);
+			return goodsService.stockJudge(list, orderFlag, supplierId);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -428,6 +430,18 @@ public class GoodsController {
 		}
 
 		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 根据同步到的库存更新库存信息
+	 */
+	@RequestMapping(value = "/{version}/goods/stock", method = RequestMethod.POST)
+	public boolean updateThirdWarehouseStock(@PathVariable("version") Double version, @RequestBody List<WarehouseStock> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.updateThirdWarehouseStock(list);
+		}
+		return false;
 	}
 
 }

@@ -44,7 +44,7 @@ CREATE TABLE `zm_goods`.`goods` (
   `description` VARCHAR(450) NULL COMMENT '描述',
   `origin` VARCHAR(100) NULL COMMENT '原产国',
   `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '商品状态0：初始，1：可用；2：可分销',
-  `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：大贸；1：跨境;2：一般贸易',
+  `type` tinyint UNSIGNED NOT NULL COMMENT '商品分类0：跨境；1：大贸;2：一般贸易',
   `is_popular` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否特推0：否，1是',
   `is_new` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否新品0：否，1是',
   `is_good` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否精选0：否，1是',

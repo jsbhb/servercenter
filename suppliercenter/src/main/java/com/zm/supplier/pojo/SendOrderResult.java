@@ -2,7 +2,7 @@ package com.zm.supplier.pojo;
 
 public class SendOrderResult {
 	
-	private Long uniquId;
+	private String uniquId;
 
 	private String orderId;
 	
@@ -10,11 +10,11 @@ public class SendOrderResult {
 	
 	private Integer supplierId;
 
-	public Long getUniquId() {
+	public String getUniquId() {
 		return uniquId;
 	}
 
-	public void setUniquId(Long uniquId) {
+	public void setUniquId(String uniquId) {
 		this.uniquId = uniquId;
 	}
 

@@ -1,4 +1,4 @@
-package com.zm.goods.pojo;
+package com.zm.supplier.pojo;
 
 public class OrderBussinessModel {
 

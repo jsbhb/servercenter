@@ -14,6 +14,7 @@ import com.zm.pay.pojo.ResultModel;
 @FeignClient("goodscenter")
 public interface GoodsFeignClient {
 
-	@RequestMapping(value = "{version}/goods/stockjudge", method = RequestMethod.POST)
-	public ResultModel stockJudge(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list);
+	@RequestMapping(value = "{version}/goods/stockjudge/{orderFlag}/{supplierId}", method = RequestMethod.POST)
+	public ResultModel stockJudge(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+			@PathVariable("orderFlag") Integer orderFlag, @RequestBody List<OrderBussinessModel> list);
 }

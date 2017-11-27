@@ -6,9 +6,19 @@ public class OrderBussinessModel {
 	
 	private String itemId;
 	
+	private String sku;
+	
 	private Integer quantity;
 	
 	private String deliveryPlace;
+
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
 
 	public String getOrderId() {
 		return orderId;

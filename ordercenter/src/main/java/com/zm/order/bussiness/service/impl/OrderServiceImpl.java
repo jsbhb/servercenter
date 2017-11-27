@@ -129,6 +129,7 @@ public class OrderServiceImpl implements OrderService {
 			model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
 			model.setItemId(goods.getItemId());
 			model.setQuantity(goods.getItemQuantity());
+			model.setSku(goods.getSku());
 			list.add(model);
 			detail.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
 		}
@@ -151,14 +152,9 @@ public class OrderServiceImpl implements OrderService {
 			activity = (Activity) result.getObj();
 		}
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
-		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())
-				&& !Constants.OWN_SUPPLIER.equals(info.getSupplierId())) {
-			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, false, vip, info.getCenterId(),
-					info.getOrderFlag());
-		} else {
-			result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, true, vip, info.getCenterId(),
-					info.getOrderFlag());
-		}
+		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip, info.getCenterId(),
+				info.getOrderFlag());
+		
 		if (!result.isSuccess()) {
 			return result;
 		}
@@ -212,8 +208,8 @@ public class OrderServiceImpl implements OrderService {
 							tax.getIncrementTax());
 					totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
 				} else {
-					totalIncremTax += CalculationUtils.mul(CalculationUtils.mul(CalculationUtils.add(fee, subPostFee),
-							tax.getIncrementTax()),0.7);
+					totalIncremTax += CalculationUtils.mul(
+							CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()), 0.7);
 				}
 			}
 			taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
@@ -306,7 +302,7 @@ public class OrderServiceImpl implements OrderService {
 		pagination.setTotalRows(count.longValue());
 		pagination.webListConverter();
 		List<OrderInfo> list = orderMapper.listOrderByParam(param);
-		Map<String,Object> resultMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("pagination", pagination);
 		resultMap.put("orderList", list);
 		result.setObj(resultMap);

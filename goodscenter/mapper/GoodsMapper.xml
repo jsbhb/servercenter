@@ -289,10 +289,10 @@
 		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
 		as sub_create_time,g.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,
-		<if test="goodsType == 2 or goodsType == 0">
+		<if test="goodsType == 2 or goodsType == 1">
 			stock.lockedqty as qpqty,
 		</if>
-		<if test="goodsType == 1">
+		<if test="goodsType == 0">
 			stock.fxqty as qpqty,
 		</if>
 		gp.update_time as
@@ -724,13 +724,13 @@
 			close=";" separator=";" >
 			update goods_stock
 			<set>
-<!-- 				<if test="orderFlag == 0"> -->
-					fxqty = fxqty - 1
-<!-- 				</if> -->
-<!-- 				<if test="orderFlag == 1 or orderFlag == 2"> -->
-<!-- 					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty}, -->
-<!-- 				</if> -->
-<!-- 				frozenqty = frozenqty + 1 -->
+				<if test="orderFlag == 0">
+					fxqty = fxqty - #{item.frozenqty},
+				</if>
+				<if test="orderFlag == 1 or orderFlag == 2">
+					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty},
+				</if>
+				frozenqty = frozenqty + #{item.frozenqty}
 			</set>
 			where item_id = #{item.itemId, jdbcType=VARCHAR}
 		</foreach>
@@ -780,5 +780,16 @@
 	<select id="getGoodsIdByItemId" parameterType="Object" resultType="java.lang.String">
 		select goods_id from goods_item where item_id = #{itemId}
 	</select>
+	
+	<update id="updateThirdWarehouseStock" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update goods_stock
+			<set>
+				fxqty = #{item.quantity},
+			</set>
+			where item_id = #{item.itemId}
+		</foreach>
+	</update>
 
 </mapper>

@@ -16,6 +16,7 @@ import com.zm.supplier.bussiness.service.SupplierService;
 import com.zm.supplier.common.Pagination;
 import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
@@ -101,8 +102,18 @@ public class SupplierController {
 			@RequestBody List<OrderIdAndSupplierId> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			supplierService.checkOrderStatus(list);
+		}
+	}
+
+	@RequestMapping(value = "{version}/supplier/checkStock/{supplierId}", method = RequestMethod.POST)
+	public void checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+			@RequestBody List<OrderBussinessModel> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			supplierService.checkStock(list ,supplierId);
 		}
 	}
 }

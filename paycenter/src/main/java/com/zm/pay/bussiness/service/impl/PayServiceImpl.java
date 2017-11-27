@@ -57,7 +57,7 @@ public class PayServiceImpl implements PayService {
 
 	@Resource
 	RedisTemplate<String, ?> redisTemplate;
-	
+
 	@Resource
 	GoodsFeignClient goodsFeignClient;
 
@@ -122,16 +122,16 @@ public class PayServiceImpl implements PayService {
 	}
 
 	@Override
-	public Map<String,Object> aliPay(Integer clientId, String type, PayModel model) throws Exception {
+	public Map<String, Object> aliPay(Integer clientId, String type, PayModel model) throws Exception {
 		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
 		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝支付" + type + "，后台请求成功";
-		Map<String,Object> result = new HashMap<String, Object>();
-		
+		Map<String, Object> result = new HashMap<String, Object>();
+
 		if (Constants.SCAN_CODE.equals(type)) {
 			AlipayTradePrecreateResponse response = AliPayUtils.precreate(config, model);
-			if (response.isSuccess()){
+			if (response.isSuccess()) {
 				logFeignClient.saveLog(Constants.FIRST_VERSION,
 						CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝支付", clientId, content, ""));
 				result.put("success", true);
@@ -144,7 +144,7 @@ public class PayServiceImpl implements PayService {
 				result.put("errorSubMsg", response.getSubMsg());
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -226,21 +226,23 @@ public class PayServiceImpl implements PayService {
 			orderFeignClient.closeOrder(version, orderId);
 			throw new RuntimeException("该订单已经超时关闭");
 		}
-		
-		//如果是跨境第三方仓库的，需要同步库存并判断库存
-		if(O2O_ORDER.equals(info.getOrderFlag()) && !OWN_SUPPLIER.equals(info.getSupplierId())){
+
+		// 如果是跨境第三方仓库的，需要同步库存并判断库存
+		if (O2O_ORDER.equals(info.getOrderFlag()) && !OWN_SUPPLIER.equals(info.getSupplierId())) {
 			OrderBussinessModel model = null;
 			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
-			for(OrderGoods goods : info.getOrderGoodsList()){
+			for (OrderGoods goods : info.getOrderGoodsList()) {
 				model = new OrderBussinessModel();
 				model.setItemId(goods.getItemId());
 				model.setQuantity(goods.getItemQuantity());
 				model.setOrderId(info.getOrderId());
+				model.setSku(goods.getSku());
 				model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
 				list.add(model);
 			}
-			ResultModel result = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, list);
-			if(result == null || !result.isSuccess()){
+			ResultModel result = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getOrderFlag(),
+					info.getSupplierId(), list);
+			if (result == null || !result.isSuccess()) {
 				return result;
 			}
 		}

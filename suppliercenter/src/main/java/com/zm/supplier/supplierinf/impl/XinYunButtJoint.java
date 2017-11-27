@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -33,9 +34,9 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 	}
 
 	@Override
-	public Set<CheckStockModel> checkStock(List<CheckStockModel> list) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
+		String msg = ButtJointMessageUtils.getXinYunStock(list, appKey, appSecret);
+		return sendXinYunWarehouse(url, msg, CheckStockModel.class);
 	}
 	
 	private <T> Set<T> sendXinYunWarehouse(String url, String msg, Class<T> clazz){
@@ -58,7 +59,7 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 		joint.setAppKey("75041628");
 		joint.setAppSecret("1BG847AC10007300A8C000000F634ED6");
 //		OrderInfo info = new OrderInfo();
-//		info.setOrderId("GX10010012121102");
+//		info.setOrderId("GX10010012121104");
 //		info.setRemark("测试");
 //		OrderDetail detail = new OrderDetail();
 //		detail.setReceiveProvince("山东");
@@ -69,11 +70,11 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 //		detail.setReceiveZipCode("273100");
 //		List<OrderGoods> list = new ArrayList<OrderGoods>();
 //		OrderGoods goods = new OrderGoods();
-//		goods.setItemCode("MBS07866-B");
+//		goods.setSku("MBS07866-B");
 //		goods.setItemQuantity(2);
 //		list.add(goods);
 //		goods = new OrderGoods();
-//		goods.setItemCode("MBS04487-B");
+//		goods.setSku("MBS04487-B");
 //		goods.setItemQuantity(5);
 //		list.add(goods);
 //		info.setOrderDetail(detail);
@@ -84,9 +85,21 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 //		d.setName("李政");
 //		user.setUserDetail(d);
 //		System.out.println(joint.sendOrder(info, user));
-		List<String> list = new ArrayList<String>();
-		list.add("OA35114226249246197");
-		System.out.println(joint.checkOrderStatus(list));
+		//查询订单状态
+//		List<String> list = new ArrayList<String>();
+//		list.add("OA35114226249246197");
+//		System.out.println(joint.checkOrderStatus(list));
+		//查询库存
+		OrderBussinessModel model = new OrderBussinessModel();
+		model.setSku("MBS07866-B");
+		model.setItemId("c00083");
+		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+		list.add(model);
+		model = new OrderBussinessModel();
+		model.setSku("MBS04487-B");
+		model.setItemId("c00084");
+		list.add(model);
+		System.out.println(joint.checkStock(list));
 	}
 
 }

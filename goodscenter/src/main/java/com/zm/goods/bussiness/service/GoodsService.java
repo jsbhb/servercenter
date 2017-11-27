@@ -10,6 +10,7 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
@@ -67,7 +68,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip, Integer centerId,
+	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip, Integer centerId,
 			Integer orderFlag);
 
 	/**
@@ -219,6 +220,11 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ResultModel stockJudge(List<OrderBussinessModel> list);
+	ResultModel stockJudge(List<OrderBussinessModel> list, Integer orderFlag, Integer supplierId);
+
+	/**
+	 * @fun 根据同步到的库存更新库存信息
+	 */
+	boolean updateThirdWarehouseStock(List<WarehouseStock> list);
 
 }

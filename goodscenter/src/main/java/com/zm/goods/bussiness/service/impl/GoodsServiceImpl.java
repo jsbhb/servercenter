@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsFile;
@@ -27,6 +28,7 @@ import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.Tax;
+import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
@@ -58,14 +60,17 @@ public class GoodsServiceImpl implements GoodsService {
 	@Resource
 	ProcessWarehouse processWarehouse;
 
+	@Resource
+	SupplierFeignClient supplierFeignClient;
+
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param) {
 
-		if(param.get("itemId") != null){
-			String goodsId = goodsMapper.getGoodsIdByItemId((String)param.get("itemId"));
+		if (param.get("itemId") != null) {
+			String goodsId = goodsMapper.getGoodsIdByItemId((String) param.get("itemId"));
 			param.put("goodsId", goodsId);
 		}
-		
+
 		List<GoodsItem> goodsList = goodsMapper.listGoods(param);
 
 		List<String> idList = new ArrayList<String>();
@@ -177,7 +182,7 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, boolean delStock, boolean vip,
+	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
 			Integer centerId, Integer orderFlag) {
 
 		ResultModel result = new ResultModel();
@@ -201,18 +206,18 @@ public class GoodsServiceImpl implements GoodsService {
 				weight += specs.getWeight() * model.getQuantity();
 				if (taxMap.get(tax) == null) {
 					Double amount = getAmount(vip, specs, model, 10.0);
-					if(amount == null){
+					if (amount == null) {
 						result.setSuccess(false);
 						result.setErrorMsg("购买数量不在指定范围内");
-						return result; 
+						return result;
 					}
 					taxMap.put(tax, amount);
 				} else {
 					Double amount = getAmount(vip, specs, model, 10.0);
-					if(amount == null){
+					if (amount == null) {
 						result.setSuccess(false);
 						result.setErrorMsg("购买数量不在指定范围内");
-						return result; 
+						return result;
 					}
 					taxMap.put(tax, taxMap.get(tax) + amount);
 				}
@@ -227,30 +232,25 @@ public class GoodsServiceImpl implements GoodsService {
 				discount = specs.getDiscount();
 				weight += specs.getWeight() * model.getQuantity();
 				Double amount = getAmount(vip, specs, model, discount);
-				if(amount == null){
+				if (amount == null) {
 					result.setSuccess(false);
 					result.setErrorMsg("购买数量不在指定范围内");
-					return result; 
+					return result;
 				}
 				totalAmount += amount;
 			}
 		}
 
-		if (delStock) {
-			boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-			if (!enough) {
-				result.setSuccess(false);
-				result.setErrorMsg("库存不足");
-				return result;
-			}
-		} else {
-			// TODO 调用第三方库存接口，更新库存数据
-			boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-			if (!enough) {
-				result.setSuccess(false);
-				result.setErrorMsg("库存不足");
-				return result;
-			}
+		
+		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
+			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
+		}
+
+		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
+		if (!enough) {
+			result.setSuccess(false);
+			result.setErrorMsg("库存不足");
+			return result;
 		}
 
 		map.put("weight", weight);
@@ -731,7 +731,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
 		String id = judgeCenterId(centerId);
-		;
+		
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", id);
 		param.put("type", type);
@@ -739,9 +739,19 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public ResultModel stockJudge(List<OrderBussinessModel> list) {
-		// TODO 调用第三方接口，更新库存、冻结库存，判断库存
-		return null;
+	public ResultModel stockJudge(List<OrderBussinessModel> list, Integer orderFlag, Integer supplierId) {
+		supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
+		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
+		if (!enough) {
+			return new ResultModel(false, "库存不足");
+		}
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public boolean updateThirdWarehouseStock(List<WarehouseStock> list) {
+		goodsMapper.updateThirdWarehouseStock(list);
+		return true;
 	}
 
 }

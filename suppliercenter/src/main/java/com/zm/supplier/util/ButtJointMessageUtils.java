@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.model.LianYouOrder;
 import com.zm.supplier.supplierinf.model.OutOrderGoods;
+import com.zm.supplier.supplierinf.model.XinYunCheckStock;
 import com.zm.supplier.supplierinf.model.XinYunGetOrderStatus;
 import com.zm.supplier.supplierinf.model.XinYunGoods;
 import com.zm.supplier.supplierinf.model.XinYunOrder;
@@ -250,7 +252,7 @@ public class ButtJointMessageUtils {
 
 		return JSONUtil.toJson(order);
 	}
-	
+
 	public static String getXinYunOrderStatusMsg(String orderId, String appKey, String secret) {
 		XinYunGetOrderStatus orderStatus = new XinYunGetOrderStatus();
 		orderStatus.setMerchant_id(appKey);
@@ -258,5 +260,21 @@ public class ButtJointMessageUtils {
 		String sign = SignUtil.XinYunSing(JSONUtil.toJson(orderStatus), secret);
 		orderStatus.setSign(sign);
 		return JSONUtil.toJson(orderStatus);
+	}
+
+	public static String getXinYunStock(List<OrderBussinessModel> list, String appKey, String secret) {
+		StringBuilder sb = new StringBuilder();
+		for (OrderBussinessModel model : list) {
+			sb.append(model.getSku() + ",");
+		}
+		XinYunCheckStock checkStock = new XinYunCheckStock();
+		checkStock.setMerchant_id(appKey);
+		checkStock.setSku_list(sb.toString().substring(0, sb.length() - 1));
+		
+		String sign = SignUtil.XinYunSing(JSONUtil.toJson(checkStock), secret);
+		checkStock.setSign(sign);
+		
+		return JSONUtil.toJson(checkStock);
+
 	}
 }

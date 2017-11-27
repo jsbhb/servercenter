@@ -11,6 +11,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -44,7 +45,7 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 	}
 	
 	@Override
-	public Set<CheckStockModel> checkStock(List<CheckStockModel> list) {
+	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
 		return null;
 	}
 	

@@ -15,6 +15,7 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.Tax;
+import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
@@ -100,5 +101,7 @@ public interface GoodsMapper {
 	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
 
 	String getGoodsIdByItemId(String itemId);
+
+	void updateThirdWarehouseStock(List<WarehouseStock> list);
 	
 }

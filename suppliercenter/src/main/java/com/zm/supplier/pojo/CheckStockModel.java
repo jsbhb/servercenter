@@ -2,7 +2,7 @@ package com.zm.supplier.pojo;
 
 public class CheckStockModel {
 	
-	private Long unionId;
+	private String uniquId;
 
 	private String itemId;
 	
@@ -10,14 +10,14 @@ public class CheckStockModel {
 	
 	private String itemCode;
 	
-	private Integer quantity;
+	private String quantity;
 
-	public Long getUnionId() {
-		return unionId;
+	public String getUniquId() {
+		return uniquId;
 	}
 
-	public void setUnionId(Long unionId) {
-		this.unionId = unionId;
+	public void setUniquId(String uniquId) {
+		this.uniquId = uniquId;
 	}
 
 	public String getItemCode() {
@@ -44,11 +44,11 @@ public class CheckStockModel {
 		this.itemId = itemId;
 	}
 
-	public Integer getQuantity() {
+	public String getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Integer quantity) {
+	public void setQuantity(String quantity) {
 		this.quantity = quantity;
 	}
 
@@ -93,6 +93,12 @@ public class CheckStockModel {
 		} else if (!sku.equals(other.sku))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "CheckStockModel [uniquId=" + uniquId + ", itemId=" + itemId + ", sku=" + sku + ", itemCode=" + itemCode
+				+ ", quantity=" + quantity + "]";
 	}
 	
 }

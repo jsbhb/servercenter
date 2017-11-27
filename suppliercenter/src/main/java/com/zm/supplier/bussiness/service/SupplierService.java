@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.pagehelper.Page;
 import com.zm.supplier.pojo.Express;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
@@ -52,4 +53,14 @@ public interface SupplierService {
 	 * @since JDK 1.7  
 	 */
 	void checkOrderStatus(List<OrderIdAndSupplierId> list);
+
+	/**  
+	 * checkStock:获取第三方库存. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param id
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	void checkStock(List<OrderBussinessModel> list, Integer supplierId);
 }

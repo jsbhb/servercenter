@@ -17,7 +17,7 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version,
-			@RequestBody List<OrderBussinessModel> list, @RequestParam("delStock") boolean delStock,
+			@RequestBody List<OrderBussinessModel> list, @RequestParam("supplierId") Integer supplierId,
 			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
 			@RequestParam("orderFlag") Integer orderFlag);
 

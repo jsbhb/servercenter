@@ -13,8 +13,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.feignclient.GoodsFeignClient;
 import com.zm.supplier.feignclient.OrderFeignClient;
 import com.zm.supplier.feignclient.UserFeignClient;
+import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
@@ -22,6 +25,7 @@ import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.pojo.ThirdOrderInfo;
 import com.zm.supplier.pojo.UserInfo;
+import com.zm.supplier.pojo.WarehouseStock;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ExpressContrast;
 import com.zm.supplier.util.SpringContextUtil;
@@ -39,6 +43,9 @@ public class WarehouseThreadPool {
 
 	@Resource
 	OrderFeignClient orderFeignClient;
+	
+	@Resource
+	GoodsFeignClient goodsFeignClient;
 
 	Logger logger = LoggerFactory.getLogger(WarehouseThreadPool.class);
 
@@ -97,6 +104,41 @@ public class WarehouseThreadPool {
 			logger.error(e.getMessage());
 		}
 
+	}
+	
+	public void checkStock(List<OrderBussinessModel> list, Integer supplierId){
+		try {
+			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
+			if (buttJoint == null) {
+				return;
+			}
+			Set<CheckStockModel> set = buttJoint.checkStock(list);
+			//将ItemId赋值到返回的checkStockModel里面
+			for(OrderBussinessModel model : list){
+				for(CheckStockModel tem : set){
+					if(model.getSku().equals(tem.getSku())){
+						tem.setItemId(model.getItemId());
+					}
+				}
+			}
+			List<WarehouseStock> stockList = new ArrayList<WarehouseStock>();
+			WarehouseStock stock = null;
+			for(CheckStockModel tem : set){
+				stock = toWarehouseStock(tem);
+				stockList.add(stock);
+			}
+			goodsFeignClient.updateThirdWarehouseStock(Constants.FIRST_VERSION, stockList);
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	private WarehouseStock toWarehouseStock(CheckStockModel tem) {
+		WarehouseStock stock = new WarehouseStock();
+		stock.setItemId(tem.getItemId());
+		stock.setQuantity(Integer.valueOf(tem.getQuantity()));
+		return stock;
 	}
 
 	private ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderDetail;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
@@ -49,7 +50,7 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 	}
 	
 	@Override
-	public Set<CheckStockModel> checkStock(List<CheckStockModel> list) {
+	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
 		// TODO Auto-generated method stub
 		return null;
 	}
