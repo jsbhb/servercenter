@@ -517,7 +517,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void timeTaskcloseOrder() {
-		String time = DateUtils.getTime(Calendar.MINUTE, -5);
+		String time = DateUtils.getTime(Calendar.DATE, -1);
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
 		for (String orderId : orderIdList) {
 			closeOrder(DEFAULT_USER_ID, orderId);

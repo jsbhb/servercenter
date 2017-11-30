@@ -34,7 +34,7 @@ public class SignUtil {
 	@SuppressWarnings("unchecked")
 	public static String XinYunSing(String msg, String appSecret) {
 		Map<String, Object> params = JSONUtil.parse(msg, Map.class);
-		if(params.get("items") != null){
+		if (params.get("items") != null) {
 			String items = params.get("items").toString();
 			items = items.replace("=", ":").replace(" ", "");
 			params.put("items", items);
@@ -81,6 +81,11 @@ public class SignUtil {
 		}
 
 		return sb.toString();
+	}
+
+	public static String fuBangSign(String msg, String appSecret) {
+		String toSignStr = appSecret + msg;
+		return DigestUtils.md5Hex(toSignStr);
 	}
 
 }

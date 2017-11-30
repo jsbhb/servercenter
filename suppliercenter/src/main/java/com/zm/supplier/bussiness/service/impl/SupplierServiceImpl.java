@@ -60,6 +60,7 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 	
 	private static final Integer XINYUN_WAREHOUSE = 3;
+	private static final Integer FUBANG_WAREHOUSE = 4;
 
 	@Override
 	public void checkOrderStatus(List<OrderIdAndSupplierId> list) {
@@ -75,7 +76,7 @@ public class SupplierServiceImpl implements SupplierService {
 			}
 		}
 		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
-			if(XINYUN_WAREHOUSE.equals(entry.getKey())){
+			if(XINYUN_WAREHOUSE.equals(entry.getKey()) ||FUBANG_WAREHOUSE.equals(entry.getKey())){
 				List<OrderIdAndSupplierId> temp = null;
 				for(OrderIdAndSupplierId model : entry.getValue()){
 					temp = new ArrayList<OrderIdAndSupplierId>();
@@ -90,8 +91,16 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Override
 	public void checkStock(List<OrderBussinessModel> list, Integer supplierId) {
-		
-		warehouseThreadPool.checkStock(list, supplierId);
+		if(FUBANG_WAREHOUSE.equals(supplierId)){
+			List<OrderBussinessModel> temp = null;
+			for(OrderBussinessModel model : list){
+				temp = new ArrayList<OrderBussinessModel>();
+				temp.add(model);
+				warehouseThreadPool.checkStock(temp, supplierId);
+			}
+		} else {
+			warehouseThreadPool.checkStock(list, supplierId);
+		}
 	}
 
 }

@@ -82,8 +82,10 @@ public class XmlUtil {
 		if (flag) {
 			Object obj = clazz.newInstance();
 			Method method = clazz.getMethod("setUniquId", String.class);
-			method.invoke(obj, UUID.randomUUID().toString().replaceAll("-", ""));
+			String uniquId = UUID.randomUUID().toString().replaceAll("-", "");
+			method.invoke(obj, uniquId);
 			Map<String, Object> map = new HashMap<String, Object>();
+			map.put(uniquId, obj);
 			parseNode(root, clazz, confMap, map, obj);
 			Set set = new HashSet();
 			for (Map.Entry<String, Object> entry : map.entrySet()) {

@@ -30,11 +30,11 @@ import com.zm.supplier.util.SignUtil;
 
 public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 
-	private final String URL = "http://www.cnbuyers.cn/index.php?app=webService";
+	private static String URL = "http://www.cnbuyers.cn/index.php?app=webService";
 
-	private final String NEED_APP_ID_URL = URL + "&act={action}&app_id={appKey}&v=2.0&format=xml";
+	private static String NEED_APP_ID_URL = URL + "&act={action}&app_id={appKey}&v=2.0&format=xml";
 
-	private final String NEED_ACCESS_TOKEN_URL = URL + "&act={action}&access_token={token}&v=2.0&format=json";
+	private static String NEED_ACCESS_TOKEN_URL = URL + "&act={action}&access_token={token}&v=2.0&format=json";
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {

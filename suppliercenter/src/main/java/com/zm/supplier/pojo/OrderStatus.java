@@ -18,6 +18,36 @@ public class OrderStatus {
 	
 	private Integer supplierId;
 	
+	private String logisticsName;
+	
+	private String check_flg;
+	
+	private String msg;
+	
+	public String getMsg() {
+		return msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+
+	public String getCheck_flg() {
+		return check_flg;
+	}
+
+	public void setCheck_flg(String check_flg) {
+		this.check_flg = check_flg;
+	}
+
+	public String getLogisticsName() {
+		return logisticsName;
+	}
+
+	public void setLogisticsName(String logisticsName) {
+		this.logisticsName = logisticsName;
+	}
+
 	public String getUniquId() {
 		return uniquId;
 	}
@@ -145,9 +175,10 @@ public class OrderStatus {
 
 	@Override
 	public String toString() {
-		return "OrderStatus [orderId=" + orderId + ", thirdOrderId=" + thirdOrderId + ", status=" + status
-				+ ", packageweight=" + packageweight + ", logisticsCode=" + logisticsCode + ", expressId=" + expressId
-				+ ", supplierId=" + supplierId + "]";
+		return "OrderStatus [uniquId=" + uniquId + ", orderId=" + orderId + ", thirdOrderId=" + thirdOrderId
+				+ ", status=" + status + ", packageweight=" + packageweight + ", logisticsCode=" + logisticsCode
+				+ ", expressId=" + expressId + ", supplierId=" + supplierId + ", logisticsName=" + logisticsName
+				+ ", check_flg=" + check_flg + ", msg=" + msg + "]";
 	}
 
 }

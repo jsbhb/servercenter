@@ -9,6 +9,8 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
+import com.zm.supplier.supplierinf.model.FuBangOrder;
+import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.LianYouOrder;
 import com.zm.supplier.supplierinf.model.OutOrderGoods;
 import com.zm.supplier.supplierinf.model.XinYunCheckStock;
@@ -276,5 +278,40 @@ public class ButtJointMessageUtils {
 		
 		return JSONUtil.toJson(checkStock);
 
+	}
+
+	public static String getFuBangOrderMsg(OrderInfo info, UserInfo user) {
+		FuBangOrder order = new FuBangOrder();
+		order.setCity(info.getOrderDetail().getReceiveCity());
+		order.setConsignee(info.getOrderDetail().getReceiveName());
+		order.setConsignee_addr(info.getOrderDetail().getReceiveAddress());
+		order.setConsignee_mobile(info.getOrderDetail().getReceivePhone());
+		order.setDistrict(info.getOrderDetail().getReceiveArea());
+		order.setOrder_no(info.getOrderId());
+		order.setProvince(info.getOrderDetail().getReceiveProvince());
+		order.setName(user.getUserDetail().getName());
+		order.setId_num(user.getUserDetail().getIdNum());
+		order.setLogistics_name("中通速递");
+		FuBangOrderGoods goods = null;
+		List<FuBangOrderGoods> list = new ArrayList<FuBangOrderGoods>();
+		for(OrderGoods temGoods : info.getOrderGoodsList()){
+			goods = new FuBangOrderGoods();
+			goods.setProduct_no(temGoods.getSku());
+			goods.setQty(temGoods.getItemQuantity());
+			list.add(goods);
+		}
+		order.setGoods(list);
+		
+		return JSONUtil.toJson(order);
+	}
+
+	public static String getFuBangOrderStatusMsg(List<String> orderIds) {
+		
+		return "{\"order_no\":"+orderIds.get(0)+"}";
+	}
+
+	public static String getFuBangStock(List<OrderBussinessModel> list) {
+		
+		return "{\"product_no\":"+list.get(0).getSku()+"}";
 	}
 }

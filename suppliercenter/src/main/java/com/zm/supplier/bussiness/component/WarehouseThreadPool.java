@@ -43,7 +43,7 @@ public class WarehouseThreadPool {
 
 	@Resource
 	OrderFeignClient orderFeignClient;
-	
+
 	@Resource
 	GoodsFeignClient goodsFeignClient;
 
@@ -63,6 +63,9 @@ public class WarehouseThreadPool {
 		for (SendOrderResult model : set) {
 			model.setSupplierId(info.getSupplierId());
 			model.setOrderId(info.getOrderId());
+			if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+				model.setThirdOrderId(info.getOrderId());
+			}
 		}
 		boolean flag = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);
 		if (flag) {
@@ -84,14 +87,19 @@ public class WarehouseThreadPool {
 				orderIds.add(model.getThirdOrderId());
 			}
 			Set<OrderStatus> set = buttJoint.checkOrderStatus(orderIds);
+			//设置本地订单号和供应商Id,如果没有第三方订单号则以本地订单号当第三方订单号
 			for (OrderStatus orderStatus : set) {
 				for (OrderIdAndSupplierId model : orderList) {
 					if (orderStatus.getThirdOrderId().equals(model.getThirdOrderId())) {
 						orderStatus.setOrderId(model.getOrderId());
 						orderStatus.setSupplierId(supplierId);
+						if(orderStatus.getThirdOrderId() == null){
+							orderStatus.setThirdOrderId(model.getOrderId());
+						}
 					}
 				}
 			}
+			//end
 			List<ThirdOrderInfo> list = new ArrayList<ThirdOrderInfo>();
 			ThirdOrderInfo thirdOrder = null;
 			for (OrderStatus orderStatus : set) {
@@ -105,30 +113,30 @@ public class WarehouseThreadPool {
 		}
 
 	}
-	
-	public void checkStock(List<OrderBussinessModel> list, Integer supplierId){
+
+	public void checkStock(List<OrderBussinessModel> list, Integer supplierId) {
 		try {
 			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
 			if (buttJoint == null) {
 				return;
 			}
 			Set<CheckStockModel> set = buttJoint.checkStock(list);
-			//将ItemId赋值到返回的checkStockModel里面
-			for(OrderBussinessModel model : list){
-				for(CheckStockModel tem : set){
-					if(model.getSku().equals(tem.getSku())){
+			// 将ItemId赋值到返回的checkStockModel里面
+			for (OrderBussinessModel model : list) {
+				for (CheckStockModel tem : set) {
+					if (model.getSku().equals(tem.getSku())) {
 						tem.setItemId(model.getItemId());
 					}
 				}
 			}
 			List<WarehouseStock> stockList = new ArrayList<WarehouseStock>();
 			WarehouseStock stock = null;
-			for(CheckStockModel tem : set){
+			for (CheckStockModel tem : set) {
 				stock = toWarehouseStock(tem);
 				stockList.add(stock);
 			}
 			goodsFeignClient.updateThirdWarehouseStock(Constants.FIRST_VERSION, stockList);
-			
+
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -145,10 +153,15 @@ public class WarehouseThreadPool {
 		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
 		thirdOrder.setExpressId(orderStatus.getExpressId());
 		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
-		thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
-		String CNStatus = StatusTOChiness.get(orderStatus.getSupplierId() + orderStatus.getStatus());
+		if (orderStatus.getLogisticsCode() == null) {
+			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsName()));
+		} else {
+			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
+		}
+		thirdOrder.setRemark(orderStatus.getMsg());
+		String CNStatus = StatusTOChiness.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus());
 		thirdOrder.setStatus(CNStatus == null ? orderStatus.getStatus() : CNStatus);
-		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + orderStatus.getStatus()));
+		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus()));
 		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
 		thirdOrder.setOrderId(orderStatus.getOrderId());
 		return thirdOrder;

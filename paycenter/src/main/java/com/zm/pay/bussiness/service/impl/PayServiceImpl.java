@@ -240,8 +240,8 @@ public class PayServiceImpl implements PayService {
 				model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
 				list.add(model);
 			}
-			ResultModel result = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getOrderFlag(),
-					info.getSupplierId(), list);
+			ResultModel result = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getSupplierId(),
+					info.getOrderFlag(), list);
 			if (result == null || !result.isSuccess()) {
 				return result;
 			}

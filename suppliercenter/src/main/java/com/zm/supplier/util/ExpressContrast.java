@@ -18,6 +18,19 @@ public class ExpressContrast {
 			put("BEST", "百世快递");
 			put("YUNDA", "韵达快递");
 			put("TTKDEX", "天天快递");
+			put("zhongtong", "中通速递");
+			put("yunda", "韵达快递");
+			put("shentong", "申通快递");
+			put("ems", "EMS");
+			put("yuantong", "圆通速递");
+			put("tiantian", "天天快递");
+			put("zhaijisong", "宅急送");
+			put("youzhengguonei", "邮政平邮/小包");
+			put("debangwuliu", "德邦");
+			put("annengwuliu", "安能物流");
+			put("顺丰速运", "顺丰快递");
+			put("邮政速递", "EMS");
+			put("中通速递", "中通速递");
 		}
 	};
 
