@@ -514,5 +514,16 @@ public class UserController {
 
 		return null;
 	}
+	
+	@RequestMapping(value = "{version}/grade/{id}", method = RequestMethod.GET)
+	public ResultModel getGradeNameByParentId(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, userService.listGradeByParentId(id));
+		}
+
+		return null;
+	}
 
 }

@@ -196,4 +196,6 @@ public interface UserService {
 	 * @since JDK 1.7
 	 */
 	UserInfo getUserIdentityId(Integer userId);
+
+	List<Grade> listGradeByParentId(Integer parentId);
 }

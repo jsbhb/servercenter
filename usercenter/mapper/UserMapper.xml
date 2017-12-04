@@ -380,5 +380,9 @@
 		user_detail ud on u.id = ud.user_id
 		where u.id = #{userId}
 	</select>
+	
+	<select id="listGradeByParentId" parameterType="Object" resultMap="grade">
+		select id, grade_name from grade where parent_id = #{id}
+	</select>
 
 </mapper>

@@ -78,4 +78,6 @@ public interface UserMapper {
 	void updatePersonInChargeId(Grade grade);
 
 	UserInfo getUserIdentityId(Integer userId);
+
+	List<Grade> listGradeByParentId(Integer id);
 }

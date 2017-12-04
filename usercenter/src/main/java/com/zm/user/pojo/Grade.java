@@ -1,5 +1,7 @@
 package com.zm.user.pojo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.zm.user.common.Pagination;
 
 /**
@@ -7,6 +9,7 @@ import com.zm.user.common.Pagination;
  * @author user
  *
  */
+@JsonInclude(Include.NON_NULL)
 public class Grade extends Pagination{
 
 	private Integer id;

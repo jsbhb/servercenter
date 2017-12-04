@@ -400,4 +400,9 @@ public class UserServiceImpl implements UserService {
 		return userMapper.getUserIdentityId(userId);
 	}
 
+	@Override
+	public List<Grade> listGradeByParentId(Integer id) {
+		return userMapper.listGradeByParentId(id);
+	}
+
 }
