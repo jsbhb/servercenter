@@ -479,4 +479,8 @@
 		</foreach>
 	</update>
 	
+	<select id="countShoppingCartQuantity" parameterType="Object" resultType="java.lang.Integer">
+		select item_quantity from order_shopping_cart where center_id = #{centerId} and user_id=#{userId} and item_id=#{itemId}
+	</select>
+	
 </mapper>

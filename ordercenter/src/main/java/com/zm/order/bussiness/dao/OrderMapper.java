@@ -98,4 +98,6 @@ public interface OrderMapper {
 	void updateOrderStatusByThirdStatus(ThirdOrderInfo thirdOrderInfo);
 	
 	Integer queryCountOrderInfo(Map<String,Object> param);
+
+	Integer countShoppingCartQuantity(Map<String, Object> param);
 }

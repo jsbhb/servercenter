@@ -608,4 +608,10 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.updateThirdOrderInfo(list);
 		orderMapper.updateOrderStatusByThirdStatus(list.get(0));
 	}
+
+	@Override
+	public Integer countShoppingCartQuantity(Map<String, Object> param) {
+		
+		return orderMapper.countShoppingCartQuantity(param);
+	}
 }

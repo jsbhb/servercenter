@@ -293,4 +293,14 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list);
+
+	/**
+	 * countShoppingCartQuantity:根据itemID和centerId获取itemID购物车内数量. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Integer countShoppingCartQuantity(Map<String, Object> param);
 }

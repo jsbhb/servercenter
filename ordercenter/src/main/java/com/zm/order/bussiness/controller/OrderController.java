@@ -341,6 +341,31 @@ public class OrderController {
 		return result;
 
 	}
+	
+	@RequestMapping(value = "{version}/order/shoping-cart/quantity/{centerId}/{userId}/{itemId}", method = RequestMethod.GET)
+	@ApiOperation(value = "根据itemId获取购物车内商品数量接口", response = ResultModel.class)
+	@ApiImplicitParams({
+			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
+			@ApiImplicitParam(paramType = "path", name = "itemId", dataType = "String", required = true, value = "itemID"),
+			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+	public ResultModel getShopCartQuantityByItemId(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("itemId") String itemId,
+			@PathVariable("centerId") Integer centerId) {
+
+		ResultModel result = new ResultModel();
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("userId", userId);
+			param.put("itemId", itemId);
+			param.put("centerId", centerId);
+			Integer count = orderService.countShoppingCartQuantity(param);
+			result.setSuccess(true);
+			result.setObj(count);
+		}
+		return result;
+
+	}
 
 	@RequestMapping(value = "{version}/order/pay/{orderId}", method = RequestMethod.GET)
 	@ApiIgnore
