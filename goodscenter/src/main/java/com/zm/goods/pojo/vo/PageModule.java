@@ -3,11 +3,14 @@ package com.zm.goods.pojo.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.ActivityData;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.PopularizeDict;
 
+@JsonInclude(Include.NON_NULL)
 public class PageModule {
 
 	private Integer layoutId;

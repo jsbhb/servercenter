@@ -640,7 +640,7 @@ public class GoodsServiceImpl implements GoodsService {
 					// }
 					model.setSpecsInfo(specsSet);
 					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
-						Double discount = specs.getDiscount() == null ? 10.0 : specs.getDiscount();
+						Double discount = (specs.getDiscount() == null || specs.getDiscount() == 0) ? 10.0 : specs.getDiscount();
 						discount = CalculationUtils.div(discount, 10.0);
 						model.setPrice(specs.getPriceList().get(0).getPrice());
 						model.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));

@@ -15,6 +15,8 @@ public class DictData {
 	private String goodsId;
 
 	private String specs;
+	
+	private String origin;
 
 	private String description;
 
@@ -25,6 +27,14 @@ public class DictData {
 	private String updateTime;
 
 	private String opt;
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
 
 	public Integer getId() {
 		return id;

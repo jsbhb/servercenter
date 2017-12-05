@@ -1,8 +1,11 @@
 package com.zm.goods.pojo.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.zm.goods.pojo.ActivityData;
 import com.zm.goods.pojo.DictData;
 
+@JsonInclude(Include.NON_NULL)
 public class ModuleData {
 
 	private String title;
@@ -17,6 +20,8 @@ public class ModuleData {
 	
 	private Double price;
 	
+	private String origin;
+	
 	private String description;
 
 	public ModuleData(DictData data){
@@ -27,6 +32,7 @@ public class ModuleData {
 		this.price = data.getPrice();
 		this.specs = data.getSpecs();
 		this.goodsId = data.getGoodsId();
+		this.origin = data.getOrigin();
 	}
 	
 	public ModuleData(ActivityData data){
@@ -36,6 +42,14 @@ public class ModuleData {
 		this.goodsId = data.getGoodsId();
 	}
 	
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
 	public String getTitle() {
 		return title;
 	}

@@ -558,6 +558,7 @@
 		  picPath VARCHAR(300) NULL COMMENT '图片地址',
 		  title VARCHAR(50) NULL COMMENT '名称',
 		  specs VARCHAR(50) NULL COMMENT '规格',
+		  origin VARCHAR(100) NULL COMMENT '原产国',
 		  description VARCHAR(450) NULL COMMENT '描述',
 		  price DECIMAL(10,2) NULL COMMENT '商品价格',
 		  goodsId  int UNSIGNED NULL COMMENT '商品ID',

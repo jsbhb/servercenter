@@ -295,6 +295,7 @@ CREATE TABLE `zm_goods`.`popularize_data` (
   `picPath` VARCHAR(300) NULL COMMENT '图片地址',
   `title` VARCHAR(50) NULL COMMENT '名称',
   `specs` VARCHAR(50) NULL COMMENT '规格',
+  `origin` VARCHAR(100) NULL COMMENT '原产国',
   `description` VARCHAR(450) NULL COMMENT '描述',
   `price` DECIMAL(10,2) NULL COMMENT '商品价格',
   `goods_id` VARCHAR(50) NOT NULL COMMENT '商品ID',
