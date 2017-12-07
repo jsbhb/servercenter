@@ -63,4 +63,6 @@ public interface SupplierService {
 	 * @since JDK 1.7  
 	 */
 	void checkStock(List<OrderBussinessModel> list, Integer supplierId);
+
+	void getGoods(List<String> list, Integer supplierId, String supplierName);
 }

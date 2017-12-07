@@ -437,7 +437,7 @@
 		select
 		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
-		od.pay_type,od.pay_no,o.center_id,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,
+		od.pay_type,od.pay_no,o.center_id,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address 
 		from order_base o left join order_detail od on o.order_id =od.order_id 
@@ -448,7 +448,7 @@
 		select
 		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
-		od.pay_type,od.pay_no,o.center_id,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,
+		od.pay_type,od.pay_no,o.center_id,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address 
 		from order_base o left join order_detail od on o.order_id =od.order_id 

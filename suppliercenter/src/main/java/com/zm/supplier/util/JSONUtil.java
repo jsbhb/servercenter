@@ -53,8 +53,6 @@ public class JSONUtil {
 	}
 
 	public static String json2XML(String json) {
-		json = json.replace("\"[", "[").replace("]\"", "]").replace("\\", "");
-		System.out.println("替换后JSON======" + json);
 		JSONObject jobj = JSONObject.fromObject(json);
 		String xml = new XMLSerializer().write(jobj);
 		System.out.println("转换后XML======" + xml);

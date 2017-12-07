@@ -11,6 +11,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
+import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.XmlUtil;
@@ -63,12 +64,18 @@ public abstract class AbstractSupplierButtJoint {
 	public abstract Set<OrderStatus> checkOrderStatus(List<String> orderIds);
 	
 	/**
-	 * @fun 发送订单给第三方
-	 * @param info
-	 * @param user
+	 * @fun 同步库存
+	 * @param list
 	 * @return
 	 */
 	public abstract Set<CheckStockModel> checkStock(List<OrderBussinessModel> list);
+	
+	/**
+	 * @fun 获取第三方商品
+	 * @param itemCode
+	 * @return
+	 */
+	public abstract Set<ThirdWarehouseGoods> getGoods(String itemCode);
 
 	public String getAppKey() {
 		return appKey;

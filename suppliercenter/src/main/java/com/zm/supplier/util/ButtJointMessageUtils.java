@@ -11,6 +11,7 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
+import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
 import com.zm.supplier.supplierinf.model.LianYouOrder;
 import com.zm.supplier.supplierinf.model.OutOrderGoods;
 import com.zm.supplier.supplierinf.model.XinYunCheckStock;
@@ -44,7 +45,7 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-		sb.append("11612"); // 店铺代码
+		sb.append("17000"); // 店铺代码
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
 		sb.append(3105); // 海关关区北仑保税区
@@ -135,7 +136,7 @@ public class ButtJointMessageUtils {
 		sb.append("</pay>\n");
 		sb.append("<logistics>");
 		sb.append("<logisticsCode>");
-		sb.append("TTKDEX"); // 快递公司代码
+		sb.append("ZTO"); // 快递公司代码
 								// SF=顺丰速EMS=邮政速递POSTAM=邮政小包ZTO=中通速递STO=申通快递YTO=圆通速递JD=京东快递BEST=百世物流YUNDA=韵达速递TTKDEX=天天快递
 		sb.append("</logisticsCode>\n");
 		sb.append("<consignee>");
@@ -226,6 +227,7 @@ public class ButtJointMessageUtils {
 	public static String getXinYunOrderMsg(OrderInfo info, UserInfo user, String appKey, String secret) {
 
 		XinYunOrder order = new XinYunOrder();
+		order.setMerchant_id(appKey);
 		order.setAccept_name(user.getUserDetail().getName());
 		order.setAddress(info.getOrderDetail().getReceiveAddress());
 		order.setArea(info.getOrderDetail().getReceiveArea());
@@ -243,7 +245,7 @@ public class ButtJointMessageUtils {
 		XinYunGoods xinYunGoods = null;
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			xinYunGoods = new XinYunGoods();
-			xinYunGoods.setSku_id(goods.getSku());
+			xinYunGoods.setSku_id(goods.getItemCode());
 			xinYunGoods.setQuantity(goods.getItemQuantity() + "");
 			list.add(xinYunGoods);
 		}
@@ -257,6 +259,7 @@ public class ButtJointMessageUtils {
 
 	public static String getXinYunOrderStatusMsg(String orderId, String appKey, String secret) {
 		XinYunGetOrderStatus orderStatus = new XinYunGetOrderStatus();
+		orderStatus.setOpcode("get_order_info");
 		orderStatus.setMerchant_id(appKey);
 		orderStatus.setOrder_no(orderId);
 		String sign = SignUtil.XinYunSing(JSONUtil.toJson(orderStatus), secret);
@@ -267,10 +270,11 @@ public class ButtJointMessageUtils {
 	public static String getXinYunStock(List<OrderBussinessModel> list, String appKey, String secret) {
 		StringBuilder sb = new StringBuilder();
 		for (OrderBussinessModel model : list) {
-			sb.append(model.getSku() + ",");
+			sb.append(model.getItemCode() + ",");
 		}
 		XinYunCheckStock checkStock = new XinYunCheckStock();
 		checkStock.setMerchant_id(appKey);
+		checkStock.setOpcode("get_goods_stock");
 		checkStock.setSku_list(sb.toString().substring(0, sb.length() - 1));
 		
 		String sign = SignUtil.XinYunSing(JSONUtil.toJson(checkStock), secret);
@@ -296,7 +300,7 @@ public class ButtJointMessageUtils {
 		List<FuBangOrderGoods> list = new ArrayList<FuBangOrderGoods>();
 		for(OrderGoods temGoods : info.getOrderGoodsList()){
 			goods = new FuBangOrderGoods();
-			goods.setProduct_no(temGoods.getSku());
+			goods.setProduct_no(temGoods.getItemCode());
 			goods.setQty(temGoods.getItemQuantity());
 			list.add(goods);
 		}
@@ -312,6 +316,23 @@ public class ButtJointMessageUtils {
 
 	public static String getFuBangStock(List<OrderBussinessModel> list) {
 		
-		return "{\"product_no\":"+list.get(0).getSku()+"}";
+		return "{\"product_no\":"+list.get(0).getItemCode()+"}";
+	}
+
+	public static String getFuBangGoodsDetail(String itemCode) {
+		return "{\"product_no\":"+itemCode+"}";
+	}
+
+	public static String getXinYunGoods(String itemCode, String appKey, String appSecret) {
+		GetXinYunGoodsParam param = new GetXinYunGoodsParam();
+		param.setMerchant_id(appKey);
+		param.setOpcode("goods_detail");
+		param.setSku_id(itemCode);
+		
+		String sign = SignUtil.XinYunSing(JSONUtil.toJson(param), appSecret);
+		param.setSign(sign);
+		
+		return JSONUtil.toJson(param);
+
 	}
 }

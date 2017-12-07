@@ -6,11 +6,21 @@ public class OrderBussinessModel {
 	
 	private String sku;
 	
+	private String itemCode;
+	
 	private String itemId;
 	
 	private Integer quantity;
 	
 	private String deliveryPlace;
+
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
 
 	public String getSku() {
 		return sku;

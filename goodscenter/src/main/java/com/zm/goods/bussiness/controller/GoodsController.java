@@ -24,6 +24,7 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
@@ -440,6 +441,15 @@ public class GoodsController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsService.updateThirdWarehouseStock(list);
+		}
+		return false;
+	}
+	
+	@RequestMapping(value = "/{version}/goods/thirdGoods", method = RequestMethod.POST)
+	public boolean saveThirdGoods(@PathVariable("version") Double version, @RequestBody List<ThirdWarehouseGoods> list){
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.saveThirdGoods(list);
 		}
 		return false;
 	}

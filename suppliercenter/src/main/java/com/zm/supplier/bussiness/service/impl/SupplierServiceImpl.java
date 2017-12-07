@@ -103,4 +103,13 @@ public class SupplierServiceImpl implements SupplierService {
 		}
 	}
 
+	@Override
+	public void getGoods(List<String> list, Integer supplierId, String supplierName) {
+		if(list != null){
+			for(String itemCode : list){
+				warehouseThreadPool.getThirdGoods(itemCode, supplierId, supplierName);
+			}
+		}
+	}
+
 }

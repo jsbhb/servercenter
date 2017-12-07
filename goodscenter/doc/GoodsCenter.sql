@@ -350,6 +350,32 @@ CREATE TABLE `zm_goods`.`activity_data` (
 COMMENT = '活动数据';
 
 
+drop table if exists  `third_goods`;
+CREATE TABLE `zm_goods`.`third_goods` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `supplier_id` int UNSIGNED NOT NULL COMMENT '供应商ID',
+  `supplier_name` VARCHAR(300) NULL COMMENT '供应商名称',
+  `sku` VARCHAR(100) NULL COMMENT 'sku',
+  `item_code` VARCHAR(100) NULL COMMENT 'itemcode',
+  `goods_name` VARCHAR(100) NULL COMMENT '商品名称',
+  `brand` VARCHAR(100) NULL COMMENT '品牌',
+  `weight` int UNSIGNED NOT NULL COMMENT '商品重量（克）',
+  `origin` VARCHAR(100) NULL COMMENT '原产国',
+  `stock` int  NULL COMMENT '库存数量', 
+  `min` int UNSIGNED NULL DEFAULT 0 COMMENT '最小数量',
+  `max` int UNSIGNED NULL COMMENT '最大数量',
+  `status` tinyint UNSIGNED NULL DEFAULT 0 COMMENT '类型：0：未处理；1：已处理；',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `opt` VARCHAR(20) NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uq_sku` (`supplier_id`,`sku`),
+  UNIQUE INDEX `uq_item_code` (`supplier_id`,`item_code`),
+  INDEX `idx_supplier_id` (`supplier_id`),
+  INDEX `idx_status` (`status`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '第三方商品';
+
+
 drop table if exists  `goods_api`;
 
 CREATE TABLE `zm_goods`.`goods_api` (

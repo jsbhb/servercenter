@@ -28,6 +28,7 @@ import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.Tax;
+import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
@@ -751,6 +752,12 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public boolean updateThirdWarehouseStock(List<WarehouseStock> list) {
 		goodsMapper.updateThirdWarehouseStock(list);
+		return true;
+	}
+
+	@Override
+	public boolean saveThirdGoods(List<ThirdWarehouseGoods> list) {
+		goodsMapper.saveThirdGoods(list);
 		return true;
 	}
 

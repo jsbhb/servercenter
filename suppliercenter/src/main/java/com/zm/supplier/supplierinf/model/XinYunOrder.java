@@ -2,15 +2,11 @@ package com.zm.supplier.supplierinf.model;
 
 import java.util.List;
 
-public class XinYunOrder {
+public class XinYunOrder extends XinYunBaseParam{
 
-	private String opcode;
-	
 	private String merchant_order_no;
 	
 	private String pay_type = "1";//默认信用付款
-	
-	private String merchant_id;
 	
 	private String accept_name;
 	
@@ -38,17 +34,6 @@ public class XinYunOrder {
 	
 	private List<XinYunGoods> items; 
 	
-	private String sign;
-	
-	private String sign_type = "MD5";
-
-	public String getOpcode() {
-		return opcode;
-	}
-
-	public void setOpcode(String opcode) {
-		this.opcode = opcode;
-	}
 
 	public String getMerchant_order_no() {
 		return merchant_order_no;
@@ -64,14 +49,6 @@ public class XinYunOrder {
 
 	public void setPay_type(String pay_type) {
 		this.pay_type = pay_type;
-	}
-
-	public String getMerchant_id() {
-		return merchant_id;
-	}
-
-	public void setMerchant_id(String merchant_id) {
-		this.merchant_id = merchant_id;
 	}
 
 	public String getAccept_name() {
@@ -178,21 +155,5 @@ public class XinYunOrder {
 		this.items = items;
 	}
 
-	public String getSign() {
-		return sign;
-	}
-
-	public void setSign(String sign) {
-		this.sign = sign;
-	}
-
-	public String getSign_type() {
-		return sign_type;
-	}
-
-	public void setSign_type(String sign_type) {
-		this.sign_type = sign_type;
-	}
-	
 	
 }

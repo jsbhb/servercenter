@@ -15,6 +15,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
+import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ButtJointMessageUtils;
@@ -25,27 +26,33 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class TianTianButtJoint extends AbstractSupplierButtJoint {
 
-	private static final String CUSTOMER = "aa001";
+	private static final String CUSTOMER = "ZGGXHWG";
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 
 		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, CUSTOMER);// 报文
-		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.create";
-//		String url = "nredi/base/api/service?method=order.create";
+//		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.create";//测试
+		String url = "http://114.55.149.118:8181/nredi/base/api/service?method=order.create";//正式
 		return (Set<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class);
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, CUSTOMER);// 报文
-		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";
-//		String url = "nredi/base/api/service?method=order.query";
+//		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";//测试
+		String url = "http://114.55.149.118:8181/nredi/base/api/service?method=order.query";//正式
 		return (Set<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
 	}
 	
 	@Override
 	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
+		return null;
+	}
+	
+	@Override
+	public Set<ThirdWarehouseGoods> getGoods(String itemCode) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

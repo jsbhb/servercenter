@@ -792,5 +792,15 @@
 			where item_id = #{item.itemId}
 		</foreach>
 	</update>
+	
+	<insert id="saveThirdGoods" parameterType="Object">
+		INSERT IGNORE INTO
+		third_goods
+		(supplier_id,supplier_name,sku,item_code,goods_name,brand,weight,origin,stock,min,max,status,create_time)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.supplierId},#{item.supplierName},#{item.sku},#{item.itemCode},#{item.goodsName},#{item.brand},#{item.weight},#{item.origin},#{item.stock},#{item.min},#{item.max},0,now())
+		</foreach>
+	</insert>
 
 </mapper>

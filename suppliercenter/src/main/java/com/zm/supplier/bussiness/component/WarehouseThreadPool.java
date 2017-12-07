@@ -1,7 +1,9 @@
 package com.zm.supplier.bussiness.component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -24,6 +26,7 @@ import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.pojo.ThirdOrderInfo;
+import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.pojo.WarehouseStock;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
@@ -87,19 +90,19 @@ public class WarehouseThreadPool {
 				orderIds.add(model.getThirdOrderId());
 			}
 			Set<OrderStatus> set = buttJoint.checkOrderStatus(orderIds);
-			//设置本地订单号和供应商Id,如果没有第三方订单号则以本地订单号当第三方订单号
+			// 设置本地订单号和供应商Id,如果没有第三方订单号则以本地订单号当第三方订单号
 			for (OrderStatus orderStatus : set) {
 				for (OrderIdAndSupplierId model : orderList) {
 					if (orderStatus.getThirdOrderId().equals(model.getThirdOrderId())) {
 						orderStatus.setOrderId(model.getOrderId());
 						orderStatus.setSupplierId(supplierId);
-						if(orderStatus.getThirdOrderId() == null){
+						if (orderStatus.getThirdOrderId() == null) {
 							orderStatus.setThirdOrderId(model.getOrderId());
 						}
 					}
 				}
 			}
-			//end
+			// end
 			List<ThirdOrderInfo> list = new ArrayList<ThirdOrderInfo>();
 			ThirdOrderInfo thirdOrder = null;
 			for (OrderStatus orderStatus : set) {
@@ -114,6 +117,30 @@ public class WarehouseThreadPool {
 
 	}
 
+	@Async("myAsync")
+	public void getThirdGoods(String itemCode, Integer supplierId, String supplierName) {
+		try {
+			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
+			if (buttJoint == null) {
+				return;
+			}
+			Set<ThirdWarehouseGoods> set = buttJoint.getGoods(itemCode);
+
+			if (set != null && set.size() > 0) {
+				for (ThirdWarehouseGoods model : set) {
+					model.setSupplierId(supplierId);
+					model.setSupplierName(supplierName);
+					if (model.getQuantity() != null) {
+						model.setStock(Integer.valueOf(model.getQuantity()));
+					}
+				}
+				goodsFeignClient.saveThirdGoods(Constants.FIRST_VERSION, set);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
 	public void checkStock(List<OrderBussinessModel> list, Integer supplierId) {
 		try {
 			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
@@ -124,7 +151,7 @@ public class WarehouseThreadPool {
 			// 将ItemId赋值到返回的checkStockModel里面
 			for (OrderBussinessModel model : list) {
 				for (CheckStockModel tem : set) {
-					if (model.getSku().equals(tem.getSku())) {
+					if (model.getSku().equals(tem.getSku()) || model.getItemCode().equals(tem.getItemCode())) {
 						tem.setItemId(model.getItemId());
 					}
 				}
@@ -160,7 +187,7 @@ public class WarehouseThreadPool {
 		}
 		thirdOrder.setRemark(orderStatus.getMsg());
 		String CNStatus = StatusTOChiness.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus());
-		thirdOrder.setStatus(CNStatus == null ? orderStatus.getStatus() : CNStatus);
+		thirdOrder.setStatus((CNStatus == null || "".equals(CNStatus)) ? orderStatus.getStatus() : CNStatus);
 		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus()));
 		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
 		thirdOrder.setOrderId(orderStatus.getOrderId());

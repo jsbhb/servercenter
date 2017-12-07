@@ -16,6 +16,7 @@ import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
+import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.UserDetail;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
@@ -73,6 +74,12 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		AccessTokenCacheMap.getInstance().set(appKey, tokenResult.getToken());
 
 		return tokenResult.getToken();
+	}
+	
+	@Override
+	public Set<ThirdWarehouseGoods> getGoods(String itemCode) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private <T> Set<T> sendLiangYouWarehouse(String url, String msg, Class<T> clazz) {

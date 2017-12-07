@@ -126,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			model = new OrderBussinessModel();
 			model.setOrderId(orderId);
+			model.setItemCode(goods.getItemCode());
 			model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
 			model.setItemId(goods.getItemId());
 			model.setQuantity(goods.getItemQuantity());

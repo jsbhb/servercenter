@@ -104,8 +104,9 @@ public class ThirdOrderInfo {
 
 	@Override
 	public String toString() {
-		return "OrderExpress [id=" + id + ", orderId=" + orderId + ", expressKey=" + expressKey + ", expressName="
-				+ expressName + ", expressId=" + expressId + "]";
+		return "ThirdOrderInfo [id=" + id + ", orderId=" + orderId + ", expressKey=" + expressKey + ", thirdOrderId="
+				+ thirdOrderId + ", status=" + status + ", orderStatus=" + orderStatus + ", expressName=" + expressName
+				+ ", expressId=" + expressId + ", mftNo=" + mftNo + ", remark=" + remark + "]";
 	}
 	
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -114,6 +115,16 @@ public class SupplierController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			supplierService.checkStock(list ,supplierId);
+		}
+	}
+	
+	@RequestMapping(value = "{version}/supplier/getGoods/{supplierId}", method = RequestMethod.POST)
+	public void getGoods(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+			@RequestParam("supplierName") String supplierName, @RequestBody List<String> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			supplierService.getGoods(list ,supplierId, supplierName);
 		}
 	}
 }

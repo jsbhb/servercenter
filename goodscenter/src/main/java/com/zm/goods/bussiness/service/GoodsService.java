@@ -10,6 +10,7 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
@@ -226,5 +227,10 @@ public interface GoodsService {
 	 * @fun 根据同步到的库存更新库存信息
 	 */
 	boolean updateThirdWarehouseStock(List<WarehouseStock> list);
+
+	/**
+	 * @fun 保存第三方商品
+	 */
+	boolean saveThirdGoods(List<ThirdWarehouseGoods> list);
 
 }

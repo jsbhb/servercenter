@@ -15,6 +15,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderStatus;
 
 public class XmlUtil {
 
@@ -140,8 +141,7 @@ public class XmlUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String xml1 = "<?xml version=\"1.0\" encoding=\"utf-8\"?><o><ret_code type=\"string\">100002</ret_code><ret_msg type=\"string\">get_goods_stock查询成功！</ret_msg><sign type=\"string\">c3b818c3319fdf0ad2d6fa35b1cf21ee</sign><sign_type type=\"string\">MD5</sign_type><stock_info class=\"array\"><e class=\"object\"><sku_id type=\"string\">MBS04487-B</sku_id><sku_stock_num_show type=\"number\">272</sku_stock_num_show></e><e class=\"object\"><sku_id type=\"string\">MBS07866-B</sku_id><sku_stock_num_show type=\"number\">488</sku_stock_num_show></e></stock_info></o>";
-		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><o><fbatchIds class=\"array\"><e type=\"string\">TXQS101003778-MBS07866-B-4</e><e type=\"string\">TXQS101003778-MBS04487-B-2</e></fbatchIds><items class=\"array\"><e class=\"object\"><buy_num type=\"number\">2</buy_num><freight_amount type=\"number\">0</freight_amount><goods_order type=\"string\">OA35114226249246197</goods_order><order_status type=\"string\">2</order_status><price type=\"number\">9500</price><sku_id type=\"string\">MBS07866-B</sku_id></e><e class=\"object\"><buy_num type=\"number\">5</buy_num><freight_amount type=\"number\">1000</freight_amount><goods_order type=\"string\">OA35114226249338342</goods_order><order_status type=\"string\">2</order_status><price type=\"number\">22000</price><sku_id type=\"string\">MBS04487-B</sku_id></e></items><merchant_order_no type=\"string\">GX10010012121102</merchant_order_no><order_no type=\"string\">PA35114226249117065</order_no><order_status type=\"string\">2</order_status><real_pay_amount type=\"string\">130000</real_pay_amount><ret_code type=\"string\">000000</ret_code><ret_msg type=\"string\">交易成功！</ret_msg><sign type=\"string\">c4b8e9c8f4745ea9aead700566963cc8</sign><sign_type type=\"string\">MD5</sign_type><status type=\"number\">2</status><total_all_amount type=\"string\">130000</total_all_amount><total_freight type=\"string\">1000</total_freight></o>";
-		System.out.println(parseXml(xml1, CheckStockModel.class));
+		String xml1 = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><result>success</result><code>S200</code><message>订单查询成功</message><orderProcess><process><orderNo>EO1512550902068541</orderNo><orderStatus>订单关闭</orderStatus><orderFailDesc>支付时间不能为空！</orderFailDesc><logisticsCode>ZTO</logisticsCode><recTime>2017-12-06 17:01:42</recTime><hgPros><hgPro><hgStatus>O_OL_04</hgStatus><desc>推送失败</desc><proTime>2017-12-06 17:01:56</proTime></hgPro><hgPro><hgStatus>O_OL_015</hgStatus><desc>订单关闭</desc><proTime>2017-12-06 17:17:14</proTime></hgPro></hgPros></process></orderProcess><totalCount>1</totalCount></response>";
+		System.out.println(parseXml(xml1, OrderStatus.class));
 	}
 }

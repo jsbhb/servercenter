@@ -15,6 +15,7 @@ import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
+import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.UserDetail;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
@@ -50,6 +51,20 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 		String url = base_url.replace("{action}", "product");
 		return sendFuBangWarehouse(url, msg, sign, CheckStockModel.class);
 	}
+	
+	@Override
+	public Set<ThirdWarehouseGoods> getGoods(String itemCode) {
+		String msg = ButtJointMessageUtils.getFuBangGoodsDetail(itemCode);
+		String sign = SignUtil.fuBangSign(msg, appSecret);
+		String url = base_url.replace("{action}", "product");
+		Set<ThirdWarehouseGoods> set = sendFuBangWarehouse(url, msg, sign, ThirdWarehouseGoods.class);
+		for(ThirdWarehouseGoods model : set){
+			if(model.getRoughWeight() != null){
+				model.setWeight((int)(Double.valueOf(model.getRoughWeight())*1000));
+			} 
+		}
+		return set;
+	}
 
 	private <T> Set<T> sendFuBangWarehouse(String url, String msg, String sign, Class<T> clazz) {
 		
@@ -75,7 +90,7 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 		joint.setAppKey("zy28bbce65bad4bd00");
 		joint.setAppSecret("16539f0956a942650074ab86b0403baa");
 //		OrderInfo info = new OrderInfo();
-//		info.setOrderId("GX100100121211041");
+//		info.setOrderId("GX1001001212110411");
 //		info.setRemark("测试");
 //		OrderDetail detail = new OrderDetail();
 //		detail.setReceiveProvince("山东");
@@ -87,11 +102,11 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 //		detail.setReceiveName("李政");
 //		List<OrderGoods> list = new ArrayList<OrderGoods>();
 //		OrderGoods goods = new OrderGoods();
-//		goods.setSku("KD000110");
+//		goods.setItemCode("KD000110");
 //		goods.setItemQuantity(2);
 //		list.add(goods);
 //		goods = new OrderGoods();
-//		goods.setSku("KD000111");
+//		goods.setItemCode("KD000111");
 //		goods.setItemQuantity(5);
 //		list.add(goods);
 //		info.setOrderDetail(detail);
@@ -103,12 +118,12 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 //		user.setUserDetail(d);
 //		System.out.println(joint.sendOrder(info, user));
 //		查询订单状态
-		List<String> list = new ArrayList<String>();
-		list.add("GX100100121211041");
-		System.out.println(joint.checkOrderStatus(list));
+//		List<String> list = new ArrayList<String>();
+//		list.add("GX1001001212110411");
+//		System.out.println(joint.checkOrderStatus(list));
 //		//查询库存
 //		OrderBussinessModel model = new OrderBussinessModel();
-//		model.setSku("KD000111");
+//		model.setItemCode("KD000111");
 //		model.setItemId("c00083");
 //		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
 //		list.add(model);
@@ -117,6 +132,7 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 //		model.setItemId("c00084");
 //		list.add(model);
 //		System.out.println(joint.checkStock(list));
+		System.out.println(joint.getGoods("KD000110"));
 	}
 
 }
