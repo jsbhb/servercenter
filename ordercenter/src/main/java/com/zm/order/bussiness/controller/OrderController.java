@@ -341,7 +341,7 @@ public class OrderController {
 		return result;
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/shoping-cart/quantity/{centerId}/{userId}/{itemId}", method = RequestMethod.GET)
 	@ApiOperation(value = "根据itemId获取购物车内商品数量接口", response = ResultModel.class)
 	@ApiImplicitParams({
@@ -499,7 +499,7 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
 	@ApiIgnore
 	public ResultModel alreadyPay(@PathVariable("version") Double version) {
@@ -512,10 +512,10 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/saveThirdOrder", method = RequestMethod.POST)
 	@ApiIgnore
-	public boolean saveThirdOrder(@PathVariable("version") Double version,@RequestBody List<SendOrderResult> list) {
+	public boolean saveThirdOrder(@PathVariable("version") Double version, @RequestBody List<SendOrderResult> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -526,7 +526,7 @@ public class OrderController {
 		throw new RuntimeException("版本错误");
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/checkOrderStatus", method = RequestMethod.POST)
 	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list) {
@@ -539,7 +539,7 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
-	
+
 	@RequestMapping(value = "{version}/order/changeOrderStatusByThirdWarehouse", method = RequestMethod.POST)
 	public boolean changeOrderStatusByThirdWarehouse(@PathVariable("version") Double version,
 			@RequestBody List<ThirdOrderInfo> list) {
@@ -552,5 +552,17 @@ public class OrderController {
 		return false;
 
 	}
-	
+
+	@RequestMapping(value = "{version}/order/profit/{shopId}", method = RequestMethod.GET)
+	public ResultModel getProfit(@PathVariable("version") Double version, @PathVariable("shopId") Integer shopId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+			return new ResultModel(true, orderService.getProfit(shopId));
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
 }

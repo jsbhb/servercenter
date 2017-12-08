@@ -13,6 +13,7 @@ import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 
@@ -75,6 +76,10 @@ public interface OrderMapper {
 	
 	void createExpressFee(@Param("centerId") Integer centerId);
 	
+	void createProfitProportion(@Param("centerId") Integer centerId);
+	
+	ProfitProportion getProfitProportion(@Param("centerId") Integer centerId);
+	
 	Double getFreePostFee(@Param("id") String id);
 	
 	ExpressFee getExpressFee(Map<String,Object> param);
@@ -100,4 +105,5 @@ public interface OrderMapper {
 	Integer queryCountOrderInfo(Map<String,Object> param);
 
 	Integer countShoppingCartQuantity(Map<String, Object> param);
+
 }

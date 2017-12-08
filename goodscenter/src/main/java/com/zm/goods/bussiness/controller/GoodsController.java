@@ -453,5 +453,21 @@ public class GoodsController {
 		}
 		return false;
 	}
+	
+	/**
+	 * @fun 根据list 获取渠道价格总价
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/costPrice", method = RequestMethod.POST)
+	public Double getCostPrice(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list){
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.getCostPrice(list);
+		}
+		
+		return 0.0;
+	}
 
 }

@@ -26,6 +26,7 @@ import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
+import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -242,7 +243,6 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 
-		
 		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
@@ -641,7 +641,8 @@ public class GoodsServiceImpl implements GoodsService {
 					// }
 					model.setSpecsInfo(specsSet);
 					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
-						Double discount = (specs.getDiscount() == null || specs.getDiscount() == 0) ? 10.0 : specs.getDiscount();
+						Double discount = (specs.getDiscount() == null || specs.getDiscount() == 0) ? 10.0
+								: specs.getDiscount();
 						discount = CalculationUtils.div(discount, 10.0);
 						model.setPrice(specs.getPriceList().get(0).getPrice());
 						model.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));
@@ -732,7 +733,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
 		String id = judgeCenterId(centerId);
-		
+
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", id);
 		param.put("type", type);
@@ -759,6 +760,27 @@ public class GoodsServiceImpl implements GoodsService {
 	public boolean saveThirdGoods(List<ThirdWarehouseGoods> list) {
 		goodsMapper.saveThirdGoods(list);
 		return true;
+	}
+
+	@Override
+	public Double getCostPrice(List<OrderBussinessModel> list) {
+		List<PriceModel> priceList = goodsMapper.getCostPrice(list);
+		Double totalAmount = 0.0;
+		if (priceList != null) {
+			for (PriceModel model : priceList) {
+				for (OrderBussinessModel temp : list) {
+					if (model.getItemId().equals(temp.getItemId())) {
+						if (temp.getQuantity() >= model.getMin()
+								&& (temp.getQuantity() <= model.getMax() || model.getMax() == null)) {
+							totalAmount = CalculationUtils.add(totalAmount,
+									CalculationUtils.mul(temp.getQuantity(), model.getPrice()));
+						}
+					}
+				}
+			}
+		}
+		
+		return totalAmount;
 	}
 
 }

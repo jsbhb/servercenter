@@ -375,7 +375,7 @@
 	
 	<select id="getUserIdentityId" parameterType="Object" resultMap="userInfo">
 		select
-		u.id,u.account,u.phone,ud.id as
+		u.id,u.account,u.phone,u.center_id,u.shop_id,ud.id as
 		detail_id,ud.name,ud.certificates,ud.idNum from user u left join
 		user_detail ud on u.id = ud.user_id
 		where u.id = #{userId}

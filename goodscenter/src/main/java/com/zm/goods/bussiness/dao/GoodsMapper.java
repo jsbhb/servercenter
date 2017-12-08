@@ -12,8 +12,10 @@ import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
+import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceContrast;
+import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
@@ -106,5 +108,7 @@ public interface GoodsMapper {
 	void updateThirdWarehouseStock(List<WarehouseStock> list);
 
 	void saveThirdGoods(List<ThirdWarehouseGoods> list);
+
+	List<PriceModel> getCostPrice(List<OrderBussinessModel> list);
 	
 }

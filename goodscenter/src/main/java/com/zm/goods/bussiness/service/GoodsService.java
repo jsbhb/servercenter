@@ -233,4 +233,11 @@ public interface GoodsService {
 	 */
 	boolean saveThirdGoods(List<ThirdWarehouseGoods> list);
 
+	/**
+	 * @fun 根据itemIDList 获取渠道价格总价
+	 * @param list
+	 * @return
+	 */
+	Double getCostPrice(List<OrderBussinessModel> list);
+
 }

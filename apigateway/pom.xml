@@ -65,6 +65,7 @@
                 <targetPath>BOOT-INF/classes/</targetPath>
                 <includes>
                     <include>**/*.html</include>
+                    <include>**/*.txt</include>
                 </includes>
             </resource>
         </resources>

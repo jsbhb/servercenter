@@ -144,6 +144,14 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.PriceModel" id="priceModel">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="min" property="min" jdbcType="INTEGER" />
+		<result column="max" property="max" jdbcType="INTEGER" />
+		<result column="fxprice" property="price" jdbcType="NUMERIC" />
+	</resultMap>
+	
 	<resultMap type="com.zm.goods.pojo.PopularizeDict" id="dict">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="layout_id" property="layoutId" jdbcType="INTEGER" />
@@ -802,5 +810,13 @@
 			(#{item.supplierId},#{item.supplierName},#{item.sku},#{item.itemCode},#{item.goodsName},#{item.brand},#{item.weight},#{item.origin},#{item.stock},#{item.min},#{item.max},0,now())
 		</foreach>
 	</insert>
+	
+	<select id="getCostPrice" parameterType="Object" resultMap="priceModel">
+		select id,item_id,min,max,fxprice from goods_price where item_id in 
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.itemId,jdbcType = VARCHAR}
+		</foreach>
+	</select>
 
 </mapper>

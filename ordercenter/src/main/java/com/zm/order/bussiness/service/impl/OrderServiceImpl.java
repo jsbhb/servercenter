@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
@@ -83,6 +84,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	SupplierFeignClient supplierFeignClient;
+	
+	@Resource
+	ShareProfitComponent shareProfitComponent;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -268,6 +272,9 @@ public class OrderServiceImpl implements OrderService {
 			goods.setOrderId(orderId);
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
+		
+		//FIXME
+		shareProfitComponent.calShareProfit(orderId);
 
 		result.setSuccess(true);
 		return result;
@@ -566,6 +573,7 @@ public class OrderServiceImpl implements OrderService {
 	public void createTable(Integer centerId) {
 		orderMapper.createExpressFee(centerId);
 		orderMapper.createFreeExpressFee(centerId);
+		orderMapper.createProfitProportion(centerId);
 	}
 
 	private String judgeCenterId(Integer id) {
@@ -614,5 +622,10 @@ public class OrderServiceImpl implements OrderService {
 	public Integer countShoppingCartQuantity(Map<String, Object> param) {
 		
 		return orderMapper.countShoppingCartQuantity(param);
+	}
+
+	@Override
+	public List<Object> getProfit(Integer shopId) {
+		return redisTemplate.opsForList().range(Constants.PROFIT + shopId,0,-1);
 	}
 }

@@ -303,4 +303,6 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	Integer countShoppingCartQuantity(Map<String, Object> param);
+
+	List<Object> getProfit(Integer shopId);
 }

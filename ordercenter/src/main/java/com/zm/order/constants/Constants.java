@@ -56,4 +56,10 @@ public class Constants {
 	
 	public static final Integer GENERAL_TRADE = 2;//一般贸易
 	
+	//************************分润前缀**********************
+	public static final String PROFIT = "profit";
+	
+	//*********************异常分润订单***********************
+	public static final String EXCEPTION_PROFIT = "EXCEPTION_PROFIT";
+	
 }
