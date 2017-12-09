@@ -42,12 +42,12 @@ import springfox.documentation.annotations.ApiIgnore;
  * @since JDK 1.7
  */
 @RestController
-@Api(value="第三方登录插件",description="第三方登录插件")
+@Api(value = "第三方登录插件", description = "第三方登录插件")
 public class ThirdLoginPluginController {
 
 	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
-	
-	private static String redirect_uri = "http://api.cncoopbuy.com/auth/1.0/user/3rdLogin/wxLogin";
+
+	private static String redirect_uri = "http://api.cncoopbuy.com/3rdcenter/auth/1.0/user/3rdLogin/wxLogin";
 
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
@@ -112,15 +112,21 @@ public class ThirdLoginPluginController {
 				ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
 
 				if (apiResult.isSucceed()) {
-					redisTemplate.opsForValue().set(apiResult.getStr("unionid"), apiResult.getJson(), 30L, TimeUnit.MINUTES);
-					
+					redisTemplate.opsForValue().set(
+							apiResult.getStr("unionid") == null ? token.getOpenid() : apiResult.getStr("unionid"),
+							apiResult.getJson(), 30L, TimeUnit.MINUTES);
+
 					Map<String, Object> resultMap = new HashMap<String, Object>();
 					resultMap.put("openid", token.getOpenid());
 					resultMap.put("unionid", apiResult.getStr("unionid"));
 
-					boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
-							new ThirdLogin(Integer.parseInt(stateArr[0]), apiResult.getStr("unionid"), Constants.WX_LOGIN));
-					
+					boolean flag = userFeignClient
+							.get3rdLoginUser(Constants.FIRST_VERSION,
+									new ThirdLogin(
+											Integer.parseInt(stateArr[0]), apiResult.getStr("unionid") == null
+													? token.getOpenid() : apiResult.getStr("unionid"),
+							Constants.WX_LOGIN));
+
 					resultMap.put("isFirst", flag);
 					result.setSuccess(true);
 					result.setObj(resultMap);
