@@ -47,8 +47,6 @@ public class ThirdLoginPluginController {
 
 	private static String authorize_uri = "https://open.weixin.qq.com/connect/oauth2/authorize";
 
-	private static String redirect_uri = "http://api.cncoopbuy.com/3rdcenter/auth/1.0/user/3rdLogin/wxLogin";
-
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
 
@@ -69,7 +67,7 @@ public class ThirdLoginPluginController {
 
 			StringBuffer sb = new StringBuffer();
 			sb.append("?appid=" + config.getAppId());
-			sb.append("&redirect_uri=" + redirect_uri);
+			sb.append("&redirect_uri=" + param.getRedirectUrl());
 			sb.append("&response_type=code");
 			if (param.isSnsapiBase()) {
 				sb.append("&scope=snsapi_userinfo");
