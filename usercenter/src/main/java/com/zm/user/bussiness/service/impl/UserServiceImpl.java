@@ -164,7 +164,6 @@ public class UserServiceImpl implements UserService {
 
 	private void packageUser(ApiResult apiResult, UserInfo info) {
 
-		info.setWechat(apiResult.get("unionid") + "");
 		UserDetail userDetail = new UserDetail();
 		boolean isNum = RegularUtil.isNumeric(apiResult.get("sex") + "");
 		if (isNum) {
