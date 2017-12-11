@@ -81,7 +81,7 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 							.loadUserByUsername((String) claims.get(JWTUtil.USER_NAME));
 				} else if (claims.containsKey(JWTUtil.OPEN_ID)) {
 					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByUsername((String) claims.get(JWTUtil.OPEN_ID) + "_" + WX_OPENID_SECRET);
+							.loadUserByUsername((String) claims.get(JWTUtil.OPEN_ID) + "," + WX_OPENID_SECRET);
 
 					if (userDetails != null) {
 						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

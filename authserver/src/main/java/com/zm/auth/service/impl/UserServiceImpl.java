@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
 		UserInfo userInfo = null;
 		if (userName.endsWith(WX_OPENID_SECRET)) {
-			userInfo = getUserByOpenId(userName.split("_")[0]);
+			userInfo = getUserByOpenId(userName.split(",")[0]);
 		} else {
 			userInfo = getUserByName(userName);
 		}
