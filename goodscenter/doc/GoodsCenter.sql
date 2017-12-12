@@ -403,3 +403,47 @@ CREATE TABLE `zm_goods`.`goods_search_parameter` (
   PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '检索字段表';
 
+drop table if exists  `specs_template`;
+CREATE TABLE `specs_template` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `name` varchar(100) NOT NULL COMMENT '模板名称',
+  `status` int(10) NOT NULL COMMENT '模板名称',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='规格模板表';
+
+drop table if exists  `goods_specs`;
+CREATE TABLE `goods_specs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `template_id` int(10) unsigned NOT NULL COMMENT '模板编号',
+  `name` varchar(100) NOT NULL COMMENT '供销内部商品ID',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_template_id` (`template_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品规格表';
+
+drop table if exists  `goods_specs_value`;
+CREATE TABLE `goods_specs_value` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `specs_id` int(10) unsigned NOT NULL COMMENT '商品ID',
+  `value` varchar(100) NOT NULL COMMENT '供销内部商品ID',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_specs_id` (`specs_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品规格值表';
+
+drop table if exists  `goods_specs_relation`;
+CREATE TABLE `goods_specs_relation` (
+  `specs_template_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `goods_item_id` int(10) unsigned NOT NULL COMMENT '商品ID',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  INDEX `idx_specs_template_id` (`specs_template_id`),
+  INDEX `idx_goods_item_id` (`goods_item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品规格模板关联表';
+
