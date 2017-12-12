@@ -38,7 +38,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(value="手机验证码接口",description="手机验证码")
 public class ThirdPartPhoneController {
 
-	private final Long EFFECTIVE_TIME = 2 * 60 * 1000L;
+	private final Long EFFECTIVE_TIME = 5 * 60 * 1000L;
 
 	@Resource
 	RedisTemplate<String, PhoneValidata> redisTemplate;
