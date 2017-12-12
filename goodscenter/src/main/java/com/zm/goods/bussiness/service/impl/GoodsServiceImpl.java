@@ -771,7 +771,7 @@ public class GoodsServiceImpl implements GoodsService {
 				for (OrderBussinessModel temp : list) {
 					if (model.getItemId().equals(temp.getItemId())) {
 						if (temp.getQuantity() >= model.getMin()
-								&& (temp.getQuantity() <= model.getMax() || model.getMax() == null)) {
+								&& (model.getMax() == null || temp.getQuantity() <= model.getMax())) {
 							totalAmount = CalculationUtils.add(totalAmount,
 									CalculationUtils.mul(temp.getQuantity(), model.getPrice()));
 						}

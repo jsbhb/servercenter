@@ -51,6 +51,12 @@ public class PriceModel {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+
+	@Override
+	public String toString() {
+		return "PriceModel [id=" + id + ", itemId=" + itemId + ", min=" + min + ", max=" + max + ", price=" + price
+				+ "]";
+	}
 	
 	
 }

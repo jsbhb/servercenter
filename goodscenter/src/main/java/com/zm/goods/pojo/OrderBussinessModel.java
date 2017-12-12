@@ -61,5 +61,11 @@ public class OrderBussinessModel {
 	public void setDeliveryPlace(String deliveryPlace) {
 		this.deliveryPlace = deliveryPlace;
 	}
+
+	@Override
+	public String toString() {
+		return "OrderBussinessModel [orderId=" + orderId + ", sku=" + sku + ", itemCode=" + itemCode + ", itemId="
+				+ itemId + ", quantity=" + quantity + ", deliveryPlace=" + deliveryPlace + "]";
+	}
 	
 }
