@@ -8,9 +8,9 @@ public class Constants {
 
 	public static final String SECRET = "e33330f7005b1dc56fea21d8d76db1cb";
 
-	public static final String SMS_VERIFY_ID = "SMS_109750258";
+	public static final String SMS_VERIFY_ID = "SMS_111795980";
 
-	public static final String SMS_SIGN = "阿里云短信测试专用";
+	public static final String SMS_SIGN = "中国供销海外购";
 
 	public static final String ACCESS_KEY_ID = "LTAIzBKHpqjzUCdg";
 
