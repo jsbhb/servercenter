@@ -18,6 +18,7 @@
 		<module>paycenter</module>
 		<module>timetaskcenter</module>
 		<module>suppliercenter</module>
+		<module>activitycenter</module>
 	</modules>
 
 	<parent>

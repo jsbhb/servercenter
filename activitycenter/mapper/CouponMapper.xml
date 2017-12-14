@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.activity.bussiness.dao.CouponMapper">
+
+	<resultMap type="com.zm.activity.pojo.Coupon" id="coupon">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="coupon_id" property="couponId" jdbcType="VARCHAR" />
+		<result column="active_id" property="activeId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="node" property="node" jdbcType="INTEGER" />
+		<result column="num" property="num" jdbcType="INTEGER" />
+		<result column="receive_num" property="receiveNum" jdbcType="INTEGER" />
+		<result column="use_num" property="useNum" jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="VARCHAR" />
+		<result column="end_time" property="endTime" jdbcType="VARCHAR" />
+		<result column="pic_path" property="picPath" jdbcType="VARCHAR" />
+		<association property="rule" javaType="com.zm.activity.pojo.Rule">
+			<id column="rule_id" property="id" jdbcType="INTEGER" />
+			<result column="description" property="description" jdbcType="VARCHAR" />
+			<result column="condition" property="condition" jdbcType="DECIMAL" />
+			<result column="deductible_value" property="deductibleValue"
+				jdbcType="DECIMAL" />
+			<result column="value_type" property="valueType" jdbcType="INTEGER" />
+			<result column="range" property="range" jdbcType="INTEGER" />
+			<result column="category" property="category" jdbcType="VARCHAR" />
+			<result column="superposition" property="superposition"
+				jdbcType="INTEGER" />
+			<result column="weight" property="weight" jdbcType="INTEGER" />
+			<collection property="bindingList"
+				javaType="com.zm.activity.pojo.CouponGoodsbinding">
+				<id column="bind_id" property="id" jdbcType="INTEGER" />
+				<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+				<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+			</collection>
+		</association>
+	</resultMap>
+
+	<select id="listCoupon" parameterType="Object" resultMap="coupon">
+		select
+		coupon_id, pic_path from coupon_${centerId} where status in(0,1,2) and
+		node = 0
+	</select>
+
+	<select id="listCouponByCouponIds" parameterType="Object"
+		resultMap="coupon">
+		select c.id, c.coupon_id, c.pic_path, r.condition, r.id as rule_id,
+		r.deductible_value, r.value_type, r.range, r.category,
+		r.superposition, r.weight, cg.id as bind_id,cg.goods_id from
+		coupon_${centerId} c left join rule_${centerId} r on c.rule_id = r.rule_id
+		left join
+		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status in(0,1,2) and c.coupon_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listUserCouponByUserId" parameterType="Object" resultType="java.lang.String">
+		select coupon_id from user_coupon where center_id = #{centerId} and user_id = #{userId}
+	</select>
+	
+	<select id="getNumByCouponId" parameterType="Object" resultType="java.lang.Integer">
+		select num from coupon_${centerId} where coupon_id = #{couponId}
+	</select>
+	
+	<update id="updateCouponReceiveNum" parameterType="Object">
+		update coupon_${centerId} set receive_num = #{receiveNum} where coupon_id = #{couponId}
+	</update>
+	
+	<insert id="binding" parameterType="Object">
+		insert ignore into user_coupon(user_id,coupon_id,center_id) values (#{userId},#{couponId},#{centerId})
+	</insert>
+
+	<!-- 建表语句start -->
+	<update id="createCoupon" parameterType="java.lang.Integer">
+		CREATE TABLE IF NOT
+		EXISTS coupon_${centerId} (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		coupon_id varchar(100) NOT NULL COMMENT '优惠券ID',
+		rule_id INT UNSIGNED NOT NULL COMMENT '规则ID',
+		active_id INT UNSIGNED NULL DEFAULT 0 COMMENT '活动ID',
+		name varchar(100) NOT NULL COMMENT '优惠券名称',
+		status TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0:未开始，1：正常；2:已发完；3：已过期',
+		start_time DATETIME NULL DEFAULT '1970-01-01 00:00:00' COMMENT '开始时间',
+		end_time DATETIME NULL DEFAULT '2970-01-01 00:00:00' COMMENT '结束时间',
+		node TINYINT NULL DEFAULT 0 COMMENT '触发节点 1：注册完成；',
+		num INT NULL COMMENT '发行数量',
+		receive_num INT NULL COMMENT '领取数量',
+		use_num INT NULL COMMENT '使用数量',
+		pic_path varchar(200) NULL COMMENT '图片地址',
+		attribute varchar(100) NULL COMMENT '备用',
+		opt varchar(20) NULL COMMENT '',
+		PRIMARY KEY (id),
+		INDEX idx_coupon_id (coupon_id),
+		INDEX idx_rule_id (rule_id),
+		INDEX
+		idx_active_id (active_id),
+		INDEX idx_status (status),
+		INDEX idx_node
+		(node)
+		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+		COMMENT = '优惠券';
+	</update>
+
+	<update id="createRule" parameterType="java.lang.Integer">
+		CREATE TABLE IF NOT EXISTS
+		rule_${centerId} (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		description varchar(100) NULL COMMENT '规则描述',
+		condition DECIMAL(10,2) NOT NULL COMMENT '满条件',
+		deductible_value DECIMAL(10,2) NOT NULL COMMENT '抵扣额',
+		value_type TINYINT NOT NULL COMMENT '0:折扣；1金额',
+		range TINYINT NOT NULL COMMENT '使用范围0全场，1一级分了；2二级分类；3三级分类；4特定商品',
+		category varchar(100) NULL COMMENT '分类ID，range为1,2,3时不为空',
+		is_superposition INT NULL DEFAULT 0 COMMENT '是否可叠加：0否，1是',
+		create_time DATETIME NULL COMMENT '创建时间',
+		update_time DATETIME NULL COMMENT '更新时间',
+		weight INT NULL COMMENT '权重',
+		attribute varchar(100) NULL COMMENT '备用',
+		opt varchar(20) NULL COMMENT '',
+		PRIMARY KEY (id)
+		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+		COMMENT = '规则表';
+	</update>
+
+	<update id="createCouponGoods" parameterType="java.lang.Integer">
+		CREATE TABLE IF NOT EXISTS
+		coupon_goods_${centerId} (
+		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		rule_id INT UNSIGNED NOT NULL COMMENT '规则ID',
+		goods_id varchar(50) NOT NULL COMMENT '商品ID',
+		attribute varchar(100) NULL COMMENT '备用',
+		opt varchar(20) NULL COMMENT '',
+		PRIMARY KEY (id),
+		INDEX idx_coupon_id (rule_id),
+		INDEX idx_goods_id (goods_id)
+		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+		COMMENT = '优惠券商品';
+	</update>
+
+	<!-- 建表语句END -->
+</mapper>

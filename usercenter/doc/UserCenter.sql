@@ -114,7 +114,6 @@ CREATE TABLE `zm_user`.`user_detail` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '用户明细表';
 

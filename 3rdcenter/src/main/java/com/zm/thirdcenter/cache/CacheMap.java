@@ -7,13 +7,17 @@ public class CacheMap {
 
 	private Map<String,Object> data = new HashMap<String,Object>();;
 	
-	private static CacheMap cacheMap;
+	private static volatile CacheMap cacheMap;
 	
 	private CacheMap(){}
 	
 	public static CacheMap getCache(){
 		if(cacheMap == null){
-			cacheMap = new CacheMap();
+			synchronized (CacheMap.class){
+				if(cacheMap == null){
+					cacheMap = new CacheMap();
+				}
+			}
 		}
 		return cacheMap;
 	}
