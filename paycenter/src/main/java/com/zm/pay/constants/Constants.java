@@ -8,7 +8,7 @@ public class Constants {
 
 	public static final String FEE_TYPE = "CNY";
 
-	public static final String WX_NOTIFY_URL = "http://106.15.156.118:8080/paycenter/auth/payMng/wxPayReturn";
+	public static final String WX_NOTIFY_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/wxPayReturn";
 	
 	public static final String JSAPI = "JSAPI";
 
@@ -58,8 +58,8 @@ public class Constants {
 	public static final String CUSTOMS_QUERY_SERVICE = "alipay.overseas.acquire.customs.query";//报关接口
 	
 	//********************支付宝支付参数*****************************
-	public static final String ALI_NOTIFY_URL = "http://106.15.156.118:8080/paycenter/auth/payMng/payNotify";
-	public static final String ALI_RETURN_URL = "http://106.15.156.118:8080/paycenter/auth/payMng/payReturn";
+	public static final String ALI_NOTIFY_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/payNotify";
+	public static final String ALI_RETURN_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/payReturn";
 	public static final String SCAN_CODE = "scanCode";//扫码支付
 	public static final String SCAN_CODE_SERVICE = "create_direct_pay_by_user";//扫码支付接口名
 }

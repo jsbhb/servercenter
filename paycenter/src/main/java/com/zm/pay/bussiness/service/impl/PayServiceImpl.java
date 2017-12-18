@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
@@ -47,6 +48,7 @@ import com.zm.pay.utils.wx.WxPayUtils;
  * @since JDK 1.7
  */
 @Service
+@Transactional
 public class PayServiceImpl implements PayService {
 
 	@Resource

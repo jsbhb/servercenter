@@ -2,12 +2,14 @@ package com.zm.activity.pojo;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Rule {
 
+	@JsonIgnore
 	private Integer id;
 	
 	private String ruleId;

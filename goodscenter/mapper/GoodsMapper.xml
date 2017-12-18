@@ -730,7 +730,7 @@
 	
 	<update id="updateStock" parameterType="Object">
 		<foreach collection="list" item="item" index="index" open=""
-			close=";" separator=";" >
+			close="" separator=";" >
 			update goods_stock
 			<set>
 				<if test="orderFlag == 0">

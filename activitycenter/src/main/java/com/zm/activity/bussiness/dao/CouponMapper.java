@@ -6,10 +6,11 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.zm.activity.pojo.Coupon;
+import com.zm.activity.pojo.Rule;
 
 public interface CouponMapper {
 
-	List<Coupon> listCoupon(Integer centerId);
+	List<Coupon> listCoupon(@Param("centerId")Integer centerId);
 
 	List<Coupon> listCouponByCouponIds(Map<String, Object> param);
 	
@@ -19,12 +20,18 @@ public interface CouponMapper {
 	
 	void createCouponGoods(@Param("centerId")Integer centerId);
 
-	Integer getNumByCouponId(Map<String, Object> param);
+	Integer getIssueNumByCouponId(Map<String, Object> param);
 	
 	List<String> listUserCouponByUserId(Map<String, Object> param);
+	
+	List<Rule> listRuleByRuleIds(Map<String, Object> param);
 
 	void updateCouponReceiveNum(Map<String, Object> param);
 
 	int binding(Map<String, Object> param);
+
+	List<Coupon> listIssueNum(Map<String, Object> param);
+
+	void updateCouponGiveOut(Map<String, Object> param);
 
 }

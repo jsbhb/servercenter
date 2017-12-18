@@ -1,14 +1,16 @@
 package com.zm.activity.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class CouponGoodsbinding {
 
+	@JsonIgnore
 	private Integer id;
 	
-	private Integer ruleId;
+	private String ruleId;
 	
 	private String goodsId;
 
@@ -20,11 +22,11 @@ public class CouponGoodsbinding {
 		this.id = id;
 	}
 
-	public Integer getRuleId() {
+	public String getRuleId() {
 		return ruleId;
 	}
 
-	public void setRuleId(Integer ruleId) {
+	public void setRuleId(String ruleId) {
 		this.ruleId = ruleId;
 	}
 

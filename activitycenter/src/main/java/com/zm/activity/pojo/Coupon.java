@@ -1,11 +1,13 @@
 package com.zm.activity.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Coupon {
 
+	@JsonIgnore
 	private Integer id;
 	
 	private String couponId;
@@ -14,7 +16,7 @@ public class Coupon {
 	
 	private String name;
 	
-	private Integer userStatus = 0;//用户的优惠券状态是否使用 0:未领；1已领  默认0
+	private Integer receiveStatus = -1;
 	
 	private Integer status;
 	
@@ -30,16 +32,17 @@ public class Coupon {
 	
 	private Integer useNum;
 	
-	private String picPath;
+	private String picPath = "null";
 	
 	private Rule rule;
 
-	public Integer getUserStatus() {
-		return userStatus;
+
+	public Integer getReceiveStatus() {
+		return receiveStatus;
 	}
 
-	public void setUserStatus(Integer userStatus) {
-		this.userStatus = userStatus;
+	public void setReceiveStatus(Integer receiveStatus) {
+		this.receiveStatus = receiveStatus;
 	}
 
 	public Rule getRule() {

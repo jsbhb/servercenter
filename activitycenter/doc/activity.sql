@@ -11,7 +11,7 @@ drop table if exists  `zm_activity`.`coupon`;
 CREATE TABLE `zm_activity`.`coupon` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `coupon_id` varchar(100) NOT NULL COMMENT '优惠券ID',
-  `rule_id` varchar(100) UNSIGNED NOT NULL COMMENT '规则ID',
+  `rule_id` varchar(100) NOT NULL COMMENT '规则ID',
   `active_id` INT UNSIGNED NULL DEFAULT 0 COMMENT '活动ID',
   `name` varchar(100) NOT NULL COMMENT '优惠券名称',
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始，1：审核通过；2:发放；3：使用；4：过期',
@@ -58,13 +58,14 @@ drop table if exists  `zm_activity`.`coupon_goods`;
 
 CREATE TABLE `zm_activity`.`coupon_goods` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `rule_id` varchar(100) UNSIGNED NOT NULL COMMENT '规则ID',
+  `rule_id` varchar(100) NOT NULL COMMENT '规则ID',
   `goods_id` varchar(50) NOT NULL COMMENT '商品ID',
   `attribute` varchar(100) NULL COMMENT '备用',
   `opt` varchar(20) NULL COMMENT '',
   PRIMARY KEY (`id`),
   INDEX `idx_coupon_id` (`rule_id`),
-  INDEX `idx_goods_id` (`goods_id`)
+  INDEX `idx_goods_id` (`goods_id`),
+  UNIQUE INDEX `id_UNIQUE` (`rule_id`,`goods_id`)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '优惠券商品';
 

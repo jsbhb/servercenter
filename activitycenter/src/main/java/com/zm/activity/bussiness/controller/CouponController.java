@@ -1,8 +1,11 @@
 package com.zm.activity.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +34,7 @@ public class CouponController {
 	 */
 	@RequestMapping(value = "{version}/coupon/{centerId}", method = RequestMethod.GET)
 	public ResultModel listCoupon(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestParam(value="userId",required = false) Integer userId) {
+			@RequestParam(value = "userId", required = false) Integer userId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
@@ -42,18 +45,19 @@ public class CouponController {
 	}
 
 	/**
-	 * @fun 根据优惠券IDs获取优惠券列表
+	 * @fun 根据user获取优惠券列表
 	 * @param version
 	 * @param centerId
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/coupon/{centerId}/{userId}", method = RequestMethod.GET)
 	public ResultModel listCouponByCouponIds(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId, @PathVariable("userId") Integer userId) {
+			@PathVariable("centerId") Integer centerId, @PathVariable("userId") Integer userId,
+			@RequestParam("status") Integer status) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(true, couponService.listCouponByCouponIds(centerId, userId));
+			return new ResultModel(true, couponService.listCouponByUserId(centerId, userId, status));
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -91,6 +95,25 @@ public class CouponController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			return couponService.receiveCoupon(centerId, userId, couponId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 发放优惠券
+	 * @param version
+	 * @param List
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/giveout-coupon/{centerId}", method = RequestMethod.POST)
+	public ResultModel giveOutCoupon(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @RequestBody List<String> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return couponService.giveOutCoupon(centerId, list);
 		}
 
 		return new ResultModel(false, "版本错误");

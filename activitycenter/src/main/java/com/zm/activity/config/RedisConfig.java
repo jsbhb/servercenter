@@ -53,7 +53,7 @@ public class RedisConfig {
 
 	@Bean
 	public RedisTemplate<?, ?> getRedisTemplate() {
-		RedisTemplate<?, ?> template = new StringRedisTemplate(getConnectionFactory());
-		return template;
+		RedisTemplate<?, ?> redisTemplate = new StringRedisTemplate(getConnectionFactory());
+		return redisTemplate;
 	}
 }

@@ -24,13 +24,12 @@
 			<result column="value_type" property="valueType" jdbcType="INTEGER" />
 			<result column="range" property="range" jdbcType="INTEGER" />
 			<result column="category" property="category" jdbcType="VARCHAR" />
-			<result column="superposition" property="superposition"
+			<result column="is_superposition" property="superposition"
 				jdbcType="INTEGER" />
 			<result column="weight" property="weight" jdbcType="INTEGER" />
 			<collection property="bindingList"
-				javaType="com.zm.activity.pojo.CouponGoodsbinding">
+				ofType="com.zm.activity.pojo.CouponGoodsbinding">
 				<id column="bind_id" property="id" jdbcType="INTEGER" />
-				<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
 				<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 			</collection>
 		</association>
@@ -38,7 +37,7 @@
 
 	<select id="listCoupon" parameterType="Object" resultMap="coupon">
 		select
-		coupon_id, pic_path from coupon_${centerId} where status in(0,1,2) and
+		id, coupon_id, pic_path,num,status from coupon_${centerId} where status in(2,3) and
 		node = 0
 	</select>
 
@@ -46,10 +45,10 @@
 		resultMap="coupon">
 		select c.id, c.coupon_id, c.pic_path, r.condition, r.id as rule_id,
 		r.deductible_value, r.value_type, r.range, r.category,
-		r.superposition, r.weight, cg.id as bind_id,cg.goods_id from
+		r.is_superposition, r.weight, cg.id as bind_id,cg.goods_id from
 		coupon_${centerId} c left join rule_${centerId} r on c.rule_id = r.rule_id
 		left join
-		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status in(0,1,2) and c.coupon_id in
+		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status in(2,3) and c.coupon_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}
@@ -57,10 +56,13 @@
 	</select>
 	
 	<select id="listUserCouponByUserId" parameterType="Object" resultType="java.lang.String">
-		select coupon_id from user_coupon where center_id = #{centerId} and user_id = #{userId}
+		select coupon_id from user_coupon where center_id = #{centerId} and user_id = #{userId} 
+		<if test="status != null">
+			and status = #{status}
+		</if>
 	</select>
 	
-	<select id="getNumByCouponId" parameterType="Object" resultType="java.lang.Integer">
+	<select id="getIssueNumByCouponId" parameterType="Object" resultType="java.lang.Integer">
 		select num from coupon_${centerId} where coupon_id = #{couponId}
 	</select>
 	
@@ -71,6 +73,23 @@
 	<insert id="binding" parameterType="Object">
 		insert ignore into user_coupon(user_id,coupon_id,center_id) values (#{userId},#{couponId},#{centerId})
 	</insert>
+	
+	<select id="listIssueNum" parameterType="Object" resultMap="coupon">
+		select num, coupon_id from coupon_${centerId} where num != 0 and status = 1 and coupon_id in 
+		<foreach collection="list" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<update id="updateCouponGiveOut" parameterType="Object">
+		<foreach collection="list" item="item" separator=";" open="" close="">
+			update coupon_${centerId} 
+			<set>
+				status = 2
+			</set>
+			where coupon_id = #{item} and status = 1
+		</foreach>
+	</update>
 
 	<!-- 建表语句start -->
 	<update id="createCoupon" parameterType="java.lang.Integer">
