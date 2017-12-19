@@ -5,13 +5,14 @@
 	<resultMap type="com.zm.activity.pojo.Coupon" id="coupon">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="coupon_id" property="couponId" jdbcType="VARCHAR" />
-		<result column="active_id" property="activeId" jdbcType="INTEGER" />
+		<result column="activity_id" property="activityId" jdbcType="VARCHAR" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="node" property="node" jdbcType="INTEGER" />
 		<result column="num" property="num" jdbcType="INTEGER" />
 		<result column="receive_num" property="receiveNum" jdbcType="INTEGER" />
 		<result column="use_num" property="useNum" jdbcType="INTEGER" />
+		<result column="issue_start_time" property="issueStartTime" jdbcType="VARCHAR" />
 		<result column="start_time" property="startTime" jdbcType="VARCHAR" />
 		<result column="end_time" property="endTime" jdbcType="VARCHAR" />
 		<result column="pic_path" property="picPath" jdbcType="VARCHAR" />
@@ -37,8 +38,8 @@
 
 	<select id="listCoupon" parameterType="Object" resultMap="coupon">
 		select
-		id, coupon_id, pic_path,num,status from coupon_${centerId} where status in(2,3) and
-		node = 0
+		id, coupon_id, pic_path,num,status from coupon_${centerId} where status in(2,1) and
+		node = 0 and activity_id = #{activityId}
 	</select>
 
 	<select id="listCouponByCouponIds" parameterType="Object"
@@ -48,7 +49,7 @@
 		r.is_superposition, r.weight, cg.id as bind_id,cg.goods_id from
 		coupon_${centerId} c left join rule_${centerId} r on c.rule_id = r.rule_id
 		left join
-		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status in(2,3) and c.coupon_id in
+		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status in(2,1) and c.coupon_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}
@@ -75,7 +76,7 @@
 	</insert>
 	
 	<select id="listIssueNum" parameterType="Object" resultMap="coupon">
-		select num, coupon_id from coupon_${centerId} where num != 0 and status = 1 and coupon_id in 
+		select num, coupon_id from coupon_${centerId} where num != 0 and status = 0 and coupon_id in 
 		<foreach collection="list" item="item" separator="," open="(" close=")">
 			#{item}
 		</foreach>
@@ -85,9 +86,9 @@
 		<foreach collection="list" item="item" separator=";" open="" close="">
 			update coupon_${centerId} 
 			<set>
-				status = 2
+				status = 1
 			</set>
-			where coupon_id = #{item} and status = 1
+			where coupon_id = #{item} and status = 0
 		</foreach>
 	</update>
 

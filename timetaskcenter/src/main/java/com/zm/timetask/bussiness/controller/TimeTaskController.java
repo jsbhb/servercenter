@@ -2,6 +2,7 @@ package com.zm.timetask.bussiness.controller;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,9 @@ public class TimeTaskController {
 
 	@Resource
 	TimeTaskService timeTaskService;
+	
+	@Resource
+	RedisTemplate<String, Object> redisTemplate;
 
 	@RequestMapping(value = "{version}/timetask/start", method = RequestMethod.GET)
 	public ResultModel startTimeTask(@PathVariable("version") Double version, Integer id) {

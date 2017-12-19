@@ -12,7 +12,7 @@ public class Coupon {
 	
 	private String couponId;
 	
-	private Integer activeId;
+	private String activityId;
 	
 	private String name;
 	
@@ -23,6 +23,10 @@ public class Coupon {
 	private String startTime;
 	
 	private String endTime;
+	
+	private String issueStartTime;
+	
+	private String issueEndTime;
 	
 	private Integer node;
 	
@@ -36,6 +40,21 @@ public class Coupon {
 	
 	private Rule rule;
 
+	public String getIssueStartTime() {
+		return issueStartTime;
+	}
+
+	public void setIssueStartTime(String issueStartTime) {
+		this.issueStartTime = issueStartTime;
+	}
+
+	public String getIssueEndTime() {
+		return issueEndTime;
+	}
+
+	public void setIssueEndTime(String issueEndTime) {
+		this.issueEndTime = issueEndTime;
+	}
 
 	public Integer getReceiveStatus() {
 		return receiveStatus;
@@ -69,12 +88,13 @@ public class Coupon {
 		this.couponId = couponId;
 	}
 
-	public Integer getActiveId() {
-		return activeId;
+
+	public String getActivityId() {
+		return activityId;
 	}
 
-	public void setActiveId(Integer activeId) {
-		this.activeId = activeId;
+	public void setActivityId(String activityId) {
+		this.activityId = activityId;
 	}
 
 	public String getName() {

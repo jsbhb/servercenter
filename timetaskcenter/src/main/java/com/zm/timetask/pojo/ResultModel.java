@@ -23,9 +23,9 @@ public class ResultModel {
 		this.success = flag;
 	}
 	
-	public ResultModel(Object obj){
+	public ResultModel(boolean flag, Object obj){
 		this.obj = obj;
-		this.success = true;
+		this.success = flag;
 	}
 	
 	public String getErrorCode() {

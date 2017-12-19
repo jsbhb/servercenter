@@ -13,7 +13,7 @@ public interface CouponService {
 	 * @param userId
 	 * @return
 	 */
-	List<Coupon> listCoupon(Integer centerId, Integer userId);
+	List<Coupon> listCoupon(Integer centerId, Integer userId, String activityId);
 
 	/**
 	 * @fun 根据userId获取用户优惠券

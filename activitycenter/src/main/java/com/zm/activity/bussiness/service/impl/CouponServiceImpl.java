@@ -31,13 +31,14 @@ public class CouponServiceImpl implements CouponService {
 	private final Integer ALREADY_EMPTY = 99;
 
 	@Override
-	public List<Coupon> listCoupon(Integer centerId, Integer userId) {
-		List<Coupon> couponList = couponMapper.listCoupon(centerId);
+	public List<Coupon> listCoupon(Integer centerId, Integer userId, String activityId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("activityId", activityId);
+		List<Coupon> couponList = couponMapper.listCoupon(param);
 		if (userId == null) {
 			return couponList;
 		}
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
 		param.put("userId", userId);
 		List<String> couponIdList = couponMapper.listUserCouponByUserId(param);
 		for (Coupon coupon : couponList) {

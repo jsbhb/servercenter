@@ -2,4 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zm.activity.bussiness.dao.ActivityMapper">
 
+	<resultMap type="com.zm.activity.pojo.Activity" id="activity">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="activity_id" property="activityId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="start_time" property="startTime" jdbcType="VARCHAR"/>
+		<result column="end_time" property="endTime" jdbcType="VARCHAR"/>
+		<result column="pic_path" property="picPath" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="listActivity" parameterType="Object" resultMap="activity">
+		select * from activity_${centerId}
+	</select>
 </mapper>

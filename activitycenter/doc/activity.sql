@@ -4,6 +4,64 @@ CREATE SCHEMA `zm_activity` ;
 
 use zm_activity;
 
+drop table if exists  `zm_activity`.`activity`;
+
+CREATE TABLE `zm_activity`.`activity` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `activity_id` varchar(100) NOT NULL COMMENT '活动ID',
+  `name` varchar(100) NOT NULL COMMENT '活动名称',
+  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：未开始，1:开始；2：结束；11：暂停',
+  `start_time` DATETIME NULL  COMMENT '开始时间',
+  `end_time` DATETIME NULL  COMMENT '结束时间',
+  `pic_path` varchar(200) NULL COMMENT '图片地址',
+  `attribute` varchar(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL  COMMENT '创建时间',
+  `update_time` DATETIME NULL  COMMENT '更新时间',
+  `opt` varchar(20) NULL COMMENT '',
+  PRIMARY KEY (`id`),
+  INDEX `idx_active_id` (`activity_id`),
+  INDEX `idx_status` (`status`)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '活动表';
+
+
+drop table if exists  `zm_activity`.`dictionary`;
+
+CREATE TABLE `zm_activity`.`dictionary` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `dict_name` varchar(100) NOT NULL COMMENT '字典名称',
+  `dict_value` varchar(100) NOT NULL COMMENT '字典值',
+  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：正常，1:停用；',
+  `attribute` varchar(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL  COMMENT '创建时间',
+  `update_time` DATETIME NULL  COMMENT '更新时间',
+  `opt` varchar(20) NULL COMMENT '',
+  PRIMARY KEY (`id`),
+  INDEX `idx_dict_value` (`dict_value`),
+  INDEX `idx_status` (`status`)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '字典表';
+
+
+drop table if exists  `zm_activity`.`dictentry`;
+
+CREATE TABLE `zm_activity`.`dictentry` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `dict_value` varchar(100) NOT NULL COMMENT '字典值',
+  `entry_name` varchar(100) NOT NULL COMMENT '名称',
+  `entry_value` varchar(100) NOT NULL COMMENT '值',
+  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：正常，1:停用；',
+  `attribute` varchar(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL  COMMENT '创建时间',
+  `update_time` DATETIME NULL  COMMENT '更新时间',
+  `opt` varchar(20) NULL COMMENT '',
+  PRIMARY KEY (`id`),
+  INDEX `idx_dict_value` (`dict_value`),
+  INDEX `idx_entry_value` (`entry_value`),
+  INDEX `idx_status` (`status`)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '字典属性表';
+
 
 
 drop table if exists  `zm_activity`.`coupon`;
@@ -12,22 +70,27 @@ CREATE TABLE `zm_activity`.`coupon` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `coupon_id` varchar(100) NOT NULL COMMENT '优惠券ID',
   `rule_id` varchar(100) NOT NULL COMMENT '规则ID',
-  `active_id` INT UNSIGNED NULL DEFAULT 0 COMMENT '活动ID',
+  `activity_id` varchar(100) NOT NULL COMMENT '活动ID',
   `name` varchar(100) NOT NULL COMMENT '优惠券名称',
-  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始，1：审核通过；2:发放；3：使用；4：过期',
-  `start_time` DATETIME NULL DEFAULT '1970-01-01 00:00:00' COMMENT '开始时间',
-  `end_time` DATETIME NULL DEFAULT '2970-01-01 00:00:00' COMMENT '结束时间',
+  `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：初始，1:发放；2：使用；3：过期；11：暂停',
+  `issue_start_time` DATETIME NULL COMMENT '发放开始时间',
+  `issue_end_time` DATETIME NULL COMMENT '发放结束时间',
+  `issue_end_status` TINYINT UNSIGNED DEFAULT 0 COMMENT '0：正常，1:发放结束；此字段预留',
+  `start_time` DATETIME NULL  COMMENT '开始时间',
+  `end_time` DATETIME NULL  COMMENT '结束时间',
   `node` TINYINT  NULL DEFAULT 0 COMMENT '触发节点 1：注册完成；',
   `num` INT NULL DEFAULT 0 COMMENT '发行数量0表示不限量',
   `receive_num` INT NULL DEFAULT 0 COMMENT '领取数量',
   `use_num` INT NULL DEFAULT 0 COMMENT '使用数量',
   `pic_path` varchar(200) NULL COMMENT '图片地址',
   `attribute` varchar(100) NULL COMMENT '备用',
+  `create_time` DATETIME NULL  COMMENT '创建时间',
+  `update_time` DATETIME NULL  COMMENT '更新时间',
   `opt` varchar(20) NULL COMMENT '',
   PRIMARY KEY (`id`),
   INDEX `idx_coupon_id` (`coupon_id`),
   INDEX `idx_rule_id` (`rule_id`),
-  INDEX `idx_active_id` (`active_id`),
+  INDEX `idx_active_id` (`activity_id`),
   INDEX `idx_status` (`status`),
   INDEX `idx_node` (`node`)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 

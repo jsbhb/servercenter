@@ -10,7 +10,7 @@ import com.zm.activity.pojo.Rule;
 
 public interface CouponMapper {
 
-	List<Coupon> listCoupon(@Param("centerId")Integer centerId);
+	List<Coupon> listCoupon(Map<String, Object> param);
 
 	List<Coupon> listCouponByCouponIds(Map<String, Object> param);
 	

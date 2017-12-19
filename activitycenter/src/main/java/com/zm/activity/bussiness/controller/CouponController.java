@@ -32,13 +32,14 @@ public class CouponController {
 	 * @param centerId
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/coupon/{centerId}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/coupon/{centerId}", method = RequestMethod.GET)
 	public ResultModel listCoupon(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestParam(value = "userId", required = false) Integer userId) {
+			@RequestParam(value = "userId", required = false) Integer userId,
+			@RequestParam(value = "activityId") String activityId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(true, couponService.listCoupon(centerId, userId));
+			return new ResultModel(true, couponService.listCoupon(centerId, userId, activityId));
 		}
 
 		return new ResultModel(false, "版本错误");
