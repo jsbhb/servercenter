@@ -29,7 +29,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<GoodsItem> listGoods(Map<String, Object> param);
+	List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, String userId);
 
 	/**
 	 * listBigTradeGoods:获取大贸海蒸鲜商品比价信息. <br/>

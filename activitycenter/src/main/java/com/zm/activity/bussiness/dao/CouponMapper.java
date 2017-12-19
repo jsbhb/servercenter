@@ -34,4 +34,6 @@ public interface CouponMapper {
 
 	void updateCouponGiveOut(Map<String, Object> param);
 
+	List<Coupon> listCouponByGoodsId(Map<String, Object> param);
+
 }

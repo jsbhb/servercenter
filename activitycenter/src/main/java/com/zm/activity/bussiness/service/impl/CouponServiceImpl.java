@@ -44,7 +44,7 @@ public class CouponServiceImpl implements CouponService {
 		for (Coupon coupon : couponList) {
 			if (coupon.getNum() > 0) {
 				Object obj = redisTemplate.opsForValue().get(Constants.RECEIVE_NUM + coupon.getCouponId());
-				if(obj != null){
+				if (obj != null) {
 					Integer receiveNum = Integer.valueOf(obj.toString());
 					if (receiveNum >= coupon.getNum()) {
 						coupon.setStatus(ALREADY_EMPTY);
@@ -132,6 +132,27 @@ public class CouponServiceImpl implements CouponService {
 			return new ResultModel(false, e.getMessage());
 		}
 
+	}
+
+	@Override
+	public ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String userId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("goodsId", goodsId);
+		List<Coupon> couponList = couponMapper.listCouponByGoodsId(param);
+		if (userId != null) {
+			param.put("userId", Integer.valueOf(userId));
+			List<String> couponIdList = couponMapper.listUserCouponByUserId(param);
+			for (Coupon coupon : couponList) {
+				for (String couponId : couponIdList) {
+					if (couponId.equals(coupon.getCouponId())) {
+						coupon.setReceiveStatus(ALREADY_RECEIVE);
+					}
+				}
+			}
+		}
+
+		return new ResultModel(true, couponList);
 	}
 
 }

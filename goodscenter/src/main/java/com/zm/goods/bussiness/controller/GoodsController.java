@@ -84,6 +84,7 @@ public class GoodsController {
 
 		String goodsId = req.getParameter("goodsId");
 		String itemId = req.getParameter("itemId");
+		String userId = req.getParameter("userId");
 		if (goodsId != null && itemId != null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数错误");
@@ -103,7 +104,7 @@ public class GoodsController {
 			param.put("itemId", itemId);
 			pagination.init();
 			param.put("pagination", pagination);
-			List<GoodsItem> goodsList = goodsService.listGoods(param);
+			List<GoodsItem> goodsList = goodsService.listGoods(param, centerId, userId);
 
 			result.setSuccess(true);
 			result.setObj(goodsList);
@@ -437,23 +438,25 @@ public class GoodsController {
 	 * @fun 根据同步到的库存更新库存信息
 	 */
 	@RequestMapping(value = "/{version}/goods/stock", method = RequestMethod.POST)
-	public boolean updateThirdWarehouseStock(@PathVariable("version") Double version, @RequestBody List<WarehouseStock> list) {
+	public boolean updateThirdWarehouseStock(@PathVariable("version") Double version,
+			@RequestBody List<WarehouseStock> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsService.updateThirdWarehouseStock(list);
 		}
 		return false;
 	}
-	
+
 	@RequestMapping(value = "/{version}/goods/thirdGoods", method = RequestMethod.POST)
-	public boolean saveThirdGoods(@PathVariable("version") Double version, @RequestBody List<ThirdWarehouseGoods> list){
-		
+	public boolean saveThirdGoods(@PathVariable("version") Double version,
+			@RequestBody List<ThirdWarehouseGoods> list) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsService.saveThirdGoods(list);
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @fun 根据list 获取渠道价格总价
 	 * @param version
@@ -461,12 +464,12 @@ public class GoodsController {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/goods/costPrice", method = RequestMethod.POST)
-	public Double getCostPrice(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list){
-		
+	public Double getCostPrice(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsService.getCostPrice(list);
 		}
-		
+
 		return 0.0;
 	}
 

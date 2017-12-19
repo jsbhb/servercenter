@@ -1,4 +1,4 @@
-package com.zm.activity.pojo;
+package com.zm.goods.pojo.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,7 +16,7 @@ public class Coupon {
 	
 	private String name;
 	
-	private Integer receiveStatus = -1;//是否领取
+	private Integer receiveStatus = -1;
 	
 	private Integer status;
 	
@@ -38,8 +38,6 @@ public class Coupon {
 	
 	private String picPath = "null";
 	
-	private Rule rule;
-
 	public String getIssueStartTime() {
 		return issueStartTime;
 	}
@@ -62,14 +60,6 @@ public class Coupon {
 
 	public void setReceiveStatus(Integer receiveStatus) {
 		this.receiveStatus = receiveStatus;
-	}
-
-	public Rule getRule() {
-		return rule;
-	}
-
-	public void setRule(Rule rule) {
-		this.rule = rule;
 	}
 
 	public Integer getId() {

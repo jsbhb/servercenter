@@ -3,6 +3,8 @@ package com.zm.goods.pojo;
 import java.util.List;
 import java.util.Set;
 
+import com.zm.goods.pojo.vo.Coupon;
+
 public class GoodsItem extends GoodsBase {
 	
 	private Integer id;
@@ -58,6 +60,17 @@ public class GoodsItem extends GoodsBase {
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
+	
+	private List<Coupon> couponList;
+
+	
+	public List<Coupon> getCouponList() {
+		return couponList;
+	}
+
+	public void setCouponList(List<Coupon> couponList) {
+		this.couponList = couponList;
+	}
 
 	public String getOrigin() {
 		return origin;

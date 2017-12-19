@@ -119,4 +119,24 @@ public class CouponController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	/**
+	 * @fun 根据goodsId获取优惠券（商品详情页显示）
+	 * @param version
+	 * @param List
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/coupon-goodsId/{centerId}", method = RequestMethod.GET)
+	public ResultModel listCouponByGoodsId(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @RequestParam("goodsId") String goodsId,
+			@RequestParam(value = "userId", required = false) String userId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return couponService.listCouponByGoodsId(centerId, goodsId, userId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

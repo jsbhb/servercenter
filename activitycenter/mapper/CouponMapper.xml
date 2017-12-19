@@ -91,6 +91,11 @@
 			where coupon_id = #{item} and status = 0
 		</foreach>
 	</update>
+	
+	<select id="listCouponByGoodsId" parameterType="Object" resultMap="coupon">
+		select c.id, coupon_id, pic_path, name from coupon_${centerId} c left join rule_${centerId} r on c.rule_id = r.rule_id 
+		left join coupon_goods_${centerId} cg on r.rule_id=cg.rule_id where cg.goods_id=#{goodsId}
+	</select>
 
 	<!-- 建表语句start -->
 	<update id="createCoupon" parameterType="java.lang.Integer">

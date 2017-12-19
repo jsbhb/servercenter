@@ -46,4 +46,7 @@ public interface CouponService {
 	 * @return
 	 */
 	ResultModel giveOutCoupon(Integer centerId, List<String> list);
+
+	
+	ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String userId);
 }

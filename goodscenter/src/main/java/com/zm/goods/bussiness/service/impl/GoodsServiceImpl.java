@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.feignclient.ActivityFeignClient;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
@@ -34,6 +35,7 @@ import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.vo.Coupon;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
 import com.zm.goods.pojo.vo.TimeLimitActive;
@@ -65,8 +67,11 @@ public class GoodsServiceImpl implements GoodsService {
 	@Resource
 	SupplierFeignClient supplierFeignClient;
 
+	@Resource
+	ActivityFeignClient activityFeignClient;
+
 	@Override
-	public List<GoodsItem> listGoods(Map<String, Object> param) {
+	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, String userId) {
 
 		if (param.get("itemId") != null) {
 			String goodsId = goodsMapper.getGoodsIdByItemId((String) param.get("itemId"));
@@ -93,12 +98,23 @@ public class GoodsServiceImpl implements GoodsService {
 			parameter.put("goodsType", goodsList.get(0).getType());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			packageGoodsItem(goodsList, fileList, specsList, true);
+			ResultModel result = activityFeignClient.listCouponByGoodsId(Constants.FIRST_VERSION, centerId,
+					goodsList.get(0).getGoodsId(),userId);
+			if (result.isSuccess()) {
+				doPackGoodsCoupon(goodsList, result);
+			}
 		} else {
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			packageGoodsItem(goodsList, fileList, specsList, false);
 		}
 
 		return goodsList;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void doPackGoodsCoupon(List<GoodsItem> goodsList, ResultModel result) {
+		List<Coupon> couponList = (List<Coupon>) result.getObj();
+		goodsList.get(0).setCouponList(couponList);
 	}
 
 	@Override
@@ -779,7 +795,7 @@ public class GoodsServiceImpl implements GoodsService {
 				}
 			}
 		}
-		
+
 		return totalAmount;
 	}
 
