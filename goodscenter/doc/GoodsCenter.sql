@@ -40,6 +40,7 @@ CREATE TABLE `zm_goods`.`goods` (
   `supplier_id` int UNSIGNED NULL COMMENT '商家ID',
   `supplier_name` VARCHAR(100) NULL COMMENT '商家名称',
   `base_id` int UNSIGNED NOT NULL COMMENT '商品基本信息ID',
+  `specs_template_id` int UNSIGNED NOT NULL COMMENT '规格模板ID',
   `goods_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
   `description` VARCHAR(450) NULL COMMENT '描述',
   `origin` VARCHAR(100) NULL COMMENT '原产国',
