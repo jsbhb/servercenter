@@ -3,10 +3,12 @@ package com.zm.goods.pojo;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zm.goods.pojo.vo.Coupon;
 
 public class GoodsItem extends GoodsBase {
 	
+	@JsonIgnore
 	private Integer id;
 
 	private String goodsId;
@@ -35,16 +37,20 @@ public class GoodsItem extends GoodsBase {
 
 	private Integer choice;
 
+	@JsonIgnore
 	private Integer indexStatus;
 
 	private String detailPath;
 
+	@JsonIgnore
 	private String createTime;
 
+	@JsonIgnore
 	private String updateTime;
 	
 	private Set<String> specsInfo;
 
+	@JsonIgnore
 	private String opt;
 	
 	private Double price;

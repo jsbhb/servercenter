@@ -3,6 +3,8 @@ package com.zm.goods.pojo;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**  
  * ClassName: GoodsSpecs <br/>  
  * Function: 商品规格，包括价格. <br/>   
@@ -16,6 +18,7 @@ public class GoodsSpecs implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
+	@JsonIgnore
 	private Integer id;
 	
 	private String goodsId;
@@ -36,10 +39,13 @@ public class GoodsSpecs implements Serializable{
 	
 	private Double exciseTax;
 	
+	@JsonIgnore
 	private String createTime;
 	
+	@JsonIgnore
 	private String updateTime;
 	
+	@JsonIgnore
 	private String opt;
 	
 	private Double minPrice;
