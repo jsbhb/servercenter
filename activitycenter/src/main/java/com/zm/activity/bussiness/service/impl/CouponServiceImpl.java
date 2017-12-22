@@ -1,5 +1,6 @@
 package com.zm.activity.bussiness.service.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +89,11 @@ public class CouponServiceImpl implements CouponService {
 		param.put("centerId", centerId);
 		param.put("couponId", couponId);
 		Integer total = couponMapper.getIssueNumByCouponId(param);
+		if(total == null){
+			return new ResultModel(false, "没有该优惠券");
+		}
 		// 如果有数量限制
-		if (total != null && total > 0) {
+		if (total > 0) {
 			Object obj = redisTemplate.opsForList().leftPop(Constants.ISSUE_NUM + couponId);
 			if (obj == null) {
 				return new ResultModel(false, "已抢完");
@@ -100,13 +104,14 @@ public class CouponServiceImpl implements CouponService {
 		if (back == 1) {
 			redisTemplate.setValueSerializer(new StringRedisSerializer());
 			redisTemplate.opsForValue().increment(Constants.RECEIVE_NUM + couponId, 1);
+			return new ResultModel(true, "领取成功");
 		} else {
 			// 如果没插入，队列数量返回
 			if (total != null && total > 0) {
 				redisTemplate.opsForList().rightPush(Constants.ISSUE_NUM + couponId, couponId);
 			}
+			return new ResultModel(false, "您已经领取过该优惠券");
 		}
-		return new ResultModel(true, "领取成功");
 	}
 
 	@Override
@@ -140,19 +145,65 @@ public class CouponServiceImpl implements CouponService {
 		param.put("centerId", centerId);
 		param.put("goodsId", goodsId);
 		List<Coupon> couponList = couponMapper.listCouponByGoodsId(param);
+		List<String> couponIdList = null;
 		if (userId != null) {
 			param.put("userId", Integer.valueOf(userId));
-			List<String> couponIdList = couponMapper.listUserCouponByUserId(param);
-			for (Coupon coupon : couponList) {
+			couponIdList = couponMapper.listUserCouponByUserId(param);
+		}
+		for (Coupon coupon : couponList) {
+			if(couponIdList != null){
 				for (String couponId : couponIdList) {
 					if (couponId.equals(coupon.getCouponId())) {
 						coupon.setReceiveStatus(ALREADY_RECEIVE);
 					}
 				}
 			}
+			if (coupon.getNum() > 0) {
+				Object obj = redisTemplate.opsForValue().get(Constants.RECEIVE_NUM + coupon.getCouponId());
+				if (obj != null) {
+					Integer receiveNum = Integer.valueOf(obj.toString());
+					if (receiveNum >= coupon.getNum()) {
+						coupon.setStatus(ALREADY_EMPTY);
+					}
+				}
+			}
 		}
 
 		return new ResultModel(true, couponList);
+	}
+
+	@Override
+	public ResultModel listCouponByNode(Integer node, Integer centerId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("node", node);
+		
+		return new ResultModel(true, couponMapper.listCouponByNode(param));
+	}
+
+	@Override
+	public ResultModel listCouponByCouponIds(String couponIds, Integer centerId, Integer userId) {
+		String[] couponIdArr = couponIds.split(",");
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("userId", userId);
+		param.put("list", Arrays.asList(couponIdArr));
+		Integer count = couponMapper.countUserCoupon(param);
+		if(count != couponIdArr.length){
+			return new ResultModel(false, "优惠券使用非法");
+		}
+		return new ResultModel(true,couponMapper.listCouponByCouponIds(param));
+	}
+
+	@Override
+	public void updateUserCoupon(String couponIds, Integer centerId, Integer userId) {
+		String[] couponIdArr = couponIds.split(",");
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("list", Arrays.asList(couponIdArr));
+		param.put("userId", userId);
+		couponMapper.updateUserCoupon(param);
+		
 	}
 
 }

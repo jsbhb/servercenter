@@ -48,6 +48,15 @@ public class GoodsSpecs implements Serializable{
 	@JsonIgnore
 	private String opt;
 	
+	@JsonIgnore
+	private String thirdCategory;
+	
+	@JsonIgnore
+	private String secondCategory;
+	
+	@JsonIgnore
+	private String firstCategory;
+	
 	private Double minPrice;
 	
 	private Double maxPrice;
@@ -71,6 +80,30 @@ public class GoodsSpecs implements Serializable{
 	private Double incrementTax;
 	
 	private List<GoodsPrice> priceList;
+
+	public String getThirdCategory() {
+		return thirdCategory;
+	}
+
+	public void setThirdCategory(String thirdCategory) {
+		this.thirdCategory = thirdCategory;
+	}
+
+	public String getSecondCategory() {
+		return secondCategory;
+	}
+
+	public void setSecondCategory(String secondCategory) {
+		this.secondCategory = secondCategory;
+	}
+
+	public String getFirstCategory() {
+		return firstCategory;
+	}
+
+	public void setFirstCategory(String firstCategory) {
+		this.firstCategory = firstCategory;
+	}
 
 	public Double getRealMinPrice() {
 		return realMinPrice;

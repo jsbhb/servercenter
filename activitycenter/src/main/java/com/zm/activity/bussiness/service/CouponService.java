@@ -49,4 +49,10 @@ public interface CouponService {
 
 	
 	ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String userId);
+
+	ResultModel listCouponByNode(Integer node, Integer centerId);
+
+	ResultModel listCouponByCouponIds(String couponIds, Integer centerId, Integer userId);
+
+	void updateUserCoupon(String couponIds, Integer centerId, Integer userId);
 }

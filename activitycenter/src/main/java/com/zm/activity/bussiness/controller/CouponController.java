@@ -139,4 +139,52 @@ public class CouponController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	/**
+	 * @fun 获取指定节点优惠券
+	 * @param version
+	 * @param List
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/listCouponByNode/{centerId}", method = RequestMethod.GET)
+	public ResultModel listCouponByNode(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @RequestParam(value = "node") Integer node) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return couponService.listCouponByNode(node, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 根据优惠券IDS获取优惠券
+	 * @param version
+	 * @param List
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/listCouponByCouponIds/{centerId}", method = RequestMethod.GET)
+	public ResultModel listCouponByCouponIds(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @RequestParam(value = "couponIds") String couponIds,
+			@RequestParam(value = "userId") Integer userId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return couponService.listCouponByCouponIds(couponIds, centerId, userId);
+		}
+
+		return new ResultModel(false, "");
+	}
+	
+	@RequestMapping(value = "{version}/update/{centerId}", method = RequestMethod.GET)
+	public void updateUserCoupon(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestParam("userId") Integer userId, @RequestParam(value = "couponIds") String couponIds){
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			couponService.updateUserCoupon(couponIds, centerId, userId);
+		}
+	}
 }

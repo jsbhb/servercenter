@@ -196,12 +196,13 @@ public class GoodsController {
 	@ApiIgnore
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag) {
+			Integer centerId, Integer orderFlag, @RequestParam(value = "couponIds", required = false) String couponIds,
+			@RequestParam(value = "userId") Integer userId) {
 
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag);
+			result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds, userId);
 		}
 
 		return result;

@@ -2,10 +2,14 @@ package com.zm.goods.pojo;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 public class GoodsFile implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
+	@JsonIgnore
 	private Integer id;
 	
 	private String goodsId;
@@ -13,15 +17,15 @@ public class GoodsFile implements Serializable{
 	private String path;
 	
 	private String suffix;
-	
+	@JsonIgnore
 	private Integer storeType;
-	
+	@JsonIgnore
 	private Integer type;
-	
+	@JsonIgnore
 	private String createTime;
-	
+	@JsonIgnore
 	private String updateTime;
-	
+	@JsonIgnore
 	private String opt;
 
 	public Integer getId() {

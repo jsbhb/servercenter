@@ -69,6 +69,7 @@ drop table if exists  `zm_activity`.`coupon`;
 CREATE TABLE `zm_activity`.`coupon` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `coupon_id` varchar(100) NOT NULL COMMENT '优惠券ID',
+  `parent_coupon_id` varchar(100) NULL COMMENT '父级优惠券ID，用于礼包券',
   `rule_id` varchar(100) NOT NULL COMMENT '规则ID',
   `activity_id` varchar(100) NOT NULL COMMENT '活动ID',
   `name` varchar(100) NOT NULL COMMENT '优惠券名称',
@@ -143,6 +144,7 @@ CREATE TABLE `zm_activity`.`user_coupon` (
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：未使用；1：已使用',
   PRIMARY KEY (`id`),
   INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_status` (`status`),
   INDEX `idx_center_id` (`center_id`),
   UNIQUE INDEX `id_UNIQUE` (`user_id`,`coupon_id`,`center_id`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 

@@ -12,16 +12,17 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.goods.bussiness.component.ActivityComponent;
+import com.zm.goods.bussiness.component.GoodsServiceUtil;
+import com.zm.goods.bussiness.component.PriceComponent;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.feignclient.ActivityFeignClient;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
-import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -35,15 +36,12 @@ import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
-import com.zm.goods.pojo.vo.Coupon;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
 import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.pojo.vo.TimeLimitActiveData;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
-import com.zm.goods.utils.CommonUtils;
-import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
@@ -68,7 +66,10 @@ public class GoodsServiceImpl implements GoodsService {
 	SupplierFeignClient supplierFeignClient;
 
 	@Resource
-	ActivityFeignClient activityFeignClient;
+	ActivityComponent activityComponent;
+	
+	@Resource
+	PriceComponent priceComponent;
 
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, String userId) {
@@ -97,24 +98,14 @@ public class GoodsServiceImpl implements GoodsService {
 		if (param.get("goodsId") != null) {
 			parameter.put("goodsType", goodsList.get(0).getType());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
-			packageGoodsItem(goodsList, fileList, specsList, true);
-			ResultModel result = activityFeignClient.listCouponByGoodsId(Constants.FIRST_VERSION, centerId,
-					goodsList.get(0).getGoodsId(),userId);
-			if (result.isSuccess()) {
-				doPackGoodsCoupon(goodsList, result);
-			}
+			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, true);
+			activityComponent.doPackCoupon(centerId, userId, goodsList);
 		} else {
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
-			packageGoodsItem(goodsList, fileList, specsList, false);
+			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, false);
 		}
 
 		return goodsList;
-	}
-
-	@SuppressWarnings("unchecked")
-	private void doPackGoodsCoupon(List<GoodsItem> goodsList, ResultModel result) {
-		List<Coupon> couponList = (List<Coupon>) result.getObj();
-		goodsList.get(0).setCouponList(couponList);
 	}
 
 	@Override
@@ -139,14 +130,14 @@ public class GoodsServiceImpl implements GoodsService {
 	public Map<String, Object> tradeGoodsDetail(String itemId, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("itemId", itemId);
 		GoodsSpecs specs = goodsMapper.getGoodsSpecs(param);
 		if (specs == null) {
 			return null;
 		}
-		getPriceInterval(specs, specs.getDiscount());
+		GoodsServiceUtil.getPriceInterval(specs, specs.getDiscount());
 
 		List<String> idList = new ArrayList<String>();
 		idList.add(specs.getGoodsId());
@@ -168,7 +159,7 @@ public class GoodsServiceImpl implements GoodsService {
 	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", list);
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(param);
 		if (specsList == null || specsList.size() == 0) {
@@ -176,7 +167,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		for (GoodsSpecs specs : specsList) {
-			getPriceInterval(specs, specs.getDiscount());
+			GoodsServiceUtil.getPriceInterval(specs, specs.getDiscount());
 		}
 
 		List<String> idList = new ArrayList<String>();
@@ -201,63 +192,44 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag) {
+			Integer centerId, Integer orderFlag, String couponIds, Integer userId) {
 
-		ResultModel result = new ResultModel();
+		ResultModel result = new ResultModel(true, "");
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();
-
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("orderFlag", orderFlag);
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
 		Integer weight = 0;
-		Double discount = null;
-		if (Constants.O2O_ORDER.equals(orderFlag)) {
-			for (OrderBussinessModel model : list) {
-				param.put("itemId", model.getItemId());
+		Map<String, GoodsSpecs> specsMap = new HashMap<String, GoodsSpecs>();
+
+		for (OrderBussinessModel model : list) {
+			param.put("itemId", model.getItemId());
+			specs = goodsMapper.getGoodsSpecsForOrder(param);
+			weight += specs.getWeight() * model.getQuantity();
+			Double amount = GoodsServiceUtil.judgeQuantityRange(vip, result, specs, model);
+			if (Constants.O2O_ORDER.equals(orderFlag)) {
 				Tax tax = goodsMapper.getTax(param);
-				specs = goodsMapper.getGoodsSpecs(param);
-				discount = specs.getDiscount();
-				weight += specs.getWeight() * model.getQuantity();
 				if (taxMap.get(tax) == null) {
-					Double amount = getAmount(vip, specs, model, 10.0);
-					if (amount == null) {
-						result.setSuccess(false);
-						result.setErrorMsg("购买数量不在指定范围内");
-						return result;
-					}
 					taxMap.put(tax, amount);
 				} else {
-					Double amount = getAmount(vip, specs, model, 10.0);
-					if (amount == null) {
-						result.setSuccess(false);
-						result.setErrorMsg("购买数量不在指定范围内");
-						return result;
-					}
 					taxMap.put(tax, taxMap.get(tax) + amount);
 				}
-				totalAmount += getAmount(vip, specs, model, discount);
 			}
-			map.put("tax", taxMap);
-		} else {
-			for (OrderBussinessModel model : list) {
-
-				param.put("itemId", model.getItemId());
-				specs = goodsMapper.getGoodsSpecs(param);
-				discount = specs.getDiscount();
-				weight += specs.getWeight() * model.getQuantity();
-				Double amount = getAmount(vip, specs, model, discount);
-				if (amount == null) {
-					result.setSuccess(false);
-					result.setErrorMsg("购买数量不在指定范围内");
-					return result;
-				}
-				totalAmount += amount;
+			if (!result.isSuccess()) {
+				return result;
 			}
+			specsMap.put(model.getItemId(),specs);
 		}
+
+		totalAmount = priceComponent.calPrice(list, specsMap, couponIds, false, vip, centerId, result, userId);
+		if(!result.isSuccess()){
+			return result;
+		}
+		map.put("tax", taxMap);
 
 		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
@@ -277,109 +249,6 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
-	private Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion) {
-		Double totalAmount = 0.0;
-		getPriceInterval(specs, promotion);
-		boolean calculation = false;
-		Double discount = 10.0;
-		if (promotion != null && promotion != 0.0) {
-			discount = promotion;
-		}
-		discount = CalculationUtils.div(discount, 10.0);
-		for (GoodsPrice price : specs.getPriceList()) {
-			boolean flag = model.getQuantity() >= price.getMin()
-					&& (price.getMax() == null || model.getQuantity() <= price.getMax());
-			if (flag) {
-				if (model.getDeliveryPlace() != null) {
-					if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
-						totalAmount += model.getQuantity()
-								* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
-						calculation = true;
-						break;
-					}
-				} else {
-					totalAmount += model.getQuantity()
-							* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
-					calculation = true;
-					break;
-				}
-			}
-		}
-		if (!calculation) {
-			return null;
-		}
-
-		return CalculationUtils.mul(totalAmount, discount);
-	}
-
-	@SuppressWarnings("unchecked")
-	private void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList,
-			boolean flag) {
-
-		Map<String, GoodsItem> goodsMap = new HashMap<String, GoodsItem>();
-		if (goodsList == null || goodsList.size() == 0) {
-			return;
-		}
-
-		for (GoodsItem item : goodsList) {
-			goodsMap.put(item.getGoodsId(), item);
-		}
-
-		GoodsItem item = null;
-		List<GoodsFile> tempFileList = null;
-		List<GoodsSpecs> tempSpecsList = null;
-		if (fileList != null && fileList.size() > 0) {
-			for (GoodsFile file : fileList) {
-				item = goodsMap.get(file.getGoodsId());
-				if (item == null) {
-					continue;
-				}
-				if (item.getGoodsFileList() == null) {
-					tempFileList = new ArrayList<GoodsFile>();
-					tempFileList.add(file);
-					item.setGoodsFileList(tempFileList);
-				} else {
-					item.getGoodsFileList().add(file);
-				}
-			}
-		}
-
-		if (specsList != null && specsList.size() > 0) {
-			Map<String, String> temp = null;
-			Set<String> tempSet = null;
-			Double discount = null;
-			for (GoodsSpecs specs : specsList) {
-				item = goodsMap.get(specs.getGoodsId());
-				if (item == null) {
-					continue;
-				}
-				if (flag) {
-					if (item.getGoodsSpecsList() == null) {
-						tempSpecsList = new ArrayList<GoodsSpecs>();
-						tempSpecsList.add(specs);
-						item.setGoodsSpecsList(tempSpecsList);
-					} else {
-						item.getGoodsSpecsList().add(specs);
-					}
-					discount = specs.getDiscount();
-					getPriceInterval(specs, discount);
-				} else {
-					temp = JSONUtil.parse(specs.getInfo(), Map.class);
-					for (Map.Entry<String, String> entry : temp.entrySet()) {
-						if (item.getSpecsInfo() == null) {
-							tempSet = new HashSet<String>();
-							tempSet.add(entry.getValue());
-							item.setSpecsInfo(tempSet);
-						} else {
-							item.getSpecsInfo().add(entry.getKey());
-						}
-					}
-				}
-			}
-		}
-
-	}
-
 	@Override
 	public Activity getActivity(Map<String, Object> param) {
 
@@ -389,7 +258,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public List<Layout> getModular(String page, Integer centerId, Integer pageType) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("page", page);
 		param.put("pageType", pageType);
@@ -417,7 +286,7 @@ public class GoodsServiceImpl implements GoodsService {
 	public List<PageModule> getModularData(Integer pageType, String page, Layout layout, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		List<PageModule> result = new ArrayList<PageModule>();
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("page", page);
 		param.put("pageType", pageType);
@@ -465,7 +334,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void updateActiveStart(Integer centerId, Integer activeId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("activeId", activeId);
 		goodsMapper.updateActivitiesStart(param);
@@ -475,58 +344,11 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void updateActiveEnd(Integer centerId, Integer activeId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("activeId", activeId);
 		goodsMapper.updateActivitiesEnd(param);
 
-	}
-
-	// 封装价格区间
-	private void getPriceInterval(GoodsSpecs specs, Double discountParam) {
-		List<GoodsPrice> priceList = specs.getPriceList();
-		if (priceList == null) {
-			return;
-		}
-		Double discount = 10.0;
-		if (discountParam != null && discountParam != 0.0) {
-			discount = discountParam;
-		}
-		discount = CalculationUtils.div(discount, 10.0);
-		for (int i = 0; i < priceList.size(); i++) {
-			if (i == 0) {
-				specs.setMinPrice(priceList.get(i).getPrice());
-				specs.setMaxPrice(priceList.get(i).getPrice());
-				specs.setRealMinPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
-				specs.setRealMaxPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
-				if (priceList.get(i).getVipPrice() != null) {
-					specs.setVipMinPrice(priceList.get(i).getVipPrice());
-					specs.setVipMaxPrice(priceList.get(i).getVipPrice());
-					specs.setRealVipMinPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
-					specs.setRealVipMaxPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
-				}
-
-			} else {
-				specs.setRealMinPrice(CalculationUtils
-						.mul(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()), discount));
-				specs.setMinPrice(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()));
-				specs.setRealMaxPrice(CalculationUtils
-						.mul(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()), discount));
-				specs.setMaxPrice(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()));
-				if (priceList.get(i).getVipPrice() != null) {
-					specs.setRealVipMinPrice(CalculationUtils.mul(
-							CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()),
-							discount));
-					specs.setVipMinPrice(
-							CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()));
-					specs.setRealVipMaxPrice(CalculationUtils.mul(
-							CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()),
-							discount));
-					specs.setVipMaxPrice(
-							CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()));
-				}
-			}
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -564,7 +386,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	private void renderLuceneModel(Map<String, Object> param, List<GoodsSearch> searchList, Integer id) {
 		GoodsSearch searchModel;
-		String centerId = judgeCenterId(id);
+		String centerId = GoodsServiceUtil.judgeCenterId(id);
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(centerId);
 		for (GoodsItem item : itemList) {
 			searchModel = new GoodsSearch();
@@ -587,11 +409,6 @@ public class GoodsServiceImpl implements GoodsService {
 		AbstractLucene lucene = LuceneFactory.get(id);
 		lucene.writerIndex(searchList);
 		goodsMapper.updateLuceneStatus(centerId);
-	}
-
-	private String judgeCenterId(Integer id) {
-		String centerId = "_" + id;
-		return centerId;
 	}
 
 	private final String GOODS_LIST = "goodsList";
@@ -621,7 +438,7 @@ public class GoodsServiceImpl implements GoodsService {
 			if (sortList != null && sortList.getSortList() != null && sortList.getSortList().size() > 0) {
 				searchParm.put("sortList", sortList.getSortList());
 			}
-			String centerId = judgeCenterId(searchModel.getCenterId());
+			String centerId = GoodsServiceUtil.judgeCenterId(searchModel.getCenterId());
 
 			searchParm.put("centerId", centerId);
 			goodsList = goodsMapper.queryGoodsItem(searchParm);
@@ -696,7 +513,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<GoodsIndustryModel> loadIndexNavigation(Integer centerId) {
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 
 		return goodsMapper.queryGoodsCategory(id);
 	}
@@ -711,7 +528,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<TimeLimitActive> getTimelimitGoods(Integer centerId) {
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		List<TimeLimitActive> list = goodsMapper.listLimitTimeData(id);
 		Map<String, Object> searchParm = new HashMap<String, Object>();
 		if (list == null || list.size() == 0) {
@@ -748,7 +565,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
-		String id = judgeCenterId(centerId);
+		String id = GoodsServiceUtil.judgeCenterId(centerId);
 
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", id);

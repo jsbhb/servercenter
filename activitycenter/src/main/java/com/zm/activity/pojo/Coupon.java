@@ -18,11 +18,11 @@ public class Coupon {
 	
 	private Integer receiveStatus = -1;//是否领取
 	
-	private Integer status;
+	private Integer status = -1;
 	
-	private String startTime;
+	private String startTime= "null";
 	
-	private String endTime;
+	private String endTime= "null";
 	
 	private String issueStartTime;
 	
@@ -36,7 +36,7 @@ public class Coupon {
 	
 	private Integer useNum;
 	
-	private String picPath = "null";
+	private String picPath;
 	
 	private Rule rule;
 

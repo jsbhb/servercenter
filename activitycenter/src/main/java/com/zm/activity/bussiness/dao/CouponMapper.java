@@ -36,4 +36,10 @@ public interface CouponMapper {
 
 	List<Coupon> listCouponByGoodsId(Map<String, Object> param);
 
+	List<Coupon> listCouponByNode(Map<String, Object> param);
+
+	Integer countUserCoupon(Map<String, Object> param);
+
+	void updateUserCoupon(Map<String, Object> param);
+
 }

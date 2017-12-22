@@ -15,4 +15,9 @@ public interface ActivityFeignClient {
 	public ResultModel listCouponByGoodsId(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId, @RequestParam("goodsId") String goodsId,
 			@RequestParam(value = "userId", required = false) String userId);
+
+	@RequestMapping(value = "{version}/listCouponByCouponIds/{centerId}", method = RequestMethod.GET)
+	public ResultModel listCouponByCouponIds(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @RequestParam(value = "couponIds") String couponIds,
+			@RequestParam(value = "userId") Integer userId);
 }

@@ -12,7 +12,8 @@
 		<result column="num" property="num" jdbcType="INTEGER" />
 		<result column="receive_num" property="receiveNum" jdbcType="INTEGER" />
 		<result column="use_num" property="useNum" jdbcType="INTEGER" />
-		<result column="issue_start_time" property="issueStartTime" jdbcType="VARCHAR" />
+		<result column="issue_start_time" property="issueStartTime"
+			jdbcType="VARCHAR" />
 		<result column="start_time" property="startTime" jdbcType="VARCHAR" />
 		<result column="end_time" property="endTime" jdbcType="VARCHAR" />
 		<result column="pic_path" property="picPath" jdbcType="VARCHAR" />
@@ -38,63 +39,111 @@
 
 	<select id="listCoupon" parameterType="Object" resultMap="coupon">
 		select
-		id, coupon_id, pic_path,num,status from coupon_${centerId} where status in(2,1) and
-		node = 0 and activity_id = #{activityId}
+		id, coupon_id, pic_path,num,status,name,start_time,end_time from
+		coupon_${centerId} where status in(2,1) and
+		node = 0 and activity_id =
+		#{activityId}
 	</select>
 
 	<select id="listCouponByCouponIds" parameterType="Object"
 		resultMap="coupon">
-		select c.id, c.coupon_id, c.pic_path, r.condition, r.id as rule_id,
-		r.deductible_value, r.value_type, r.range, r.category,
-		r.is_superposition, r.weight, cg.id as bind_id,cg.goods_id from
-		coupon_${centerId} c left join rule_${centerId} r on c.rule_id = r.rule_id
+		select c.id, c.coupon_id, c.pic_path, r.condition, r.id as
+		rule_id,c.name,c.start_time,c.end_time,
+		r.deductible_value,
+		r.value_type, r.range, r.category,
+		r.is_superposition, r.weight, cg.id
+		as bind_id,cg.goods_id from
+		coupon_${centerId} c left join
+		rule_${centerId} r on c.rule_id = r.rule_id
 		left join
-		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status in(2,1) and c.coupon_id in
+		coupon_goods_${centerId} cg on cg.rule_id = r.rule_id where c.status
+		in(2,1) and c.coupon_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}
 		</foreach>
 	</select>
-	
-	<select id="listUserCouponByUserId" parameterType="Object" resultType="java.lang.String">
-		select coupon_id from user_coupon where center_id = #{centerId} and user_id = #{userId} 
+
+	<select id="countUserCoupon" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from user_coupon where center_id = #{centerId} and
+		user_id = #{userId} and status = 0 and coupon_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="listUserCouponByUserId" parameterType="Object"
+		resultType="java.lang.String">
+		select coupon_id from user_coupon where center_id = #{centerId} and
+		user_id = #{userId}
 		<if test="status != null">
 			and status = #{status}
 		</if>
 	</select>
-	
-	<select id="getIssueNumByCouponId" parameterType="Object" resultType="java.lang.Integer">
-		select num from coupon_${centerId} where coupon_id = #{couponId}
+
+	<select id="getIssueNumByCouponId" parameterType="Object"
+		resultType="java.lang.Integer">
+		select num from coupon_${centerId} where coupon_id =
+		#{couponId}
 	</select>
-	
+
 	<update id="updateCouponReceiveNum" parameterType="Object">
-		update coupon_${centerId} set receive_num = #{receiveNum} where coupon_id = #{couponId}
+		update
+		coupon_${centerId} set receive_num = #{receiveNum} where coupon_id =
+		#{couponId}
 	</update>
-	
+
 	<insert id="binding" parameterType="Object">
-		insert ignore into user_coupon(user_id,coupon_id,center_id) values (#{userId},#{couponId},#{centerId})
+		insert ignore into
+		user_coupon(user_id,coupon_id,center_id) values
+		(#{userId},#{couponId},#{centerId})
 	</insert>
-	
+
 	<select id="listIssueNum" parameterType="Object" resultMap="coupon">
-		select num, coupon_id from coupon_${centerId} where num != 0 and status = 0 and coupon_id in 
-		<foreach collection="list" item="item" separator="," open="(" close=")">
+		select num, coupon_id from coupon_${centerId} where num != 0 and
+		status = 0 and coupon_id in
+		<foreach collection="list" item="item" separator="," open="("
+			close=")">
 			#{item}
 		</foreach>
 	</select>
-	
+
+	<update id="updateUserCoupon" parameterType="Object">
+		<foreach collection="list" item="item" separator=";" open=""
+			close="">
+			update user_coupon 
+			<set>
+				status = 1
+			</set>
+			where center_id = #{centerId} and user_id = #{userId} and coupon_id = #{item}
+		</foreach>
+	</update>
+
 	<update id="updateCouponGiveOut" parameterType="Object">
-		<foreach collection="list" item="item" separator=";" open="" close="">
-			update coupon_${centerId} 
+		<foreach collection="list" item="item" separator=";" open=""
+			close="">
+			update coupon_${centerId}
 			<set>
 				status = 1
 			</set>
 			where coupon_id = #{item} and status = 0
 		</foreach>
 	</update>
-	
-	<select id="listCouponByGoodsId" parameterType="Object" resultMap="coupon">
-		select c.id, coupon_id, pic_path, name from coupon_${centerId} c left join rule_${centerId} r on c.rule_id = r.rule_id 
-		left join coupon_goods_${centerId} cg on r.rule_id=cg.rule_id where cg.goods_id=#{goodsId}
+
+	<select id="listCouponByGoodsId" parameterType="Object"
+		resultMap="coupon">
+		select c.id, c.coupon_id, c.pic_path,c.num,
+		c.name,c.start_time,c.end_time from coupon_${centerId} c left join
+		rule_${centerId} r on c.rule_id = r.rule_id
+		left join
+		coupon_goods_${centerId} cg on r.rule_id=cg.rule_id where
+		cg.goods_id=#{goodsId} and c.status in(1,2)
+	</select>
+
+	<select id="listCouponByNode" parameterType="Object" resultMap="coupon">
+		select c.id, c.coupon_id, c.pic_path, c.name,c.start_time,c.end_time
+		from coupon_${centerId} c
+		where c.node = #{node} and c.status in(1,2)
 	</select>
 
 	<!-- 建表语句start -->
@@ -103,28 +152,48 @@
 		EXISTS coupon_${centerId} (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 		coupon_id varchar(100) NOT NULL COMMENT '优惠券ID',
-		rule_id INT UNSIGNED NOT NULL COMMENT '规则ID',
-		active_id INT UNSIGNED NULL DEFAULT 0 COMMENT '活动ID',
+		parent_coupon_id
+		varchar(100) NULL COMMENT '父级优惠券ID，用于礼包券',
+		rule_id varchar(100) NOT
+		NULL COMMENT '规则ID',
+		activity_id varchar(100) NOT NULL COMMENT '活动ID',
 		name varchar(100) NOT NULL COMMENT '优惠券名称',
-		status TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0:未开始，1：正常；2:已发完；3：已过期',
-		start_time DATETIME NULL DEFAULT '1970-01-01 00:00:00' COMMENT '开始时间',
-		end_time DATETIME NULL DEFAULT '2970-01-01 00:00:00' COMMENT '结束时间',
-		node TINYINT NULL DEFAULT 0 COMMENT '触发节点 1：注册完成；',
-		num INT NULL COMMENT '发行数量',
-		receive_num INT NULL COMMENT '领取数量',
-		use_num INT NULL COMMENT '使用数量',
+		status TINYINT UNSIGNED
+		NULL DEFAULT 0 COMMENT '0：初始，1:发放；2：使用；3：过期；11：暂停',
+		issue_start_time
+		DATETIME NULL COMMENT '发放开始时间',
+		issue_end_time DATETIME NULL COMMENT
+		'发放结束时间',
+		issue_end_status TINYINT UNSIGNED DEFAULT 0 COMMENT
+		'0：正常，1:发放结束；此字段预留',
+		start_time DATETIME NULL COMMENT '开始时间',
+		end_time
+		DATETIME NULL COMMENT '结束时间',
+		node TINYINT NULL DEFAULT 0 COMMENT '触发节点
+		1：注册完成；',
+		num INT NULL DEFAULT 0 COMMENT '发行数量0表示不限量',
+		receive_num INT
+		NULL DEFAULT 0 COMMENT '领取数量',
+		use_num INT NULL DEFAULT 0 COMMENT
+		'使用数量',
 		pic_path varchar(200) NULL COMMENT '图片地址',
-		attribute varchar(100) NULL COMMENT '备用',
-		opt varchar(20) NULL COMMENT '',
+		attribute
+		varchar(100) NULL COMMENT '备用',
+		create_time DATETIME NULL COMMENT
+		'创建时间',
+		update_time DATETIME NULL COMMENT '更新时间',
+		opt varchar(20) NULL
+		COMMENT '',
 		PRIMARY KEY (id),
 		INDEX idx_coupon_id (coupon_id),
-		INDEX idx_rule_id (rule_id),
 		INDEX
-		idx_active_id (active_id),
-		INDEX idx_status (status),
-		INDEX idx_node
-		(node)
-		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+		idx_rule_id (rule_id),
+		INDEX idx_active_id (activity_id),
+		INDEX
+		idx_status (status),
+		INDEX idx_node (node)
+		)ENGINE=InnoDB
+		AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 		COMMENT = '优惠券';
 	</update>
 
@@ -132,17 +201,26 @@
 		CREATE TABLE IF NOT EXISTS
 		rule_${centerId} (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-		description varchar(100) NULL COMMENT '规则描述',
+		rule_id
+		varchar(100) NOT NULL COMMENT '优惠券ID',
+		description varchar(100) NULL
+		COMMENT '规则描述',
 		condition DECIMAL(10,2) NOT NULL COMMENT '满条件',
 		deductible_value DECIMAL(10,2) NOT NULL COMMENT '抵扣额',
-		value_type TINYINT NOT NULL COMMENT '0:折扣；1金额',
-		range TINYINT NOT NULL COMMENT '使用范围0全场，1一级分了；2二级分类；3三级分类；4特定商品',
-		category varchar(100) NULL COMMENT '分类ID，range为1,2,3时不为空',
-		is_superposition INT NULL DEFAULT 0 COMMENT '是否可叠加：0否，1是',
+		value_type
+		TINYINT NOT NULL COMMENT '0:折扣；1金额',
+		range TINYINT NOT NULL COMMENT
+		'使用范围0全场，1一级分了；2二级分类；3三级分类；4特定商品',
+		category varchar(100) NULL COMMENT
+		'分类ID，range为1,2,3时不为空',
+		is_superposition INT NULL DEFAULT 0 COMMENT
+		'是否可叠加：0否，1是',
 		create_time DATETIME NULL COMMENT '创建时间',
-		update_time DATETIME NULL COMMENT '更新时间',
+		update_time
+		DATETIME NULL COMMENT '更新时间',
 		weight INT NULL COMMENT '权重',
-		attribute varchar(100) NULL COMMENT '备用',
+		attribute
+		varchar(100) NULL COMMENT '备用',
 		opt varchar(20) NULL COMMENT '',
 		PRIMARY KEY (id)
 		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
@@ -150,17 +228,25 @@
 	</update>
 
 	<update id="createCouponGoods" parameterType="java.lang.Integer">
-		CREATE TABLE IF NOT EXISTS
+		CREATE TABLE IF NOT
+		EXISTS
 		coupon_goods_${centerId} (
-		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-		rule_id INT UNSIGNED NOT NULL COMMENT '规则ID',
-		goods_id varchar(50) NOT NULL COMMENT '商品ID',
-		attribute varchar(100) NULL COMMENT '备用',
+		id INT UNSIGNED NOT NULL
+		AUTO_INCREMENT,
+		rule_id varchar(100) NOT NULL COMMENT '规则ID',
+		goods_id
+		varchar(50) NOT NULL COMMENT '商品ID',
+		attribute varchar(100) NULL
+		COMMENT '备用',
 		opt varchar(20) NULL COMMENT '',
 		PRIMARY KEY (id),
-		INDEX idx_coupon_id (rule_id),
-		INDEX idx_goods_id (goods_id)
-		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+		INDEX
+		idx_coupon_id (rule_id),
+		INDEX idx_goods_id (goods_id),
+		UNIQUE INDEX
+		id_UNIQUE (rule_id,goods_id)
+		)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT
+		CHARSET=utf8
 		COMMENT = '优惠券商品';
 	</update>
 

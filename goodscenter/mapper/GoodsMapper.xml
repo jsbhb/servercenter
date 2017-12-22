@@ -55,6 +55,9 @@
 		<result column="increment_tax" property="incrementTax"
 			jdbcType="NUMERIC" />
 		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
+		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
+		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
@@ -252,7 +255,7 @@
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
-		gi.status,g.supplier_id,g.type,g.supplier_name,
+		gi.status,g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
 		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join
@@ -337,6 +340,17 @@
 		goods_stock stock
 		on gs.item_id =
 		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id left join goods_price bgp on 
+		gp.base_price_id = bgp.id where gs.item_id = #{itemId}
+	</select>
+	
+	<select id="getGoodsSpecsForOrder" parameterType="Object" resultMap="goodsSpecs">
+		select gs.id,gs.is_promotion,gi.weight,gs.item_id,gs.goods_id,
+		gp.id as price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,
+		gp.delivery_place,b.first_category,b.second_category,b.third_category
+		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
+		left join goods_price${centerId} gp on
+		gs.item_id = gp.item_id 
+		left join goods g on gs.goods_id = g.goods_id left join base b on g.base_id=b.id left join goods_price bgp on 
 		gp.base_price_id = bgp.id where gs.item_id = #{itemId}
 	</select>
 	
