@@ -54,6 +54,12 @@ public class GoodsSpecs implements Serializable {
 
 	private Double realVipMaxPrice;
 
+	private String thirdCategory;
+
+	private String secondCategory;
+
+	private String firstCategory;
+
 	private Integer stock;
 
 	private Double incrementTax;
@@ -63,6 +69,30 @@ public class GoodsSpecs implements Serializable {
 	private Double exciseTax;
 
 	private List<GoodsPrice> priceList;
+
+	public String getThirdCategory() {
+		return thirdCategory;
+	}
+
+	public void setThirdCategory(String thirdCategory) {
+		this.thirdCategory = thirdCategory;
+	}
+
+	public String getSecondCategory() {
+		return secondCategory;
+	}
+
+	public void setSecondCategory(String secondCategory) {
+		this.secondCategory = secondCategory;
+	}
+
+	public String getFirstCategory() {
+		return firstCategory;
+	}
+
+	public void setFirstCategory(String firstCategory) {
+		this.firstCategory = firstCategory;
+	}
 
 	public Double getRealMinPrice() {
 		return realMinPrice;

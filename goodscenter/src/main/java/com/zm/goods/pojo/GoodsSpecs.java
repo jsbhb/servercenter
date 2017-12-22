@@ -48,13 +48,10 @@ public class GoodsSpecs implements Serializable{
 	@JsonIgnore
 	private String opt;
 	
-	@JsonIgnore
 	private String thirdCategory;
 	
-	@JsonIgnore
 	private String secondCategory;
 	
-	@JsonIgnore
 	private String firstCategory;
 	
 	private Double minPrice;

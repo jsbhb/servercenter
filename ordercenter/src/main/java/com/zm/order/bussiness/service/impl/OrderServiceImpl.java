@@ -19,12 +19,12 @@ import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.constants.LogConstants;
+import com.zm.order.feignclient.ActivityFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.LogFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.SupplierFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
-import com.zm.order.feignclient.model.Activity;
 import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
@@ -84,9 +84,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	SupplierFeignClient supplierFeignClient;
-	
+
 	@Resource
 	ShareProfitComponent shareProfitComponent;
+
+	@Resource
+	ActivityFeignClient activityFeignClient;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -98,13 +101,8 @@ public class OrderServiceImpl implements OrderService {
 			result.setSuccess(false);
 			return result;
 		}
-		if (info.getOrderDetail() == null) {
-			result.setErrorMsg("订单详情不能为空");
-			result.setSuccess(false);
-			return result;
-		}
-		if (info.getOrderGoodsList() == null || info.getOrderGoodsList().size() == 0) {
-			result.setErrorMsg("订单商品不能为空");
+		if (!info.check()) {
+			result.setErrorMsg("订单参数不全");
 			result.setSuccess(false);
 			return result;
 		}
@@ -142,43 +140,18 @@ public class OrderServiceImpl implements OrderService {
 		Map<String, Object> priceAndWeightMap = null;
 		Double amount = 0.0;
 		boolean vip = false;
-		Activity activity = null;
 
 		// 获取该用户是否是VIP
 		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
-		// 获取全场活动
-		result = goodsFeignClient.getActivity(Constants.FIRST_VERSION, null, Constants.ACTIVE_AREA, info.getCenterId());
-		if (!result.isSuccess()) {
-			result.setErrorMsg("获取活动信息失败");
-			return result;
-		}
-
-		if (result.getObj() != null) {
-			activity = (Activity) result.getObj();
-		}
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
-		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip, info.getCenterId(),
-				info.getOrderFlag());
-		
+		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
+				info.getCenterId(), info.getOrderFlag(), info.getCouponIds(), info.getUserId());
+
 		if (!result.isSuccess()) {
 			return result;
 		}
 		priceAndWeightMap = (Map<String, Object>) result.getObj();
 		amount = (Double) priceAndWeightMap.get("totalAmount");
-		// 是否有活动
-		if (activity != null) {
-			if (Constants.FULL_CUT.equals(activity.getType())) {
-				if (amount > activity.getConditionPrice()) {
-					amount = CalculationUtils.sub(amount, activity.getDiscount());
-				}
-			}
-			if (Constants.FULL_DISCOUNT.equals(activity.getType())) {
-				if (amount > activity.getConditionPrice()) {
-					Double discount = CalculationUtils.div(activity.getDiscount(), 10.0);
-					amount = CalculationUtils.mul(amount, discount);
-				}
-			}
-		}
 
 		// 计算邮费(自提不算邮费)
 		Double postFee = 0.0;
@@ -273,7 +246,13 @@ public class OrderServiceImpl implements OrderService {
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
 		
-		//FIXME
+		//FIXME 用mq
+		if (info.getCouponIds() != null) {
+			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
+					info.getCouponIds());
+		}
+
+		// FIXME 换计算节点
 		shareProfitComponent.calShareProfit(orderId);
 
 		result.setSuccess(true);
@@ -620,12 +599,17 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Integer countShoppingCartQuantity(Map<String, Object> param) {
-		
+
 		return orderMapper.countShoppingCartQuantity(param);
 	}
 
 	@Override
 	public List<Object> getProfit(Integer shopId) {
-		return redisTemplate.opsForList().range(Constants.PROFIT + shopId,0,-1);
+		return redisTemplate.opsForList().range(Constants.PROFIT + shopId, 0, -1);
+	}
+
+	@Override
+	public List<OrderIdAndSupplierId> listUnDeliverOrder() {
+		return orderMapper.listUnDeliverOrder();
 	}
 }

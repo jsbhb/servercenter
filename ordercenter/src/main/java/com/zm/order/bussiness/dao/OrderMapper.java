@@ -12,6 +12,7 @@ import com.zm.order.pojo.ExpressFee;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
+import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.ShoppingCart;
@@ -105,5 +106,7 @@ public interface OrderMapper {
 	Integer queryCountOrderInfo(Map<String,Object> param);
 
 	Integer countShoppingCartQuantity(Map<String, Object> param);
+
+	List<OrderIdAndSupplierId> listUnDeliverOrder();
 
 }

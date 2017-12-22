@@ -16,22 +16,22 @@ public class OrderInfo {
 
 	private Integer userId;
 
-	private Integer status;
+	private Integer status;// 0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消;99异常状态
 
 	// 物流、自提
-	private Integer expressType;
+	private Integer expressType;// 0：快递；1：自提
 
 	// 区域中心ID
 	private Integer centerId;
 
 	private Integer shopId;
-	
+
 	private Integer guideId;
 
 	private Integer supplierId;
 
 	private Integer tdq;
-	
+
 	private Integer weight;
 
 	private String gtime;
@@ -43,20 +43,48 @@ public class OrderInfo {
 	private String updateTime;
 
 	private String remark;
-	
-	private Integer orderFlag;
-	
+
+	private Integer orderFlag;// 0:跨境；1：大贸;2：一般贸易
+
 	private String statusArr;
 
 	private OrderDetail orderDetail;
 
 	private List<OrderGoods> orderGoodsList;
-	
+
 	private List<ThirdOrderInfo> orderExpressList;
-	
+
 	private String startTime;
-	
+
 	private String endTime;
+
+	private String couponIds;
+
+	private Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
+
+	public boolean check() {
+		if (orderDetail == null || orderGoodsList == null || orderFlag == null || createType == null || userId == null
+				|| tdq == null || expressType == null || centerId == null || supplierId == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public Integer getCreateType() {
+		return createType;
+	}
+
+	public void setCreateType(Integer createType) {
+		this.createType = createType;
+	}
+
+	public String getCouponIds() {
+		return couponIds;
+	}
+
+	public void setCouponIds(String couponIds) {
+		this.couponIds = couponIds;
+	}
 
 	public Integer getWeight() {
 		return weight;

@@ -305,4 +305,6 @@ public interface OrderService {
 	Integer countShoppingCartQuantity(Map<String, Object> param);
 
 	List<Object> getProfit(Integer shopId);
+
+	List<OrderIdAndSupplierId> listUnDeliverOrder();
 }

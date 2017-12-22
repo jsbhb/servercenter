@@ -557,12 +557,22 @@ public class OrderController {
 	public ResultModel getProfit(@PathVariable("version") Double version, @PathVariable("shopId") Integer shopId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+
 			return new ResultModel(true, orderService.getProfit(shopId));
 		}
 
 		return new ResultModel(false, "版本错误");
 
+	}
+
+	@RequestMapping(value = "{version}/order/listUnDeliverOrder", method = RequestMethod.GET)
+	public ResultModel listUnDeliverOrder(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, orderService.listUnDeliverOrder());
+		}
+
+		return new ResultModel(false, "版本错误");
 	}
 
 }

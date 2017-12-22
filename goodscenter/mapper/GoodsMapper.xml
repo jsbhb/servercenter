@@ -357,13 +357,11 @@
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
 		select gs.id,gi.info,gs.item_id,gs.goods_id , gc.status as specsStatus,
-		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
+		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gs.opt,gp.id as
-		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time, gs.excise_tax,gi.weight,
-		gp.delivery_place,gb.increment_tax,
-		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
+		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount, gs.excise_tax,gi.weight,
+		gp.delivery_place,gb.increment_tax
+		 from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods_price${centerId} gp on
 		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
 		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id 
