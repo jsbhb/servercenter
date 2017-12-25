@@ -89,7 +89,7 @@ public class CouponServiceImpl implements CouponService {
 		param.put("centerId", centerId);
 		param.put("couponId", couponId);
 		Integer total = couponMapper.getIssueNumByCouponId(param);
-		if(total == null){
+		if (total == null) {
 			return new ResultModel(false, "没有该优惠券");
 		}
 		// 如果有数量限制
@@ -140,18 +140,24 @@ public class CouponServiceImpl implements CouponService {
 	}
 
 	@Override
-	public ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String userId) {
+	public ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String firstId, String secondId,
+			String thirdId, Integer userId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", centerId);
 		param.put("goodsId", goodsId);
-		List<Coupon> couponList = couponMapper.listCouponByGoodsId(param);
+		param.put("firstId", firstId);
+		param.put("secondId", secondId);
+		param.put("thirdId", thirdId);
+		List<Coupon> couponList = couponMapper.listCouponSpecialByGoodsId(param);//range=4
+		couponList.addAll(couponMapper.listCouponByCategory(param));//range = 1,2,3
+		couponList.addAll(couponMapper.listCouponAllRange(param));//range = 0
 		List<String> couponIdList = null;
 		if (userId != null) {
-			param.put("userId", Integer.valueOf(userId));
+			param.put("userId", userId);
 			couponIdList = couponMapper.listUserCouponByUserId(param);
 		}
 		for (Coupon coupon : couponList) {
-			if(couponIdList != null){
+			if (couponIdList != null) {
 				for (String couponId : couponIdList) {
 					if (couponId.equals(coupon.getCouponId())) {
 						coupon.setReceiveStatus(ALREADY_RECEIVE);
@@ -177,7 +183,7 @@ public class CouponServiceImpl implements CouponService {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", centerId);
 		param.put("node", node);
-		
+
 		return new ResultModel(true, couponMapper.listCouponByNode(param));
 	}
 
@@ -189,10 +195,10 @@ public class CouponServiceImpl implements CouponService {
 		param.put("userId", userId);
 		param.put("list", Arrays.asList(couponIdArr));
 		Integer count = couponMapper.countUserCoupon(param);
-		if(count != couponIdArr.length){
+		if (count != couponIdArr.length) {
 			return new ResultModel(false, "优惠券使用非法");
 		}
-		return new ResultModel(true,couponMapper.listCouponByCouponIds(param));
+		return new ResultModel(true, couponMapper.listCouponByCouponIds(param));
 	}
 
 	@Override
@@ -203,12 +209,12 @@ public class CouponServiceImpl implements CouponService {
 		param.put("list", Arrays.asList(couponIdArr));
 		param.put("userId", userId);
 		couponMapper.updateUserCoupon(param);
-		
+
 	}
 
 	@Override
 	public void updateCouponStatus(List<Integer> centerIdList) {
-		for(Integer centerId : centerIdList){
+		for (Integer centerId : centerIdList) {
 			couponMapper.updateCouponStatus(centerId);
 		}
 	}

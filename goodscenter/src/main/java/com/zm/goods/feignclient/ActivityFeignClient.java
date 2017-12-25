@@ -14,7 +14,10 @@ public interface ActivityFeignClient {
 	@RequestMapping(value = "{version}/coupon-goodsId/{centerId}", method = RequestMethod.GET)
 	public ResultModel listCouponByGoodsId(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId, @RequestParam("goodsId") String goodsId,
-			@RequestParam(value = "userId", required = false) String userId);
+			@RequestParam(value = "firstId", required = false) String firstId,
+			@RequestParam(value = "secondId", required = false) String secondId,
+			@RequestParam(value = "thirdId", required = false) String thirdId,
+			@RequestParam(value = "userId", required = false) Integer userId);
 
 	@RequestMapping(value = "{version}/listCouponByCouponIds/{centerId}", method = RequestMethod.GET)
 	public ResultModel listCouponByCouponIds(@PathVariable("version") Double version,

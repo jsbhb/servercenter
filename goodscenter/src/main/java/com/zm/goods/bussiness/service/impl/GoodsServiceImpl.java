@@ -72,7 +72,7 @@ public class GoodsServiceImpl implements GoodsService {
 	PriceComponent priceComponent;
 
 	@Override
-	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, String userId) {
+	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId) {
 
 		if (param.get("itemId") != null) {
 			String goodsId = goodsMapper.getGoodsIdByItemId((String) param.get("itemId"));

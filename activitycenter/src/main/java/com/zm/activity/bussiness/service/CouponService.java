@@ -47,8 +47,8 @@ public interface CouponService {
 	 */
 	ResultModel giveOutCoupon(Integer centerId, List<String> list);
 
-	
-	ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String userId);
+	ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String firstId, String secondId, String thirdId,
+			Integer userId);
 
 	ResultModel listCouponByNode(Integer node, Integer centerId);
 

@@ -65,10 +65,13 @@
 	</select>
 
 	<select id="countUserCoupon" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from user_coupon u left join coupon_${centerId} c on u.coupon_id=c.coupon_id 
+		select count(*) from user_coupon u left join coupon_${centerId} c on
+		u.coupon_id=c.coupon_id
 		where u.center_id = #{centerId} and
-		u.user_id = #{userId} and u.status = 0 and c.status in(1,2) and u.coupon_id in
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
+		u.user_id = #{userId} and u.status = 0
+		and c.status in(1,2) and u.coupon_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
 			#{item}
 		</foreach>
 	</select>
@@ -112,31 +115,52 @@
 	<update id="updateUserCoupon" parameterType="Object">
 		<foreach collection="list" item="item" separator=";" open=""
 			close="">
-			update user_coupon 
+			update user_coupon
 			<set>
 				status = 1
 			</set>
-			where center_id = #{centerId} and user_id = #{userId} and coupon_id = #{item}
+			where center_id = #{centerId} and user_id = #{userId} and coupon_id =
+			#{item}
 		</foreach>
 	</update>
 
 	<update id="updateCouponGiveOut" parameterType="Object">
 		<foreach collection="list" item="item" separator=";" open=""
 			close="">
-			update coupon_${centerId} set status = (case when now() > start_time and status=0 then 2 
+			update coupon_${centerId} set status = (case when now() >
+			start_time and status=0 then 2
 			when start_time > now() and status=0 then 1 else status end)
-			where coupon_id = #{item} 
+			where
+			coupon_id = #{item}
 		</foreach>
 	</update>
 
-	<select id="listCouponByGoodsId" parameterType="Object"
+	<select id="listCouponSpecialByGoodsId" parameterType="Object"
 		resultMap="coupon">
 		select c.id, c.coupon_id, c.pic_path,c.num,
 		c.name,c.start_time,c.end_time from coupon_${centerId} c left join
 		rule_${centerId} r on c.rule_id = r.rule_id
 		left join
 		coupon_goods_${centerId} cg on r.rule_id=cg.rule_id where
-		cg.goods_id=#{goodsId} and c.status in(1,2)
+		cg.goods_id=#{goodsId} and c.status in(1,2) and r.range = 4
+	</select>
+
+	<select id="listCouponByCategory" parameterType="Object"
+		resultMap="coupon">
+			select c.id, c.coupon_id, c.pic_path,c.num,
+		c.name,c.start_time,c.end_time from coupon_${centerId} c left join
+		rule_${centerId} r on c.rule_id = r.rule_id where 
+		category = (case when r.range=1 then #{firstId} when r.range=2 then #{secondId} when r.range=3 then #{thirdId} end) 
+		and c.status in(1,2)
+	
+	</select>
+	
+	<select id="listCouponAllRange" parameterType="Object"
+		resultMap="coupon">
+			select c.id, c.coupon_id, c.pic_path,c.num,
+		c.name,c.start_time,c.end_time from coupon_${centerId} c left join
+		rule_${centerId} r on c.rule_id = r.rule_id where r.range = 0 and c.status in(1,2)
+	
 	</select>
 
 	<select id="listCouponByNode" parameterType="Object" resultMap="coupon">
@@ -144,14 +168,15 @@
 		from coupon_${centerId} c
 		where c.node = #{node} and c.status in(1,2)
 	</select>
-	
+
 	<select id="updateCouponStatus" parameterType="Object">
-		update coupon_${centerId} set 
-		status = (case when now() > start_time and status=1 then 2 
+		update
+		coupon_${centerId} set
+		status = (case when now() > start_time and status=1 then 2
 		when now() > end_time and status = 2 then 3 else status end);
 
 	</select>
-	
+
 	<!-- 建表语句start -->
 	<update id="createCoupon" parameterType="java.lang.Integer">
 		CREATE TABLE IF NOT

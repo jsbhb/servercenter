@@ -130,11 +130,14 @@ public class CouponController {
 	@RequestMapping(value = "{version}/coupon-goodsId/{centerId}", method = RequestMethod.GET)
 	public ResultModel listCouponByGoodsId(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId, @RequestParam("goodsId") String goodsId,
-			@RequestParam(value = "userId", required = false) String userId) {
+			@RequestParam(value = "firstId", required = false) String firstId,
+			@RequestParam(value = "secondId", required = false) String secondId,
+			@RequestParam(value = "thirdId", required = false) String thirdId,
+			@RequestParam(value = "userId", required = false) Integer userId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return couponService.listCouponByGoodsId(centerId, goodsId, userId);
+			return couponService.listCouponByGoodsId(centerId, goodsId,firstId,secondId,thirdId, userId);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -178,18 +181,18 @@ public class CouponController {
 
 		return new ResultModel(false, "");
 	}
-	
+
 	@RequestMapping(value = "{version}/update/{centerId}", method = RequestMethod.GET)
 	public void updateUserCoupon(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestParam("userId") Integer userId, @RequestParam(value = "couponIds") String couponIds){
+			@RequestParam("userId") Integer userId, @RequestParam(value = "couponIds") String couponIds) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			couponService.updateUserCoupon(couponIds, centerId, userId);
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/updateCouponStatus", method = RequestMethod.POST)
-	public void updateCouponStatus(@PathVariable("version") Double version, @RequestBody List<Integer> centerIdList){
+	public void updateCouponStatus(@PathVariable("version") Double version, @RequestBody List<Integer> centerIdList) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			couponService.updateCouponStatus(centerIdList);

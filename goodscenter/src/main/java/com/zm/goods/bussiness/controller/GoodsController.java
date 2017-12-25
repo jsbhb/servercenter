@@ -78,13 +78,13 @@ public class GoodsController {
 			@ApiImplicitParam(paramType = "query", name = "goodsId", dataType = "String", required = false, value = "商品ID"),
 			@ApiImplicitParam(paramType = "query", name = "itemId", dataType = "String", required = false, value = "itemID") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
-			Pagination pagination, @PathVariable("centerId") Integer centerId) {
+			Pagination pagination, @PathVariable("centerId") Integer centerId,
+			@RequestParam(value = "userId", required = false) Integer userId) {
 
 		ResultModel result = new ResultModel();
 
 		String goodsId = req.getParameter("goodsId");
 		String itemId = req.getParameter("itemId");
-		String userId = req.getParameter("userId");
 		if (goodsId != null && itemId != null) {
 			result.setSuccess(false);
 			result.setErrorMsg("参数错误");
