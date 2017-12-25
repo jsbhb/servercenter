@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.timetask.bussiness.service.TimeTaskService;
@@ -76,13 +77,13 @@ public class TimeTaskController {
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/timetask/createActive/{centerId}/{activeId}/{startTime}/{endTime}", method = RequestMethod.POST)
-	public ResultModel createActive(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@PathVariable("activeId") Integer activeId, @PathVariable("startTime") String startTime,
-			@PathVariable("endTime") String endTime) {
+	@RequestMapping(value = "{version}/timetask/dynamicSchedule/{centerId}", method = RequestMethod.POST)
+	public ResultModel dynamicSchedule(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestParam("id") String id, @RequestParam("startTime") String startTime,
+			@RequestParam(value = "endTime", required = false) String endTime,@RequestParam("type") Integer type) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			timeTaskService.createActive(centerId, activeId, startTime, endTime);
+			timeTaskService.dynamicSchedule(centerId, id, startTime, endTime, type);
 			return new ResultModel(true);
 		}
 		return null;

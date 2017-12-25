@@ -187,4 +187,12 @@ public class CouponController {
 			couponService.updateUserCoupon(couponIds, centerId, userId);
 		}
 	}
+	
+	@RequestMapping(value = "{version}/updateCouponStatus", method = RequestMethod.POST)
+	public void updateCouponStatus(@PathVariable("version") Double version, @RequestBody List<Integer> centerIdList){
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			couponService.updateCouponStatus(centerIdList);
+		}
+	}
 }

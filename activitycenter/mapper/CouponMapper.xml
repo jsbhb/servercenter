@@ -65,8 +65,9 @@
 	</select>
 
 	<select id="countUserCoupon" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from user_coupon where center_id = #{centerId} and
-		user_id = #{userId} and status = 0 and coupon_id in
+		select count(*) from user_coupon u left join coupon_${centerId} c on u.coupon_id=c.coupon_id 
+		where u.center_id = #{centerId} and
+		u.user_id = #{userId} and u.status = 0 and c.status in(1,2) and u.coupon_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
@@ -95,8 +96,8 @@
 
 	<insert id="binding" parameterType="Object">
 		insert ignore into
-		user_coupon(user_id,coupon_id,center_id) values
-		(#{userId},#{couponId},#{centerId})
+		user_coupon(user_id,coupon_id,center_id,create_time) values
+		(#{userId},#{couponId},#{centerId},now())
 	</insert>
 
 	<select id="listIssueNum" parameterType="Object" resultMap="coupon">
@@ -122,11 +123,9 @@
 	<update id="updateCouponGiveOut" parameterType="Object">
 		<foreach collection="list" item="item" separator=";" open=""
 			close="">
-			update coupon_${centerId}
-			<set>
-				status = 1
-			</set>
-			where coupon_id = #{item} and status = 0
+			update coupon_${centerId} set status = (case when now() > start_time and status=0 then 2 
+			when start_time > now() and status=0 then 1 else status end)
+			where coupon_id = #{item} 
 		</foreach>
 	</update>
 
@@ -145,7 +144,14 @@
 		from coupon_${centerId} c
 		where c.node = #{node} and c.status in(1,2)
 	</select>
+	
+	<select id="updateCouponStatus" parameterType="Object">
+		update coupon_${centerId} set 
+		status = (case when now() > start_time and status=1 then 2 
+		when now() > end_time and status = 2 then 3 else status end);
 
+	</select>
+	
 	<!-- 建表语句start -->
 	<update id="createCoupon" parameterType="java.lang.Integer">
 		CREATE TABLE IF NOT

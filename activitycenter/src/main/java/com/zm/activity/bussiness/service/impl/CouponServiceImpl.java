@@ -206,4 +206,11 @@ public class CouponServiceImpl implements CouponService {
 		
 	}
 
+	@Override
+	public void updateCouponStatus(List<Integer> centerIdList) {
+		for(Integer centerId : centerIdList){
+			couponMapper.updateCouponStatus(centerId);
+		}
+	}
+
 }

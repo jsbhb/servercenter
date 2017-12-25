@@ -366,7 +366,7 @@
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
-		select id from grade where parent_id in(1,2);
+		select id from grade where parent_id in(0,1);
 	</select>
 	
 	<update id="updatePersonInChargeId" parameterType="Object">

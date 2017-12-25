@@ -58,12 +58,12 @@ public interface TimeTaskService {
 	void saveTimeTask(TimeTaskModel model);
 	
 	/**
-	 * createActive:创建活动是启动定时器. <br/>
+	 * @fun dynamicSchedule:动态生成定时器. type 0:活动定时器；1：优惠券定时器<br/>
 	 * 时间格式yyyy-MM-dd HH:mm:ss
 	 * @author wqy
 	 * @param 
 	 * @since JDK 1.7
 	 */
-	void createActive(Integer centerId, Integer activeId, String startTime, String endTime);
+	void dynamicSchedule(Integer centerId, String activeId, String startTime, String endTime, Integer type);
 	
 }

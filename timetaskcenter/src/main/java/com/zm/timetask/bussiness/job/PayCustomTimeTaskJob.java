@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 
 import com.zm.timetask.constants.Constants;
@@ -15,7 +18,7 @@ import com.zm.timetask.pojo.ResultModel;
 import com.zm.timetask.util.JSONUtil;
 
 @Component
-public class OrderTimeTaskJob {
+public class PayCustomTimeTaskJob implements Job{
 
 	@Resource
 	OrderFeignClient orderFeignClient;
@@ -23,12 +26,9 @@ public class OrderTimeTaskJob {
 	@Resource
 	PayFeignClient payFeignClient;
 	
-	public void closeTimeOutOrder(){
-		orderFeignClient.timeTaskcloseOrder(Constants.FIRST_VERSION);
-	}
-	
 	@SuppressWarnings("unchecked")
-	public void payCustom(){
+	@Override
+	public void execute(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
 		ResultModel result = orderFeignClient.payCustom(Constants.FIRST_VERSION);
 		if(result.isSuccess()){
 			List<Map<String, Object>> list =  (List<Map<String, Object>>) result.getObj();
@@ -48,5 +48,5 @@ public class OrderTimeTaskJob {
 			}
 		}
 	}
-	
+
 }

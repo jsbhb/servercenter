@@ -42,4 +42,6 @@ public interface CouponMapper {
 
 	void updateUserCoupon(Map<String, Object> param);
 
+	void updateCouponStatus(@Param("centerId")Integer centerId);
+
 }

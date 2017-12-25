@@ -55,4 +55,6 @@ public interface CouponService {
 	ResultModel listCouponByCouponIds(String couponIds, Integer centerId, Integer userId);
 
 	void updateUserCoupon(String couponIds, Integer centerId, Integer userId);
+
+	void updateCouponStatus(List<Integer> centerIdList);
 }

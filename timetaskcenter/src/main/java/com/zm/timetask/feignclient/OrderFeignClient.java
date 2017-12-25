@@ -42,4 +42,12 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
 	public ResultModel alreadyPay(@PathVariable("version") Double version);
+	
+	/**
+	 * @fun 获取需要同步状态的订单
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/listUnDeliverOrder", method = RequestMethod.GET)
+	public ResultModel listUnDeliverOrder(@PathVariable("version") Double version);
 }

@@ -19,7 +19,7 @@ public interface GoodsFeignClient {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/goods/active/start/{centerId}/{activeId}", method = RequestMethod.POST)
-	public ResultModel startActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
+	public ResultModel startActive(@PathVariable("version") Double version, @PathVariable("activeId") String activeId,
 			@PathVariable("centerId") Integer centerId);
 	
 	/**

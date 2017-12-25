@@ -224,6 +224,6 @@ COMMENT = '检索字段表';
 
 
 INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('1', '0', '跨境O2O', 'admin', '13456789012', now());
-INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('3', '1', '大贸', 'admin', '13456789012', now());
+INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('0', '1', '大贸', 'admin', '13456789012', now());
 INSERT INTO `zm_user`.`user` (`id`, `plat_user_type`, `account`, `phone`, `is_phone_validate`, `center_id`, `create_time`) VALUES ('1', '0', 'admin', '15957456456', '1', '0', now());
 
