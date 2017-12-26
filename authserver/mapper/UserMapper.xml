@@ -120,4 +120,12 @@
          INSERT INTO USER (
               USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
     </insert>
+    
+    <update id="modifyPwd" parameterType="object">
+    	update user 
+    	<set>
+    		PASSWORD = #{password}
+    	</set>
+    	where PLATFORM = #{platUserType} and USER_NAME = #{userName}
+    </update>
 </mapper>

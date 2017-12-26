@@ -197,6 +197,9 @@ public class WarehouseThreadPool {
 				.get(Constants.SUPPLIER_INTERFACE + supplierId);
 		AbstractSupplierButtJoint buttJoint = (AbstractSupplierButtJoint) SpringContextUtil
 				.getBean(inf.getTargetObject());
+		if(buttJoint == null){
+			return null;
+		}
 		buttJoint.setAppKey(inf.getAppKey());
 		buttJoint.setAppSecret(inf.getAppSecret());
 		return buttJoint;

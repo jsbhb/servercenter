@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderDetail;
@@ -29,6 +31,7 @@ import com.zm.supplier.util.HttpClientUtil;
 import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.SignUtil;
 
+@Component
 public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 
 	private static String URL = "http://www.cnbuyers.cn/index.php?app=webService";

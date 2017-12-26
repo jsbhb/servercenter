@@ -109,6 +109,12 @@
 			<version>3.4</version>
 		</dependency>
 		
+		<!-- 远程调用服务，支持负载均衡 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-feign</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>

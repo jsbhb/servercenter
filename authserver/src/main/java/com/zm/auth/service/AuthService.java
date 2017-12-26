@@ -60,5 +60,8 @@ public interface AuthService {
 	 * @since JDK 1.7
 	 */
 	boolean checkAccount(UserInfo userInfo);
+
+
+	boolean modifyPwd(UserInfo userInfo);
 	
 }

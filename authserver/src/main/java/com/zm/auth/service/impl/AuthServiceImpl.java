@@ -216,4 +216,14 @@ public class AuthServiceImpl implements AuthService {
 		return false;
 	}
 
+	@Override
+	public boolean modifyPwd(UserInfo userInfo) {
+		userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
+		int num = userMapper.modifyPwd(userInfo);
+		if(num == 0){
+			return false;
+		}
+		return true;
+	}
+
 }

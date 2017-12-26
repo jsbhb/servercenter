@@ -9,6 +9,7 @@
 
 package com.zm.auth.controller;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -20,8 +21,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zm.auth.feignclient.ThirdPartFeignClient;
 import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.UserInfo;
 import com.zm.auth.service.AuthService;
@@ -44,6 +47,9 @@ public class UserController {
 
 	@Autowired
 	private AuthService authService;
+	
+	@Resource
+	ThirdPartFeignClient thirdPartFeignClient;
 
 	Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -83,6 +89,22 @@ public class UserController {
 	public ResultPojo check(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		try {
 			return new ResultPojo(authService.checkAccount(userInfo));
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			return new ResultPojo("401", e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/modifyPwd", method = RequestMethod.POST)
+	public ResultPojo modifyPwd(@RequestBody UserInfo userInfo, @RequestParam("code") String code)
+			throws AuthenticationException {
+		try {
+			boolean flag = thirdPartFeignClient.verifyPhoneCode(1.0, userInfo.getUserName(), code);
+			if (flag) {
+				return new ResultPojo(authService.modifyPwd(userInfo));
+			} else {
+				return new ResultPojo("1", "验证码错误");
+			}
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 			return new ResultPojo("401", e.getMessage());

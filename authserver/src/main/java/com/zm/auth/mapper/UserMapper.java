@@ -76,5 +76,16 @@ public interface UserMapper {
 	 * @since JDK 1.7
 	 */
 	public UserInfo queryByOpenId(UserInfo userInfo);
+	
+	/**
+	 * 
+	 * modifyPwd:修改密码 <br/>  
+	 *  
+	 * @author wqy  
+	 * @param userInfo
+	 * @return  
+	 * @since JDK 1.7
+	 */
+	int modifyPwd(UserInfo userInfo);
 
 }
