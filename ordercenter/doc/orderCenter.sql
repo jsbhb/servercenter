@@ -287,3 +287,17 @@ CREATE TABLE `zm_order`.`free_express_fee` (
   PRIMARY KEY (`id`)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '包邮条件';
+
+drop table if exists  `zm_order`.`profit_proportion`;
+
+CREATE TABLE `zm_order`.`profit_proportion` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`total_profit_proportion` decimal(10,2) NOT NULL COMMENT '总利润的多少用于分润',
+	`register_profit_proportion` decimal(10,2) NOT NULL COMMENT '注册地分润比例',
+	`consume_profit_proportion` decimal(10,2) NOT NULL COMMENT '交易地分润比例',
+	`create_time` DATETIME NULL,
+	`update_time` DATETIME NULL,
+	`opt` VARCHAR(20) NULL,
+	PRIMARY KEY (id)
+	)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+COMMENT = '分润比例设置';

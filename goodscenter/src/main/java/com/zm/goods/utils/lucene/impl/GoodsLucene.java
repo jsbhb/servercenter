@@ -85,7 +85,8 @@ public class GoodsLucene extends AbstractLucene {
 			doc.add(new TextField("specs", model.getSpecs() == null ? "" : model.getSpecs(), Store.YES));
 
 			doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
-			doc.add(new StringField("status", model.getStatus() == null ? "0" : model.getStatus() + "", Store.NO));
+			// doc.add(new StringField("status", model.getStatus() == null ? "0"
+			// : model.getStatus() + "", Store.NO));
 			doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
 			doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
 			doc.add(new StringField("thirdCategory", model.getThirdCategory().trim(), Store.NO));
@@ -206,8 +207,7 @@ public class GoodsLucene extends AbstractLucene {
 				e.printStackTrace();
 			}
 			if (o != null) {
-				if ("brand".equals(field.getName()) || "origin".equals(field.getName())
-						|| "status".equals(field.getName())) {
+				if ("brand".equals(field.getName()) || "origin".equals(field.getName())) {
 					accuratePara.put(field.getName(), o + "");
 				} else if (!"centerId".equals(field.getName())) {
 					keyWordsList.add(o + "");
@@ -306,11 +306,13 @@ public class GoodsLucene extends AbstractLucene {
 					QueryWrapperFilter filter = new QueryWrapperFilter(query);// 添加过滤器
 					booleanFilter.add(filter, Occur.MUST);
 				}
-				if ("status".equals(entry.getKey())) {
-					Term term = new Term(entry.getKey(), entry.getValue());// 添加term
-					QueryWrapperFilter filter = new QueryWrapperFilter(new TermQuery(term));// 添加过滤器
-					booleanFilter.add(filter, Occur.MUST);
-				}
+				// if ("status".equals(entry.getKey())) {
+				// Term term = new Term(entry.getKey(), entry.getValue());//
+				// 添加term
+				// QueryWrapperFilter filter = new QueryWrapperFilter(new
+				// TermQuery(term));// 添加过滤器
+				// booleanFilter.add(filter, Occur.MUST);
+				// }
 			}
 			return booleanFilter;
 		}
@@ -320,14 +322,14 @@ public class GoodsLucene extends AbstractLucene {
 	@Override
 	public void deleteIndex(List<String> list) {
 		try {
-			if(list != null && list.size() > 0){
-				for(String goodsId : list){
+			if (list != null && list.size() > 0) {
+				for (String goodsId : list) {
 					indexWriter.deleteDocuments(new Term("goodsId", goodsId));
 				}
 			}
 			indexWriter.commit();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 
