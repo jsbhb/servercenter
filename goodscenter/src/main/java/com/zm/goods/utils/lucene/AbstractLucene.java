@@ -12,9 +12,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.BooleanFilter;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -71,7 +69,7 @@ public abstract class AbstractLucene {
 	 * @param id
 	 * @since JDK 1.7
 	 */
-	public abstract void deleteIndex(String id);
+	public abstract void deleteIndex(List<String> list);
 
 	/**
 	 * 

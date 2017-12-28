@@ -146,6 +146,9 @@ public class WarehouseThreadPool {
 				return;
 			}
 			Set<CheckStockModel> set = buttJoint.checkStock(list);
+			if(set == null){
+				return;
+			}
 			// 将ItemId赋值到返回的checkStockModel里面
 			for (OrderBussinessModel model : list) {
 				for (CheckStockModel tem : set) {

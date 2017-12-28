@@ -387,7 +387,8 @@ public class GoodsServiceImpl implements GoodsService {
 	private void renderLuceneModel(Map<String, Object> param, List<GoodsSearch> searchList, Integer id) {
 		GoodsSearch searchModel;
 		String centerId = GoodsServiceUtil.judgeCenterId(id);
-		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(centerId);
+		param.put("centerId", centerId);
+		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
 		for (GoodsItem item : itemList) {
 			searchModel = new GoodsSearch();
 			searchModel.setGoodsId(item.getGoodsId());
@@ -399,7 +400,6 @@ public class GoodsServiceImpl implements GoodsService {
 			searchModel.setSecondCategory(item.getSecondCategory());
 			searchModel.setGoodsName(item.getCustomGoodsName());
 			param.put("goodsId", item.getGoodsId());
-			param.put("centerId", centerId);
 			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 			if (specsList != null && specsList.size() > 0) {
 				searchModel.setPrice(specsList.get(0).getMinPrice());
@@ -408,7 +408,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		AbstractLucene lucene = LuceneFactory.get(id);
 		lucene.writerIndex(searchList);
-		goodsMapper.updateLuceneStatus(centerId);
+		goodsMapper.updateGoodsUpShelves(param);
 	}
 
 	private final String GOODS_LIST = "goodsList";
@@ -614,6 +614,40 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		return totalAmount;
+	}
+
+	@Override
+	public List<OrderBussinessModel> checkStock() {
+		return goodsMapper.checkStock();
+	}
+
+	@Override
+	public ResultModel upShelves(List<String> goodsIdList, Integer centerId) {
+		if(goodsIdList != null && goodsIdList.size() > 0){
+			Map<String, Object> param = new HashMap<String, Object>();
+			List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
+			param.put("list", goodsIdList);
+			renderLuceneModel(param, searchList, centerId);
+		}
+		return new ResultModel(true,"");
+	}
+
+	@Override
+	public ResultModel downShelves(List<String> goodsIdList, Integer centerId) {
+		if(goodsIdList != null && goodsIdList.size() > 0){
+			deleteLuceneAndDownShelves(goodsIdList, centerId);
+		}
+		return new ResultModel(true,"");
+	}
+
+	private void deleteLuceneAndDownShelves(List<String> goodsIdList, Integer id) {
+		String centerId = GoodsServiceUtil.judgeCenterId(id);
+		AbstractLucene lucene = LuceneFactory.get(id);
+		lucene.deleteIndex(goodsIdList);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("list", goodsIdList);
+		goodsMapper.updateGoodsDownShelves(param);
 	}
 
 }

@@ -83,11 +83,11 @@ public interface GoodsMapper {
 	
 	List<Integer> listEndActiveId(@Param("centerId")String centerId);
 	
-	List<GoodsItem> listGoodsForLucene(@Param("centerId")String centerId);
+	List<GoodsItem> listGoodsForLucene(Map<String, Object> param);
 	
 	List<GoodsSpecs> listSpecsForLucene(Map<String,Object> param);
 	
-	void updateLuceneStatus(@Param("centerId")String centerId);
+	void updateGoodsUpShelves(Map<String,Object> param);
 
 	List<GoodsItem> queryGoodsItem(Map<String, Object> searchParm);
 	
@@ -112,5 +112,9 @@ public interface GoodsMapper {
 	void saveThirdGoods(List<ThirdWarehouseGoods> list);
 
 	List<PriceModel> getCostPrice(List<OrderBussinessModel> list);
+
+	List<OrderBussinessModel> checkStock();
+
+	void updateGoodsDownShelves(Map<String, Object> param);
 	
 }

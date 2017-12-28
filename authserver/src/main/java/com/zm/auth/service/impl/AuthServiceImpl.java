@@ -160,7 +160,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		if (userDetail == null) {
-			throw new SecurityException("登录失败，没有该用户！");
+			throw new SecurityException("登录失败，用户名或密码错误，请重新输入！");
 		}
 
 		userDetail.setAuthorities(asList("ROLE_USER"));

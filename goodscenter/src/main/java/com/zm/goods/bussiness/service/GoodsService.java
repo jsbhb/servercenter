@@ -240,4 +240,10 @@ public interface GoodsService {
 	 */
 	Double getCostPrice(List<OrderBussinessModel> list);
 
+	List<OrderBussinessModel> checkStock();
+
+	ResultModel upShelves(List<String> goodsIdList, Integer centerId);
+
+	ResultModel downShelves(List<String> goodsIdList, Integer centerId);
+
 }

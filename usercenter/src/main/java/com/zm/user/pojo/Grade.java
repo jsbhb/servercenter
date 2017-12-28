@@ -23,6 +23,8 @@ public class Grade extends Pagination{
 	private Integer shopId;
 
 	private Integer gradeType;
+	
+	private Integer gradeLevel;
 
 	private String gradeName;
 
@@ -46,6 +48,14 @@ public class Grade extends Pagination{
 	
 	public Grade(){
 		super();
+	}
+
+	public Integer getGradeLevel() {
+		return gradeLevel;
+	}
+
+	public void setGradeLevel(Integer gradeLevel) {
+		this.gradeLevel = gradeLevel;
 	}
 
 	public Integer getCenterId() {

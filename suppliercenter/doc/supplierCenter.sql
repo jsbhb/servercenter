@@ -28,9 +28,11 @@ CREATE TABLE `zm_supplier`.`supplier_base`(
   `update_time` DATETIME NULL COMMENT '最后修改时间',
   `opt` varchar(20) NULL COMMENT '修改人',
   `is_delete`  tinyint Unsigned NOT NULL DEFAULT 0 COMMENT '是否废除 0:否；1：是',
+  `mode` tinyint Unsigned NOT NULL COMMENT '0:自营，1：非自营',
   PRIMARY KEY (`id`),
   UNIQUE `uk_supplierName` (`supplier_name`),
   INDEX `idx_supplierName` (`supplier_name`),
+  INDEX `idx_mode` (`mode`),
   INDEX `idx_type` (`type`),
   INDEX `idx_isDelete` (`is_delete`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
@@ -112,7 +114,7 @@ CREATE TABLE `zm_supplier`.`supplier_search_parameter` (
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '供应商字段表';
 
-INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `enter_time`) VALUES ('1', '0', '天天仓', '中国', '浙江', '宁波', '北仑', now());
-INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `enter_time`) VALUES ('2', '0', '粮油仓(宁波)', '中国', '浙江', '宁波', '北仑', now());
-INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `enter_time`) VALUES ('3', '0', '行云仓', '中国', '浙江', '宁波', '北仑', now());
-INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `enter_time`) VALUES ('4', '0', '富邦仓', '中国', '浙江', '宁波', '北仑', now());
+INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `mode`, `enter_time`) VALUES ('1', '0', '天天仓', '中国', '浙江', '宁波', '北仑', '0', now());
+INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `mode`, `enter_time`) VALUES ('2', '0', '粮油仓(宁波)', '中国', '浙江', '宁波', '北仑', '1', now());
+INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `mode`, `enter_time`) VALUES ('3', '0', '行云仓', '中国', '浙江', '宁波', '北仑', '1', now());
+INSERT INTO `zm_supplier`.`supplier_base` (`id`, `type`, `supplier_name`, `country`, `province`, `city`, `area`, `mode`, `enter_time`) VALUES ('4', '0', '富邦仓', '中国', '浙江', '宁波', '北仑', '1', now());

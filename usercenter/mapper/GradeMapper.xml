@@ -6,6 +6,7 @@
 		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
 		<result column="parent_grade_name" property="parentGradeName" jdbcType="VARCHAR" />
 		<result column="grade_type" property="gradeType" jdbcType="INTEGER" />
+		<result column="grade_level" property="gradeLevel" jdbcType="INTEGER" />
 		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
 		<result column="person_in_charge" property="personInCharge" jdbcType="VARCHAR" />
 		<result column="phone" property="phone" jdbcType="VARCHAR" />

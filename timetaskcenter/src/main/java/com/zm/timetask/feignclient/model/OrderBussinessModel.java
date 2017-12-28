@@ -1,4 +1,4 @@
-package com.zm.goods.pojo;
+package com.zm.timetask.feignclient.model;
 
 public class OrderBussinessModel {
 	

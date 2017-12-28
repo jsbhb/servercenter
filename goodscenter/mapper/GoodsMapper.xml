@@ -695,8 +695,14 @@
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
-		where gi.index_status = 0;
-	</select>
+		where gi.index_status = 0 
+		<if test="list != null and list.size > 0">
+			and gi.goods_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</select> 
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
 		select gi.info,gp.id as price_id, gp.price, gs.discount from goods_item${centerId} gs left join
@@ -704,8 +710,21 @@
 		gs.item_id = gp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId}
 	</select>
 	
-	<update id="updateLuceneStatus" parameterType="Object">
-		update goods${centerId} set index_status = 1 where index_status = 0;
+	<update id="updateGoodsUpShelves" parameterType="Object">
+		update goods${centerId} set index_status = 1,status = 1 where index_status = 0 
+		<if test="list != null and list.size > 0">
+			and goods_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</update>
+	
+	<update id="updateGoodsDownShelves" parameterType="Object">
+		update goods${centerId} set index_status = 0,status = 0 where goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
 	</update>
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
@@ -829,6 +848,19 @@
 			separator=",">
 			#{item.itemId,jdbcType = VARCHAR}
 		</foreach>
+	</select>
+	
+	
+	<resultMap type="com.zm.goods.pojo.OrderBussinessModel" id="orderBussinessModel">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="checkStock" parameterType="Object" resultMap="orderBussinessModel">
+		select i.id, i.item_id,i.sku,i.item_code,g.supplier_id from goods_item i left join goods g on i.goods_id = g.goods_id 
+		where g.supplier_id != 1
 	</select>
 
 </mapper>

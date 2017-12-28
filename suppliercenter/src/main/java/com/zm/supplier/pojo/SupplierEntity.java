@@ -21,6 +21,7 @@ import com.zm.supplier.common.Pagination;
 public class SupplierEntity extends Pagination {
 	private int id;
 	private String type;
+	private String mode;
 	private String supplierName;
 	private String country;// 国家
 	private String province;// 省
@@ -40,6 +41,14 @@ public class SupplierEntity extends Pagination {
 
 	public SupplierEntity() {
 		super();
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 
 	public int getId() {

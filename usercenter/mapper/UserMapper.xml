@@ -7,6 +7,7 @@
 		<result column="parent_id" property="parentId" jdbcType="INTEGER" />
 		<result column="parent_grade_name" property="parentGradeName" jdbcType="VARCHAR" />
 		<result column="grade_type" property="gradeType" jdbcType="INTEGER" />
+		<result column="grade_level" property="gradeLevel" jdbcType="INTEGER" />
 		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
 		<result column="person_in_charge" property="personInCharge" jdbcType="VARCHAR" />
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
@@ -359,14 +360,14 @@
 	</select>
 
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,
+		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
 		create_time,opt,company)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},now(),#{opt},#{company})
+		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company})
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
-		select id from grade where parent_id in(0,1);
+		select id from grade where grade_level = 2;
 	</select>
 	
 	<update id="updatePersonInChargeId" parameterType="Object">

@@ -19,6 +19,7 @@
 	<resultMap type="com.zm.supplier.pojo.SupplierEntity" id="supplier">
 		<id column="id" property="id"/>
 		<result column="type" property="type"/>
+		<result column="mode" property="mode"/>
 		<result column="supplier_name" property="supplierName" />
 		<result column="country" property="country"/>
 		<result column="province" property="province"/>
@@ -67,7 +68,7 @@
 		(#{id},0,#{supplierName},0,
 		#{country},#{province},#{city},#{area},#{address},
 		#{operator},#{phone},#{mobile},#{fax},#{email},#{qq},
-		now(),now(),#{opt},0)
+		now(),now(),#{opt},0,#{mode})
 	</insert>
 	
 </mapper>

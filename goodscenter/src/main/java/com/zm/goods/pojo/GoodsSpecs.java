@@ -4,79 +4,94 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.zm.goods.utils.JSONUtil;
 
-/**  
- * ClassName: GoodsSpecs <br/>  
- * Function: 商品规格，包括价格. <br/>   
- * date: Aug 22, 2017 2:17:27 PM <br/>  
- *  
- * @author wqy  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: GoodsSpecs <br/>
+ * Function: 商品规格，包括价格. <br/>
+ * date: Aug 22, 2017 2:17:27 PM <br/>
+ * 
+ * @author wqy
+ * @version
+ * @since JDK 1.7
  */
-public class GoodsSpecs implements Serializable{
+public class GoodsSpecs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@JsonIgnore
 	private Integer id;
-	
+
 	private String goodsId;
-	
+
 	private String itemId;
-	
+
 	private String itemCode;
-	
+
 	private String sku;
-	
+
 	private Integer promotion;
-	
+
 	private Double discount;
-	
+
 	private String info;
-	
+
 	private Integer weight;
-	
+
 	private Double exciseTax;
-	
+
 	@JsonIgnore
 	private String createTime;
-	
+
 	@JsonIgnore
 	private String updateTime;
-	
+
 	@JsonIgnore
 	private String opt;
-	
+
 	private String thirdCategory;
-	
+
 	private String secondCategory;
-	
+
 	private String firstCategory;
-	
+
 	private Double minPrice;
-	
+
 	private Double maxPrice;
-	
+
 	private Double vipMinPrice;
-	
+
 	private Double vipMaxPrice;
-	
+
 	private Double realMinPrice;
-	
+
 	private Double realMaxPrice;
-	
+
 	private Double realVipMinPrice;
-	
+
 	private Double realVipMaxPrice;
-	
+
 	private Integer status;
-	
+
 	private Integer stock;
-	
+
 	private Double incrementTax;
-	
+
 	private List<GoodsPrice> priceList;
+
+	public void infoFilter() {
+		if (info != null && !"".equals(info.trim())) {
+			List<TempSpecs> temList = JSONUtil.parse(info, new TypeReference<List<TempSpecs>>() {
+			});
+			StringBuilder sb = new StringBuilder("{");
+			for (TempSpecs temp : temList) {
+				sb.append("\"" + temp.skV + "\":\"" + temp.svV + "\",");
+			}
+			info = sb.substring(0, sb.length() - 1);
+			info = info + "}";
+		}
+	}
 
 	public String getThirdCategory() {
 		return thirdCategory;
@@ -304,10 +319,32 @@ public class GoodsSpecs implements Serializable{
 
 	@Override
 	public String toString() {
-		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId
-				+ ", itemCode=" + itemCode + ", sku=" + sku + ", promotion=" + promotion + ", info=" + info
-				+ ", createTime=" + createTime + ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice="
-				+ minPrice + ", maxPrice=" + maxPrice + ", stock=" + stock + ", priceList=" + priceList + "]";
+		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + ", itemCode=" + itemCode
+				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
+				+ ", stock=" + stock + ", priceList=" + priceList + "]";
 	}
-	
+
+	private static class TempSpecs {
+		private String svV;
+
+		private String skV;
+
+		@SuppressWarnings("unused")
+		public void setSvV(String svV) {
+			this.svV = svV;
+		}
+
+		@SuppressWarnings("unused")
+		public void setSkV(String skV) {
+			this.skV = skV;
+		}
+
+		@Override
+		public String toString() {
+			return "TempSpecs [svV=" + svV + ", skV=" + skV + "]";
+		}
+
+	}
+
 }

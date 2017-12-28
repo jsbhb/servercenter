@@ -356,45 +356,45 @@
 	<update id="updateOrderClose" parameterType="Object">
 		update
 		order_base set
-		status = 9 where order_id = #{orderId}
+		status = 9, update_time=now() where order_id = #{orderId}
 	</update>
 
 	<update id="updatePayCustom" parameterType="Object">
 		update
 		order_base set
-		status = 2 where order_id = #{orderId} and status = 1
+		status = 2, update_time=now() where order_id = #{orderId} and status = 1
 	</update>
 
 	<update id="updateOrderCancel" parameterType="Object">
 		update order_base
-		set status = 8 where order_id = #{orderId,jdbcType =
+		set status = 8, update_time=now() where order_id = #{orderId,jdbcType =
 		VARCHAR}
 	</update>
 
 	<update id="updateOrderPayStatusByOrderId" parameterType="Object">
 		update
 		order_base
-		set status = 1 where order_id = #{orderId,jdbcType =
+		set status = 1, update_time=now() where order_id = #{orderId,jdbcType =
 		VARCHAR} and status = 0
 	</update>
 
 	<update id="confirmUserOrder" parameterType="Object">
 		update order_base
-		set status = 7 where order_id = #{orderId,jdbcType = VARCHAR} and
+		set status = 7, update_time=now() where order_id = #{orderId,jdbcType = VARCHAR} and
 		user_id = #{userId,jdbcType = INTEGER} and status = 6
 	</update>
 
 	<update id="updateOrderSendToWarehouse" parameterType="Object">
 		update
 		order_base set
-		status = 3 where order_id = #{orderId} and status in
+		status = 3, update_time=now() where order_id = #{orderId} and status in
 		(1,2)
 	</update>
 
 	<update id="updateOrderStatusByThirdStatus" parameterType="Object">
 		update
 		order_base set
-		status = #{orderStatus} where order_id =
+		status = #{orderStatus}, update_time=now() where order_id =
 		#{orderId}
 	</update>
 
@@ -565,6 +565,16 @@
 		
 		select t.id,t.order_id,t.third_order_id,t.supplier_id from third_order_info t left join 
 		order_base o on t.order_id = o.order_id where o.status in(3,4,5) and o.order_flag = 0
+	</select>
+	
+	<resultMap type="com.zm.order.pojo.Order4Confirm" id="order4Confirm">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="listUnConfirmOrder" parameterType="Object" resultMap="order4Confirm">
+		select user_id ,order_id from order_base where status = 6 and update_time &lt;= #{time}
 	</select>
 
 </mapper>

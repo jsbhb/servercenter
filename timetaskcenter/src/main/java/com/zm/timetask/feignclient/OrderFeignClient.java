@@ -44,6 +44,14 @@ public interface OrderFeignClient {
 	public ResultModel alreadyPay(@PathVariable("version") Double version);
 	
 	/**
+	 * @fun 定时确认收货
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/confirmByTimeTask", method = RequestMethod.GET)
+	public void confirmByTimeTask(@PathVariable("version") Double version);
+	
+	/**
 	 * @fun 获取需要同步状态的订单
 	 * @param version
 	 * @return

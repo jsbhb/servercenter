@@ -9,6 +9,7 @@ import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
+import com.zm.order.pojo.Order4Confirm;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -108,5 +109,7 @@ public interface OrderMapper {
 	Integer countShoppingCartQuantity(Map<String, Object> param);
 
 	List<OrderIdAndSupplierId> listUnDeliverOrder();
+
+	List<Order4Confirm> listUnConfirmOrder(String time);
 
 }

@@ -474,4 +474,54 @@ public class GoodsController {
 		return 0.0;
 	}
 
+	/**
+	 * @fun 获取需要同步库存的商品
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/checkStock", method = RequestMethod.GET)
+	public List<OrderBussinessModel> checkStock(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.checkStock();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @fun 商品上架
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/upShelves/{centerId}", method = RequestMethod.POST)
+	public ResultModel upShelves(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestBody List<String> goodsIdList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.upShelves(goodsIdList, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	/**
+	 * @fun 商品下架
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/downShelves/{centerId}", method = RequestMethod.POST)
+	public ResultModel downShelves(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestBody List<String> goodsIdList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.downShelves(goodsIdList, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 }

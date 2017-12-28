@@ -318,9 +318,13 @@ public class GoodsLucene extends AbstractLucene {
 	}
 
 	@Override
-	public void deleteIndex(String goodsId) {
+	public void deleteIndex(List<String> list) {
 		try {
-			indexWriter.deleteDocuments(new Term("goodsId", goodsId));
+			if(list != null && list.size() > 0){
+				for(String goodsId : list){
+					indexWriter.deleteDocuments(new Term("goodsId", goodsId));
+				}
+			}
 			indexWriter.commit();
 		} catch (IOException e) {
 			

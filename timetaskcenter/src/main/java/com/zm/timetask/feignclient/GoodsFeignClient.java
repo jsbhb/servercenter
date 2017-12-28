@@ -1,10 +1,13 @@
 package com.zm.timetask.feignclient;
 
+import java.util.List;
+
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.zm.timetask.feignclient.model.OrderBussinessModel;
 import com.zm.timetask.pojo.ResultModel;
 
 
@@ -40,4 +43,12 @@ public interface GoodsFeignClient {
 	 */
 	@RequestMapping(value = "{version}/goods/endactive", method = RequestMethod.GET)
 	public ResultModel getEndActive(@PathVariable("version") Double version);
+	
+	/**
+	 * @fun 获取需要同步的商品
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/checkStock", method = RequestMethod.GET)
+	public List<OrderBussinessModel> checkStock(@PathVariable("version") Double version);
 }

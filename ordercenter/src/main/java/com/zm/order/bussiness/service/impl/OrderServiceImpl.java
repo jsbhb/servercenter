@@ -34,6 +34,7 @@ import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
+import com.zm.order.pojo.Order4Confirm;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -245,17 +246,15 @@ public class OrderServiceImpl implements OrderService {
 			goods.setOrderId(orderId);
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
-		
-		//FIXME 用mq
+
+		// FIXME 用mq
 		if (info.getCouponIds() != null) {
 			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
 					info.getCouponIds());
 		}
 
-		// FIXME 换计算节点
-		shareProfitComponent.calShareProfit(orderId);
-
 		result.setSuccess(true);
+		result.setErrorMsg(orderId);
 		return result;
 
 	}
@@ -313,6 +312,7 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel result = new ResultModel();
 
 		orderMapper.confirmUserOrder(param);
+		shareProfitComponent.calShareProfit(param.get("orderId").toString());
 
 		result.setSuccess(true);
 		return result;
@@ -611,5 +611,18 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<OrderIdAndSupplierId> listUnDeliverOrder() {
 		return orderMapper.listUnDeliverOrder();
+	}
+
+	@Override
+	public void confirmByTimeTask() {
+		String time = DateUtils.getTime(Calendar.DATE, -7);
+		List<Order4Confirm> list = orderMapper.listUnConfirmOrder(time);
+		Map<String, Object> param = null;
+		for (Order4Confirm model : list) {
+			param = new HashMap<String, Object>();
+			param.put("userId", model.getUserId());
+			param.put("orderId", model.getOrderId());
+			confirmUserOrder(param);
+		}
 	}
 }

@@ -160,12 +160,14 @@ drop table if exists  `grade`;
 CREATE TABLE `zm_user`.`grade` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `parent_id` INT UNSIGNED NULL COMMENT '父级ID',
-  `grade_type` TINYINT UNSIGNED NOT NULL COMMENT '类型0:跨境；1大贸',
+  `grade_type` TINYINT UNSIGNED NOT NULL COMMENT '类型0:跨境；1大贸，100总部',
   `grade_name` VARCHAR(50) NOT NULL COMMENT '名称',
+  `grade_level` TINYINT UNSIGNED NOT NULL COMMENT '等级',
   `person_in_charge` VARCHAR(50) NOT NULL COMMENT '负责人',
   `phone` CHAR(11) NOT NULL COMMENT '负责人电话',
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
   `grade_person_in_charge` INT UNSIGNED NULL COMMENT '负责该等级的负责人userID',
+  `redirect_url` varchar(1000) NULL COMMENT '区域中心域名',  
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(50) NULL COMMENT '操作人',
@@ -223,7 +225,5 @@ CREATE TABLE `zm_user`.`user_search_parameter` (
 COMMENT = '检索字段表';
 
 
-INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('1', '0', '跨境O2O', 'admin', '13456789012', now());
-INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `create_time`) VALUES ('0', '1', '大贸', 'admin', '13456789012', now());
-INSERT INTO `zm_user`.`user` (`id`, `plat_user_type`, `account`, `phone`, `is_phone_validate`, `center_id`, `create_time`) VALUES ('1', '0', 'admin', '15957456456', '1', '0', now());
+INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `grade_level`, `create_time`) VALUES ('1', '100', '鑫海总部', 'admin', '13456789012', '1', now());
 

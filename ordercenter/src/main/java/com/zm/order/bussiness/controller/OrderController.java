@@ -574,5 +574,14 @@ public class OrderController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/order/confirmByTimeTask", method = RequestMethod.GET)
+	public void confirmByTimeTask(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			orderService.confirmByTimeTask();
+		}
+
+	}
 
 }

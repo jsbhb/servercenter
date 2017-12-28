@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.zm.timetask.feignclient.model.OrderBussinessModel;
 import com.zm.timetask.feignclient.model.OrderIdAndSupplierId;
 import com.zm.timetask.feignclient.model.OrderInfo;
 import com.zm.timetask.pojo.ResultModel;
@@ -21,4 +22,8 @@ public interface SupplierFeignClient {
 	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
 	public void checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list);
+	
+	@RequestMapping(value = "{version}/supplier/checkStock/{supplierId}", method = RequestMethod.POST)
+	public void checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+			@RequestBody List<OrderBussinessModel> list);
 }

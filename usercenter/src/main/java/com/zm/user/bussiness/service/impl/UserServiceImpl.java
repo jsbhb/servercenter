@@ -15,6 +15,7 @@ import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.constants.LogConstants;
+import com.zm.user.feignclient.ActivityFeignClient;
 import com.zm.user.feignclient.GoodsFeignClient;
 import com.zm.user.feignclient.LogFeignClient;
 import com.zm.user.feignclient.OrderFeignClient;
@@ -52,15 +53,18 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	LogFeignClient logFeignClient;
-	
+
 	@Resource
 	OrderFeignClient orderFeignClient;
 
 	@Resource
 	PayFeignClient payFeignClient;
-	
+
 	@Resource
 	GoodsFeignClient goodsFeignClient;
+
+	@Resource
+	ActivityFeignClient activityFeignClient;
 
 	@Resource
 	RedisTemplate<String, String> redisTemplate;
@@ -336,35 +340,43 @@ public class UserServiceImpl implements UserService {
 		return false;
 	}
 
+	private final Integer FIRST_GRADE = 1;
+	private final Integer SECOND_GRADE = 2;
+	private final Integer THIRD_GRADE = 3;
+	private final Integer FOURTH_GRADE = 4;
+
 	@Override
-	public Map<String,Object> saveGrade(Grade grade) {
-		Map<String,Object> result = new HashMap<String, Object>();
+	public Map<String, Object> saveGrade(Grade grade) {
+		Map<String, Object> result = new HashMap<String, Object>();
 		userMapper.saveGrade(grade);
 		result.put("centerId", grade.getId());
 		UserInfo user = new UserInfo();
-		
-		boolean flag = false;//区域中心需要新建数据表
-		//生成新建等级的admin
-		//设置区域中心ID,店铺ID，导购ID
-		if (grade.getCenterId() == null) {//说明新建的是区域中心
+
+		boolean flag = false;// 区域中心需要新建数据表
+		// 生成新建等级的admin
+		// 设置区域中心ID,店铺ID，导购ID
+		if (FIRST_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是总公司
+			user.setPlatUserType(Constants.COOP);
+			result.put("platUserType", Constants.COOP);
+			user.setCenterId(grade.getId());
+		} else if (SECOND_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是区域中心
 			user.setPlatUserType(Constants.CENTER);
 			result.put("platUserType", Constants.CENTER);
 			user.setCenterId(grade.getId());
 			flag = true;
-		} else {
-			if(grade.getShopId() == null){//说明新建的是店铺
-				user.setPlatUserType(Constants.SHOP);
-				result.put("platUserType", Constants.SHOP);
-				user.setCenterId(grade.getCenterId());
-				user.setShopId(grade.getId());
-			} else {//说明新建的是导购
-				user.setPlatUserType(Constants.SHOPPING_GUIDE);
-				result.put("platUserType", Constants.SHOPPING_GUIDE);
-				user.setCenterId(grade.getCenterId());
-				user.setShopId(grade.getShopId());
-				user.setGuideId(grade.getId());
-			}
+		} else if (THIRD_GRADE.equals(grade.getGradeLevel())){// 说明新建的是店铺
+			user.setPlatUserType(Constants.SHOP);
+			result.put("platUserType", Constants.SHOP);
+			user.setCenterId(grade.getCenterId());
+			user.setShopId(grade.getId());
+		}else if (FOURTH_GRADE.equals(grade.getGradeLevel())){// 说明新建的是导购
+			user.setPlatUserType(Constants.SHOP);
+			result.put("platUserType", Constants.SHOP);
+			user.setCenterId(grade.getCenterId());
+			user.setShopId(grade.getShopId());
+			user.setGuideId(grade.getId());
 		}
+
 		user.setPhone(grade.getPhone());
 		user.setPhoneValidate(VALIDATE);
 		user.setStatus(1);
@@ -374,28 +386,32 @@ public class UserServiceImpl implements UserService {
 		detail.setName(grade.getPersonInCharge());
 		userMapper.saveUserDetail(detail);
 		result.put("userId", user.getId());
-		
+
 		grade.setPersonInChargeId(user.getId());
-		
+
 		userMapper.updatePersonInChargeId(grade);
-		
-		if(flag){
-//			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-//			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-			
+
+		if (flag) {
+			// goodsFeignClient.createTable(Constants.FIRST_VERSION,
+			// grade.getId());
+			// orderFeignClient.createTable(Constants.FIRST_VERSION,
+			// grade.getId());
+			// activityFeignClient.createTable(Constants.FIRST_VERSION,
+			// grade.getId());
+
 		}
 		return result;
 	}
 
 	@Override
 	public List<Integer> getCenterId() {
-		
+
 		return userMapper.listCenterId();
 	}
 
 	@Override
 	public UserInfo getUserIdentityId(Integer userId) {
-		
+
 		return userMapper.getUserIdentityId(userId);
 	}
 

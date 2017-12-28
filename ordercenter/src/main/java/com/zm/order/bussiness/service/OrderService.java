@@ -307,4 +307,6 @@ public interface OrderService {
 	List<Object> getProfit(Integer shopId);
 
 	List<OrderIdAndSupplierId> listUnDeliverOrder();
+
+	void confirmByTimeTask();
 }
