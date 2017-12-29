@@ -205,7 +205,7 @@ public class PayServiceImpl implements PayService {
 		return result;
 	}
 
-	private static final Long time = (Constants.PAY_EFFECTIVE_TIME_HOUR - 1) * 3600000L;// 支付有效期前一小时交易关闭
+	private static final Long time = Constants.PAY_EFFECTIVE_TIME_HOUR * 3600000L;// 支付有效期1小时
 	private static final Integer O2O_ORDER = 0;
 	private static final Integer OWN_SUPPLIER = 1;
 

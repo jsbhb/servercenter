@@ -125,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
 		OrderBussinessModel model = null;
 		StringBuilder detail = new StringBuilder();
-		String localAmount = (int) (info.getOrderDetail().getPayment() * 100) + "";
+		int localAmount = (int) (info.getOrderDetail().getPayment() * 100);
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			model = new OrderBussinessModel();
 			model.setOrderId(orderId);
@@ -201,10 +201,11 @@ public class OrderServiceImpl implements OrderService {
 
 		amount = CalculationUtils.add(amount, taxFee, postFee);
 		amount = CalculationUtils.round(2, amount);
-		String totalAmount = (int) (amount * 100) + "";
+		int totalAmount = (int) (amount * 100);
 
-		if (!totalAmount.equals(localAmount + "")) {
-			result.setErrorMsg("价格前后台不一致");
+		if (totalAmount-localAmount > 5 || totalAmount-localAmount < -5) {//价格区间定义在正负5分
+			result.setErrorMsg("价格前后台不一致,商品原总价：" + unDiscountAmount + ",现订单总价：" + amount + ",税费：" + taxFee + ",运费："
+					+ postFee + ",优惠金额：" + disAmount);
 			result.setSuccess(false);
 			return result;
 		}
@@ -212,7 +213,7 @@ public class OrderServiceImpl implements OrderService {
 		PayModel payModel = new PayModel();
 		payModel.setBody("购物订单");
 		payModel.setOrderId(orderId);
-		payModel.setTotalAmount(totalAmount);
+		payModel.setTotalAmount(totalAmount + "");
 		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));
 
 		if (Constants.WX_PAY.equals(payType)) {
@@ -235,6 +236,7 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.saveOrder(info);
 
 		info.getOrderDetail().setPostFee(postFee);
+		info.getOrderDetail().setPayment(amount);
 		info.getOrderDetail().setTaxFee(taxFee);
 		info.getOrderDetail().setIncrementTax(totalIncremTax);
 		info.getOrderDetail().setExciseTax(totalExciseTax);
@@ -504,7 +506,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void timeTaskcloseOrder() {
-		String time = DateUtils.getTime(Calendar.DATE, -1);
+		String time = DateUtils.getTime(Calendar.MINUTE, -90);
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
 		for (String orderId : orderIdList) {
 			closeOrder(DEFAULT_USER_ID, orderId);

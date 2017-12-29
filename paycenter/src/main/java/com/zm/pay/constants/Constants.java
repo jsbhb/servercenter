@@ -47,7 +47,7 @@ public class Constants {
 	
 	
 	// *********************支付有效时间******************************/
-	public static final Integer PAY_EFFECTIVE_TIME_HOUR = 24;
+	public static final Integer PAY_EFFECTIVE_TIME_HOUR = 1;
 	
 	
 	// *********************支付报关参数******************************/
