@@ -94,6 +94,7 @@ public class GoodsServiceUtil {
 			Double discount = null;
 			for (GoodsSpecs specs : specsList) {
 				item = goodsMap.get(specs.getGoodsId());
+//				specs.infoFilter();
 				if (item == null) {
 					continue;
 				}
@@ -126,6 +127,7 @@ public class GoodsServiceUtil {
 	// 封装价格区间
 	public static void getPriceInterval(GoodsSpecs specs, Double discountParam) {
 		List<GoodsPrice> priceList = specs.getPriceList();
+//		specs.infoFilter();
 		if (priceList == null) {
 			return;
 		}
@@ -183,4 +185,32 @@ public class GoodsServiceUtil {
 		}
 		return amount;
 	}
+	
+	public static Map<String,Double> getMinPrice(List<GoodsSpecs> specsList){
+		Map<String,Double> result = new HashMap<String,Double>();
+		if(specsList == null || specsList.size() == 0){
+			result.put("price", 0.0);
+			result.put("realPrice", 0.0);
+			return result;
+		}
+		for(GoodsSpecs specs : specsList){
+			getPriceInterval(specs, specs.getDiscount());
+		}
+		int len = specsList.size();
+		
+		for(int i=0;i<len;i++){
+			if(i == 0){
+				result.put("price", specsList.get(i).getMinPrice());
+				result.put("realPrice", specsList.get(i).getRealMinPrice());
+			} else {
+				if(specsList.get(i).getMinPrice() < result.get("price")){
+					result.put("price", specsList.get(i).getMinPrice());
+				}
+				if(specsList.get(i).getRealMinPrice() < result.get("realPrice")){
+					result.put("realPrice", specsList.get(i).getRealMinPrice());
+				}
+			}
+		}
+		return result;
+	} 
 }

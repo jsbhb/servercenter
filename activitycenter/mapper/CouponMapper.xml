@@ -142,7 +142,7 @@
 		rule_${centerId} r on c.rule_id = r.rule_id
 		left join
 		coupon_goods_${centerId} cg on r.rule_id=cg.rule_id where
-		cg.goods_id=#{goodsId} and c.status in(1,2) and r.range = 4
+		cg.goods_id=#{goodsId} and c.status in(1,2) and r.range = 4 and c.node = 0
 	</select>
 
 	<select id="listCouponByCategory" parameterType="Object"
@@ -151,7 +151,7 @@
 		c.name,c.start_time,c.end_time from coupon_${centerId} c left join
 		rule_${centerId} r on c.rule_id = r.rule_id where 
 		category = (case when r.range=1 then #{firstId} when r.range=2 then #{secondId} when r.range=3 then #{thirdId} end) 
-		and c.status in(1,2)
+		and c.status in(1,2) and c.node = 0
 	
 	</select>
 	
@@ -159,7 +159,7 @@
 		resultMap="coupon">
 			select c.id, c.coupon_id, c.pic_path,c.num,
 		c.name,c.start_time,c.end_time from coupon_${centerId} c left join
-		rule_${centerId} r on c.rule_id = r.rule_id where r.range = 0 and c.status in(1,2)
+		rule_${centerId} r on c.rule_id = r.rule_id where r.range = 0 and c.status in(1,2) and c.node = 0
 	
 	</select>
 

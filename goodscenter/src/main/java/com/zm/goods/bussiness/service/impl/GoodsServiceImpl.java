@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,7 @@ import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.pojo.vo.TimeLimitActiveData;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
+import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
@@ -67,9 +70,11 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	ActivityComponent activityComponent;
-	
+
 	@Resource
 	PriceComponent priceComponent;
+
+	private Logger logger = LoggerFactory.getLogger(GoodsServiceImpl.class);
 
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId) {
@@ -222,11 +227,11 @@ public class GoodsServiceImpl implements GoodsService {
 			if (!result.isSuccess()) {
 				return result;
 			}
-			specsMap.put(model.getItemId(),specs);
+			specsMap.put(model.getItemId(), specs);
 		}
 
 		totalAmount = priceComponent.calPrice(list, specsMap, couponIds, false, vip, centerId, result, userId);
-		if(!result.isSuccess()){
+		if (!result.isSuccess()) {
 			return result;
 		}
 		map.put("tax", taxMap);
@@ -389,6 +394,7 @@ public class GoodsServiceImpl implements GoodsService {
 		String centerId = GoodsServiceUtil.judgeCenterId(id);
 		param.put("centerId", centerId);
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
+		Map<String,Double> result = null;
 		for (GoodsItem item : itemList) {
 			searchModel = new GoodsSearch();
 			searchModel.setGoodsId(item.getGoodsId());
@@ -402,7 +408,8 @@ public class GoodsServiceImpl implements GoodsService {
 			param.put("goodsId", item.getGoodsId());
 			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 			if (specsList != null && specsList.size() > 0) {
-				searchModel.setPrice(specsList.get(0).getMinPrice());
+				result = GoodsServiceUtil.getMinPrice(specsList);
+				searchModel.setPrice(result.get("realPrice"));
 			}
 			searchList.add(searchModel);
 		}
@@ -454,33 +461,44 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
-			Map<String, GoodsSpecs> temp = new HashMap<String, GoodsSpecs>();
+			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
+			List<GoodsSpecs> temList = null;
 			for (GoodsSpecs specs : specsList) {
-				temp.put(specs.getGoodsId(), specs);
+				// specs.infoFilter();
+				if (temp.get(specs.getGoodsId()) == null) {
+					temList = new ArrayList<GoodsSpecs>();
+					temList.add(specs);
+					temp.put(specs.getGoodsId(), temList);
+				} else {
+					temp.get(specs.getGoodsId()).add(specs);
+				}
 			}
 			Set<String> specsSet = null;
+			Map<String, Double> result = null;
 			for (GoodsItem model : goodsList) {
-				GoodsSpecs specs = temp.get(model.getGoodsId());
-				if (specs != null) {
-					// String specsInfo = specs.getInfo();
-					specsSet = new HashSet<>();
-					// if(specsInfo != null){
-					// Map<String, String> specsMap = JSONUtil.parse(specsInfo,
-					// Map.class);
-					// for (Map.Entry<String, String> entry :
-					// specsMap.entrySet()) {
-					// specsSet.add(entry.getValue());
-					// }
-					// }
-					model.setSpecsInfo(specsSet);
-					if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
-						Double discount = (specs.getDiscount() == null || specs.getDiscount() == 0) ? 10.0
-								: specs.getDiscount();
-						discount = CalculationUtils.div(discount, 10.0);
-						model.setPrice(specs.getPriceList().get(0).getPrice());
-						model.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));
+				temList = temp.get(model.getGoodsId());
+				result = GoodsServiceUtil.getMinPrice(temList);
+				for (GoodsSpecs specs : temList) {
+					if (model.getSpecsInfo() == null) {
+						specsSet = new HashSet<>();
+					} else {
+						specsSet = model.getSpecsInfo();
+					}
+					String specsInfo = specs.getInfo();
+					if (specsInfo != null && !"".equals(specsInfo.trim())) {
+						try {
+							Map<String, String> specsMap = JSONUtil.parse(specsInfo, Map.class);
+							for (Map.Entry<String, String> entry : specsMap.entrySet()) {
+								specsSet.add(entry.getValue());
+							}
+						} catch (Exception e) {
+							logger.error("规格格式错误：itemId=" + specs.getItemId() + "***********specsInfo=" + specsInfo);
+						}
 					}
 				}
+				model.setSpecsInfo(specsSet);
+				model.setPrice(result.get("price"));
+				model.setRealPrice(result.get("realPrice"));
 			}
 
 			searchParm.put("type", PICTURE_TYPE);
@@ -545,6 +563,7 @@ public class GoodsServiceImpl implements GoodsService {
 				List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
 				Map<String, GoodsSpecs> temp = new HashMap<String, GoodsSpecs>();
 				for (GoodsSpecs specs : specsList) {
+					// specs.infoFilter();
 					temp.put(specs.getGoodsId(), specs);
 				}
 				for (TimeLimitActiveData data : active.getDataList()) {
@@ -623,21 +642,21 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel upShelves(List<String> goodsIdList, Integer centerId) {
-		if(goodsIdList != null && goodsIdList.size() > 0){
+		if (goodsIdList != null && goodsIdList.size() > 0) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 			param.put("list", goodsIdList);
 			renderLuceneModel(param, searchList, centerId);
 		}
-		return new ResultModel(true,"");
+		return new ResultModel(true, "");
 	}
 
 	@Override
 	public ResultModel downShelves(List<String> goodsIdList, Integer centerId) {
-		if(goodsIdList != null && goodsIdList.size() > 0){
+		if (goodsIdList != null && goodsIdList.size() > 0) {
 			deleteLuceneAndDownShelves(goodsIdList, centerId);
 		}
-		return new ResultModel(true,"");
+		return new ResultModel(true, "");
 	}
 
 	private void deleteLuceneAndDownShelves(List<String> goodsIdList, Integer id) {

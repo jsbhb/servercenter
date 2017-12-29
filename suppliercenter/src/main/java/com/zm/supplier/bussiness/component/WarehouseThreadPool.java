@@ -88,6 +88,9 @@ public class WarehouseThreadPool {
 				orderIds.add(model.getThirdOrderId());
 			}
 			Set<OrderStatus> set = buttJoint.checkOrderStatus(orderIds);
+			if (set == null || set.size() == 0) {
+				return;
+			}
 			// 设置本地订单号和供应商Id,如果没有第三方订单号则以本地订单号当第三方订单号
 			for (OrderStatus orderStatus : set) {
 				for (OrderIdAndSupplierId model : orderList) {
@@ -146,7 +149,7 @@ public class WarehouseThreadPool {
 				return;
 			}
 			Set<CheckStockModel> set = buttJoint.checkStock(list);
-			if(set == null){
+			if (set == null || set.size() == 0) {
 				return;
 			}
 			// 将ItemId赋值到返回的checkStockModel里面

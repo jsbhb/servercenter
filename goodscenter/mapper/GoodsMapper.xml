@@ -697,7 +697,7 @@
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
 		where gi.index_status = 0 
 		<if test="list == null">
-			and status = 1
+			and gi.status = 0
 		</if>
 		<if test="list != null and list.size > 0">
 			and gi.goods_id in 
