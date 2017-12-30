@@ -357,21 +357,17 @@ public class UserServiceImpl implements UserService {
 		// 设置区域中心ID,店铺ID，导购ID
 		if (FIRST_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是总公司
 			user.setUserType(Constants.COOP);
-			result.put("platUserType", Constants.COOP);
 			user.setCenterId(grade.getId());
 		} else if (SECOND_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是区域中心
 			user.setUserType(Constants.CENTER);
-			result.put("platUserType", Constants.CENTER);
 			user.setCenterId(grade.getId());
 			flag = true;
 		} else if (THIRD_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是店铺
 			user.setUserType(Constants.SHOP);
-			result.put("platUserType", Constants.SHOP);
 			user.setCenterId(grade.getCenterId());
 			user.setShopId(grade.getId());
 		} else if (FOURTH_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是导购
 			user.setUserType(Constants.SHOPPING_GUIDE);
-			result.put("platUserType", Constants.SHOPPING_GUIDE);
 			user.setCenterId(grade.getCenterId());
 			user.setShopId(grade.getShopId());
 			user.setGuideId(grade.getId());

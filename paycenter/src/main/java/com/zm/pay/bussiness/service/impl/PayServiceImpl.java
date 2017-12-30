@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.constants.LogConstants;
@@ -58,10 +59,13 @@ public class PayServiceImpl implements PayService {
 	LogFeignClient logFeignClient;
 
 	@Resource
-	RedisTemplate<String, ?> redisTemplate;
+	RedisTemplate<String, Object> redisTemplate;
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
+
+	@Resource
+	PayMapper payMapper;
 
 	private Logger logger = LoggerFactory.getLogger(PayServiceImpl.class);
 
@@ -69,6 +73,11 @@ public class PayServiceImpl implements PayService {
 	public Map<String, String> weiXinPay(Integer clientId, String type, PayModel model) throws Exception {
 		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
+
+		if (config == null) {
+			config = payMapper.getWeixinPayConfig(clientId);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+		}
 
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);
@@ -99,6 +108,12 @@ public class PayServiceImpl implements PayService {
 		if (Constants.WX_PAY.equals(model.getPayType())) {
 			WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
 					.get(Constants.PAY + model.getCenterId() + Constants.WX_PAY);
+
+			if (config == null) {
+				config = payMapper.getWeixinPayConfig(model.getCenterId());
+				redisTemplate.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+			}
+
 			config.setHttpConnectTimeoutMs(5000);
 			config.setHttpReadTimeoutMs(5000);
 			Map<String, String> result = WxPayUtils.acquireCustom(config, model);
@@ -113,6 +128,12 @@ public class PayServiceImpl implements PayService {
 		if (Constants.ALI_PAY.equals(model.getPayType())) {
 			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 					.get(Constants.PAY + model.getCenterId() + Constants.ALI_PAY);
+
+			if (config == null) {
+				config = payMapper.getAliPayConfig(model.getCenterId());
+				redisTemplate.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+			}
+
 			Map<String, String> result = AliPayUtils.acquireCustom(config, model);
 			logger.info("支付宝报关：" + model.getOutRequestNo() + "====" + result);
 			if ("T".equals(result.get("is_success")) && "SUCCESS".equals(result.get("result_code"))) {
@@ -127,6 +148,11 @@ public class PayServiceImpl implements PayService {
 	public Map<String, Object> aliPay(Integer clientId, String type, PayModel model) throws Exception {
 		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
+
+		if (config == null) {
+			config = payMapper.getAliPayConfig(clientId);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+		}
 
 		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝支付" + type + "，后台请求成功";
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -155,6 +181,11 @@ public class PayServiceImpl implements PayService {
 		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
+		if (config == null) {
+			config = payMapper.getAliPayConfig(clientId);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+		}
+
 		AlipayTradeRefundResponse response = AliPayUtils.aliRefundPay(config, model);
 		Map<String, Object> result = new HashMap<String, Object>();
 
@@ -179,6 +210,11 @@ public class PayServiceImpl implements PayService {
 	public Map<String, Object> wxRefundPay(Integer clientId, RefundPayModel model) throws Exception {
 		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
+
+		if (config == null) {
+			config = payMapper.getWeixinPayConfig(clientId);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+		}
 
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);

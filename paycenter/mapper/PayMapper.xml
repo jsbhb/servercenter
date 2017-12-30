@@ -34,5 +34,15 @@
 		select * from
 		wxpay_config;
 	</select>
+	
+	<select id="getAliPayConfig" resultMap="aliconfig">
+		select * from
+		alipay_config where center_id = #{centerId};
+	</select>
+
+	<select id="getWeixinPayConfig" resultMap="wxconfig">
+		select * from
+		wxpay_config where center_id = #{centerId};
+	</select>
 
 </mapper>

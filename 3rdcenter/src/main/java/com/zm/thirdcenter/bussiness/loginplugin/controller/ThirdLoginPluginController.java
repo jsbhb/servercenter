@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zm.thirdcenter.bussiness.dao.LoginPluginMapper;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.ApiResult;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsAccessToken;
 import com.zm.thirdcenter.bussiness.loginplugin.util.wx.SnsAccessTokenApi;
@@ -52,6 +53,9 @@ public class ThirdLoginPluginController {
 
 	@Resource
 	UserFeignClient userFeignClient;
+	
+	@Resource
+	LoginPluginMapper loginPluginMapper;
 
 	@RequestMapping(value = "auth/{version}/user/3rdLogin/wx", method = RequestMethod.POST)
 	@ApiOperation(value = "获取微信登录url接口", produces = "application/json;utf-8")
@@ -64,6 +68,15 @@ public class ThirdLoginPluginController {
 
 			WXLoginConfig config = (WXLoginConfig) redisTemplate.opsForValue()
 					.get(Constants.LOGIN + param.getCenterId() + "" + param.getLoginType());
+			
+			
+			if (config == null) {
+				Map<String,Object> temMap = new HashMap<String, Object>();
+				temMap.put("centerId", param.getCenterId());
+				temMap.put("loginType", param.getLoginType());
+				config = loginPluginMapper.getWXLoginConfig(temMap);
+				redisTemplate.opsForValue().set(Constants.LOGIN+param.getCenterId()+""+param.getLoginType(), config);
+			}
 
 			StringBuffer sb = new StringBuffer();
 			sb.append("?appid=" + config.getAppId());
