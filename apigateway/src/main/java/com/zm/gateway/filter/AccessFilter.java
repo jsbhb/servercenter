@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
@@ -51,6 +53,8 @@ public class AccessFilter extends ZuulFilter {
 	public boolean shouldFilter() {
 		return true;
 	}
+	
+	Logger logger = LoggerFactory.getLogger(AccessFilter.class);
 
 	@Override
 	public Object run() {
@@ -64,6 +68,8 @@ public class AccessFilter extends ZuulFilter {
 		if (checkPath(request.getRequestURL().toString())) {
 			return null;
 		}
+		
+		logger.info("url:"+request.getRequestURL().toString()+",starting checking auth");
 
 		HttpHeaders headers = new HttpHeaders();
 

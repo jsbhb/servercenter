@@ -394,7 +394,7 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/close/{userId}/{orderId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "{version}/order/close/{userId}/{orderId}", method = RequestMethod.POST)
 	@ApiOperation(value = "未付款时关闭订单接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),

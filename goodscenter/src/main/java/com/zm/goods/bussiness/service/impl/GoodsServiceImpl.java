@@ -642,10 +642,12 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel upShelves(List<String> goodsIdList, Integer centerId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 		if (goodsIdList != null && goodsIdList.size() > 0) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 			param.put("list", goodsIdList);
+			renderLuceneModel(param, searchList, centerId);
+		} else {
 			renderLuceneModel(param, searchList, centerId);
 		}
 		return new ResultModel(true, "");

@@ -52,14 +52,15 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/payType", method = RequestMethod.POST)
 	public boolean updateOrderPayType(@PathVariable("version") Double version, @RequestBody OrderDetail detail);
-	
+
 	/**
 	 * @fun 超时关闭订单
 	 * @param version
 	 * @param detail
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/order/close/{orderId}", method = RequestMethod.PUT)
-	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId);
-	
+	@RequestMapping(value = "{version}/order/close/{userId}/{orderId}", method = RequestMethod.POST)
+	public ResultModel closeOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId,
+			@PathVariable("userId") Integer userId);
+
 }

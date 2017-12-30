@@ -4,7 +4,7 @@ import com.zm.thirdcenter.constants.Constants;
 
 public class ThirdLogin {
 
-	private Integer platUserType;
+	private Integer userType;
 	
 	private String wechat;
 
@@ -14,8 +14,8 @@ public class ThirdLogin {
 	
 	public ThirdLogin(){}
 	
-	public ThirdLogin(Integer platUserType, String thirdAccount, Integer type){
-		this.platUserType = platUserType;
+	public ThirdLogin(Integer userType, String thirdAccount, Integer type){
+		this.userType = userType;
 		if(Constants.WX_LOGIN.equals(type)){
 			this.wechat = thirdAccount;
 		}
@@ -27,12 +27,12 @@ public class ThirdLogin {
 		}
 	}
 
-	public Integer getPlatUserType() {
-		return platUserType;
+	public Integer getUserType() {
+		return userType;
 	}
 
-	public void setPlatUserType(Integer platUserType) {
-		this.platUserType = platUserType;
+	public void setUserType(Integer userType) {
+		this.userType = userType;
 	}
 
 	public String getWechat() {
@@ -61,7 +61,7 @@ public class ThirdLogin {
 
 	@Override
 	public String toString() {
-		return "UserInfo [platUserType=" + platUserType + ", wechat=" + wechat + ", qq=" + qq + ", sinaBlog=" + sinaBlog
+		return "UserInfo [userType=" + userType + ", wechat=" + wechat + ", qq=" + qq + ", sinaBlog=" + sinaBlog
 				+ "]";
 	}
 	

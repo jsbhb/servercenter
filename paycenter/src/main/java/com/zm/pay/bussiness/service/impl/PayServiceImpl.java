@@ -76,7 +76,7 @@ public class PayServiceImpl implements PayService {
 
 		if (config == null) {
 			config = payMapper.getWeixinPayConfig(clientId);
-			if(config == null){
+			if (config == null) {
 				Map<String, String> resp = new HashMap<String, String>();
 				resp.put("error", "没有支付配置信息");
 				return resp;
@@ -116,7 +116,7 @@ public class PayServiceImpl implements PayService {
 
 			if (config == null) {
 				config = payMapper.getWeixinPayConfig(model.getCenterId());
-				if(config == null){
+				if (config == null) {
 					return false;
 				}
 				redisTemplate.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
@@ -139,7 +139,7 @@ public class PayServiceImpl implements PayService {
 
 			if (config == null) {
 				config = payMapper.getAliPayConfig(model.getCenterId());
-				if(config == null){
+				if (config == null) {
 					return false;
 				}
 				redisTemplate.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
@@ -162,7 +162,7 @@ public class PayServiceImpl implements PayService {
 
 		if (config == null) {
 			config = payMapper.getAliPayConfig(clientId);
-			if(config == null){
+			if (config == null) {
 				Map<String, Object> resp = new HashMap<String, Object>();
 				resp.put("error", "没有支付配置信息");
 				return resp;
@@ -199,7 +199,7 @@ public class PayServiceImpl implements PayService {
 
 		if (config == null) {
 			config = payMapper.getAliPayConfig(clientId);
-			if(config == null){
+			if (config == null) {
 				Map<String, Object> resp = new HashMap<String, Object>();
 				resp.put("error", "没有支付配置信息");
 				return resp;
@@ -234,7 +234,7 @@ public class PayServiceImpl implements PayService {
 
 		if (config == null) {
 			config = payMapper.getWeixinPayConfig(clientId);
-			if(config == null){
+			if (config == null) {
 				Map<String, Object> resp = new HashMap<String, Object>();
 				resp.put("error", "没有支付配置信息");
 				return resp;
@@ -287,7 +287,7 @@ public class PayServiceImpl implements PayService {
 		}
 		// 判断订单是否超时
 		if (DateUtils.judgeDate(info.getCreateTime(), time)) {
-			orderFeignClient.closeOrder(version, orderId);
+			orderFeignClient.closeOrder(version, orderId, info.getUserId());
 			throw new RuntimeException("该订单已经超时关闭");
 		}
 

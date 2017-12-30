@@ -262,9 +262,9 @@
 		base
 		gb on g.base_id = gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.brand_id  where 1=1 
+		gcb.brand_id  where 1=1  and gi.status = 1
 		<if test="type != null and type != ''">
-			g.type = #{type,jdbcType = INTEGER}
+			and g.type = #{type,jdbcType = INTEGER}
 		</if>
 		<if test="thirdCategory != null and thirdCategory != ''">
 			and gb.third_category = #{thirdCategory,jdbcType = VARCHAR}
