@@ -275,20 +275,30 @@ public class PayServiceImpl implements PayService {
 	public ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
 			throws Exception {
 
+		ResultModel resultModel = new ResultModel();
+		
 		OrderInfo info = orderFeignClient.getOrderByOrderIdForPay(version, orderId);
 		if (info == null) {
-			throw new RuntimeException("没有对应订单");
+			resultModel.setErrorMsg("没有对应订单");
+			resultModel.setSuccess(false);
+			return resultModel;
 		}
 		if (Constants.ORDER_CLOSE.equals(info.getStatus())) {
-			throw new RuntimeException("该订单已经超时关闭");
+			resultModel.setErrorMsg("该订单已经超时关闭");
+			resultModel.setSuccess(false);
+			return resultModel;
 		}
 		if (Constants.ORDER_CANCEL.equals(info.getStatus())) {
-			throw new RuntimeException("该订单已经退单");
+			resultModel.setErrorMsg("该订单已经退单");
+			resultModel.setSuccess(false);
+			return resultModel;
 		}
 		// 判断订单是否超时
 		if (DateUtils.judgeDate(info.getCreateTime(), time)) {
 			orderFeignClient.closeOrder(version, orderId, info.getUserId());
-			throw new RuntimeException("该订单已经超时关闭");
+			resultModel.setErrorMsg("该订单已经超时关闭");
+			resultModel.setSuccess(false);
+			return resultModel;
 		}
 
 		// 如果是跨境第三方仓库的，需要同步库存并判断库存
@@ -304,10 +314,10 @@ public class PayServiceImpl implements PayService {
 				model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
 				list.add(model);
 			}
-			ResultModel result = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getSupplierId(),
+			resultModel = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getSupplierId(),
 					info.getOrderFlag(), list);
-			if (result == null || !result.isSuccess()) {
-				return result;
+			if (resultModel == null || !resultModel.isSuccess()) {
+				return resultModel;
 			}
 		}
 
@@ -336,7 +346,9 @@ public class PayServiceImpl implements PayService {
 		if (Constants.WX_PAY.equals(payType)) {
 			if (Constants.JSAPI.equals(type)) {
 				if (req.getParameter("openId") == null || "".equals(req.getParameter("openId"))) {
-					throw new RuntimeException("请先用微信授权登录");
+					resultModel.setErrorMsg("请先用微信授权登录");
+					resultModel.setSuccess(false);
+					return resultModel;
 				}
 			}
 			// 微信特定参数
@@ -350,8 +362,8 @@ public class PayServiceImpl implements PayService {
 				detail.setOrderId(info.getOrderId());
 				orderFeignClient.updateOrderPayType(version, detail);
 			}
-
-			return new ResultModel(result);
+			resultModel.setObj(result);
+			return resultModel;
 		}
 		return null;
 	}
