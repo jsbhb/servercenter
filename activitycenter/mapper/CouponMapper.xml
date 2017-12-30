@@ -236,11 +236,11 @@
 		varchar(100) NOT NULL COMMENT '优惠券ID',
 		description varchar(100) NULL
 		COMMENT '规则描述',
-		condition DECIMAL(10,2) NOT NULL COMMENT '满条件',
+		`condition` DECIMAL(10,2) NOT NULL COMMENT '满条件',
 		deductible_value DECIMAL(10,2) NOT NULL COMMENT '抵扣额',
 		value_type
 		TINYINT NOT NULL COMMENT '0:折扣；1金额',
-		range TINYINT NOT NULL COMMENT
+		`range` TINYINT NOT NULL COMMENT
 		'使用范围0全场，1一级分了；2二级分类；3三级分类；4特定商品',
 		category varchar(100) NULL COMMENT
 		'分类ID，range为1,2,3时不为空',

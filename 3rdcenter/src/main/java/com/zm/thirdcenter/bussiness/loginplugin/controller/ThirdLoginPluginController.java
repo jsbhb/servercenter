@@ -71,11 +71,11 @@ public class ThirdLoginPluginController {
 			sb.append("&response_type=code");
 			if (param.isSnsapiBase()) {
 				sb.append("&scope=snsapi_userinfo");
-				sb.append("&state=" + param.getPlatUserType() + "_" + param.getCenterId() + "_" + param.getLoginType()
+				sb.append("&state=" + param.getUserType() + "_" + param.getCenterId() + "_" + param.getLoginType()
 						+ "#wechat_redirect");
 			} else {
 				sb.append("&scope=snsapi_base");
-				sb.append("&state=base" + "_" + param.getPlatUserType() + "_" + param.getCenterId() + "_"
+				sb.append("&state=base" + "_" + param.getUserType() + "_" + param.getCenterId() + "_"
 						+ param.getLoginType() + "#wechat_redirect");
 			}
 

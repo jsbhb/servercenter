@@ -16,7 +16,7 @@ public class WXLoginConfig implements Serializable{
 	
 	private String secret;
 	
-	private Integer platUserType;
+	private Integer userType;
 	
 	private boolean snsapiBase;
 	
@@ -30,12 +30,13 @@ public class WXLoginConfig implements Serializable{
 		this.redirectUrl = redirectUrl;
 	}
 
-	public Integer getPlatUserType() {
-		return platUserType;
+
+	public Integer getUserType() {
+		return userType;
 	}
 
-	public void setPlatUserType(Integer platUserType) {
-		this.platUserType = platUserType;
+	public void setUserType(Integer userType) {
+		this.userType = userType;
 	}
 
 	public boolean isSnsapiBase() {
@@ -89,6 +90,6 @@ public class WXLoginConfig implements Serializable{
 	@Override
 	public String toString() {
 		return "WXLoginConfig [id=" + id + ", centerId=" + centerId + ", loginType=" + loginType + ", appId=" + appId
-				+ ", secret=" + secret + ", platUserType=" + platUserType + ", snsapiBase=" + snsapiBase + "]";
+				+ ", secret=" + secret + ", userType=" + userType + ", snsapiBase=" + snsapiBase + "]";
 	}
 }
