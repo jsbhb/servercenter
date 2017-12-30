@@ -15,6 +15,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.supplier.bussiness.component.WarehouseThreadPool;
 import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.bussiness.service.SupplierService;
+import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.pojo.Express;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
@@ -63,7 +64,7 @@ public class SupplierServiceImpl implements SupplierService {
 	private static final Integer FUBANG_WAREHOUSE = 4;
 
 	@Override
-	public void checkOrderStatus(List<OrderIdAndSupplierId> list) {
+	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
 		Map<Integer, List<OrderIdAndSupplierId>> param = new HashMap<Integer, List<OrderIdAndSupplierId>>();
 		List<OrderIdAndSupplierId> tempList = null;
 		for (OrderIdAndSupplierId model : list) {
@@ -87,10 +88,11 @@ public class SupplierServiceImpl implements SupplierService {
 				warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
 			}
 		}
+		return new ResultModel(true, "正在同步状态");
 	}
 
 	@Override
-	public void checkStock(List<OrderBussinessModel> list, Integer supplierId) {
+	public ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId) {
 		if(FUBANG_WAREHOUSE.equals(supplierId)){
 			List<OrderBussinessModel> temp = null;
 			for(OrderBussinessModel model : list){
@@ -101,15 +103,17 @@ public class SupplierServiceImpl implements SupplierService {
 		} else {
 			warehouseThreadPool.checkStock(list, supplierId);
 		}
+		return new ResultModel(true, "同步库存完成");
 	}
 
 	@Override
-	public void getGoods(List<String> list, Integer supplierId, String supplierName) {
+	public ResultModel getGoods(List<String> list, Integer supplierId, String supplierName) {
 		if(list != null){
 			for(String itemCode : list){
 				warehouseThreadPool.getThirdGoods(itemCode, supplierId, supplierName);
 			}
 		}
+		return new ResultModel(true, "正在同步商品");
 	}
 
 }

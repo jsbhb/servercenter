@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.zm.order.pojo.OrderIdAndSupplierId;
+import com.zm.order.pojo.ResultModel;
 
 @FeignClient("suppliercenter")
 public interface SupplierFeignClient {
 
 	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
-	public void checkOrderStatus(@PathVariable("version") Double version,
+	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list);
 }

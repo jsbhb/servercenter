@@ -36,7 +36,7 @@
 
 	<resultMap type="com.zm.user.pojo.UserInfo" id="userInfo">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="plat_user_type" property="platUserType"
+		<result column="user_type" property="userType"
 			jdbcType="INTEGER" />
 		<result column="account" property="account" jdbcType="VARCHAR" />
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
@@ -95,7 +95,7 @@
 
 	<select id="getUserInfo" parameterType="Object" resultMap="userInfo">
 		select
-		u.id,u.plat_user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
+		u.id,u.user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
 		u.center_id,u.last_login_time,u.ipcity,ud.id as
 		detail_id,ud.name,ud.nick_name,ud.company,ud.location,u.guide_id,
 		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join
@@ -265,18 +265,18 @@
 	<insert id="saveUser" parameterType="Object" useGeneratedKeys="true"
 		keyProperty="id">
 		insert into
-		user(phone,plat_user_type,email,account,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
+		user(phone,user_type,email,account,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
 		shop_id,guide_id,create_time)
 		values
-		(#{phone},#{platUserType},#{email},#{account},#{pwd},#{parentId},#{band},#{phoneValidate},
+		(#{phone},#{userType},#{email},#{account},#{pwd},#{parentId},#{band},#{phoneValidate},
 		#{emailValidate},#{centerId},#{shopId},#{guideId},now())
 	</insert>
 
 	<insert id="saveWechat" parameterType="Object">
 		insert IGNORE into
-		user_wechat(user_id,plat_user_type,wechat,create_time)
+		user_wechat(user_id,user_type,wechat,create_time)
 		values
-		(#{userId},#{platUserType},#{wechat},now())
+		(#{userId},#{userType},#{wechat},now())
 	</insert>
 
 
@@ -334,7 +334,7 @@
 
 	<select id="getUserIdByUserInfo" parameterType="Object"
 		resultType="java.lang.Integer">
-		select id from user where plat_user_type = #{platUserType}
+		select id from user where user_type = #{userType}
 		<if test="account != null and account != ''">
 			and account = #{account}
 		</if>
@@ -355,8 +355,8 @@
 	<select id="countWechatBy3rdLogin" parameterType="Object"
 		resultType="java.lang.Integer">
 
-		select count(*) from user_wechat where plat_user_type =
-		#{platUserType} and wechat = #{wechat}
+		select count(*) from user_wechat where user_type =
+		#{userType} and wechat = #{wechat}
 	</select>
 
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">

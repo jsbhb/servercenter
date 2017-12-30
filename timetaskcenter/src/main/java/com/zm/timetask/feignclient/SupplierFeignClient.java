@@ -20,10 +20,10 @@ public interface SupplierFeignClient {
 	public ResultModel sendOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> infoList);
 	
 	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
-	public void checkOrderStatus(@PathVariable("version") Double version,
+	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list);
 	
 	@RequestMapping(value = "{version}/supplier/checkStock/{supplierId}", method = RequestMethod.POST)
-	public void checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+	public ResultModel checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
 			@RequestBody List<OrderBussinessModel> list);
 }

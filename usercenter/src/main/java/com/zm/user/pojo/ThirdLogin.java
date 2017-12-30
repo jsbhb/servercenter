@@ -6,7 +6,7 @@ public class ThirdLogin {
 	
 	private Integer userId;
 
-	private Integer platUserType;
+	private Integer userType;
 
 	private String wechat;
 
@@ -16,8 +16,8 @@ public class ThirdLogin {
 	
 	public ThirdLogin(){}
 	
-	public ThirdLogin(Integer userId, Integer platUserType, String thirdAccount, Integer type){
-		this.platUserType = platUserType;
+	public ThirdLogin(Integer userId, Integer userType, String thirdAccount, Integer type){
+		this.userType = userType;
 		this.userId = userId;
 		if(Constants.WX_LOGIN.equals(type)){
 			this.wechat = thirdAccount;
@@ -31,7 +31,7 @@ public class ThirdLogin {
 	}
 
 	public boolean check() {
-		return platUserType != null && (wechat != null || qq != null || sinaBlog != null);
+		return userType != null && (wechat != null || qq != null || sinaBlog != null);
 	}
 
 	public Integer getUserId() {
@@ -42,12 +42,13 @@ public class ThirdLogin {
 		this.userId = userId;
 	}
 
-	public Integer getPlatUserType() {
-		return platUserType;
+
+	public Integer getUserType() {
+		return userType;
 	}
 
-	public void setPlatUserType(Integer platUserType) {
-		this.platUserType = platUserType;
+	public void setUserType(Integer userType) {
+		this.userType = userType;
 	}
 
 	public String getWechat() {
@@ -76,7 +77,7 @@ public class ThirdLogin {
 
 	@Override
 	public String toString() {
-		return "ThirdLogin [userId=" + userId + ", platUserType=" + platUserType + ", wechat=" + wechat + ", qq=" + qq
+		return "ThirdLogin [userId=" + userId + ", userType=" + userType + ", wechat=" + wechat + ", qq=" + qq
 				+ ", sinaBlog=" + sinaBlog + "]";
 	}
 

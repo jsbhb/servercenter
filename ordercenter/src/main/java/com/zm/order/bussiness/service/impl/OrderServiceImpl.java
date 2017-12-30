@@ -589,8 +589,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public void checkOrderStatus(List<OrderIdAndSupplierId> list) {
-		supplierFeignClient.checkOrderStatus(Constants.FIRST_VERSION, list);
+	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
+		return supplierFeignClient.checkOrderStatus(Constants.FIRST_VERSION, list);
 	}
 
 	@Override

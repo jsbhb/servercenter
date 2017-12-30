@@ -282,7 +282,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	void checkOrderStatus(List<OrderIdAndSupplierId> list);
+	ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list);
 
 	/**
 	 * changeOrderStatusByThirdWarehouse:根据第三方订单状态修改本地状态. <br/>

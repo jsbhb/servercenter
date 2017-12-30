@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.zm.goods.pojo.OrderBussinessModel;
+import com.zm.goods.pojo.ResultModel;
 
 @FeignClient("suppliercenter")
 public interface SupplierFeignClient {
 
 	@RequestMapping(value = "{version}/supplier/checkStock/{supplierId}", method = RequestMethod.POST)
-	public void checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+	public ResultModel checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
 			@RequestBody List<OrderBussinessModel> list);
 }

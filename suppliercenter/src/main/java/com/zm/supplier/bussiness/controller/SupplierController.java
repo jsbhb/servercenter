@@ -99,32 +99,35 @@ public class SupplierController {
 	}
 
 	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
-	public void checkOrderStatus(@PathVariable("version") Double version,
+	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			supplierService.checkOrderStatus(list);
+			return supplierService.checkOrderStatus(list);
 		}
+		return new ResultModel(false, "版本错误");
 	}
 
 	@RequestMapping(value = "{version}/supplier/checkStock/{supplierId}", method = RequestMethod.POST)
-	public void checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+	public ResultModel checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
 			@RequestBody List<OrderBussinessModel> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			supplierService.checkStock(list ,supplierId);
+			return supplierService.checkStock(list ,supplierId);
 		}
+		return new ResultModel(false, "版本错误");
 	}
 	
 	@RequestMapping(value = "{version}/supplier/getGoods/{supplierId}", method = RequestMethod.POST)
-	public void getGoods(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
+	public ResultModel getGoods(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
 			@RequestParam("supplierName") String supplierName, @RequestBody List<String> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			supplierService.getGoods(list ,supplierId, supplierName);
+			return supplierService.getGoods(list ,supplierId, supplierName);
 		}
+		return new ResultModel(false, "版本错误");
 	}
 }

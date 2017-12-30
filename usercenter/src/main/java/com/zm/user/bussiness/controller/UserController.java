@@ -208,16 +208,15 @@ public class UserController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			if (!info.check()) {
-				result.setErrorMsg("参数不全");
-				result.setSuccess(false);
-				return result;
-			}
-
 			boolean flag = false;
 			if (BACK_CODE.equals(code)) {
 				flag = true;
 			} else {
+				if (!info.check()) {
+					result.setErrorMsg("参数不全");
+					result.setSuccess(false);
+					return result;
+				}
 				flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
 			}
 			if (flag) {
@@ -514,7 +513,7 @@ public class UserController {
 
 		return null;
 	}
-	
+
 	@RequestMapping(value = "{version}/grade/{id}", method = RequestMethod.GET)
 	public ResultModel getGradeNameByParentId(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
 

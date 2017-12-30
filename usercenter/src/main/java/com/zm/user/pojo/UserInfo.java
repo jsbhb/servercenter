@@ -13,7 +13,7 @@ public class UserInfo {
 
 	private Integer id;
 
-	private Integer platUserType;
+	private Integer userType;
 
 	private String account;
 
@@ -66,9 +66,9 @@ public class UserInfo {
 	private Integer vipLevel;
 
 	public boolean check() {
-		return platUserType != null && (account != null || phone != null || email != null) && centerId != null;
+		return userType != null && (account != null || phone != null || email != null) && centerId != null;
 	}
-
+	
 	public Integer getGuideId() {
 		return guideId;
 	}
@@ -77,12 +77,12 @@ public class UserInfo {
 		this.guideId = guideId;
 	}
 
-	public Integer getPlatUserType() {
-		return platUserType;
+	public Integer getUserType() {
+		return userType;
 	}
 
-	public void setPlatUserType(Integer platUserType) {
-		this.platUserType = platUserType;
+	public void setUserType(Integer userType) {
+		this.userType = userType;
 	}
 
 	public Integer getVipLevel() {
@@ -287,7 +287,7 @@ public class UserInfo {
 
 	@Override
 	public String toString() {
-		return "UserInfo [id=" + id + ", platUserType=" + platUserType + ", account=" + account + ", phone=" + phone
+		return "UserInfo [id=" + id + ", userType=" + userType + ", account=" + account + ", phone=" + phone
 				+ ", email=" + email + ", wechat=" + wechat + ", qq=" + qq + ", sinaBlog=" + sinaBlog + ", pwd=" + pwd
 				+ ", parentId=" + parentId + ", band=" + band + ", phoneValidate=" + phoneValidate + ", emailValidate="
 				+ emailValidate + ", status=" + status + ", centerId=" + centerId + ", shopId=" + shopId + ", guideId="

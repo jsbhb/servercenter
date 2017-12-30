@@ -532,8 +532,7 @@ public class OrderController {
 			@RequestBody List<OrderIdAndSupplierId> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			orderService.checkOrderStatus(list);
-			return new ResultModel(true, "正在同步状态");
+			return orderService.checkOrderStatus(list);
 		}
 
 		return new ResultModel(false, "版本错误");

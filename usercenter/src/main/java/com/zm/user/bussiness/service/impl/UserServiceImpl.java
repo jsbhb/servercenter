@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
 		if (userId != null) {
 			if (info.getWechat() != null) {
 				userMapper.saveWechat(
-						new ThirdLogin(userId, info.getPlatUserType(), info.getWechat(), Constants.WX_LOGIN));
+						new ThirdLogin(userId, info.getUserType(), info.getWechat(), Constants.WX_LOGIN));
 			}
 
 			return userId;
@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
 			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
 			packageUser(apiResult, info);
 			userMapper.saveWechat(
-					new ThirdLogin(info.getId(), info.getPlatUserType(), info.getWechat(), Constants.WX_LOGIN));
+					new ThirdLogin(info.getId(), info.getUserType(), info.getWechat(), Constants.WX_LOGIN));
 		}
 
 		if (info.getUserDetail() != null) {
@@ -356,22 +356,22 @@ public class UserServiceImpl implements UserService {
 		// 生成新建等级的admin
 		// 设置区域中心ID,店铺ID，导购ID
 		if (FIRST_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是总公司
-			user.setPlatUserType(Constants.COOP);
+			user.setUserType(Constants.COOP);
 			result.put("platUserType", Constants.COOP);
 			user.setCenterId(grade.getId());
 		} else if (SECOND_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是区域中心
-			user.setPlatUserType(Constants.CENTER);
+			user.setUserType(Constants.CENTER);
 			result.put("platUserType", Constants.CENTER);
 			user.setCenterId(grade.getId());
 			flag = true;
-		} else if (THIRD_GRADE.equals(grade.getGradeLevel())){// 说明新建的是店铺
-			user.setPlatUserType(Constants.SHOP);
+		} else if (THIRD_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是店铺
+			user.setUserType(Constants.SHOP);
 			result.put("platUserType", Constants.SHOP);
 			user.setCenterId(grade.getCenterId());
 			user.setShopId(grade.getId());
-		}else if (FOURTH_GRADE.equals(grade.getGradeLevel())){// 说明新建的是导购
-			user.setPlatUserType(Constants.SHOP);
-			result.put("platUserType", Constants.SHOP);
+		} else if (FOURTH_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是导购
+			user.setUserType(Constants.SHOPPING_GUIDE);
+			result.put("platUserType", Constants.SHOPPING_GUIDE);
 			user.setCenterId(grade.getCenterId());
 			user.setShopId(grade.getShopId());
 			user.setGuideId(grade.getId());
@@ -392,12 +392,9 @@ public class UserServiceImpl implements UserService {
 		userMapper.updatePersonInChargeId(grade);
 
 		if (flag) {
-			// goodsFeignClient.createTable(Constants.FIRST_VERSION,
-			// grade.getId());
-			// orderFeignClient.createTable(Constants.FIRST_VERSION,
-			// grade.getId());
-			// activityFeignClient.createTable(Constants.FIRST_VERSION,
-			// grade.getId());
+			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
+			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
+			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 
 		}
 		return result;

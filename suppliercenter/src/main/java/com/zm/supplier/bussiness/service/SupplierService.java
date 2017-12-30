@@ -3,6 +3,7 @@ package com.zm.supplier.bussiness.service;
 import java.util.List;
 
 import com.github.pagehelper.Page;
+import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.pojo.Express;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
@@ -52,7 +53,7 @@ public interface SupplierService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	void checkOrderStatus(List<OrderIdAndSupplierId> list);
+	ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list);
 
 	/**  
 	 * checkStock:获取第三方库存. <br/>  
@@ -62,7 +63,7 @@ public interface SupplierService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	void checkStock(List<OrderBussinessModel> list, Integer supplierId);
+	ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId);
 
-	void getGoods(List<String> list, Integer supplierId, String supplierName);
+	ResultModel getGoods(List<String> list, Integer supplierId, String supplierName);
 }

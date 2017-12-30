@@ -7,7 +7,7 @@ drop table if exists  `user`;
 
 CREATE TABLE `zm_user`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型0:admin,1:海外购、大贸，2、区域中心；3、店铺；4、导购、5消费者',
+  `user_type` TINYINT UNSIGNED NULL COMMENT '用户类型0:admin,1:海外购、大贸，2、区域中心；3、店铺；4、导购、5消费者',
   `account` VARCHAR(50) NULL COMMENT '账号',
   `phone` VARCHAR(15) NULL COMMENT '手机',
   `email` VARCHAR(100) NULL COMMENT '邮箱',
@@ -33,11 +33,11 @@ CREATE TABLE `zm_user`.`user` (
   INDEX `idx_shop_id` (`shop_id`),
   INDEX `idx_phone` (`phone`),
   INDEX `idx_email` (`email`),
-  INDEX `idx_plat_user_type` (`plat_user_type`),
+  INDEX `idx_user_type` (`user_type`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `account_UNIQUE` (`account`, `plat_user_type` ASC),
-  UNIQUE INDEX `phone_UNIQUE` (`phone`,`plat_user_type` ASC),
-  UNIQUE INDEX `email_UNIQUE` (`email`,`plat_user_type` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
+  UNIQUE INDEX `account_UNIQUE` (`account`, `user_type` ASC),
+  UNIQUE INDEX `phone_UNIQUE` (`phone`,`user_type` ASC),
+  UNIQUE INDEX `email_UNIQUE` (`email`,`user_type` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
 COMMENT = '用户表';
 
 drop table if exists  `user_wechat`;
@@ -45,13 +45,13 @@ drop table if exists  `user_wechat`;
 CREATE TABLE `zm_user`.`user_wechat` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `plat_user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
+  `user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
   `wechat` VARCHAR(100) NOT NULL COMMENT '微信unionid',
   `attribute` VARCHAR(100) COMMENT '备用',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `awechat_UNIQUE` (`wechat`, `plat_user_type` ASC),
+  UNIQUE INDEX `awechat_UNIQUE` (`wechat`, `user_type` ASC),
   INDEX `idx_user_id` (`user_id`),
   INDEX `idx_wechat` (`wechat`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
