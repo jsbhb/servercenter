@@ -16,7 +16,7 @@
 		wxlogin_config;
 	</select>
 	
-	<select id="getWXLoginConfig" resultMap="wxlogin">
+	<select id="getWXLoginConfig" parameterType="Object" resultMap="wxlogin">
 		select * from
 		wxlogin_config where center_id = #{centerId} and login_type = #{loginType};
 	</select>

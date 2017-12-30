@@ -2,6 +2,8 @@ package com.zm.supplier.bussiness.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.github.pagehelper.Page;
 import com.zm.supplier.pojo.Express;
 import com.zm.supplier.pojo.SupplierEntity;
@@ -41,4 +43,6 @@ public interface SupplierMapper {
 	 * @since JDK 1.7  
 	 */
 	SupplierEntity selectById(int id);
+	
+	SupplierInterface getSupplierInterface(@Param("supplierId")Integer supplierId);
 }

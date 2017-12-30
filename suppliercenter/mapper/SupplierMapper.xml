@@ -71,4 +71,8 @@
 		now(),now(),#{opt},0,#{mode})
 	</insert>
 	
+	<select id="getSupplierInterface" parameterType="Object" resultMap="supplierinf">
+		select * from supplier_interface where supplier_id = #{supplierId}
+	</select>
+	
 </mapper>

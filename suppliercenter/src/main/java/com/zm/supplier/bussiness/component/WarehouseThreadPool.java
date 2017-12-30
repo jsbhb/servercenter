@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.feignclient.GoodsFeignClient;
 import com.zm.supplier.feignclient.OrderFeignClient;
@@ -47,6 +48,9 @@ public class WarehouseThreadPool {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
+	
+	@Resource
+	SupplierMapper supplierMapper;
 
 	Logger logger = LoggerFactory.getLogger(WarehouseThreadPool.class);
 
@@ -201,6 +205,13 @@ public class WarehouseThreadPool {
 	private AbstractSupplierButtJoint getTargetInterface(Integer supplierId) {
 		SupplierInterface inf = (SupplierInterface) redisTemplate.opsForValue()
 				.get(Constants.SUPPLIER_INTERFACE + supplierId);
+		if(inf == null){
+			inf = supplierMapper.getSupplierInterface(supplierId);
+			if(inf == null){
+				return null;
+			}
+			redisTemplate.opsForValue().set(Constants.SUPPLIER_INTERFACE + supplierId, inf);
+		}
 		AbstractSupplierButtJoint buttJoint = (AbstractSupplierButtJoint) SpringContextUtil
 				.getBean(inf.getTargetObject());
 		if(buttJoint == null){

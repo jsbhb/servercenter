@@ -75,6 +75,9 @@ public class ThirdLoginPluginController {
 				temMap.put("centerId", param.getCenterId());
 				temMap.put("loginType", param.getLoginType());
 				config = loginPluginMapper.getWXLoginConfig(temMap);
+				if(config == null){
+					return "error";
+				}
 				redisTemplate.opsForValue().set(Constants.LOGIN+param.getCenterId()+""+param.getLoginType(), config);
 			}
 
