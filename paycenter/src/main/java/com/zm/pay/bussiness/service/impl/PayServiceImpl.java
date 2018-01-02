@@ -34,6 +34,7 @@ import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.utils.CalculationUtils;
 import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
@@ -275,30 +276,20 @@ public class PayServiceImpl implements PayService {
 	public ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
 			throws Exception {
 
-		ResultModel resultModel = new ResultModel();
-		
 		OrderInfo info = orderFeignClient.getOrderByOrderIdForPay(version, orderId);
 		if (info == null) {
-			resultModel.setErrorMsg("没有对应订单");
-			resultModel.setSuccess(false);
-			return resultModel;
+			return new ResultModel(false, "没有该订单");
 		}
 		if (Constants.ORDER_CLOSE.equals(info.getStatus())) {
-			resultModel.setErrorMsg("该订单已经超时关闭");
-			resultModel.setSuccess(false);
-			return resultModel;
+			return new ResultModel(false, "该订单已经超时关闭");
 		}
 		if (Constants.ORDER_CANCEL.equals(info.getStatus())) {
-			resultModel.setErrorMsg("该订单已经退单");
-			resultModel.setSuccess(false);
-			return resultModel;
+			return new ResultModel(false, "该订单已经退单");
 		}
 		// 判断订单是否超时
 		if (DateUtils.judgeDate(info.getCreateTime(), time)) {
 			orderFeignClient.closeOrder(version, orderId, info.getUserId());
-			resultModel.setErrorMsg("该订单已经超时关闭");
-			resultModel.setSuccess(false);
-			return resultModel;
+			return new ResultModel(false, "该订单已经超时关闭");
 		}
 
 		// 如果是跨境第三方仓库的，需要同步库存并判断库存
@@ -314,7 +305,7 @@ public class PayServiceImpl implements PayService {
 				model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
 				list.add(model);
 			}
-			resultModel = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getSupplierId(),
+			ResultModel resultModel = goodsFeignClient.stockJudge(Constants.FIRST_VERSION, info.getSupplierId(),
 					info.getOrderFlag(), list);
 			if (resultModel == null || !resultModel.isSuccess()) {
 				return resultModel;
@@ -325,7 +316,7 @@ public class PayServiceImpl implements PayService {
 		PayModel model = new PayModel();
 		model.setBody("购物订单");
 		model.setOrderId(info.getOrderId());
-		model.setTotalAmount((int) (info.getOrderDetail().getPayment() * 100) + "");
+		model.setTotalAmount((int)CalculationUtils.mul(info.getOrderDetail().getPayment(), 100) + "");
 		StringBuilder sb = new StringBuilder();
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
@@ -346,9 +337,7 @@ public class PayServiceImpl implements PayService {
 		if (Constants.WX_PAY.equals(payType)) {
 			if (Constants.JSAPI.equals(type)) {
 				if (req.getParameter("openId") == null || "".equals(req.getParameter("openId"))) {
-					resultModel.setErrorMsg("请先用微信授权登录");
-					resultModel.setSuccess(false);
-					return resultModel;
+					return new ResultModel(false, "请先用微信授权登录");
 				}
 			}
 			// 微信特定参数
@@ -362,10 +351,12 @@ public class PayServiceImpl implements PayService {
 				detail.setOrderId(info.getOrderId());
 				orderFeignClient.updateOrderPayType(version, detail);
 			}
-			resultModel.setObj(result);
-			return resultModel;
+			if("false".equals(result.get("success"))){
+				return new ResultModel(false, "微信调用失败:"+result.get("errorMsg"));
+			}else{
+				return new ResultModel(result);
+			}
 		}
 		return null;
 	}
-
 }

@@ -48,10 +48,10 @@ public class WxPayUtils {
 		data.put("notify_url", Constants.WX_NOTIFY_URL);
 		data.put("detail", model.getDetail() == null ? "" : model.getDetail());
 		// 支付时间设定为5分钟
-		Calendar cal = Calendar.getInstance();
-		data.put("time_start", sdf.format(cal.getTime()));
-		cal.add(Calendar.HOUR, Constants.PAY_EFFECTIVE_TIME_HOUR);
-		data.put("time_expire", sdf.format(cal.getTime()));
+//		Calendar cal = Calendar.getInstance();
+//		data.put("time_start", sdf.format(cal.getTime()));
+//		cal.add(Calendar.HOUR, Constants.PAY_EFFECTIVE_TIME_HOUR);
+//		data.put("time_expire", sdf.format(cal.getTime()));
 		data.put("trade_type", type);
 		if (Constants.JSAPI.equals(type)) {
 			data.put("openid", model.getOpenId());

@@ -24,6 +24,11 @@ public class ResultModel {
 		this.success = true;
 	}
 	
+	public ResultModel(boolean flag, String errMsg){
+		this.errorMsg = errMsg;
+		this.success = flag;
+	}
+	
 	public String getErrorCode() {
 		return errorCode;
 	}

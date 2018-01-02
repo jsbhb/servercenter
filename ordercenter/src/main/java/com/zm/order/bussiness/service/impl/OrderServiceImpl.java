@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
 
 		amount = CalculationUtils.add(amount, taxFee, postFee);
 		amount = CalculationUtils.round(2, amount);
-		int totalAmount = (int) (amount * 100);
+		int totalAmount = (int) CalculationUtils.mul(amount, 100);
 
 		if (totalAmount-localAmount > 5 || totalAmount-localAmount < -5) {//价格区间定义在正负5分
 			result.setErrorMsg("价格前后台不一致,商品原总价：" + unDiscountAmount + ",现订单总价：" + amount + ",税费：" + taxFee + ",运费："
