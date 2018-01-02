@@ -1,5 +1,7 @@
 package com.zm.order.pojo;
 
+import com.zm.order.common.Pagination;
+
 import io.swagger.annotations.ApiModel;
 
 /**  
@@ -12,7 +14,7 @@ import io.swagger.annotations.ApiModel;
  * @since JDK 1.7  
  */
 @ApiModel(value="orderGoods", description="商品信息")
-public class OrderGoods {
+public class OrderGoods extends Pagination{
 
 	private Integer id;
 	

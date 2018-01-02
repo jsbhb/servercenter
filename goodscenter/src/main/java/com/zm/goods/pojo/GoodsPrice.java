@@ -6,25 +6,18 @@ public class GoodsPrice {
 
 	@JsonIgnore
 	private Integer id;
-
 	private String itemId;
-
 	private Integer min;
-
 	private Integer max;
-
 	private Double price;
-
 	private Double vipPrice;
-
 	private String deliveryPlace;
-
+	private Double proxyPrice;
+	private Double fxPrice;
 	@JsonIgnore
 	private String createTime;
-
 	@JsonIgnore
 	private String updateTime;
-
 	@JsonIgnore
 	private String opt;
 
@@ -106,6 +99,22 @@ public class GoodsPrice {
 
 	public void setOpt(String opt) {
 		this.opt = opt;
+	}
+
+	public double getProxyPrice() {
+		return proxyPrice;
+	}
+
+	public void setProxyPrice(double proxyPrice) {
+		this.proxyPrice = proxyPrice;
+	}
+
+	public double getFxPrice() {
+		return fxPrice;
+	}
+
+	public void setFxPrice(double fxPrice) {
+		this.fxPrice = fxPrice;
 	}
 
 	@Override

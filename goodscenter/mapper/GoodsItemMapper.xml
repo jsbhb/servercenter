@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsItemMapper">
+
+	
+	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="entity">
+		<id column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="item_id" property="itemId" />
+		<result column="item_code" property="itemCode"/>
+		<result column="sku" property="sku"/>
+		<result column="weight" property="weight"/>
+		<result column="excise_fax" property="exciseTax"/>
+		<result column="status" property="status"/>
+		<result column="discount" property="discount"/>
+		<result column="info" property="info"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_name" property="supplierName"/>
+		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
+			<result column="min" property="min"/>
+			<result column="max" property="max"/>
+			<result column="proxy_price" property="proxyPrice"/>
+			<result column="fxprice" property="fxPrice"/>
+			<result column="delivery_Place" property="deliveryPlace"/>
+		</association>
+		<association property="stock" javaType="com.zm.goods.pojo.GoodsStockEntity">
+			<result column="qpQty" property="qpQty"/>
+			<result column="fxQty" property="fxQty"/>
+			<result column="defQty" property="defQty"/>
+			<result column="lockedQty" property="lockedQty"/>
+			<result column="frozenQty" property="frozenQty"/>
+		</association>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsPrice" id="price">
+		<id column="id" property="id"/>
+		<result column="item_id" property="itemId" />
+		<result column="min" property="min"/>
+		<result column="max" property="max"/>
+		<result column="proxy_price" property="proxyPrice"/>
+		<result column="fxprice" property="fxPrice"/>
+		<result column="delivery_Place" property="deliveryPlace"/>
+		<result column="discount" property="discount"/>
+		<result column="info" property="info"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<select id="selectById" parameterType="Object" resultMap="entity">
+		select * from goods_item where id = #{id} 
+	</select>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="entity">
+		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
+		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,
+		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
+		from goods_item i left join goods g on g.goods_id = i.goods_id
+		left join goods_price p on p.item_id = i.item_id 
+		left join goods_stock s on s.item_id = i.item_id where 1=1 
+		<if test="goodsName!=null and goodsName!=''">
+			and g.goods_name like concat('%',#{goodsName},'%') 
+		</if>
+		<if test="itemCode!=null and itemCode!=''">
+			and i.item_code = #{itemCode}
+		</if>
+		<if test="sku !=null and sku!=''">
+			and i.sku = #{sku}
+		</if>
+		<if test="status !=null and status!=''">
+			and i.status = #{status}
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and g.supplier_id = #{supplierId}
+		</if>
+		<if test="itemId!=null and itemId!=''">
+			and i.item_id = #{itemId} 
+		</if>
+		<if test="goodsId!=null and goodsId !=''">
+			and i.goods_id = #{goodsId} 
+		</if>
+		<if test="id !=null and id !=''">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	
+	<insert id="insert" parameterType="Object">
+		insert into goods_item 
+		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt)
+		value
+		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertPrice" parameterType="Object">
+		insert into goods_price 
+		(item_id,
+		<if test="min != null and min > 0">
+			min,
+		</if>
+		<if test="max != null and max > 0">
+			max,
+		</if>
+		proxy_price,fxprice,create_time,update_time,opt)
+		value
+		(#{itemId},
+		<if test="min != null and min > 0">
+			#{min},
+		</if>
+		<if test="max != null and max > 0">
+			#{max},
+		</if>
+		#{proxyPrice},#{fxPrice},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateStatus" parameterType="Object">
+		update goods_item set status= #{status},update_time=now() where item_id  = #{itemId}
+	</update>
+	
+	
+	<insert id="insertStock" parameterType="Object">
+		insert into goods_stock 
+		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time,opt)
+		value
+		(#{itemId},0,0,0,0,0,now(),now(),#{opt})
+	</insert>
+	
+</mapper>

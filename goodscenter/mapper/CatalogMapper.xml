@@ -71,10 +71,10 @@
 	</insert>
 
 	<insert id="insertSecondCatalog" parameterType="Object">
-		insert into goods_second_categroy value (#{id},#{secondId},#{firstId},#{name},now(),now(),#{opt});
+		insert into goods_second_categroy value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt});
 	</insert>
 	
 	<insert id="insertThirdCatalog" parameterType="Object">
-		insert into goods_third_category value (#{id},#{thirdId},#{secondId},#{name},now(),now(),#{opt});
+		insert into goods_third_category value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt});
 	</insert>
 </mapper>

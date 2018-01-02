@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
-import com.zm.goods.bussiness.service.BrandService;
 import com.zm.goods.bussiness.service.SpecsService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.pojo.BrandEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.SpecsTemplateEntity;
 

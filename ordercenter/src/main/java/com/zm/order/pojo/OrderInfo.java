@@ -2,10 +2,12 @@ package com.zm.order.pojo;
 
 import java.util.List;
 
+import com.zm.order.common.Pagination;
+
 import io.swagger.annotations.ApiModel;
 
 @ApiModel
-public class OrderInfo {
+public class OrderInfo extends Pagination{
 
 	private Integer id;
 

@@ -1,32 +1,25 @@
 package com.zm.goods.pojo;
 
-public class ThirdWarehouseGoods {
+import com.zm.goods.common.Pagination;
+
+public class ThirdWarehouseGoods extends Pagination {
 
 	private Integer id;
-	
 	private Integer supplierId;
-	
 	private String supplierName;
-	
 	private String sku;
-	
 	private String itemCode;
-	
 	private String goodsName;
-	
 	private String brand;
-	
 	private Integer weight;
-	
 	private String origin;
-	
 	private Integer stock;
-	
 	private Integer min;
-	
 	private Integer max;
-	
 	private Integer status;
+	private String createTime;// 创建时间
+	private String updateTime;// 更新时间
+	private String opt;
 
 	public Integer getId() {
 		return id;
@@ -131,6 +124,29 @@ public class ThirdWarehouseGoods {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
-	
+
+	public String getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getOpt() {
+		return opt;
+	}
+
+	public void setOpt(String opt) {
+		this.opt = opt;
+	}
+
 }

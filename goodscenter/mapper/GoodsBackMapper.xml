@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsBackMapper">
+
+	
+	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="entity">
+		<id column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="specs_template_id" property="templateId"/>
+		<result column="base_id" property="baseId"/>
+		<result column="origin" property="origin"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="description" property="description"/>
+		<result column="status" property="status"/>
+		<result column="detail_path" property="detailPath"/>
+		<result column="index_status" property="indexStatus"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+
+	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsWithItems">
+			<id column="id" property="id"/>
+			<result column="goods_id" property="goodsId"/>
+			<result column="specs_template_id" property="templateId"/>
+			<result column="base_id" property="baseId"/>
+			<result column="origin" property="origin"/>
+			<result column="supplier_id" property="supplierId"/>
+			<result column="supplier_name" property="supplierName"/>
+			<result column="goods_name" property="goodsName"/>
+			<result column="description" property="description"/>
+			<result column="detail_path" property="detailPath"/>
+			<result column="index_status" property="indexStatus"/>
+			<collection property="items"
+				ofType="com.zm.goods.pojo.GoodsItemEntity">
+				<result column="goods_id" property="goodsId"/>
+				<result column="item_id" property="itemId" />
+				<result column="item_code" property="itemCode"/>
+				<result column="sku" property="sku"/>
+				<result column="weight" property="weight"/>
+				<result column="proxy_price" property="proxyPrice"/>
+				<result column="fxprice" property="fxPrice"/>
+				<result column="excise_fax" property="exciseTax"/>
+				<result column="status" property="status"/>
+				<result column="discount" property="discount"/>
+				<result column="info" property="info"/>
+			</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ThirdWarehouseGoods" id="thirdEntity">
+		<id column="id" property="id"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="sku" property="sku"/>
+		<result column="item_code" property="itemCode"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="brand" property="brand"/>
+		<result column="weight" property="weight"/>
+		<result column="stock" property="stock"/>
+		<result column="min" property="min"/>
+		<result column="max" property="max"/>
+		<result column="status" property="status"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
+		select * from third_goods where 1=1 
+		<if test="id != null and id > 0">
+			and id = #{id} 
+		</if>
+		<if test="itemCode != null and itemCode != ''">
+			and item_code = #{itemCode} 
+		</if>
+		<if test="sku != null and sku != ''">
+			and sku = #{sku} 
+		</if>
+		<if test="status != null and status != -1">
+			and status = #{status} 
+		</if>
+		<if test="supplierId != null and supplierId != -1">
+			and supplier_id = #{supplierId} 
+		</if>
+	</select>
+	
+	<select id="selectThird" parameterType="Object" resultMap="thirdEntity">
+		select * from third_goods where 1=1 
+		<if test="id != null and id > 0">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	
+	<select id="select" parameterType="Object" resultMap="goodsWithItems">
+		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} 
+	</select>
+	
+	<select id="selectById" parameterType="Object" resultMap="entity">
+		select * from goods where id = #{id} 
+	</select>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="entity">
+		select * from goods where 1=1 
+		<if test="goodsName!=null and goodsName!=''">
+			and goods_name like concat('%',#{goodsName},'%') 
+		</if>
+		<if test="id > 0">
+			and id = #{id} 
+		</if>
+		<if test="goodsId != null and goodsId != ''">
+			and goods_id = #{goodsId} 
+		</if>
+		<if test="baseId > 0">
+			and base_id = #{baseId} 
+		</if>
+	</select>
+	
+	<insert id="insert" parameterType="Object">
+		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt) value
+		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,0,now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateThirdStatus" parameterType="Object">
+		update third_goods set status = 1 , update_time = now() where id = #{id};
+	</update>
+	
+</mapper>
