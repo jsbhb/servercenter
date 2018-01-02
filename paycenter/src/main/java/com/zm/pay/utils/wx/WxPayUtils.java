@@ -2,18 +2,15 @@ package com.zm.pay.utils.wx;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.wxpay.sdk.WXPay;
-import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.CustomModel;
@@ -41,8 +38,8 @@ public class WxPayUtils {
 
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("body", model.getBody());
-		data.put("out_trade_no", model.getOrderId());
 		data.put("device_info", "");
+		data.put("out_trade_no", model.getOrderId()+"_"+type);
 		data.put("fee_type", Constants.FEE_TYPE);
 		data.put("total_fee", model.getTotalAmount());
 		data.put("notify_url", Constants.WX_NOTIFY_URL);
@@ -60,6 +57,7 @@ public class WxPayUtils {
 			data.put("spbill_create_ip", model.getIP());
 		} else if (Constants.NATIVE.equals(type)) {
 			data.put("spbill_create_ip", Constants.CREATE_IP);
+			data.put("product_id", model.getOrderId());
 		}
 
 		Map<String, String> resp = wxpay.unifiedOrder(data);
