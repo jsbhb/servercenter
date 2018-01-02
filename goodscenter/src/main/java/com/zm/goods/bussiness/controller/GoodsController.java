@@ -498,10 +498,10 @@ public class GoodsController {
 	 */
 	@RequestMapping(value = "{version}/goods/upShelves/{centerId}", method = RequestMethod.POST)
 	public ResultModel upShelves(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> goodsIdList) {
+			@RequestBody List<String> itemIdList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.upShelves(goodsIdList, centerId);
+			return goodsService.upShelves(itemIdList, centerId);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -515,10 +515,27 @@ public class GoodsController {
 	 */
 	@RequestMapping(value = "{version}/goods/downShelves/{centerId}", method = RequestMethod.POST)
 	public ResultModel downShelves(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> goodsIdList) {
+			@RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.downShelves(goodsIdList, centerId);
+			return goodsService.downShelves(itemId, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	/**
+	 * @fun 商品同步
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/syncgoods/{centerId}", method = RequestMethod.POST)
+	public ResultModel syncgoods(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestBody List<String> itemIdList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.syncgoods(itemIdList, centerId);
 		}
 
 		return new ResultModel(false, "版本错误");

@@ -110,9 +110,9 @@ CREATE TABLE `zm_goods`.`goods_first_category` (
 COMMENT = '供应商商品一级分类表';
 
 
-drop table if exists  `goods_second_categroy`;
+drop table if exists  `goods_second_category`;
 
-CREATE TABLE `zm_goods`.`goods_second_categroy` (
+CREATE TABLE `zm_goods`.`goods_second_category` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `first_id` varchar(100) NOT NULL COMMENT 'first_id',
   `second_id` varchar(100) NOT NULL COMMENT 'first_id',

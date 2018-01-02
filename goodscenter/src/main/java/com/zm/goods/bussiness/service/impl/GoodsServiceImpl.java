@@ -80,8 +80,10 @@ public class GoodsServiceImpl implements GoodsService {
 	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId) {
 
 		if (param.get("itemId") != null) {
-			String goodsId = goodsMapper.getGoodsIdByItemId((String) param.get("itemId"));
-			param.put("goodsId", goodsId);
+			List<String> itemIdList = new ArrayList<String>();
+			itemIdList.add((String) param.get("itemId"));
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+			param.put("goodsId", goodsIdList.get(0));
 		}
 
 		List<GoodsItem> goodsList = goodsMapper.listGoods(param);
@@ -394,28 +396,30 @@ public class GoodsServiceImpl implements GoodsService {
 		String centerId = GoodsServiceUtil.judgeCenterId(id);
 		param.put("centerId", centerId);
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
-		Map<String,Double> result = null;
-		for (GoodsItem item : itemList) {
-			searchModel = new GoodsSearch();
-			searchModel.setGoodsId(item.getGoodsId());
-			searchModel.setBrand(item.getBrand());
-			searchModel.setStatus(item.getStatus());
-			searchModel.setOrigin(item.getOrigin());
-			searchModel.setFirstCategory(item.getFirstCategory());
-			searchModel.setThirdCategory(item.getThirdCategory());
-			searchModel.setSecondCategory(item.getSecondCategory());
-			searchModel.setGoodsName(item.getCustomGoodsName());
-			param.put("goodsId", item.getGoodsId());
-			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
-			if (specsList != null && specsList.size() > 0) {
-				result = GoodsServiceUtil.getMinPrice(specsList);
-				searchModel.setPrice(result.get("realPrice"));
+		if (itemList != null && itemList.size() > 0) {
+			Map<String, Double> result = null;
+			for (GoodsItem item : itemList) {
+				searchModel = new GoodsSearch();
+				searchModel.setGoodsId(item.getGoodsId());
+				searchModel.setBrand(item.getBrand());
+				searchModel.setStatus(item.getStatus());
+				searchModel.setOrigin(item.getOrigin());
+				searchModel.setFirstCategory(item.getFirstCategory());
+				searchModel.setThirdCategory(item.getThirdCategory());
+				searchModel.setSecondCategory(item.getSecondCategory());
+				searchModel.setGoodsName(item.getCustomGoodsName());
+				param.put("goodsId", item.getGoodsId());
+				List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
+				if (specsList != null && specsList.size() > 0) {
+					result = GoodsServiceUtil.getMinPrice(specsList);
+					searchModel.setPrice(result.get("realPrice"));
+				}
+				searchList.add(searchModel);
 			}
-			searchList.add(searchModel);
+			AbstractLucene lucene = LuceneFactory.get(id);
+			lucene.writerIndex(searchList);
+			goodsMapper.updateGoodsUpShelves(param);
 		}
-		AbstractLucene lucene = LuceneFactory.get(id);
-		lucene.writerIndex(searchList);
-		goodsMapper.updateGoodsUpShelves(param);
 	}
 
 	private final String GOODS_LIST = "goodsList";
@@ -641,21 +645,33 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public ResultModel upShelves(List<String> goodsIdList, Integer centerId) {
+	public ResultModel upShelves(List<String> itemIdList, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
-		if (goodsIdList != null && goodsIdList.size() > 0) {
-			param.put("list", goodsIdList);
-			renderLuceneModel(param, searchList, centerId);
-		} else {
-			renderLuceneModel(param, searchList, centerId);
+		if (itemIdList != null && itemIdList.size() > 0) {
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+			if (goodsIdList != null && goodsIdList.size() > 0) {
+				param.put("list", goodsIdList);
+			}
 		}
+		renderLuceneModel(param, searchList, centerId);
+		param.put("list", itemIdList);
+		goodsMapper.updateGoodsItemUpShelves(param);
 		return new ResultModel(true, "");
 	}
 
 	@Override
-	public ResultModel downShelves(List<String> goodsIdList, Integer centerId) {
-		if (goodsIdList != null && goodsIdList.size() > 0) {
+	public ResultModel downShelves(String itemId, Integer centerId) {
+		List<String> itemIdList = new ArrayList<String>();
+		itemIdList.add(itemId);
+		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("centerId", centerId);
+		param.put("goodsId", goodsIdList.get(0));
+		param.put("list", itemIdList);
+		goodsMapper.updateGoodsItemDownShelves(param);
+		int count = goodsMapper.countUpShelvesStatus(param);
+		if (count == 0) {
 			deleteLuceneAndDownShelves(goodsIdList, centerId);
 		}
 		return new ResultModel(true, "");
@@ -669,6 +685,33 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("centerId", centerId);
 		param.put("list", goodsIdList);
 		goodsMapper.updateGoodsDownShelves(param);
+	}
+
+	@Override
+	public ResultModel syncgoods(List<String> itemIdList, Integer id) {
+		if(itemIdList != null && itemIdList .size() >0){
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
+			List<String> secondIdList = goodsMapper.listSecondCategory(goodsIdList);
+			List<String> thirdIdList = goodsMapper.listThirdCategory(goodsIdList);
+			String centerId = GoodsServiceUtil.judgeCenterId(id);
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("goodsIdlist", goodsIdList);
+			param.put("centerId", centerId);
+			param.put("firstIdlist", firstIdList);
+			param.put("secondIdlist", secondIdList);
+			param.put("thirdIdlist", thirdIdList);
+			param.put("itemList", itemIdList);
+			goodsMapper.insertCenterFirstCategory(param);
+			goodsMapper.insertCenterSecondCategory(param);
+			goodsMapper.insertCenterThirdCategory(param);
+			goodsMapper.insertCenterGoods(param);
+			goodsMapper.insertCenterGoodsFile(param);
+			goodsMapper.insertCenterGoodsItem(param);
+			goodsMapper.insertCenterGoodsPrice(param);
+		}
+		
+		return new ResultModel(true, "");
 	}
 
 }

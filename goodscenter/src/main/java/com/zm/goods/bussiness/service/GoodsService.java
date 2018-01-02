@@ -242,8 +242,10 @@ public interface GoodsService {
 
 	List<OrderBussinessModel> checkStock();
 
-	ResultModel upShelves(List<String> goodsIdList, Integer centerId);
+	ResultModel upShelves(List<String> itemIdList, Integer centerId);
 
-	ResultModel downShelves(List<String> goodsIdList, Integer centerId);
+	ResultModel downShelves(String itemId, Integer centerId);
+
+	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
 
 }

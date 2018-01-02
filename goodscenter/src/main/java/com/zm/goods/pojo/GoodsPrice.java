@@ -12,8 +12,8 @@ public class GoodsPrice {
 	private Double price;
 	private Double vipPrice;
 	private String deliveryPlace;
-	private Double proxyPrice;
-	private Double fxPrice;
+	private Double proxyPrice = 0.0;
+	private Double fxPrice = 0.0;
 	@JsonIgnore
 	private String createTime;
 	@JsonIgnore

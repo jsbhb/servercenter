@@ -88,6 +88,8 @@ public interface GoodsMapper {
 	List<GoodsSpecs> listSpecsForLucene(Map<String,Object> param);
 	
 	void updateGoodsUpShelves(Map<String,Object> param);
+	
+	void updateGoodsItemUpShelves(Map<String,Object> param);
 
 	List<GoodsItem> queryGoodsItem(Map<String, Object> searchParm);
 	
@@ -105,7 +107,7 @@ public interface GoodsMapper {
 	
 	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
 
-	String getGoodsIdByItemId(String itemId);
+	List<String> getGoodsIdByItemId(List<String> itemIdList);
 
 	void updateThirdWarehouseStock(List<WarehouseStock> list);
 
@@ -116,5 +118,29 @@ public interface GoodsMapper {
 	List<OrderBussinessModel> checkStock();
 
 	void updateGoodsDownShelves(Map<String, Object> param);
+	
+	void updateGoodsItemDownShelves(Map<String, Object> param);
+	
+	int countUpShelvesStatus(Map<String, Object> param);
+	
+	void insertCenterGoods(Map<String, Object> param);
+	
+	void insertCenterGoodsFile(Map<String, Object> param);
+	
+	void insertCenterFirstCategory(Map<String, Object> param);
+	
+	void insertCenterSecondCategory(Map<String, Object> param);
+	
+	void insertCenterThirdCategory(Map<String, Object> param);
+	
+	void insertCenterGoodsItem(Map<String, Object> param);
+	
+	void insertCenterGoodsPrice(Map<String, Object> param);
+	
+	List<String> listFirstCategory(List<String> goodsIdList);
+	
+	List<String> listSecondCategory(List<String> goodsIdList);
+	
+	List<String> listThirdCategory(List<String> goodsIdList);
 	
 }

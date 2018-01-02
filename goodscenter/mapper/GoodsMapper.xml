@@ -241,7 +241,7 @@
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
 		select gfc.id,gfc.first_id,gfc.name as industryName,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
 		gtc.id as entryId,gtc.name as entryName,gtc.third_id  
-		from goods_first_category${centerId} gfc left join goods_second_categroy${centerId} gsc on gfc.first_id = gsc.first_id 
+		from goods_first_category${centerId} gfc left join goods_second_category${centerId} gsc on gfc.first_id = gsc.first_id 
 		left join goods_third_category${centerId} gtc on gsc.second_id = gtc.second_id order by gfc.id
 	</select>
 
@@ -255,14 +255,14 @@
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
-		gi.status,g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
+		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
 		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join
 		base
 		gb on g.base_id = gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.brand_id  where 1=1  and gi.status = 1
+		gcb.brand_id  where 1=1  
 		<if test="type != null and type != ''">
 			and g.type = #{type,jdbcType = INTEGER}
 		</if>
@@ -298,7 +298,7 @@
 		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
 		gs.opt,gp.id as
 		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,g.status as specsStatus,gs.excise_tax,gi.weight,
+		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gi.weight,
 		gp.delivery_place,
 		<if test="goodsType == 2 or goodsType == 1">
 			stock.lockedqty as qpqty,
@@ -313,7 +313,7 @@
 		goods_stock stock
 		on gs.item_id =
 		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.goods_id in
+		gp.base_price_id = bgp.id where gs.status = 1 and gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -332,7 +332,7 @@
 		<if test="goodsType == 1">
 			stock.fxqty as qpqty,
 		</if>
-		gp.delivery_place,g.status as specsStatus,
+		gp.delivery_place,gs.status as specsStatus,
 		gp.update_time as
 		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods_price${centerId} gp on
@@ -340,7 +340,7 @@
 		goods_stock stock
 		on gs.item_id =
 		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.item_id = #{itemId}
+		gp.base_price_id = bgp.id where gs.status = 1 and gs.item_id = #{itemId}
 	</select>
 	
 	<select id="getGoodsSpecsForOrder" parameterType="Object" resultMap="goodsSpecs">
@@ -356,7 +356,7 @@
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gi.info,gs.item_id,gs.goods_id , gc.status as specsStatus,
+		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,
 		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gs.opt,gp.id as
 		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount, gs.excise_tax,gi.weight,
@@ -366,7 +366,7 @@
 		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
 		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id 
 		left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.item_id in
+		gp.base_price_id = bgp.id where gs.status = 1 and gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -453,7 +453,7 @@
 		
 	<update id="createSecondCategory" parameterType="java.lang.Integer">
 		
-		CREATE TABLE IF NOT EXISTS goods_second_categroy_${centerId} (
+		CREATE TABLE IF NOT EXISTS goods_second_category_${centerId} (
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  first_id varchar(100) NOT NULL COMMENT '一级分类ID',
 		  second_id varchar(100) NOT NULL COMMENT 'first_id',
@@ -464,7 +464,7 @@
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX second_id_UNIQUE (second_id ASC),
 		  INDEX idx_second_id (second_id),
-   		  INDEX goods_second_categroy_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+   		  INDEX goods_second_category_first_id (first_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '供应商商品二级分类表';
 	</update>
 		
@@ -521,6 +521,7 @@
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
 		  INDEX idx_base_price_id (base_price_id),
+		  UNIQUE INDEX uq_base_price_id (base_price_id),
 		  INDEX idx_item_id (item_id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 		COMMENT = '商品价格表';
 	</update>
@@ -691,14 +692,11 @@
 	
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
-		select gi.id, gi.status, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,
+		select gi.id, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
 		where gi.index_status = 0 
-		<if test="list == null">
-			and gi.status = 0
-		</if>
 		<if test="list != null and list.size > 0">
 			and gi.goods_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -714,7 +712,7 @@
 	</select>
 	
 	<update id="updateGoodsUpShelves" parameterType="Object">
-		update goods${centerId} set index_status = 1,status = 1 where index_status = 0 
+		update goods${centerId} set status = 1, index_status = 1 where index_status = 0 
 		<if test="list != null and list.size > 0">
 			and goods_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -723,8 +721,25 @@
 		</if>
 	</update>
 	
+	<update id="updateGoodsItemUpShelves" parameterType="Object">
+		update goods_item${centerId} set status = 1 where 1=1
+		<if test="list != null and list.size > 0">
+			and item_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</update>
+	
 	<update id="updateGoodsDownShelves" parameterType="Object">
-		update goods${centerId} set index_status = 0,status = 0 where goods_id in 
+		update goods${centerId} set status = 0, index_status = 0 where goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
+	</update>
+	
+	<update id="updateGoodsItemDownShelves" parameterType="Object">
+		update goods_item_${centerId} set status = 0 where item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
@@ -732,14 +747,14 @@
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
-		gi.status,g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
+		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
 		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
 		gcb.brand_id 
 		left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i on gs.item_id=i.item_id 
-		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gi.goods_id in
+		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gs.status = 1 and gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
 			#{id}
@@ -804,14 +819,14 @@
 	
 	<select id="listSpecialGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
-		gi.status,g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
+		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
 		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
 		gcb.brand_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
 		on gs.item_id = i.item_id 
-		left join goods_price${centerId} gp on gs.item_id = gp.item_id where 1=1
+		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gs.status = 1
 		<if test="type == 0">
 			and gi.is_new = 1
 		</if>
@@ -821,7 +836,10 @@
 	</select>
 	
 	<select id="getGoodsIdByItemId" parameterType="Object" resultType="java.lang.String">
-		select goods_id from goods_item where item_id = #{itemId}
+		select distinct goods_id from goods_item where item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
 	</select>
 	
 	<update id="updateThirdWarehouseStock" parameterType="Object">
@@ -864,6 +882,97 @@
 	<select id="checkStock" parameterType="Object" resultMap="orderBussinessModel">
 		select i.id, i.item_id,i.sku,i.item_code,g.supplier_id from goods_item i left join goods g on i.goods_id = g.goods_id 
 		where g.supplier_id != 1
+	</select>
+	
+	<select id="countUpShelvesStatus" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from goods_item_${centerId} where goods_id = #{goodsId} and status = 1
+	</select>
+	
+	<!-- 同步商品 -->
+	<insert id="insertCenterGoods" parameterType="Object">
+		insert ignore into goods${centerId}(goods_id,goods_name,description,detail_path) 
+		select goods_id,goods_name,description,detail_path from goods where goods_id in 
+		<foreach collection="goodsIdlist" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	
+	<insert id="insertCenterGoodsFile" parameterType="Object">
+		insert ignore into goods_file${centerId} 
+		select * from goods_file where goods_id in 
+		<foreach collection="goodsIdlist" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	
+	<insert id="insertCenterFirstCategory" parameterType="Object">
+		insert ignore into goods_first_category${centerId} 
+		select * from goods_first_category where first_id in 
+		<foreach collection="firstIdlist" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	<insert id="insertCenterSecondCategory" parameterType="Object">
+		insert ignore into goods_second_category${centerId} 
+		select * from goods_second_category where second_id in 
+		<foreach collection="secondIdlist" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	<insert id="insertCenterThirdCategory" parameterType="Object">
+		insert ignore into goods_third_category${centerId} 
+		select * from goods_third_category where third_id in 
+		<foreach collection="thirdIdlist" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	
+	<insert id="insertCenterGoodsItem" parameterType="Object">
+		insert ignore into goods_item${centerId}(goods_id,item_id,item_code) 
+		select goods_id,item_id,item_code from goods_item where item_id in 
+		<foreach collection="itemList" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	
+	<insert id="insertCenterGoodsPrice" parameterType="Object">
+		insert ignore into goods_price${centerId}(base_price_id,item_id) 
+		select id,item_id from goods_price where item_id in
+		<foreach collection="itemList" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</insert>
+	<!-- 商品同步END -->
+	
+	<select id="listFirstCategory" parameterType="Object" resultType = "java.lang.String">
+		select distinct b.first_category from goods g left join base b on g.base_id = b.id where g.goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</select>
+	
+	<select id="listSecondCategory" parameterType="Object" resultType = "java.lang.String">
+		select distinct b.second_category from goods g left join base b on g.base_id = b.id where g.goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+	</select>
+	
+	<select id="listThirdCategory" parameterType="Object" resultType = "java.lang.String">
+		select distinct b.third_category from goods g left join base b on g.base_id = b.id where g.goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
 	</select>
 
 </mapper>
