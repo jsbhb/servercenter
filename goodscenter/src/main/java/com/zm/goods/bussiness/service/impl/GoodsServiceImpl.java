@@ -468,7 +468,6 @@ public class GoodsServiceImpl implements GoodsService {
 			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
 			List<GoodsSpecs> temList = null;
 			for (GoodsSpecs specs : specsList) {
-				// specs.infoFilter();
 				if (temp.get(specs.getGoodsId()) == null) {
 					temList = new ArrayList<GoodsSpecs>();
 					temList.add(specs);
@@ -567,7 +566,7 @@ public class GoodsServiceImpl implements GoodsService {
 				List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
 				Map<String, GoodsSpecs> temp = new HashMap<String, GoodsSpecs>();
 				for (GoodsSpecs specs : specsList) {
-					// specs.infoFilter();
+					specs.infoFilter();
 					temp.put(specs.getGoodsId(), specs);
 				}
 				for (TimeLimitActiveData data : active.getDataList()) {
@@ -689,7 +688,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel syncgoods(List<String> itemIdList, Integer id) {
-		if(itemIdList != null && itemIdList .size() >0){
+		if (itemIdList != null && itemIdList.size() > 0) {
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
 			List<String> secondIdList = goodsMapper.listSecondCategory(goodsIdList);
@@ -710,7 +709,7 @@ public class GoodsServiceImpl implements GoodsService {
 			goodsMapper.insertCenterGoodsItem(param);
 			goodsMapper.insertCenterGoodsPrice(param);
 		}
-		
+
 		return new ResultModel(true, "");
 	}
 
