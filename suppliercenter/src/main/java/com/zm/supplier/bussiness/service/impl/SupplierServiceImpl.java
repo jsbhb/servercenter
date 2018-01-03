@@ -116,4 +116,9 @@ public class SupplierServiceImpl implements SupplierService {
 		return new ResultModel(true, "正在同步商品");
 	}
 
+	@Override
+	public List<SupplierEntity> queryAll() {
+		return supplierMapper.selectAll();
+	}
+
 }

@@ -48,6 +48,10 @@
 		select * from supplier_base where id = #{id} 
 	</select>
 	
+	<select id="selectAll" resultMap="supplier">
+		select * from supplier_base
+	</select>
+	
 	<select id="selectForPage" parameterType="Object" resultMap="supplier">
 		select * from supplier_base where 1=1 
 		<if test="supplierName!=null and supplierName!=''">

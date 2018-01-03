@@ -65,6 +65,21 @@ public class SupplierController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/supplier/queryAll", method = RequestMethod.POST)
+	public ResultModel queryAll(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				List<SupplierEntity> result = supplierService.queryAll();
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 
 	@RequestMapping(value = "{version}/supplier/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,

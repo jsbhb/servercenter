@@ -66,4 +66,13 @@ public interface SupplierService {
 	ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId);
 
 	ResultModel getGoods(List<String> list, Integer supplierId, String supplierName);
+
+	/**  
+	 * queryAll:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<SupplierEntity> queryAll();
 }

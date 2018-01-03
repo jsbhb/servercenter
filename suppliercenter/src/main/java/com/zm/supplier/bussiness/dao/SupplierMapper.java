@@ -45,4 +45,13 @@ public interface SupplierMapper {
 	SupplierEntity selectById(int id);
 	
 	SupplierInterface getSupplierInterface(@Param("supplierId")Integer supplierId);
+
+	/**  
+	 * selectAll:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<SupplierEntity> selectAll();
 }
