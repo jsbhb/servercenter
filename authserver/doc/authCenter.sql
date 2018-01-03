@@ -48,7 +48,7 @@ CREATE TABLE `user_role` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='用户角色表';
 
 
-INSERT INTO `zm_auth`.`user` (`user_id`, `user_name`, `STATUS`, `CREATION_DATE`, `CREATED_BY`, `LAST_UPDATE_DATE`, `LAST_UPDATED_BY`, `usercenterid`) VALUES ('21','admin', '1', now(), '1', now(), '1', '8001');
+INSERT INTO `zm_auth`.`user` (`user_id`, `user_name`, `STATUS`, `CREATION_DATE`, `CREATED_BY`, `LAST_UPDATE_DATE`, `LAST_UPDATED_BY`, `usercenterid`, `platform`) VALUES ('21','admin', '1', now(), '1', now(), '1', '8001', '1');
 
 
 

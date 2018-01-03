@@ -28,7 +28,7 @@ CREATE TABLE `zm_supplier`.`supplier_base`(
   `update_time` DATETIME NULL COMMENT '最后修改时间',
   `opt` varchar(20) NULL COMMENT '修改人',
   `is_delete`  tinyint Unsigned NOT NULL DEFAULT 0 COMMENT '是否废除 0:否；1：是',
-  `mode` tinyint Unsigned NOT NULL COMMENT '0:自营，1：非自营',
+  `mode` tinyint Unsigned DEFAULT 1 COMMENT '0:自营，1：非自营',
   PRIMARY KEY (`id`),
   UNIQUE `uk_supplierName` (`supplier_name`),
   INDEX `idx_supplierName` (`supplier_name`),
