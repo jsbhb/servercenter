@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
 
-package com.zm.thirdcenter.bussiness.loginplugin.util.wx;
+package com.zm.thirdcenter.wx;
 
 import java.io.Serializable;
 import java.util.Map;

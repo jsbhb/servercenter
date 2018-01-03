@@ -70,7 +70,8 @@ public class NotifyController {
 
 		Map<String, String> notifyMap = WXPayUtil.xmlToMap(sb.toString()); // 转换成map
 
-		String orderId = notifyMap.get("out_trade_no");
+		String orderId = notifyMap.get("out_trade_no").split("_")[0];
+		
 		Integer clientId = null;
 		UserVip user = null;
 		if (orderId != null && orderId.startsWith("GX")) {
