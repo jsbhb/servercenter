@@ -428,6 +428,7 @@
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX id_UNIQUE (id ASC),
+		  UNIQUE INDEX `goodsIdpath_UNIQUE` (`goods_id`,`path` ASC),
 		  INDEX idx_goods_id (goods_id),
 		  INDEX idx_suffix (suffix),
 		  INDEX idx_store_type (store_type),
@@ -501,6 +502,7 @@
 		  opt VARCHAR(20) NULL COMMENT '操作人',
 		  PRIMARY KEY (id),
 		  INDEX idx_goods_id (goods_id),
+		  UNIQUE INDEX `item_id_UNIQUE` (`item_id` ASC),
 		  INDEX idx_item_id (item_id), 
 		  INDEX idx_is_promotion (is_promotion)
 		  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
@@ -899,8 +901,8 @@
 	</insert>
 	
 	<insert id="insertCenterGoodsFile" parameterType="Object">
-		insert ignore into goods_file${centerId} 
-		select * from goods_file where goods_id in 
+		insert ignore into goods_file_2(goods_id,path,suffix,store_type,type,create_time,update_time) 
+		select goods_id,path,suffix,store_type,type,create_time,update_time from goods_file where goods_id in 
 		<foreach collection="goodsIdlist" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
