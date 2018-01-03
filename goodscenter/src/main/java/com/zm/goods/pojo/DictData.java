@@ -1,32 +1,23 @@
 package com.zm.goods.pojo;
 
-public class DictData {
+import com.zm.goods.common.Pagination;
+
+public class DictData extends Pagination {
 
 	private Integer id;
-
 	private Integer dictId;
-
 	private String href;
-
 	private String picPath;
-
 	private String title;
-
 	private String goodsId;
-
 	private String specs;
-	
 	private String origin;
-
 	private String description;
-
 	private Double price;
-
 	private String createTime;
-
 	private String updateTime;
-
 	private String opt;
+	private Integer centerId;
 
 	public String getOrigin() {
 		return origin;
@@ -131,6 +122,13 @@ public class DictData {
 	public void setOpt(String opt) {
 		this.opt = opt;
 	}
-	
-	
+
+	public Integer getCenterId() {
+		return centerId;
+	}
+
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
+	}
+
 }

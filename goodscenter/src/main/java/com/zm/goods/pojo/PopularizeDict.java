@@ -1,36 +1,26 @@
 package com.zm.goods.pojo;
 
-public class PopularizeDict {
+import com.zm.goods.common.Pagination;
+
+public class PopularizeDict extends Pagination{
 
 	private Integer id;
-	
 	private Integer layoutId;
-	
 	private String code;
-	
 	private String name;
-	
 	private String enname;
-	
 	private String firstCategory;
-	
 	private Integer type;
-	
 	private String picPath1;
-	
 	private String picPath2;
-	
 	private String picPath3;
-	
 	private String description;
-	
 	private String createTime;
-	
 	private String updateTime;
-	
 	private String opt;
-	
 	private String href;
+	private Layout layout;
+	private int centerId;
 
 	public String getHref() {
 		return href;
@@ -150,6 +140,24 @@ public class PopularizeDict {
 
 	public void setPicPath3(String picPath3) {
 		this.picPath3 = picPath3;
+	}
+	
+	public Layout getLayout() {
+		return layout;
+	}
+
+	public void setLayout(Layout layout) {
+		this.layout = layout;
+	}
+	
+	
+
+	public int getCenterId() {
+		return centerId;
+	}
+
+	public void setCenterId(int centerId) {
+		this.centerId = centerId;
 	}
 
 	@Override

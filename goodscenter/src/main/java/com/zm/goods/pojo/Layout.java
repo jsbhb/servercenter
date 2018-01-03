@@ -4,33 +4,37 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.annotations.ApiModel;
 
-@ApiModel(value="layout",description="模块布局对象，如果先获取模块再获取数据，带上id,如果一次性获取，传空对象")
+@ApiModel(value = "layout", description = "模块布局对象，如果先获取模块再获取数据，带上id,如果一次性获取，传空对象")
 public class Layout {
 
 	@JsonIgnore
 	private Integer id;
-	
+
 	private String page;
-	
+
+	private Integer pageType;
+
 	private String code;
-	
+
 	private String config;
-	
+
 	private Integer type;
-	
+
 	private Integer show;
-	
+
 	@JsonIgnore
 	private String description;
-	
+
 	@JsonIgnore
 	private String createTime;
-	
+
 	@JsonIgnore
 	private String updateTime;
-	
+
 	@JsonIgnore
 	private String opt;
+
+	private int centerId;
 
 	public Integer getType() {
 		return type;
@@ -112,11 +116,27 @@ public class Layout {
 		this.opt = opt;
 	}
 
+	public int getCenterId() {
+		return centerId;
+	}
+
+	public void setCenterId(int centerId) {
+		this.centerId = centerId;
+	}
+
+	public Integer getPageType() {
+		return pageType;
+	}
+
+	public void setPageType(Integer pageType) {
+		this.pageType = pageType;
+	}
+
 	@Override
 	public String toString() {
 		return "Layout [id=" + id + ", page=" + page + ", code=" + code + ", config=" + config + ", show=" + show
 				+ ", description=" + description + ", createTime=" + createTime + ", updateTime=" + updateTime
 				+ ", opt=" + opt + "]";
 	}
-	
+
 }

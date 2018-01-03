@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.MallMapper">
+
+
+	<resultMap type="com.zm.goods.pojo.PopularizeDict" id="dict">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="enname" property="enname"/>
+		<result column="first_category" property="firstCategory"/>
+		<result column="type" property="type"/>
+		<result column="picPath1" property="picPath1"/>
+		<result column="picPath2" property="picPath2"/>
+		<result column="picPath3" property="picPath3"/>
+		<result column="description" property="description"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<result column="href" property="href"/>
+		<association property="layout" javaType="com.zm.goods.pojo.Layout">
+			<result column="is_show" property="show"/>
+			<result column="page_type" property="pageType"/>
+		</association>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.DictData" id="data">
+		<id column="id" property="id"/>
+		<result column="dictId" property="dictId"/>
+		<result column="href" property="href"/>
+		<result column="value" property="picPath"/>
+		<result column="value" property="title"/>
+		<result column="value" property="goodsId"/>
+		<result column="value" property="specs"/>
+		<result column="value" property="origin"/>
+		<result column="value" property="description"/>
+		<result column="value" property="price"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+
+	
+	<select id="selectByDictId" parameterType="Object" resultMap="dict">
+		select * from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout where id = #{id}
+	</select>
+	
+	<select id="selectDictForPage" parameterType="Object" resultMap="dict">
+		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where l.code = #{code}
+	</select>
+	
+	<select id="selectDataForPage" parameterType="Object" >
+		select * from popularize_data_${centerId} where dictId = #{id}
+	</select>
+	
+	<select id="selectDataAll" parameterType="Object" resultMap="data">
+		select d.* from popularize_data_${centerId} d left join popularize_dict_${centerId} t on d.dictId = t.id
+		left join layout_${centerId} l on l.id = t.layout_id where l.code = #{code}
+	</select>
+	
+	<insert id="insertDict" useGeneratedKeys="true" keyProperty="id" parameterType="Object">
+		insert into popularize_dict_${centerId} (layout_id,name,href,type,enname,first_category,picPath1,picPath2,picPath3,description,create_time,update_time,opt)
+		value
+		(#{layoutId},#{name},#{href},#{type},#{enname},#{firstCategory},#{picPath1},#{picPath2},#{picPath3},#{description},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertLayout" useGeneratedKeys="true" keyProperty="id" parameterType="Object" >
+		insert into layout_${centerId} 
+		(page,code,type,page_type,is_show,description,create_time,update_time,opt)
+		value 
+		(#{page},#{code},#{type},#{pageType},#{show},#{description},now(),now(),opt);
+	</insert>
+	
+	
+	<insert id="insertDataBatch"  parameterType="Object" >
+		insert into popularize_data_${centerId} 
+		(dictId,create_time,update_time)
+		values
+		<foreach collection="list" item="item"
+			separator=",">
+			(#{item.dictId},now(),now())
+		</foreach>
+	</insert>
+	
+</mapper>
