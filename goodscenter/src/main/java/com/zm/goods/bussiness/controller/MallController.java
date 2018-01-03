@@ -36,7 +36,7 @@ public class MallController {
 	@Resource
 	MallService mallService;
 
-	@RequestMapping(value = "{version}/mall/floor/queryDictForPage", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/mall/index/queryDictForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody PopularizeDict entity) {
 
@@ -53,7 +53,7 @@ public class MallController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/mall/floor/saveDict", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/mall/index/saveDict", method = RequestMethod.POST)
 	public ResultModel saveDict(@PathVariable("version") Double version, @RequestBody PopularizeDict entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -69,7 +69,7 @@ public class MallController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/mall/floor/queryDict", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/mall/index/queryDict", method = RequestMethod.POST)
 	public ResultModel queryDict(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody PopularizeDict entity) {
 
@@ -79,7 +79,28 @@ public class MallController {
 					return new ResultModel(false, "没有编号信息");
 				}
 
-				PopularizeDict result = mallService.queryDictById(entity.getId());
+				PopularizeDict result = mallService.queryDictById(entity);
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+	
+
+	@RequestMapping(value = "{version}/mall/index/queryData", method = RequestMethod.POST)
+	public ResultModel queryDictById(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody DictData entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				if (entity.getId() == 0) {
+					return new ResultModel(false, "没有编号信息");
+				}
+
+				DictData result = mallService.queryDataById(entity);
 				return new ResultModel(true, result);
 			}
 
@@ -89,7 +110,7 @@ public class MallController {
 		}
 	}
 
-	@RequestMapping(value = "{version}/mall/floor/queryDataForPage", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/mall/index/queryDataForPage", method = RequestMethod.POST)
 	public ResultModel queryDataForPage(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody DictData entity) {
 
@@ -106,7 +127,7 @@ public class MallController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/mall/floor/saveData", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/mall/index/saveData", method = RequestMethod.POST)
 	public ResultModel save(@PathVariable("version") Double version, @RequestBody DictData entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -120,25 +141,20 @@ public class MallController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/mall/index/updateData", method = RequestMethod.POST)
+	public ResultModel updateData(@PathVariable("version") Double version, @RequestBody DictData entity) {
 
-	@RequestMapping(value = "{version}/mall/floor/queryData", method = RequestMethod.POST)
-	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody DictData entity) {
-
-		try {
-			if (Constants.FIRST_VERSION.equals(version)) {
-				if (entity.getId() == 0) {
-					return new ResultModel(false, "没有编号信息");
-				}
-
-				PopularizeDict result = mallService.queryDataById(entity.getId());
-				return new ResultModel(true, result);
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				mallService.updateData(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
 			}
-
-			return new ResultModel(false, "版本错误");
-		} catch (Exception e) {
-			return new ResultModel(false, e.getMessage());
 		}
+		return new ResultModel(false, "版本错误");
 	}
 
 	@RequestMapping(value = "{version}/mall/index/init", method = RequestMethod.POST)

@@ -28,7 +28,7 @@ public interface MallMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	PopularizeDict selectDictById(int id);
+	PopularizeDict selectDictById(PopularizeDict entity);
 
 	/**  
 	 * insertDict:插入字段表. <br/>  
@@ -86,7 +86,7 @@ public interface MallMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	PopularizeDict selectDataById(Integer id);
+	DictData selectDataById(DictData entity);
 
 	/**  
 	 * insertDataBatch:(这里用一句话描述这个方法的作用). <br/>  
@@ -106,4 +106,13 @@ public interface MallMapper {
 	 * @since JDK 1.7  
 	 */
 	List<DictData> selectDataAll(Layout layout);
+
+	/**  
+	 * updateData:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateData(DictData entity);
 }

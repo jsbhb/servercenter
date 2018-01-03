@@ -43,7 +43,7 @@ public interface MallService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	PopularizeDict queryDictById(int id);
+	PopularizeDict queryDictById(PopularizeDict dict);
 
 	/**  
 	 * save:新增模块. <br/>  
@@ -81,7 +81,7 @@ public interface MallService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	PopularizeDict queryDataById(Integer id);
+	DictData queryDataById(DictData entity);
 
 	/**  
 	 * initData:(这里用一句话描述这个方法的作用). <br/>  
@@ -102,5 +102,14 @@ public interface MallService {
 	 * @since JDK 1.7
 	 */
 	public List<DictData> queryDataAll(Layout layout);
+
+	/**  
+	 * updateData:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateData(DictData entity);
 
 }

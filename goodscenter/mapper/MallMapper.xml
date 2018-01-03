@@ -40,8 +40,12 @@
 	</resultMap>
 
 	
-	<select id="selectByDictId" parameterType="Object" resultMap="dict">
-		select * from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout where id = #{id}
+	<select id="selectDictById" parameterType="Object" resultMap="dict">
+		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where d.id = #{id}
+	</select>
+	
+	<select id="selectDataById" parameterType="Object" resultMap="data">
+		select * from popularize_data_${centerId} where id = #{id}
 	</select>
 	
 	<select id="selectDictForPage" parameterType="Object" resultMap="dict">
@@ -80,5 +84,9 @@
 			(#{item.dictId},now(),now())
 		</foreach>
 	</insert>
+	
+	<update id="updateData" parameterType="Object" >
+		update popularize_data_${centerId}  set description = #{description},picpath = #{picPath},update_time = now() where id = #{id} 
+	</update>
 	
 </mapper>

@@ -48,8 +48,8 @@ public class MallServiceImpl implements MallService {
 	}
 
 	@Override
-	public PopularizeDict queryDictById(int id) {
-		return mallMapper.selectDictById(id);
+	public PopularizeDict queryDictById(PopularizeDict dict) {
+		return mallMapper.selectDictById(dict);
 	}
 
 	@Override
@@ -73,8 +73,8 @@ public class MallServiceImpl implements MallService {
 	}
 
 	@Override
-	public PopularizeDict queryDataById(Integer id) {
-		return mallMapper.selectDataById(id);
+	public DictData queryDataById(DictData entity) {
+		return mallMapper.selectDataById(entity);
 	}
 
 	@Override
@@ -101,5 +101,10 @@ public class MallServiceImpl implements MallService {
 			map.put("list", dataList);
 			mallMapper.insertDataBatch(map);
 		}
+	}
+
+	@Override
+	public void updateData(DictData entity) {
+		mallMapper.updateData(entity);
 	}
 }

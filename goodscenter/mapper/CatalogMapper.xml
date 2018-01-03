@@ -48,7 +48,7 @@
 	</select>
 	
 	<select id="selectSecondByFirstId" resultMap="second">
-		select * from goods_second_categroy where first_id = #{firstId}
+		select * from goods_second_category where first_id = #{firstId}
 	</select>
 	
 	<select id="selectThirdBySecondId" resultMap="third">
@@ -62,7 +62,7 @@
 		f.id,f.first_id,f.name,s.id as secondId,s.second_id,s.name as secondName,
 		t.id as thirdId,t.third_id,t.name as thirdName 
 		from goods_first_category f
-		left join goods_second_categroy s on f.first_id = s.first_id
+		left join goods_second_category s on f.first_id = s.first_id
 		left join goods_third_category t on t.second_id = s.second_id;
 	</select>
 	
@@ -71,7 +71,7 @@
 	</insert>
 
 	<insert id="insertSecondCatalog" parameterType="Object">
-		insert into goods_second_categroy value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt});
+		insert into goods_second_category value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt});
 	</insert>
 	
 	<insert id="insertThirdCatalog" parameterType="Object">
