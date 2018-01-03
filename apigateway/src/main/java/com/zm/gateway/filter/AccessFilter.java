@@ -53,7 +53,7 @@ public class AccessFilter extends ZuulFilter {
 	public boolean shouldFilter() {
 		return true;
 	}
-	
+
 	Logger logger = LoggerFactory.getLogger(AccessFilter.class);
 
 	@Override
@@ -68,8 +68,8 @@ public class AccessFilter extends ZuulFilter {
 		if (checkPath(request.getRequestURL().toString())) {
 			return null;
 		}
-		
-		logger.info("url:"+request.getRequestURL().toString()+",starting checking auth");
+
+		logger.info("url:" + request.getRequestURL().toString() + ",starting checking auth");
 
 		HttpHeaders headers = new HttpHeaders();
 
@@ -97,6 +97,7 @@ public class AccessFilter extends ZuulFilter {
 			ctx.setSendZuulResponse(false);
 			ctx.setResponseStatusCode(401);
 			ctx.setResponseBody(e.getMessage());
+			logger.error("error:APIGATEWAY==========" + request.getRemoteAddr(), e);
 			return null;
 		}
 
