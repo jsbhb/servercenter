@@ -86,6 +86,7 @@ CREATE TABLE `zm_goods`.`goods_file` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `goodsIdpath_UNIQUE` (`goods_id`,`path` ASC),
   INDEX `idx_goods_id` (`goods_id`),
   INDEX `idx_suffix` (`suffix`),
   INDEX `idx_store_type` (store_type),
@@ -182,6 +183,7 @@ CREATE TABLE `zm_goods`.`goods_item` (
   PRIMARY KEY (`id`),
   INDEX `idx_goods_id` (`goods_id`),
   INDEX `idx_is_promotion` (`is_promotion`),
+  UNIQUE INDEX `item_id_UNIQUE` (`item_id` ASC),
   INDEX `idx_sku` (`sku`)
   ) ENGINE=InnoDB AUTO_INCREMENT=200000 DEFAULT CHARSET=utf8 
 COMMENT = '商品item表';
