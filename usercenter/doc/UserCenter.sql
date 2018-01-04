@@ -225,7 +225,7 @@ CREATE TABLE `zm_user`.`user_search_parameter` (
 COMMENT = '检索字段表';
 
 
-INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `grade_level`, `create_time`) VALUES ('1', '100', '鑫海总部', 'admin', '13456789012', '1', now());
+INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `grade_level`, `create_time`, `company`) VALUES ('1', '100', '鑫海总部', 'admin', '13456789012', '1', now(), '鑫海通达');
 INSERT INTO `zm_user`.`user` (`user_type`, `account`, `phone`, `is_phone_validate`, `status`, `center_id`, `create_time`) VALUES ('0', 'admin', '13456789012', '1', '1', '1', now());
 
 

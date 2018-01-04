@@ -94,7 +94,6 @@ public class GoodsServiceUtil {
 			Double discount = null;
 			for (GoodsSpecs specs : specsList) {
 				item = goodsMap.get(specs.getGoodsId());
-//				specs.infoFilter();
 				if (item == null) {
 					continue;
 				}
@@ -127,7 +126,7 @@ public class GoodsServiceUtil {
 	// 封装价格区间
 	public static void getPriceInterval(GoodsSpecs specs, Double discountParam) {
 		List<GoodsPrice> priceList = specs.getPriceList();
-//		specs.infoFilter();
+		specs.infoFilter();
 		if (priceList == null) {
 			return;
 		}
