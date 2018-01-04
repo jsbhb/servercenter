@@ -37,15 +37,20 @@ public class GoodsItemController {
 			@RequestBody GoodsItemEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			entity.setGoodsId(request.getParameter("goodsId"));
-			entity.setGoodsName(request.getParameter("goodsName"));
-			entity.setItemCode(request.getParameter("itemCode"));
-			entity.setSku(request.getParameter("sku"));
-			entity.setItemId(request.getParameter("itemId"));
-			entity.setStatus(request.getParameter("status"));
-			entity.setSupplierId(request.getParameter("supplierId"));
-			Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
-			return new ResultModel(true, page, new Pagination(page));
+			String gradeLevel = request.getParameter("gradeLevel");
+
+			if ("1".equals(gradeLevel)) {
+				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
+				return new ResultModel(true, page, new Pagination(page));
+			} else {
+				String centerId = request.getParameter("centerId");
+				if (centerId == null || "".equals(centerId)) {
+					new ResultModel(false, "没有获取区域中心编号");
+				}
+				Page<GoodsItemEntity> page = goodsItemService.queryCenterByPage(entity, Integer.parseInt(centerId));
+				return new ResultModel(true, page, new Pagination(page));
+			}
+
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -65,7 +70,7 @@ public class GoodsItemController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/beUse", method = RequestMethod.POST)
 	public ResultModel beUse(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
 
@@ -80,6 +85,7 @@ public class GoodsItemController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
 	@RequestMapping(value = "{version}/goods/item/beFx", method = RequestMethod.POST)
 	public ResultModel beFx(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
 
@@ -94,7 +100,7 @@ public class GoodsItemController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/notBeFx", method = RequestMethod.POST)
 	public ResultModel notBeFx(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
 

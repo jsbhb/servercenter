@@ -88,6 +88,36 @@
 		</if>
 	</select>
 	
+	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
+		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
+		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,
+		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
+		from goods_item_${centerId} i left join goods g on g.goods_id = i.goods_id
+		left join goods_price_${centerId} p on p.item_id = i.item_id 
+		left join goods_stock s on s.item_id = i.item_id where 1=1 
+		<if test="goodsName!=null and goodsName!=''">
+			and g.goods_name like concat('%',#{goodsName},'%') 
+		</if>
+		<if test="itemCode!=null and itemCode!=''">
+			and i.item_code = #{itemCode}
+		</if>
+		<if test="status !=null and status!=''">
+			and i.status = #{status}
+		</if>
+		<if test="supplierId!=null and supplierId!=''">
+			and g.supplier_id = #{supplierId}
+		</if>
+		<if test="itemId!=null and itemId!=''">
+			and i.item_id = #{itemId} 
+		</if>
+		<if test="goodsId!=null and goodsId !=''">
+			and i.goods_id = #{goodsId} 
+		</if>
+		<if test="id !=null and id !=''">
+			and id = #{id} 
+		</if>
+	</select>
+	
 	
 	<insert id="insert" parameterType="Object">
 		insert into goods_item 

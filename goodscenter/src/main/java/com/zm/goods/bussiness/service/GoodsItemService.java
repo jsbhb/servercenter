@@ -77,4 +77,15 @@ public interface GoodsItemService {
 	 */
 	void beUse(GoodsItemEntity entity);
 
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin
+	 * @param entity
+	 * @param parseInt
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsItemEntity> queryCenterByPage(GoodsItemEntity entity, int centerId);
+
 }

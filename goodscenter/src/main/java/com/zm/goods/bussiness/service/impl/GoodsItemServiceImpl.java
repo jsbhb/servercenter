@@ -7,6 +7,9 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -71,6 +74,15 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		entity.setStatus(GoodsStatusEnum.USEFUL.getIndex()+"");
 		goodsItemMapper.updateStatus(entity);
 		goodsItemMapper.insertStock(entity);
+	}
+
+	@Override
+	public Page<GoodsItemEntity> queryCenterByPage(GoodsItemEntity entity, int centerId) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("entity", entity);
+		params.put("centerId", centerId);
+		return goodsItemMapper.queryCenterByPage(entity, centerId);
 	}
 
 }
