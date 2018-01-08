@@ -79,7 +79,7 @@
 		from 
 		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.user_id ,ob.combination_id
 		from order_base ob where
-		is_del = 0
+		1 = 1
 		<if test="status != null">
 			and ob.status = #{status,jdbcType = INTEGER}
 		</if>
