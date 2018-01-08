@@ -26,7 +26,7 @@
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
 		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where 1=1
-		<if test="id > 0">
+		<if test="id != null">
 			and (a.id = #{id} or a.parent_id = #{id})
 		</if>
 		<if test="gradeName != null and gradeName != ''">

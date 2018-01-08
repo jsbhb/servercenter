@@ -8,6 +8,7 @@
 package com.zm.goods.bussiness.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsItemEntity;
@@ -98,6 +99,6 @@ public interface GoodsItemMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	Page<GoodsItemEntity> queryCenterByPage(GoodsItemEntity entity, int centerId);
+	Page<GoodsItemEntity> selectCenterForPage(Map<String,Object> params);
 
 }

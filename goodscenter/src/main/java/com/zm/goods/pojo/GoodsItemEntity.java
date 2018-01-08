@@ -38,6 +38,8 @@ public class GoodsItemEntity extends Pagination {
 	private String supplierId;
 	private String supplierName;
 	private GoodsStockEntity stock;
+	private int centerStatus;
+	private int centerItemId;
 	
 
 	public int getId() {
@@ -191,4 +193,21 @@ public class GoodsItemEntity extends Pagination {
 	public void setStock(GoodsStockEntity stock) {
 		this.stock = stock;
 	}
+
+	public int getCenterStatus() {
+		return centerStatus;
+	}
+
+	public void setCenterStatus(int centerStatus) {
+		this.centerStatus = centerStatus;
+	}
+
+	public int getCenterItemId() {
+		return centerItemId;
+	}
+
+	public void setCenterItemId(int centerItemId) {
+		this.centerItemId = centerItemId;
+	}
+	
 }

@@ -20,6 +20,8 @@
 		<result column="goods_name" property="goodsName"/>
 		<result column="supplier_id" property="supplierId"/>
 		<result column="supplier_name" property="supplierName"/>
+		<result column="center_item_id" property="centerItemId"/>
+		<result column="center_status" property="centerStatus"/>
 		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
 			<result column="min" property="min"/>
 			<result column="max" property="max"/>
@@ -66,10 +68,7 @@
 			and g.goods_name like concat('%',#{goodsName},'%') 
 		</if>
 		<if test="itemCode!=null and itemCode!=''">
-			and i.item_code = #{itemCode}
-		</if>
-		<if test="sku !=null and sku!=''">
-			and i.sku = #{sku}
+			and i.item_code = #{entity.itemCode}
 		</if>
 		<if test="status !=null and status!=''">
 			and i.status = #{status}
@@ -90,31 +89,33 @@
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
+		c.item_id as center_item_id,c.status as item_status,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
-		from goods_item_${centerId} i left join goods g on g.goods_id = i.goods_id
-		left join goods_price_${centerId} p on p.item_id = i.item_id 
-		left join goods_stock s on s.item_id = i.item_id where 1=1 
-		<if test="goodsName!=null and goodsName!=''">
-			and g.goods_name like concat('%',#{goodsName},'%') 
+		from goods_item i left join goods g on g.goods_id = i.goods_id
+		left join goods_price p on p.item_id = i.item_id 
+		left join goods_stock s on s.item_id = i.item_id 
+		left join goods_item_${centerId} c on c.item_id = i.item_id where i.status = 2
+		<if test="entity.goodsName!=null and entity.goodsName!=''">
+			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
-		<if test="itemCode!=null and itemCode!=''">
-			and i.item_code = #{itemCode}
+		<if test="entity.itemCode!=null and entity.itemCode!=''">
+			and i.item_code = #{entity.itemCode}
 		</if>
-		<if test="status !=null and status!=''">
-			and i.status = #{status}
+		<if test="entity.status !=null and entity.status!=''">
+			and i.status = #{entity.status}
 		</if>
-		<if test="supplierId!=null and supplierId!=''">
-			and g.supplier_id = #{supplierId}
+		<if test="entity.supplierId!=null and entity.supplierId!=''">
+			and g.supplier_id = #{entity.supplierId}
 		</if>
-		<if test="itemId!=null and itemId!=''">
-			and i.item_id = #{itemId} 
+		<if test="entity.itemId!=null and entity.itemId!=''">
+			and i.item_id = #{entity.itemId} 
 		</if>
-		<if test="goodsId!=null and goodsId !=''">
-			and i.goods_id = #{goodsId} 
+		<if test="entity.goodsId!=null and entity.goodsId !=''">
+			and i.goods_id = #{entity.goodsId} 
 		</if>
-		<if test="id !=null and id !=''">
-			and id = #{id} 
+		<if test="entity.id !=null and entity.id !=''">
+			and id = #{entity.id} 
 		</if>
 	</select>
 	

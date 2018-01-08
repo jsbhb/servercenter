@@ -82,7 +82,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("entity", entity);
 		params.put("centerId", centerId);
-		return goodsItemMapper.queryCenterByPage(entity, centerId);
+		return goodsItemMapper.selectCenterForPage(params);
 	}
 
 }
