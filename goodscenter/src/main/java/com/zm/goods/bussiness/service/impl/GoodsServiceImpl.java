@@ -383,18 +383,20 @@ public class GoodsServiceImpl implements GoodsService {
 			if (resultModel.isSuccess()) {
 				List<Integer> list = (List<Integer>) resultModel.getObj();
 				for (Integer id : list) {
+					String centerIdstr = GoodsServiceUtil.judgeCenterId(id);
+					param.put("centerId", centerIdstr);
 					renderLuceneModel(param, searchList, id);
 				}
 			}
 		} else {
+			String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
+			param.put("centerId", centerIdstr);
 			renderLuceneModel(param, searchList, centerId);
 		}
 	}
 
 	private void renderLuceneModel(Map<String, Object> param, List<GoodsSearch> searchList, Integer id) {
 		GoodsSearch searchModel;
-		String centerId = GoodsServiceUtil.judgeCenterId(id);
-		param.put("centerId", centerId);
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
 		if (itemList != null && itemList.size() > 0) {
 			Map<String, Double> result = null;
@@ -646,8 +648,22 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public ResultModel upShelves(List<String> itemIdList, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
+		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
+		param.put("centerId", centerIdstr);
 		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
+		List<String> itemIdS = new ArrayList<String>();
 		if (itemIdList != null && itemIdList.size() > 0) {
+			//判断之前有没有同步到商城端，将没有同步的先同步
+			for(String itemId : itemIdList){
+				param.put("itemId", itemId);
+				int tem = goodsMapper.countItem(param);
+				if(tem == 0){
+					itemIdS.add(itemId);
+				}
+			}
+			if(itemIdS.size() > 0){
+				syncgoods(itemIdS, centerId);
+			}
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 			if (goodsIdList != null && goodsIdList.size() > 0) {
 				param.put("list", goodsIdList);
@@ -664,6 +680,9 @@ public class GoodsServiceImpl implements GoodsService {
 		List<String> itemIdList = new ArrayList<String>();
 		itemIdList.add(itemId);
 		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+		if(goodsIdList == null || goodsIdList.size() == 0){
+			return new ResultModel(false, "没有该商品"); 
+		}
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("centerId", centerId);
 		param.put("goodsId", goodsIdList.get(0));
@@ -686,8 +705,7 @@ public class GoodsServiceImpl implements GoodsService {
 		goodsMapper.updateGoodsDownShelves(param);
 	}
 
-	@Override
-	public ResultModel syncgoods(List<String> itemIdList, Integer id) {
+	private void syncgoods(List<String> itemIdList, Integer id) {
 		if (itemIdList != null && itemIdList.size() > 0) {
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
@@ -709,8 +727,24 @@ public class GoodsServiceImpl implements GoodsService {
 			goodsMapper.insertCenterGoodsItem(param);
 			goodsMapper.insertCenterGoodsPrice(param);
 		}
+	}
 
-		return new ResultModel(true, "");
+	@SuppressWarnings("unchecked")
+	@Override
+	public ResultModel unDistribution(String itemId) {
+		goodsMapper.updateGoodsItemUnDistribution(itemId);
+		ResultModel resultModel = userFeignClient.getCenterId(Constants.FIRST_VERSION);
+		if (resultModel.isSuccess()) {
+			List<Integer> list = (List<Integer>) resultModel.getObj();
+			if(list != null && list.size() > 0){
+				for(Integer centerId : list){
+					downShelves(itemId, centerId);
+				}
+			}
+			return new ResultModel(true,"");
+		} else {
+			return resultModel;
+		}
 	}
 
 }

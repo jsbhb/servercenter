@@ -501,12 +501,15 @@ public class GoodsController {
 			@RequestBody List<String> itemIdList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			if (itemIdList == null || itemIdList.size() == 0) {
+				return new ResultModel(false, "没有选择商品明细");
+			}
 			return goodsService.upShelves(itemIdList, centerId);
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	/**
 	 * @fun 商品下架
 	 * @param version
@@ -523,22 +526,40 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
+	/**
+	 * @fun 总部不可分销时区域中心全部下架
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/unDistribution", method = RequestMethod.POST)
+	public ResultModel unDistribution(@PathVariable("version") Double version, @RequestParam("itemId") String itemId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.unDistribution(itemId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 	/**
 	 * @fun 商品同步
 	 * @param version
 	 * @param list
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/goods/syncgoods/{centerId}", method = RequestMethod.POST)
-	public ResultModel syncgoods(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> itemIdList) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.syncgoods(itemIdList, centerId);
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
+	// @RequestMapping(value = "{version}/goods/syncgoods/{centerId}", method =
+	// RequestMethod.POST)
+	// public ResultModel syncgoods(@PathVariable("version") Double version,
+	// @PathVariable("centerId") Integer centerId,
+	// @RequestBody List<String> itemIdList) {
+	//
+	// if (Constants.FIRST_VERSION.equals(version)) {
+	// return goodsService.syncgoods(itemIdList, centerId);
+	// }
+	//
+	// return new ResultModel(false, "版本错误");
+	// }
 
 }

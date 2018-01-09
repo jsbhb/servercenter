@@ -262,7 +262,7 @@
 		base
 		gb on g.base_id = gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.brand_id  where 1=1  
+		gcb.brand_id  where gi.status = 1  
 		<if test="type != null and type != ''">
 			and g.type = #{type,jdbcType = INTEGER}
 		</if>
@@ -295,25 +295,23 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select
-		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,
-		gs.opt,gp.id as
-		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,gs.status as specsStatus,gs.excise_tax,gi.weight,
-		gp.delivery_place,
+		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,
+		bgp.id as
+		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
+		gs.status as specsStatus,gs.excise_tax,gi.weight,
 		<if test="goodsType == 2 or goodsType == 1">
 			stock.lockedqty as qpqty,
 		</if>
 		<if test="goodsType == 0">
 			stock.fxqty as qpqty,
 		</if>
-		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id 
-		left join goods_price${centerId} gp on
-		gs.item_id = gp.item_id left join 
+		bgp.delivery_place
+		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id 
+		left join 
 		goods_stock stock
 		on gs.item_id =
 		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.status = 1 and gs.goods_id in
+		gs.item_id = bgp.item_id where gs.status = 1 and gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -322,51 +320,45 @@
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select gs.id,gi.info,gs.item_id,gs.goods_id,
-		gs.item_code,gi.sku,gs.is_promotion,gs.create_time,gs.update_time,gs.excise_tax,gi.weight,
-		gs.opt,gp.id as
-		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,gp.create_time
-		as sub_create_time,
+		gs.item_code,gi.sku,gs.is_promotion,gs.excise_tax,gi.weight,
+		bgp.id as
+		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
 		<if test="goodsType == 2 or goodsType == 0">
 			stock.lockedqty as qpqty,
 		</if>
 		<if test="goodsType == 1">
 			stock.fxqty as qpqty,
 		</if>
-		gp.delivery_place,gs.status as specsStatus,
-		gp.update_time as
-		sub_update_time,gp.opt as sub_opt from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
-		left join goods_price${centerId} gp on
-		gs.item_id = gp.item_id left join 
+		bgp.delivery_place,gs.status as specsStatus 
+		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
+		left join 
 		goods_stock stock
 		on gs.item_id =
 		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.status = 1 and gs.item_id = #{itemId}
+		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id = #{itemId}
 	</select>
 	
 	<select id="getGoodsSpecsForOrder" parameterType="Object" resultMap="goodsSpecs">
 		select gs.id,gs.is_promotion,gi.weight,gs.item_id,gs.goods_id,
-		gp.id as price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount,
-		gp.delivery_place,b.first_category,b.second_category,b.third_category
+		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
+		bgp.delivery_place,b.first_category,b.second_category,b.third_category
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
-		left join goods_price${centerId} gp on
-		gs.item_id = gp.item_id 
 		left join goods g on gs.goods_id = g.goods_id left join base b on g.base_id=b.id left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.item_id = #{itemId}
+		gs.item_id = bgp.item_id where gs.item_id = #{itemId}
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
 		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,
 		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
-		gs.opt,gp.id as
-		price_id,bgp.min,bgp.max,gp.price,gp.vip_price,gs.discount, gs.excise_tax,gi.weight,
-		gp.delivery_place,gb.increment_tax
+		gs.opt,bgp.id as
+		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount, gs.excise_tax,gi.weight,
+		bgp.delivery_place,gb.increment_tax
 		 from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
-		left join goods_price${centerId} gp on
-		gs.item_id = gp.item_id left join goods g on gs.goods_id=g.goods_id 
+		left join goods g on gs.goods_id=g.goods_id 
 		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id 
 		left join goods_price bgp on 
-		gp.base_price_id = bgp.id where gs.status = 1 and gs.item_id in
+		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -708,13 +700,13 @@
 	</select> 
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
-		select gi.info,gp.id as price_id, gp.price, gs.discount from goods_item${centerId} gs left join
-		goods_price${centerId} gp on
-		gs.item_id = gp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId}
+		select gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount from goods_item${centerId} gs left join
+		goods_price bgp on
+		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId}
 	</select>
 	
 	<update id="updateGoodsUpShelves" parameterType="Object">
-		update goods${centerId} set status = 1, index_status = 1 where index_status = 0 
+		update goods${centerId} set status = 1, index_status = 1, update_time=now() where index_status = 0 
 		<if test="list != null and list.size > 0">
 			and goods_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -724,7 +716,7 @@
 	</update>
 	
 	<update id="updateGoodsItemUpShelves" parameterType="Object">
-		update goods_item${centerId} set status = 1 where 1=1
+		update goods_item${centerId} set status = 1, update_time=now() where 1=1
 		<if test="list != null and list.size > 0">
 			and item_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -734,21 +726,21 @@
 	</update>
 	
 	<update id="updateGoodsDownShelves" parameterType="Object">
-		update goods${centerId} set status = 0, index_status = 0 where goods_id in 
+		update goods${centerId} set status = 0, index_status = 0, update_time=now() where goods_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
 	</update>
 	
 	<update id="updateGoodsItemDownShelves" parameterType="Object">
-		update goods_item_${centerId} set status = 0 where item_id in 
+		update goods_item_${centerId} set status = 0, update_time=now() where item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
 	</update>
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
-		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
 		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
@@ -756,7 +748,7 @@
 		goods_category_brand gcb on gb.brand_id =
 		gcb.brand_id 
 		left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i on gs.item_id=i.item_id 
-		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gs.status = 1 and gi.goods_id in
+		left join goods_price bgp on gs.item_id = bgp.item_id where gs.status = 1 and gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
 			#{id}
@@ -790,7 +782,7 @@
 				<if test="orderFlag == 1 or orderFlag == 2">
 					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty},
 				</if>
-				frozenqty = frozenqty + #{item.frozenqty}
+				frozenqty = frozenqty + #{item.frozenqty}, update_time=now()
 			</set>
 			where item_id = #{item.itemId, jdbcType=VARCHAR}
 		</foreach>
@@ -807,7 +799,7 @@
 				<if test="orderFlag == 1 or orderFlag == 2">
 					lockedqty = ifnull(lockedqty,0) + #{item.quantity},
 				</if>
-				frozenqty = ifnull(frozenqty,0) - #{item.quantity}
+				frozenqty = ifnull(frozenqty,0) - #{item.quantity}, update_time=now()
 			</set>
 			where item_id = #{item.itemId}
 		</foreach>
@@ -820,7 +812,7 @@
 	</select>
 	
 	<select id="listSpecialGoods" parameterType="Object" resultMap="goodsItem">
-		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(gp.price) as price,
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
 		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}
@@ -828,7 +820,7 @@
 		goods_category_brand gcb on gb.brand_id =
 		gcb.brand_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
 		on gs.item_id = i.item_id 
-		left join goods_price${centerId} gp on gs.item_id = gp.item_id where gs.status = 1
+		left join goods_price bgp on gs.item_id = bgp.item_id where gs.status = 1
 		<if test="type == 0">
 			and gi.is_new = 1
 		</if>
@@ -849,7 +841,7 @@
 			close="" separator=";">
 			update goods_stock
 			<set>
-				fxqty = #{item.quantity},
+				fxqty = #{item.quantity}, update_time=now()
 			</set>
 			where item_id = #{item.itemId}
 		</foreach>
@@ -976,5 +968,13 @@
 			#{item,jdbcType = VARCHAR}
 		</foreach>
 	</select>
+	
+	<select id="countItem" parameterType="Object" resultType = "java.lang.Integer">
+		select count(*) from goods_item${centerId} where item_id = #{itemId}
+	</select>
+	
+	<update id="updateGoodsItemUnDistribution" parameterType="Object">
+		update goods_item set status = 1, update_time=now() where item_id = #{itemId}
+	</update>
 
 </mapper>

@@ -142,5 +142,9 @@ public interface GoodsMapper {
 	List<String> listSecondCategory(List<String> goodsIdList);
 	
 	List<String> listThirdCategory(List<String> goodsIdList);
+
+	int countItem(Map<String, Object> param);
+
+	void updateGoodsItemUnDistribution(String itemId);
 	
 }

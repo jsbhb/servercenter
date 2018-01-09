@@ -246,6 +246,8 @@ public interface GoodsService {
 
 	ResultModel downShelves(String itemId, Integer centerId);
 
-	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
+	ResultModel unDistribution(String itemId);
+
+//	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
 
 }
