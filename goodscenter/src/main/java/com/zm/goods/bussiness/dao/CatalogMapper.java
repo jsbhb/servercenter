@@ -92,4 +92,58 @@ public interface CatalogMapper {
 	 */
 	List<ThirdCatalogEntity> selectThirdBySecondId(String secondId);
 
+	/**  
+	 * deleteByFristId:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id  
+	 * @since JDK 1.7  
+	 */
+	void deleteByFristId(String id);
+
+	/**  
+	 * deleteBySelectId:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id  
+	 * @since JDK 1.7  
+	 */
+	void deleteBySecondId(String id);
+
+	/**  
+	 * deleteByThirdId:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id  
+	 * @since JDK 1.7  
+	 */
+	void deleteByThirdId(String id);
+
+	/**  
+	 * updateFirstCatalog:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateFirstCatalog(FirstCatalogEntity entity);
+
+	/**  
+	 * updateSecondCatalog:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateSecondCatalog(SecondCatalogEntity entity);
+
+	/**  
+	 * updateThirdCatalog:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateThirdCatalog(ThirdCatalogEntity entity);
+
 }

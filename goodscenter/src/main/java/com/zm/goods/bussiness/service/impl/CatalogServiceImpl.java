@@ -12,10 +12,14 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.dao.CatalogMapper;
+import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.CatalogService;
+import com.zm.goods.pojo.CategoryTypeEnum;
 import com.zm.goods.pojo.FirstCatalogEntity;
+import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.SecondCatalogEntity;
 import com.zm.goods.pojo.ThirdCatalogEntity;
 
@@ -33,6 +37,9 @@ public class CatalogServiceImpl implements CatalogService {
 
 	@Resource
 	CatalogMapper catalogMapper;
+
+	@Resource
+	GoodsBaseMapper goodsBaseMapper;
 
 	@Override
 	public List<FirstCatalogEntity> queryAll() {
@@ -67,6 +74,49 @@ public class CatalogServiceImpl implements CatalogService {
 	@Override
 	public List<ThirdCatalogEntity> queryThirdBySecondId(String secondId) {
 		return catalogMapper.selectThirdBySecondId(secondId);
+	}
+
+	@Override
+	@Transactional
+	public void delete(String id, String type) throws Exception {
+		GoodsBaseEntity entity = new GoodsBaseEntity();
+		if (CategoryTypeEnum.FIRST.getType().equals(type)) {
+			entity.setFirstCatalogId(id);
+		} else if (CategoryTypeEnum.SECOND.getType().equals(type)) {
+			entity.setSecondCatalogId(id);
+		} else if (CategoryTypeEnum.THIRD.getType().equals(type)) {
+			entity.setThirdCatalogId(id);
+		}
+
+		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectForExists(entity);
+
+		if (goodsBaseEntity != null) {
+			throw new Exception("已绑定商品,无法删除");
+		}
+		
+		if (CategoryTypeEnum.FIRST.getType().equals(type)) {
+			catalogMapper.deleteByFristId(id);
+		} else if (CategoryTypeEnum.SECOND.getType().equals(type)) {
+			catalogMapper.deleteBySecondId(id);
+		} else if (CategoryTypeEnum.THIRD.getType().equals(type)) {
+			catalogMapper.deleteByThirdId(id);
+		}
+
+	}
+
+	@Override
+	public void modifyFirstCatalog(FirstCatalogEntity entity) {
+		catalogMapper.updateFirstCatalog(entity);
+	}
+
+	@Override
+	public void modifySecondCatalog(SecondCatalogEntity entity) {
+		catalogMapper.updateSecondCatalog(entity);
+	}
+
+	@Override
+	public void modifyThirdCatalog(ThirdCatalogEntity entity) {
+		catalogMapper.updateThirdCatalog(entity);
 	}
 
 }

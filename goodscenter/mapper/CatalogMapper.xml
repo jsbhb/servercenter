@@ -77,4 +77,31 @@
 	<insert id="insertThirdCatalog" parameterType="Object">
 		insert into goods_third_category value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt});
 	</insert>
+	
+	<insert id="updateFirstCatalog" parameterType="Object">
+		update  goods_first_category set name = #{name},update_time = now() where first_id = #{firstId}
+	</insert>
+
+	<insert id="updateSecondCatalog" parameterType="Object">
+		update  goods_second_category set name = #{name},update_time = now() where second_id = #{secondId}
+	</insert>
+	
+	<insert id="updateThirdCatalog" parameterType="Object">
+		update  goods_third_category set name = #{name},update_time = now() where third_id = #{thirdId}
+	</insert>
+	
+		
+	<delete id="deleteByFristId" parameterType="Object">
+		delete f,s,t from goods_first_category f left join goods_second_category s on s.first_id = f.first_id 
+		left join goods_third_category t on t.second_id = s.second_id where f.first_id = #{id}
+	</delete>
+	
+	
+	<delete id="deleteBySecondId" parameterType="Object">
+		delete s,t from goods_second_category s left join goods_third_category t on t.second_id = s.second_id where s.second_id = #{id}
+	</delete>
+	
+	<delete id="deleteByThirdId" parameterType="Object">
+		delete from goods_third_category where third_id = #{id}
+	</delete>
 </mapper>

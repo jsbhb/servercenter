@@ -33,9 +33,14 @@
 	</select>
 	
 	<insert id="insert" parameterType="Object">
-		insert into
-		goods_category_brand value
-		(#{id},#{brandId},#{brand},#{attr},now(),now(),#{opt})
+		insert into goods_category_brand value (#{id},#{brandId},#{brand},#{attr},now(),now(),#{opt})
 	</insert>
 	
+	<update id="update" parameterType="Object">
+		update goods_category_brand set brand = #{brand} where brand_id = #{brandId}
+	</update>
+	
+	<delete id="delete" parameterType="Object">
+		delete from goods_category_brand where brand_id = #{brandId}
+	</delete>
 </mapper>

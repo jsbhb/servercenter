@@ -61,4 +61,32 @@ public interface BrandService {
 	 */
 	List<BrandEntity> queryAll();
 
+	/**  
+	 * delete:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param brandId  
+	 * @since JDK 1.7  
+	 */
+	void delete(String brandId) throws Exception;
+
+	/**  
+	 * modify:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void modify(BrandEntity entity);
+	
+	/**
+	 * 
+	 * remove:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param brandId  
+	 * @since JDK 1.7
+	 */
+	void remove(String brandId);
+
 }

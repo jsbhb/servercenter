@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.goods.bussiness.service.CatalogService;
@@ -146,6 +145,76 @@ public class CatalogController {
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
 				catalogService.saveThirdCatalog(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+	
+	
+	@RequestMapping(value = "{version}/goods/catalog/modifyFirst", method = RequestMethod.POST)
+	public ResultModel modifyFirst(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody FirstCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				catalogService.modifyFirstCatalog(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/modifySecond", method = RequestMethod.POST)
+	public ResultModel modifySecond(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody SecondCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				catalogService.modifySecondCatalog(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/modifyThird", method = RequestMethod.POST)
+	public ResultModel modifyThird(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody ThirdCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				catalogService.modifyThirdCatalog(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/delete", method = RequestMethod.POST)
+	public ResultModel delete(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				String id = request.getParameter("id");
+				String type = request.getParameter("type");
+				catalogService.delete(id, type);
 				return new ResultModel(true, "");
 			}
 

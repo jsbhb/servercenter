@@ -16,8 +16,10 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.BrandMapper;
+import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.BrandService;
 import com.zm.goods.pojo.BrandEntity;
+import com.zm.goods.pojo.GoodsBaseEntity;
 
 /**
  * ClassName: BrandService <br/>
@@ -33,7 +35,10 @@ public class BrandServiceImpl implements BrandService {
 
 	@Resource
 	BrandMapper brandMapper;
-	
+
+	@Resource
+	GoodsBaseMapper goodsBaseMapper;
+
 	@Override
 	public Page<BrandEntity> queryByPage(BrandEntity entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
@@ -53,6 +58,28 @@ public class BrandServiceImpl implements BrandService {
 	@Override
 	public List<BrandEntity> queryAll() {
 		return brandMapper.selectAll();
+	}
+
+	@Override
+	public void delete(String brandId) throws Exception {
+		GoodsBaseEntity entity = new GoodsBaseEntity();
+		entity.setBrandId(brandId);
+		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectForExists(entity);
+
+		if (goodsBaseEntity != null) {
+			throw new Exception("已绑定商品,无法删除");
+		}
+		brandMapper.delete(brandId);
+	}
+
+	@Override
+	public void modify(BrandEntity entity) {
+		brandMapper.update(entity);
+	}
+
+	@Override
+	public void remove(String brandId) {
+		brandMapper.delete(brandId);		
 	}
 
 }

@@ -26,6 +26,23 @@
 		select * from base where id = #{id} 
 	</select>
 	
+	<select id="selectForExists" parameterType="Object" resultMap="entity">
+		select * from base where 1=1 
+		<if test="firstCatalogId!=null and firstCatalogId!=''">
+			and first_category = #{firstCatalogId}
+		</if>
+		<if test="secondCatalogId!=null and secondCatalogId!=''">
+			and second_category = #{secondCatalogId}
+		</if>
+		<if test="thirdCatalogId!=null and thirdCatalogId!=''">
+			and third_category = #{thirdCatalogId}
+		</if>
+		<if test="brandId!=null and brandId!=''">
+			and brand_id = #{brandId} 
+		</if>
+		 limit 0,1
+	</select>
+	
 	<select id="selectForPage" parameterType="Object" resultMap="entity">
 		select * from base where 1=1 
 		<if test="goodsName!=null and goodsName!=''">
@@ -34,14 +51,14 @@
 		<if test="brand!=null and brand!=''">
 			and brand like concat('%',#{brand},'%') 
 		</if>
-		<if test="hscode!=null and hscode!=''">
-			and hscode like concat('%',#{hscode},'%') 
+		<if test="brandId!=null and brandId!=''">
+			and brand_id = #{brandId}
 		</if>
 		<if test="hscode!=null and hscode!=''">
-			and hscode like concat('%',#{hscode},'%') 
+			and hscode = #{hscode}
 		</if>
 		<if test="firstCatalogId!=null and firstCatalogId!=''">
-			and first_category = #{} 
+			and first_category = #{firstCatalogId} 
 		</if>
 		<if test="id > 0">
 			and id = #{id} 

@@ -50,4 +50,14 @@ public interface GoodsBaseMapper {
 	 */
 	void insert(GoodsBaseEntity entity);
 
+	/**  
+	 * selectForExists:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	GoodsBaseEntity selectForExists(GoodsBaseEntity entity);
+
 }

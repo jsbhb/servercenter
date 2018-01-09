@@ -7,6 +7,7 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -52,21 +53,20 @@ public class SpecsServiceImpl implements SpecsService {
 	@Transactional
 	public void save(SpecsTemplateEntity entity) {
 		specsMapper.insertTemplate(entity);
-		
+
 		List<SpecsEntity> specs = entity.getSpecs();
 		for (SpecsEntity spec : specs) {
 			spec.setTemplateId(entity.getId());
 			specsMapper.insertSpce(spec);
 		}
-		
-		
+
 		for (SpecsEntity spec : specs) {
 			List<SpecsValueEntity> values = spec.getValues();
-			
-			for(SpecsValueEntity value:values){
+
+			for (SpecsValueEntity value : values) {
 				value.setSpecsId(spec.getId());
 			}
-			
+
 			specsMapper.insertSpcesValue(spec.getValues());
 		}
 	}
@@ -74,6 +74,23 @@ public class SpecsServiceImpl implements SpecsService {
 	@Override
 	public List<SpecsTemplateEntity> queryAll() {
 		return specsMapper.selectAll();
+	}
+
+	@Override
+	public void saveSpecs(SpecsEntity entity) {
+		specsMapper.insertSpce(entity);
+
+		for (SpecsValueEntity value : entity.getValues()) {
+			value.setSpecsId(entity.getId());
+		}
+		specsMapper.insertSpcesValue(entity.getValues());
+	}
+
+	@Override
+	public void saveValue(SpecsValueEntity value) {
+		List<SpecsValueEntity> list = new ArrayList<SpecsValueEntity>();
+		list.add(value);
+		specsMapper.insertSpcesValue(list);
 	}
 
 }

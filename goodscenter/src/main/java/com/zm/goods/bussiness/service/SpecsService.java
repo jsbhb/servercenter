@@ -10,7 +10,9 @@ package com.zm.goods.bussiness.service;
 import java.util.List;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.SpecsEntity;
 import com.zm.goods.pojo.SpecsTemplateEntity;
+import com.zm.goods.pojo.SpecsValueEntity;
 
 /**
  * ClassName: SpecsService <br/>
@@ -60,5 +62,23 @@ public interface SpecsService {
 	 * @since JDK 1.7
 	 */
 	List<SpecsTemplateEntity> queryAll();
+
+	/**  
+	 * saveSpecs:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void saveSpecs(SpecsEntity entity);
+
+	/**  
+	 * saveValue:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param value  
+	 * @since JDK 1.7  
+	 */
+	void saveValue(SpecsValueEntity value);
 
 }

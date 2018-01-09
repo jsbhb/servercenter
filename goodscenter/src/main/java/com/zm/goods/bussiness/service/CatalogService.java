@@ -89,4 +89,41 @@ public interface CatalogService {
 	 */
 	List<ThirdCatalogEntity> queryThirdBySecondId(String secondId);
 
+	/**  
+	 * delete:删除. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id
+	 * @param type  
+	 * @since JDK 1.7  
+	 */
+	void delete(String id, String type) throws Exception ;
+
+	/**  
+	 * modifyFirstCatalog:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void modifyFirstCatalog(FirstCatalogEntity entity);
+
+	/**  
+	 * modifySecondCatalog:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void modifySecondCatalog(SecondCatalogEntity entity);
+
+	/**  
+	 * modifyThirdCatalog:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void modifyThirdCatalog(ThirdCatalogEntity entity);
+
 }

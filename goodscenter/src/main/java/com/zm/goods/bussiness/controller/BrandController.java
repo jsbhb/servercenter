@@ -44,21 +44,37 @@ public class BrandController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/brand/save", method = RequestMethod.POST)
 	public ResultModel save(@PathVariable("version") Double version, @RequestBody BrandEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			try{
+			try {
 				brandService.saveBrand(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			}
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
+	@RequestMapping(value = "{version}/goods/brand/modify", method = RequestMethod.POST)
+	public ResultModel modify(@PathVariable("version") Double version, @RequestBody BrandEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				brandService.modify(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 	@RequestMapping(value = "{version}/goods/brand/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody BrandEntity entity) {
@@ -78,7 +94,7 @@ public class BrandController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/brand/queryAll", method = RequestMethod.POST)
 	public ResultModel queryAll(HttpServletRequest request, @PathVariable("version") Double version) {
 
@@ -90,6 +106,23 @@ public class BrandController {
 
 			return new ResultModel(false, "版本错误");
 		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/brand/remove", method = RequestMethod.POST)
+	public ResultModel remove(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				String brandId = request.getParameter("brandId");
+				brandService.delete(brandId);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResultModel(false, e.getMessage());
 		}
 	}

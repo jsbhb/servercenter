@@ -61,4 +61,22 @@ public interface BrandMapper {
 	 */
 	List<BrandEntity> selectAll();
 
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void update(BrandEntity entity);
+	
+	/**  
+	 * delete:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void delete(String brandId);
+
 }

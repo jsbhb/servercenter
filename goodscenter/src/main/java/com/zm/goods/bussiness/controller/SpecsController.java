@@ -16,7 +16,9 @@ import com.zm.goods.bussiness.service.SpecsService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.SpecsEntity;
 import com.zm.goods.pojo.SpecsTemplateEntity;
+import com.zm.goods.pojo.SpecsValueEntity;
 
 /**
  * ClassName: SpecsController <br/>
@@ -51,6 +53,38 @@ public class SpecsController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
 				specsService.save(template);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/saveSpecs", method = RequestMethod.POST)
+	public ResultModel saveSpecs(@PathVariable("version") Double version, @RequestBody SpecsEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				specsService.saveSpecs(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/saveValue", method = RequestMethod.POST)
+	public ResultModel saveValue(@PathVariable("version") Double version, @RequestBody SpecsValueEntity value) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				specsService.saveValue(value);
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				e.printStackTrace();
