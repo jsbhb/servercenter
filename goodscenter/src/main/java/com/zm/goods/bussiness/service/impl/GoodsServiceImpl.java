@@ -81,8 +81,12 @@ public class GoodsServiceImpl implements GoodsService {
 
 		if (param.get("itemId") != null) {
 			List<String> itemIdList = new ArrayList<String>();
+			Map<String, Object> tempMap = new HashMap<String, Object>();
 			itemIdList.add((String) param.get("itemId"));
-			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+			String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
+			tempMap.put("centerId", centerIdstr);
+			tempMap.put("list", itemIdList);
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(tempMap);
 			param.put("goodsId", goodsIdList.get(0));
 		}
 
@@ -664,7 +668,9 @@ public class GoodsServiceImpl implements GoodsService {
 			if(itemIdS.size() > 0){
 				syncgoods(itemIdS, centerId);
 			}
-			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+			param.put("list", itemIdList);
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
+			param.remove("list");
 			if (goodsIdList != null && goodsIdList.size() > 0) {
 				param.put("list", goodsIdList);
 			}
@@ -679,14 +685,15 @@ public class GoodsServiceImpl implements GoodsService {
 	public ResultModel downShelves(String itemId, Integer centerId) {
 		List<String> itemIdList = new ArrayList<String>();
 		itemIdList.add(itemId);
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+		Map<String, Object> param = new HashMap<String, Object>();
+		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
+		param.put("centerId", centerIdstr);
+		param.put("list", itemIdList);
+		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
 		if(goodsIdList == null || goodsIdList.size() == 0){
 			return new ResultModel(false, "没有该商品"); 
 		}
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
 		param.put("goodsId", goodsIdList.get(0));
-		param.put("list", itemIdList);
 		goodsMapper.updateGoodsItemDownShelves(param);
 		int count = goodsMapper.countUpShelvesStatus(param);
 		if (count == 0) {
@@ -707,14 +714,15 @@ public class GoodsServiceImpl implements GoodsService {
 
 	private void syncgoods(List<String> itemIdList, Integer id) {
 		if (itemIdList != null && itemIdList.size() > 0) {
-			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+			Map<String, Object> param = new HashMap<String, Object>();
+			String centerId = GoodsServiceUtil.judgeCenterId(id);
+			param.put("list", itemIdList);
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
 			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
 			List<String> secondIdList = goodsMapper.listSecondCategory(goodsIdList);
 			List<String> thirdIdList = goodsMapper.listThirdCategory(goodsIdList);
-			String centerId = GoodsServiceUtil.judgeCenterId(id);
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("goodsIdlist", goodsIdList);
 			param.put("centerId", centerId);
+			param.put("goodsIdlist", goodsIdList);
 			param.put("firstIdlist", firstIdList);
 			param.put("secondIdlist", secondIdList);
 			param.put("thirdIdlist", thirdIdList);

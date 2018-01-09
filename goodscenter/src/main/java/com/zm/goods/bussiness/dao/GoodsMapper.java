@@ -107,7 +107,7 @@ public interface GoodsMapper {
 	
 	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
 
-	List<String> getGoodsIdByItemId(List<String> itemIdList);
+	List<String> getGoodsIdByItemId(Map<String,Object> param);
 
 	void updateThirdWarehouseStock(List<WarehouseStock> list);
 

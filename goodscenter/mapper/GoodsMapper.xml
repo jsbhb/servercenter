@@ -733,7 +733,7 @@
 	</update>
 	
 	<update id="updateGoodsItemDownShelves" parameterType="Object">
-		update goods_item_${centerId} set status = 0, update_time=now() where item_id in 
+		update goods_item${centerId} set status = 0, update_time=now() where item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
@@ -830,7 +830,14 @@
 	</select>
 	
 	<select id="getGoodsIdByItemId" parameterType="Object" resultType="java.lang.String">
-		select distinct goods_id from goods_item where item_id in 
+		select distinct goods_id from 
+		<if test="centerId != null">
+			goods_item${centerId} 
+		</if>
+		<if test="centerId == null">
+			goods_item 
+		</if>
+		where item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
@@ -879,7 +886,7 @@
 	</select>
 	
 	<select id="countUpShelvesStatus" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from goods_item_${centerId} where goods_id = #{goodsId} and status = 1
+		select count(*) from goods_item${centerId} where goods_id = #{goodsId} and status = 1
 	</select>
 	
 	<!-- 同步商品 -->
