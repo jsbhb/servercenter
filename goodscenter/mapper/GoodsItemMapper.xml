@@ -82,6 +82,9 @@
 		<if test="goodsId!=null and goodsId !=''">
 			and i.goods_id = #{goodsId} 
 		</if>
+		<if test="sku !=null and sku !=''">
+			and sku = #{sku} 
+		</if>
 		<if test="id !=null and id !=''">
 			and id = #{id} 
 		</if>
@@ -113,6 +116,9 @@
 		</if>
 		<if test="entity.goodsId!=null and entity.goodsId !=''">
 			and i.goods_id = #{entity.goodsId} 
+		</if>
+		<if test="entity.sku !=null and entity.sku !=''">
+			and sku = #{entity.sku} 
 		</if>
 		<if test="entity.id !=null and entity.id !=''">
 			and id = #{entity.id} 
