@@ -14,6 +14,7 @@ public class GoodsPrice {
 	private String deliveryPlace;
 	private Double proxyPrice = 0.0;
 	private Double fxPrice = 0.0;
+	private Double retailPrice;
 	@JsonIgnore
 	private String createTime;
 	@JsonIgnore
@@ -115,6 +116,14 @@ public class GoodsPrice {
 
 	public void setFxPrice(double fxPrice) {
 		this.fxPrice = fxPrice;
+	}
+
+	public Double getRetailPrice() {
+		return retailPrice;
+	}
+
+	public void setRetailPrice(Double retailPrice) {
+		this.retailPrice = retailPrice;
 	}
 
 	@Override

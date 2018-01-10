@@ -28,6 +28,7 @@
 			<result column="proxy_price" property="proxyPrice"/>
 			<result column="fxprice" property="fxPrice"/>
 			<result column="delivery_Place" property="deliveryPlace"/>
+			<result column="retail_price" property="retailPrice"/>
 		</association>
 		<association property="stock" javaType="com.zm.goods.pojo.GoodsStockEntity">
 			<result column="qpQty" property="qpQty"/>
@@ -59,7 +60,7 @@
 	
 	<select id="selectForPage" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
-		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,
+		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
@@ -93,7 +94,7 @@
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		c.item_id as center_item_id,c.status as center_status,
-		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,
+		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
@@ -142,7 +143,7 @@
 		<if test="max != null and max > 0">
 			max,
 		</if>
-		proxy_price,fxprice,create_time,update_time,opt)
+		proxy_price,fxprice,retail_price,create_time,update_time,opt)
 		value
 		(#{itemId},
 		<if test="min != null and min > 0">
@@ -151,7 +152,7 @@
 		<if test="max != null and max > 0">
 			#{max},
 		</if>
-		#{proxyPrice},#{fxPrice},now(),now(),#{opt})
+		#{proxyPrice},#{fxPrice},#{retailPrice},now(),now(),#{opt})
 	</insert>
 	
 	<update id="updateStatus" parameterType="Object">
