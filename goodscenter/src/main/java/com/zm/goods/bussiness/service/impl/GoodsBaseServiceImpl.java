@@ -48,4 +48,9 @@ public class GoodsBaseServiceImpl implements GoodsBaseService {
 		goodsBaseMapper.insert(entity);
 	}
 
+	@Override
+	public void editEntity(GoodsBaseEntity entity) {
+		goodsBaseMapper.insert(entity);
+	}
+
 }
