@@ -50,7 +50,7 @@ public class GoodsBaseServiceImpl implements GoodsBaseService {
 
 	@Override
 	public void editEntity(GoodsBaseEntity entity) {
-		goodsBaseMapper.insert(entity);
+		goodsBaseMapper.update(entity);
 	}
 
 }
