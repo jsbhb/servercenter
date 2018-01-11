@@ -364,7 +364,7 @@ public class UserServiceImpl implements UserService {
 			flag = true;
 		} else if (THIRD_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是店铺
 			user.setUserType(Constants.SHOP);
-			user.setCenterId(grade.getCenterId());
+			user.setCenterId(grade.getParentId());
 			user.setShopId(grade.getId());
 		} else if (FOURTH_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是导购
 			user.setUserType(Constants.SHOPPING_GUIDE);
