@@ -167,4 +167,13 @@
 		(#{itemId},0,0,0,0,0,now(),now(),#{opt})
 	</insert>
 	
+	<insert id="insertFiles" parameterType="Object">
+		insert into goods_file 
+		(goods_id,path,store_type,type,create_time,update_time,opt)
+		values
+		<foreach collection="list" item="item"  index="index" separator=",">
+		(#{item.goodsId},#{item.path},0,0,now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
 </mapper>

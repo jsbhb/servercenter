@@ -7,6 +7,8 @@
  */
 package com.zm.goods.pojo;
 
+import java.util.List;
+
 import com.zm.goods.common.Pagination;
 
 /**
@@ -44,6 +46,7 @@ public class GoodsEntity extends Pagination {
 	private GoodsItemEntity goodsItem;
 	private int thirdId;
 	private GoodsPrice goodsPrice;
+	private List<GoodsFile> files;
 
 	public int getId() {
 		return id;
@@ -244,4 +247,13 @@ public class GoodsEntity extends Pagination {
 	public void setGoodsPrice(GoodsPrice goodsPrice) {
 		this.goodsPrice = goodsPrice;
 	}
+
+	public List<GoodsFile> getFiles() {
+		return files;
+	}
+
+	public void setFiles(List<GoodsFile> files) {
+		this.files = files;
+	}
+
 }

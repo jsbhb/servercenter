@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 
@@ -100,5 +101,14 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	Page<GoodsItemEntity> selectCenterForPage(Map<String,Object> params);
+
+	/**  
+	 * insertFiles:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param files  
+	 * @since JDK 1.7  
+	 */
+	void insertFiles(List<GoodsFile> files);
 
 }
