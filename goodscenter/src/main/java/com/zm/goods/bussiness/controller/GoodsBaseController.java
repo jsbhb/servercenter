@@ -77,4 +77,18 @@ public class GoodsBaseController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+	
+	@RequestMapping(value = "{version}/goods/base/edit", method = RequestMethod.POST)
+	public ResultModel edit(@PathVariable("version") Double version, @RequestBody GoodsBaseEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try{
+				goodsBaseService.editEntity(entity);
+				return new ResultModel(true, "");
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

@@ -50,4 +50,13 @@ public interface GoodsBaseService {
 	 */
 	void saveEntity(GoodsBaseEntity entity);
 
+	/**
+	 * saveBrand:保存品牌. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void editEntity(GoodsBaseEntity entity);
+
 }
