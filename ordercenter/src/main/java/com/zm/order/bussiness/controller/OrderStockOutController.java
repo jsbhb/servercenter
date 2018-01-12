@@ -38,18 +38,6 @@ public class OrderStockOutController {
 			@RequestBody OrderInfo entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-
-			entity.setOrderId(request.getParameter("orderId"));
-			String supplierId = request.getParameter("supplierId");
-			if (supplierId != null && !"".equals(supplierId)) {
-				entity.setSupplierId(Integer.parseInt(supplierId));
-			}
-
-			String status = request.getParameter("status");
-			if (status != null && !"".equals(status)) {
-				entity.setStatus(Integer.parseInt(status));
-			}
-
 			Page<OrderInfo> page = orderStockOutService.queryByPage(entity);
 			return new ResultModel(true, page, new Pagination(page));
 		}

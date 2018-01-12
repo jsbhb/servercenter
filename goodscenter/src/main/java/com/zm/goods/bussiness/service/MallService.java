@@ -112,4 +112,13 @@ public interface MallService {
 	 */
 	void updateData(DictData entity);
 
+	/**  
+	 * updateDict:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateDict(PopularizeDict entity);
+
 }

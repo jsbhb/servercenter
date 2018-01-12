@@ -40,6 +40,7 @@ public class MallServiceImpl implements MallService {
 	MallMapper mallMapper;
 
 	private final int PC_AD_NUM = 4;
+	private final int BANNER_NUM = 6;
 
 	@Override
 	public Page<PopularizeDict> queryDictByPage(PopularizeDict entity) {
@@ -101,10 +102,28 @@ public class MallServiceImpl implements MallService {
 			map.put("list", dataList);
 			mallMapper.insertDataBatch(map);
 		}
+		
+		if("module_00003".equals(entity.getLayout().getCode())){
+			List<DictData> dataList = new ArrayList<DictData>();
+			for (int i = 0; i < BANNER_NUM; i++) {
+				DictData data = new DictData();
+				data.setDictId(entity.getId());
+				dataList.add(data);
+			}
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("centerId",entity.getCenterId());
+			map.put("list", dataList);
+			mallMapper.insertDataBatch(map);
+		}
 	}
 
 	@Override
 	public void updateData(DictData entity) {
 		mallMapper.updateData(entity);
+	}
+	
+	@Override
+	public void updateDict(PopularizeDict entity) {
+		mallMapper.updateDict(entity);
 	}
 }

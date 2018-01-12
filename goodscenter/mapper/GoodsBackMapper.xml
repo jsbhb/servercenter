@@ -117,6 +117,9 @@
 		<if test="baseId > 0">
 			and base_id = #{baseId} 
 		</if>
+		<if test="supplierId != null and supplierId != -1">
+			and supplier_id = #{supplierId} 
+		</if>
 	</select>
 	
 	<insert id="insert" parameterType="Object">

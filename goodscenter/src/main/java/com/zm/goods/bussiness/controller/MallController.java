@@ -116,7 +116,7 @@ public class MallController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String dictId = request.getParameter("dictId");
-			if (dictId != null && "".equals(dictId)) {
+			if (dictId != null && !"".equals(dictId)) {
 				entity.setDictId(Integer.parseInt(dictId));
 			}
 			entity.setCenterId(Integer.parseInt(request.getParameter("centerId")));
@@ -148,6 +148,21 @@ public class MallController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
 				mallService.updateData(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/mall/index/updateDict", method = RequestMethod.POST)
+	public ResultModel updateData(@PathVariable("version") Double version, @RequestBody PopularizeDict entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				mallService.updateDict(entity);
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				e.printStackTrace();

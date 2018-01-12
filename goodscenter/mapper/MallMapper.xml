@@ -27,13 +27,13 @@
 		<id column="id" property="id"/>
 		<result column="dictId" property="dictId"/>
 		<result column="href" property="href"/>
-		<result column="value" property="picPath"/>
-		<result column="value" property="title"/>
-		<result column="value" property="goodsId"/>
-		<result column="value" property="specs"/>
-		<result column="value" property="origin"/>
-		<result column="value" property="description"/>
-		<result column="value" property="price"/>
+		<result column="picPath" property="picPath"/>
+		<result column="title" property="title"/>
+		<result column="goodsId" property="goodsId"/>
+		<result column="specs" property="specs"/>
+		<result column="origin" property="origin"/>
+		<result column="description" property="description"/>
+		<result column="price" property="price"/>
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
@@ -52,13 +52,15 @@
 		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where l.code = #{code}
 	</select>
 	
-	<select id="selectDataForPage" parameterType="Object" >
-		select * from popularize_data_${centerId} where dictId = #{id}
+	<select id="selectDataForPage" parameterType="Object" resultMap="data">
+		select * from popularize_data_${centerId} where dictId = #{dictId}
 	</select>
 	
 	<select id="selectDataAll" parameterType="Object" resultMap="data">
 		select d.* from popularize_data_${centerId} d left join popularize_dict_${centerId} t on d.dictId = t.id
 		left join layout_${centerId} l on l.id = t.layout_id where l.code = #{code}
+		<if test="pageType!=null"></if>
+		 and l.page_type = #{pageType}
 	</select>
 	
 	<insert id="insertDict" useGeneratedKeys="true" keyProperty="id" parameterType="Object">
@@ -76,17 +78,66 @@
 	
 	
 	<insert id="insertDataBatch"  parameterType="Object" >
-		insert into popularize_data_${centerId} 
-		(dictId,create_time,update_time)
+		insert into popularize_data_${centerId}
+		(dictId,title,origin,goodsId,href,price,picPath,create_time,update_time)
 		values
 		<foreach collection="list" item="item"
 			separator=",">
-			(#{item.dictId},now(),now())
+			(#{item.dictId},#{item.title},#{item.origin},#{item.goodsId},#{item.href},#{item.price},#{item.picPath},now(),now())
 		</foreach>
 	</insert>
 	
+	<insert id="insertData"  parameterType="Object" >
+		insert into popularize_data_${centerId}
+		(dictId,title,origin,goodsId,href,price,picPath,create_time,update_time)
+		values
+		(#{dictId},#{title},#{origin},#{goodsId},#{href},#{price},#{picPath},now(),now())
+	</insert>
+	
 	<update id="updateData" parameterType="Object" >
-		update popularize_data_${centerId}  set description = #{description},picpath = #{picPath},update_time = now() where id = #{id} 
+		update popularize_data_${centerId}  set description = #{description},picpath = #{picPath},update_time = now()
+		<if test="goodsId!=null and goodsId!=''">
+		,goodsId = #{goodsId}
+		</if>
+		<if test="origin!=null and origin!=''">
+		,origin = #{origin}
+		</if>
+		<if test="title!=null and title!=''">
+		,title = #{title}
+		</if>
+		<if test="price!=null and price!=''">
+		,price = #{price}
+		</if>
+		<if test="picPath!=null and picPath!=''">
+		,picPath = #{picPath}
+		</if>
+		<if test="href!=null and href!=''">
+		,href = #{href}
+		</if>
+		 where id = #{id} 
+	</update>
+	
+	<update id="updateDict" parameterType="Object" >
+		update popularize_dict_${centerId}  set update_time = now()
+		<if test="description!=null and description!=''">
+		,description = #{description}
+		</if>
+		<if test="picPath1!=null and picPath1!=''">
+		,picPath1 = #{picPath1}
+		</if>
+		<if test="enname!=null and enname!=''">
+		,enname = #{enname}
+		</if>
+		<if test="name!=null and name!=''">
+		,name = #{name}
+		</if>
+		<if test="firstCategory!=null and firstCategory!=''">
+		,first_category = #{firstCategory}
+		</if>
+		<if test="href!=null and href!=''">
+		,href = #{href}
+		</if>
+		 where id = #{id} 
 	</update>
 	
 </mapper>
