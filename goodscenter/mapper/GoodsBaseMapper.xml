@@ -73,12 +73,11 @@
 	
 	<update id="update" parameterType="Object">
 		update base set
-		brand_id=#{brandId},goods_name=#{goodsName},
-		brand=#{brand},increment_tax=#{incrementTax},
-		tariff=#{tariff},unit=#{unit},
-		hscode=#{hscode},encode=#{encode},
-		first_category=#{firstCatalogId},second_category=#{secondCatalogId},
-		third_category=#{thirdCatalogId},center_id=#{centerId},
+		goods_name=#{goodsName},
+		brand=#{brand},
+		increment_tax=#{incrementTax},
+		tariff=#{tariff},
+		center_id=#{centerId},
 		update_time=now(),opt=#{opt}  where id=#{id}
 	</update>
 	
