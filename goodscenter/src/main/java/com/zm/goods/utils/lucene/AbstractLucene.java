@@ -96,12 +96,13 @@ public abstract class AbstractLucene {
 		// 封装查询参数
 		renderParameter(keyWordsList, filedsList, accuratePara, obj);
 
-		if (keyWordsList.size() == 0 && accuratePara.size() == 0) {//什么参数都没有默认查询所有推广商品
-			filedsList.add("popular");
-			keyWordsList.add("1");
+		if (keyWordsList.size() == 0 && accuratePara.size() == 0) {
+//			filedsList.add("popular");
+//			keyWordsList.add("1");
+			return queryWithOutPara(pagination);
+		} else {
+			return queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
 		}
-
-		return queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
 
 	}
 
@@ -334,9 +335,12 @@ public abstract class AbstractLucene {
 		int count = reader.maxDoc();
 		int start = (pagination.getCurrentPage() - 1) * pagination.getNumPerPage();
 		int end = pagination.getCurrentPage() * pagination.getNumPerPage();
+		if(end >= count){
+			end = count;
+		}
 		for (int i = start; i < end; i++) {
 			doc1 = indexSearch.doc(i);
-			String res = doc1.get("id");
+			String res = doc1.get("goodsId");
 			if (res != null) {
 				idList.add(res);
 			}
