@@ -176,4 +176,8 @@
 		</foreach>
 	</insert>
 	
+	<delete id="delete" parameterType="Object">
+		delete from goods_item where goods_id = #{goodsId}; 
+	</delete>
+	
 </mapper>

@@ -131,4 +131,17 @@
 		update third_goods set status = 1 , update_time = now() where id = #{id};
 	</update>
 	
+	<update id="update" parameterType="Object">
+		update goods set goods_name = #{goodsName} , update_time = now() where id = #{id};
+	</update>
+	
+	<delete id="delete" parameterType="Object">
+		delete from goods where id = #{id}; 
+	</delete>
+	
+	<select id="selectRecordForDel" parameterType="Object" resultMap="entity">
+		SELECT a.* FROM goods a where a.id = #{id} and not exists 
+		(select id from goods_item where status != '0' and goods_id = a.goods_id);
+	</select>
+	
 </mapper>

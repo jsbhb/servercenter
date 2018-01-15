@@ -76,4 +76,23 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		return goodsBackMapper.selectThird(entity);
 	}
 
+	@Override
+	@Transactional
+	public void edit(GoodsEntity entity) {
+		goodsBackMapper.update(entity);
+	}
+
+	@Override
+	@Transactional
+	public void remove(GoodsEntity entity) {
+		goodsBackMapper.delete(entity);
+		goodsItemMapper.delete(entity);
+	}
+
+	@Override
+	public GoodsEntity checkRecordForDel(GoodsEntity entity) {
+		GoodsEntity retEntity = goodsBackMapper.selectRecordForDel(entity);
+		return retEntity;
+	}
+
 }
