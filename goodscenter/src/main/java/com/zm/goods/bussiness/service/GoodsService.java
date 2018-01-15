@@ -248,6 +248,8 @@ public interface GoodsService {
 
 	ResultModel unDistribution(String itemId);
 
+	ResultModel syncStock(List<String> itemIdList);
+
 //	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
 
 }

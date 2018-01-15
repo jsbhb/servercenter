@@ -147,4 +147,6 @@ public interface GoodsMapper {
 
 	void updateGoodsItemUnDistribution(String itemId);
 	
+	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
+	
 }
