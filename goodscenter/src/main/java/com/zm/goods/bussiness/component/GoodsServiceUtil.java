@@ -20,7 +20,7 @@ import com.zm.goods.utils.JSONUtil;
 
 public class GoodsServiceUtil {
 
-	//计算价格
+	// 计算价格
 	public static Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion) {
 		Double totalAmount = 0.0;
 		getPriceInterval(specs, promotion);
@@ -56,7 +56,7 @@ public class GoodsServiceUtil {
 		return CalculationUtils.mul(totalAmount, discount);
 	}
 
-	//封装商品属性
+	// 封装商品属性
 	@SuppressWarnings("unchecked")
 	public static void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList,
 			boolean flag) {
@@ -108,16 +108,18 @@ public class GoodsServiceUtil {
 					} else {
 						item.getGoodsSpecsList().add(specs);
 					}
-					
+
 				} else {
-					temp = JSONUtil.parse(specs.getInfo(), Map.class);
-					for (Map.Entry<String, String> entry : temp.entrySet()) {
-						if (item.getSpecsInfo() == null) {
-							tempSet = new HashSet<String>();
-							tempSet.add(entry.getValue());
-							item.setSpecsInfo(tempSet);
-						} else {
-							item.getSpecsInfo().add(entry.getKey());
+					if (specs.getInfo() != null && !"".equals(specs.getInfo().trim())) {
+						temp = JSONUtil.parse(specs.getInfo(), Map.class);
+						for (Map.Entry<String, String> entry : temp.entrySet()) {
+							if (item.getSpecsInfo() == null) {
+								tempSet = new HashSet<String>();
+								tempSet.add(entry.getValue());
+								item.setSpecsInfo(tempSet);
+							} else {
+								item.getSpecsInfo().add(entry.getKey());
+							}
 						}
 					}
 				}
@@ -172,15 +174,16 @@ public class GoodsServiceUtil {
 			}
 		}
 	}
-	
+
 	public static String judgeCenterId(Integer id) {
-		if(Constants.PREDETERMINE_PLAT_TYPE == id){
+		if (Constants.PREDETERMINE_PLAT_TYPE == id) {
 			return "_2B";
 		}
 		return "_" + id;
 	}
-	
-	public static Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs, OrderBussinessModel model) {
+
+	public static Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs,
+			OrderBussinessModel model) {
 		Double amount = getAmount(vip, specs, model, 10.0);
 		if (amount == null) {
 			result.setSuccess(false);
@@ -188,32 +191,32 @@ public class GoodsServiceUtil {
 		}
 		return amount;
 	}
-	
-	public static Map<String,Double> getMinPrice(List<GoodsSpecs> specsList){
-		Map<String,Double> result = new HashMap<String,Double>();
-		if(specsList == null || specsList.size() == 0){
+
+	public static Map<String, Double> getMinPrice(List<GoodsSpecs> specsList) {
+		Map<String, Double> result = new HashMap<String, Double>();
+		if (specsList == null || specsList.size() == 0) {
 			result.put("price", 0.0);
 			result.put("realPrice", 0.0);
 			return result;
 		}
-		for(GoodsSpecs specs : specsList){
+		for (GoodsSpecs specs : specsList) {
 			getPriceInterval(specs, specs.getDiscount());
 		}
 		int len = specsList.size();
-		
-		for(int i=0;i<len;i++){
-			if(i == 0){
+
+		for (int i = 0; i < len; i++) {
+			if (i == 0) {
 				result.put("price", specsList.get(i).getMinPrice());
 				result.put("realPrice", specsList.get(i).getRealMinPrice());
 			} else {
-				if(specsList.get(i).getMinPrice() < result.get("price")){
+				if (specsList.get(i).getMinPrice() < result.get("price")) {
 					result.put("price", specsList.get(i).getMinPrice());
 				}
-				if(specsList.get(i).getRealMinPrice() < result.get("realPrice")){
+				if (specsList.get(i).getRealMinPrice() < result.get("realPrice")) {
 					result.put("realPrice", specsList.get(i).getRealMinPrice());
 				}
 			}
 		}
 		return result;
-	} 
+	}
 }

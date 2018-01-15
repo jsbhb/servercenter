@@ -56,7 +56,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		goodsBackMapper.insert(entity);
 		goodsItemMapper.insert(entity.getGoodsItem());
 		goodsItemMapper.insertPrice(entity.getGoodsItem().getGoodsPrice());
-		goodsItemMapper.insertFiles(entity.getFiles());
+		if(entity.getFiles() != null && entity.getFiles().size() > 0){
+			goodsItemMapper.insertFiles(entity.getFiles());
+		}
 
 		if ("sync".equals(type)) {
 			goodsBackMapper.updateThirdStatus(entity.getThirdId());
