@@ -44,58 +44,10 @@ public class ShareProfitComponent {
 		try {
 
 			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-
-			if (info.getOrderGoodsList() != null) {
-				List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
-				OrderBussinessModel model = null;
-				for (OrderGoods goods : info.getOrderGoodsList()) {
-					model = new OrderBussinessModel();
-					model.setItemId(goods.getItemId());
-					model.setQuantity(goods.getItemQuantity());
-					list.add(model);
-				}
-				Double cost = goodsFeignClient.getCostPrice(Constants.FIRST_VERSION, list);
-				// TODO 结算邮费
-
-				Double totalProfit = 0.0;
-				if (cost != null && cost > 0) {
-					totalProfit = CalculationUtils.sub(info.getOrderDetail().getPayment(),
-							info.getOrderDetail().getTaxFee());
-					totalProfit = CalculationUtils.sub(totalProfit, cost);
-				}
-
-				UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
-				ProfitProportion profitProportion = orderMapper.getProfitProportion(info.getCenterId());
-
-				// 获取用于分润的钱
-				Double totalShareProfit = CalculationUtils.mul(totalProfit,
-						profitProportion.getTotal_profit_proportion());
-
-				if (info.getShopId() == null && user.getShopId() == null) {
-					return;
-				}
-				boolean crossArea = false;
-				if (!user.getCenterId().equals(info.getCenterId())) {
-					crossArea = true;
-				}
-				if (info.getShopId() == null && user.getShopId() != null) {
-					setShareProfit(totalProfit, profitProportion, totalShareProfit, info, register_type, crossArea,
-							user.getShopId());
-				}
-				if (info.getShopId() != null && user.getShopId() == null) {
-					setShareProfit(totalProfit, profitProportion, totalShareProfit, info, consume_type, crossArea,
-							info.getShopId());
-				}
-				if (info.getShopId() != null && user.getShopId() != null) {
-					if (info.getShopId().equals(user.getShopId())) {
-						setShareProfit(totalProfit, profitProportion, totalShareProfit, info, register_consume_type,
-								crossArea, user.getShopId());
-					} else {
-						setShareProfit(totalProfit, profitProportion, totalShareProfit, info, crossArea,
-								user.getShopId(), info.getShopId());
-					}
-				}
-
+			if (Constants.PREDETERMINE_ORDER == info.getCreateType()) {
+				predetermineOrderProfit(info);
+			} else {
+				consumOrderProfit(info);
 			}
 
 		} catch (Exception e) {
@@ -103,6 +55,74 @@ public class ShareProfitComponent {
 			e.printStackTrace();
 		}
 
+	}
+	
+
+	/**
+	 * @fun 订货平台分润
+	 * @param info
+	 */
+	private void predetermineOrderProfit(OrderInfo info) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @fun 消费订单分润计算
+	 * @param info
+	 */
+	private void consumOrderProfit(OrderInfo info) {
+		if (info.getOrderGoodsList() != null) {
+			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+			OrderBussinessModel model = null;
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				model = new OrderBussinessModel();
+				model.setItemId(goods.getItemId());
+				model.setQuantity(goods.getItemQuantity());
+				list.add(model);
+			}
+			Double cost = goodsFeignClient.getCostPrice(Constants.FIRST_VERSION, list);
+			// TODO 结算邮费
+
+			Double totalProfit = 0.0;
+			if (cost != null && cost > 0) {
+				totalProfit = CalculationUtils.sub(info.getOrderDetail().getPayment(),
+						info.getOrderDetail().getTaxFee());
+				totalProfit = CalculationUtils.sub(totalProfit, cost);
+			}
+
+			UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
+			ProfitProportion profitProportion = orderMapper.getProfitProportion(info.getCenterId());
+
+			// 获取用于分润的钱
+			Double totalShareProfit = CalculationUtils.mul(totalProfit, profitProportion.getTotal_profit_proportion());
+
+			if (info.getShopId() == null && user.getShopId() == null) {
+				return;
+			}
+			boolean crossArea = false;
+			if (!info.getCenterId().equals(user.getCenterId())) {
+				crossArea = true;
+			}
+			if (info.getShopId() == null && user.getShopId() != null) {
+				setShareProfit(totalProfit, profitProportion, totalShareProfit, info, register_type, crossArea,
+						user.getShopId());
+			}
+			if (info.getShopId() != null && user.getShopId() == null) {
+				setShareProfit(totalProfit, profitProportion, totalShareProfit, info, consume_type, crossArea,
+						info.getShopId());
+			}
+			if (info.getShopId() != null && user.getShopId() != null) {
+				if (info.getShopId().equals(user.getShopId())) {
+					setShareProfit(totalProfit, profitProportion, totalShareProfit, info, register_consume_type,
+							crossArea, user.getShopId());
+				} else {
+					setShareProfit(totalProfit, profitProportion, totalShareProfit, info, crossArea, user.getShopId(),
+							info.getShopId());
+				}
+			}
+
+		}
 	}
 
 	private void setShareProfit(Double totalProfit, ProfitProportion profitProportion, Double totalShareProfit,

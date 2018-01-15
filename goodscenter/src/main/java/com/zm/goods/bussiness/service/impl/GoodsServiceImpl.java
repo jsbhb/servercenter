@@ -78,12 +78,12 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId) {
-
+		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
+		param.put("centerId", centerIdstr);
 		if (param.get("itemId") != null) {
 			List<String> itemIdList = new ArrayList<String>();
 			Map<String, Object> tempMap = new HashMap<String, Object>();
 			itemIdList.add((String) param.get("itemId"));
-			String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
 			tempMap.put("centerId", centerIdstr);
 			tempMap.put("list", itemIdList);
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(tempMap);
@@ -104,13 +104,15 @@ public class GoodsServiceImpl implements GoodsService {
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		parameter.put("list", idList);
 		parameter.put("type", PICTURE_TYPE);
-		parameter.put("centerId", param.get("centerId"));
+		parameter.put("centerId", centerIdstr);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		if (param.get("goodsId") != null) {
 			parameter.put("goodsType", goodsList.get(0).getType());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, true);
-			activityComponent.doPackCoupon(centerId, userId, goodsList);
+			if(Constants.PREDETERMINE_PLAT_TYPE != centerId){
+				activityComponent.doPackCoupon(centerId, userId, goodsList);
+			}
 		} else {
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, false);
@@ -188,7 +190,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		parameter.put("list", idList);
-		parameter.put("centerId", param.get("centerId"));
+		parameter.put("centerId", id);
 		parameter.put("type", PICTURE_TYPE);
 
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
@@ -414,6 +416,7 @@ public class GoodsServiceImpl implements GoodsService {
 				searchModel.setThirdCategory(item.getThirdCategory());
 				searchModel.setSecondCategory(item.getSecondCategory());
 				searchModel.setGoodsName(item.getCustomGoodsName());
+				searchModel.setPopular(item.getPopular());
 				param.put("goodsId", item.getGoodsId());
 				List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 				if (specsList != null && specsList.size() > 0) {

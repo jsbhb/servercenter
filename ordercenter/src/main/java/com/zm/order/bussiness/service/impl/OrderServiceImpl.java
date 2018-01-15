@@ -145,8 +145,14 @@ public class OrderServiceImpl implements OrderService {
 		// 获取该用户是否是VIP
 		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
+		Integer centerId = null;
+		if (Constants.PREDETERMINE_ORDER == info.getCreateType()) {// 如果是订货平台订单，默认centerId
+			centerId = -1;
+		} else {
+			centerId = info.getCenterId();
+		}
 		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
-				info.getCenterId(), info.getOrderFlag(), info.getCouponIds(), info.getUserId());
+				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId());
 
 		if (!result.isSuccess()) {
 			return result;
@@ -203,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
 		amount = CalculationUtils.round(2, amount);
 		int totalAmount = (int) CalculationUtils.mul(amount, 100);
 
-		if (totalAmount-localAmount > 5 || totalAmount-localAmount < -5) {//价格区间定义在正负5分
+		if (totalAmount - localAmount > 5 || totalAmount - localAmount < -5) {// 价格区间定义在正负5分
 			result.setErrorMsg("价格前后台不一致,商品原总价：" + unDiscountAmount + ",现订单总价：" + amount + ",税费：" + taxFee + ",运费："
 					+ postFee + ",优惠金额：" + disAmount);
 			result.setSuccess(false);

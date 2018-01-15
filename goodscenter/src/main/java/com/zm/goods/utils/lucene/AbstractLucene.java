@@ -87,8 +87,6 @@ public abstract class AbstractLucene {
 	public Map<String, Object> search(Object obj, Pagination pagination, SortModelList sortList)
 			throws IOException, InvalidTokenOffsetsException {
 
-		Map<String, Object> result = new HashMap<String, Object>(16);
-
 		List<String> keyWordsList = new ArrayList<String>();
 		List<String> filedsList = new ArrayList<String>();
 		Map<String, String> accuratePara = new HashMap<String, String>();
@@ -98,16 +96,12 @@ public abstract class AbstractLucene {
 		// 封装查询参数
 		renderParameter(keyWordsList, filedsList, accuratePara, obj);
 
-		if (keyWordsList.size() == 0 && accuratePara.size() == 0) {
-
-			throw new RuntimeException("请输入查询参数");
-
-		} else {
-
-			result = queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
+		if (keyWordsList.size() == 0 && accuratePara.size() == 0) {//什么参数都没有默认查询所有推广商品
+			filedsList.add("popular");
+			keyWordsList.add("1");
 		}
 
-		return result;
+		return queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
 
 	}
 

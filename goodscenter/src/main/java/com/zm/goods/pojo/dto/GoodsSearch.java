@@ -20,12 +20,22 @@ public class GoodsSearch {
 	
 	private Integer status;
 	
+	private Integer popular;
+	
 	private String thirdCategory;
 	
 	private String secondCategory;
 	
 	private String firstCategory;
 	
+	public Integer getPopular() {
+		return popular;
+	}
+
+	public void setPopular(Integer popular) {
+		this.popular = popular;
+	}
+
 	public String getThirdCategory() {
 		return thirdCategory;
 	}

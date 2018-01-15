@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsPrice;
@@ -97,6 +98,8 @@ public class GoodsServiceUtil {
 				if (item == null) {
 					continue;
 				}
+				discount = specs.getDiscount();
+				getPriceInterval(specs, discount);
 				if (flag) {
 					if (item.getGoodsSpecsList() == null) {
 						tempSpecsList = new ArrayList<GoodsSpecs>();
@@ -105,8 +108,7 @@ public class GoodsServiceUtil {
 					} else {
 						item.getGoodsSpecsList().add(specs);
 					}
-					discount = specs.getDiscount();
-					getPriceInterval(specs, discount);
+					
 				} else {
 					temp = JSONUtil.parse(specs.getInfo(), Map.class);
 					for (Map.Entry<String, String> entry : temp.entrySet()) {
@@ -172,8 +174,10 @@ public class GoodsServiceUtil {
 	}
 	
 	public static String judgeCenterId(Integer id) {
-		String centerId = "_" + id;
-		return centerId;
+		if(Constants.PREDETERMINE_PLAT_TYPE == id){
+			return "_2B";
+		}
+		return "_" + id;
 	}
 	
 	public static Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs, OrderBussinessModel model) {

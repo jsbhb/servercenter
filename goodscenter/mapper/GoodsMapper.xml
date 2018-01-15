@@ -310,7 +310,14 @@
 		left join 
 		goods_stock stock
 		on gs.item_id =
-		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id left join goods_price bgp on 
+		stock.item_id left join goods${centerId} g on gs.goods_id=g.goods_id left join 
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on 
 		gs.item_id = bgp.item_id where gs.status = 1 and gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
@@ -334,7 +341,14 @@
 		left join 
 		goods_stock stock
 		on gs.item_id =
-		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id left join goods_price bgp on 
+		stock.item_id left join goods${centerId} g on gs.goods_id = g.goods_id left join 
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on 
 		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id = #{itemId}
 	</select>
 	
@@ -343,7 +357,14 @@
 		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
 		bgp.delivery_place,b.first_category,b.second_category,b.third_category
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
-		left join goods g on gs.goods_id = g.goods_id left join base b on g.base_id=b.id left join goods_price bgp on 
+		left join goods g on gs.goods_id = g.goods_id left join base b on g.base_id=b.id left join 
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on 
 		gs.item_id = bgp.item_id where gs.item_id = #{itemId}
 	</select>
 	
@@ -357,7 +378,14 @@
 		 from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods g on gs.goods_id=g.goods_id 
 		left join base gb on g.base_id = gb.id left join goods${centerId} gc on g.goods_id=gc.goods_id 
-		left join goods_price bgp on 
+		left join 
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on 
 		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
@@ -507,7 +535,7 @@
 		  id int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 		  base_price_id int UNSIGNED NOT NULL COMMENT '主站后台价格ID',
 		  item_id varchar(50) NOT NULL COMMENT '商品ID',
-		  price decimal(10,2) NULL DEFAULT 0.0 COMMENT '价格',
+		  retail_price decimal(10,2) NULL DEFAULT 0.0 COMMENT '价格',
 		  vip_price decimal(10,2) NULL COMMENT '会员价格',
 		  delivery_place varchar(20) NULL COMMENT '发货地',
 		  create_time DATETIME NULL COMMENT '创建时间',
@@ -686,7 +714,7 @@
 	
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
-		select gi.id, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,
+		select gi.id, gi.goods_id, gi.create_time, gi.goods_name as customGoodsName ,gi.is_popular,
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
@@ -701,7 +729,13 @@
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
 		select gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount from goods_item${centerId} gs left join
-		goods_price bgp on
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on
 		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId}
 	</select>
 	
@@ -743,19 +777,27 @@
 		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
 		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
-		from goods${centerId}
+		from goods${centerId} 
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
 		gcb.brand_id 
 		left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i on gs.item_id=i.item_id 
-		left join goods_price bgp on gs.item_id = bgp.item_id where gs.status = 1 and gi.goods_id in
+		left join 
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on gs.item_id = bgp.item_id where gs.status = 1 and gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
 			#{id}
 		</foreach>
 		group by gi.goods_id
+		order by gi.is_popular desc
 		<if test="sortList != null and sortList != ''">
-			order by 
+		,
 			<foreach item="sort" index="index" collection="sortList" open=""
 				separator="," close="">
 				${sort.sortField} ${sort.sortRule} 
@@ -820,7 +862,14 @@
 		goods_category_brand gcb on gb.brand_id =
 		gcb.brand_id left join goods_item${centerId} gs on gi.goods_id = gs.goods_id left join goods_item i 
 		on gs.item_id = i.item_id 
-		left join goods_price bgp on gs.item_id = bgp.item_id where gs.status = 1
+		left join 
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on gs.item_id = bgp.item_id where gs.status = 1
 		<if test="type == 0">
 			and gi.is_new = 1
 		</if>
@@ -900,7 +949,7 @@
 	</insert>
 	
 	<insert id="insertCenterGoodsFile" parameterType="Object">
-		insert ignore into goods_file_2(goods_id,path,suffix,store_type,type,create_time,update_time) 
+		insert ignore into goods_file${centerId}(goods_id,path,suffix,store_type,type,create_time,update_time) 
 		select goods_id,path,suffix,store_type,type,create_time,update_time from goods_file where goods_id in 
 		<foreach collection="goodsIdlist" item="item" open="(" close=")"
 			separator=",">

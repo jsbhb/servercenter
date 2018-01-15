@@ -32,4 +32,8 @@ public class Constants {
 	
 	public static final Integer O2O_ORDER = 0;
 	
+	//*********************订货平台ID*********************
+	
+	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
+	
 }

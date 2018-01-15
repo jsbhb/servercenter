@@ -331,7 +331,7 @@
 
 	<select id="getOrderByOrderId" parameterType="Object" resultMap="orderBase">
 		select
-		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,od.id
+		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,o.create_type,od.id
 		as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as

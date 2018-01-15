@@ -17,7 +17,7 @@ CREATE TABLE `zm_user`.`user` (
   `is_phone_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '手机是否验证',
   `is_email_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '邮箱是否验证',
   `status` TINYINT UNSIGNED NULL DEFAULT 1 COMMENT '用户状态0：不可用，1正常',
-  `center_id` INT UNSIGNED NOT NULL COMMENT '注册区域中心ID',
+  `center_id` INT UNSIGNED NULL COMMENT '注册区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
   `create_time` DATETIME NULL COMMENT '注册时间', 
