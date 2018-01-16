@@ -562,4 +562,18 @@ public class GoodsController {
 	// return new ResultModel(false, "版本错误");
 	// }
 
+	/**
+	 * @fun 同步库存
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/syncStock", method = RequestMethod.POST)
+	public ResultModel syncStock(@PathVariable("version") Double version, @RequestBody List<String> itemIdList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.syncStock(itemIdList);
+		}
+		
+		return new ResultModel(false, "版本错误");
+	}
+
 }

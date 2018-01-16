@@ -120,4 +120,38 @@ public class GoodsBackController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+	
+	@RequestMapping(value = "{version}/goods/goods/edit", method = RequestMethod.POST)
+	public ResultModel edit(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try{
+				goodsBackService.edit(entity);
+				return new ResultModel(true, "");
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/goods/remove", method = RequestMethod.POST)
+	public ResultModel remove(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try{
+				GoodsEntity result = goodsBackService.checkRecordForDel(entity);
+				if (result != null) {
+					goodsBackService.remove(entity);
+					return new ResultModel(true, "");
+				} else {
+					return new ResultModel(false, "该商品下的明细状态非初始化，无法进行删除");	
+				}
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

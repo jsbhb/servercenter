@@ -934,6 +934,14 @@
 		where g.supplier_id != 1
 	</select>
 	
+	<select id="checkStockByItemIds" parameterType="Object" resultMap="orderBussinessModel">
+		select i.id, i.item_id,i.sku,i.item_code,g.supplier_id from goods_item i left join goods g on i.goods_id = g.goods_id 
+		where i.item_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
 	<select id="countUpShelvesStatus" parameterType="Object" resultType="java.lang.Integer">
 		select count(*) from goods_item${centerId} where goods_id = #{goodsId} and status = 1
 	</select>

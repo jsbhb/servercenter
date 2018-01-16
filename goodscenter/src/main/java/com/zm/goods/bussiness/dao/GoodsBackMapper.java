@@ -91,4 +91,32 @@ public interface GoodsBackMapper {
 	 */
 	void updateThirdStatus(int thirdId);
 
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void update(GoodsEntity entity);
+
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void delete(GoodsEntity entity);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsEntity selectRecordForDel(GoodsEntity entity);
+
 }

@@ -758,4 +758,28 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 	}
 
+	@Override
+	public ResultModel syncStock(List<String> itemIdList) {
+		if(itemIdList != null && itemIdList.size() > 0){
+			List<OrderBussinessModel> list = goodsMapper.checkStockByItemIds(itemIdList);
+			if(list != null && list.size() > 0){
+				Map<Integer, List<OrderBussinessModel>> param = new HashMap<Integer, List<OrderBussinessModel>>();
+				List<OrderBussinessModel> temp = null;
+				for(OrderBussinessModel model : list){
+					if(param.get(model.getSupplierId()) == null){
+						temp = new ArrayList<OrderBussinessModel>();
+						temp.add(model);
+						param.put(model.getSupplierId(), temp);
+					} else {
+						param.get(model.getSupplierId()).add(model);
+					}
+				}
+				for(Map.Entry<Integer, List<OrderBussinessModel>> entry : param.entrySet()){
+					supplierFeignClient.checkStock(Constants.FIRST_VERSION, entry.getKey(), entry.getValue());
+				}
+			}
+		}
+		return new ResultModel(true, "同步完成");
+	}
+
 }

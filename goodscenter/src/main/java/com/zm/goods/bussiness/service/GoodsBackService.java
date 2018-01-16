@@ -73,4 +73,36 @@ public interface GoodsBackService {
 	 */
 	ThirdWarehouseGoods queryThird(ThirdWarehouseGoods entity);
 
+	/**
+	 * saveBrand:保存商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @param type
+	 *            sync: 同步商品新增 normal：自营商品新增
+	 * @since JDK 1.7
+	 */
+	void edit(GoodsEntity entity);
+
+	/**
+	 * saveBrand:保存商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @param type
+	 *            sync: 同步商品新增 normal：自营商品新增
+	 * @since JDK 1.7
+	 */
+	void remove(GoodsEntity entity);
+
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsEntity checkRecordForDel(GoodsEntity entity);
+
 }

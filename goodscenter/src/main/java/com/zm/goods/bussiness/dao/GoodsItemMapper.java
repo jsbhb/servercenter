@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -120,7 +121,6 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	void insertFiles(List<GoodsFile> files);
-
 	/**  
 	 * update:(这里用一句话描述这个方法的作用). <br/>  
 	 *  
@@ -129,5 +129,13 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	void update(GoodsItemEntity entity);
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void delete(GoodsEntity entity);
 
 }
