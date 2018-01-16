@@ -70,6 +70,21 @@ public class GoodsItemController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/goods/item/update", method = RequestMethod.POST)
+	public ResultModel update(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				goodsItemService.update(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 
 	@RequestMapping(value = "{version}/goods/item/beUse", method = RequestMethod.POST)
 	public ResultModel beUse(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {

@@ -88,4 +88,13 @@ public interface GoodsItemService {
 	 */
 	Page<GoodsItemEntity> queryCenterByPage(GoodsItemEntity entity, int centerId);
 
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void update(GoodsItemEntity entity);
+
 }

@@ -55,7 +55,12 @@
 	</resultMap>
 	
 	<select id="selectById" parameterType="Object" resultMap="entity">
-		select * from goods_item where id = #{id} 
+		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
+		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
+		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
+		from goods_item i left join goods g on g.goods_id = i.goods_id
+		left join goods_price p on p.item_id = i.item_id 
+		left join goods_stock s on s.item_id = i.item_id where i.id=#{id}
 	</select>
 	
 	<select id="selectForPage" parameterType="Object" resultMap="entity">
@@ -84,10 +89,10 @@
 			and i.goods_id = #{goodsId} 
 		</if>
 		<if test="sku !=null and sku !=''">
-			and sku = #{sku} 
+			and i.sku = #{sku} 
 		</if>
 		<if test="id !=null and id !=''">
-			and id = #{id} 
+			and i.id = #{id} 
 		</if>
 	</select>
 	
@@ -155,10 +160,44 @@
 		#{proxyPrice},#{fxPrice},#{retailPrice},now(),now(),#{opt})
 	</insert>
 	
+	<update id="update" parameterType="Object">
+		update goods_item set update_time=now()
+		<if test="itemCode!=null and itemCode!=''">
+			,item_code = #{itemCode}
+		</if>
+		<if test="sku !=null and sku !=''">
+			,sku = #{sku} 
+		</if>
+		<if test="weight !=null and weight !=''">
+			,weight = #{weight} 
+		</if>
+		 where item_id  = #{itemId}
+	</update>
+	
+	<update id="updatePrice" parameterType="Object">
+		update goods_price set update_time=now()
+		<if test="proxyPrice!=null and proxyPrice>0">
+			,proxy_price = #{proxyPrice}
+		</if>
+		<if test="fxPrice !=null and fxPrice>0">
+			,fxPrice = #{fxPrice}
+		</if>
+		<if test="retailPrice !=null and retailPrice >0">
+			,retail_price = #{retailPrice}
+		</if>
+		<if test="min !=null">
+			,min = #{min}
+		</if>
+		<if test="max !=null">
+			,max = #{max}
+		</if>
+		 where item_id  = #{itemId}
+	</update>
+	
+	
 	<update id="updateStatus" parameterType="Object">
 		update goods_item set status= #{status},update_time=now() where item_id  = #{itemId}
 	</update>
-	
 	
 	<insert id="insertStock" parameterType="Object">
 		insert into goods_stock 

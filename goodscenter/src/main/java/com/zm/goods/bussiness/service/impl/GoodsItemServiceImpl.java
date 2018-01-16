@@ -85,4 +85,11 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		return goodsItemMapper.selectCenterForPage(params);
 	}
 
+	@Override
+	@Transactional
+	public void update(GoodsItemEntity entity) {
+		goodsItemMapper.update(entity);
+		goodsItemMapper.updatePrice(entity.getGoodsPrice());
+	}
+
 }

@@ -81,6 +81,16 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	void updateStatus(GoodsItemEntity entity);
+	
+	/**
+	 * 
+	 * updatePrice:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7
+	 */
+	void updatePrice(GoodsPrice entity);
 
 	/**  
 	 * insertStock:插入库存. <br/>  
@@ -110,5 +120,14 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	void insertFiles(List<GoodsFile> files);
+
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void update(GoodsItemEntity entity);
 
 }
