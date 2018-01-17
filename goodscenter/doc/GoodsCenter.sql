@@ -451,3 +451,137 @@ CREATE TABLE `goods_specs_relation` (
   INDEX `idx_goods_item_id` (`goods_item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品规格模板关联表';
 
+
+drop table if exists  `goods_2b`;
+CREATE TABLE `goods_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `goods_id` varchar(50) NOT NULL COMMENT '商品ID',
+  `goods_name` varchar(100) NOT NULL COMMENT '商品名称',
+  `description` varchar(450) DEFAULT NULL COMMENT '描述',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '商品状态0：下架，1：上架',
+  `is_popular` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否特推0：否，1是',
+  `is_hot` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否新品0：否，1是',
+  `is_new` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否新品0：否，1是',
+  `is_good` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否精选0：否，1是',
+  `is_choice` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否渠道商品0：否，1是',
+  `is_free_postfee` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否包邮0：否，1是',
+  `detail_path` varchar(100) DEFAULT NULL COMMENT '详情地址',
+  `index_status` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否创建lucene0：否，1是',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `goodsId_UNIQUE` (`goods_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_is_popular` (`is_popular`),
+  KEY `idx_is_hot` (`is_hot`),
+  KEY `idx_is_new` (`is_new`),
+  KEY `idx_is_good` (`is_good`),
+  KEY `idx_is_choice` (`is_choice`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B商品表';
+
+
+drop table if exists  `goods_file_2b`;
+CREATE TABLE `goods_file_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `goods_id` varchar(100) NOT NULL COMMENT '商品ID',
+  `path` varchar(100) DEFAULT NULL COMMENT '文件路径',
+  `suffix` char(5) DEFAULT NULL COMMENT '后缀',
+  `store_type` tinyint(3) unsigned DEFAULT NULL COMMENT '存储类型',
+  `type` tinyint(3) unsigned DEFAULT NULL COMMENT '存储类型',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `goodsIdpath_UNIQUE` (`goods_id`,`path`),
+  KEY `idx_goods_id` (`goods_id`),
+  KEY `idx_suffix` (`suffix`),
+  KEY `idx_store_type` (`store_type`),
+  KEY `idx_type` (`type`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B商品文件表';
+
+
+drop table if exists  `goods_first_category_2b`;
+CREATE TABLE `goods_first_category_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `first_id` varchar(100) NOT NULL COMMENT '一级分类ID',
+  `name` varchar(100) DEFAULT NULL COMMENT '一级分类名称',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `first_id_UNIQUE` (`first_id`),
+  KEY `idx_first_id` (`first_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B一级分类表';
+
+
+drop table if exists  `goods_item_2b`;
+CREATE TABLE `goods_item_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `goods_id` varchar(100) NOT NULL COMMENT '商品ID',
+  `item_id` varchar(50) NOT NULL COMMENT '供销内部商品ID',
+  `item_code` varchar(50) NOT NULL COMMENT '商家自有编码',
+  `excise_tax` decimal(5,2) DEFAULT NULL COMMENT '消费税',
+  `is_promotion` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否促销0：否；1：是',
+  `status` tinyint(3) unsigned DEFAULT NULL COMMENT '商品状态0：停售，1：在售',
+  `discount` decimal(10,2) DEFAULT NULL COMMENT '促销折扣',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `item_id_UNIQUE` (`item_id`),
+  KEY `idx_goods_id` (`goods_id`),
+  KEY `idx_item_id` (`item_id`),
+  KEY `idx_is_promotion` (`is_promotion`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B商品规格表';
+
+
+drop table if exists  `goods_price_2b`;
+CREATE TABLE `goods_price_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `min` int(10) unsigned DEFAULT '0' COMMENT '最小数量',
+  `max` int(10) unsigned DEFAULT NULL COMMENT '最大数量',
+  `item_id` varchar(50) NOT NULL COMMENT '商品ID',
+  `retail_price` decimal(10,2) DEFAULT '0.00' COMMENT '价格',
+  `vip_price` decimal(10,2) DEFAULT NULL COMMENT '会员价格',
+  `delivery_place` varchar(20) DEFAULT NULL COMMENT '发货地',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  KEY `idx_item_id` (`item_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B商品价格表';
+
+
+drop table if exists  `goods_second_category_2b`;
+CREATE TABLE `goods_second_category_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `first_id` varchar(100) NOT NULL COMMENT '一级分类ID',
+  `second_id` varchar(100) NOT NULL COMMENT 'first_id',
+  `name` varchar(100) DEFAULT NULL COMMENT '二级分类名称',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `second_id_UNIQUE` (`second_id`),
+  KEY `idx_second_id` (`second_id`),
+  KEY `goods_second_category_first_id` (`first_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B二级分类表';
+
+
+drop table if exists  `goods_third_category_2b`;
+CREATE TABLE `goods_third_category_2b` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `second_id` varchar(100) NOT NULL COMMENT 'second_id',
+  `third_id` varchar(100) NOT NULL COMMENT 'second_id',
+  `name` varchar(100) DEFAULT NULL COMMENT '三级分类名称',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `opt` varchar(20) DEFAULT NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `third_id_UNIQUE` (`third_id`),
+  KEY `idx_third_id` (`third_id`),
+  KEY `goods_third_category_second_id` (`second_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B三级分类表';

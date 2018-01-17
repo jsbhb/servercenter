@@ -33,11 +33,10 @@ CREATE TABLE `zm_user`.`user` (
   INDEX `idx_shop_id` (`shop_id`),
   INDEX `idx_phone` (`phone`),
   INDEX `idx_email` (`email`),
-  INDEX `idx_user_type` (`user_type`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `account_UNIQUE` (`account`, `user_type` ASC),
-  UNIQUE INDEX `phone_UNIQUE` (`phone`,`user_type` ASC),
-  UNIQUE INDEX `email_UNIQUE` (`email`,`user_type` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
+  UNIQUE INDEX `account_UNIQUE` (`account` ASC),
+  UNIQUE INDEX `phone_UNIQUE` (`phone` ASC),
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC)) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 
 COMMENT = '用户表';
 
 drop table if exists  `user_wechat`;
@@ -51,7 +50,7 @@ CREATE TABLE `zm_user`.`user_wechat` (
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `awechat_UNIQUE` (`wechat`, `user_type` ASC),
+  UNIQUE INDEX `awechat_UNIQUE` (`wechat`ASC),
   INDEX `idx_user_id` (`user_id`),
   INDEX `idx_wechat` (`wechat`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
@@ -179,6 +178,49 @@ CREATE TABLE `zm_user`.`grade` (
   INDEX `idx_grade_person_in_charge` (`grade_person_in_charge`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '等级表';
+
+
+drop table if exists  `grade_config`;
+
+CREATE TABLE `zm_user`.`grade_config` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `grade_id` INT UNSIGNED NULL COMMENT '等级ID',
+  `head_img` VARCHAR(200) NULL COMMENT '微店头像',
+  `aboutus` VARCHAR(200) NULL COMMENT '微店简介',
+  `name` VARCHAR(50) NULL COMMENT '微店名称',
+  `attribute` VARCHAR(200) NULL COMMENT '备用字段',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_grade_id` (`grade_id`),
+  UNIQUE INDEX `grade_id_UNIQUE` (`grade_id` ASC)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '微店配置表';
+
+
+drop table if exists  `push_user`;
+
+CREATE TABLE `zm_user`.`push_user` ( 
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` INT UNSIGNED NULL COMMENT '用户ID',
+  `grade_id` INT UNSIGNED NULL COMMENT '哪个等级的推手',
+  `status` TINYINT UNSIGNED DEFAULT 0 COMMENT '0未审核，1审核未通过，2审核通过，11清退',
+  `phone` VARCHAR(15) NULL COMMENT '手机号',
+  `name` VARCHAR(15) NULL COMMENT '姓名',
+  `inviter` VARCHAR(15) NULL COMMENT '邀请人',
+  `specialty_channel` VARCHAR(200) NULL COMMENT '擅长推广的渠道',
+  `remark` VARCHAR(200) NULL COMMENT '备注',
+  `attribute` VARCHAR(200) NULL COMMENT '备用字段',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_status` (`status`),
+  INDEX `idx_grade_id` (`grade_id`),
+  INDEX `idx_user_id` (`user_id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '推手表';
 
 drop table if exists  `vip_price`;
 
