@@ -16,8 +16,7 @@ public class ThirdLogin {
 	
 	public ThirdLogin(){}
 	
-	public ThirdLogin(Integer userId, Integer userType, String thirdAccount, Integer type){
-		this.userType = userType;
+	public ThirdLogin(Integer userId, String thirdAccount, Integer type){
 		this.userId = userId;
 		if(Constants.WX_LOGIN.equals(type)){
 			this.wechat = thirdAccount;
@@ -31,7 +30,7 @@ public class ThirdLogin {
 	}
 
 	public boolean check() {
-		return userType != null && (wechat != null || qq != null || sinaBlog != null);
+		return (wechat != null || qq != null || sinaBlog != null);
 	}
 
 	public Integer getUserId() {

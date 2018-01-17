@@ -524,5 +524,13 @@ public class UserController {
 
 		return null;
 	}
+	
+	@RequestMapping(value = "{version}/user/phone/{userId}", method = RequestMethod.GET)
+	public String getPhoneByUserId(@PathVariable("version") Double version,@PathVariable("userId") Integer userId){
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return userService.getPhoneByUserId(userId);
+		}
+		return null;
+	}
 
 }

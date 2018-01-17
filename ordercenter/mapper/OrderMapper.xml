@@ -6,6 +6,7 @@
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="push_user_id" property="pushUserId" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
@@ -231,10 +232,10 @@
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
 		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,guide_id,supplier_id,tdq,
-		gtime,send_time,create_time,remark,weight,create_type,coupon_ids)
+		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id)
 		VALUES
 		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
-		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds})
+		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId})
 	</insert>
 
 	<insert id="saveOrderDetail" parameterType="Object">
@@ -331,7 +332,7 @@
 
 	<select id="getOrderByOrderId" parameterType="Object" resultMap="orderBase">
 		select
-		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,o.create_type,od.id
+		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,o.create_type,o.push_user_id,od.id
 		as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as

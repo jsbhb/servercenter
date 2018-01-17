@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.user.bussiness.dao.PushUserMapper">
+	<resultMap type="com.zm.user.pojo.PushUser" id="pushUser">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="inviter" property="inviter" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="specialty_channel" property="specialtyChannel" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+	</resultMap>
+	
+	
+	<insert id="savePushUser" parameterType="Object" >
+		insert into push_user(grade_id,name,inviter,phone,specialty_channel,status,create_time)
+		values(#{gradeId},#{name},#{inviter},#{phone},#{specialtyChannel},0,now())
+	</insert>
+	
+	<select id="getPushUserById" parameterType="Object" resultMap="pushUser">
+		select * from push_user where id = #{id}
+	</select>
+	
+	<select id="updatePushUserStatus" parameterType="Object">
+		update push_user set status = #{status} where id = #{id}
+	</select>
+
+
+</mapper>

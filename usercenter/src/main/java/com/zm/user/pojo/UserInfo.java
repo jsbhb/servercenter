@@ -66,7 +66,7 @@ public class UserInfo {
 	private Integer vipLevel;
 
 	public boolean check() {
-		return userType != null && (account != null || phone != null || email != null) && centerId != null;
+		return (account != null || phone != null || email != null) && centerId != null;
 	}
 	
 	public Integer getGuideId() {

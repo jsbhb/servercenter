@@ -80,4 +80,8 @@ public interface UserMapper {
 	UserInfo getUserIdentityId(Integer userId);
 
 	List<Grade> listGradeByParentId(Integer id);
+
+	String getPhoneByUserId(Integer userId);
+	
+	Integer getParentIdByGradeId(Integer gradeId);
 }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zm.auth.common.Constants;
 import com.zm.auth.feignclient.ThirdPartFeignClient;
 import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.UserInfo;
@@ -47,7 +48,7 @@ public class UserController {
 
 	@Autowired
 	private AuthService authService;
-	
+
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
 
@@ -99,12 +100,23 @@ public class UserController {
 	public ResultPojo modifyPwd(@RequestBody UserInfo userInfo, @RequestParam("code") String code)
 			throws AuthenticationException {
 		try {
-			boolean flag = thirdPartFeignClient.verifyPhoneCode(1.0, userInfo.getUserName(), code);
+			boolean flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, userInfo.getUserName(), code);
 			if (flag) {
 				return new ResultPojo(authService.modifyPwd(userInfo));
 			} else {
 				return new ResultPojo("1", "验证码错误");
 			}
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			return new ResultPojo("401", e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/platform/register", method = RequestMethod.POST)
+	public ResultPojo createAccount(@RequestParam("userId") Integer userId,
+			@RequestParam("platUserType") Integer platUserType) throws AuthenticationException {
+		try {
+			return new ResultPojo(authService.createAccount(userId, platUserType));
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 			return new ResultPojo("401", e.getMessage());

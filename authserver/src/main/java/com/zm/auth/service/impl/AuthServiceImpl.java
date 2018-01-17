@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.auth.common.Constants;
 import com.zm.auth.common.JWTUtil;
 import com.zm.auth.common.MethodUtil;
+import com.zm.auth.feignclient.UserCenterFeignClient;
 import com.zm.auth.mapper.UserMapper;
 import com.zm.auth.model.PlatUserType;
 import com.zm.auth.model.SecurityUserDetail;
@@ -39,6 +42,9 @@ public class AuthServiceImpl implements AuthService {
 
 	@Value("${jwt.tokenHead}")
 	private String tokenHead;
+	
+	@Resource
+	UserCenterFeignClient userCenterFeignClient;
 
 	@Autowired
 	public AuthServiceImpl(UserMapper userMapper) {
@@ -223,6 +229,22 @@ public class AuthServiceImpl implements AuthService {
 		if(num == 0){
 			return false;
 		}
+		return true;
+	}
+
+	@Override
+	public boolean createAccount(Integer userId,Integer platUserType) {
+		String phone = userCenterFeignClient.getPhoneByUserId(Constants.FIRST_VERSION, userId);
+		if(phone == null){
+			return false;
+		}
+		UserInfo userInfo = new UserInfo();
+		userInfo.setUserName(phone);
+		userInfo.setUserCenterId(userId);
+		userInfo.setPlatUserType(platUserType);
+		userInfo.setPassword(MethodUtil.MD5("000000"));//密码默认6个0
+		userInfo.setPhone(phone);
+		userMapper.insert(userInfo);
 		return true;
 	}
 

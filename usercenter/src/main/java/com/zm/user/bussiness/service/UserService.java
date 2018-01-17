@@ -198,4 +198,6 @@ public interface UserService {
 	UserInfo getUserIdentityId(Integer userId);
 
 	List<Grade> listGradeByParentId(Integer parentId);
+
+	String getPhoneByUserId(Integer userId);
 }
