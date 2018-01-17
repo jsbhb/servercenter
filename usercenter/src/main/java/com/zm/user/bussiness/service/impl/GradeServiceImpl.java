@@ -45,4 +45,9 @@ public class GradeServiceImpl implements GradeService {
 		return gradeMapper.selectById(id);
 	}
 
+	@Override
+	public void update(Grade entity) {
+		gradeMapper.update(entity);
+	}
+
 }

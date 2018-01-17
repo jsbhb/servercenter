@@ -35,4 +35,13 @@ public interface GradeService {
 	 * @since JDK 1.7  
 	 */
 	Grade queryById(Integer id);
+
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void update(Grade entity);
 }

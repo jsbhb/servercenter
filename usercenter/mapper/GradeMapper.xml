@@ -19,9 +19,29 @@
 		<result column="person_in_charge_id" property="personInChargeId" jdbcType="INTEGER" />
 	</resultMap>
 	
+	<update id="update" parameterType="Object">
+		update grade set update_time = now()
+		<if test="gradeName!=null and gradeName!=''">
+			,grade_name = #{gradeName}
+		</if>
+		<if test="personInCharge!=null and personInCharge !=''">
+			,person_in_charge = #{personInCharge}
+		</if>
+		<if test="gradePersonInCharge !=null and gradePersonInCharge !=''">
+			,grade_person_in_charge = #{gradePersonInCharge}
+		</if>
+		<if test="phone !=null and phone !=''">
+			,phone = #{phone}
+		</if>
+		<if test="company!=null and company!=''">
+			,company = #{company}
+		</if>
+		where id = #{id}
+	</update>
+	
 	
 	<select id="selectById" parameterType="Object" resultMap="grade">
-		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where a.id = #{id} or a.parent_id = #{id}
+		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where a.id = #{id}
 	</select>
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">

@@ -75,4 +75,23 @@ public class GradeController {
 		}
 	}
 
+	@RequestMapping(value = "{version}/grade/update", method = RequestMethod.POST)
+	public ResultModel update(@PathVariable("version") Double version, @RequestBody Grade entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				if (entity.getId() == 0) {
+					return new ResultModel(false, "没有分级编号");
+
+				}
+				gradeService.update(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 }
