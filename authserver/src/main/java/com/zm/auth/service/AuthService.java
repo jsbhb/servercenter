@@ -63,5 +63,8 @@ public interface AuthService {
 
 
 	boolean modifyPwd(UserInfo userInfo);
+
+
+	boolean createAccount(Integer userId, Integer platUserType);
 	
 }

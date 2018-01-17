@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
 		if (userId != null) {
 			if (info.getWechat() != null) {
 				userMapper.saveWechat(
-						new ThirdLogin(userId, info.getUserType(), info.getWechat(), Constants.WX_LOGIN));
+						new ThirdLogin(userId, info.getWechat(), Constants.WX_LOGIN));
 			}
 
 			return userId;
@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
 			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
 			packageUser(apiResult, info);
 			userMapper.saveWechat(
-					new ThirdLogin(info.getId(), info.getUserType(), info.getWechat(), Constants.WX_LOGIN));
+					new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
 		}
 
 		if (info.getUserDetail() != null) {
@@ -356,32 +356,33 @@ public class UserServiceImpl implements UserService {
 		// 生成新建等级的admin
 		// 设置区域中心ID,店铺ID，导购ID
 		if (FIRST_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是总公司
-			user.setUserType(Constants.COOP);
 			user.setCenterId(grade.getId());
 		} else if (SECOND_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是区域中心
-			user.setUserType(Constants.CENTER);
 			user.setCenterId(grade.getId());
 			flag = true;
 		} else if (THIRD_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是店铺
-			user.setUserType(Constants.SHOP);
 			user.setCenterId(grade.getParentId());
 			user.setShopId(grade.getId());
 		} else if (FOURTH_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是导购
-			user.setUserType(Constants.SHOPPING_GUIDE);
 			user.setCenterId(grade.getCenterId());
 			user.setShopId(grade.getShopId());
 			user.setGuideId(grade.getId());
 		}
 
 		user.setPhone(grade.getPhone());
-		user.setPhoneValidate(VALIDATE);
-		user.setStatus(1);
-		userMapper.saveUser(user);
-		UserDetail detail = new UserDetail();
-		detail.setUserId(user.getId());
-		detail.setName(grade.getPersonInCharge());
-		userMapper.saveUserDetail(detail);
-		result.put("userId", user.getId());
+		Integer userId = userMapper.getUserIdByUserInfo(user);
+		if(userId == null){
+			user.setPhoneValidate(VALIDATE);
+			user.setStatus(1);
+			userMapper.saveUser(user);
+			UserDetail detail = new UserDetail();
+			detail.setUserId(user.getId());
+			detail.setName(grade.getPersonInCharge());
+			userMapper.saveUserDetail(detail);
+			result.put("userId", user.getId());
+		} else {
+			result.put("userId", userId);
+		}
 
 		grade.setPersonInChargeId(user.getId());
 
@@ -390,8 +391,7 @@ public class UserServiceImpl implements UserService {
 		if (flag) {
 			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-//			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-
+			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 		}
 		return result;
 	}
@@ -411,6 +411,12 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Grade> listGradeByParentId(Integer id) {
 		return userMapper.listGradeByParentId(id);
+	}
+
+	@Override
+	public String getPhoneByUserId(Integer userId) {
+		
+		return userMapper.getPhoneByUserId(userId);
 	}
 
 }

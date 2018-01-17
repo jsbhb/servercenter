@@ -334,7 +334,7 @@
 
 	<select id="getUserIdByUserInfo" parameterType="Object"
 		resultType="java.lang.Integer">
-		select id from user where user_type = #{userType}
+		select id from user where 1=1
 		<if test="account != null and account != ''">
 			and account = #{account}
 		</if>
@@ -355,8 +355,7 @@
 	<select id="countWechatBy3rdLogin" parameterType="Object"
 		resultType="java.lang.Integer">
 
-		select count(*) from user_wechat where user_type =
-		#{userType} and wechat = #{wechat}
+		select count(*) from user_wechat where wechat = #{wechat}
 	</select>
 
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
@@ -384,6 +383,14 @@
 	
 	<select id="listGradeByParentId" parameterType="Object" resultMap="grade">
 		select id, grade_name from grade where parent_id = #{id}
+	</select>
+	
+	<select id="getPhoneByUserId" parameterType="Object" resultType="java.lang.String">
+		select phone from user where id = #{userId}
+	</select>
+	
+	<select id="getParentIdByGradeId" parameterType="Object" resultType="java.lang.Integer">
+		select parent_id from grade where id = #{id}
 	</select>
 
 </mapper>

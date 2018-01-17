@@ -61,6 +61,8 @@ public class OrderInfo extends Pagination{
 	private String endTime;
 
 	private String couponIds;
+	
+	private Integer pushUserId;
 
 	private Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
 
@@ -70,6 +72,14 @@ public class OrderInfo extends Pagination{
 			return false;
 		}
 		return true;
+	}
+
+	public Integer getPushUserId() {
+		return pushUserId;
+	}
+
+	public void setPushUserId(Integer pushUserId) {
+		this.pushUserId = pushUserId;
 	}
 
 	public Integer getCreateType() {

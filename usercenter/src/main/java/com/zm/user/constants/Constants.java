@@ -42,4 +42,10 @@ public class Constants {
 	public static final Integer SHOP = 3;
 	
 	public static final Integer SHOPPING_GUIDE = 4;
+	
+	
+	// *********************推手状态******************************/
+	
+	public static final Integer AUDIT_PASS = 2;
+	public static final Integer AUDIT_UN_PASS = 1;
 }

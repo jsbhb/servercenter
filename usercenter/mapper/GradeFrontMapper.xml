@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.user.bussiness.dao.GradeFrontMapper">
+	<resultMap type="com.zm.user.pojo.GradeConfig" id="gradeConfig">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="aboutus" property="aboutus" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="head_img" property="headImg" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	
+	<select id="getGradeConfig" parameterType="Object" resultMap="gradeConfig">
+		select id,grade_id,aboutus,head_img,name from grade_config where grade_id = #{gradeId}
+	</select>
+
+
+</mapper>

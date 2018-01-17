@@ -110,7 +110,7 @@ public class GoodsServiceImpl implements GoodsService {
 			parameter.put("goodsType", goodsList.get(0).getType());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, true);
-			if(Constants.PREDETERMINE_PLAT_TYPE != centerId){
+			if (Constants.PREDETERMINE_PLAT_TYPE != centerId) {
 				activityComponent.doPackCoupon(centerId, userId, goodsList);
 			}
 		} else {
@@ -660,15 +660,15 @@ public class GoodsServiceImpl implements GoodsService {
 		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 		List<String> itemIdS = new ArrayList<String>();
 		if (itemIdList != null && itemIdList.size() > 0) {
-			//判断之前有没有同步到商城端，将没有同步的先同步
-			for(String itemId : itemIdList){
+			// 判断之前有没有同步到商城端，将没有同步的先同步
+			for (String itemId : itemIdList) {
 				param.put("itemId", itemId);
 				int tem = goodsMapper.countItem(param);
-				if(tem == 0){
+				if (tem == 0) {
 					itemIdS.add(itemId);
 				}
 			}
-			if(itemIdS.size() > 0){
+			if (itemIdS.size() > 0) {
 				syncgoods(itemIdS, centerId);
 			}
 			param.put("list", itemIdList);
@@ -693,8 +693,8 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("centerId", centerIdstr);
 		param.put("list", itemIdList);
 		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-		if(goodsIdList == null || goodsIdList.size() == 0){
-			return new ResultModel(false, "没有该商品"); 
+		if (goodsIdList == null || goodsIdList.size() == 0) {
+			return new ResultModel(false, "没有该商品");
 		}
 		param.put("goodsId", goodsIdList.get(0));
 		goodsMapper.updateGoodsItemDownShelves(param);
@@ -746,13 +746,13 @@ public class GoodsServiceImpl implements GoodsService {
 		goodsMapper.updateGoodsItemUnDistribution(itemId);
 		ResultModel resultModel = userFeignClient.getCenterId(Constants.FIRST_VERSION);
 		if (resultModel.isSuccess()) {
-			List<Integer> list = (List<Integer>) resultModel.getObj();
-			if(list != null && list.size() > 0){
-				for(Integer centerId : list){
-					downShelves(itemId, centerId);
-				}
+			List<Integer> list = new ArrayList<Integer>();
+			list = (List<Integer>) resultModel.getObj();
+			list.add(Constants.PREDETERMINE_PLAT_TYPE);
+			for (Integer centerId : list) {
+				downShelves(itemId, centerId);
 			}
-			return new ResultModel(true,"");
+			return new ResultModel(true, "");
 		} else {
 			return resultModel;
 		}
@@ -760,13 +760,13 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel syncStock(List<String> itemIdList) {
-		if(itemIdList != null && itemIdList.size() > 0){
+		if (itemIdList != null && itemIdList.size() > 0) {
 			List<OrderBussinessModel> list = goodsMapper.checkStockByItemIds(itemIdList);
-			if(list != null && list.size() > 0){
+			if (list != null && list.size() > 0) {
 				Map<Integer, List<OrderBussinessModel>> param = new HashMap<Integer, List<OrderBussinessModel>>();
 				List<OrderBussinessModel> temp = null;
-				for(OrderBussinessModel model : list){
-					if(param.get(model.getSupplierId()) == null){
+				for (OrderBussinessModel model : list) {
+					if (param.get(model.getSupplierId()) == null) {
 						temp = new ArrayList<OrderBussinessModel>();
 						temp.add(model);
 						param.put(model.getSupplierId(), temp);
@@ -774,7 +774,7 @@ public class GoodsServiceImpl implements GoodsService {
 						param.get(model.getSupplierId()).add(model);
 					}
 				}
-				for(Map.Entry<Integer, List<OrderBussinessModel>> entry : param.entrySet()){
+				for (Map.Entry<Integer, List<OrderBussinessModel>> entry : param.entrySet()) {
 					supplierFeignClient.checkStock(Constants.FIRST_VERSION, entry.getKey(), entry.getValue());
 				}
 			}
