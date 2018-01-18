@@ -895,11 +895,9 @@
 	<update id="updateThirdWarehouseStock" parameterType="Object">
 		<foreach collection="list" item="item" index="index" open=""
 			close="" separator=";">
-			update goods_stock
-			<set>
-				fxqty = #{item.quantity}, update_time=now()
-			</set>
-			where item_id = #{item.itemId}
+			insert into goods_stock (item_id,qpqty,fxqty) values (#{item.itemId},#{item.quantity},#{item.quantity})
+			ON DUPLICATE KEY UPDATE 
+			qpqty = #{item.quantity},fxqty = #{item.quantity}, update_time=now() where item_id = #{item.itemId}
 		</foreach>
 	</update>
 	
