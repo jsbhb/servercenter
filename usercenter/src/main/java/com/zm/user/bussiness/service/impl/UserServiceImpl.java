@@ -126,8 +126,7 @@ public class UserServiceImpl implements UserService {
 		userId = userMapper.getUserIdByUserInfo(info);
 		if (userId != null) {
 			if (info.getWechat() != null) {
-				userMapper.saveWechat(
-						new ThirdLogin(userId, info.getWechat(), Constants.WX_LOGIN));
+				userMapper.saveWechat(new ThirdLogin(userId, info.getWechat(), Constants.WX_LOGIN));
 			}
 
 			return userId;
@@ -143,8 +142,7 @@ public class UserServiceImpl implements UserService {
 		if (info.getWechat() != null && !"".equals(info.getWechat())) {
 			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
 			packageUser(apiResult, info);
-			userMapper.saveWechat(
-					new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
+			userMapper.saveWechat(new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
 		}
 
 		if (info.getUserDetail() != null) {
@@ -371,7 +369,7 @@ public class UserServiceImpl implements UserService {
 
 		user.setPhone(grade.getPhone());
 		Integer userId = userMapper.getUserIdByUserInfo(user);
-		if(userId == null){
+		if (userId == null) {
 			user.setPhoneValidate(VALIDATE);
 			user.setStatus(1);
 			userMapper.saveUser(user);
@@ -379,12 +377,12 @@ public class UserServiceImpl implements UserService {
 			detail.setUserId(user.getId());
 			detail.setName(grade.getPersonInCharge());
 			userMapper.saveUserDetail(detail);
-			result.put("userId", user.getId());
-		} else {
-			result.put("userId", userId);
+			userId = user.getId();
 		}
+		
+		result.put("userId", userId);
 
-		grade.setPersonInChargeId(user.getId());
+		grade.setPersonInChargeId(userId);
 
 		userMapper.updatePersonInChargeId(grade);
 
@@ -415,7 +413,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public String getPhoneByUserId(Integer userId) {
-		
+
 		return userMapper.getPhoneByUserId(userId);
 	}
 

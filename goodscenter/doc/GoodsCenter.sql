@@ -52,7 +52,7 @@ CREATE TABLE `zm_goods`.`goods` (
   `is_choice` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否渠道商品0：否，1是',
   `is_hot` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否..0：否，1是',
   `is_free_postfee` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包邮0：否，1是',
-  `detail_path` VARCHAR(100) NULL COMMENT '详情地址',
+  `detail_path` VARCHAR(2000) NULL COMMENT '详情地址',
   `index_status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否创建lucene0：否，1是',
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
