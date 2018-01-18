@@ -135,6 +135,10 @@
 		update goods set goods_name = #{goodsName} , update_time = now() where id = #{id};
 	</update>
 	
+	<update id="updateDetailPath" parameterType="Object">
+		update goods set detail_path = #{detailPath} , update_time = now() where goods_id = #{goodsId};
+	</update>
+	
 	<delete id="delete" parameterType="Object">
 		delete from goods where id = #{id}; 
 	</delete>

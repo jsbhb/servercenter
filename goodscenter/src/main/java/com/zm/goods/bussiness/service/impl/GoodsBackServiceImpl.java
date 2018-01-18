@@ -95,4 +95,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		return retEntity;
 	}
 
+	@Override
+	public void saveDetailPath(GoodsEntity entity) {
+		goodsBackMapper.updateDetailPath(entity);
+	}
+
 }

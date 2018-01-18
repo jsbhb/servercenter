@@ -105,4 +105,13 @@ public interface GoodsBackService {
 	 */
 	GoodsEntity checkRecordForDel(GoodsEntity entity);
 
+	/**  
+	 * saveDetailPath:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void saveDetailPath(GoodsEntity entity);
+
 }

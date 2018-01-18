@@ -81,6 +81,20 @@ public class GoodsBackController {
 		return new ResultModel(false, "版本错误");
 	}
 	
+	@RequestMapping(value = "{version}/goods/goods/saveDetailPath", method = RequestMethod.POST)
+	public ResultModel saveDetailPath(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try{
+				goodsBackService.saveDetailPath(entity);
+				return new ResultModel(true, "");
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			}
+		}
+		
+		return new ResultModel(false, "版本错误");
+	}
+	
 	@RequestMapping(value = "{version}/goods/goods/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsEntity entity) {
