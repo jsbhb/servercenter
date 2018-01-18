@@ -334,16 +334,7 @@
 
 	<select id="getUserIdByUserInfo" parameterType="Object"
 		resultType="java.lang.Integer">
-		select id from user where 1=1
-		<if test="account != null and account != ''">
-			and account = #{account}
-		</if>
-		<if test="phone != null and phone != ''">
-			and phone = #{phone}
-		</if>
-		<if test="email != null and email != ''">
-			and email = #{email}
-		</if>
+		select id from user where phone = #{phone}
 	</select>
 
 	<select id="countAddressByUserId" parameterType="Object"
