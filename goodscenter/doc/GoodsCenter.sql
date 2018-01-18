@@ -243,6 +243,7 @@ CREATE TABLE `zm_goods`.`goods_stock` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `uq_item_id` (`item_id` ASC),
   INDEX `idx_item_id` (`item_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品库存表';
 
