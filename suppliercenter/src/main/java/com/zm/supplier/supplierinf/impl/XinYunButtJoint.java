@@ -23,7 +23,8 @@ import com.zm.supplier.util.HttpClientUtil;
 @Component
 public class XinYunButtJoint extends AbstractSupplierButtJoint {
 
-	private final String url = "http://120.76.191.121/api/service/business";
+//	private final String url = "http://120.76.191.121/api/service/business";
+	private final String url = "http://apiserv.xyb2b.com/api/service/business";
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {

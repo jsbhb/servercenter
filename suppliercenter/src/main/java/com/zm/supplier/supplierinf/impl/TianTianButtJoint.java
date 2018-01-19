@@ -26,22 +26,22 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class TianTianButtJoint extends AbstractSupplierButtJoint {
 
-	private static final String CUSTOMER = "aa001";
+	private static final String CUSTOMER = "ZGGXHWG";
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 
 		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, CUSTOMER);// 报文
-		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.create";//测试
-//		String url = "http://114.55.149.118:8181/nredi/base/api/service?method=order.create";//正式
+//		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.create";//测试
+		String url = "http://114.55.149.118:8181/nredi/base/api/service?method=order.create";//正式
 		return (Set<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class);
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, CUSTOMER);// 报文
-		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";//测试
-//		String url = "http://114.55.149.118:8181/nredi/base/api/service?method=order.query";//正式
+//		String url = "http://121.196.224.76:8022/nredi/base/api/service?method=order.query";//测试
+		String url = "http://114.55.149.118:8181/nredi/base/api/service?method=order.query";//正式
 		return (Set<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
 	}
 	
