@@ -91,7 +91,7 @@
 		insert into popularize_data_${centerId}
 		(dictId,title,origin,goodsId,href,price,picPath,create_time,description,update_time)
 		values
-		(#{dictId},#{title},#{origin},#{goodsId},#{href},#{description},#{price},#{picPath},now(),now())
+		(#{dictId},#{title},#{origin},#{goodsId},#{href},#{price},#{picPath},now(),#{description},now())
 	</insert>
 	
 	<update id="updateData" parameterType="Object" >
