@@ -111,8 +111,11 @@
 		<if test="entity.itemCode!=null and entity.itemCode!=''">
 			and i.item_code = #{entity.itemCode}
 		</if>
-		<if test="entity.status !=null and entity.status!=''">
-			and c.status = #{entity.status}
+		<if test="entity.status == 0 and entity.status != ''">
+			and (c.status = 0 or c.status is null)
+		</if>
+		<if test="entity.status == 1">
+			and c.status = 1
 		</if>
 		<if test="entity.supplierId!=null and entity.supplierId!=''">
 			and g.supplier_id = #{entity.supplierId}
