@@ -12,6 +12,8 @@ public class GoodsSearch {
 	
 	private String brand;
 	
+	private String upShelves;
+	
 	private Double price;
 	
 	private String createTime;
@@ -28,6 +30,14 @@ public class GoodsSearch {
 	
 	private String firstCategory;
 	
+	public String getUpShelves() {
+		return upShelves;
+	}
+
+	public void setUpShelves(String upShelves) {
+		this.upShelves = upShelves;
+	}
+
 	public Integer getPopular() {
 		return popular;
 	}
