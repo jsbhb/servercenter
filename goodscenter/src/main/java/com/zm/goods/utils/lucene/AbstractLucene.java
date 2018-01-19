@@ -97,12 +97,11 @@ public abstract class AbstractLucene {
 		renderParameter(keyWordsList, filedsList, accuratePara, obj);
 
 		if (keyWordsList.size() == 0 && accuratePara.size() == 0) {
-//			filedsList.add("popular");
-//			keyWordsList.add("1");
-			return queryWithOutPara(pagination);
-		} else {
-			return queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
-		}
+			filedsList.add("upShelves");
+			keyWordsList.add("1");
+		} 
+		
+		return queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
 
 	}
 

@@ -86,6 +86,7 @@ public class GoodsLucene extends AbstractLucene {
 
 			doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
 			doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
+			doc.add(new StringField("upShelves", "1", Store.NO));
 			doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
 			doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
 			doc.add(new StringField("thirdCategory", model.getThirdCategory().trim(), Store.NO));
@@ -246,7 +247,7 @@ public class GoodsLucene extends AbstractLucene {
 		BooleanQuery query = new BooleanQuery();
 		TokenStream stream = null;
 		for (int i = 0; i < keyWordsList.size(); i++) {
-			if (filedsList.get(i).contains("Category") || filedsList.get(i).contains("popular")) {
+			if (filedsList.get(i).contains("Category") || filedsList.get(i).contains("upShelves")) {
 				Term tm = new Term(filedsList.get(i), keyWordsList.get(i));
 				Query termQuery = new TermQuery(tm);
 				return termQuery;

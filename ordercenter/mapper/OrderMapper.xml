@@ -51,6 +51,7 @@
 			<result column="sku" property="sku" jdbcType="VARCHAR" />
 			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
 			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 			<result column="item_quantity" property="itemQuantity"
 				jdbcType="INTEGER" />
 			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
@@ -336,7 +337,7 @@
 		as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as
-		goods_id,og.item_id,og.item_name,og.item_quantity,
+		goods_id,og.item_id,og.item_name,og.item_quantity,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
 		from order_base o
@@ -502,7 +503,7 @@
 		as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as
-		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,
+		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
 		from order_base o
@@ -519,7 +520,7 @@
 		as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as
-		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,
+		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
 		from order_base o
