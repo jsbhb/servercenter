@@ -254,7 +254,7 @@
 	</select>
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
-		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,
+		select gi.id,gi.goods_id ,gi.goods_name as customGoodsName, gi.description,g.detail_path,
 		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
 		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
 		from goods${centerId}

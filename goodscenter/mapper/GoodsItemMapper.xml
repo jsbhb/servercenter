@@ -200,7 +200,7 @@
 	</update>
 	
 	<insert id="insertStock" parameterType="Object">
-		insert into goods_stock 
+		insert ignore into goods_stock 
 		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time,opt)
 		value
 		(#{itemId},0,0,0,0,0,now(),now(),#{opt})

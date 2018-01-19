@@ -45,7 +45,7 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-		sb.append("11612"); // 店铺代码
+		sb.append("17000"); // 店铺代码
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
 		sb.append(3105); // 海关关区北仑保税区
