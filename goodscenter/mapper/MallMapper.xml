@@ -49,7 +49,7 @@
 	</select>
 	
 	<select id="selectDictForPage" parameterType="Object" resultMap="dict">
-		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where l.code = #{code}
+		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where l.code = 'module_00024' or code='module_00009'
 	</select>
 	
 	<select id="selectDataForPage" parameterType="Object" resultMap="data">
