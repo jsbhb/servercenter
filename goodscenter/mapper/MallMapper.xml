@@ -89,9 +89,9 @@
 	
 	<insert id="insertData"  parameterType="Object" >
 		insert into popularize_data_${centerId}
-		(dictId,title,origin,goodsId,href,price,picPath,create_time,update_time)
+		(dictId,title,origin,goodsId,href,price,picPath,create_time,description,update_time)
 		values
-		(#{dictId},#{title},#{origin},#{goodsId},#{href},#{price},#{picPath},now(),now())
+		(#{dictId},#{title},#{origin},#{goodsId},#{href},#{description},#{price},#{picPath},now(),now())
 	</insert>
 	
 	<update id="updateData" parameterType="Object" >
@@ -110,6 +110,9 @@
 		</if>
 		<if test="picPath!=null and picPath!=''">
 		,picPath = #{picPath}
+		</if>
+		<if test="description!=null and description!=''">
+		,description = #{description}
 		</if>
 		<if test="href!=null and href!=''">
 		,href = #{href}
