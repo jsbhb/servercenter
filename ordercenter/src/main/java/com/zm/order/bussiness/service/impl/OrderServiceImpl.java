@@ -320,7 +320,7 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel result = new ResultModel();
 
 		orderMapper.confirmUserOrder(param);
-		shareProfitComponent.calShareProfit(param.get("orderId").toString());
+//		shareProfitComponent.calShareProfit(param.get("orderId").toString());
 
 		result.setSuccess(true);
 		return result;
