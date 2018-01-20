@@ -98,12 +98,12 @@ public class WarehouseThreadPool {
 			// 设置本地订单号和供应商Id,如果没有第三方订单号则以本地订单号当第三方订单号
 			for (OrderStatus orderStatus : set) {
 				for (OrderIdAndSupplierId model : orderList) {
-					if (orderStatus.getThirdOrderId().equals(model.getThirdOrderId())) {
+					if (model.getThirdOrderId().equals(orderStatus.getThirdOrderId())) {
 						orderStatus.setOrderId(model.getOrderId());
 						orderStatus.setSupplierId(supplierId);
-						if (orderStatus.getThirdOrderId() == null) {
-							orderStatus.setThirdOrderId(model.getOrderId());
-						}
+					}
+					if (orderStatus.getThirdOrderId() == null) {
+						orderStatus.setThirdOrderId(model.getOrderId());
 					}
 				}
 			}
