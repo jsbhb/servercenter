@@ -104,6 +104,8 @@ public class WarehouseThreadPool {
 					}
 					if (orderStatus.getThirdOrderId() == null) {
 						orderStatus.setThirdOrderId(model.getOrderId());
+						orderStatus.setOrderId(model.getOrderId());
+						orderStatus.setSupplierId(supplierId);
 					}
 				}
 			}
