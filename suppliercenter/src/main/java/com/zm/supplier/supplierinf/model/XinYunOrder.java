@@ -6,7 +6,7 @@ public class XinYunOrder extends XinYunBaseParam{
 
 	private String merchant_order_no;
 	
-	private String pay_type = "1";//默认信用付款
+	private String pay_type = "2";//默认信用付款
 	
 	private String accept_name;
 	
