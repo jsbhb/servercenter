@@ -5,4 +5,6 @@ import com.zm.user.pojo.GradeConfig;
 public interface GradeFrontMapper {
 
 	GradeConfig getGradeConfig(Integer gradeId);
+
+	String getClientUrlById(Integer id);
 }

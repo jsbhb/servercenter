@@ -13,6 +13,10 @@
 	<select id="getGradeConfig" parameterType="Object" resultMap="gradeConfig">
 		select id,grade_id,aboutus,head_img,name from grade_config where grade_id = #{gradeId}
 	</select>
+	
+	<select id="getClientUrlById" parameterType="Object" resultType="java.lang.String">
+		select redirect_url from grade where id = #{id}
+	</select>
 
 
 </mapper>

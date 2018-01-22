@@ -161,36 +161,38 @@ public class PayServiceImpl implements PayService {
 		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
+		Map<String, Object> result = new HashMap<String, Object>();
 		if (config == null) {
 			config = payMapper.getAliPayConfig(clientId);
 			if (config == null) {
-				Map<String, Object> resp = new HashMap<String, Object>();
-				resp.put("error", "没有支付配置信息");
-				return resp;
+				result.put("error", "没有支付配置信息");
+				return result;
 			}
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
 		}
 
 		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝支付" + type + "，后台请求成功";
-		Map<String, Object> result = new HashMap<String, Object>();
+		
 
 		if (Constants.SCAN_CODE.equals(type)) {
-			AlipayTradePrecreateResponse response = AliPayUtils.precreate(config, model);
-			if (response.isSuccess()) {
+			String htmlStr = AliPayUtils.aliPay(type, config, model);
+//			AlipayTradePrecreateResponse response = AliPayUtils.precreate(config, model);
+//			if (response.isSuccess()) {
 				logFeignClient.saveLog(Constants.FIRST_VERSION,
 						CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝支付", clientId, content, ""));
 				result.put("success", true);
-				result.put("urlCode", response.getQrCode());
-			} else {
-				logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
-						+ response.getSubMsg());
-				result.put("success", false);
-				result.put("errorMsg", response.getMsg());
-				result.put("errorSubMsg", response.getSubMsg());
-			}
+				result.put("htmlStr", htmlStr);
+//				result.put("urlCode", response.getQrCode());
+//			} else {
+//				logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
+//						+ response.getSubMsg());
+//				result.put("success", false);
+//				result.put("errorMsg", response.getMsg());
+//				result.put("errorSubMsg", response.getSubMsg());
+//			}
 		}
 
-		return null;
+		return result;
 	}
 
 	@Override

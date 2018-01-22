@@ -30,4 +30,18 @@ public class GradeFrontController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	/**
+	 * @fun 获取区域中心主站url
+	 * @param version
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/grade-url/{centerId}", method = RequestMethod.GET)
+	public String getClientUrl(@PathVariable("centerId")Integer centerId, @PathVariable("version")Double version){
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeFrontService.getClientUrl(centerId);
+		}
+		return null;
+	}
 }

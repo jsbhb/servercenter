@@ -68,4 +68,7 @@ public interface UserFeignClient {
 	 */
 	@RequestMapping(value = "{version}/user/is-already-pay/{orderId}", method = RequestMethod.GET)
 	public boolean isAlreadyPay(@PathVariable("version") Double version, @PathVariable("orderId") String orderId);
+
+	@RequestMapping(value = "{version}/grade-url/{centerId}", method = RequestMethod.GET)
+	public String getClientUrl(@PathVariable("centerId")Integer centerId, @PathVariable("version")Double version);
 }

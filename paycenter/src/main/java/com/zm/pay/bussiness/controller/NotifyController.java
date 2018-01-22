@@ -39,7 +39,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public class NotifyController {
 
 	@Resource
-	RedisTemplate<String, ?> redisTemplate;
+	RedisTemplate<String, Object> redisTemplate;
 
 	@Resource
 	LogFeignClient logFeignClient;
@@ -159,7 +159,7 @@ public class NotifyController {
 					valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
 				}
 				// 乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
-				valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+//				valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
 				params.put(name, valueStr);
 			}
 
@@ -183,6 +183,13 @@ public class NotifyController {
 
 			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
 					.get(Constants.PAY + clientId + Constants.ALI_PAY);
+			
+			Object o = redisTemplate.opsForValue().get(clientId + "-url");
+			String url = (o == null ? null : o.toString());
+			if(url == null){
+				url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
+				redisTemplate.opsForValue().set(clientId + "-url", url);
+			}
 
 			config.initParameter();
 			// 计算得出通知验证结果
@@ -194,6 +201,8 @@ public class NotifyController {
 					if (orderId.startsWith("GX")) {
 						String payNo = params.get("trade_no");
 						orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
+						res.sendRedirect(url+"/personal.html?child=order");
+						return;
 					}
 					if (orderId.startsWith("VIP")) {
 						if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
@@ -206,6 +215,8 @@ public class NotifyController {
 								userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
 							}
 						}
+						res.sendRedirect(url+"/personal.html");
+						return;
 					}
 				}
 

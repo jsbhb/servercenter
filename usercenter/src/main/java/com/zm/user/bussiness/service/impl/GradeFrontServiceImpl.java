@@ -20,4 +20,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 		return gradeFrontMapper.getGradeConfig(gradeId);
 	}
 
+	@Override
+	public String getClientUrl(Integer centerId) {
+		return gradeFrontMapper.getClientUrlById(centerId);
+	}
+
 }

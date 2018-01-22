@@ -52,7 +52,7 @@ public class Constants {
 	
 	// *********************支付报关参数******************************/
 	public static final String MERCHANT_CUSTOMS_CODE = "3302462230";//商户在海关备案的编号。
-	public static final String MERCHANT_CUSTOMS_NAME = "";//商户海关备案名称。
+	public static final String MERCHANT_CUSTOMS_NAME = "宁波鑫海通达贸易有限公司";//商户海关备案名称。
 	public static final String CUSTOMS_PLACE = "NINGBO";//海关编号
 	public static final String CUSTOMS_SERVICE = "alipay.acquire.customs";//报关接口
 	public static final String CUSTOMS_QUERY_SERVICE = "alipay.overseas.acquire.customs.query";//报关接口

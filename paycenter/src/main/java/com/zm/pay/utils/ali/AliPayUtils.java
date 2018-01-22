@@ -17,6 +17,7 @@ import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
+import com.zm.pay.utils.CalculationUtils;
 import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.ali.util.AlipaySubmit;
 
@@ -24,7 +25,7 @@ public class AliPayUtils {
 
 	// 支付宝报关接口
 	public static Map<String, String> acquireCustom(AliPayConfigModel config, CustomModel custom)
-			throws DocumentException {
+			throws Exception {
 		config.initParameter();
 		// 把请求参数打包成数组
 		Map<String, String> sParaTemp = new HashMap<String, String>();
@@ -39,7 +40,7 @@ public class AliPayUtils {
 		sParaTemp.put("customs_place", Constants.CUSTOMS_PLACE);
 
 		// 建立请求
-		String sHtmlText = AlipaySubmit.buildRequest(config, sParaTemp, "get", "确认");
+		String sHtmlText = AlipaySubmit.buildRequest(config, "", "", sParaTemp);
 
 		return CommonUtils.xmlToMap(sHtmlText);
 	}
@@ -55,6 +56,8 @@ public class AliPayUtils {
 			sParaTemp.put("payment_type", "1");// 扫码支付默认1
 		}
 
+		Double totalFee = CalculationUtils.div(Double.valueOf(model.getTotalAmount()), 100);
+		
 		sParaTemp.put("partner", config.getPid());
 		sParaTemp.put("seller_id", config.getPid());
 		sParaTemp.put("_input_charset", config.getCharset());
@@ -63,9 +66,9 @@ public class AliPayUtils {
 		sParaTemp.put("anti_phishing_key", "");// 防钓鱼时间戳
 		sParaTemp.put("exter_invoke_ip", "");
 		sParaTemp.put("out_trade_no", model.getOrderId());
-		sParaTemp.put("subject", model.getSubject());
-		sParaTemp.put("total_fee", model.getTotalAmount());
-		sParaTemp.put("body", model.getBody());
+		sParaTemp.put("subject", model.getBody());
+		sParaTemp.put("total_fee", totalFee.toString());
+		sParaTemp.put("body", model.getDetail());
 
 		// 建立请求
 		return AlipaySubmit.buildRequest(config, sParaTemp, "get", "确认");
