@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -127,5 +128,23 @@ public interface GoodsBackMapper {
 	 * @since JDK 1.7  
 	 */
 	void updateDetailPath(GoodsEntity entity);
+
+	/**
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<GoodsFile> selectGoodsFileByGoodsId(GoodsEntity entity);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsEntity selectRecordForUpd(GoodsEntity entity);
 
 }

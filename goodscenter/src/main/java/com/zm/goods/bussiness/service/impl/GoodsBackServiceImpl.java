@@ -7,6 +7,9 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -47,6 +51,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public GoodsEntity queryById(int id) {
 		GoodsEntity entity = goodsBackMapper.selectById(id);
+		List<GoodsFile> fileList = goodsBackMapper.selectGoodsFileByGoodsId(entity);
+		entity.setFiles(fileList);
 		return entity;
 	}
 
@@ -80,6 +86,17 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Transactional
 	public void edit(GoodsEntity entity) {
 		goodsBackMapper.update(entity);
+		List<GoodsFile> isrFileList = new ArrayList<GoodsFile>();
+		if(entity.getFiles() != null && entity.getFiles().size() > 0){
+			for(GoodsFile gf : entity.getFiles())  {
+				if (gf.getId() != null) {
+					goodsItemMapper.updateFiles(gf);
+				} else {
+					isrFileList.add(gf);
+				}
+			}
+		}
+		goodsItemMapper.insertFiles(isrFileList);
 	}
 
 	@Override
@@ -100,4 +117,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		goodsBackMapper.updateDetailPath(entity);
 	}
 
+	@Override
+	public GoodsEntity checkRecordForUpd(GoodsEntity entity) {
+		GoodsEntity retEntity = goodsBackMapper.selectRecordForUpd(entity);
+		return retEntity;
+	}
 }

@@ -68,6 +68,18 @@
 		<result column="opt" property="opt"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsFile" id="goodsFile">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="path" property="path" jdbcType="VARCHAR" />
+		<result column="suffix" property="suffix" jdbcType="VARCHAR" />
+		<result column="storeType" property="storeType" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -144,8 +156,18 @@
 	</delete>
 	
 	<select id="selectRecordForDel" parameterType="Object" resultMap="entity">
-		SELECT a.* FROM goods a where a.id = #{id} and not exists 
-		(select id from goods_item where status != '0' and goods_id = a.goods_id);
+		SELECT a.* FROM goods a where a.id = #{id} and exists 
+		(select goods_id from goods_item where status in('1','2')  and goods_id = a.goods_id);
+	</select>
+
+	<select id="selectGoodsFileByGoodsId" parameterType="Object" resultMap="goodsFile">
+		select * from goods_file where type = '0'
+		and goods_id = #{goodsId}
+	</select>
+	
+	<select id="selectRecordForUpd" parameterType="Object" resultMap="entity">
+		SELECT a.* FROM goods a where a.id = #{id} and exists 
+		(select goods_id from goods_item where status = '2' and goods_id = a.goods_id);
 	</select>
 	
 </mapper>

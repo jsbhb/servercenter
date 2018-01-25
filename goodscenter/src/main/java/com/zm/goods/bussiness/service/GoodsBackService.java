@@ -114,4 +114,14 @@ public interface GoodsBackService {
 	 */
 	void saveDetailPath(GoodsEntity entity);
 
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsEntity checkRecordForUpd(GoodsEntity entity);
+
 }

@@ -222,4 +222,9 @@
 		delete from goods_item where goods_id = #{goodsId}; 
 	</delete>
 	
+	<update id="updateFiles" parameterType="Object">
+		update goods_file set path = #{path},update_time = now(),opt = #{opt}
+		where id = #{id}
+	</update>
+	
 </mapper>

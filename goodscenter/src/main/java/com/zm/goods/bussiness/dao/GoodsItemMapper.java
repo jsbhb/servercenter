@@ -138,4 +138,13 @@ public interface GoodsItemMapper {
 	 */
 	void delete(GoodsEntity entity);
 
+	/**  
+	 * insertFiles:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param files  
+	 * @since JDK 1.7  
+	 */
+	void updateFiles(GoodsFile file);
+
 }

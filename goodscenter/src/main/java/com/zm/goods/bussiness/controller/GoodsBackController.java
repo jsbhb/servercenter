@@ -140,8 +140,13 @@ public class GoodsBackController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try{
-				goodsBackService.edit(entity);
-				return new ResultModel(true, "");
+				GoodsEntity result = goodsBackService.checkRecordForUpd(entity);
+				if (result == null) {
+					goodsBackService.edit(entity);
+					return new ResultModel(true, "");
+				} else {
+					return new ResultModel(false, "该商品下的明细状态非不可分销，无法进行修改");	
+				}
 			}catch(Exception e){
 				return new ResultModel(false, e.getMessage());			}
 		}
@@ -155,7 +160,7 @@ public class GoodsBackController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try{
 				GoodsEntity result = goodsBackService.checkRecordForDel(entity);
-				if (result != null) {
+				if (result == null) {
 					goodsBackService.remove(entity);
 					return new ResultModel(true, "");
 				} else {
