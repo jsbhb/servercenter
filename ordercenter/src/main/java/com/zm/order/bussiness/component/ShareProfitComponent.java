@@ -44,7 +44,7 @@ public class ShareProfitComponent {
 		try {
 
 			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-			if (Constants.PREDETERMINE_ORDER == info.getCreateType()) {
+			if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {
 				predetermineOrderProfit(info);
 			} else {
 				consumOrderProfit(info);

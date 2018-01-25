@@ -63,6 +63,6 @@ public class Constants {
 	public static final String EXCEPTION_PROFIT = "EXCEPTION_PROFIT";
 	
 	//*********************订货平台订单***********************
-	public static final Integer PREDETERMINE_ORDER = 4;
+	public static final Integer PREDETERMINE_ORDER = 2;
 	
 }

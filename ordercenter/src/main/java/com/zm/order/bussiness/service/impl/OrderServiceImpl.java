@@ -146,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
 		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		Integer centerId = null;
-		if (Constants.PREDETERMINE_ORDER == info.getCreateType()) {// 如果是订货平台订单，默认centerId
+		if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {// 如果是订货平台订单，默认centerId
 			centerId = -1;
 		} else {
 			centerId = info.getCenterId();

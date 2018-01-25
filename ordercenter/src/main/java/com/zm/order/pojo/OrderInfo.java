@@ -33,6 +33,8 @@ public class OrderInfo extends Pagination{
 	private Integer supplierId;
 
 	private Integer tdq;
+	
+	private Integer orderSource;
 
 	private Integer weight;
 
@@ -72,6 +74,14 @@ public class OrderInfo extends Pagination{
 			return false;
 		}
 		return true;
+	}
+
+	public Integer getOrderSource() {
+		return orderSource;
+	}
+
+	public void setOrderSource(Integer orderSource) {
+		this.orderSource = orderSource;
 	}
 
 	public Integer getPushUserId() {
