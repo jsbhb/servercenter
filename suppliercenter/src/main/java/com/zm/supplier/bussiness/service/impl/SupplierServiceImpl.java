@@ -59,7 +59,7 @@ public class SupplierServiceImpl implements SupplierService {
 	public SupplierEntity queryById(int id) {
 		return supplierMapper.selectById(id);
 	}
-	
+
 	private static final Integer XINYUN_WAREHOUSE = 3;
 	private static final Integer FUBANG_WAREHOUSE = 4;
 
@@ -77,14 +77,14 @@ public class SupplierServiceImpl implements SupplierService {
 			}
 		}
 		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
-			if(XINYUN_WAREHOUSE.equals(entry.getKey()) ||FUBANG_WAREHOUSE.equals(entry.getKey())){
+			if (XINYUN_WAREHOUSE.equals(entry.getKey()) || FUBANG_WAREHOUSE.equals(entry.getKey())) {
 				List<OrderIdAndSupplierId> temp = null;
-				for(OrderIdAndSupplierId model : entry.getValue()){
+				for (OrderIdAndSupplierId model : entry.getValue()) {
 					temp = new ArrayList<OrderIdAndSupplierId>();
 					temp.add(model);
 					warehouseThreadPool.checkOrderStatus(temp, entry.getKey());
 				}
-			}else{
+			} else {
 				warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
 			}
 		}
@@ -92,24 +92,32 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 
 	@Override
-	public ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId) {
-		if(FUBANG_WAREHOUSE.equals(supplierId)){
+	public ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId, boolean flag) {
+		if (FUBANG_WAREHOUSE.equals(supplierId)) {
 			List<OrderBussinessModel> temp = null;
-			for(OrderBussinessModel model : list){
+			for (OrderBussinessModel model : list) {
 				temp = new ArrayList<OrderBussinessModel>();
 				temp.add(model);
-				warehouseThreadPool.checkStock(temp, supplierId);
+				if (flag) {
+					warehouseThreadPool.checkStockByAsync(temp, supplierId);//定时器调用的库存方法用线程池，防止feign调用超时
+				} else {
+					warehouseThreadPool.checkStock(temp, supplierId);
+				}
 			}
 		} else {
-			warehouseThreadPool.checkStock(list, supplierId);
+			if(flag){
+				warehouseThreadPool.checkStockByAsync(list, supplierId);//定时器调用的库存方法用线程池，防止feign调用超时
+			}else {
+				warehouseThreadPool.checkStock(list, supplierId);
+			}
 		}
 		return new ResultModel(true, "同步库存完成");
 	}
 
 	@Override
 	public ResultModel getGoods(List<String> list, Integer supplierId, String supplierName) {
-		if(list != null){
-			for(String itemCode : list){
+		if (list != null) {
+			for (String itemCode : list) {
 				warehouseThreadPool.getThirdGoods(itemCode, supplierId, supplierName);
 			}
 		}

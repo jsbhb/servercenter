@@ -48,7 +48,7 @@ public class WarehouseThreadPool {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
-	
+
 	@Resource
 	SupplierMapper supplierMapper;
 
@@ -148,6 +148,38 @@ public class WarehouseThreadPool {
 		}
 	}
 
+	@Async("myAsync")
+	public void checkStockByAsync(List<OrderBussinessModel> list, Integer supplierId) {
+		try {
+			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
+			if (buttJoint == null) {
+				return;
+			}
+			Set<CheckStockModel> set = buttJoint.checkStock(list);
+			if (set == null || set.size() == 0) {
+				return;
+			}
+			// 将ItemId赋值到返回的checkStockModel里面
+			for (OrderBussinessModel model : list) {
+				for (CheckStockModel tem : set) {
+					if (model.getSku().equals(tem.getSku()) || model.getItemCode().equals(tem.getItemCode())) {
+						tem.setItemId(model.getItemId());
+					}
+				}
+			}
+			List<WarehouseStock> stockList = new ArrayList<WarehouseStock>();
+			WarehouseStock stock = null;
+			for (CheckStockModel tem : set) {
+				stock = toWarehouseStock(tem);
+				stockList.add(stock);
+			}
+			goodsFeignClient.updateThirdWarehouseStock(Constants.FIRST_VERSION, stockList);
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+	
 	public void checkStock(List<OrderBussinessModel> list, Integer supplierId) {
 		try {
 			AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
@@ -207,16 +239,16 @@ public class WarehouseThreadPool {
 	private AbstractSupplierButtJoint getTargetInterface(Integer supplierId) {
 		SupplierInterface inf = (SupplierInterface) redisTemplate.opsForValue()
 				.get(Constants.SUPPLIER_INTERFACE + supplierId);
-		if(inf == null){
+		if (inf == null) {
 			inf = supplierMapper.getSupplierInterface(supplierId);
-			if(inf == null){
+			if (inf == null) {
 				return null;
 			}
 			redisTemplate.opsForValue().set(Constants.SUPPLIER_INTERFACE + supplierId, inf);
 		}
 		AbstractSupplierButtJoint buttJoint = (AbstractSupplierButtJoint) SpringContextUtil
 				.getBean(inf.getTargetObject());
-		if(buttJoint == null){
+		if (buttJoint == null) {
 			return null;
 		}
 		buttJoint.setAppKey(inf.getAppKey());

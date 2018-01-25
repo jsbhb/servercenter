@@ -18,22 +18,22 @@ import com.zm.timetask.feignclient.SupplierFeignClient;
 import com.zm.timetask.feignclient.model.OrderBussinessModel;
 
 @Component
-public class CheckStockTimeTask implements Job{
+public class CheckStockTimeTask implements Job {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
-	
+
 	@Resource
 	SupplierFeignClient supplierFeignClient;
-	
+
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		List<OrderBussinessModel> list = goodsFeignClient.checkStock(Constants.FIRST_VERSION);
-		if(list != null && list.size() > 0){
+		if (list != null && list.size() > 0) {
 			Map<Integer, List<OrderBussinessModel>> temMap = new HashMap<Integer, List<OrderBussinessModel>>();
 			List<OrderBussinessModel> temList = null;
-			for(OrderBussinessModel model : list){
-				if(temMap.get(model.getSupplierId()) == null){
+			for (OrderBussinessModel model : list) {
+				if (temMap.get(model.getSupplierId()) == null) {
 					temList = new ArrayList<OrderBussinessModel>();
 					temList.add(model);
 					temMap.put(model.getSupplierId(), temList);
@@ -41,11 +41,11 @@ public class CheckStockTimeTask implements Job{
 					temMap.get(model.getSupplierId()).add(model);
 				}
 			}
-			for(Map.Entry<Integer, List<OrderBussinessModel>> entry : temMap.entrySet()){
-				supplierFeignClient.checkStock(Constants.FIRST_VERSION, entry.getKey(), entry.getValue());
+			for (Map.Entry<Integer, List<OrderBussinessModel>> entry : temMap.entrySet()) {
+				supplierFeignClient.checkStock(Constants.FIRST_VERSION, entry.getKey(), entry.getValue(), true);
 			}
 		}
-		
+
 	}
 
 }

@@ -63,7 +63,7 @@ public interface SupplierService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId);
+	ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId, boolean flag);
 
 	ResultModel getGoods(List<String> list, Integer supplierId, String supplierName);
 

@@ -31,6 +31,7 @@ public class ExpressContrast {
 			put("顺丰速运", "顺丰快递");
 			put("邮政速递", "EMS");
 			put("中通速递", "中通速递");
+			put("北仑军通", "圆通速递");
 		}
 	};
 

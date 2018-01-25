@@ -65,7 +65,7 @@ public class SupplierController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/supplier/queryAll", method = RequestMethod.POST)
 	public ResultModel queryAll(HttpServletRequest request, @PathVariable("version") Double version) {
 
@@ -125,23 +125,24 @@ public class SupplierController {
 	}
 
 	@RequestMapping(value = "{version}/supplier/checkStock/{supplierId}", method = RequestMethod.POST)
-	public ResultModel checkStock(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
-			@RequestBody List<OrderBussinessModel> list) {
+	public ResultModel checkStock(@PathVariable("version") Double version,
+			@PathVariable("supplierId") Integer supplierId, @RequestBody List<OrderBussinessModel> list,
+			@RequestParam(value = "flag", required = false, defaultValue = "false") boolean flag) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return supplierService.checkStock(list ,supplierId);
+			return supplierService.checkStock(list, supplierId, flag);
 		}
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/supplier/getGoods/{supplierId}", method = RequestMethod.POST)
 	public ResultModel getGoods(@PathVariable("version") Double version, @PathVariable("supplierId") Integer supplierId,
 			@RequestParam("supplierName") String supplierName, @RequestBody List<String> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return supplierService.getGoods(list ,supplierId, supplierName);
+			return supplierService.getGoods(list, supplierId, supplierName);
 		}
 		return new ResultModel(false, "版本错误");
 	}

@@ -4,30 +4,57 @@ import java.util.List;
 
 public class LianYouOrder {
 
+	public enum ShipType {
+		NINGBO_BONDED_EXPRESS("宁波保税仓-圆通", 6);
+		private String name;
+		private int index;
+
+		private ShipType(String name, int index) {
+			this.name = name;
+			this.index = index;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+
+		public void setIndex(int index) {
+			this.index = index;
+		}
+	}
+
 	private String consignee;
-	
+
 	private String order_sn;
-	
+
 	private String out_order_sn;
-	
+
 	private String realName;
-	
+
 	private String imId;
-	
+
 	private String disType = "F";
-	
+
 	private String phoneMob;
-	
+
 	private String address;
-	
+
 	private String province;
-	
+
 	private String city;
-	
+
 	private String county;
-	
+
 	private Integer shipping_id = 6;
-	
+
 	private List<OutOrderGoods> outOrderGoods;
 
 	public String getConsignee() {
@@ -133,5 +160,5 @@ public class LianYouOrder {
 	public void setOutOrderGoods(List<OutOrderGoods> outOrderGoods) {
 		this.outOrderGoods = outOrderGoods;
 	}
-	
+
 }
