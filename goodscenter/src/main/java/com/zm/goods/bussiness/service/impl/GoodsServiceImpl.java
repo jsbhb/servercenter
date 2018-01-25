@@ -715,7 +715,7 @@ public class GoodsServiceImpl implements GoodsService {
 		goodsMapper.updateGoodsDownShelves(param);
 	}
 
-	private void syncgoods(List<String> itemIdList, Integer id) {
+	public ResultModel syncgoods(List<String> itemIdList, Integer id) {
 		if (itemIdList != null && itemIdList.size() > 0) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			String centerId = GoodsServiceUtil.judgeCenterId(id);
@@ -736,8 +736,13 @@ public class GoodsServiceImpl implements GoodsService {
 			goodsMapper.insertCenterGoods(param);
 			goodsMapper.insertCenterGoodsFile(param);
 			goodsMapper.insertCenterGoodsItem(param);
-			goodsMapper.insertCenterGoodsPrice(param);
+			if(Constants.PREDETERMINE_PLAT_TYPE.equals(id)){
+				goodsMapper.insert2BGoodsPrice(param);
+			} else {
+				goodsMapper.insertCenterGoodsPrice(param);
+			}
 		}
+		return new ResultModel(true, "");
 	}
 
 	@SuppressWarnings("unchecked")

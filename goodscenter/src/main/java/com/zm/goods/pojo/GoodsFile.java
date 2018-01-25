@@ -9,7 +9,6 @@ public class GoodsFile implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
-	@JsonIgnore
 	private Integer id;
 	
 	private String goodsId;

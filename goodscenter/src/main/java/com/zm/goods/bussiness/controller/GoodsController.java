@@ -549,18 +549,16 @@ public class GoodsController {
 	 * @param list
 	 * @return
 	 */
-	// @RequestMapping(value = "{version}/goods/syncgoods/{centerId}", method =
-	// RequestMethod.POST)
-	// public ResultModel syncgoods(@PathVariable("version") Double version,
-	// @PathVariable("centerId") Integer centerId,
-	// @RequestBody List<String> itemIdList) {
-	//
-	// if (Constants.FIRST_VERSION.equals(version)) {
-	// return goodsService.syncgoods(itemIdList, centerId);
-	// }
-	//
-	// return new ResultModel(false, "版本错误");
-	// }
+	@RequestMapping(value = "{version}/goods/syncgoods/{centerId}", method = RequestMethod.POST)
+	public ResultModel syncgoods(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestBody List<String> itemIdList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.syncgoods(itemIdList, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 
 	/**
 	 * @fun 同步库存

@@ -137,6 +137,8 @@ public interface GoodsMapper {
 	
 	void insertCenterGoodsPrice(Map<String, Object> param);
 	
+	void insert2BGoodsPrice(Map<String, Object> param);
+	
 	List<String> listFirstCategory(List<String> goodsIdList);
 	
 	List<String> listSecondCategory(List<String> goodsIdList);

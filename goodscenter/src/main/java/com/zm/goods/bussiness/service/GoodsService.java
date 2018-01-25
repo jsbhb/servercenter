@@ -250,6 +250,6 @@ public interface GoodsService {
 
 	ResultModel syncStock(List<String> itemIdList);
 
-//	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
+	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
 
 }
