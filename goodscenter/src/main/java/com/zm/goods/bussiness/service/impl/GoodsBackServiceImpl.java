@@ -96,7 +96,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				}
 			}
 		}
-		goodsItemMapper.insertFiles(isrFileList);
+		if (isrFileList != null && isrFileList.size() > 0) {
+			goodsItemMapper.insertFiles(isrFileList);
+		}
 	}
 
 	@Override
