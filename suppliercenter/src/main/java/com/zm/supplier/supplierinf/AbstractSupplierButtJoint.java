@@ -36,14 +36,18 @@ public abstract class AbstractSupplierButtJoint {
 	 * @throws Exception
 	 */
 	public <T> Set<T> renderResult(String result, String format, Class<T> clazz) throws Exception{
+		Set<T> set = null;
 		if(result != null){
 			if(XML.equalsIgnoreCase(format)){
-				return XmlUtil.parseXml(result, clazz);
+				set = XmlUtil.parseXml(result, clazz);
 			}else if(JSON.equalsIgnoreCase(format)){
-				return JSONUtil.toObject(result, clazz);
+				set = JSONUtil.toObject(result, clazz);
 			}
 		}
-		return null;
+		if(set == null){
+			//失败后处理
+		}
+		return set;
 	}
 	
 	

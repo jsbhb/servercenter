@@ -14,7 +14,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderStatus;
 
 public class XmlUtil {

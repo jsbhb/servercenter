@@ -13,6 +13,7 @@ import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
 import com.zm.supplier.supplierinf.model.LianYouOrder;
+import com.zm.supplier.supplierinf.model.LianYouOrder.ShipType;
 import com.zm.supplier.supplierinf.model.OutOrderGoods;
 import com.zm.supplier.supplierinf.model.XinYunCheckStock;
 import com.zm.supplier.supplierinf.model.XinYunGetOrderStatus;
@@ -137,7 +138,7 @@ public class ButtJointMessageUtils {
 		sb.append("<logistics>");
 		sb.append("<logisticsCode>");
 		sb.append("ZTO"); // 快递公司代码
-								// SF=顺丰速EMS=邮政速递POSTAM=邮政小包ZTO=中通速递STO=申通快递YTO=圆通速递JD=京东快递BEST=百世物流YUNDA=韵达速递TTKDEX=天天快递
+							// SF=顺丰速EMS=邮政速递POSTAM=邮政小包ZTO=中通速递STO=申通快递YTO=圆通速递JD=京东快递BEST=百世物流YUNDA=韵达速递TTKDEX=天天快递
 		sb.append("</logisticsCode>\n");
 		sb.append("<consignee>");
 		sb.append(info.getOrderDetail().getReceiveName()); // 收货人名称
@@ -192,10 +193,13 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
-	public static String getLiangYouOrderMsg(OrderInfo info, UserInfo user) {
+	public static String getLiangYouOrderMsg(OrderInfo info, UserInfo user, Integer supplierId) {
 		try {
 
 			LianYouOrder order = new LianYouOrder();
+			if (Constants.LIANGYOU_NB_SUPPLIERID.equals(supplierId)) {
+				order.setShipping_id(ShipType.NINGBO_BONDED_EXPRESS.getIndex());
+			}
 			order.setAddress(URLEncoder.encode(info.getOrderDetail().getReceiveAddress(), "utf-8"));
 			order.setCity(URLEncoder.encode(info.getOrderDetail().getReceiveCity(), "utf-8"));
 			order.setConsignee(URLEncoder.encode(info.getOrderDetail().getReceiveName(), "utf-8"));
@@ -222,6 +226,16 @@ public class ButtJointMessageUtils {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public static String getLiangYouStock(List<OrderBussinessModel> list) {
+		StringBuilder sb = new StringBuilder();
+		if (list != null && list.size() > 0) {
+			for (OrderBussinessModel model : list) {
+				sb.append(model.getSku() + ",");
+			}
+		}
+		return sb.toString().substring(0, sb.length() - 1);
 	}
 
 	public static String getXinYunOrderMsg(OrderInfo info, UserInfo user, String appKey, String secret) {
@@ -276,10 +290,10 @@ public class ButtJointMessageUtils {
 		checkStock.setMerchant_id(appKey);
 		checkStock.setOpcode("get_goods_stock");
 		checkStock.setSku_list(sb.toString().substring(0, sb.length() - 1));
-		
+
 		String sign = SignUtil.XinYunSing(JSONUtil.toJson(checkStock), secret);
 		checkStock.setSign(sign);
-		
+
 		return JSONUtil.toJson(checkStock);
 
 	}
@@ -298,29 +312,29 @@ public class ButtJointMessageUtils {
 		order.setLogistics_name("中通速递");
 		FuBangOrderGoods goods = null;
 		List<FuBangOrderGoods> list = new ArrayList<FuBangOrderGoods>();
-		for(OrderGoods temGoods : info.getOrderGoodsList()){
+		for (OrderGoods temGoods : info.getOrderGoodsList()) {
 			goods = new FuBangOrderGoods();
 			goods.setProduct_no(temGoods.getItemCode());
 			goods.setQty(temGoods.getItemQuantity());
 			list.add(goods);
 		}
 		order.setGoods(list);
-		
+
 		return JSONUtil.toJson(order);
 	}
 
 	public static String getFuBangOrderStatusMsg(List<String> orderIds) {
-		
-		return "{\"order_no\":"+orderIds.get(0)+"}";
+
+		return "{\"order_no\":" + orderIds.get(0) + "}";
 	}
 
 	public static String getFuBangStock(List<OrderBussinessModel> list) {
-		
-		return "{\"product_no\":"+list.get(0).getItemCode()+"}";
+
+		return "{\"product_no\":" + list.get(0).getItemCode() + "}";
 	}
 
 	public static String getFuBangGoodsDetail(String itemCode) {
-		return "{\"product_no\":"+itemCode+"}";
+		return "{\"product_no\":" + itemCode + "}";
 	}
 
 	public static String getXinYunGoods(String itemCode, String appKey, String appSecret) {
@@ -328,10 +342,10 @@ public class ButtJointMessageUtils {
 		param.setMerchant_id(appKey);
 		param.setOpcode("goods_detail");
 		param.setSku_id(itemCode);
-		
+
 		String sign = SignUtil.XinYunSing(JSONUtil.toJson(param), appSecret);
 		param.setSign(sign);
-		
+
 		return JSONUtil.toJson(param);
 
 	}
