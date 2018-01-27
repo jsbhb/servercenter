@@ -84,4 +84,6 @@ public interface UserMapper {
 	String getPhoneByUserId(Integer userId);
 	
 	Integer getParentIdByGradeId(Integer gradeId);
+	
+	void saveGradeData(Grade grade);
 }

@@ -384,4 +384,10 @@
 		select parent_id from grade where id = #{id}
 	</select>
 
+	<insert id="saveGradeData" parameterType="com.zm.user.pojo.Grade">
+		INSERT INTO grade_data
+		VALUES (#{id},#{storeName},#{contacts},#{contactsPhone},#{province},#{city},
+		#{district},#{address},#{storeOperator},#{operatorIDNum},#{picPath1},#{picPath2},#{picPath3},#{picPath4},now(),now(),#{opt})
+	</insert>
+
 </mapper>

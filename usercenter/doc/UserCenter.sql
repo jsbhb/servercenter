@@ -271,4 +271,27 @@ COMMENT = '检索字段表';
 INSERT INTO `zm_user`.`grade` (`id`, `grade_type`, `grade_name`, `person_in_charge`, `phone`, `grade_level`, `create_time`, `company`) VALUES ('1', '100', '鑫海总部', 'admin', '13456789012', '1', now(), '鑫海通达');
 INSERT INTO `zm_user`.`user` (`user_type`, `account`, `phone`, `is_phone_validate`, `status`, `center_id`, `create_time`) VALUES ('0', 'admin', '13456789012', '1', '1', '1', now());
 
+drop table if exists  `grade_data`;
+
+CREATE TABLE `zm_user`.`grade_data` (
+  `id` INT UNSIGNED NOT NULL COMMENT 'gradeID',
+  `store_name` VARCHAR(100) NOT NULL COMMENT '门店名称',
+  `contacts` VARCHAR(20) NOT NULL COMMENT '门店联系人',
+  `contacts_phone` VARCHAR(20) NOT NULL COMMENT '联系人电话',
+  `province` VARCHAR(20) NULL COMMENT '省',
+  `city` VARCHAR(20) NULL COMMENT '市',
+  `district` VARCHAR(20) NULL COMMENT '区',
+  `address` VARCHAR(200) NOT NULL COMMENT '门店地址',
+  `store_operator` VARCHAR(20) NOT NULL COMMENT '门店经营者',
+  `operator_idnum` VARCHAR(50) NOT NULL COMMENT '经营者证件号',
+  `pic1_path` VARCHAR(200) NOT NULL COMMENT '证件照片',
+  `pic2_path` VARCHAR(200) NOT NULL COMMENT '营业执照',
+  `pic3_path` VARCHAR(200) NOT NULL COMMENT '门店照片',
+  `pic4_path` VARCHAR(200) NOT NULL COMMENT '供销货架照片',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
+  PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+COMMENT = '等级数据表';
 

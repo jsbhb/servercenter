@@ -151,8 +151,8 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
-		logFeignClient.saveLog(Constants.FIRST_VERSION,
-				packageLog(LogConstants.REGISTER, "注册账号", info.getCenterId(), content, info.getPhone()));
+//		logFeignClient.saveLog(Constants.FIRST_VERSION,
+//				packageLog(LogConstants.REGISTER, "注册账号", info.getCenterId(), content, info.getPhone()));
 
 		return info.getId();
 	}
@@ -391,6 +391,9 @@ public class UserServiceImpl implements UserService {
 			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 		}
+		
+		//添加注册信息存储
+		userMapper.saveGradeData(grade);
 		return result;
 	}
 

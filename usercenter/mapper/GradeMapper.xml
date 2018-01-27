@@ -17,6 +17,19 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 		<result column="company" property="company" jdbcType="VARCHAR" />
 		<result column="person_in_charge_id" property="personInChargeId" jdbcType="INTEGER" />
+		<result column="store_name" property="storeName" jdbcType="VARCHAR" />
+		<result column="contacts" property="contacts" jdbcType="VARCHAR" />
+		<result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="district" property="district" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="store_operator" property="storeOperator" jdbcType="VARCHAR" />
+		<result column="operator_idnum" property="operatorIDNum" jdbcType="VARCHAR" />
+		<result column="pic1_path" property="picPath1" jdbcType="VARCHAR" />
+		<result column="pic2_path" property="picPath2" jdbcType="VARCHAR" />
+		<result column="pic3_path" property="picPath3" jdbcType="VARCHAR" />
+		<result column="pic4_path" property="picPath4" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<update id="update" parameterType="Object">
@@ -41,7 +54,14 @@
 	
 	
 	<select id="selectById" parameterType="Object" resultMap="grade">
-		select a.*,b.grade_name as parentGradeName from grade a left join grade b on a.parent_id = b.id where a.id = #{id}
+		select a.*,b.grade_name as parentGradeName
+		,store_name,contacts,contacts_phone,province
+		,city,district,address,store_operator,operator_idnum
+		,pic1_path,pic2_path,pic3_path,pic4_path 
+		from grade a 
+		left join grade b on a.parent_id = b.id 
+		left join grade_data c on a.id = c.id
+		where a.id = #{id}
 	</select>
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
@@ -56,5 +76,14 @@
 			and a.company like CONCAT('%',#{company},'%') 
 		</if>
 	</select>
+	
+	<update id="updateGradeData" parameterType="Object">
+		update grade_data set update_time = now()
+		,store_name= #{storeName},contacts= #{contacts},contacts_phone= #{contactsPhone}
+		,province= #{province},city= #{city},district= #{district},address= #{address}
+		,store_operator= #{storeOperator},operator_idnum= #{operatorIDNum},pic1_path= #{picPath1}
+		,pic2_path= #{picPath2},pic3_path= #{picPath3},pic4_path = #{picPath4}
+		where id = #{id}
+	</update>
 
 </mapper>
