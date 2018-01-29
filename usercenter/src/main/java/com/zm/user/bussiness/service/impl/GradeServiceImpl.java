@@ -48,6 +48,7 @@ public class GradeServiceImpl implements GradeService {
 	@Override
 	public void update(Grade entity) {
 		gradeMapper.update(entity);
+		gradeMapper.updateGradeData(entity);
 	}
 
 }
