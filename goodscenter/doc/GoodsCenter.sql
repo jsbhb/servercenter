@@ -526,7 +526,7 @@ CREATE TABLE `goods_item_2b` (
   `item_code` varchar(50) NOT NULL COMMENT '商家自有编码',
   `excise_tax` decimal(5,2) DEFAULT NULL COMMENT '消费税',
   `is_promotion` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否促销0：否；1：是',
-  `status` tinyint(3) unsigned DEFAULT NULL COMMENT '商品状态0：停售，1：在售',
+  `status` tinyint(3) unsigned DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
   `discount` decimal(10,2) DEFAULT NULL COMMENT '促销折扣',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
