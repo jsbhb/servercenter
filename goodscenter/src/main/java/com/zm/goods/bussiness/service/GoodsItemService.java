@@ -9,6 +9,7 @@ package com.zm.goods.bussiness.service;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsPrice;
 
 /**
  * ClassName: GoodsItemService <br/>
@@ -96,5 +97,58 @@ public interface GoodsItemService {
 	 * @since JDK 1.7  
 	 */
 	void update(GoodsItemEntity entity);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin
+	 * @param entity
+	 * @param parseInt
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsItemEntity> queryPurchaseCenterByPage(GoodsItemEntity entity, int centerId);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin
+	 * @param entity
+	 * @param parseInt
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsItemEntity> queryPurchaseCenterItem(GoodsItemEntity entity);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin
+	 * @param entity
+	 * @param parseInt
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	GoodsPrice queryPurchaseCenterItemForEdit(GoodsItemEntity entity);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin
+	 * @param entity
+	 * @param parseInt
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	GoodsPrice queryItemPrice(String itemId);
+
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateItemPrice(GoodsPrice entity);
 
 }

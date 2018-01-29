@@ -20,6 +20,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsStatusEnum;
 
 /**
@@ -90,6 +91,42 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	public void update(GoodsItemEntity entity) {
 		goodsItemMapper.update(entity);
 		goodsItemMapper.updatePrice(entity.getGoodsPrice());
+	}
+
+	@Override
+	public Page<GoodsItemEntity> queryPurchaseCenterByPage(GoodsItemEntity entity, int centerId) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("entity", entity);
+		if (centerId == -1) {
+			params.put("centerId", "2B");
+		} else {
+			params.put("centerId", centerId);
+		}
+		return goodsItemMapper.selectPurchaseCenterForPage(params);
+	}
+
+	@Override
+	public Page<GoodsItemEntity> queryPurchaseCenterItem(GoodsItemEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("entity", entity);
+		return goodsItemMapper.selectPurchaseCenterItem(params);
+	}
+
+	@Override
+	public GoodsPrice queryPurchaseCenterItemForEdit(GoodsItemEntity entity) {
+		return goodsItemMapper.selectPurchaseCenterItemForEdit(entity);
+	}
+
+	@Override
+	public GoodsPrice queryItemPrice(String itemId) {
+		return goodsItemMapper.selectItemPrice(itemId);
+	}
+
+	@Override
+	public void updateItemPrice(GoodsPrice entity) {
+		goodsItemMapper.updateItemPrice(entity);
 	}
 
 }

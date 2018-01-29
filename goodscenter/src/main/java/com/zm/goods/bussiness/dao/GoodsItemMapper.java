@@ -147,4 +147,48 @@ public interface GoodsItemMapper {
 	 */
 	void updateFiles(GoodsFile file);
 
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity
+	 * @param centerId
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsItemEntity> selectPurchaseCenterForPage(Map<String,Object> params);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity
+	 * @param centerId
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsItemEntity> selectPurchaseCenterItem(Map<String,Object> params);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity
+	 * @param centerId
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	GoodsPrice selectPurchaseCenterItemForEdit(GoodsItemEntity entity);
+	
+	GoodsPrice selectItemPrice(String itemId);
+
+	/**  
+	 * insertFiles:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param files  
+	 * @since JDK 1.7  
+	 */
+	void updateItemPrice(GoodsPrice entity);
+
 }
