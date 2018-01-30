@@ -270,7 +270,7 @@
 	</select>
 	
 	<select id="selectPurchaseCenterItem" parameterType="Object" resultMap="entity">
-		select g.goods_id,g.goods_name,g.status,
+		select g.id,g.goods_id,g.goods_name,g.status,
 		g.detail_path,g.index_status,i.item_id,
 		i.item_code,i.excise_tax,i.is_promotion,
 		i.discount,p.min,p.max,p.retail_price,
@@ -278,6 +278,7 @@
 		from goods_2b g
 		left join goods_item_2b i on g.goods_id = i.goods_id
 		left join goods_price_2b p on p.item_id = i.item_id 
+		where 1=1
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
