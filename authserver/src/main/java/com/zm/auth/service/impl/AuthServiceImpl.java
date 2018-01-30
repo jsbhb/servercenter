@@ -45,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
 	
 	@Resource
 	UserCenterFeignClient userCenterFeignClient;
+	
+	public static final Integer B2B_FORM = 6;
 
 	@Autowired
 	public AuthServiceImpl(UserMapper userMapper) {
@@ -121,6 +123,8 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		int loginType = userInfo.getLoginType();
+		
+		int platUserType = userInfo.getPlatUserType();
 
 		UserInfo userDetail = null;
 		Map<String, Object> claim = new HashMap<String, Object>();
@@ -153,8 +157,6 @@ public class AuthServiceImpl implements AuthService {
 				userDetail = userMapper.getUserByPlatId(userInfo.getUserId());
 			}
 
-			int platUserType = userInfo.getPlatUserType();
-
 			if (platUserType == PlatUserType.CONSUMER.getIndex()) {
 
 				claim.put(JWTUtil.PASSWORD, MethodUtil.MD5(userInfo.getPassword()));
@@ -162,6 +164,14 @@ public class AuthServiceImpl implements AuthService {
 
 				userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 				userDetail = userMapper.getUserForLogin(userInfo);
+			}
+			
+			if(platUserType == B2B_FORM){
+				claim.put(JWTUtil.PASSWORD, MethodUtil.MD5(userInfo.getPassword()));
+				claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
+
+				userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
+				userDetail = userMapper.loginFor2B(userInfo);
 			}
 		}
 
@@ -238,13 +248,22 @@ public class AuthServiceImpl implements AuthService {
 		if(phone == null){
 			return false;
 		}
+		
 		UserInfo userInfo = new UserInfo();
-		userInfo.setUserName(phone);
-		userInfo.setUserCenterId(userId);
-		userInfo.setPlatUserType(platUserType);
-		userInfo.setPassword(MethodUtil.MD5("000000"));//密码默认6个0
-		userInfo.setPhone(phone);
-		userMapper.insert(userInfo);
+		
+		userInfo = userMapper.getUserByName(phone);
+		if(userInfo == null){
+			userInfo = new UserInfo();
+			userInfo.setUserName(phone);
+			userInfo.setUserCenterId(userId);
+			userInfo.setPlatUserType(JWTUtil.CONSUMER);
+			userInfo.setPassword(MethodUtil.MD5("000000"));//密码默认6个0
+			userInfo.setPhone(phone);
+			userMapper.insert2B(userInfo);
+		} else {
+			userMapper.updateUserAuth(phone);
+		}
+		
 		return true;
 	}
 

@@ -19,7 +19,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS = 1
+              U.STATUS in (1,2)
           AND U.USER_NAME = #{USERNAME}
     </select>
     
@@ -37,7 +37,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS = 1
+              U.STATUS in (1,2)
           AND U.OPENID = #{openId}
     </select>
     
@@ -58,7 +58,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS = 1
+              U.STATUS in (1,2)
           AND U.USER_ID = #{platId}
     </select>
     
@@ -79,7 +79,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS = 1
+              U.STATUS in (1,2)
          <if test="userName != null and userName != ''">
 			and U.USER_NAME = #{userName}
 		 </if>
@@ -112,7 +112,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS = 1
+              U.STATUS in (1,2)
           AND U.PHONE = #{phone}
     </select>
     
@@ -121,11 +121,52 @@
               USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
     </insert>
     
+    <insert id="insert2B"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
+         INSERT INTO USER (
+              USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},2,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
+    </insert>
+    
     <update id="modifyPwd" parameterType="object">
     	update user 
     	<set>
     		PASSWORD = #{password}
     	</set>
-    	where PLATFORM = #{platUserType} and USER_NAME = #{userName}
+    	where USER_NAME = #{userName}
     </update>
+    
+    <update id="updateUserAuth" parameterType="object">
+    	update user set status = 2 where USER_NAME = #{userName}
+    </update>
+    
+    <select id="loginFor2B" parameterType="java.lang.String" resultType="userInfo">
+                    SELECT
+              U.USER_ID userId,
+              U.USER_NAME userName,
+              U.PASSWORD password,
+              U.PHONE phone,
+              U.EMAIL email,
+              U.STATUS status,
+              U.CREATION_DATE creationDate,
+              U.CREATED_BY createdBy,
+              U.LAST_UPDATE_DATE lastUpdateDate,
+              U.LAST_UPDATED_BY lastUpdatedBy,
+              U.PLATFORM platUserType,
+			  U.USERCENTERID userCenterId
+          FROM
+              USER U
+          WHERE
+              U.STATUS = 2
+         <if test="userName != null and userName != ''">
+			and U.USER_NAME = #{userName}
+		 </if>
+		 <if test="phone != null and phone != ''">
+			and U.PHONE = #{phone}
+		 </if>
+		 <if test="password != null and password != ''">
+			and U.PASSWORD = #{password}
+		 </if>
+		 <if test="openId != null and openId != ''">
+			and U.OPENID = #{openId}
+		 </if>
+    </select>
 </mapper>

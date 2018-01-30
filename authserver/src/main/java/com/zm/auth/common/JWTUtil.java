@@ -31,7 +31,7 @@ public class JWTUtil {
 
 	public final static String PLATFORM_ID = "platid";
 
-	private final static int CONSUMER = 5;
+	public final static int CONSUMER = 5;
 
 	public static String generateToken(Map<String, Object> claims) {
 		return Jwts.builder().setClaims(claims).setExpiration(DateUtil.getFixDate(2020, 12, 30, 0, 0, 0))
