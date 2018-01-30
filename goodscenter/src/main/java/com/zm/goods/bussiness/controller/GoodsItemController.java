@@ -14,6 +14,7 @@ import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.ResultModel;
 
 /**
@@ -149,5 +150,72 @@ public class GoodsItemController {
 		} catch (Exception e) {
 			return new ResultModel(false, e.getMessage());
 		}
+	}
+	
+	@RequestMapping(value = "{version}/goods/item/queryPurchaseItemForPage", method = RequestMethod.POST)
+	public ResultModel queryPurchaseItemForPage(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String centerId = request.getParameter("centerId");
+			if (centerId == null || "".equals(centerId)) {
+				new ResultModel(false, "没有获取订货平台编号");
+			}
+			Page<GoodsItemEntity> page = goodsItemService.queryPurchaseCenterByPage(entity, Integer.parseInt(centerId));
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/item/queryPurchaseItem", method = RequestMethod.POST)
+	public ResultModel queryPurchaseItem(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<GoodsItemEntity> page = goodsItemService.queryPurchaseCenterItem(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryPurchaseItemForEdit", method = RequestMethod.POST)
+	public ResultModel queryPurchaseItemForEdit(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+	
+		if (Constants.FIRST_VERSION.equals(version)) {
+			GoodsPrice result = goodsItemService.queryPurchaseCenterItemForEdit(entity);
+			return new ResultModel(true, result);
+		}
+	
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/item/editPurchaseItem", method = RequestMethod.POST)
+	public ResultModel editPurchaseItem(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsPrice entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				//先确认当前商品的起批量是否在总部设置的区间内
+				GoodsPrice chkGoodsPrice = goodsItemService.queryItemPrice(entity.getItemId());
+				if (chkGoodsPrice == null) {
+					return new ResultModel(false, "当前商品数据异常，请联系系统管理员");
+				}
+				if (chkGoodsPrice.getMin() > entity.getMin()) {
+					return new ResultModel(false, "当前商品最小起批量应大于等于"+chkGoodsPrice.getMin());
+				}
+				if (chkGoodsPrice.getMax() < entity.getMax()) {
+					return new ResultModel(false, "当前商品最大起批量应小于等于"+chkGoodsPrice.getMax());
+				}
+				goodsItemService.updateItemPrice(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
 	}
 }

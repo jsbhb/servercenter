@@ -574,4 +574,24 @@ public class GoodsController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	/**
+	 * @fun 订货平台商品同步
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/itemSync/{centerId}", method = RequestMethod.POST)
+	public ResultModel itemSync(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestBody List<String> itemIdList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			if (itemIdList == null || itemIdList.size() == 0) {
+				return new ResultModel(false, "没有选择要同步的商品");
+			}
+			return goodsService.syncgoods(itemIdList, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 }
