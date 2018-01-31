@@ -10,8 +10,8 @@ drop table if exists  `zm_log`.`log`;
 
 CREATE TABLE `zm_log`.`log`(
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `center_id` INT NOT NULL,
-  `client_id` INT UNSIGNED NOT NULL,
+  `center_id` INT NOT NULL COMMENT '服务中心ID',
+  `client_id` INT NOT NULL COMMENT '客户端ID',
   `api_id` TINYINT UNSIGNED NOT NULL,
   `center_name` VARCHAR(20) NULL,
   `api_name` VARCHAR(20) NULL,
