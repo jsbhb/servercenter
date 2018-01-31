@@ -18,7 +18,7 @@ CREATE TABLE `zm_goods`.`base` (
   `first_category` varchar(100) NOT NULL COMMENT '一级分类id',
   `second_category` varchar(100) NOT NULL COMMENT '二级分类id',
   `third_category` varchar(100) NOT NULL COMMENT '三级分类id',
-  `center_id` int UNSIGNED NOT NULL COMMENT '区域中心ID',
+  `center_id` int NULL COMMENT '区域中心ID',
   `create_time` DATETIME NULL COMMENT '注册时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',

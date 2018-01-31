@@ -140,7 +140,7 @@ CREATE TABLE `zm_activity`.`user_coupon` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '账号ID',
   `coupon_id` varchar(100) NOT NULL COMMENT '优惠券ID',
-  `center_id` INT UNSIGNED NOT NULL COMMENT '区域中心ID',
+  `center_id` INT NULL COMMENT '区域中心ID',
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：未使用；1：已使用',
   `create_time` DATETIME NULL  COMMENT '创建时间',
   PRIMARY KEY (`id`),

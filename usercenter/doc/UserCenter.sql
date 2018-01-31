@@ -17,7 +17,7 @@ CREATE TABLE `zm_user`.`user` (
   `is_phone_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '手机是否验证',
   `is_email_validate` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '邮箱是否验证',
   `status` TINYINT UNSIGNED NULL DEFAULT 1 COMMENT '用户状态0：不可用，1正常',
-  `center_id` INT UNSIGNED NULL COMMENT '注册区域中心ID',
+  `center_id` INT NULL COMMENT '注册区域中心ID',
   `shop_id` INT UNSIGNED NULL COMMENT '注册店中店ID',
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
   `create_time` DATETIME NULL COMMENT '注册时间', 
@@ -62,7 +62,7 @@ drop table if exists  `user_vip`;
 CREATE TABLE `zm_user`.`user_vip` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `center_id` INT UNSIGNED NOT NULL COMMENT '那个区域中心的会员',
+  `center_id` INT NULL COMMENT '那个区域中心的会员',
   `duration` TINYINT UNSIGNED NOT NULL COMMENT '持续时间（月）',
   `vip_level` TINYINT UNSIGNED NOT NULL COMMENT 'vip等级',
   `status` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效0：否；1：是',
@@ -228,7 +228,7 @@ drop table if exists  `vip_price`;
 CREATE TABLE `zm_user`.`vip_price` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `vip_level` TINYINT UNSIGNED NOT NULL COMMENT 'vip等级',
-  `center_id` INT UNSIGNED NOT NULL COMMENT '区域中心',
+  `center_id` INT NULL COMMENT '区域中心',
   `duration` TINYINT UNSIGNED NOT NULL COMMENT '持续时间（月）',
   `price` DECIMAL(10,2) NOT NULL COMMENT '价格',
   `attribute` VARCHAR(200) NULL COMMENT '备用字段',
