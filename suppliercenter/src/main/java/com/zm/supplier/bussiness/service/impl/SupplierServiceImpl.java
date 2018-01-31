@@ -21,6 +21,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
+import com.zm.supplier.util.ListUtil;
 
 @Service
 @Transactional
@@ -91,6 +92,8 @@ public class SupplierServiceImpl implements SupplierService {
 		return new ResultModel(true, "正在同步状态");
 	}
 
+	private static final int LIMITSIZE = 20;
+
 	@Override
 	public ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId, boolean flag) {
 		if (FUBANG_WAREHOUSE.equals(supplierId)) {
@@ -99,16 +102,19 @@ public class SupplierServiceImpl implements SupplierService {
 				temp = new ArrayList<OrderBussinessModel>();
 				temp.add(model);
 				if (flag) {
-					warehouseThreadPool.checkStockByAsync(temp, supplierId);//定时器调用的库存方法用线程池，防止feign调用超时
+					warehouseThreadPool.checkStockByAsync(temp, supplierId);// 定时器调用的库存方法用线程池，防止feign调用超时
 				} else {
 					warehouseThreadPool.checkStock(temp, supplierId);
 				}
 			}
 		} else {
-			if(flag){
-				warehouseThreadPool.checkStockByAsync(list, supplierId);//定时器调用的库存方法用线程池，防止feign调用超时
-			}else {
-				warehouseThreadPool.checkStock(list, supplierId);
+			List<List<OrderBussinessModel>> subList = ListUtil.split(list, LIMITSIZE);//批量同步没次20个，防止超时
+			for(List<OrderBussinessModel> temp : subList){
+				if (flag) {
+					warehouseThreadPool.checkStockByAsync(temp, supplierId);// 定时器调用的库存方法用线程池，防止feign调用超时
+				} else {
+					warehouseThreadPool.checkStock(temp, supplierId);
+				}
 			}
 		}
 		return new ResultModel(true, "同步库存完成");
