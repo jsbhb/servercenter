@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.order.bussiness.dao.PurchaseOrderMapper">
+
+<!-- 	<resultMap type="com.zm.order.pojo.PurchaseOrderInfo" id="purchaseOrderInfo"> -->
+<!-- 		<id column="centerId" property="centerId" jdbcType="INTEGER" /> -->
+<!-- 		<id column="shopId" property="shopId" jdbcType="INTEGER" /> -->
+<!-- 		<result column="startTime" property="startTime" jdbcType="VARCHAR" /> -->
+<!-- 		<result column="endTime" property="endTime" jdbcType="VARCHAR" /> -->
+<!-- 		<result column="orderCount" property="orderCount" jdbcType="VARCHAR" /> -->
+<!-- 		<result column="orderAmountCount" property="orderAmountCount" jdbcType="VARCHAR" /> -->
+<!-- 	</resultMap> -->
+
+	<resultMap type="com.zm.order.pojo.OrderInfo" id="orderBase">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
+		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
+		<result column="create_type" property="createType" jdbcType="INTEGER" />
+		<result column="coupon_ids" property="couponIds" jdbcType="VARCHAR" />
+		<result column="express_type" property="expressType" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
+			<id column="detail_id" property="id" jdbcType="INTEGER" />
+			<result column="payment" property="payment" jdbcType="DECIMAL" />
+			<result column="dis_amount" property="disAmount" jdbcType="DECIMAL" />
+			<result column="post_fee" property="postFee" jdbcType="DECIMAL" />
+			<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
+			<result column="tariff_tax" property="tariffTax" jdbcType="DECIMAL" />
+			<result column="increment_tax" property="incrementTax"
+				jdbcType="DECIMAL" />
+			<result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+			<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
+			<result column="excise_tax" property="exciseTax" jdbcType="DECIMAL" />
+			<result column="pay_type" property="payType" jdbcType="INTEGER" />
+			<result column="carry_address" property="carryAddress"
+				jdbcType="VARCHAR" />
+			<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+			<result column="receive_phone" property="receivePhone"
+				jdbcType="VARCHAR" />
+			<result column="receive_province" property="receiveProvince"
+				jdbcType="VARCHAR" />
+			<result column="receive_city" property="receiveCity" jdbcType="VARCHAR" />
+			<result column="receive_area" property="receiveArea" jdbcType="VARCHAR" />
+			<result column="receive_address" property="receiveAddress"
+				jdbcType="VARCHAR" />
+			<result column="receive_zip_code" property="receiveZipCode"
+				jdbcType="VARCHAR" />
+		</association>
+		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
+			property="orderExpressList">
+			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
+			<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+			<result column="oestatus" property="status" jdbcType="VARCHAR" />
+			<result column="express_name" property="expressName" jdbcType="VARCHAR" />
+			<result column="express_id" property="expressId" jdbcType="VARCHAR" />
+			<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderGoods" id="orderGoods">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="item_quantity" property="itemQuantity"
+			jdbcType="INTEGER" />
+		<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
+		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+		<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
+	</resultMap>
+
+<!-- 	<select id="selectPurchaseOrderInfoForPage" resultMap="purchaseOrderInfo" parameterType="Object"> -->
+<!-- 		select a.center_id centerId,a.shop_id shopId, -->
+<!-- 		count(a.order_id) as orderCount, -->
+<!-- 		sum(b.payment) as orderAmountCount -->
+<!-- 		from order_base a -->
+<!-- 		left join order_detail b on a.order_id = b.order_id -->
+<!-- 		where 1=1  -->
+<!-- 		and a.status = '7' -->
+<!-- 		and a.order_source = '2' -->
+<!-- 		<if test="centerId != null and centerId != 0"> -->
+<!-- 			and a.center_id = #{centerId} -->
+<!-- 		</if> -->
+<!-- 		<if test="shopId != null and shopId != 0"> -->
+<!-- 			and a.shop_id = #{shopId} -->
+<!-- 		</if> -->
+<!-- 		<if test="orderId != null and orderId != ''"> -->
+<!-- 			and a.order_id = #{orderId} -->
+<!-- 		</if> -->
+<!-- 		<if test="startTime != null and startTime != ''"> -->
+<!-- 			and b.pay_time &gt;= #{startTime} -->
+<!-- 		</if> -->
+<!-- 		<if test="endTime != null and endTime != ''"> -->
+<!-- 			and b.pay_time &lt;= #{endTime} -->
+<!-- 		</if> -->
+<!-- 		group by a.center_id,a.shop_id -->
+<!-- 	</select> -->
+	
+	<select id="selectPurchaseOrderInfoForPage" resultMap="orderBase" parameterType="Object">
+		select 
+		o.*,
+		oe.id as orderExpress_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus,
+		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
+		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
+		from 
+		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.user_id ,ob.combination_id
+		from order_base ob where
+		1 = 1 and ob.order_source = '2'
+		<if test="status != null">
+			and ob.status = #{status,jdbcType = INTEGER}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			and ob.order_id = #{orderId}
+		</if>
+		<if test="remark != null and remark != ''">
+			and ob.user_id in (${remark}) 
+		</if>
+		order by ob.create_time desc) o 
+		left join order_detail od on o.order_id = od.order_id 
+		left join third_order_info oe
+		on oe.order_id = o.order_id order by o.create_time desc
+	</select>
+	
+
+</mapper>
