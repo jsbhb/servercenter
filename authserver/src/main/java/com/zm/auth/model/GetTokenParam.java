@@ -2,7 +2,7 @@ package com.zm.auth.model;
 
 public class GetTokenParam {
 
-	private String version;
+	private Double version;
 	private String appKey;
 	private String nonceStr;
 	private String sign;
@@ -11,11 +11,11 @@ public class GetTokenParam {
 		return (version != null && appKey != null && nonceStr != null && sign != null);
 	}
 
-	public String getVersion() {
+	public Double getVersion() {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(Double version) {
 		this.version = version;
 	}
 

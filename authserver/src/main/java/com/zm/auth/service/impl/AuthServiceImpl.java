@@ -292,7 +292,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(JWTUtil.APPKEY, param.getAppKey());
-		claim.put("expires", 7200);
+		claim.put("expires", JWTUtil.EXPIRES);
 		String token = JWTUtil.generateLimitTimeToken(claim);
 		return new ResultPojo(new AccessToken(token, JWTUtil.EXPIRES));
 	}
