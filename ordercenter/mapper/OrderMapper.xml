@@ -397,8 +397,11 @@
 	<update id="updateOrderStatusByThirdStatus" parameterType="Object">
 		update
 		order_base set
-		status = #{orderStatus}, update_time=now() where order_id =
-		#{orderId}
+		status = #{orderStatus}
+		<if test="orderStatus == 6">
+		, update_time=now()
+		</if>
+		where order_id = #{orderId}
 	</update>
 
 	<!-- 更新订单状态END -->
@@ -581,7 +584,7 @@
 	</select>
 	
 	<insert id="addOrderStatusRecord" parameterType="Object">
-		INSERT INTO order_status_record(order_id,status,create_time)
+		INSERT ignore INTO order_status_record(order_id,status,create_time)
 		VALUES(#{orderId},#{status},now())
 	</insert>
 

@@ -152,6 +152,7 @@ CREATE TABLE `zm_order`.`order_status_record` (
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `uk_orderId` (`order_id`,`status` ASC),
   INDEX `idx_orderId` (`order_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '订单状态记录表';
