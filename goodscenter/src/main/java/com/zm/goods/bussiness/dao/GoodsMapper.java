@@ -37,6 +37,8 @@ public interface GoodsMapper {
 	
 	GoodsSpecs getGoodsSpecsForOrder(Map<String,Object> param);
 	
+	GoodsSpecs getGoodsSpecsForButtJoinOrder(String itemId);
+	
 	List<GoodsSpecs> listGoodsSpecsByItemId(Map<String,Object> param);
 	
 	Activity getActivity(Map<String,Object> param);

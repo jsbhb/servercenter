@@ -4,41 +4,46 @@ import com.zm.order.common.Pagination;
 
 import io.swagger.annotations.ApiModel;
 
-/**  
- * ClassName: OrderGoods <br/>  
- * Function: TODO ADD FUNCTION. <br/>   
- * date: Aug 11, 2017 3:16:08 PM <br/>  
- *  
- * @author wqy  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: OrderGoods <br/>
+ * Function: TODO ADD FUNCTION. <br/>
+ * date: Aug 11, 2017 3:16:08 PM <br/>
+ * 
+ * @author wqy
+ * @version
+ * @since JDK 1.7
  */
-@ApiModel(value="orderGoods", description="商品信息")
-public class OrderGoods extends Pagination{
+@ApiModel(value = "orderGoods", description = "商品信息")
+public class OrderGoods extends Pagination {
 
 	private Integer id;
-	
+
 	private String orderId;
-	
+
 	private String itemId;
-	
+
 	private String sku;
-	
+
 	private String itemName;
-	
+
 	private String itemImg;
-	
+
 	private String itemInfo;
-	
+
 	private String itemCode;
-	
+
 	private Integer itemQuantity;
-	
+
 	private Double itemPrice;
-	
+
 	private Double actualPrice;
-	
+
 	private String remark;
+
+	public boolean validate() {
+		return (itemId != null && sku != null && itemCode != null && itemQuantity != null && itemPrice != null
+				&& actualPrice != null);
+	}
 
 	public String getItemImg() {
 		return itemImg;

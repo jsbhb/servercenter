@@ -41,6 +41,20 @@ public class DateUtil {
 		now.set(Calendar.DATE, now.get(Calendar.DATE) + day);
 		return now.getTime();
 	}
+	
+	/**
+	 * 得到时间
+	 * 
+	 * @param field
+	 * @param num
+	 * @return
+	 */
+	public static Date getDate(int field, int num) {
+		Calendar now = Calendar.getInstance();
+		now.setTime(new Date());
+		now.add(field, num);
+		return now.getTime();
+	}
 
 	/**
 	 * 获取固定的时间 getFixDate:(这里用一句话描述这个方法的作用). <br/>

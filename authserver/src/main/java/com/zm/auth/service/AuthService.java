@@ -1,5 +1,9 @@
 package com.zm.auth.service;
 
+import java.util.Map;
+
+import com.zm.auth.model.GetTokenParam;
+import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.SecurityUserDetail;
 import com.zm.auth.model.UserInfo;
 
@@ -66,5 +70,13 @@ public interface AuthService {
 
 
 	boolean createAccount(Integer userId, Integer platUserType);
+
+
+	/**
+	 * @fun 对接用户获取token
+	 * @param param
+	 * @return
+	 */
+	ResultPojo getToken(GetTokenParam param);
 	
 }

@@ -1,5 +1,7 @@
 package com.zm.goods.pojo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.zm.goods.common.Pagination;
 
 /**
@@ -11,6 +13,7 @@ import com.zm.goods.common.Pagination;
  * @version
  * @since JDK 1.7
  */
+@JsonInclude(Include.NON_NULL)
 public class ResultModel {
 
 	private String errorCode;
@@ -25,6 +28,12 @@ public class ResultModel {
 	public ResultModel(boolean flag, Object obj) {
 		this.success = flag;
 		this.obj = obj;
+	}
+	
+	public ResultModel(boolean flag, String errorCode, String errorMsg) {
+		this.success = flag;
+		this.errorCode = errorCode;
+		this.errorMsg = errorMsg;
 	}
 
 	public ResultModel(boolean flag, Object obj, Pagination pagination) {

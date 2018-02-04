@@ -25,7 +25,9 @@ import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.zm.gateway.common.StringUtil;
+import com.zm.gateway.model.ErrorCodeEnum;
 import com.zm.gateway.model.ResultPojo;
+import com.zm.gateway.util.JSONUtil;
 
 /**
  * 
@@ -96,7 +98,8 @@ public class AccessFilter extends ZuulFilter {
 		} catch (Exception e) {
 			ctx.setSendZuulResponse(false);
 			ctx.setResponseStatusCode(401);
-			ctx.setResponseBody(e.getMessage());
+			ctx.setResponseBody(JSONUtil.toJson(new ResultPojo(ErrorCodeEnum.TOKEN_VALIDATE_ERROR.getErrorCode(),
+					ErrorCodeEnum.TOKEN_VALIDATE_ERROR.getErrorMsg())));
 			logger.error("error:APIGATEWAY==========" + request.getRemoteAddr(), e);
 			return null;
 		}

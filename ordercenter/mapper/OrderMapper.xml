@@ -234,21 +234,21 @@
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
 		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,guide_id,supplier_id,tdq,
-		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source)
+		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status)
 		VALUES
 		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
-		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource})
+		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource},#{status})
 	</insert>
-
+	
 	<insert id="saveOrderDetail" parameterType="Object">
 		INSERT INTO
 		order_detail
 		(order_id,pay_type,payment,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,
 		receive_city,receive_area,receive_address,receive_zip_code,post_fee,
-		tax_fee,tariff_tax,increment_tax,excise_tax,create_time,remark,dis_amount)
+		tax_fee,tariff_tax,increment_tax,excise_tax,create_time,remark,dis_amount,pay_time)
 		VALUES
 		(#{orderId},#{payType},#{payment},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
-		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{postFee},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},now(),#{remark},#{disAmount});
+		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{postFee},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},now(),#{remark},#{disAmount},#{payTime});
 	</insert>
 
 	<insert id="saveOrderGoods" parameterType="Object">
@@ -579,5 +579,10 @@
 	<select id="listUnConfirmOrder" parameterType="Object" resultMap="order4Confirm">
 		select user_id ,order_id from order_base where status = 6 and update_time &lt;= #{time}
 	</select>
+	
+	<insert id="addOrderStatusRecord" parameterType="Object">
+		INSERT INTO order_status_record(order_id,status,create_time)
+		VALUES(#{orderId},#{status},now())
+	</insert>
 
 </mapper>

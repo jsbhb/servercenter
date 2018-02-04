@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -197,12 +198,38 @@ public class GoodsController {
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
 			Integer centerId, Integer orderFlag, @RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId") Integer userId) {
+			@RequestParam(value = "userId", required = false) Integer userId) {
 
 		ResultModel result = new ResultModel();
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds,
+						userId);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			result.setSuccess(false);
+			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());
+		}
 
-		if (Constants.FIRST_VERSION.equals(version)) {
-			result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds, userId);
+		return result;
+	}
+
+	@RequestMapping(value = "{version}/goods/for-buttjoinorder", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel delButtjoinOrderStock(@PathVariable("version") Double version,
+			@RequestBody List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
+		ResultModel result = new ResultModel();
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				result = goodsService.delButtjoinOrderStock(list, supplierId, orderFlag);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			result.setSuccess(false);
+			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());
 		}
 
 		return result;
@@ -570,7 +597,7 @@ public class GoodsController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsService.syncStock(itemIdList);
 		}
-		
+
 		return new ResultModel(false, "版本错误");
 	}
 

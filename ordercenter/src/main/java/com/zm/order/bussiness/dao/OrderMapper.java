@@ -40,9 +40,9 @@ public interface OrderMapper {
 	
 	void removeUserOrder(Map<String,Object> param);
 	
-	void confirmUserOrder(Map<String,Object> param);
+	int confirmUserOrder(Map<String,Object> param);
 	
-	void updateOrderPayStatusByOrderId(String orderId);
+	int updateOrderPayStatusByOrderId(String orderId);
 	
 	Integer getClientIdByOrderId(String orderId);
 	
@@ -50,7 +50,7 @@ public interface OrderMapper {
 	
 	List<ShoppingCart> listShoppingCart(Map<String,Object> param);
 	
-	void updateOrderDetailPayTime(Map<String,Object> param);
+	int updateOrderDetailPayTime(Map<String,Object> param);
 	
 	List<OrderCount> getCountByStatus(Map<String,Object> param);
 	
@@ -58,7 +58,7 @@ public interface OrderMapper {
 	
 	Integer countShoppingCart(Map<String,Object> param);
 	
-	void updateOrderCancel(String orderId);
+	int updateOrderCancel(String orderId);
 	
 	Integer getOrderStatusByOrderId(String orderId);
 	
@@ -66,13 +66,13 @@ public interface OrderMapper {
 	
 	void updateOrderPayType(OrderDetail detail);
 	
-	void updateOrderClose(String orderId);
+	int updateOrderClose(String orderId);
 	
 	List<String> listTimeOutOrderIds(String time);
 	
 	List<CustomModel> listPayCustomOrder();
 	
-	void updatePayCustom(String orderId);
+	int updatePayCustom(String orderId);
 	
 	void createFreeExpressFee(@Param("centerId") Integer centerId);
 	
@@ -98,11 +98,11 @@ public interface OrderMapper {
 
 	void saveThirdOrder(List<SendOrderResult> list);
 
-	void updateOrderSendToWarehouse(String orderId);
+	int updateOrderSendToWarehouse(String orderId);
 
 	void updateThirdOrderInfo(List<ThirdOrderInfo> list);
 
-	void updateOrderStatusByThirdStatus(ThirdOrderInfo thirdOrderInfo);
+	int updateOrderStatusByThirdStatus(ThirdOrderInfo thirdOrderInfo);
 	
 	Integer queryCountOrderInfo(Map<String,Object> param);
 
@@ -111,5 +111,7 @@ public interface OrderMapper {
 	List<OrderIdAndSupplierId> listUnDeliverOrder();
 
 	List<Order4Confirm> listUnConfirmOrder(String time);
+	
+	void addOrderStatusRecord(Map<String,Object> param);
 
 }

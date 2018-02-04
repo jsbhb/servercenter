@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsOpenInterfaceMapper">
+
+
+	<resultMap type="com.zm.goods.pojo.GoodsStock" id="stock">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="fxqty" property="quantity" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsDetail" id="detail">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="weight" property="weight" jdbcType="INTEGER"/>
+		<result column="goods_name" property="itemName" jdbcType="VARCHAR"/>
+		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC"/>
+		<result column="tariff" property="tariff" jdbcType="NUMERIC"/>
+		<result column="info" property="info" jdbcType="VARCHAR"/>
+		<result column="fxprice" property="fxPrice" jdbcType="NUMERIC"/>
+		<result column="type" property="type" jdbcType="INTEGER"/>
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER"/>
+		<result column="origin" property="origin" jdbcType="VARCHAR"/>
+		<result column="brand" property="brand" jdbcType="VARCHAR"/>
+		<result column="min" property="min" jdbcType="INTEGER"/>
+		<result column="max" property="max" jdbcType="INTEGER"/>
+	</resultMap>
+
+	<select id="listGoodsStock" parameterType="Object" resultMap="stock">
+		select g.id,g.item_id,g.fxqty from goods_stock g left join goods_item i on g.item_id = i.item_id 
+		where i.status = 2 and g.item_id in
+		<foreach collection="array" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGoodsDetail" parameterType="Object" resultMap="detail">
+		select i.item_id,i.weight,g.goods_name,b.increment_tax,b.tariff,i.info,p.fxprice,g.type,g.supplier_id,g.origin,
+		b.brand,p.min,p.max from goods_item i left join goods g on i.goods_id = g.goods_id left join 
+		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id where i.status = 2 and i.item_id in 
+		<foreach collection="array" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGoodsDetailByPage" parameterType="Object" resultMap="detail">
+		select i.item_id,i.weight,g.goods_name,b.increment_tax,b.tariff,i.info,p.fxprice,g.type,g.supplier_id,g.origin,
+		b.brand,p.min,p.max from goods_item i left join goods g on i.goods_id = g.goods_id left join 
+		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id where i.status = 2 
+		limit #{startRow},#{pageSize}
+	</select>
+	
+</mapper>

@@ -9,6 +9,8 @@
 
 package com.zm.auth.controller;
 
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,9 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.auth.common.Constants;
 import com.zm.auth.feignclient.ThirdPartFeignClient;
+import com.zm.auth.model.ErrorCodeEnum;
+import com.zm.auth.model.GetTokenParam;
 import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.UserInfo;
 import com.zm.auth.service.AuthService;
+import com.zm.auth.util.JSONUtil;
 
 /**
  * ClassName: UserController <br/>
@@ -121,6 +126,29 @@ public class UserController {
 			logger.info(e.getMessage());
 			return new ResultPojo("401", e.getMessage());
 		}
+	}
+
+	@RequestMapping(value = "/get_token", method = RequestMethod.POST)
+	public ResultPojo getToken(HttpServletRequest req) {
+		String data = req.getParameter("data");
+		GetTokenParam param = null;
+		try {
+			param = JSONUtil.parse(data, GetTokenParam.class);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			return new ResultPojo(ErrorCodeEnum.FORMAT_ERROR.getErrorCode(), ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+		}
+		if (Constants.FIRST_VERSION.equals(param.getVersion())) {
+			try {
+				return authService.getToken(param);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultPojo(ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			}
+		}
+		return new ResultPojo(ErrorCodeEnum.VERSION_ERROR.getErrorCode(), ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+
 	}
 
 }

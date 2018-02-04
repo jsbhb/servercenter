@@ -23,6 +23,7 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
+import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
@@ -736,7 +737,7 @@ public class GoodsServiceImpl implements GoodsService {
 			goodsMapper.insertCenterGoods(param);
 			goodsMapper.insertCenterGoodsFile(param);
 			goodsMapper.insertCenterGoodsItem(param);
-			if(Constants.PREDETERMINE_PLAT_TYPE.equals(id)){
+			if (Constants.PREDETERMINE_PLAT_TYPE.equals(id)) {
 				goodsMapper.insert2BGoodsPrice(param);
 			} else {
 				goodsMapper.insertCenterGoodsPrice(param);
@@ -785,6 +786,37 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 		return new ResultModel(true, "同步完成");
+	}
+
+	@Override
+	public ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
+		ResultModel result = new ResultModel(true, "");
+		GoodsSpecs specs = null;
+
+		for (OrderBussinessModel model : list) {
+			specs = goodsMapper.getGoodsSpecsForButtJoinOrder(model.getItemId());
+			if(specs == null){
+				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
+						"itemId="+model.getItemId()+ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
+			}
+			GoodsServiceUtil.judgeQuantityRange(false, result, specs, model);
+			if (!result.isSuccess()) {
+				return new ResultModel(false, ErrorCodeEnum.OUT_OF_RANGE.getErrorCode(),
+						ErrorCodeEnum.OUT_OF_RANGE.getErrorMsg());
+			}
+		}
+
+		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
+//			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
+		}
+
+		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
+		if (!enough) {
+			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
+					ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
+		}
+
+		return result;
 	}
 
 }

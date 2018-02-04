@@ -11,34 +11,34 @@ public class OrderInfo extends Pagination{
 
 	private Integer id;
 
-	private String orderId;
+	protected String orderId;
 
 	// 订单拆分时提供一个总ID
-	private String combinationId;
+	protected String combinationId;
 
-	private Integer userId;
+	protected Integer userId;
 
-	private Integer status;// 0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消;99异常状态
+	protected Integer status;// 0：初始；1：已付款;2：支付单报关;3：已发仓库；4：已报海关；5：单证放行；6：已发货；7：已收货；8：退单;9、超时取消;99异常状态
 
 	// 物流、自提
-	private Integer expressType;// 0：快递；1：自提
+	protected Integer expressType;// 0：快递；1：自提
 
 	// 区域中心ID
-	private Integer centerId;
+	protected Integer centerId;
 
-	private Integer shopId;
+	protected Integer shopId;
 
-	private Integer guideId;
+	protected Integer guideId;
 
-	private Integer supplierId;
+	protected Integer supplierId;
 
-	private Integer tdq;
+	protected Integer tdq;
 	
-	private Integer orderSource;
+	protected Integer orderSource;
 
-	private Integer weight;
+	protected Integer weight;
 
-	private String gtime;
+	protected String gtime;
 
 	private String sendTime;
 
@@ -46,15 +46,15 @@ public class OrderInfo extends Pagination{
 
 	private String updateTime;
 
-	private String remark;
+	protected String remark;
 
-	private Integer orderFlag;// 0:跨境；1：大贸;2：一般贸易
+	protected Integer orderFlag;// 0:跨境；1：大贸;2：一般贸易
 
 	private String statusArr;
 
-	private OrderDetail orderDetail;
+	protected OrderDetail orderDetail;
 
-	private List<OrderGoods> orderGoodsList;
+	protected List<OrderGoods> orderGoodsList;
 
 	private List<ThirdOrderInfo> orderExpressList;
 
@@ -66,11 +66,11 @@ public class OrderInfo extends Pagination{
 	
 	private Integer pushUserId;
 
-	private Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
+	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
 
 	public boolean check() {
 		if (orderDetail == null || orderGoodsList == null || orderFlag == null || createType == null || userId == null
-				|| tdq == null || expressType == null || centerId == null || supplierId == null) {
+				|| tdq == null || expressType == null || supplierId == null) {
 			return false;
 		}
 		return true;

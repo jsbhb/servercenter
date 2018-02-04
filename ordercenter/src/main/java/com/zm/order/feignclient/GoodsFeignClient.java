@@ -21,7 +21,7 @@ public interface GoodsFeignClient {
 			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
 			@RequestParam("orderFlag") Integer orderFlag,
 			@RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId") Integer userId);
+			@RequestParam(value = "userId", required = false) Integer userId);
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
@@ -37,4 +37,9 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/costPrice", method = RequestMethod.POST)
 	public Double getCostPrice(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list);
+
+	@RequestMapping(value = "{version}/goods/for-buttjoinorder", method = RequestMethod.POST)
+	public ResultModel delButtjoinOrderStock(@PathVariable("version") Double version,
+			@RequestBody List<OrderBussinessModel> list, @RequestParam("supplierId") Integer supplierId,
+			@RequestParam("orderFlag") Integer orderFlag);
 }

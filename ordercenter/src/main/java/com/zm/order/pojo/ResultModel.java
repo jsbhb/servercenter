@@ -1,5 +1,8 @@
 package com.zm.order.pojo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -13,6 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @since JDK 1.7  
  */
 @ApiModel
+@JsonInclude(Include.NON_NULL)
 public class ResultModel {
 
 	@ApiModelProperty(value="错误码")
@@ -34,6 +38,12 @@ public class ResultModel {
 	public ResultModel(boolean success, String errorMsg){
 		this.success = success;
 		this.errorMsg = errorMsg;
+	}
+	
+	public ResultModel(boolean success, String errorCode, String errorMsg){
+		this.success = success;
+		this.errorMsg = errorMsg;
+		this.errorCode = errorCode;
 	}
 	
 	public String getErrorCode() {

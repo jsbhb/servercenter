@@ -10,7 +10,7 @@ public class Constants {
 	public static final String WX_PAY = "1";
 
 	public static final String ALI_PAY = "2";
-	
+
 	public static final String JSAPI = "JSAPI";
 
 	// *********************订单状态******************************/
@@ -26,43 +26,45 @@ public class Constants {
 	public static final Integer ORDER_CANCEL = 8;// 退单
 	public static final Integer ORDER_CLOSE = 9;// 交易关闭
 	public static final Integer ORDER_EXCEPTION = 99;// 订单异常
-	
-	
-	// *********************活动范围，获取是否有全场活动******************************/
-	public static final Integer ACTIVE_AREA = 1;//活动范围：全场
-	
-	// *********************活动类型******************************/
-	public static final Integer FULL_CUT = 1;//满减
-	
-	public static final Integer FULL_DISCOUNT = 2;//满打折
-	
-	//*******************区域中心ID**********************
-	
-	public static final Integer O2O_CENTERID = 1;
-	
-	public static final Integer BIG_TRADE_CENTERID = 2;
-	
-	
-	//*******************快递方式******************
-	public static final Integer EXPRESS = 0;
-	
-	public static final Integer OWN_CARRIER = 1;
-	
-	//*********************订单类型*********************
-	
-	public static final Integer O2O_ORDER_TYPE = 0;//跨境
 
-	public static final Integer TRADE_ORDER_TYPE = 1;//大贸
-	
-	public static final Integer GENERAL_TRADE = 2;//一般贸易
-	
-	//************************分润前缀**********************
+	// *********************活动范围，获取是否有全场活动******************************/
+	public static final Integer ACTIVE_AREA = 1;// 活动范围：全场
+
+	// *********************活动类型******************************/
+	public static final Integer FULL_CUT = 1;// 满减
+
+	public static final Integer FULL_DISCOUNT = 2;// 满打折
+
+	// *******************区域中心ID**********************
+
+	public static final Integer O2O_CENTERID = 1;
+
+	public static final Integer BIG_TRADE_CENTERID = 2;
+
+	// *******************快递方式******************
+	public static final Integer EXPRESS = 0;
+
+	public static final Integer OWN_CARRIER = 1;
+
+	// *********************订单类型*********************
+
+	public static final Integer O2O_ORDER_TYPE = 0;// 跨境
+
+	public static final Integer TRADE_ORDER_TYPE = 1;// 大贸
+
+	public static final Integer GENERAL_TRADE = 2;// 一般贸易
+
+	// ************************分润前缀**********************
 	public static final String PROFIT = "profit";
-	
-	//*********************异常分润订单***********************
+
+	// *********************异常分润订单***********************
 	public static final String EXCEPTION_PROFIT = "EXCEPTION_PROFIT";
-	
-	//*********************订货平台订单***********************
+
+	// *********************订货平台订单***********************
 	public static final Integer PREDETERMINE_ORDER = 2;
-	
+
+	// *********************订货平台ID*********************
+
+	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
+
 }

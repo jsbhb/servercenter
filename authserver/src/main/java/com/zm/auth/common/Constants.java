@@ -28,6 +28,6 @@ public class Constants {
 	public final static int LOGIN_PLATID = 4;
 	
 	//******************版本控制*****************
-	public final static double FIRST_VERSION = 1.0;
+	public final static Double FIRST_VERSION = 1.0;
 
 }

@@ -6,7 +6,7 @@ public class Constants {
 
 	public static final String EMAIL = "email";
 
-	public static final String MOBILE = "mobile";
+	public static final String MOBILE = "phone";
 
 	public static final String ACCOUNT = "account";
 

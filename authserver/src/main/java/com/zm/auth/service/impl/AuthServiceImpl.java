@@ -18,11 +18,16 @@ import com.zm.auth.common.JWTUtil;
 import com.zm.auth.common.MethodUtil;
 import com.zm.auth.feignclient.UserCenterFeignClient;
 import com.zm.auth.mapper.UserMapper;
+import com.zm.auth.model.AccessToken;
+import com.zm.auth.model.ErrorCodeEnum;
+import com.zm.auth.model.GetTokenParam;
 import com.zm.auth.model.PlatUserType;
+import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.SecurityUserDetail;
 import com.zm.auth.model.SecurityUserFactory;
 import com.zm.auth.model.UserInfo;
 import com.zm.auth.service.AuthService;
+import com.zm.auth.util.SignUtil;
 
 /**
  * 
@@ -42,10 +47,10 @@ public class AuthServiceImpl implements AuthService {
 
 	@Value("${jwt.tokenHead}")
 	private String tokenHead;
-	
+
 	@Resource
 	UserCenterFeignClient userCenterFeignClient;
-	
+
 	public static final Integer B2B_FORM = 6;
 
 	@Autowired
@@ -123,7 +128,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		int loginType = userInfo.getLoginType();
-		
+
 		int platUserType = userInfo.getPlatUserType();
 
 		UserInfo userDetail = null;
@@ -165,8 +170,8 @@ public class AuthServiceImpl implements AuthService {
 				userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 				userDetail = userMapper.getUserForLogin(userInfo);
 			}
-			
-			if(platUserType == B2B_FORM){
+
+			if (platUserType == B2B_FORM) {
 				claim.put(JWTUtil.PASSWORD, MethodUtil.MD5(userInfo.getPassword()));
 				claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
 
@@ -236,35 +241,60 @@ public class AuthServiceImpl implements AuthService {
 	public boolean modifyPwd(UserInfo userInfo) {
 		userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 		int num = userMapper.modifyPwd(userInfo);
-		if(num == 0){
+		if (num == 0) {
 			return false;
 		}
 		return true;
 	}
 
 	@Override
-	public boolean createAccount(Integer userId,Integer platUserType) {
+	public boolean createAccount(Integer userId, Integer platUserType) {
 		String phone = userCenterFeignClient.getPhoneByUserId(Constants.FIRST_VERSION, userId);
-		if(phone == null){
+		if (phone == null) {
 			return false;
 		}
-		
+
 		UserInfo userInfo = new UserInfo();
-		
+
 		userInfo = userMapper.getUserByName(phone);
-		if(userInfo == null){
+		if (userInfo == null) {
 			userInfo = new UserInfo();
 			userInfo.setUserName(phone);
 			userInfo.setUserCenterId(userId);
 			userInfo.setPlatUserType(JWTUtil.CONSUMER);
-			userInfo.setPassword(MethodUtil.MD5("000000"));//密码默认6个0
+			userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
 			userInfo.setPhone(phone);
 			userMapper.insert2B(userInfo);
 		} else {
 			userMapper.updateUserAuth(phone);
 		}
-		
+
 		return true;
+	}
+
+	@Override
+	public ResultPojo getToken(GetTokenParam param) {
+		if (!param.validata()) {
+			return new ResultPojo(ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+		}
+		UserInfo info = userMapper.getUserByName(param.getAppKey());
+		String appSecret = info.getPassword();
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("appSecret", appSecret);
+		map.put("version", param.getVersion());
+		map.put("appKey", param.getAppKey());
+		map.put("nonceStr", param.getNonceStr());
+		String sing = SignUtil.sign(map);
+		if(!param.getSign().equals(sing)){
+			return new ResultPojo(ErrorCodeEnum.SIGN_VALIDATE_ERROR.getErrorCode(),
+					ErrorCodeEnum.SIGN_VALIDATE_ERROR.getErrorMsg());
+		}
+		Map<String, Object> claim = new HashMap<String, Object>();
+		claim.put(JWTUtil.APPKEY, param.getAppKey());
+		claim.put("expires", 7200);
+		String token = JWTUtil.generateLimitTimeToken(claim);
+		return new ResultPojo(new AccessToken(token, JWTUtil.EXPIRES));
 	}
 
 }

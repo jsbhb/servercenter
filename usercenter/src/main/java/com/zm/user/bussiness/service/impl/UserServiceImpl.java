@@ -146,7 +146,11 @@ public class UserServiceImpl implements UserService {
 		}
 
 		if (info.getUserDetail() != null) {
-			info.getUserDetail().setNickName(EmojiFilter.emojiChange(info.getUserDetail().getNickName()));
+			String nickName = info.getUserDetail().getNickName();
+			if(nickName != null && !"".equals(nickName)){
+				info.getUserDetail().setNickName(EmojiFilter.emojiChange(info.getUserDetail().getNickName()));
+			}
+			info.getUserDetail().setUserId(info.getId());
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
 

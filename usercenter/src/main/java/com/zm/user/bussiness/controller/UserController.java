@@ -23,6 +23,7 @@ import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.ThirdPartFeignClient;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
+import com.zm.user.pojo.ErrorCodeEnum;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
@@ -177,7 +178,9 @@ public class UserController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			detail.setNickName(EmojiFilter.emojiChange(detail.getNickName()));
+			if(detail.getNickName() != null){
+				detail.setNickName(EmojiFilter.emojiChange(detail.getNickName()));
+			}
 			userService.updateUserDetail(detail);
 			result.setSuccess(true);
 			result.setObj(detail);
@@ -205,29 +208,37 @@ public class UserController {
 			@RequestBody UserInfo info, @PathVariable("code") String code, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			boolean flag = false;
-			if (BACK_CODE.equals(code)) {
-				flag = true;
-			} else {
-				if (!info.check()) {
-					result.setErrorMsg("参数不全");
-					result.setSuccess(false);
-					return result;
+				boolean flag = false;
+				if (BACK_CODE.equals(code)) {
+					flag = true;
+				} else {
+					if (!info.check()) {
+						result.setErrorMsg("参数不全");
+						result.setSuccess(false);
+						return result;
+					}
+					flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
 				}
-				flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, info.getPhone(), code);
+				if (flag) {
+					Integer userId = userService.saveUser(info);
+					result.setObj(userId);
+					result.setSuccess(true);
+				} else {
+					result.setObj(Constants.PHONE_VERIFY_ERROR_CODE);
+					result.setSuccess(false);
+					result.setErrorMsg("验证码错误");
+				}
 			}
-			if (flag) {
-				Integer userId = userService.saveUser(info);
-				result.setObj(userId);
-				result.setSuccess(true);
-			} else {
-				result.setObj(Constants.PHONE_VERIFY_ERROR_CODE);
-				result.setSuccess(false);
-				result.setErrorMsg("验证码错误");
-			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			e.printStackTrace();
+			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			result.setSuccess(false);
+			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());
 		}
 
 		return result;
@@ -524,9 +535,9 @@ public class UserController {
 
 		return null;
 	}
-	
+
 	@RequestMapping(value = "{version}/user/phone/{userId}", method = RequestMethod.GET)
-	public String getPhoneByUserId(@PathVariable("version") Double version,@PathVariable("userId") Integer userId){
+	public String getPhoneByUserId(@PathVariable("version") Double version, @PathVariable("userId") Integer userId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return userService.getPhoneByUserId(userId);
 		}

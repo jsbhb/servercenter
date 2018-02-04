@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModel;
  * @version
  * @since JDK 1.7
  */
-@ApiModel(value="orderDetail", description="订单详细信息")
+@ApiModel(value = "orderDetail", description = "订单详细信息")
 public class OrderDetail {
 
 	private Integer id;
@@ -27,19 +27,19 @@ public class OrderDetail {
 	private Double postFee;
 
 	private Double taxFee;
-	
-	private Double tariffTax;//关税
-	
-	private Double incrementTax;//增值税
-	
-	private Double exciseTax;//消费税
+
+	private Double tariffTax;// 关税
+
+	private Double incrementTax;// 增值税
+
+	private Double exciseTax;// 消费税
 
 	private String payNo;
-	
+
 	private Double disAmount;
-	
+
 	private String returnPayNo;
-	
+
 	private Integer customStatus;
 
 	// 发货地
@@ -64,6 +64,12 @@ public class OrderDetail {
 
 	private String remark;
 
+	public boolean validate() {
+		return (payType != null && payment != null && payTime != null && postFee != null && taxFee != null
+				&& tariffTax != null && incrementTax != null && exciseTax != null && payNo != null && disAmount != null
+				&& receiveName != null && receivePhone != null && receiveProvince != null && receiveCity != null
+				&& receiveArea != null && receiveAddress != null && receiveZipCode != null);
+	}
 
 	public Double getDisAmount() {
 		return disAmount;
@@ -259,13 +265,12 @@ public class OrderDetail {
 
 	@Override
 	public String toString() {
-		return "OrderDetail [id=" + id + ", orderId=" + orderId + ", payType=" + payType
-				+ ", payment=" + payment + ", payTime=" + payTime + ", postFee=" + postFee + ", taxFee=" + taxFee
-				+ ", payNo=" + payNo + ", deliveryPlace=" + deliveryPlace + ", carryAddress=" + carryAddress
-				+ ", receiveName=" + receiveName + ", receivePhone=" + receivePhone + ", receiveProvince="
-				+ receiveProvince + ", receiveCity=" + receiveCity + ", receiveArea=" + receiveArea
-				+ ", receiveAddress=" + receiveAddress + ", receiveZipCode=" + receiveZipCode + ", remark=" + remark
-				+ "]";
+		return "OrderDetail [id=" + id + ", orderId=" + orderId + ", payType=" + payType + ", payment=" + payment
+				+ ", payTime=" + payTime + ", postFee=" + postFee + ", taxFee=" + taxFee + ", payNo=" + payNo
+				+ ", deliveryPlace=" + deliveryPlace + ", carryAddress=" + carryAddress + ", receiveName=" + receiveName
+				+ ", receivePhone=" + receivePhone + ", receiveProvince=" + receiveProvince + ", receiveCity="
+				+ receiveCity + ", receiveArea=" + receiveArea + ", receiveAddress=" + receiveAddress
+				+ ", receiveZipCode=" + receiveZipCode + ", remark=" + remark + "]";
 	}
 
 }

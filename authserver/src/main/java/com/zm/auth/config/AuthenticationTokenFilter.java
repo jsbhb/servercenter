@@ -92,7 +92,18 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 						SecurityContextHolder.getContext().setAuthentication(authentication);
 					}
 					return;
-				} else {
+					
+				} else if(claims.containsKey(JWTUtil.APPKEY)){
+					userDetails = (SecurityUserDetail) this.userService
+							.loadUserByUsername((String) claims.get(JWTUtil.APPKEY));
+					if (userDetails != null) {
+						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+								userDetails, null, userDetails.getAuthorities());
+						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						logger.info(
+								"authenticated appKey " + claims.get(JWTUtil.APPKEY) + ", setting security context");
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+					}
 					return;
 				}
 

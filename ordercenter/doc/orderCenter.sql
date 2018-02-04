@@ -142,9 +142,9 @@ COMMENT = '订单商品';
 
 
 
-drop table if exists  `zm_order`.`customs_status`;
+drop table if exists  `zm_order`.`order_status_record`;
 
-CREATE TABLE `zm_order`.`customs_status` (
+CREATE TABLE `zm_order`.`order_status_record` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `order_id` CHAR(21) NOT NULL,
   `status` TINYINT UNSIGNED NOT NULL,
@@ -154,7 +154,7 @@ CREATE TABLE `zm_order`.`customs_status` (
   PRIMARY KEY (`id`),
   INDEX `idx_orderId` (`order_id` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '跨境订单海关状态';
+COMMENT = '订单状态记录表';
 
 
 
@@ -304,3 +304,36 @@ CREATE TABLE `zm_order`.`profit_proportion` (
 	PRIMARY KEY (id)
 	)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 COMMENT = '分润比例设置';
+
+drop table if exists  `zm_order`.`express_fee_2b`;
+
+CREATE TABLE `zm_order`.`express_fee_2b` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`express_key` VARCHAR(45) NOT NULL,
+	`name` VARCHAR(45) NOT NULL COMMENT '名称',
+	`fee` decimal(10,2) NOT NULL COMMENT '默认费用',
+	`weight` int UNSIGNED NOT NULL COMMENT '默认重量',
+	`heavy_fee` decimal(10,2) NOT NULL COMMENT '续重费用',
+	`include_province` VARCHAR(1000) NULL COMMENT '包含省份',
+	`attr` VARCHAR(100) NULL COMMENT '备用',
+	`create_time` DATETIME NULL,
+	`update_time` DATETIME NULL,
+	`opt` VARCHAR(20) NULL,
+	PRIMARY KEY (id)
+	)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+	COMMENT ='快递费用设置';
+	
+	
+drop table if exists  `zm_order`.`free_express_fee_2b`;
+
+CREATE TABLE `zm_order`.`free_express_fee_2b` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`condition_fee` decimal(10,2) NOT NULL COMMENT '包邮条件费用',
+	`attr` VARCHAR(100) NULL COMMENT '备用',
+	`attr1` VARCHAR(100) NULL COMMENT '备用',
+	`create_time` DATETIME NULL,
+	`update_time` DATETIME NULL,
+	`opt` VARCHAR(20) NULL,
+	PRIMARY KEY (id)
+	)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
+	COMMENT = '包邮条件';

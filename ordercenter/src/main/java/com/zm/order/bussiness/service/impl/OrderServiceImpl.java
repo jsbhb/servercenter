@@ -141,16 +141,16 @@ public class OrderServiceImpl implements OrderService {
 		Map<String, Object> priceAndWeightMap = null;
 		Double amount = 0.0;
 		boolean vip = false;
-
-		// 获取该用户是否是VIP
-		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
-		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		Integer centerId = null;
 		if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {// 如果是订货平台订单，默认centerId
 			centerId = -1;
 		} else {
 			centerId = info.getCenterId();
 		}
+
+		// 获取该用户是否是VIP
+		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
+		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
 				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId());
 
@@ -225,19 +225,25 @@ public class OrderServiceImpl implements OrderService {
 		if (Constants.WX_PAY.equals(payType)) {
 			payModel.setOpenId(openId);
 			payModel.setIP(req.getRemoteAddr());
-			Map<String, String> paymap = payFeignClient.wxPay(info.getCenterId(), type, payModel);
+			Map<String, String> paymap = payFeignClient.wxPay(centerId, type, payModel);
 			result.setObj(paymap);
 		} else if (Constants.ALI_PAY.equals(payType)) {
-			result.setObj(payFeignClient.aliPay(info.getCenterId(), type, payModel));
+			result.setObj(payFeignClient.aliPay(centerId, type, payModel));
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
 			return result;
 		}
 
+		if (info.getCouponIds() != null) {
+			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
+					info.getCouponIds());
+		}
+
 		info.setOrderId(orderId);
 		info.setWeight(weight);
 		info.getOrderDetail().setOrderId(orderId);
+		info.setStatus(0);
 
 		orderMapper.saveOrder(info);
 
@@ -254,12 +260,6 @@ public class OrderServiceImpl implements OrderService {
 			goods.setOrderId(orderId);
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
-
-		// FIXME 用mq
-		if (info.getCouponIds() != null) {
-			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
-					info.getCouponIds());
-		}
 
 		result.setSuccess(true);
 		result.setErrorMsg(orderId);
@@ -319,8 +319,12 @@ public class OrderServiceImpl implements OrderService {
 	public ResultModel confirmUserOrder(Map<String, Object> param) {
 		ResultModel result = new ResultModel();
 
-		orderMapper.confirmUserOrder(param);
-//		shareProfitComponent.calShareProfit(param.get("orderId").toString());
+		int count = orderMapper.confirmUserOrder(param);
+		// shareProfitComponent.calShareProfit(param.get("orderId").toString());
+		if (count > 0) {// 有更新结果后插入状态记录表
+			param.put("status", Constants.ORDER_COMPLETE);
+			orderMapper.addOrderStatusRecord(param);
+		}
 
 		result.setSuccess(true);
 		return result;
@@ -331,9 +335,13 @@ public class OrderServiceImpl implements OrderService {
 
 		ResultModel result = new ResultModel();
 
-		orderMapper.updateOrderPayStatusByOrderId(param.get("orderId") + "");
+		int count = orderMapper.updateOrderPayStatusByOrderId(param.get("orderId") + "");
 
 		orderMapper.updateOrderDetailPayTime(param);
+		if (count > 0) {// 有更新结果后插入状态记录表
+			param.put("status", Constants.ORDER_PAY);
+			orderMapper.addOrderStatusRecord(param);
+		}
 
 		result.setSuccess(true);
 		return result;
@@ -450,7 +458,13 @@ public class OrderServiceImpl implements OrderService {
 					OrderDetail detail = new OrderDetail();
 					detail.setOrderId(orderId);
 					detail.setReturnPayNo((String) result.get("returnPayNo"));
-					orderMapper.updateOrderCancel(orderId);
+					int count = orderMapper.updateOrderCancel(orderId);
+					if (count > 0) {
+						Map<String, Object> param = new HashMap<String, Object>();
+						param.put("status", Constants.ORDER_CANCEL);
+						param.put("orderId", orderId);
+						orderMapper.addOrderStatusRecord(param);
+					}
 					stockBack(info);
 					String content = "订单号\"" + info.getOrderId() + "\"退单";
 
@@ -492,7 +506,13 @@ public class OrderServiceImpl implements OrderService {
 		if (!DEFAULT_USER_ID.equals(userId) && (info == null || !userId.equals(info.getUserId()))) {
 			return false;
 		}
-		orderMapper.updateOrderClose(orderId);
+		int count = orderMapper.updateOrderClose(orderId);
+		if (count > 0) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("status", Constants.ORDER_CLOSE);
+			param.put("orderId", orderId);
+			orderMapper.addOrderStatusRecord(param);
+		}
 		stockBack(info);
 		return true;
 	}
@@ -527,7 +547,13 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void updatePayCustom(String orderId) {
-		orderMapper.updatePayCustom(orderId);
+		int count = orderMapper.updatePayCustom(orderId);
+		if (count > 0) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("status", Constants.ORDER_PAY_CUSTOMS);
+			param.put("orderId", orderId);
+			orderMapper.addOrderStatusRecord(param);
+		}
 	}
 
 	@Override
@@ -564,9 +590,10 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private String judgeCenterId(Integer id) {
-		String centerId;
-		centerId = "_" + id;
-		return centerId;
+		if (Constants.PREDETERMINE_PLAT_TYPE == id) {
+			return "_2B";
+		}
+		return "_" + id;
 	}
 
 	@Override
@@ -591,7 +618,13 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void saveThirdOrder(List<SendOrderResult> list) {
 		orderMapper.saveThirdOrder(list);
-		orderMapper.updateOrderSendToWarehouse(list.get(0).getOrderId());
+		int count = orderMapper.updateOrderSendToWarehouse(list.get(0).getOrderId());
+		if (count > 0) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("status", Constants.ORDER_TO_WAREHOUSE);
+			param.put("orderId", list.get(0).getOrderId());
+			orderMapper.addOrderStatusRecord(param);
+		}
 	}
 
 	@Override
@@ -602,7 +635,13 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list) {
 		orderMapper.updateThirdOrderInfo(list);
-		orderMapper.updateOrderStatusByThirdStatus(list.get(0));
+		int count = orderMapper.updateOrderStatusByThirdStatus(list.get(0));
+		if (count > 0) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("status", list.get(0).getOrderStatus());
+			param.put("orderId", list.get(0).getOrderId());
+			orderMapper.addOrderStatusRecord(param);
+		}
 	}
 
 	@Override

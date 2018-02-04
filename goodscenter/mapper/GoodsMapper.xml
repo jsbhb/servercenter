@@ -256,7 +256,7 @@
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,g.goods_name as customGoodsName, g.description,g.detail_path,
 		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
-		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join
 		base
@@ -366,6 +366,16 @@
 		</if>
 		on 
 		gs.item_id = bgp.item_id where gs.item_id = #{itemId}
+	</select>
+	
+	<select id="getGoodsSpecsForButtJoinOrder" parameterType="Object" resultMap="goodsSpecs">
+		select gi.id,gi.weight,gi.item_id,gi.goods_id,bgp.retail_price as price,
+		bgp.id as price_id,bgp.min,bgp.max,
+		bgp.delivery_place,b.first_category,b.second_category,b.third_category
+		from goods_item gi 
+		left join goods g on gi.goods_id = g.goods_id left join base b on g.base_id=b.id left join 
+		goods_price bgp on 
+		gi.item_id = bgp.item_id where gi.item_id = #{itemId} and gi.status = 2
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
@@ -515,7 +525,7 @@
 		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
   		  excise_tax DECIMAL(5,2) NULL COMMENT '消费税',
 		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
-		  status tinyint UNSIGNED NULL COMMENT '商品状态0：停售，1：在售',
+		  status tinyint UNSIGNED DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
 		  discount decimal(10,2) NULL COMMENT '促销折扣',
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
@@ -776,7 +786,7 @@
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,g.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
-		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
 		from goods${centerId} 
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
@@ -856,7 +866,7 @@
 	<select id="listSpecialGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,g.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
-		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode,gb.encode
+		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
@@ -929,7 +939,7 @@
 	</resultMap>
 	<select id="checkStock" parameterType="Object" resultMap="orderBussinessModel">
 		select i.id, i.item_id,i.sku,i.item_code,g.supplier_id from goods_item i left join goods g on i.goods_id = g.goods_id 
-		where g.supplier_id != 1
+		where g.supplier_id != 1 and i.status = 2
 	</select>
 	
 	<select id="checkStockByItemIds" parameterType="Object" resultMap="orderBussinessModel">

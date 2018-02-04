@@ -1,5 +1,6 @@
 package com.zm.auth.common;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,10 @@ public class JWTUtil {
 	public final static String PLATFORM_ID = "platid";
 
 	public final static int CONSUMER = 5;
+	
+	public final static String APPKEY = "appKey";
+	
+	public final static Integer EXPIRES = 7200;
 
 	public static String generateToken(Map<String, Object> claims) {
 		return Jwts.builder().setClaims(claims).setExpiration(DateUtil.getFixDate(2020, 12, 30, 0, 0, 0))
@@ -101,6 +106,17 @@ public class JWTUtil {
 		String token = generateToken(claim);
 		System.out.println(token);
 		return token;
+	}
+
+	public static String generateLimitTimeToken(Map<String, Object> claims) {
+		return Jwts.builder().setClaims(claims).setExpiration(DateUtil.getDate(Calendar.SECOND, EXPIRES))
+				.signWith(SignatureAlgorithm.HS512, SECRET).compact();
+	}
+	
+	public static void main(String[] args) {
+		Map<String,Object> claims = new HashMap<>();
+		claims.put(APPKEY, "18067100336");
+		System.out.println(generateLimitTimeToken(claims));
 	}
 
 }

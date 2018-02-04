@@ -54,7 +54,7 @@
 		<result column="ipcity" property="ipCity" jdbcType="VARCHAR" />
 		<association property="userDetail" javaType="com.zm.user.pojo.UserDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
-			<result column="id" property="userId" jdbcType="INTEGER" />
+			<result column="duserId" property="userId" jdbcType="INTEGER" />
 			<result column="name" property="name" jdbcType="VARCHAR" />
 			<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
 			<result column="location" property="location" jdbcType="VARCHAR" />
@@ -97,7 +97,7 @@
 		select
 		u.id,u.user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
 		u.center_id,u.last_login_time,u.ipcity,ud.id as
-		detail_id,ud.name,ud.nick_name,ud.company,ud.location,u.guide_id,
+		detail_id,ud.name,ud.nick_name,ud.company,ud.location,u.guide_id,ud.user_id as duserId,
 		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join
 		user_detail ud on u.id = ud.user_id
 		where u.id = #{userId}
