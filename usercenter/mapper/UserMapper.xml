@@ -16,6 +16,8 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
+		<result column="mobile_url" property="mobileUrl" jdbcType="VARCHAR" />
 		<result column="company" property="company" jdbcType="VARCHAR" />
 		<result column="person_in_charge_id" property="personInChargeId" jdbcType="INTEGER" />
 	</resultMap>
@@ -351,9 +353,9 @@
 
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
-		create_time,opt,company)
+		create_time,opt,company,redirect_url,mobile_url)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company})
+		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company},#{redirectUrl},#{mobileUrl})
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
