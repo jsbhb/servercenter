@@ -19,6 +19,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
+import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsStatusEnum;
@@ -129,4 +130,18 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		goodsItemMapper.updateItemPrice(entity);
 	}
 
+	@Override
+	public Page<GoodsEntity> queryByPageDownload(GoodsItemEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return goodsItemMapper.selectForPageDownload(entity);
+	}
+
+	@Override
+	public Page<GoodsEntity> queryCenterByPageDownload(GoodsItemEntity entity, int centerId) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("entity", entity);
+		params.put("centerId", centerId);
+		return goodsItemMapper.selectCenterForPageDownload(params);
+	}
 }

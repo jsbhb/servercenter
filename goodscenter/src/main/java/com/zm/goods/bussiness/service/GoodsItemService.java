@@ -8,6 +8,7 @@
 package com.zm.goods.bussiness.service;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 
@@ -150,5 +151,26 @@ public interface GoodsItemService {
 	 * @since JDK 1.7  
 	 */
 	void updateItemPrice(GoodsPrice entity);
+
+	/**
+	 * queryByPage:分页查询商品信息. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<GoodsEntity> queryByPageDownload(GoodsItemEntity entity);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin
+	 * @param entity
+	 * @param parseInt
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsEntity> queryCenterByPageDownload(GoodsItemEntity entity, int centerId);
 
 }

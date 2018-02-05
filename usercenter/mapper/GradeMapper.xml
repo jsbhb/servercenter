@@ -12,6 +12,7 @@
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="attribute" property="attribute" jdbcType="VARCHAR" />
 		<result column="grade_person_in_charge" property="gradePersonInCharge" jdbcType="INTEGER" />
+		<result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />

@@ -190,5 +190,26 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	void updateItemPrice(GoodsPrice entity);
+	
+	/**
+	 * selectForPage:分页查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<GoodsEntity> selectForPageDownload(GoodsItemEntity entity);
+
+	/**  
+	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity
+	 * @param centerId
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	Page<GoodsEntity> selectCenterForPageDownload(Map<String,Object> params);
 
 }

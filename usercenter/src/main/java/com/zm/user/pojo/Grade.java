@@ -38,6 +38,8 @@ public class Grade extends Pagination{
 
 	private Integer gradePersonInCharge;// 负责该区域中心的人
 
+	private String redirectUrl;
+
 	private String createTime;
 
 	private String updateTime;
@@ -317,4 +319,13 @@ public class Grade extends Pagination{
 	public void setPicPath4(String picPath4) {
 		this.picPath4 = picPath4;
 	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
+	
 }
