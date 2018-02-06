@@ -33,7 +33,7 @@ CREATE TABLE `user` (
   `platform` int(11) DEFAULT NULL,
   `usercenterid` int(11) NOT NULL,
   PRIMARY KEY (`USER_ID`),
-  UNIQUE KEY `USER_NAME_UNIQUE` (`user_name`)
+  UNIQUE KEY `USER_NAME_UNIQUE` (`user_name`,`platform`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 

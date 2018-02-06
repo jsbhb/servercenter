@@ -20,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.zm.auth.common.JWTUtil;
 import com.zm.auth.model.SecurityUserDetail;
+import com.zm.auth.model.UserInfo;
 import com.zm.auth.service.UserService;
 
 import io.jsonwebtoken.Claims;
@@ -70,18 +71,24 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 			Claims claims = JWTUtil.getClaimsFromToken(authToken);
 
 			logger.info("checking authentication " + claims);
-
+			UserInfo user = null;
 			if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				user = new UserInfo();
+				Object platUserTypeStr = claims.get(JWTUtil.PLATUSERTYPE);
+				if(platUserTypeStr != null){
+					user.setPlatUserType(Integer.valueOf(platUserTypeStr.toString()));
+				}
 				SecurityUserDetail userDetails = null;
 				if (claims.containsKey(JWTUtil.PLATFORM_ID)) {
 					userDetails = (SecurityUserDetail) this.userService
 							.loadUserByPlatId((String) claims.get(JWTUtil.PLATFORM_ID));
 				} else if (claims.containsKey(JWTUtil.USER_NAME)) {
-					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByUsername((String) claims.get(JWTUtil.USER_NAME));
+					user.setUserName((String) claims.get(JWTUtil.USER_NAME));
+					userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
 				} else if (claims.containsKey(JWTUtil.OPEN_ID)) {
+					user.setUserName((String) claims.get(JWTUtil.OPEN_ID) + "," + WX_OPENID_SECRET);
 					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByUsername((String) claims.get(JWTUtil.OPEN_ID) + "," + WX_OPENID_SECRET);
+							.loadUserByUsername(user);
 
 					if (userDetails != null) {
 						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -92,10 +99,11 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 						SecurityContextHolder.getContext().setAuthentication(authentication);
 					}
 					return;
-					
-				} else if(claims.containsKey(JWTUtil.APPKEY)){
+
+				} else if (claims.containsKey(JWTUtil.APPKEY)) {
+					user.setUserName((String) claims.get(JWTUtil.APPKEY));
 					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByUsername((String) claims.get(JWTUtil.APPKEY));
+							.loadUserByUsername(user);
 					if (userDetails != null) {
 						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 								userDetails, null, userDetails.getAuthorities());

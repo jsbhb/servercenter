@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zm.auth.mapper.UserMapper">
 
-    <select id="getUserByName" parameterType="java.lang.String" resultType="userInfo">
+    <select id="getUserByName" parameterType="Object" resultType="userInfo">
           SELECT
               U.USER_ID USERID,
               U.USER_NAME USERNAME,
@@ -19,11 +19,11 @@
           FROM
               USER U
           WHERE
-              U.STATUS in (1,2)
-          AND U.USER_NAME = #{USERNAME}
+              U.STATUS = 1
+          AND U.USER_NAME = #{userName} AND U.PLATFORM = #{platUserType}
     </select>
     
-     <select id="queryByOpenId" parameterType="java.lang.String" resultType="userInfo">
+     <select id="queryByOpenId" parameterType="Object" resultType="userInfo">
           SELECT
               U.USER_ID USERID,
               U.STATUS STATUS,
@@ -37,8 +37,8 @@
           FROM
               USER U
           WHERE
-              U.STATUS in (1,2)
-          AND U.OPENID = #{openId}
+              U.STATUS = 1
+          AND U.OPENID = #{openId} AND U.PLATFORM = #{platUserType}
     </select>
     
     <select id="getUserByPlatId" parameterType="java.lang.String" resultType="userInfo">
@@ -58,7 +58,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS in (1,2)
+              U.STATUS = 1
           AND U.USER_ID = #{platId}
     </select>
     
@@ -79,7 +79,7 @@
           FROM
               USER U
           WHERE
-              U.STATUS in (1,2)
+              U.STATUS = 1 and U.PLATFORM = #{platUserType}
          <if test="userName != null and userName != ''">
 			and U.USER_NAME = #{userName}
 		 </if>
@@ -94,7 +94,7 @@
 		 </if>
     </select>
     
-     <select id="getUserByPhone" parameterType="java.lang.String" resultType="userInfo">
+     <select id="getUserByPhone" parameterType="Object" resultType="userInfo">
           SELECT
               U.USER_ID userId,
               U.USER_NAME userName,
@@ -112,8 +112,8 @@
           FROM
               USER U
           WHERE
-              U.STATUS in (1,2)
-          AND U.PHONE = #{phone}
+              U.STATUS = 1
+          AND U.PHONE = #{phone} AND U.PLATFORM = #{platUserType}
     </select>
     
     <insert id="insert"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
@@ -121,52 +121,12 @@
               USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
     </insert>
     
-    <insert id="insert2B"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
-         INSERT INTO USER (
-              USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},2,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
-    </insert>
-    
     <update id="modifyPwd" parameterType="object">
     	update user 
     	<set>
     		PASSWORD = #{password}
     	</set>
-    	where USER_NAME = #{userName}
+    	where USER_NAME = #{userName} AND PLATFORM = #{platUserType}
     </update>
     
-    <update id="updateUserAuth" parameterType="object">
-    	update user set status = 2 where USER_NAME = #{userName}
-    </update>
-    
-    <select id="loginFor2B" parameterType="java.lang.String" resultType="userInfo">
-                    SELECT
-              U.USER_ID userId,
-              U.USER_NAME userName,
-              U.PASSWORD password,
-              U.PHONE phone,
-              U.EMAIL email,
-              U.STATUS status,
-              U.CREATION_DATE creationDate,
-              U.CREATED_BY createdBy,
-              U.LAST_UPDATE_DATE lastUpdateDate,
-              U.LAST_UPDATED_BY lastUpdatedBy,
-              U.PLATFORM platUserType,
-			  U.USERCENTERID userCenterId
-          FROM
-              USER U
-          WHERE
-              U.STATUS = 2
-         <if test="userName != null and userName != ''">
-			and U.USER_NAME = #{userName}
-		 </if>
-		 <if test="phone != null and phone != ''">
-			and U.PHONE = #{phone}
-		 </if>
-		 <if test="password != null and password != ''">
-			and U.PASSWORD = #{password}
-		 </if>
-		 <if test="openId != null and openId != ''">
-			and U.OPENID = #{openId}
-		 </if>
-    </select>
 </mapper>

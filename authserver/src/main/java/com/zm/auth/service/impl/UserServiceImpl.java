@@ -36,13 +36,15 @@ public class UserServiceImpl implements UserService {
 	private String WX_OPENID_SECRET;
 
 	@Override
-	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(UserInfo user) throws UsernameNotFoundException {
 
+		String userName = user.getUserName();
 		UserInfo userInfo = null;
 		if (userName.endsWith(WX_OPENID_SECRET)) {
-			userInfo = getUserByOpenId(userName.split(",")[0]);
+			user.setOpenId((userName.split(",")[0]));
+			userInfo = getUserByOpenId(user);
 		} else {
-			userInfo = getUserByName(userName);
+			userInfo = getUserByName(user);
 		}
 
 		if (userInfo == null) {
@@ -88,8 +90,8 @@ public class UserServiceImpl implements UserService {
 	 * @since JDK 1.7
 	 */
 	@Override
-	public UserInfo getUserByOpenId(String openId) {
-		return userMapper.queryByOpenId(new UserInfo(openId));
+	public UserInfo getUserByOpenId(UserInfo userInfo) {
+		return userMapper.queryByOpenId(userInfo);
 	}
 
 	@Override
@@ -110,17 +112,23 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfo getUserByName(String userName) {
-		return userMapper.getUserByName(userName);
+	public UserInfo getUserByName(UserInfo userInfo) {
+		return userMapper.getUserByName(userInfo);
 	}
 
 	@Override
-	public UserInfo getUserByPhone(String phone) {
-		return userMapper.getUserByPhone(phone);
+	public UserInfo getUserByPhone(UserInfo userInfo) {
+		return userMapper.getUserByPhone(userInfo);
 	}
 
 	@Override
 	public UserInfo getUserByPlatId(String platId) {
 		return userMapper.getUserByPlatId(platId);
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

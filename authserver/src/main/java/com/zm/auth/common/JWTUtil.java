@@ -28,11 +28,13 @@ public class JWTUtil {
 
 	public final static String PASSWORD = "password";
 	
+	public final static String PLATUSERTYPE="platUserType";
+	
 	public final static String OPEN_ID = "openid";
 
 	public final static String PLATFORM_ID = "platid";
 
-	public final static int CONSUMER = 5;
+	public final static int BACKMANAGER = 1;
 	
 	public final static String APPKEY = "appKey";
 	
@@ -65,11 +67,11 @@ public class JWTUtil {
 		String token = "";
 
 		switch (userDetails.getPlatUserType()) {
-		case (CONSUMER):
-			token = generatorCustomer(userDetails);
+		case (BACKMANAGER):
+			token = generatorPlatUser(userDetails);
 			break;
 		default:
-			token = generatorPlatUser(userDetails);
+			token = generatorDefault(userDetails);
 		}
 
 		return authToken.equals(token);
@@ -85,7 +87,7 @@ public class JWTUtil {
 	private static String generatorPlatUser(SecurityUserDetail userDetails) {
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(PLATFORM_ID, userDetails.getPlatId());
-
+		claim.put(PLATUSERTYPE, userDetails.getPlatUserType());
 		String token = generateToken(claim);
 		System.out.println(token);
 		return token;
@@ -98,11 +100,11 @@ public class JWTUtil {
 	 * @param userDetails
 	 * @since JDK 1.7
 	 */
-	private static String generatorCustomer(SecurityUserDetail userDetails) {
+	private static String generatorDefault(SecurityUserDetail userDetails) {
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(PASSWORD, userDetails.getPassword());
 		claim.put(USER_NAME, userDetails.getUsername());
-
+		claim.put(PLATUSERTYPE, userDetails.getPlatUserType());
 		String token = generateToken(claim);
 		System.out.println(token);
 		return token;

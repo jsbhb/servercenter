@@ -18,7 +18,7 @@ public interface UserMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	public UserInfo getUserByName(String userName);
+	public UserInfo getUserByName(UserInfo userInfo);
 
 	/**
 	 * 
@@ -29,7 +29,7 @@ public interface UserMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	public UserInfo getUserByPhone(String phone);
+	public UserInfo getUserByPhone(UserInfo userInfo);
 
 	/**
 	 * 
@@ -88,35 +88,4 @@ public interface UserMapper {
 	 */
 	int modifyPwd(UserInfo userInfo);
 	
-	
-	/**
-	 * 
-	 * updateUserAuth:账号状态升级为可以登录订货平台 <br/>  
-	 *  
-	 * @author wqy  
-	 * @param userName
-	 * @since JDK 1.7
-	 */
-	void updateUserAuth(String userName);
-	
-	/**
-	 * 
-	 * insert2B：生成订货平台账号（同时可以登录普通平台）. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param userInfo
-	 * @since JDK 1.7
-	 */
-	public void insert2B(UserInfo userInfo);
-	
-	/**
-	 * 
-	 * loginFor2B：登录订货平台. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param userInfo
-	 * @since JDK 1.7
-	 */
-	UserInfo loginFor2B(UserInfo userInfo);
-
 }

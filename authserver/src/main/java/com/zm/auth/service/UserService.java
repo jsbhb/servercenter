@@ -19,7 +19,10 @@ public interface UserService extends UserDetailsService {
 	 * @param userName
 	 * @return
 	 */
-	public UserInfo getUserByName(String userName);
+	public UserInfo getUserByName(UserInfo userInfo);
+	
+	
+	public UserDetails loadUserByUsername(UserInfo userInfo) throws UsernameNotFoundException;
 
 	/**
 	 * 根据电话号码获取用户
@@ -27,7 +30,7 @@ public interface UserService extends UserDetailsService {
 	 * @param userName
 	 * @return
 	 */
-	public UserInfo getUserByPhone(String phone);
+	public UserInfo getUserByPhone(UserInfo userInfo);
 
 	/**
 	 * loadUserByPlatId:根据用户编号获取用户. <br/>
@@ -58,5 +61,5 @@ public interface UserService extends UserDetailsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	UserInfo getUserByOpenId(String openId);
+	UserInfo getUserByOpenId(UserInfo userInfo);
 }
