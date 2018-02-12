@@ -95,13 +95,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDetails loadUserByPlatId(String platId) throws UsernameNotFoundException {
+	public UserDetails loadUserByPlatId(UserInfo user) throws UsernameNotFoundException {
 
-		UserInfo userInfo = getUserByPlatId(platId);
+		UserInfo userInfo = getUserByPlatId(user);
 		List<String> roles = new ArrayList<String>();
 
 		if (userInfo == null) {
-			throw new UsernameNotFoundException(platId);
+			throw new UsernameNotFoundException(user.getUserId());
 		}
 
 		roles.add("ADMIN");
@@ -122,8 +122,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfo getUserByPlatId(String platId) {
-		return userMapper.getUserByPlatId(platId);
+	public UserInfo getUserByPlatId(UserInfo userInfo) {
+		return userMapper.getUserByPlatId(userInfo);
 	}
 
 	@Override

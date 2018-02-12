@@ -9,57 +9,57 @@
               U.PASSWORD PASSWORD,
               U.PHONE PHONE,
               U.EMAIL EMAIL,
-              U.STATUS STATUS,
+              pu.STATUS STATUS,
               U.CREATION_DATE CREATIONDATE,
               U.CREATED_BY CREATEDBY,
               U.LAST_UPDATE_DATE LASTUPDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFORM platUserType,
+              pu.PLATFORM platUserType,
               U.USERCENTERID userCenterId
           FROM
-              USER U
+              USER U left join platform_user pu on u.user_id = pu.user_id
           WHERE
-              U.STATUS = 1
-          AND U.USER_NAME = #{userName} AND U.PLATFORM = #{platUserType}
+              pu.STATUS = 1
+          AND U.USER_NAME = #{userName} AND pu.PLATFORM = #{platUserType}
     </select>
     
      <select id="queryByOpenId" parameterType="Object" resultType="userInfo">
           SELECT
               U.USER_ID USERID,
-              U.STATUS STATUS,
+              pu.STATUS STATUS,
               U.CREATION_DATE CREATIONDATE,
               U.CREATED_BY CREATEDBY,
               U.OPENID OPENID,
               U.LAST_UPDATE_DATE LASTUPDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFORM PLATUSERTYPE,
+              pu.PLATFORM PLATUSERTYPE,
               U.USERCENTERID userCenterId
           FROM
-              USER U
+              USER U left join platform_user pu on u.user_id = pu.user_id
           WHERE
-              U.STATUS = 1
-          AND U.OPENID = #{openId} AND U.PLATFORM = #{platUserType}
+              pu.STATUS = 1
+          AND U.OPENID = #{openId} AND pu.PLATFORM = #{platUserType}
     </select>
     
-    <select id="getUserByPlatId" parameterType="java.lang.String" resultType="userInfo">
+    <select id="getUserByPlatId" parameterType="userInfo" resultType="userInfo">
           SELECT
               U.USER_ID USERID,
               U.USER_NAME USERNAME,
               U.PASSWORD PASSWORD,
               U.PHONE PHONE,
               U.EMAIL EMAIL,
-              U.STATUS STATUS,
+              pu.STATUS STATUS,
               U.CREATION_DATE CREATIONDATE,
               U.CREATED_BY CREATEDBY,
               U.LAST_UPDATE_DATE LASTUPDATEDATE,
               U.LAST_UPDATED_BY LASTUPDATEDBY,
-              U.PLATFORM platUserType,
+              pu.PLATFORM platUserType,
               U.USERCENTERID userCenterId
           FROM
-              USER U
+              USER U left join platform_user pu on u.user_id = pu.user_id
           WHERE
-              U.STATUS = 1
-          AND U.USER_ID = #{platId}
+              pu.STATUS = 1
+          AND U.USER_ID = #{userId} AND pu.PLATFORM = #{platUserType}
     </select>
     
     <select id="getUserForLogin" parameterType="userInfo" resultType="userInfo">
@@ -69,17 +69,17 @@
               U.PASSWORD password,
               U.PHONE phone,
               U.EMAIL email,
-              U.STATUS status,
+              pu.STATUS status,
               U.CREATION_DATE creationDate,
               U.CREATED_BY createdBy,
               U.LAST_UPDATE_DATE lastUpdateDate,
               U.LAST_UPDATED_BY lastUpdatedBy,
-              U.PLATFORM platUserType,
+              pu.PLATFORM platUserType,
 			  U.USERCENTERID userCenterId
           FROM
-              USER U
+              USER U left join platform_user pu on u.user_id = pu.user_id
           WHERE
-              U.STATUS = 1 and U.PLATFORM = #{platUserType}
+              pu.STATUS = 1 and pu.PLATFORM = #{platUserType}
          <if test="userName != null and userName != ''">
 			and U.USER_NAME = #{userName}
 		 </if>
@@ -101,19 +101,19 @@
               U.PASSWORD password,
               U.PHONE phone,
               U.EMAIL email,
-              U.STATUS status,
+              pu.STATUS status,
               U.CREATION_DATE creationDate,
               U.CREATED_BY createdBy,
               U.LAST_UPDATE_DATE lastUpdateDate,
               U.LAST_UPDATED_BY lastUpdatedBy,
               U.OPENID openId,
-              U.PLATFORM platUserType,
+              pu.PLATFORM platUserType,
               U.USERCENTERID userCenterId
           FROM
-              USER U
+              USER U left join platform_user pu on u.user_id = pu.user_id
           WHERE
-              U.STATUS = 1
-          AND U.PHONE = #{phone} AND U.PLATFORM = #{platUserType}
+              pu.STATUS = 1
+          AND U.PHONE = #{phone} AND pu.PLATFORM = #{platUserType}
     </select>
     
     <insert id="insert"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
@@ -121,12 +121,28 @@
               USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
     </insert>
     
+    <insert id="insertPlatformUser" parameterType="object">
+         INSERT ignore INTO platform_user (
+              USER_ID,STATUS ,PLATFORM,REMARK,CREATION_DATE,LAST_UPDATE_DATE) VALUE 
+         <foreach collection="set" item="item" separator=",">
+              (#{item.userId},1,#{item.platUserType},#{item.remark},now(),now())
+         </foreach>
+    </insert>
+    
+    <select id="getUserIdByUserName" parameterType="object" resultType="java.lang.String">
+    	select user_id from USER where USER_NAME = #{userName}
+    </select>
+    
+    <select id="getUserIdByOpenId" parameterType="object" resultType="java.lang.String">
+    	select user_id from USER where OPENID = #{openId}
+    </select>
+    
     <update id="modifyPwd" parameterType="object">
     	update user 
     	<set>
     		PASSWORD = #{password}
     	</set>
-    	where USER_NAME = #{userName} AND PLATFORM = #{platUserType}
+    	where USER_NAME = #{userName}
     </update>
     
 </mapper>

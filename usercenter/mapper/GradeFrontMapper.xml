@@ -18,5 +18,8 @@
 		select redirect_url from grade where id = #{id}
 	</select>
 
+	<select id="getMobileUrl" parameterType="Object" resultType="java.lang.String">
+		select mobile_url from grade where id = #{id}
+	</select>
 
 </mapper>

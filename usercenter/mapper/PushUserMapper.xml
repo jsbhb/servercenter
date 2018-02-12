@@ -10,21 +10,29 @@
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="specialty_channel" property="specialtyChannel" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
 	</resultMap>
 	
 	
 	<insert id="savePushUser" parameterType="Object" >
-		insert into push_user(grade_id,name,inviter,phone,specialty_channel,status,create_time)
-		values(#{gradeId},#{name},#{inviter},#{phone},#{specialtyChannel},0,now())
+		insert into push_user(user_id,grade_id,name,inviter,phone,specialty_channel,status,create_time,type)
+		values(#{userId},#{gradeId},#{name},#{inviter},#{phone},#{specialtyChannel},#{status},now(),#{type})
 	</insert>
 	
 	<select id="getPushUserById" parameterType="Object" resultMap="pushUser">
 		select * from push_user where id = #{id}
 	</select>
 	
-	<select id="updatePushUserStatus" parameterType="Object">
-		update push_user set status = #{status} where id = #{id}
+	<select id="listPushUserByGradeId" parameterType="Object" resultMap="pushUser">
+		select * from push_user where grade_id = #{gradeId} and status in(0,2)
 	</select>
-
+	
+	<update id="updatePushUserStatus" parameterType="Object">
+		update push_user set status = #{status} where id = #{id}
+	</update>
+	
+	<select id="countShopPassPushUser" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from push_user where grade_id = #{gradeId} and status = 2
+	</select>
 
 </mapper>

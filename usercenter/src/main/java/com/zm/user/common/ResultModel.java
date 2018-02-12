@@ -27,9 +27,10 @@ public class ResultModel {
 		this.obj = obj;
 	}
 
-	public ResultModel(boolean flag, String errorMsg) {
+	public ResultModel(boolean flag, String errorCode, String errorMsg) {
 		this.success = flag;
 		this.errorMsg = errorMsg;
+		this.errorCode = errorCode;
 	}
 
 	public ResultModel(boolean flag, Object obj, Pagination pagination) {

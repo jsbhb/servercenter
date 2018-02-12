@@ -3,8 +3,10 @@ package com.zm.auth.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -22,6 +24,7 @@ import com.zm.auth.model.AccessToken;
 import com.zm.auth.model.ErrorCodeEnum;
 import com.zm.auth.model.GetTokenParam;
 import com.zm.auth.model.PlatUserType;
+import com.zm.auth.model.PlatformUser;
 import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.SecurityUserDetail;
 import com.zm.auth.model.SecurityUserFactory;
@@ -97,13 +100,29 @@ public class AuthServiceImpl implements AuthService {
 
 		}
 
-		if (loginType == Constants.LOGIN_PHONE) {
-			userInfo.setUserName(userName);
-		}
-
 		userInfo.setLastPasswordResetDate(new Date());
 		userInfo.setAuthorities(asList("ROLE_USER"));
-		userMapper.insert(userInfo);
+		Set<PlatformUser> set = new HashSet<PlatformUser>();
+		String userId = null;
+		if(PlatUserType.CROSS_BORDER.getIndex() == userInfo.getPlatUserType()){
+			userMapper.insert(userInfo);
+			userId = userInfo.getUserId();
+		}else{
+			userId = userMapper.getUserIdByUserName(userName);
+			if(userId == null){
+				userMapper.insert(userInfo);
+				userId = userInfo.getUserId();
+			}
+			//插入平台用户
+			PlatformUser consumerPlat = new PlatformUser(userId,PlatUserType.CONSUMER.getIndex());
+			PlatformUser pushUserPlat = new PlatformUser(userId,PlatUserType.PUSH_USER.getIndex());
+			set.add(pushUserPlat);
+			set.add(consumerPlat);
+			//end
+		}
+		PlatformUser platformUser = new PlatformUser(userId,userInfo.getPlatUserType());
+		set.add(platformUser);
+		userMapper.insertPlatformUser(set);
 
 		SecurityUserDetail userDetail = SecurityUserFactory.createWithOutPassWord(userInfo);
 
@@ -144,7 +163,15 @@ public class AuthServiceImpl implements AuthService {
 			userDetail = userMapper.queryByOpenId(userInfo);
 
 			if (userDetail == null) {
-				userMapper.insert(userInfo);
+				String userId = userMapper.getUserIdByOpenId(userInfo.getOpenId());
+				if(userId == null){
+					userMapper.insert(userInfo);
+					userId = userInfo.getUserId();
+				}
+				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(),userInfo.getPlatUserType());
+				Set<PlatformUser> set = new HashSet<PlatformUser>();
+				set.add(platformUser);
+				userMapper.insertPlatformUser(set);
 				userDetail = userInfo;
 				userInfo = null;
 			}
@@ -162,7 +189,7 @@ public class AuthServiceImpl implements AuthService {
 
 			if (loginType == Constants.LOGIN_PLATID) {
 				claim.put(JWTUtil.PLATFORM_ID, userInfo.getUserId());
-				userDetail = userMapper.getUserByPlatId(userInfo.getUserId());
+				userDetail = userMapper.getUserByPlatId(userInfo);
 			}
 
 			if (platUserType == PlatUserType.CONSUMER.getIndex()
@@ -252,13 +279,28 @@ public class AuthServiceImpl implements AuthService {
 		tempUser.setPlatUserType(platUserType);
 		UserInfo userInfo = userMapper.getUserByName(tempUser);
 		if (userInfo == null) {
-			userInfo = new UserInfo();
-			userInfo.setUserName(phone);
-			userInfo.setUserCenterId(userId);
-			userInfo.setPlatUserType(platUserType);
-			userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
-			userInfo.setPhone(phone);
-			userMapper.insert(userInfo);
+			String authUserId = userMapper.getUserIdByUserName(phone);
+			PlatformUser consumerPlat = null;
+			PlatformUser pushUserPlat = null;
+			PlatformUser platformUser = null;
+			Set<PlatformUser> set = new HashSet<PlatformUser>();
+			if(authUserId == null){
+				userInfo = new UserInfo();
+				userInfo.setUserName(phone);
+				userInfo.setUserCenterId(userId);
+				userInfo.setPlatUserType(platUserType);
+				userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
+				userInfo.setPhone(phone);
+				userMapper.insert(userInfo);
+				authUserId = userInfo.getUserId();
+				consumerPlat = new PlatformUser(authUserId,PlatUserType.CONSUMER.getIndex());
+				pushUserPlat = new PlatformUser(authUserId,PlatUserType.PUSH_USER.getIndex());
+				set.add(pushUserPlat);
+				set.add(consumerPlat);
+			}
+			platformUser = new PlatformUser(authUserId,platUserType);
+			set.add(platformUser);
+			userMapper.insertPlatformUser(set);
 		}
 
 		return true;

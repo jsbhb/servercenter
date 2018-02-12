@@ -1,5 +1,10 @@
 package com.zm.auth.mapper;
 
+import java.util.Set;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.zm.auth.model.PlatformUser;
 import com.zm.auth.model.UserInfo;
 
 /**
@@ -41,6 +46,17 @@ public interface UserMapper {
 	 * @since JDK 1.7
 	 */
 	public void insert(UserInfo userInfo);
+	
+	/**
+	 * 
+	 * insert:插入新用户. <br/>
+	 * 
+	 * @author hebin
+	 * @param PlatformUser
+	 * @return
+	 * @since JDK 1.7
+	 */
+	public void insertPlatformUser(@Param("set")Set<PlatformUser> list);
 
 	/**
 	 * 
@@ -64,7 +80,7 @@ public interface UserMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	public UserInfo getUserByPlatId(String userId);
+	public UserInfo getUserByPlatId(UserInfo userInfo);
 
 	/**
 	 * 
@@ -87,5 +103,9 @@ public interface UserMapper {
 	 * @since JDK 1.7
 	 */
 	int modifyPwd(UserInfo userInfo);
+	
+	String getUserIdByUserName(String userName);
+	
+	String getUserIdByOpenId(String openId);
 	
 }

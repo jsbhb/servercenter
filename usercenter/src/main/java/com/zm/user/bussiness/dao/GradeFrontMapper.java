@@ -7,4 +7,6 @@ public interface GradeFrontMapper {
 	GradeConfig getGradeConfig(Integer gradeId);
 
 	String getClientUrlById(Integer id);
+
+	String getMobileUrl(Integer parentId);
 }

@@ -17,11 +17,21 @@ public class PushUser {
 	private String specialtyChannel;
 	
 	private Integer status;
+	
+	private Integer type;
 
 	public boolean check(){
 		return phone != null && name != null && gradeId != null && inviter != null && specialtyChannel != null;
 	}
 	
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
 	public Integer getUserId() {
 		return userId;
 	}
@@ -84,6 +94,11 @@ public class PushUser {
 
 	public void setSpecialtyChannel(String specialtyChannel) {
 		this.specialtyChannel = specialtyChannel;
+	}
+
+	@Override
+	public String toString() {
+		return "PushUser [name=" + name + "]";
 	}
 	
 }

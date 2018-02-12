@@ -80,8 +80,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 				}
 				SecurityUserDetail userDetails = null;
 				if (claims.containsKey(JWTUtil.PLATFORM_ID)) {
+					user.setUserId((String) claims.get(JWTUtil.PLATFORM_ID));
 					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByPlatId((String) claims.get(JWTUtil.PLATFORM_ID));
+							.loadUserByPlatId(user);
 				} else if (claims.containsKey(JWTUtil.USER_NAME)) {
 					user.setUserName((String) claims.get(JWTUtil.USER_NAME));
 					userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);

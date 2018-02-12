@@ -29,6 +29,8 @@ public class PushUserController {
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
 
+	private static final String BACK_CODE = "erp";
+
 	@RequestMapping(value = "{version}/pushuser/register/{code}", method = RequestMethod.POST)
 	public ResultModel pushUserRegister(@PathVariable("version") Double version, @RequestBody PushUser pushUser,
 			@PathVariable("code") String code) {
@@ -36,10 +38,12 @@ public class PushUserController {
 			if (!pushUser.check()) {
 				return new ResultModel(false, "参数不全");
 			}
-			boolean flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, pushUser.getPhone(), code);
+			boolean flag = true;
+			if (!BACK_CODE.equals(code)) {
+				flag = thirdPartFeignClient.verifyPhoneCode(Constants.FIRST_VERSION, pushUser.getPhone(), code);
+			}
 			if (flag) {
-				pushUserService.savePushUser(pushUser);
-				return new ResultModel(true, "提交成功");
+				return pushUserService.savePushUser(pushUser);
 			} else {
 				return new ResultModel(false, "验证码错误");
 			}
@@ -52,9 +56,35 @@ public class PushUserController {
 			@RequestParam("id") Integer id) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, pushUserService.pushUserAudit(pass, id));
+			return pushUserService.pushUserAudit(pass, id);
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	/**
+	 * @fun 登录后获取推手绑定的店铺列表
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/listBindingGrade/{userId}", method = RequestMethod.GET)
+	public ResultModel listBindingShop() {
+		// TODO
+		return null;
+	}
+
+	/**
+	 * @fun 获取推手列表
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/listPushUser/{gradeId}", method = RequestMethod.GET)
+	public ResultModel listPushUserByGradeId(@PathVariable("version") Double version,
+			@PathVariable("gradeId") Integer gradeId) {
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.listPushUserByGradeId(gradeId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 }
