@@ -17,6 +17,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.service.GradeService;
 import com.zm.user.pojo.Grade;
+import com.zm.user.pojo.ShopEntity;
 
 /**
  * ClassName: GradeServiceImpl <br/>
@@ -49,6 +50,21 @@ public class GradeServiceImpl implements GradeService {
 	public void update(Grade entity) {
 		gradeMapper.update(entity);
 		gradeMapper.updateGradeData(entity);
+	}
+
+	@Override
+	public ShopEntity queryByGradeId(Integer gradeId) {
+		return gradeMapper.selectByGradeId(gradeId);
+	}
+
+	@Override
+	public void updateShop(ShopEntity entity) {
+		ShopEntity shopEntity = gradeMapper.selectByGradeId(entity.getGradeId());
+		if (shopEntity != null) {
+			gradeMapper.updateGradeConfig(entity);
+		} else {
+			gradeMapper.insertGradeConfig(entity);
+		}
 	}
 
 }

@@ -22,6 +22,7 @@ import com.zm.user.common.Pagination;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.pojo.Grade;
+import com.zm.user.pojo.ShopEntity;
 
 /**
  * ClassName: GradeController <br/>
@@ -94,4 +95,41 @@ public class GradeController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	@RequestMapping(value = "{version}/shop/query", method = RequestMethod.POST)
+	public ResultModel queryByGradeId(@PathVariable("version") Double version, @RequestBody ShopEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				if (entity.getGradeId() == 0) {
+					return new ResultModel(false, "没有分级编号");
+
+				}
+				ShopEntity result = gradeService.queryByGradeId(entity.getGradeId());
+				return new ResultModel(true, result);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/shop/update", method = RequestMethod.POST)
+	public ResultModel updateShop(@PathVariable("version") Double version, @RequestBody ShopEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				if (entity.getGradeId() == 0) {
+					return new ResultModel(false, "没有分级编号");
+
+				}
+				gradeService.updateShop(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

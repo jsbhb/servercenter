@@ -33,6 +33,17 @@
 		<result column="pic3_path" property="picPath3" jdbcType="VARCHAR" />
 		<result column="pic4_path" property="picPath4" jdbcType="VARCHAR" />
 	</resultMap>
+	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="head_img" property="headImg" jdbcType="VARCHAR" />
+		<result column="aboutus" property="aboutUs" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="attribute" property="attribute" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
 	
 	<update id="update" parameterType="Object">
 		update grade set update_time = now()
@@ -50,6 +61,12 @@
 		</if>
 		<if test="company!=null and company!=''">
 			,company = #{company}
+		</if>
+		<if test="redirectUrl!=null and redirectUrl!=''">
+			,redirect_url = #{redirectUrl}
+		</if>
+		<if test="mobileUrl!=null and mobileUrl!=''">
+			,mobile_url = #{mobileUrl}
 		</if>
 		where id = #{id}
 	</update>
@@ -86,6 +103,23 @@
 		,store_operator= #{storeOperator},operator_idnum= #{operatorIDNum},pic1_path= #{picPath1}
 		,pic2_path= #{picPath2},pic3_path= #{picPath3},pic4_path = #{picPath4}
 		where id = #{id}
+	</update>
+	
+	<select id="selectByGradeId" parameterType="Object" resultMap="shop">
+		select a.*
+		from grade a 
+		where a.grade_id = #{gradeId}
+	</select>
+	
+	<insert id="insertGradeConfig" parameterType="Object" >
+		insert into grade_config(grade_id,head_img,aboutus,name,create_time,update_time,opt)
+		values(#{gradeId},#{headImg},#{aboutUs},#{name},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateGradeConfig" parameterType="Object">
+		update grade_config set update_time = now(),opt= #{opt},
+		head_img= #{headImg},aboutus= #{aboutUs},name= #{name}
+		where grade_id = #{gradeId}
 	</update>
 
 </mapper>
