@@ -31,7 +31,7 @@ public class PushUserController {
 
 	private static final String BACK_CODE = "erp";
 
-	@RequestMapping(value = "{version}/pushuser/register/{code}", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/{version}/pushuser/register/{code}", method = RequestMethod.POST)
 	public ResultModel pushUserRegister(@PathVariable("version") Double version, @RequestBody PushUser pushUser,
 			@PathVariable("code") String code) {
 		if (Constants.FIRST_VERSION.equals(version)) {
