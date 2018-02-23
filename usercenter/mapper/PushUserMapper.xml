@@ -11,6 +11,7 @@
 		<result column="specialty_channel" property="specialtyChannel" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="gradeName" property="gradeName" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	
@@ -20,11 +21,14 @@
 	</insert>
 	
 	<select id="getPushUserById" parameterType="Object" resultMap="pushUser">
-		select * from push_user where id = #{id}
+		select pu.*,gc.name as gradeName from push_user pu left join grade_config gc on pu.grade_id = gc.grade_id 
+		where pu.id = #{id}
 	</select>
 	
 	<select id="listPushUserByGradeId" parameterType="Object" resultMap="pushUser">
-		select * from push_user where grade_id = #{gradeId} and status in(0,2)
+		select pu.id,pu.name,pu.status,gc.name as gradeName from 
+		push_user pu left join grade_config gc on pu.grade_id = gc.grade_id 
+		where pu.grade_id = #{gradeId} and pu.status in(0,2)
 	</select>
 	
 	<update id="updatePushUserStatus" parameterType="Object">
@@ -33,6 +37,10 @@
 	
 	<select id="countShopPassPushUser" parameterType="Object" resultType="java.lang.Integer">
 		select count(*) from push_user where grade_id = #{gradeId} and status = 2
+	</select>
+	
+	<select id="verify" parameterType="Object" resultMap="pushUser">
+		select * from push_user where grade_id = #{gradeId} and phone = #{phone}
 	</select>
 
 </mapper>

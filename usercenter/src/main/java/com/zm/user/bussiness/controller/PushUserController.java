@@ -79,9 +79,38 @@ public class PushUserController {
 	@RequestMapping(value = "{version}/listPushUser/{gradeId}", method = RequestMethod.GET)
 	public ResultModel listPushUserByGradeId(@PathVariable("version") Double version,
 			@PathVariable("gradeId") Integer gradeId) {
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return pushUserService.listPushUserByGradeId(gradeId);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 获取单个推手推手
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/getPushUser/{id}", method = RequestMethod.GET)
+	public ResultModel getPushUserById(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.getPushUserById(id);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 获取推手是否已经在该店铺下
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/pushUserVerify/{phone}", method = RequestMethod.GET)
+	public ResultModel judgePushUserIsExist(@PathVariable("version") Double version,
+			@PathVariable("phone") String phone, @RequestParam("gradeId") Integer gradeId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.pushUserVerify(phone, gradeId);
 		}
 
 		return new ResultModel(false, "版本错误");

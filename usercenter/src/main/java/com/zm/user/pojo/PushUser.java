@@ -1,5 +1,9 @@
 package com.zm.user.pojo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class PushUser {
 
 	private Integer id;
@@ -7,6 +11,8 @@ public class PushUser {
 	private Integer userId;
 	
 	private String phone;
+	
+	private String gradeName;
 	
 	private String name;
 	
@@ -24,6 +30,14 @@ public class PushUser {
 		return phone != null && name != null && gradeId != null && inviter != null && specialtyChannel != null;
 	}
 	
+	public String getGradeName() {
+		return gradeName;
+	}
+
+	public void setGradeName(String gradeName) {
+		this.gradeName = gradeName;
+	}
+
 	public Integer getType() {
 		return type;
 	}

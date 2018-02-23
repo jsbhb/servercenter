@@ -18,10 +18,8 @@ import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
-import com.zm.order.constants.LogConstants;
 import com.zm.order.feignclient.ActivityFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
-import com.zm.order.feignclient.LogFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.SupplierFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
@@ -76,9 +74,6 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	PayFeignClient payFeignClient;
-
-	@Resource
-	LogFeignClient logFeignClient;
 
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
@@ -466,10 +461,6 @@ public class OrderServiceImpl implements OrderService {
 						orderMapper.addOrderStatusRecord(param);
 					}
 					stockBack(info);
-					String content = "订单号\"" + info.getOrderId() + "\"退单";
-
-					logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL,
-							"订单退单", info.getCenterId(), content, info.getUserId() + ""));
 				} else {
 					return new ResultModel(false, result.get("errorMsg"));
 				}

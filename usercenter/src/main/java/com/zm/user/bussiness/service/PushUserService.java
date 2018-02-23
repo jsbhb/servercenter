@@ -10,4 +10,8 @@ public interface PushUserService {
 	ResultModel pushUserAudit(boolean pass, Integer id);
 
 	ResultModel listPushUserByGradeId(Integer gradeId);
+
+	ResultModel getPushUserById(Integer id);
+
+	ResultModel pushUserVerify(String phone, Integer gradeId);
 }

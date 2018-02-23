@@ -52,9 +52,6 @@ public class UserServiceImpl implements UserService {
 	UserMapper userMapper;
 
 	@Resource
-	LogFeignClient logFeignClient;
-
-	@Resource
 	OrderFeignClient orderFeignClient;
 
 	@Resource
@@ -197,9 +194,6 @@ public class UserServiceImpl implements UserService {
 	public void modifyPwd(Map<String, Object> param, String phone) {
 
 		userMapper.updateUserPwd(param);
-
-		String content = "用户  \"" + phone + "\"  修改了密码";
-		logFeignClient.saveLog(Constants.FIRST_VERSION, packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
 
 	}
 

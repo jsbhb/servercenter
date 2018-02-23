@@ -16,4 +16,6 @@ public interface PushUserMapper {
 	int countShopPassPushUser(Integer gradeId);
 
 	List<PushUser> listPushUserByGradeId(Integer gradeId);
+
+	PushUser verify(Map<String, Object> param);
 }

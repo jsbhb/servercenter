@@ -177,6 +177,9 @@
 		<if test="info.endTime != null and info.endTime != ''">
 			and ob.create_time &lt;= #{info.endTime}
 		</if>
+		<if test="info.pushUserId != null and info.pushUserId != ''">
+			and ob.push_user_id = #{info.pushUserId}
+		</if>
 		order by ob.create_time desc
 		<if test="pagination != null">
 			limit #{pagination.startRow},#{pagination.numPerPage}
@@ -227,6 +230,9 @@
 		</if>
 		<if test="info.endTime != null and info.endTime != ''">
 			and o.create_time &lt;= #{info.endTime}
+		</if>
+		<if test="info.pushUserId != null and info.pushUserId != ''">
+			and ob.push_user_id = #{info.pushUserId}
 		</if>
 	</select>
 

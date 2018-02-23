@@ -15,6 +15,7 @@ import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.PushUserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
+import com.zm.user.pojo.ErrorCodeEnum;
 import com.zm.user.pojo.PushUser;
 import com.zm.user.pojo.UserInfo;
 import com.zm.user.utils.PinYin4JUtil;
@@ -86,5 +87,24 @@ public class PushUserServiceImpl implements PushUserService {
 			}
 		}
 		return new ResultModel(true, result);
+	}
+
+	@Override
+	public ResultModel getPushUserById(Integer id) {
+
+		return new ResultModel(true, pushUserMapper.getPushUserById(id));
+	}
+
+	@Override
+	public ResultModel pushUserVerify(String phone, Integer gradeId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("phone", phone);
+		param.put("gradeId", gradeId);
+		PushUser pushUser = pushUserMapper.verify(param);
+		if (pushUser == null) {
+			return new ResultModel(true, "");
+		}
+		return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
+				ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
 	}
 }

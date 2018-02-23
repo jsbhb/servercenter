@@ -99,13 +99,7 @@ public class OrderController {
 			@ModelAttribute Pagination pagination, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-
-		if (info.getUserId() == null || info.getCenterId() == null) {
-			result.setSuccess(false);
-			result.setErrorMsg("参数不全");
-			return result;
-		}
-
+		
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.listUserOrder(info, pagination);
 		}
