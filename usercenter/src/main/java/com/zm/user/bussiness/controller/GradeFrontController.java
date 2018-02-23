@@ -25,7 +25,7 @@ public class GradeFrontController {
 	 * @param gradeId
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/grade/config/{centerId}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/grade/config/{centerId}", method = RequestMethod.GET)
 	public ResultModel getGradeConfig(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId,
 			@RequestParam(value = "shopId", required = false) Integer shopId,

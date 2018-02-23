@@ -25,11 +25,21 @@ public class PushUser {
 	private Integer status;
 	
 	private Integer type;
+	
+	private Integer centerId;
 
 	public boolean check(){
 		return phone != null && name != null && gradeId != null && inviter != null && specialtyChannel != null;
 	}
 	
+	public Integer getCenterId() {
+		return centerId;
+	}
+
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
+	}
+
 	public String getGradeName() {
 		return gradeName;
 	}

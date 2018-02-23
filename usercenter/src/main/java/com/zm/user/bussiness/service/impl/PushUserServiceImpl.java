@@ -107,4 +107,10 @@ public class PushUserServiceImpl implements PushUserService {
 		return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
 				ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
 	}
+
+	@Override
+	public ResultModel listBindingShop(Integer userId) {
+		
+		return new ResultModel(true, pushUserMapper.listBindingShop(userId));
+	}
 }

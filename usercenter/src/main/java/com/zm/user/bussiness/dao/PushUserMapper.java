@@ -18,4 +18,6 @@ public interface PushUserMapper {
 	List<PushUser> listPushUserByGradeId(Integer gradeId);
 
 	PushUser verify(Map<String, Object> param);
+
+	List<PushUser> listBindingShop(Integer userId);
 }

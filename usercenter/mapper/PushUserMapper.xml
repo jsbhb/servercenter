@@ -12,6 +12,7 @@
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="gradeName" property="gradeName" jdbcType="VARCHAR" />
+		<result column="centerId" property="centerId" jdbcType="INTEGER" />
 	</resultMap>
 	
 	
@@ -41,6 +42,13 @@
 	
 	<select id="verify" parameterType="Object" resultMap="pushUser">
 		select * from push_user where grade_id = #{gradeId} and phone = #{phone}
+	</select>
+	
+	<select id="listBindingShop" parameterType="Object" resultMap="pushUser">
+		select pu.grade_id,pu.type,gc.name as gradeName,g.parent_id as centerId 
+		from push_user pu left join grade_config gc on pu.grade_id = gc.grade_id  
+		left join grade g on gc.grade_id = g.id
+		where pu.user_id = #{userId} and pu.status = 2
 	</select>
 
 </mapper>

@@ -67,9 +67,14 @@ public class PushUserController {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/listBindingGrade/{userId}", method = RequestMethod.GET)
-	public ResultModel listBindingShop() {
-		// TODO
-		return null;
+	public ResultModel listBindingShop(@PathVariable("version") Double version,
+			@PathVariable("userId") Integer userId) {
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.listBindingShop(userId);
+		}
+
+		return new ResultModel(false, "版本错误");
 	}
 
 	/**
