@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.order.annotation.Log;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
@@ -89,6 +90,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@Log(content = "新增订单", source = Log.FRONT_PLAT, type = Log.ADD)
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
 		ResultModel result = new ResultModel();
@@ -406,9 +408,15 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<OrderCount> getCountByStatus(Map<String, Object> param) {
-
-		return orderMapper.getCountByStatus(param);
+	public List<OrderCount> getCountByStatus(Map<String, Object> param, String type) {
+		
+		if ("0".equals(type)) {
+			return orderMapper.getCountByStatus(param);
+		}
+		if("1".equals(type)){
+			return orderMapper.getPushCountByStatus(param);
+		}
+		return null;
 	}
 
 	@Override

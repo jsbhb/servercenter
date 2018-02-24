@@ -114,4 +114,6 @@ public interface OrderMapper {
 	
 	void addOrderStatusRecord(Map<String,Object> param);
 
+	List<OrderCount> getPushCountByStatus(Map<String, Object> param);
+
 }

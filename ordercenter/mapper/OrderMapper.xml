@@ -232,7 +232,7 @@
 			and o.create_time &lt;= #{info.endTime}
 		</if>
 		<if test="info.pushUserId != null and info.pushUserId != ''">
-			and ob.push_user_id = #{info.pushUserId}
+			and o.push_user_id = #{info.pushUserId}
 		</if>
 	</select>
 
@@ -314,6 +314,13 @@
 		resultType="com.zm.order.pojo.OrderCount">
 		select status, count(*) as total from order_base where
 		center_id=#{centerId} and user_id = #{userId} and is_del = 0 group by
+		status
+	</select>
+	
+	<select id="getPushCountByStatus" parameterType="Object"
+		resultType="com.zm.order.pojo.OrderCount">
+		select status, count(*) as total from order_base where
+		shop_id=#{centerId} and push_user_id = #{userId} group by
 		status
 	</select>
 

@@ -122,7 +122,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<OrderCount> getCountByStatus(Map<String, Object> param);
+	List<OrderCount> getCountByStatus(Map<String, Object> param, String type);
 
 	/**
 	 * removeShoppingCart:删除购物车. <br/>

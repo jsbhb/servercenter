@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
@@ -99,7 +100,7 @@ public class OrderController {
 			@ModelAttribute Pagination pagination, HttpServletRequest req, HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.listUserOrder(info, pagination);
 		}
@@ -273,15 +274,15 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
 			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getCountByStatus(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId,
-			@PathVariable("centerId") Integer centerId) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			@RequestParam(value = "type", required = false, defaultValue = "0") String type) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
 			param.put("centerId", centerId);
-			List<OrderCount> list = orderService.getCountByStatus(param);
+			List<OrderCount> list = orderService.getCountByStatus(param, type);
 			result.setSuccess(true);
 			result.setObj(list);
 
@@ -567,7 +568,7 @@ public class OrderController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/order/confirmByTimeTask", method = RequestMethod.GET)
 	public void confirmByTimeTask(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
