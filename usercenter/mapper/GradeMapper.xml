@@ -107,7 +107,7 @@
 	
 	<select id="selectByGradeId" parameterType="Object" resultMap="shop">
 		select a.*
-		from grade a 
+		from grade_config a 
 		where a.grade_id = #{gradeId}
 	</select>
 	
