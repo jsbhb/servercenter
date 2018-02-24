@@ -309,4 +309,8 @@ public interface OrderService {
 	List<OrderIdAndSupplierId> listUnDeliverOrder();
 
 	void confirmByTimeTask();
+
+	ResultModel repayingPushJudge(Integer pushUserId, Integer shopId);
+
+	ResultModel pushUserOrderCount(Integer shopId, List<Integer> pushUserIdList);
 }

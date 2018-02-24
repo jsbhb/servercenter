@@ -671,4 +671,25 @@ public class OrderServiceImpl implements OrderService {
 			confirmUserOrder(param);
 		}
 	}
+
+	@Override
+	public ResultModel repayingPushJudge(Integer pushUserId, Integer shopId) {
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("pushUserId", pushUserId);
+		param.put("shopId", shopId);
+		int count = 0;
+		count = orderMapper.repayingPushJudge(param);
+		if(count > 0){
+			return new ResultModel(false, "还有未完成的订单");
+		}
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel pushUserOrderCount(Integer shopId, List<Integer> pushUserIdList) {
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("pushUserIdList", pushUserIdList);
+		param.put("shopId", shopId);
+		return new ResultModel(true, orderMapper.pushUserOrderCount(param));
+	}
 }

@@ -16,6 +16,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ProfitProportion;
+import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 
@@ -115,5 +116,9 @@ public interface OrderMapper {
 	void addOrderStatusRecord(Map<String,Object> param);
 
 	List<OrderCount> getPushCountByStatus(Map<String, Object> param);
+
+	int repayingPushJudge(Map<String, Object> param);
+
+	List<PushUserOrderCount> pushUserOrderCount(Map<String, Object> param);
 
 }

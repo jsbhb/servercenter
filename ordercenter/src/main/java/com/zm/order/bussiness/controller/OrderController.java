@@ -575,7 +575,26 @@ public class OrderController {
 
 			orderService.confirmByTimeTask();
 		}
+	}
 
+	@RequestMapping(value = "{version}/order/repayingPushJudge/{shopId}/{pushUserId}", method = RequestMethod.GET)
+	public ResultModel repayingPushJudge(@PathVariable("version") Double version,
+			@PathVariable("shopId") Integer shopId, @PathVariable("pushUserId") Integer pushUserId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.repayingPushJudge(pushUserId, shopId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/order/pushUserOrderCount/{shopId}", method = RequestMethod.POST)
+	public ResultModel pushUserOrderCount(@PathVariable("version") Double version,
+			@PathVariable("shopId") Integer shopId, @RequestBody List<Integer> pushUserIdList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.pushUserOrderCount(shopId, pushUserIdList);
+		}
+		return new ResultModel(false, "版本错误");
 	}
 
 }

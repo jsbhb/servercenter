@@ -69,7 +69,7 @@ public class PushUserController {
 	@RequestMapping(value = "{version}/listBindingGrade/{userId}", method = RequestMethod.GET)
 	public ResultModel listBindingShop(@PathVariable("version") Double version,
 			@PathVariable("userId") Integer userId) {
-		
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return pushUserService.listBindingShop(userId);
 		}
@@ -121,4 +121,29 @@ public class PushUserController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	/**
+	 * @fun 清退推手
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/repayingPush/{id}", method = RequestMethod.POST)
+	public ResultModel repayingPush(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.repayingPush(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	/**
+	 * @fun 获取推手订单数量
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/pushUserOrderCount/{shopId}", method = RequestMethod.POST)
+	public ResultModel pushUserOrderCount(@PathVariable("version") Double version, @PathVariable("shopId") Integer shopId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.pushUserOrderCount(shopId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }

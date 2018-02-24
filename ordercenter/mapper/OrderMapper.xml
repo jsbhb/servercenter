@@ -600,5 +600,21 @@
 		INSERT ignore INTO order_status_record(order_id,status,create_time)
 		VALUES(#{orderId},#{status},now())
 	</insert>
+	
+		
+	<select id="repayingPushJudge" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from order_base where shop_id = #{shopId} and push_user_id = #{pushUserId} 
+		and status in(0,1,2,3,4,5,6,99)
+	</select>
+	
+	<select id="pushUserOrderCount" parameterType="Object" resultType="com.zm.order.pojo.PushUserOrderCount">
+		select push_user_id as pushUserId, count(*) as count 
+		from order_base where push_user_id in 
+		<foreach collection="pushUserIdList" item="item" index="index" open="("
+			close=")" separator=",">
+			#{item}
+		</foreach>
+		and shop_id = #{shopId} and status not in(8,9) group by push_user_id
+	</select>
 
 </mapper>

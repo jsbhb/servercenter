@@ -32,6 +32,11 @@
 		where pu.grade_id = #{gradeId} and pu.status in(0,2) and pu.type = 0
 	</select>
 	
+	<select id="listPassPushUserByGradeId" parameterType="Object" resultMap="pushUser">
+		select pu.id,pu.name,pu.user_id from push_user pu 
+		where pu.grade_id = #{gradeId} and pu.status = 2 and pu.type = 0
+	</select>
+	
 	<update id="updatePushUserStatus" parameterType="Object">
 		update push_user set status = #{status} where id = #{id}
 	</update>
@@ -50,5 +55,9 @@
 		left join grade g on gc.grade_id = g.id
 		where pu.user_id = #{userId} and pu.status = 2
 	</select>
+	
+	<update id="updateRepayingPush" parameterType="Object">
+		update push_user set status = 11 where id = #{id}
+	</update>
 
 </mapper>

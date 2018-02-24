@@ -20,4 +20,8 @@ public interface PushUserMapper {
 	PushUser verify(Map<String, Object> param);
 
 	List<PushUser> listBindingShop(Integer userId);
+
+	void updateRepayingPush(Integer id);
+
+	List<PushUser> listPassPushUserByGradeId(Integer shopId);
 }

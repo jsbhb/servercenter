@@ -16,4 +16,8 @@ public interface PushUserService {
 	ResultModel pushUserVerify(String phone, Integer gradeId);
 
 	ResultModel listBindingShop(Integer userId);
+
+	ResultModel repayingPush(Integer id);
+
+	ResultModel pushUserOrderCount(Integer shopId);
 }

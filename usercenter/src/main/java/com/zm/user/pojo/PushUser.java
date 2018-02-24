@@ -27,11 +27,21 @@ public class PushUser {
 	private Integer type;
 	
 	private Integer centerId;
+	
+	private Integer orderCount;
 
 	public boolean check(){
 		return phone != null && name != null && gradeId != null && inviter != null && specialtyChannel != null;
 	}
 	
+	public Integer getOrderCount() {
+		return orderCount;
+	}
+
+	public void setOrderCount(Integer orderCount) {
+		this.orderCount = orderCount;
+	}
+
 	public Integer getCenterId() {
 		return centerId;
 	}

@@ -15,9 +15,12 @@ import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.PushUserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
+import com.zm.user.feignclient.OrderFeignClient;
+import com.zm.user.feignclient.model.PushUserOrderCount;
 import com.zm.user.pojo.ErrorCodeEnum;
 import com.zm.user.pojo.PushUser;
 import com.zm.user.pojo.UserInfo;
+import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.PinYin4JUtil;
 
 @Service
@@ -29,6 +32,9 @@ public class PushUserServiceImpl implements PushUserService {
 	@Resource
 	UserMapper userMapper;
 
+	@Resource
+	OrderFeignClient orderFeignClient;
+
 	private static final int PUSH_COUNT = 10;
 
 	@Override
@@ -37,7 +43,7 @@ public class PushUserServiceImpl implements PushUserService {
 		param.put("phone", pushUser.getPhone());
 		param.put("gradeId", pushUser.getGradeId());
 		PushUser pushUsertem = pushUserMapper.verify(param);
-		if(pushUsertem != null){
+		if (pushUsertem != null) {
 			return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
 		}
@@ -54,10 +60,10 @@ public class PushUserServiceImpl implements PushUserService {
 			userId = userInfo.getId();
 		}
 		pushUser.setUserId(userId);
-		if(pushUser.getStatus() == null){
+		if (pushUser.getStatus() == null) {
 			pushUser.setStatus(0);
 		}
-		if(pushUser.getType() == null){
+		if (pushUser.getType() == null) {
 			pushUser.setType(0);
 		}
 		pushUserMapper.savePushUser(pushUser);
@@ -124,7 +130,55 @@ public class PushUserServiceImpl implements PushUserService {
 
 	@Override
 	public ResultModel listBindingShop(Integer userId) {
-		
+
 		return new ResultModel(true, pushUserMapper.listBindingShop(userId));
+	}
+
+	@Override
+	public ResultModel repayingPush(Integer id) {
+		PushUser pushUser = pushUserMapper.getPushUserById(id);
+		ResultModel result = orderFeignClient.repayingPushJudge(Constants.FIRST_VERSION, pushUser.getGradeId(),
+				pushUser.getUserId());
+		if (result.isSuccess()) {
+			pushUserMapper.updateRepayingPush(id);
+			return new ResultModel(true, "");
+		}
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ResultModel pushUserOrderCount(Integer shopId) {
+		List<PushUser> pushUserList = pushUserMapper.listPassPushUserByGradeId(shopId);
+		if(pushUserList == null || pushUserList.size() == 0){
+			return new ResultModel(true,null);
+		}
+		List<Integer> pushUserIdList = new ArrayList<Integer>();
+		for (PushUser pushUser : pushUserList) {
+			pushUserIdList.add(pushUser.getUserId());
+		}
+		
+		ResultModel result = orderFeignClient.pushUserOrderCount(Constants.FIRST_VERSION, shopId, pushUserIdList);
+		if (result.isSuccess()) {
+			List<Map<String, Object>> list = (List<Map<String, Object>>) result.getObj();
+			if (list != null) {
+				List<PushUserOrderCount> orderList = new ArrayList<PushUserOrderCount>();
+				PushUserOrderCount pushUserOrderCount = null;
+				for (Map<String, Object> map : list) {
+					pushUserOrderCount = JSONUtil.parse(JSONUtil.toJson(map), PushUserOrderCount.class);
+					orderList.add(pushUserOrderCount);
+				}
+				for (PushUser pushUser : pushUserList) {
+					for (PushUserOrderCount orderCount : orderList) {
+						if (pushUser.getUserId().equals(orderCount.getPushUserId())) {
+							pushUser.setOrderCount(orderCount.getCount());
+						}
+					}
+				}
+			}
+		} else {
+			return result;
+		}
+		return new ResultModel(true, pushUserList);
 	}
 }
