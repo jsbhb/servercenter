@@ -33,6 +33,14 @@ public class PushUserServiceImpl implements PushUserService {
 
 	@Override
 	public ResultModel savePushUser(PushUser pushUser) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("phone", pushUser.getPhone());
+		param.put("gradeId", pushUser.getGradeId());
+		PushUser pushUsertem = pushUserMapper.verify(param);
+		if(pushUsertem != null){
+			return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
+					ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
+		}
 		UserInfo userInfo = new UserInfo();
 		userInfo.setPhone(pushUser.getPhone());
 		Integer userId = userMapper.getUserIdByUserInfo(userInfo);
@@ -46,6 +54,12 @@ public class PushUserServiceImpl implements PushUserService {
 			userId = userInfo.getId();
 		}
 		pushUser.setUserId(userId);
+		if(pushUser.getStatus() == null){
+			pushUser.setStatus(0);
+		}
+		if(pushUser.getType() == null){
+			pushUser.setType(0);
+		}
 		pushUserMapper.savePushUser(pushUser);
 		return new ResultModel(true, "提交成功");
 	}
