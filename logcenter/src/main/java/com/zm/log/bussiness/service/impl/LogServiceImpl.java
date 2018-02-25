@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.log.bussiness.dao.LogMapper;
 import com.zm.log.bussiness.service.LogService;
+import com.zm.log.pojo.ExceptionLog;
 import com.zm.log.pojo.LogInfo;
+import com.zm.log.pojo.OpenInfLog;
 
 @Service
 @Transactional
@@ -21,18 +23,28 @@ public class LogServiceImpl implements LogService{
 	
 	
 	@Override
-	public void saveLog(LogInfo info) {
-		logMapper.saveLogInfo(info);
+	public void saveExceptionLog(ExceptionLog info) {
+		logMapper.saveExceptionLog(info);
 	}
 
 	@Override
-	public List<LogInfo> listLogInfo(Map<String, Object> param) {
+	public List<ExceptionLog> listLogInfo(Map<String, Object> param) {
 		return logMapper.listLogInfo(param);
 	}
 
 	@Override
 	public void removeLogInfo(String endTime) {
 		logMapper.removeLogInfo(endTime);
+	}
+
+	@Override
+	public void saveOpenInfoLog(OpenInfLog log) {
+		logMapper.saveOpenInfLog(log);
+	}
+
+	@Override
+	public void saveLogInfo(LogInfo logInfo) {
+		logMapper.saveLogInfo(logInfo);
 	}
 
 }

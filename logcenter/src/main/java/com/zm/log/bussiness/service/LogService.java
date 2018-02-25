@@ -3,7 +3,9 @@ package com.zm.log.bussiness.service;
 import java.util.List;
 import java.util.Map;
 
+import com.zm.log.pojo.ExceptionLog;
 import com.zm.log.pojo.LogInfo;
+import com.zm.log.pojo.OpenInfLog;
 
 /**  
  * ClassName: LogService <br/>  
@@ -17,23 +19,23 @@ import com.zm.log.pojo.LogInfo;
 public interface LogService {
 
 	/**  
-	 * saveLog:保存日志. <br/>  
+	 * saveLog:保存错误日志. <br/>  
 	 *  
 	 * @author wqy  
 	 * @param info  
 	 * @since JDK 1.7  
 	 */
-	void saveLog(LogInfo info);
+	void saveExceptionLog(ExceptionLog info);
 	
 	/**  
-	 * listLogInfo:根据条件获取日志信息. <br/>  
+	 * listLogInfo:根据条件获取错误日志信息. <br/>  
 	 *  
 	 * @author wqy  
 	 * @param param
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	List<LogInfo> listLogInfo(Map<String,Object> param);
+	List<ExceptionLog> listLogInfo(Map<String,Object> param);
 	
 	
 	/**  
@@ -44,4 +46,22 @@ public interface LogService {
 	 * @since JDK 1.7  
 	 */
 	void removeLogInfo(String endTime);
+
+	/**  
+	 * saveOpenInfoLog:保存开放接口日志. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param log  
+	 * @since JDK 1.7  
+	 */
+	void saveOpenInfoLog(OpenInfLog log);
+
+	/**  
+	 * saveLogInfo:保存自定义接口日志. <br/>  
+	 *  
+	 * @author wqy  
+	 * @param log  
+	 * @since JDK 1.7  
+	 */
+	void saveLogInfo(LogInfo logInfo);
 }

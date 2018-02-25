@@ -15,14 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
-import com.zm.pay.constants.LogConstants;
 import com.zm.pay.feignclient.GoodsFeignClient;
-import com.zm.pay.feignclient.LogFeignClient;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.model.OrderBussinessModel;
 import com.zm.pay.feignclient.model.OrderDetail;
@@ -35,7 +32,6 @@ import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CalculationUtils;
-import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
 import com.zm.pay.utils.wx.WxPayUtils;
@@ -55,9 +51,6 @@ public class PayServiceImpl implements PayService {
 
 	@Resource
 	OrderFeignClient orderFeignClient;
-
-	@Resource
-	LogFeignClient logFeignClient;
 
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
@@ -95,9 +88,6 @@ public class PayServiceImpl implements PayService {
 		Map<String, String> result = new HashMap<String, String>();
 
 		if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
-			String content = "订单号 \"" + model.getOrderId() + "\" 通过微信支付" + type + "，后台请求成功";
-			logFeignClient.saveLog(Constants.FIRST_VERSION,
-					CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
 
 			WxPayUtils.packageReturnParameter(clientId, type, model, config, resp, result);
 		} else {
@@ -171,15 +161,11 @@ public class PayServiceImpl implements PayService {
 			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
 		}
 
-		String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝支付" + type + "，后台请求成功";
-		
 
 		if (Constants.SCAN_CODE.equals(type)) {
 			String htmlStr = AliPayUtils.aliPay(type, config, model);
 //			AlipayTradePrecreateResponse response = AliPayUtils.precreate(config, model);
 //			if (response.isSuccess()) {
-				logFeignClient.saveLog(Constants.FIRST_VERSION,
-						CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝支付", clientId, content, ""));
 				result.put("success", true);
 				result.put("htmlStr", htmlStr);
 //				result.put("urlCode", response.getQrCode());
@@ -214,9 +200,6 @@ public class PayServiceImpl implements PayService {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		if (response.isSuccess()) {
-			String content = "订单号 \"" + model.getOrderId() + "\" 通过支付宝退款，后台请求成功";
-			logFeignClient.saveLog(Constants.FIRST_VERSION,
-					CommonUtils.packageLog(LogConstants.WX_PAY, "支付宝退款", clientId, content, ""));
 			result.put("success", true);
 			result.put("returnPayNo", response.getTradeNo());
 		} else {
@@ -257,9 +240,6 @@ public class PayServiceImpl implements PayService {
 		if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
 			result.put("success", true);
 			result.put("returnPayNo", resp.get("refund_id"));
-			String content = "订单号 \"" + model.getOrderId() + "\" 通过微信退款，后台请求成功";
-			logFeignClient.saveLog(Constants.FIRST_VERSION,
-					CommonUtils.packageLog(LogConstants.WX_PAY, "微信支付", clientId, content, ""));
 		} else {
 			result.put("success", false);
 			if ("SUCCESS".equals(return_code)) {

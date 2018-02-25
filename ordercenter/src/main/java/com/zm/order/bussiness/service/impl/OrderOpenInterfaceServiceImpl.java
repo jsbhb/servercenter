@@ -2,6 +2,7 @@ package com.zm.order.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -22,6 +23,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderStatus;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.utils.JSONUtil;
 
 @Service
 @Transactional
@@ -40,7 +42,19 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	OrderOpenInterfaceMapper orderOpenInterfaceMapper;
 
 	@Override
-	public ResultModel addOrder(ButtJointOrder orderInfo) {
+	public ResultModel addOrder(String order) {
+		
+		ButtJointOrder orderInfo = null;
+		try {
+			orderInfo = JSONUtil.parse(order, ButtJointOrder.class);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
+					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+
+		}
+		
+		
 
 		Integer status = orderMapper.getOrderStatusByOrderId(orderInfo.getOrderId());
 		if (status != null) {
@@ -94,8 +108,19 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		return new ResultModel(true, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel getOrderStatus(String orderId) {
+	public ResultModel getOrderStatus(String json) {
+		
+		Map<String,String> param = null;
+		try {
+			param = JSONUtil.parse(json, Map.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
+					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+		}
+		String orderId = param.get("orderId");
 		if(orderId == null){
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());

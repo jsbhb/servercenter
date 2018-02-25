@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
-import com.zm.pay.feignclient.LogFeignClient;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
 import com.zm.pay.feignclient.model.UserVip;
@@ -40,9 +39,6 @@ public class NotifyController {
 
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
-
-	@Resource
-	LogFeignClient logFeignClient;
 
 	@Resource
 	OrderFeignClient orderFeignClient;

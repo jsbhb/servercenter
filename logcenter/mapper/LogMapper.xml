@@ -2,19 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zm.log.bussiness.dao.LogMapper">
 
-	<resultMap type="com.zm.log.pojo.LogInfo" id="logInfo">
+	<resultMap type="com.zm.log.pojo.ExceptionLog" id="exceptionLog">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
-		<result column="api_id" property="apiId" jdbcType="INTEGER" />
-		<result column="center_name" property="centerName" jdbcType="VARCHAR" />
-		<result column="api_name" property="apiName" jdbcType="VARCHAR" />
+		<result column="server_id" property="serverId" jdbcType="INTEGER" />
+		<result column="server_name" property="serverName" jdbcType="VARCHAR" />
+		<result column="method_name" property="methodName" jdbcType="VARCHAR" />
 		<result column="content" property="content" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="parameter" property="parameter" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.log.pojo.OpenInfLog" id="OpenInfLog">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="server_id" property="serverId" jdbcType="INTEGER" />
+		<result column="center_id" property="center" jdbcType="INTEGER" />
+		<result column="server_name" property="serverName" jdbcType="VARCHAR" />
+		<result column="method_name" property="methodName" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="call_ip" property="callIp" jdbcType="VARCHAR" />
+		<result column="parameter" property="parameter" jdbcType="VARCHAR" />
 	</resultMap>
 
 
-	<select id="listLogInfo" resultMap="logInfo" parameterType="Object">
+	<select id="listLogInfo" resultMap="exceptionLog" parameterType="Object">
 		select id,center_id,api_id,center_name,api_name,content,create_time,opt from log where 1=1
 		<if test="centerId != null centerId != ''">
 			and center_id = #{centerId,jdbcType = INTEGER}
@@ -31,11 +43,52 @@
 	</select>
 
 
-	<insert id="saveLogInfo" parameterType="Object">
-		INSERT INTO log
-		(center_id,api_id,center_name,api_name,client_id,content,create_time,opt)
+	<insert id="saveExceptionLog" parameterType="Object">
+		INSERT INTO exception_log
+		(server_id,server_name,method_name,content,create_time)
 		VALUES
-		(#{centerId},#{apiId},#{centerName},#{apiName},#{clientId},#{content},now(),#{opt})
+		(#{serverId},#{serverName},#{methodName},#{content},now())
+	</insert>
+	
+	<insert id="saveLogInfo" parameterType="Object">
+		INSERT INTO 
+		<if test="serverId == 1">
+			user_center_log
+		</if>
+		<if test="serverId == 2">
+			goods_center_log
+		</if>
+		<if test="serverId == 3">
+			order_center_log
+		</if>
+		<if test="serverId == 4">
+			supplier_center_log
+		</if>
+		<if test="serverId == 5">
+			pay_center_log
+		</if>
+		<if test="serverId == 6">
+			third_center_log
+		</if>
+		<if test="serverId == 7">
+			auth_center_log
+		</if>
+		<if test="serverId == 8">
+			timetask_center_log
+		</if>
+		<if test="serverId == 9">
+			activity_center_log
+		</if>
+		(center_id,shop_id,source,type,call_ip,parameter,method_name,content,create_time,opt)
+		VALUES
+		(#{centerId},#{shopId},#{source},#{type},#{callIp},#{parameter},#{methodName},#{content},now(),#{opt})
+	</insert>
+	
+	<insert id="saveOpenInfLog" parameterType="Object">
+		INSERT INTO open_inf_log
+		(server_id,server_name,method_name,content,center_id,call_ip,create_time,parameter)
+		VALUES
+		(#{serverId},#{serverName},#{methodName},#{content},#{centerId},#{callIp},now(),#{parameter})
 	</insert>
 
 	<delete id="removeLogInfo" parameterType="Object">

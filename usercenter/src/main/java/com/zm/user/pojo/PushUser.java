@@ -28,7 +28,7 @@ public class PushUser {
 	
 	private Integer centerId;
 	
-	private Integer orderCount;
+	private int orderCount;
 
 	public boolean check(){
 		return phone != null && name != null && gradeId != null && inviter != null && specialtyChannel != null;

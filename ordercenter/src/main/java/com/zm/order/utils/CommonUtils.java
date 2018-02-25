@@ -12,9 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import com.zm.order.constants.LogConstants;
-import com.zm.order.feignclient.model.LogInfo;
-
 public class CommonUtils {
 
 	private static final String DATE_FORMATE = "yyMMddHHmmssSSS";
@@ -82,20 +79,5 @@ public class CommonUtils {
   
         return obj;  
     }    
-    
-    
-    public static LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
-		LogInfo info = new LogInfo();
-
-		info.setApiId(apiId);
-		info.setApiName(apiName);
-		info.setCenterId(LogConstants.ORDER_CENTER_ID);
-		info.setCenterName("订单服务中心");
-		info.setClientId(clientId);
-		info.setContent(content);
-		info.setOpt(opt);
-
-		return info;
-	}
     
 }

@@ -150,14 +150,14 @@ public class PushUserServiceImpl implements PushUserService {
 	@Override
 	public ResultModel pushUserOrderCount(Integer shopId) {
 		List<PushUser> pushUserList = pushUserMapper.listPassPushUserByGradeId(shopId);
-		if(pushUserList == null || pushUserList.size() == 0){
-			return new ResultModel(true,null);
+		if (pushUserList == null || pushUserList.size() == 0) {
+			return new ResultModel(true, null);
 		}
 		List<Integer> pushUserIdList = new ArrayList<Integer>();
 		for (PushUser pushUser : pushUserList) {
 			pushUserIdList.add(pushUser.getUserId());
 		}
-		
+
 		ResultModel result = orderFeignClient.pushUserOrderCount(Constants.FIRST_VERSION, shopId, pushUserIdList);
 		if (result.isSuccess()) {
 			List<Map<String, Object>> list = (List<Map<String, Object>>) result.getObj();
@@ -171,7 +171,8 @@ public class PushUserServiceImpl implements PushUserService {
 				for (PushUser pushUser : pushUserList) {
 					for (PushUserOrderCount orderCount : orderList) {
 						if (pushUser.getUserId().equals(orderCount.getPushUserId())) {
-							pushUser.setOrderCount(orderCount.getCount());
+							int count = orderCount.getCount() == null ? 0 : orderCount.getCount();
+							pushUser.setOrderCount(count);
 						}
 					}
 				}

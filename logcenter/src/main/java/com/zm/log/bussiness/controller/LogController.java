@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.log.bussiness.service.LogService;
 import com.zm.log.constants.Constants;
+import com.zm.log.pojo.ExceptionLog;
 import com.zm.log.pojo.LogInfo;
+import com.zm.log.pojo.OpenInfLog;
 import com.zm.log.pojo.ResultModel;
 
 /**
@@ -33,14 +35,37 @@ public class LogController {
 	@Resource
 	LogService logService;
 
-	@RequestMapping(value = "{version}/log", method = RequestMethod.POST)
-	public ResultModel saveLog(@PathVariable("version") Double version, @RequestBody LogInfo info, HttpServletResponse res, HttpServletRequest req) {
+	@RequestMapping(value = "{version}/exception/log", method = RequestMethod.POST)
+	public ResultModel saveExceptionLog(@PathVariable("version") Double version, @RequestBody ExceptionLog info, HttpServletResponse res, HttpServletRequest req) {
 
 		ResultModel result = new ResultModel();
 
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			logService.saveLog(info);
+			logService.saveExceptionLog(info);
+			result.setSuccess(true);
+			return result;
+		}
+		return result;
+	}
+	
+	@RequestMapping(value="{version}/openInfoLog/log", method = RequestMethod.POST)
+	public ResultModel saveOpenInfoLog(@PathVariable("version") Double version, @RequestBody OpenInfLog log){
+		
+		ResultModel result = new ResultModel();
+		if (Constants.FIRST_VERSION.equals(version)) {
+			logService.saveOpenInfoLog(log);
+			result.setSuccess(true);
+			return result;
+		}
+		return result;
+	}
+	
+	@RequestMapping(value="{version}/logInfo/log", method = RequestMethod.POST)
+	ResultModel saveLogInfo(@PathVariable("version") Double version, @RequestBody LogInfo logInfo){
+		ResultModel result = new ResultModel();
+		if (Constants.FIRST_VERSION.equals(version)) {
+			logService.saveLogInfo(logInfo);
 			result.setSuccess(true);
 			return result;
 		}
