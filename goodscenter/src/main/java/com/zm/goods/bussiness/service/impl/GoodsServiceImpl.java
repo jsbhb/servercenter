@@ -78,7 +78,7 @@ public class GoodsServiceImpl implements GoodsService {
 	private Logger logger = LoggerFactory.getLogger(GoodsServiceImpl.class);
 
 	@Override
-	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId) {
+	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
 		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", centerIdstr);
 		if (param.get("itemId") != null) {
@@ -119,7 +119,14 @@ public class GoodsServiceImpl implements GoodsService {
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, false);
 		}
 
-		return goodsList;
+		if(proportion){
+			Map<String,Object> result = new HashMap<String,Object>();
+			result.put(Constants.PROPORTION, 0.2);
+			result.put("goodsList", goodsList);
+			return result;
+		} else {
+			return goodsList;
+		}
 	}
 
 	@Override

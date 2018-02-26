@@ -28,6 +28,8 @@ public class Constants {
 	
 	public static final String ORIGIN = "origin";
 	
+	public static final String PROPORTION = "proportion";
+	
 	//*********************订单类型*********************
 	
 	public static final Integer O2O_ORDER = 0;

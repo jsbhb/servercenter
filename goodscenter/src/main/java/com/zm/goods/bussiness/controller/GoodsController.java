@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ErrorCodeEnum;
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
@@ -80,7 +79,8 @@ public class GoodsController {
 			@ApiImplicitParam(paramType = "query", name = "itemId", dataType = "String", required = false, value = "itemID") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId,
-			@RequestParam(value = "userId", required = false) Integer userId) {
+			@RequestParam(value = "userId", required = false) Integer userId,
+			@RequestParam(value = "proportion", required = false, defaultValue = "false") boolean proportion) {
 
 		ResultModel result = new ResultModel();
 
@@ -105,10 +105,9 @@ public class GoodsController {
 			param.put("itemId", itemId);
 			pagination.init();
 			param.put("pagination", pagination);
-			List<GoodsItem> goodsList = goodsService.listGoods(param, centerId, userId);
 
+			result.setObj(goodsService.listGoods(param, centerId, userId, proportion));
 			result.setSuccess(true);
-			result.setObj(goodsList);
 		}
 
 		return result;
