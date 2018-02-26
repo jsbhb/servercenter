@@ -14,6 +14,7 @@ import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsDetail;
 import com.zm.goods.pojo.GoodsStock;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.utils.JSONUtil;
 
 @Service
 public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService {
@@ -21,8 +22,19 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 	@Resource
 	GoodsOpenInterfaceMapper goodsOpenInterfaceMapper;
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel getGoodsStock(String itemId) {
+	public ResultModel getGoodsStock(String data) {
+		
+		Map<String,String> param = null;
+		try {
+			param = JSONUtil.parse(data, Map.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
+					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+		}
+		String itemId = param.get("itemId");
 		if (itemId == null) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
@@ -54,8 +66,19 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		return new ResultModel(true, list);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel getGoodsDetail(Map<String, String> param) {
+	public ResultModel getGoodsDetail(String data) {
+		
+		Map<String,String> param = null;
+		try {
+			param = JSONUtil.parse(data, Map.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
+					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+		}
+		
 		String itemId = param.get("itemId");
 		if (itemId != null) {
 			String[] itemIdArr = itemId.split(",");

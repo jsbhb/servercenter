@@ -1,13 +1,11 @@
 package com.zm.goods.bussiness.service;
 
-import java.util.Map;
-
 import com.zm.goods.pojo.ResultModel;
 
 public interface GoodsOpenInterfaceService {
 
-	ResultModel getGoodsStock(String itemId);
+	ResultModel getGoodsStock(String data);
 
-	ResultModel getGoodsDetail(Map<String, String> param);
+	ResultModel getGoodsDetail(String data);
 
 }
