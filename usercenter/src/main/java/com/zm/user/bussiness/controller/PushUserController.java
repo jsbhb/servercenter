@@ -110,7 +110,7 @@ public class PushUserController {
 	 * @fun 获取推手是否已经在该店铺下
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/pushUserVerify/{phone}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/pushUserVerify/{phone}", method = RequestMethod.GET)
 	public ResultModel judgePushUserIsExist(@PathVariable("version") Double version,
 			@PathVariable("phone") String phone, @RequestParam("gradeId") Integer gradeId) {
 
