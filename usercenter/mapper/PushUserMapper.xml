@@ -34,7 +34,7 @@
 	
 	<select id="listPassPushUserByGradeId" parameterType="Object" resultMap="pushUser">
 		select pu.id,pu.name,pu.user_id from push_user pu 
-		where pu.grade_id = #{gradeId} and pu.status = 2
+		where pu.grade_id = #{gradeId} and pu.status = 2 and pu.type = 0
 	</select>
 	
 	<update id="updatePushUserStatus" parameterType="Object">
