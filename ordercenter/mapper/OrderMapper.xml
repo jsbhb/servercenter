@@ -614,7 +614,7 @@
 			close=")" separator=",">
 			#{item}
 		</foreach>
-		and shop_id = #{shopId} and status not in(8,9) group by push_user_id
+		and shop_id = #{shopId} group by push_user_id
 	</select>
 
 </mapper>
