@@ -29,6 +29,7 @@
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
+			<result column="pay_time" property="payTime" jdbcType="VARCHAR" />
 			<result column="dis_amount" property="disAmount" jdbcType="DECIMAL" />
 			<result column="post_fee" property="postFee" jdbcType="DECIMAL" />
 			<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
