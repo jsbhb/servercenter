@@ -42,7 +42,7 @@
 	</update>
 	
 	<select id="countShopPassPushUser" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from push_user where grade_id = #{gradeId} and status = 2
+		select count(*) from push_user where grade_id = #{gradeId} and status = 2 and type = 0
 	</select>
 	
 	<select id="verify" parameterType="Object" resultMap="pushUser">
