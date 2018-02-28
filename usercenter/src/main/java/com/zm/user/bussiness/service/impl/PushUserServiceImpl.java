@@ -16,10 +16,14 @@ import com.zm.user.bussiness.service.PushUserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.OrderFeignClient;
+import com.zm.user.feignclient.ThirdPartFeignClient;
 import com.zm.user.feignclient.model.PushUserOrderCount;
 import com.zm.user.pojo.ErrorCodeEnum;
+import com.zm.user.pojo.NotifyMsg;
+import com.zm.user.pojo.NotifyTypeEnum;
 import com.zm.user.pojo.PushUser;
 import com.zm.user.pojo.UserInfo;
+import com.zm.user.utils.DateUtil;
 import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.PinYin4JUtil;
 
@@ -34,6 +38,9 @@ public class PushUserServiceImpl implements PushUserService {
 
 	@Resource
 	OrderFeignClient orderFeignClient;
+	
+	@Resource
+	ThirdPartFeignClient thirdPartFeignClient;
 
 	private static final int PUSH_COUNT = 10;
 
@@ -73,7 +80,14 @@ public class PushUserServiceImpl implements PushUserService {
 	@Override
 	public ResultModel pushUserAudit(boolean pass, Integer id) {
 		Map<String, Object> param = new HashMap<String, Object>();
+		NotifyMsg notifyMsg = new NotifyMsg();
+		
 		PushUser pushUser = pushUserMapper.getPushUserById(id);
+		notifyMsg.setType(NotifyTypeEnum.AUDIT);
+		notifyMsg.setName(pushUser.getName());
+		notifyMsg.setShopName(pushUser.getGradeName());
+		notifyMsg.setPhone(pushUser.getPhone());
+		notifyMsg.setTime(DateUtil.getNow());
 		param.put("id", id);
 		if (pass) {
 			int count = pushUserMapper.countShopPassPushUser(pushUser.getGradeId());
@@ -81,11 +95,14 @@ public class PushUserServiceImpl implements PushUserService {
 				return new ResultModel(false, "", "该店铺推手已达10人");
 			}
 			param.put("status", Constants.AUDIT_PASS);
+			notifyMsg.setMsg("通过");
 		} else {
 			param.put("status", Constants.AUDIT_UN_PASS);
+			notifyMsg.setMsg("拒绝");
 		}
 		pushUserMapper.updatePushUserStatus(param);
 
+		thirdPartFeignClient.notifyMsg(Constants.FIRST_VERSION, notifyMsg);
 		return new ResultModel(true, null);
 	}
 
@@ -141,6 +158,14 @@ public class PushUserServiceImpl implements PushUserService {
 				pushUser.getUserId());
 		if (result.isSuccess()) {
 			pushUserMapper.updateRepayingPush(id);
+			//封装短信信息并发送
+			NotifyMsg notifyMsg = new NotifyMsg();
+			notifyMsg.setType(NotifyTypeEnum.REPAYING);
+			notifyMsg.setName(pushUser.getName());
+			notifyMsg.setPhone(pushUser.getPhone());
+			notifyMsg.setShopName(pushUser.getGradeName());
+			thirdPartFeignClient.notifyMsg(Constants.FIRST_VERSION, notifyMsg);
+			//end
 			return new ResultModel(true, "");
 		}
 		return result;

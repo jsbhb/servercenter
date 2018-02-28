@@ -50,7 +50,7 @@
 	</select>
 	
 	<select id="listBindingShop" parameterType="Object" resultMap="pushUser">
-		select pu.grade_id,pu.type,gc.name as gradeName,g.parent_id as centerId 
+		select pu.grade_id,pu.type,gc.name as gradeName,g.parent_id as centerId,pu.status  
 		from push_user pu left join grade_config gc on pu.grade_id = gc.grade_id  
 		left join grade g on gc.grade_id = g.id
 		where pu.user_id = #{userId} and pu.status in (2,11)

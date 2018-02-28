@@ -9,6 +9,10 @@ public class Constants {
 	public static final String SECRET = "e33330f7005b1dc56fea21d8d76db1cb";
 
 	public static final String SMS_VERIFY_ID = "SMS_111795980";
+	
+	public static final String PUSH_USER_AUDIT = "SMS_126460468";
+	
+	public static final String PUSH_USER_REPAYING = "SMS_126460455";
 
 	public static final String SMS_SIGN = "中国供销海外购";
 

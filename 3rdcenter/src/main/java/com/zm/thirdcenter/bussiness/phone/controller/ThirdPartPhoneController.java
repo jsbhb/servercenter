@@ -6,14 +6,19 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.thirdcenter.constants.Constants;
+import com.zm.thirdcenter.pojo.NotifyMsg;
+import com.zm.thirdcenter.pojo.NotifyTypeEnum;
 import com.zm.thirdcenter.pojo.PhoneValidata;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.utils.CommonUtil;
@@ -35,10 +40,11 @@ import springfox.documentation.annotations.ApiIgnore;
  * @since JDK 1.7
  */
 @RestController
-@Api(value="手机验证码接口",description="手机验证码")
+@Api(value = "手机验证码接口", description = "手机验证码")
 public class ThirdPartPhoneController {
 
 	private final Long EFFECTIVE_TIME = 5 * 60 * 1000L;
+	private Logger logger = LoggerFactory.getLogger(ThirdPartPhoneController.class);
 
 	@Resource
 	RedisTemplate<String, PhoneValidata> redisTemplate;
@@ -47,15 +53,15 @@ public class ThirdPartPhoneController {
 	@ApiOperation(value = "获取短信验证码接口", produces = "application/json;utf-8")
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "query", name = "phone", dataType = "String", required = true, value = "手机号码")})
+			@ApiImplicitParam(paramType = "query", name = "phone", dataType = "String", required = true, value = "手机号码") })
 	public ResultModel getPhoneCode(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res) {
 
 		ResultModel result = new ResultModel();
 
 		String phone = req.getParameter("phone");
-		
-		if(phone == null || "".equals(phone)){
+
+		if (phone == null || "".equals(phone)) {
 			result.setErrorMsg("号码为空");
 			result.setSuccess(false);
 			return result;
@@ -65,10 +71,15 @@ public class ThirdPartPhoneController {
 
 			String code = CommonUtil.getPhoneCode();
 
+			NotifyMsg notifyMsg = null;
 			PhoneValidata model = redisTemplate.opsForValue().get(phone);
 			if (model == null) {
 
-				result = SmsSendUtil.sendMessage(code, phone);
+				notifyMsg = new NotifyMsg();
+				notifyMsg.setMsg(code);
+				notifyMsg.setPhone(phone);
+				notifyMsg.setType(NotifyTypeEnum.CODE);
+				result = SmsSendUtil.sendMessage(notifyMsg);
 
 				if (!result.isSuccess()) {
 					return result;
@@ -87,8 +98,11 @@ public class ThirdPartPhoneController {
 					result.setErrorMsg("30分钟内发送大于5次，请稍后再发");
 					return result;
 				}
-
-				result = SmsSendUtil.sendMessage(code, phone);
+				notifyMsg = new NotifyMsg();
+				notifyMsg.setMsg(code);
+				notifyMsg.setPhone(phone);
+				notifyMsg.setType(NotifyTypeEnum.CODE);
+				result = SmsSendUtil.sendMessage(notifyMsg);
 
 				if (!result.isSuccess()) {
 					return result;
@@ -132,4 +146,18 @@ public class ThirdPartPhoneController {
 		return false;
 
 	}
+
+	@RequestMapping(value = "{version}/third-part/msg", method = RequestMethod.POST)
+	public void notifyMsg(@PathVariable("version") Double version, @RequestBody NotifyMsg notifyMsg) {
+
+		if (!notifyMsg.check()) {
+			logger.error("手机号码为空===========================" + notifyMsg.toString());
+			return;
+		}
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			SmsSendUtil.sendMessage(notifyMsg);
+		}
+	}
+
 }
