@@ -59,5 +59,9 @@
 	<update id="updateRepayingPush" parameterType="Object">
 		update push_user set status = 11 where id = #{id}
 	</update>
+	
+	<select id="verifyEffective" parameterType="Object" resultType="java.lang.Integer">
+		select status from push_user where grade_id = #{shopId} and user_id = #{userId}
+	</select>
 
 </mapper>

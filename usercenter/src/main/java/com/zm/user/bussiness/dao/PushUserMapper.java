@@ -24,4 +24,6 @@ public interface PushUserMapper {
 	void updateRepayingPush(Integer id);
 
 	List<PushUser> listPassPushUserByGradeId(Integer shopId);
+
+	Integer verifyEffective(Map<String, Object> param);
 }

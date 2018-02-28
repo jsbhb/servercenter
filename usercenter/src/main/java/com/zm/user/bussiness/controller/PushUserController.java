@@ -133,17 +133,32 @@ public class PushUserController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	/**
 	 * @fun 获取推手订单数量
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/pushUserOrderCount/{shopId}", method = RequestMethod.POST)
-	public ResultModel pushUserOrderCount(@PathVariable("version") Double version, @PathVariable("shopId") Integer shopId) {
+	public ResultModel pushUserOrderCount(@PathVariable("version") Double version,
+			@PathVariable("shopId") Integer shopId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return pushUserService.pushUserOrderCount(shopId);
 		}
 		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 判断推手是否有效
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/verifyEffective/{shopId}/{pushUserId}", method = RequestMethod.GET)
+	public boolean verifyEffective(@PathVariable("version") Double version, @PathVariable("shopId") Integer shopId,
+			@PathVariable("pushUserId") Integer pushUserId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.verifyEffective(shopId, pushUserId);
+		}
+		return false;
 	}
 }

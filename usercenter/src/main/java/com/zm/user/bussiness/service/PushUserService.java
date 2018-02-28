@@ -20,4 +20,6 @@ public interface PushUserService {
 	ResultModel repayingPush(Integer id);
 
 	ResultModel pushUserOrderCount(Integer shopId);
+
+	boolean verifyEffective(Integer shopId, Integer pushUserId);
 }

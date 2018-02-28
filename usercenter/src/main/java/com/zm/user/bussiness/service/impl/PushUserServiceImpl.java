@@ -201,4 +201,16 @@ public class PushUserServiceImpl implements PushUserService {
 		}
 		return new ResultModel(true, pushUserList);
 	}
+
+	@Override
+	public boolean verifyEffective(Integer shopId, Integer pushUserId) {
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("shopId", shopId);
+		param.put("userId", pushUserId);
+		Integer status = pushUserMapper.verifyEffective(param);
+		if(status == 2){
+			return true;
+		}
+		return false;
+	}
 }

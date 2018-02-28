@@ -236,6 +236,13 @@ public class OrderServiceImpl implements OrderService {
 			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
 					info.getCouponIds());
 		}
+		
+		if(info.getPushUserId() != null){//如果是推手订单，判断该推手是否有效
+			boolean flag = userFeignClient.verifyEffective(Constants.FIRST_VERSION, info.getShopId(), info.getPushUserId());
+			if(!flag){//失效推手ID设为null
+				info.setPushUserId(null);
+			}
+		}
 
 		info.setOrderId(orderId);
 		info.setWeight(weight);
