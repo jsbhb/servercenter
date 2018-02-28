@@ -42,8 +42,6 @@ public class PushUserServiceImpl implements PushUserService {
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
 
-	private static final int PUSH_COUNT = 10;
-
 	@Override
 	public ResultModel savePushUser(PushUser pushUser) {
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -90,10 +88,6 @@ public class PushUserServiceImpl implements PushUserService {
 		notifyMsg.setTime(DateUtil.getNow());
 		param.put("id", id);
 		if (pass) {
-			int count = pushUserMapper.countShopPassPushUser(pushUser.getGradeId());
-			if (count >= PUSH_COUNT) {
-				return new ResultModel(false, "", "该店铺推手已达10人");
-			}
 			param.put("status", Constants.AUDIT_PASS);
 			notifyMsg.setMsg("通过");
 		} else {
