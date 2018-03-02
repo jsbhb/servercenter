@@ -117,6 +117,9 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 	@Override
 	public ResultModel shareUrl(WXLoginConfig param, String url) {
 		WXLoginConfig config = getWeiXinConfig(param);
+		if(config == null){
+			return null;
+		}
 		Map<String, String> resp = new HashMap<String, String>();
 		String ticket = (String) redisTemplate.opsForValue().get(config.getAppId() + JSTICKET);
 		if (ticket == null) {// redis已经过期
