@@ -33,6 +33,10 @@ public class PinYin4JUtil {
 
 			String[] str = null;
 			char ch = chars[0];
+			if((ch>='a' && ch<='z') || (ch>='A' && ch<='Z')){
+				pybf.append(ch);
+				return pybf.toString();
+			}
 			try {
 				str = PinyinHelper.toHanyuPinyinStringArray(ch, format);
 				// 不是汉字，估计是特殊字符,统一用#号代替
