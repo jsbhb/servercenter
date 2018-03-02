@@ -14,6 +14,7 @@
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
 		<result column="create_type" property="createType" jdbcType="INTEGER" />
+		<result column="push_user_id" property="pushUserId" jdbcType="INTEGER" />
 		<result column="coupon_ids" property="couponIds" jdbcType="VARCHAR" />
 		<result column="express_type" property="expressType" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
@@ -77,7 +78,7 @@
 		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
-		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.user_id ,ob.combination_id
+		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
 		from order_base ob where
 		1 = 1
 		<if test="status != null">
