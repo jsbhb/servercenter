@@ -79,6 +79,9 @@
 		<if test="serverId == 9">
 			activity_center_log
 		</if>
+		<if test="serverId == 10">
+			coop_bakc_log
+		</if>
 		(center_id,shop_id,source,type,call_ip,parameter,method_name,content,create_time,opt)
 		VALUES
 		(#{centerId},#{shopId},#{source},#{type},#{callIp},#{parameter},#{methodName},#{content},now(),#{opt})
