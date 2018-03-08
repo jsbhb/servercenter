@@ -182,6 +182,11 @@ public class OrderServiceImpl implements OrderService {
 				Double fee = entry.getValue();
 				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
 				if (tax.getExciseTax() != null) {
+					if(tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1){
+						result.setErrorMsg("消费税或增值税设置有误");
+						result.setSuccess(false);
+						return result;
+					}
 					Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
 							CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
 					Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
