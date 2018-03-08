@@ -281,3 +281,25 @@ CREATE TABLE `zm_log`.`log_search_parameter`(
   INDEX `idx_apiName` (`api_name` ASC)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '日志字段表';
+
+drop table if exists  `zm_log`.`coop_bakc_log`;
+
+CREATE TABLE `zm_log`.`coop_bakc_log`(
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `center_id` INT NULL COMMENT '区域中心ID',
+  `shop_id` INT NULL COMMENT '店铺ID',
+  `source` TINYINT UNSIGNED NULL COMMENT '0后台，1前端',
+  `type` TINYINT UNSIGNED NULL COMMENT '0新增，1删除，2修改',
+  `method_name` VARCHAR(100) NULL COMMENT '方法名称',
+  `call_ip` VARCHAR(100) NULL COMMENT 'ip',
+  `parameter` VARCHAR(2000) NULL COMMENT '参数',
+  `content` VARCHAR(1000) NULL,
+  `create_time` DATETIME NULL,
+  `opt` VARCHAR(20) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_centerId` (`center_id` ASC),
+  INDEX `idx_source` (`source` ASC),
+  INDEX `idx_createTime` (`create_time` ASC),
+  INDEX `idx_type` (`type` ASC)
+  )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '统一后台日志信息';
