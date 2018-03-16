@@ -21,6 +21,7 @@ import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.GoodsFeignClient;
 import com.zm.pay.feignclient.OrderFeignClient;
+import com.zm.pay.feignclient.UserFeignClient;
 import com.zm.pay.feignclient.model.OrderBussinessModel;
 import com.zm.pay.feignclient.model.OrderDetail;
 import com.zm.pay.feignclient.model.OrderGoods;
@@ -30,10 +31,12 @@ import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
+import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CalculationUtils;
 import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
+import com.zm.pay.utils.unionpay.UnionPayUtil;
 import com.zm.pay.utils.wx.WxPayUtils;
 
 /**
@@ -57,6 +60,9 @@ public class PayServiceImpl implements PayService {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
+	
+	@Resource
+	UserFeignClient userFeignClient;
 
 	@Resource
 	PayMapper payMapper;
@@ -160,22 +166,29 @@ public class PayServiceImpl implements PayService {
 			}
 			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
 		}
-
+		
+		if(config.getUrl() == null){
+			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
+			config.setUrl(url);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
+		}
 
 		if (Constants.SCAN_CODE.equals(type)) {
 			String htmlStr = AliPayUtils.aliPay(type, config, model);
-//			AlipayTradePrecreateResponse response = AliPayUtils.precreate(config, model);
-//			if (response.isSuccess()) {
-				result.put("success", true);
-				result.put("htmlStr", htmlStr);
-//				result.put("urlCode", response.getQrCode());
-//			} else {
-//				logger.info(response.getCode() + "=====" + response.getMsg() + "," + response.getSubCode() + "====="
-//						+ response.getSubMsg());
-//				result.put("success", false);
-//				result.put("errorMsg", response.getMsg());
-//				result.put("errorSubMsg", response.getSubMsg());
-//			}
+			// AlipayTradePrecreateResponse response =
+			// AliPayUtils.precreate(config, model);
+			// if (response.isSuccess()) {
+			result.put("success", true);
+			result.put("htmlStr", htmlStr);
+			// result.put("urlCode", response.getQrCode());
+			// } else {
+			// logger.info(response.getCode() + "=====" + response.getMsg() +
+			// "," + response.getSubCode() + "====="
+			// + response.getSubMsg());
+			// result.put("success", false);
+			// result.put("errorMsg", response.getMsg());
+			// result.put("errorSubMsg", response.getSubMsg());
+			// }
 		}
 
 		return result;
@@ -298,7 +311,7 @@ public class PayServiceImpl implements PayService {
 		PayModel model = new PayModel();
 		model.setBody("购物订单");
 		model.setOrderId(info.getOrderId());
-		model.setTotalAmount((int)CalculationUtils.mul(info.getOrderDetail().getPayment(), 100) + "");
+		model.setTotalAmount((int) CalculationUtils.mul(info.getOrderDetail().getPayment(), 100) + "");
 		StringBuilder sb = new StringBuilder();
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
@@ -333,12 +346,38 @@ public class PayServiceImpl implements PayService {
 				detail.setOrderId(info.getOrderId());
 				orderFeignClient.updateOrderPayType(version, detail);
 			}
-			if("false".equals(result.get("success"))){
-				return new ResultModel(false, "微信调用失败:"+result.get("errorMsg"));
-			}else{
+			if ("false".equals(result.get("success"))) {
+				return new ResultModel(false, "微信调用失败:" + result.get("errorMsg"));
+			} else {
 				return new ResultModel(result);
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Map<String, Object> unionPay(Integer clientId, PayModel model, String type) {
+		UnionPayConfig config = (UnionPayConfig) redisTemplate.opsForValue()
+				.get(Constants.PAY + clientId + Constants.UNION_PAY);
+		Map<String, Object> result = new HashMap<String, Object>();
+		if (config == null) {
+			config = payMapper.getUnionPayConfig(clientId);
+			if (config == null) {
+				Map<String, Object> resp = new HashMap<String, Object>();
+				resp.put("error", "没有支付配置信息");
+				return resp;
+			}
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
+		}
+		
+		if(config.getUrl() == null){
+			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
+			config.setUrl(url);
+			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
+		}
+		
+		String str = UnionPayUtil.unionPay(config, model, type);
+		result.put("htmlStr", str);
+		return result;
 	}
 }

@@ -29,4 +29,8 @@ public interface PayFeignClient {
 	@RequestMapping(value = "wx/refund/{clientId}", method = RequestMethod.POST)
 	public Map<String, Object> wxRefundPay(@PathVariable("clientId") Integer clientId,
 			@RequestBody RefundPayModel model) throws Exception;
+	
+	@RequestMapping(value = "unionpay/{type}/{clientId}", method = RequestMethod.POST)
+	public Map<String, Object> unionpay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+			@RequestBody PayModel model);
 }

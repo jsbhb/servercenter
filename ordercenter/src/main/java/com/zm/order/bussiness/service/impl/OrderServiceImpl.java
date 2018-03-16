@@ -231,6 +231,8 @@ public class OrderServiceImpl implements OrderService {
 			result.setObj(paymap);
 		} else if (Constants.ALI_PAY.equals(payType)) {
 			result.setObj(payFeignClient.aliPay(centerId, type, payModel));
+		} else if (Constants.UNION_PAY.equals(payType)){
+			result.setObj(payFeignClient.unionpay(centerId, type, payModel));
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");

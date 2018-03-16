@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
+import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
 
 @Component
@@ -28,6 +29,8 @@ public class SysInit {
 		loadAliPayConfig();
 		
 		loadWeixinPayConfig();
+		
+		loadUnionPayConfig();
 	}
 	
 	private void loadAliPayConfig(){
@@ -41,6 +44,13 @@ public class SysInit {
 		List<WeixinPayConfig> list = payMapper.listWeixinPayConfig();
 		for(WeixinPayConfig model : list){
 			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.WX_PAY, model);
+		}
+	}
+	
+	private void loadUnionPayConfig(){
+		List<UnionPayConfig> list = payMapper.listUnionPayConfig();
+		for(UnionPayConfig model : list){
+			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY, model);
 		}
 	}
 }

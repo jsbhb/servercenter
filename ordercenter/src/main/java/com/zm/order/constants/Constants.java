@@ -10,6 +10,8 @@ public class Constants {
 	public static final String WX_PAY = "1";
 
 	public static final String ALI_PAY = "2";
+	
+	public static final String UNION_PAY = "3";
 
 	public static final String JSAPI = "JSAPI";
 
