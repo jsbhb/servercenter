@@ -88,6 +88,20 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 	</resultMap>
+	
+
+	<resultMap type="com.zm.user.pojo.UserDetail" id="UserDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="location" property="location" jdbcType="VARCHAR" />
+		<result column="company" property="company" jdbcType="VARCHAR" />
+		<result column="head_img" property="headImg" jdbcType="VARCHAR" />
+		<result column="certificates" property="certificates" jdbcType="INTEGER" />
+		<result column="idnum" property="idNum" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="INTEGER" />
+	</resultMap>
 
 	<select id="getVipUser" parameterType="Object" resultMap="vipUser">
 		select
@@ -391,5 +405,9 @@
 		VALUES (#{id},#{storeName},#{contacts},#{contactsPhone},#{province},#{city},
 		#{district},#{address},#{storeOperator},#{operatorIDNum},#{picPath1},#{picPath2},#{picPath3},#{picPath4},now(),now(),#{opt})
 	</insert>
+	
+	<select id="getAllCustomer" resultMap="UserDetail">
+		select * from user_detail
+	</select>
 
 </mapper>

@@ -161,4 +161,18 @@ public class PushUserController {
 		}
 		return false;
 	}
+
+	/**
+	 * @fun 后台获取所有推手列表
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/pushuser/listAllPushUser", method = RequestMethod.POST)
+	public ResultModel listAllPushUser(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return pushUserService.listAllPushUser();
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

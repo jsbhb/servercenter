@@ -544,4 +544,12 @@ public class UserController {
 		return null;
 	}
 
+	@RequestMapping(value = "{version}/user/customer", method = RequestMethod.POST)
+	public ResultModel getAllCustomer(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return userService.getAllCustomer();
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
 }

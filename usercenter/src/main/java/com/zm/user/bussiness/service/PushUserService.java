@@ -22,4 +22,6 @@ public interface PushUserService {
 	ResultModel pushUserOrderCount(Integer shopId);
 
 	boolean verifyEffective(Integer shopId, Integer pushUserId);
+
+	ResultModel listAllPushUser();
 }

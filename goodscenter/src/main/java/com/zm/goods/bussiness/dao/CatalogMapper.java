@@ -146,4 +146,22 @@ public interface CatalogMapper {
 	 */
 	void updateThirdCatalog(ThirdCatalogEntity entity);
 
+	/**  
+	 * selectFirstAll:检索所有一级分类. <br/>  
+	 *  
+	 * @author hebin  
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<SecondCatalogEntity> selectSecondAll();
+
+	/**  
+	 * selectFirstAll:检索所有一级分类. <br/>  
+	 *  
+	 * @author hebin  
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<ThirdCatalogEntity> selectThirdAll();
+
 }

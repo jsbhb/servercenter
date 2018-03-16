@@ -213,4 +213,10 @@ public class PushUserServiceImpl implements PushUserService {
 		}
 		return false;
 	}
+
+	@Override
+	public ResultModel listAllPushUser() {
+		List<PushUser> list = pushUserMapper.listAllPushUser();
+		return new ResultModel(true, list);
+	}
 }

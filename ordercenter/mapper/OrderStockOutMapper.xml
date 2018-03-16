@@ -107,6 +107,20 @@
 		</if>
 		order by ob.create_time desc) o 
 		left join order_detail od on o.order_id = od.order_id 
+		<if test="orderGoodsList != null and orderGoodsList.size() > 0">
+			<foreach collection="orderGoodsList" item="item" index="index">
+				inner join (select * from order_goods 
+				where 1=1
+				<if test="item.itemCode != null and item.itemCode != ''">
+					and item_code = #{item.itemCode}
+				</if>
+				<if test="item.itemId != null and item.itemId != ''">
+					and item_id = #{item.itemId}
+				</if>
+				) 
+				og on o.order_id = og.order_id 
+			</foreach>
+		</if>
 		left join third_order_info oe
 		on oe.order_id = o.order_id order by o.create_time desc
 	</select>

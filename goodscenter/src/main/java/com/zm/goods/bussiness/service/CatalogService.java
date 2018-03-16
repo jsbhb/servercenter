@@ -126,4 +126,22 @@ public interface CatalogService {
 	 */
 	void modifyThirdCatalog(ThirdCatalogEntity entity);
 
+	/**  
+	 * queryFirstAll:查询一级分类集合. <br/>  
+	 *  
+	 * @author hebin  
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<SecondCatalogEntity> querySecondAll();
+
+	/**  
+	 * queryFirstAll:查询一级分类集合. <br/>  
+	 *  
+	 * @author hebin  
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<ThirdCatalogEntity> queryThirdAll();
+
 }

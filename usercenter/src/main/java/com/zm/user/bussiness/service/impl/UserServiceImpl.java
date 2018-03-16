@@ -17,7 +17,6 @@ import com.zm.user.constants.Constants;
 import com.zm.user.constants.LogConstants;
 import com.zm.user.feignclient.ActivityFeignClient;
 import com.zm.user.feignclient.GoodsFeignClient;
-import com.zm.user.feignclient.LogFeignClient;
 import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
 import com.zm.user.feignclient.model.LogInfo;
@@ -416,6 +415,12 @@ public class UserServiceImpl implements UserService {
 	public String getPhoneByUserId(Integer userId) {
 
 		return userMapper.getPhoneByUserId(userId);
+	}
+
+	@Override
+	public ResultModel getAllCustomer() {
+		List<UserDetail> list = userMapper.getAllCustomer();
+		return new ResultModel(true, list);
 	}
 
 }

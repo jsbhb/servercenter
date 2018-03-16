@@ -104,4 +104,12 @@
 	<delete id="deleteByThirdId" parameterType="Object">
 		delete from goods_third_category where third_id = #{id}
 	</delete>
+	
+	<select id="selectSecondAll" resultMap="second">
+		select * from goods_second_category
+	</select>
+	
+	<select id="selectThirdAll" resultMap="third">
+		select * from goods_third_category
+	</select>
 </mapper>

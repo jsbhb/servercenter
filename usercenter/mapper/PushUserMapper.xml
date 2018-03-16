@@ -63,5 +63,11 @@
 	<select id="verifyEffective" parameterType="Object" resultType="java.lang.Integer">
 		select status from push_user where grade_id = #{shopId} and user_id = #{userId}
 	</select>
+	
+	<select id="listAllPushUser" resultMap="pushUser">
+		select pu.* from 
+		push_user pu 
+		where pu.type = 0
+	</select>
 
 </mapper>
