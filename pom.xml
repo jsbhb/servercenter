@@ -19,6 +19,7 @@
 		<module>timetaskcenter</module>
 		<module>suppliercenter</module>
 		<module>activitycenter</module>
+		<module>financecenter</module>
 	</modules>
 
 	<parent>

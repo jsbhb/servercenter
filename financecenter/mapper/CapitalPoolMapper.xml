@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.finance.bussiness.dao.CapitalPoolMapper">
+
+	
+	<resultMap type="com.zm.finance.pojo.capitalpool.CapitalPool" id="capitalpool">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
+		<result column="money" property="money" jdbcType="INTEGER"/>
+		<result column="frozen_money" property="frozenMoney" jdbcType="NUMERIC"/>
+		<result column="preferential" property="preferential" jdbcType="NUMERIC"/>
+		<result column="frozen_preferential" property="frozenPreferential" jdbcType="NUMERIC"/>
+		<result column="use_money" property="useMoney" jdbcType="NUMERIC"/>
+		<result column="use_preferential" property="usePreferential" jdbcType="NUMERIC"/>
+		<result column="count_money" property="countMoney" jdbcType="NUMERIC"/>
+		<result column="count_preferential" property="countPreferential" jdbcType="NUMERIC"/>
+		<result column="level" property="level" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<select id="listCenterCapitalPool" resultMap="capitalpool">
+		select * from capitalpool
+	</select>
+	
+</mapper>
