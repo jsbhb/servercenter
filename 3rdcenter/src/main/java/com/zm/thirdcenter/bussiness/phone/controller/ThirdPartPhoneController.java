@@ -47,7 +47,7 @@ public class ThirdPartPhoneController {
 	private Logger logger = LoggerFactory.getLogger(ThirdPartPhoneController.class);
 
 	@Resource
-	RedisTemplate<String, PhoneValidata> redisTemplate;
+	RedisTemplate<String, PhoneValidata> template;
 
 	@RequestMapping(value = "auth/{version}/third-part/phone", method = RequestMethod.POST)
 	@ApiOperation(value = "获取短信验证码接口", produces = "application/json;utf-8")
@@ -72,7 +72,7 @@ public class ThirdPartPhoneController {
 			String code = CommonUtil.getPhoneCode();
 
 			NotifyMsg notifyMsg = null;
-			PhoneValidata model = redisTemplate.opsForValue().get(phone);
+			PhoneValidata model = template.opsForValue().get(phone);
 			if (model == null) {
 
 				notifyMsg = new NotifyMsg();
@@ -89,7 +89,7 @@ public class ThirdPartPhoneController {
 				model.setCode(code);
 				model.setSendTime(1);
 				model.setTime(System.currentTimeMillis());
-				redisTemplate.opsForValue().set(phone, model, 30L, TimeUnit.MINUTES);
+				template.opsForValue().set(phone, model, 30L, TimeUnit.MINUTES);
 
 				return result;
 			} else {
@@ -108,11 +108,11 @@ public class ThirdPartPhoneController {
 					return result;
 				}
 
-				Long time = redisTemplate.getExpire(phone, TimeUnit.MINUTES);
+				Long time = template.getExpire(phone, TimeUnit.MINUTES);
 				model.setCode(code);
 				model.setSendTime(model.getSendTime() + 1);
 				model.setTime(System.currentTimeMillis());
-				redisTemplate.opsForValue().set(phone, model, time, TimeUnit.MINUTES);
+				template.opsForValue().set(phone, model, time, TimeUnit.MINUTES);
 				return result;
 			}
 		}
@@ -127,7 +127,7 @@ public class ThirdPartPhoneController {
 			@RequestParam("code") String code) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			PhoneValidata model = redisTemplate.opsForValue().get(phone);
+			PhoneValidata model = template.opsForValue().get(phone);
 			if (model == null) {
 				return false;
 			}

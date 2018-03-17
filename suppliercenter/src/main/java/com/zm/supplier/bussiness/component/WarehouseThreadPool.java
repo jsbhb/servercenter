@@ -38,7 +38,7 @@ import com.zm.supplier.util.StatusTOChiness;
 public class WarehouseThreadPool {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	UserFeignClient userFeignClient;
@@ -74,7 +74,7 @@ public class WarehouseThreadPool {
 		}
 		boolean flag = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);
 		if (flag) {
-			redisTemplate.delete(info.getOrderId());
+			template.delete(info.getOrderId());
 		} else {
 			logger.info("订单号：" + info.getOrderId() + "===============发送成功，更新出错==============");
 		}
@@ -237,14 +237,14 @@ public class WarehouseThreadPool {
 	}
 
 	private AbstractSupplierButtJoint getTargetInterface(Integer supplierId) {
-		SupplierInterface inf = (SupplierInterface) redisTemplate.opsForValue()
+		SupplierInterface inf = (SupplierInterface) template.opsForValue()
 				.get(Constants.SUPPLIER_INTERFACE + supplierId);
 		if (inf == null) {
 			inf = supplierMapper.getSupplierInterface(supplierId);
 			if (inf == null) {
 				return null;
 			}
-			redisTemplate.opsForValue().set(Constants.SUPPLIER_INTERFACE + supplierId, inf);
+			template.opsForValue().set(Constants.SUPPLIER_INTERFACE + supplierId, inf);
 		}
 		AbstractSupplierButtJoint buttJoint = (AbstractSupplierButtJoint) SpringContextUtil
 				.getBean(inf.getTargetObject());

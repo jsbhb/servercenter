@@ -24,7 +24,7 @@ import com.zm.order.utils.CalculationUtils;
 public class ShareProfitComponent {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	OrderMapper orderMapper;
@@ -51,7 +51,7 @@ public class ShareProfitComponent {
 			}
 
 		} catch (Exception e) {
-			redisTemplate.opsForList().leftPush(Constants.EXCEPTION_PROFIT, orderId);
+			template.opsForList().leftPush(Constants.EXCEPTION_PROFIT, orderId);
 			e.printStackTrace();
 		}
 
@@ -136,7 +136,7 @@ public class ShareProfitComponent {
 		shareProfitModel.setRegisterProfit(
 				CalculationUtils.mul(totalShareProfit, profitProportion.getRegister_profit_proportion()));
 		shareProfitModel.setCrossArea(crossArea);
-		redisTemplate.opsForList().rightPush(Constants.PROFIT + shopId, shareProfitModel);
+		template.opsForList().rightPush(Constants.PROFIT + shopId, shareProfitModel);
 
 		shareProfitModel = new ShareProfitModel();
 		shareProfitModel.setOrderAmount(info.getOrderDetail().getPayment());
@@ -145,7 +145,7 @@ public class ShareProfitComponent {
 		shareProfitModel.setConsumeProfit(
 				CalculationUtils.mul(totalShareProfit, profitProportion.getConsume_profit_proportion()));
 		shareProfitModel.setCrossArea(crossArea);
-		redisTemplate.opsForList().rightPush(Constants.PROFIT + shopId2, shareProfitModel);
+		template.opsForList().rightPush(Constants.PROFIT + shopId2, shareProfitModel);
 	}
 
 	/**
@@ -182,6 +182,6 @@ public class ShareProfitComponent {
 		}
 		shareProfitModel.setCrossArea(crossArea);
 
-		redisTemplate.opsForList().rightPush(Constants.PROFIT + shopId, shareProfitModel);
+		template.opsForList().rightPush(Constants.PROFIT + shopId, shareProfitModel);
 	}
 }

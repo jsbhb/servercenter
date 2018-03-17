@@ -18,7 +18,7 @@ import com.zm.pay.pojo.WeixinPayConfig;
 public class SysInit {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	PayMapper payMapper;
@@ -36,21 +36,21 @@ public class SysInit {
 	private void loadAliPayConfig(){
 		List<AliPayConfigModel> list = payMapper.listAliPayConfig();
 		for(AliPayConfigModel model : list){
-			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.ALI_PAY, model);
+			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.ALI_PAY, model);
 		}
 	}
 	
 	private void loadWeixinPayConfig(){
 		List<WeixinPayConfig> list = payMapper.listWeixinPayConfig();
 		for(WeixinPayConfig model : list){
-			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.WX_PAY, model);
+			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.WX_PAY, model);
 		}
 	}
 	
 	private void loadUnionPayConfig(){
 		List<UnionPayConfig> list = payMapper.listUnionPayConfig();
 		for(UnionPayConfig model : list){
-			redisTemplate.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY, model);
+			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY, model);
 		}
 	}
 }

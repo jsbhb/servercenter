@@ -3,6 +3,7 @@ package com.zm.order.bussiness.service.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.feignclient.model.SendOrderResult;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
@@ -77,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
 	PayFeignClient payFeignClient;
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	SupplierFeignClient supplierFeignClient;
@@ -182,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
 				Double fee = entry.getValue();
 				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
 				if (tax.getExciseTax() != null) {
-					if(tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1){
+					if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
 						result.setErrorMsg("消费税或增值税设置有误");
 						result.setSuccess(false);
 						return result;
@@ -231,7 +234,7 @@ public class OrderServiceImpl implements OrderService {
 			result.setObj(paymap);
 		} else if (Constants.ALI_PAY.equals(payType)) {
 			result.setObj(payFeignClient.aliPay(centerId, type, payModel));
-		} else if (Constants.UNION_PAY.equals(payType)){
+		} else if (Constants.UNION_PAY.equals(payType)) {
 			result.setObj(payFeignClient.unionpay(centerId, type, payModel));
 		} else {
 			result.setSuccess(false);
@@ -243,10 +246,11 @@ public class OrderServiceImpl implements OrderService {
 			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
 					info.getCouponIds());
 		}
-		
-		if(info.getPushUserId() != null){//如果是推手订单，判断该推手是否有效
-			boolean flag = userFeignClient.verifyEffective(Constants.FIRST_VERSION, info.getShopId(), info.getPushUserId());
-			if(!flag){//失效推手ID设为null
+
+		if (info.getPushUserId() != null) {// 如果是推手订单，判断该推手是否有效
+			boolean flag = userFeignClient.verifyEffective(Constants.FIRST_VERSION, info.getShopId(),
+					info.getPushUserId());
+			if (!flag) {// 失效推手ID设为null
 				info.setPushUserId(null);
 			}
 		}
@@ -423,11 +427,11 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<OrderCount> getCountByStatus(Map<String, Object> param, String type) {
-		
+
 		if ("0".equals(type)) {
 			return orderMapper.getCountByStatus(param);
 		}
-		if("1".equals(type)){
+		if ("1".equals(type)) {
 			return orderMapper.getPushCountByStatus(param);
 		}
 		return null;
@@ -459,7 +463,7 @@ public class OrderServiceImpl implements OrderService {
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()
 					&& !Constants.ORDER_EXCEPTION.equals(info.getStatus())) {
-				if (redisTemplate.opsForValue().get(orderId) != null) {// 是否正在发送给第三方
+				if (template.opsForValue().get(orderId) != null) {// 是否正在发送给第三方
 					return new ResultModel(false, "该订单正在发送给保税仓，请稍后重试");
 				}
 				RefundPayModel model = new RefundPayModel(info.getOrderId(), info.getOrderDetail().getPayNo(),
@@ -625,7 +629,59 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
 		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+
+		HashOperations<String, Object, Object> hashOperations = template.opsForHash();
+		Iterator<OrderInfo> it = list.iterator();
+		List<String> orderIdListForCapitalNotEnough = new ArrayList<String>();
+		OrderInfo orderInfo = null;
+		Double balance = null;
+		while (it.hasNext()) {
+			orderInfo = it.next();
+			if (!Constants.PREDETERMINE_PLAT_TYPE.equals(orderInfo.getCenterId())) {
+				balance = null;
+				try {
+					balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
+							CalculationUtils.sub(0, orderInfo.getOrderDetail().getPayment()));// 扣除资金池
+					if (balance < 0) {// 如果扣除后小于0，则不发送订单给仓库，并把扣除的资金加回去
+						orderIdListForCapitalNotEnough.add(orderInfo.getOrderId());
+						it.remove();
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
+								orderInfo.getOrderDetail().getPayment());
+					} else {// 如果余额足够，把资金放到冻结资金处
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "frozenMoney",
+								orderInfo.getOrderDetail().getPayment());
+						Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
+						hashOperations.putAll(Constants.CAPITAL_DETAIL, capitalPoolDetailMap);
+					}
+				} catch (Exception e) {
+					if (balance == null) {
+						LogUtil.writeErrorLog("【扣减资金池出错】订单号：" + orderInfo.getOrderId(), e);
+						it.remove();// 不确定资金池够不够，先移除
+					} else if (balance < 0) {// 扣减资金池成功，加回资金池时出错，资金池出现负数的时候可能这里出现问题
+						LogUtil.writeErrorLog("【加回资金池出错】订单号：" + orderInfo.getOrderId(), e);
+					} else {//加冻结资金时出错或增加记录时出错，不影响整体流程
+						LogUtil.writeErrorLog("【记录或加冻结资金出错】订单号：" + orderInfo.getOrderId(), e);
+					}
+				}
+			}
+		}
+		if (orderIdListForCapitalNotEnough.size() > 0) {
+			orderMapper.updateOrderCapitalNotEnough(orderIdListForCapitalNotEnough);
+		}
+
 		return list;
+	}
+
+	private Map<String, Object> getCapitalDetail(OrderInfo orderInfo) {
+		Map<String, Object> capitalPoolDetailMap = new HashMap<String, Object>();
+		capitalPoolDetailMap.put("centerId", orderInfo.getCenterId().toString());
+		capitalPoolDetailMap.put("payType", "1");// 类型是支出
+		capitalPoolDetailMap.put("businessType", "0");// 方式是现金
+		capitalPoolDetailMap.put("money", orderInfo.getOrderDetail().getPayment().toString());
+		capitalPoolDetailMap.put("orderId", orderInfo.getOrderId());
+		capitalPoolDetailMap.put("remark", "订单产生，资金池扣减");
+		capitalPoolDetailMap.put("createTime", orderInfo.getCreateTime());
+		return capitalPoolDetailMap;
 	}
 
 	@Override
@@ -665,7 +721,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Object> getProfit(Integer shopId) {
-		return redisTemplate.opsForList().range(Constants.PROFIT + shopId, 0, -1);
+		return template.opsForList().range(Constants.PROFIT + shopId, 0, -1);
 	}
 
 	@Override
@@ -688,12 +744,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public ResultModel repayingPushJudge(Integer pushUserId, Integer shopId) {
-		Map<String,Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("pushUserId", pushUserId);
 		param.put("shopId", shopId);
 		int count = 0;
 		count = orderMapper.repayingPushJudge(param);
-		if(count > 0){
+		if (count > 0) {
 			return new ResultModel(false, "还有未完成的订单");
 		}
 		return new ResultModel(true, "");
@@ -701,7 +757,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public ResultModel pushUserOrderCount(Integer shopId, List<Integer> pushUserIdList) {
-		Map<String,Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("pushUserIdList", pushUserIdList);
 		param.put("shopId", shopId);
 		return new ResultModel(true, orderMapper.pushUserOrderCount(param));

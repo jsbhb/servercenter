@@ -10,23 +10,25 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import redis.clients.jedis.JedisPoolConfig;
 
-@Configuration  
-@EnableAutoConfiguration 
-@ConfigurationProperties(prefix="spring.redis")
+@Configuration
+@EnableAutoConfiguration
+@ConfigurationProperties(prefix = "spring.redis")
 public class RedisConfig {
-	
+
 	@Value("${spring.redis.host}")
 	private String hostName;
-	
+
 	@Value("${spring.redis.port}")
 	private String port;
-	
+
 	@Value("${spring.redis.password}")
 	private String password;
-	
+
 	Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
 	@Bean
@@ -43,7 +45,7 @@ public class RedisConfig {
 	public JedisConnectionFactory getConnectionFactory() {
 		JedisConnectionFactory factory = new JedisConnectionFactory();
 		JedisPoolConfig config = getRedisConfig();
-		logger.info("hostName:"+hostName+",port:"+port+",password:"+password);
+		logger.info("hostName:" + hostName + ",port:" + port + ",password:" + password);
 		factory.setHostName(hostName);
 		factory.setPort(Integer.valueOf(port));
 		factory.setPassword(password);
@@ -54,6 +56,11 @@ public class RedisConfig {
 	@Bean
 	public RedisTemplate<?, ?> getRedisTemplate() {
 		RedisTemplate<?, ?> template = new StringRedisTemplate(getConnectionFactory());
+		RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+		template.setKeySerializer(stringSerializer);
+		template.setValueSerializer(stringSerializer);
+		template.setHashKeySerializer(stringSerializer);
+		template.setHashValueSerializer(stringSerializer);
 		return template;
 	}
 }

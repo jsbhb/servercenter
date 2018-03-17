@@ -30,9 +30,6 @@ public class TimeTaskController {
 	@Resource
 	TimeTaskService timeTaskService;
 	
-	@Resource
-	RedisTemplate<String, Object> redisTemplate;
-
 	@RequestMapping(value = "{version}/timetask/start", method = RequestMethod.GET)
 	public ResultModel startTimeTask(@PathVariable("version") Double version, Integer id) {
 

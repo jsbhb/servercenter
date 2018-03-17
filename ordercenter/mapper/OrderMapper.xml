@@ -420,6 +420,13 @@
 		</if>
 		where order_id = #{orderId}
 	</update>
+	
+	<update id="updateOrderCapitalNotEnough" parameterType="Object">
+		update order_base set status = 11 where order_id in 
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</update>
 
 	<!-- 更新订单状态END -->
 

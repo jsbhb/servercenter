@@ -16,7 +16,7 @@ import com.zm.supplier.pojo.SupplierInterface;
 public class SysInit {
 
 	@Resource
-	RedisTemplate<String, SupplierInterface> redisTemplate;
+	RedisTemplate<String, SupplierInterface> template;
 
 	@Resource
 	SupplierMapper supplierMapper;
@@ -34,7 +34,7 @@ public class SysInit {
 			return;
 		}
 		for (SupplierInterface model : list) {
-			redisTemplate.opsForValue().set(Constants.SUPPLIER_INTERFACE + model.getSupplierId(), model);
+			template.opsForValue().set(Constants.SUPPLIER_INTERFACE + model.getSupplierId(), model);
 		}
 	}
 }

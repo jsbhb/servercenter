@@ -27,6 +27,7 @@ public class Constants {
 	public static final Integer ORDER_COMPLETE = 7;// 已收货订单完成
 	public static final Integer ORDER_CANCEL = 8;// 退单
 	public static final Integer ORDER_CLOSE = 9;// 交易关闭
+	public static final Integer CAPITAL_POOL_NOT_ENOUGH = 11;// 资金池不足
 	public static final Integer ORDER_EXCEPTION = 99;// 订单异常
 
 	// *********************活动范围，获取是否有全场活动******************************/
@@ -68,5 +69,9 @@ public class Constants {
 	// *********************订货平台ID*********************
 
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
+	
+	// *********************资金池redis前缀*********************
 
+	public static final String CAPITAL_PERFIX = "capital:";
+	public static final String CAPITAL_DETAIL = "capitaldetail:";
 }

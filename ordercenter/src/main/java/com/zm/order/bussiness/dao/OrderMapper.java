@@ -121,4 +121,6 @@ public interface OrderMapper {
 
 	List<PushUserOrderCount> pushUserOrderCount(Map<String, Object> param);
 
+	void updateOrderCapitalNotEnough(List<String> list);
+
 }

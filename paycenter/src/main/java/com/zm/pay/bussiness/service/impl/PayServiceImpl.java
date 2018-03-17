@@ -56,7 +56,7 @@ public class PayServiceImpl implements PayService {
 	OrderFeignClient orderFeignClient;
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
@@ -71,7 +71,7 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public Map<String, String> weiXinPay(Integer clientId, String type, PayModel model) throws Exception {
-		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
+		WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
 
 		if (config == null) {
@@ -81,7 +81,7 @@ public class PayServiceImpl implements PayService {
 				resp.put("error", "没有支付配置信息");
 				return resp;
 			}
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
 		}
 
 		config.setHttpConnectTimeoutMs(5000);
@@ -108,7 +108,7 @@ public class PayServiceImpl implements PayService {
 	@Override
 	public boolean payCustom(CustomModel model) throws Exception {
 		if (Constants.WX_PAY.equals(model.getPayType())) {
-			WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
+			WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
 					.get(Constants.PAY + model.getCenterId() + Constants.WX_PAY);
 
 			if (config == null) {
@@ -116,7 +116,7 @@ public class PayServiceImpl implements PayService {
 				if (config == null) {
 					return false;
 				}
-				redisTemplate.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+				template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
 			}
 
 			config.setHttpConnectTimeoutMs(5000);
@@ -131,7 +131,7 @@ public class PayServiceImpl implements PayService {
 			}
 		}
 		if (Constants.ALI_PAY.equals(model.getPayType())) {
-			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+			AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 					.get(Constants.PAY + model.getCenterId() + Constants.ALI_PAY);
 
 			if (config == null) {
@@ -139,7 +139,7 @@ public class PayServiceImpl implements PayService {
 				if (config == null) {
 					return false;
 				}
-				redisTemplate.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+				template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
 			}
 
 			Map<String, String> result = AliPayUtils.acquireCustom(config, model);
@@ -154,7 +154,7 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public Map<String, Object> aliPay(Integer clientId, String type, PayModel model) throws Exception {
-		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+		AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -164,13 +164,13 @@ public class PayServiceImpl implements PayService {
 				result.put("error", "没有支付配置信息");
 				return result;
 			}
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
 		}
 		
 		if(config.getUrl() == null){
 			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
 			config.setUrl(url);
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
 		}
 
 		if (Constants.SCAN_CODE.equals(type)) {
@@ -196,7 +196,7 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public Map<String, Object> aliRefundPay(Integer clientId, RefundPayModel model) throws AlipayApiException {
-		AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+		AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
 		if (config == null) {
@@ -206,7 +206,7 @@ public class PayServiceImpl implements PayService {
 				resp.put("error", "没有支付配置信息");
 				return resp;
 			}
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
 		}
 
 		AlipayTradeRefundResponse response = AliPayUtils.aliRefundPay(config, model);
@@ -228,7 +228,7 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public Map<String, Object> wxRefundPay(Integer clientId, RefundPayModel model) throws Exception {
-		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
+		WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
 
 		if (config == null) {
@@ -238,7 +238,7 @@ public class PayServiceImpl implements PayService {
 				resp.put("error", "没有支付配置信息");
 				return resp;
 			}
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
 		}
 
 		config.setHttpConnectTimeoutMs(5000);
@@ -357,7 +357,7 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public Map<String, Object> unionPay(Integer clientId, PayModel model, String type) {
-		UnionPayConfig config = (UnionPayConfig) redisTemplate.opsForValue()
+		UnionPayConfig config = (UnionPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.UNION_PAY);
 		Map<String, Object> result = new HashMap<String, Object>();
 		if (config == null) {
@@ -367,13 +367,13 @@ public class PayServiceImpl implements PayService {
 				resp.put("error", "没有支付配置信息");
 				return resp;
 			}
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
 		}
 		
 		if(config.getUrl() == null){
 			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
 			config.setUrl(url);
-			redisTemplate.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
 		}
 		
 		String str = UnionPayUtil.unionPay(config, model, type);

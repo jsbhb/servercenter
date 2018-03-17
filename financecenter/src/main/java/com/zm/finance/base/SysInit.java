@@ -1,7 +1,9 @@
 package com.zm.finance.base;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -19,7 +21,7 @@ import com.zm.finance.util.JSONUtil;
 public class SysInit {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	CapitalPoolMapper capitalPoolMapper;
@@ -37,13 +39,19 @@ public class SysInit {
 	private void loadCapitalPool() {
 		List<CapitalPool> poolList = capitalPoolMapper.listCenterCapitalPool();
 		if (poolList != null && poolList.size() > 0) {
-			HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+			HashOperations<String, Object, Object> hashOperations = template.opsForHash();
 			String key;
-			Map<String, Object> result = null;
+			Map<String, Object> temp = null;
+			Map<String, String> result = new HashMap<String, String>();
 			for (CapitalPool pool : poolList) {
 				key = Constants.CAPITAL_PERFIX + pool.getCenterId();
 				if (!hashOperations.hasKey(key, key)) {
-					result = JSONUtil.parse(JSONUtil.toJson(pool), Map.class);
+					temp = JSONUtil.parse(JSONUtil.toJson(pool), Map.class);
+					for(Entry<String, Object> entry : temp.entrySet()){
+						if(entry.getValue() != null){
+							result.put(entry.getKey(), entry.getValue().toString());
+						}
+					}
 					hashOperations.putAll(key, result);
 				}
 			}

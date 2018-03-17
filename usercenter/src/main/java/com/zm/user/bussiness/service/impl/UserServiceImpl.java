@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 	ActivityFeignClient activityFeignClient;
 
 	@Resource
-	RedisTemplate<String, String> redisTemplate;
+	RedisTemplate<String, String> template;
 
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
 		userMapper.saveUser(info);
 
 		if (info.getWechat() != null && !"".equals(info.getWechat())) {
-			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
+			ApiResult apiResult = new ApiResult(template.opsForValue().get(info.getWechat()));
 			packageUser(apiResult, info);
 			userMapper.saveWechat(new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
 		}

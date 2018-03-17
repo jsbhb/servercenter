@@ -48,7 +48,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public class NotifyController {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	OrderFeignClient orderFeignClient;
@@ -88,7 +88,7 @@ public class NotifyController {
 			clientId = user.getCenterId();
 		}
 
-		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
+		WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
 
 		WXPay wxpay = new WXPay(config);
@@ -188,7 +188,7 @@ public class NotifyController {
 				clientId = user.getCenterId();
 			}
 
-			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+			AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 					.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
 			config.initParameter();
@@ -269,7 +269,7 @@ public class NotifyController {
 				clientId = user.getCenterId();
 			}
 
-			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+			AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 					.get(Constants.PAY + clientId + Constants.ALI_PAY);
 			config.initParameter();
 
@@ -345,7 +345,7 @@ public class NotifyController {
 			clientId = user.getCenterId();
 		}
 
-		UnionPayConfig config = (UnionPayConfig) redisTemplate.opsForValue()
+		UnionPayConfig config = (UnionPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.UNION_PAY);
 
 		// 重要！验证签名前不要修改reqParam中的键值对的内容，否则会验签不过
@@ -421,7 +421,7 @@ public class NotifyController {
 			clientId = user.getCenterId();
 		}
 
-		UnionPayConfig config = (UnionPayConfig) redisTemplate.opsForValue()
+		UnionPayConfig config = (UnionPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.UNION_PAY);
 
 		if (!AcpService.validate(valideData, encoding, config)) {

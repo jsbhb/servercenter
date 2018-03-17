@@ -22,7 +22,7 @@ import com.zm.thirdcenter.utils.ExcelUtil;
 public class SysInit {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	LoginPluginMapper loginPluginMapper;
@@ -43,7 +43,7 @@ public class SysInit {
 	private void loadWXLoginConfig(){
 		List<WXLoginConfig> list = loginPluginMapper.listWXLoginConfig();
 		for(WXLoginConfig model : list){
-			redisTemplate.opsForValue().set(Constants.LOGIN+model.getCenterId()+""+model.getLoginType(), model);
+			template.opsForValue().set(Constants.LOGIN+model.getCenterId()+""+model.getLoginType(), model);
 		}
 	}
 	
