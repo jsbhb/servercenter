@@ -38,7 +38,7 @@ CREATE TABLE `zm_financial`.`capitalpool_detail` (
   `business_type` TINYINT UNSIGNED NULL COMMENT '业务类型0:现金,1:返佣,2:赠送,3:抵用券',
   `money` DECIMAL(12,2) NULL COMMENT '金额',
   `pay_no` VARCHAR(30) NULL COMMENT '流水号',
-  `order_no` VARCHAR(30) NULL COMMENT '订单号',
+  `order_id` VARCHAR(30) NULL COMMENT '订单号',
   `remark` VARCHAR(200) NULL COMMENT '备注',
   `create_time` DATETIME NULL COMMENT '注册时间', 
   `opt` VARCHAR(20) NULL COMMENT '操作人',
