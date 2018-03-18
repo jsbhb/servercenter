@@ -7,4 +7,5 @@ public class Constants {
 	// *********************资金池redis前缀*********************
 
 	public static final String CAPITAL_PERFIX = "capital:";
+	public static final String CAPITAL_DETAIL = "capitaldetail:";
 }

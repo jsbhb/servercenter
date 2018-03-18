@@ -26,4 +26,48 @@
 		select * from capitalpool
 	</select>
 	
+	<insert id="insertCapitalPoolDetail" parameterType="Object">
+		insert into capitalpool_detail 
+		(center_id,pay_type,business_type,money,pay_no,order_id,remark,create_time)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.centerId},#{item.payType},#{item.businessType},#{item.money},#{item.payNo},#{item.orderId},#{item.remark},now())
+		</foreach>
+	</insert>
+	
+	<update id="updateCapitalPool" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update capitalpool
+			<set>
+				<if test="item.money != null">
+					money = #{item.money},
+				</if>
+				<if test="item.frozenMoney != null">
+					frozen_money = #{item.frozenMoney},
+				</if>
+				<if test="item.preferential != null">
+					preferential = #{item.preferential},
+				</if>
+				<if test="item.frozenPreferential != null">
+					frozen_preferential = #{item.frozenPreferential},
+				</if>
+				<if test="item.useMoney != null">
+					use_money = #{item.useMoney},
+				</if>
+				<if test="item.usePreferential != null">
+					use_preferential = #{item.usePreferential},
+				</if>
+				<if test="item.countMoney != null">
+					count_money = #{item.countMoney},
+				</if>
+				<if test="item.countPreferential != null">
+					count_preferential = #{item.countPreferential},
+				</if>
+				update_time = now 
+			</set>
+			where center_id = #{item.centerId} 
+		</foreach>
+	</update>
+	
 </mapper>

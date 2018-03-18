@@ -70,6 +70,7 @@ public class ShareProfitComponent {
 	/**
 	 * @fun 消费订单分润计算
 	 * @param info
+	 * @deprecated
 	 */
 	private void consumOrderProfit(OrderInfo info) {
 		if (info.getOrderGoodsList() != null) {
@@ -183,5 +184,13 @@ public class ShareProfitComponent {
 		shareProfitModel.setCrossArea(crossArea);
 
 		template.opsForList().rightPush(Constants.PROFIT + shopId, shareProfitModel);
+	}
+	
+	/**
+	 * @fun 订单返佣计算
+	 * @param orderInfo
+	 */
+	private void orderProfit(OrderInfo orderInfo){
+		
 	}
 }

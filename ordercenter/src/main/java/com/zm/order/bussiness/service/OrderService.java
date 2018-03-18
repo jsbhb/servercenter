@@ -255,7 +255,7 @@ public interface OrderService {
 	void updateRefundPayNo(OrderDetail detail);
 
 	/**
-	 * listOrderForSendToWarehouse:获取支付报关已经完成的订单. <br/>
+	 * listOrderForSendToWarehouse:获取需要推送仓库的订单. <br/>
 	 * 
 	 * @author wqy
 	 * @param
@@ -263,6 +263,16 @@ public interface OrderService {
 	 * @since JDK 1.7
 	 */
 	List<OrderInfo> listOrderForSendToWarehouse();
+	
+	/**
+	 * calcapitalpool:计算资金池. <br/>
+	 * 
+	 * @author wqy
+	 * @param
+	 * @return
+	 * @since JDK 1.7
+	 */
+	void calcapitalpool();
 
 	/**
 	 * saveThirdOrder:保存第三方订单号. <br/>

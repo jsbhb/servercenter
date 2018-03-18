@@ -93,10 +93,8 @@ public interface OrderMapper {
 
 	void updateRefundPayNo(OrderDetail detail);
 
-	List<OrderInfo> listOrderForSendToTTWarehouse();
+	List<OrderInfo> listOrderForSendToWarehouse();
 	
-	List<OrderInfo> listOrderForSendToOtherWarehouse();
-
 	void saveThirdOrder(List<SendOrderResult> list);
 
 	int updateOrderSendToWarehouse(String orderId);
@@ -122,5 +120,11 @@ public interface OrderMapper {
 	List<PushUserOrderCount> pushUserOrderCount(Map<String, Object> param);
 
 	void updateOrderCapitalNotEnough(List<String> list);
+
+	List<OrderInfo> listTTOrderForCalCapital();
+	
+	List<OrderInfo> listOtherOrderForCalCapital();
+
+	void updateOrderCapitalEnough(List<String> list);
 
 }

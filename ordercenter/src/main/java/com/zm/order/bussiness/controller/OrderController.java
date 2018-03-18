@@ -495,13 +495,15 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/order/calCapitalPool", method = RequestMethod.GET)
 	@ApiIgnore
-	public ResultModel alreadyPay(@PathVariable("version") Double version) {
+	public ResultModel calCapitalPool(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return new ResultModel(true, orderService.listOrderForSendToWarehouse());
+			orderService.calcapitalpool();
+			
+			return new ResultModel(true, null);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -595,6 +597,19 @@ public class OrderController {
 			return orderService.pushUserOrderCount(shopId, pushUserIdList);
 		}
 		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/order/sendToWarehouse", method = RequestMethod.GET)
+	@ApiIgnore
+	public ResultModel sendToWarehouse(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, orderService.listOrderForSendToWarehouse());
+		}
+
+		return new ResultModel(false, "版本错误");
+
 	}
 
 }

@@ -40,8 +40,8 @@ public interface OrderFeignClient {
 	 * @param version
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
-	public ResultModel alreadyPay(@PathVariable("version") Double version);
+	@RequestMapping(value = "{version}/order/sendToWarehouse", method = RequestMethod.GET)
+	public ResultModel sendToWarehouse(@PathVariable("version") Double version);
 	
 	/**
 	 * @fun 定时确认收货
@@ -58,4 +58,12 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/listUnDeliverOrder", method = RequestMethod.GET)
 	public ResultModel listUnDeliverOrder(@PathVariable("version") Double version);
+	
+	/**
+	 * @fun 计算资金池
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/calCapitalPool", method = RequestMethod.GET)
+	public ResultModel calCapitalPool(@PathVariable("version") Double version);
 }

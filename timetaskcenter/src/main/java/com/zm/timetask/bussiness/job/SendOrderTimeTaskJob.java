@@ -34,7 +34,7 @@ public class SendOrderTimeTaskJob implements Job{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
-		ResultModel result = orderFeignClient.alreadyPay(Constants.FIRST_VERSION);
+		ResultModel result = orderFeignClient.sendToWarehouse(Constants.FIRST_VERSION);
 		if(result.isSuccess()){
 			List<Map<String, Object>> list = (List<Map<String, Object>>) result.getObj();
 			if(list != null){
