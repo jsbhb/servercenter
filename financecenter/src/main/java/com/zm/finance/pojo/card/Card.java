@@ -1,6 +1,8 @@
 package com.zm.finance.pojo.card;
 
-public class Card {
+import com.zm.finance.pojo.Pagination;
+
+public class Card  extends Pagination{
 	private Integer id;
 	private Integer typeId;
 	private Integer setDefault;

@@ -49,4 +49,8 @@
 	<delete id="removeCard" parameterType="Object">
 		delete from bind_card where id = #{id}
 	</delete>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="card">
+		select * from bind_card where type_id = #{typeId} and type = #{type}
+	</select>
 </mapper>

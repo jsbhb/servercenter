@@ -1,6 +1,7 @@
 package com.zm.finance.bussiness.controller;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.bussiness.service.CardService;
 import com.zm.finance.constants.Constants;
+import com.zm.finance.pojo.Pagination;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.card.Card;
 
@@ -63,6 +66,17 @@ public class CardController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return cardService.checkCardNo(cardNo);
 		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/finance/card/queryForPage", method = RequestMethod.POST)
+	public ResultModel queryForPage(@PathVariable("version") Double version, @RequestBody Card entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<Card> page = cardService.getCardForPage(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
 		return new ResultModel(false, "版本错误");
 	}
 	

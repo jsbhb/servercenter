@@ -1,6 +1,5 @@
 package com.zm.finance.pojo;
 
-
 /**  
  * ClassName: ResultPojo <br/>  
  * Function: 返回统一对象. <br/>   
@@ -16,7 +15,16 @@ public class ResultModel {
 	private String errorMsg;
 	private boolean success;
 	private Object obj;
+	private Pagination pagination;
 	
+	public Pagination getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
+	}
+
 	public ResultModel(){}
 	
 	public ResultModel(boolean flag){
@@ -26,6 +34,12 @@ public class ResultModel {
 	public ResultModel(boolean flag, Object obj){
 		this.obj = obj;
 		this.success = flag;
+	}
+	
+	public ResultModel(boolean flag,Object obj, Pagination pagination){
+		this.success = flag;
+		this.obj = obj;
+		this.pagination = pagination;
 	}
 	
 	public String getErrorCode() {

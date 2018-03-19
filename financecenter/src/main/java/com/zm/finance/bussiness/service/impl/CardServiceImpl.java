@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.finance.bussiness.dao.CardMapper;
 import com.zm.finance.bussiness.service.CardService;
 import com.zm.finance.pojo.ResultModel;
@@ -64,5 +66,11 @@ public class CardServiceImpl implements CardService{
 			return new ResultModel(true, BankDictionary.bank.get(bank));
 		}
 		return new ResultModel(false,"卡号有误");
+	}
+
+	@Override
+	public Page<Card> getCardForPage(Card card) {
+		PageHelper.startPage(card.getCurrentPage(), card.getNumPerPage(), true);
+		return cardMapper.selectForPage(card);
 	}
 }
