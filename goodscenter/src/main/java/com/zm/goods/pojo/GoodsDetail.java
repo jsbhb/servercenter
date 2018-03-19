@@ -10,6 +10,7 @@ public class GoodsDetail {
 	@JsonIgnore
 	private String id;
 	private String itemId;
+	private String goodsId;
 	private Integer weight;
 	private String itemName;
 	private Double incrementTax;
@@ -23,6 +24,12 @@ public class GoodsDetail {
 	private Integer min;
 	private Integer max;
 	
+	public String getGoodsId() {
+		return goodsId;
+	}
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
+	}
 	public String getItemId() {
 		return itemId;
 	}

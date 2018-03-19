@@ -10,7 +10,7 @@ public class Constants {
 	public static final String WX_PAY = "1";
 
 	public static final String ALI_PAY = "2";
-	
+
 	public static final String UNION_PAY = "3";
 
 	public static final String JSAPI = "JSAPI";
@@ -70,9 +70,22 @@ public class Constants {
 	// *********************订货平台ID*********************
 
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
-	
+
 	// *********************资金池redis前缀*********************
 
 	public static final String CAPITAL_PERFIX = "capital:";
 	public static final String CAPITAL_DETAIL = "capitaldetail:";
+
+	// *********************商品返佣redis前缀***************************
+	public static final String GOODS_REBATE = "goodsrebate:";
+
+	// *********************订单返佣redis前缀***************************
+	public static final String ORDER_REBATE = "orderrebate:";
+
+	// *********************区域中心返佣***************************
+	public static final String CENTER_ORDER_REBATE = "center:orderrebate:";
+	// *********************店铺返佣***************************
+	public static final String SHOP_ORDER_REBATE = "shop:orderrebate:";
+	// *********************推手返佣***************************
+	public static final String PUSHUSER_ORDER_REBATE = "pushuser:orderrebate:";
 }

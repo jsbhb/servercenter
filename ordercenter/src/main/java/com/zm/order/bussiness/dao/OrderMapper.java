@@ -127,4 +127,8 @@ public interface OrderMapper {
 
 	void updateOrderCapitalEnough(List<String> list);
 
+	OrderInfo getOrderByOrderIdForRebate(String orderId);
+	
+	void updateOrderRebate(String orderId);
+
 }

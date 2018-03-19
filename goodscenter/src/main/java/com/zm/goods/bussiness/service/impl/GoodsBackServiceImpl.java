@@ -8,10 +8,14 @@
 package com.zm.goods.bussiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
+import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsRebateEntity;
@@ -43,6 +48,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Resource
 	GoodsItemMapper goodsItemMapper;
 
+	@Resource
+	RedisTemplate<String, Object> template;
+
 	@Override
 	public Page<GoodsEntity> queryByPage(GoodsEntity entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
@@ -63,7 +71,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		goodsBackMapper.insert(entity);
 		goodsItemMapper.insert(entity.getGoodsItem());
 		goodsItemMapper.insertPrice(entity.getGoodsItem().getGoodsPrice());
-		if(entity.getFiles() != null && entity.getFiles().size() > 0){
+		if (entity.getFiles() != null && entity.getFiles().size() > 0) {
 			goodsItemMapper.insertFiles(entity.getFiles());
 		}
 
@@ -88,8 +96,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public void edit(GoodsEntity entity) {
 		goodsBackMapper.update(entity);
 		List<GoodsFile> isrFileList = new ArrayList<GoodsFile>();
-		if(entity.getFiles() != null && entity.getFiles().size() > 0){
-			for(GoodsFile gf : entity.getFiles())  {
+		if (entity.getFiles() != null && entity.getFiles().size() > 0) {
+			for (GoodsFile gf : entity.getFiles()) {
 				if (gf.getId() != null) {
 					goodsItemMapper.updateFiles(gf);
 				} else {
@@ -145,10 +153,22 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public void insertGoodsRebate(GoodsRebateEntity entity) {
 		goodsBackMapper.insertGoodsRebate(entity);
+		setRedis(entity);
 	}
+
+	private void setRedis(GoodsRebateEntity entity) {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("first", entity.getFirst());
+		result.put("second", entity.getSecond());
+		result.put("third", entity.getThird());
+		hashOperations.putAll(Constants.GOODS_REBATE + entity.getGoodsId(), result);
+	}
+
 
 	@Override
 	public void updateGoodsRebate(GoodsRebateEntity entity) {
 		goodsBackMapper.updateGoodsRebate(entity);
+		setRedis(entity);
 	}
 }

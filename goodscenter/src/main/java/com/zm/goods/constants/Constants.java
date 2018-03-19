@@ -38,4 +38,7 @@ public class Constants {
 	
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
 	
+	//*********************商品返佣redis前缀***************************
+	public static final String GOODS_REBATE = "goodsrebate:";
+	
 }

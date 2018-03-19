@@ -58,6 +58,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				}
 				capitalPoolMapper.insertCapitalPoolDetail(detailList);
 				capitalPoolMapper.updateCapitalPool(poolList);
+				template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);//删除以保存的记录
 			}
 		}
 

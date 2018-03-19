@@ -53,6 +53,7 @@
 			<result column="sku" property="sku" jdbcType="VARCHAR" />
 			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
 			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
 			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 			<result column="item_quantity" property="itemQuantity"
 				jdbcType="INTEGER" />
@@ -261,10 +262,10 @@
 	<insert id="saveOrderGoods" parameterType="Object">
 		INSERT INTO
 		order_goods
-		(order_id,item_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
+		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.itemId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
+			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
 		</foreach>
 	</insert>
 
@@ -352,7 +353,7 @@
 		as
 		detail_id,od.payment,od.pay_time,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as
-		goods_id,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
+		goods_id,og.goods_id as goodsId,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
 		,oe.id as orderExpress_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus
@@ -365,6 +366,28 @@
 		=
 		#{orderId}
 	</select>
+	
+	<!-- 返佣 -->
+	<select id="getOrderByOrderIdForRebate" parameterType="Object" resultMap="orderBase">
+		select
+		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,od.id
+		as
+		detail_id,od.payment,o.shop_id,
+		o.center_id,og.id as
+		goods_id,og.goods_id as goodsId,og.item_id,og.item_quantity,og.item_code,
+		og.item_price,og.actual_price,og.sku,od.dis_amount
+		from order_base o
+		left join order_detail od on o.order_id =od.order_id
+		left join
+		order_goods og on o.order_id = og.order_id 
+        where o.order_id = #{orderId} and o.rebate = 0
+	</select>
+	
+	<update id="updateOrderRebate" parameterType="Object">
+		update order_base set rebate = 1 where order_id = #{orderId}
+	</update>
+	
+	<!-- 返佣end -->
 
 
 	<update id="updateOrderPayType" parameterType="Object">

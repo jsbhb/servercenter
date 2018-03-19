@@ -40,6 +40,8 @@ public class OrderGoods extends Pagination {
 
 	private String remark;
 
+	private String goodsId;
+	
 	public boolean validate() {
 		return (itemId != null && sku != null && itemCode != null && itemQuantity != null && itemPrice != null
 				&& actualPrice != null);
@@ -99,6 +101,14 @@ public class OrderGoods extends Pagination {
 
 	public void setItemCode(String itemCode) {
 		this.itemCode = itemCode;
+	}
+
+	public String getGoodsId() {
+		return goodsId;
+	}
+
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
 	}
 
 	public Integer getItemQuantity() {
