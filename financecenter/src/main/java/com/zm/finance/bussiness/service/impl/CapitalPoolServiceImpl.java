@@ -99,19 +99,27 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	}
 
 	@Override
-	public ResultModel listcalCapitalPool() {
-		Set<String> keys = template.keys(Constants.CAPITAL_PERFIX + "*");
-		Map<String, String> result = new HashMap<String, String>();
+	public ResultModel listcalCapitalPool(CapitalPool capitalPool) {
 		List<CapitalPool> poolList = new ArrayList<CapitalPool>();
+		Map<String, String> result = null;
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		if (keys != null) {
-			for (String key : keys) {
-				result = hashOperations.entries(key);
-				if (result != null) {
-					poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+		if (capitalPool.getCenterId() == null) {
+			Set<String> keys = template.keys(Constants.CAPITAL_PERFIX + "*");
+			if (keys != null) {
+				for (String key : keys) {
+					result = hashOperations.entries(key);
+					if (result != null) {
+						poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+					}
 				}
 			}
+		} else {
+			result = hashOperations.entries(Constants.CAPITAL_PERFIX + capitalPool.getCenterId());
+			if (result != null) {
+				poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+			}
 		}
+
 		return new ResultModel(true, poolList);
 	}
 

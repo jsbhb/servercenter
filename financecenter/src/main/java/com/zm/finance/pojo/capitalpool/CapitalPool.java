@@ -1,11 +1,13 @@
 package com.zm.finance.pojo.capitalpool;
 
+import com.zm.finance.pojo.Pagination;
+
 /**
  * @fun 资金池实体类(PO持久层)
  * @author user
  *
  */
-public class CapitalPool {
+public class CapitalPool extends Pagination{
 
 	private Integer id;
 	private Integer centerId;//区域中心ID

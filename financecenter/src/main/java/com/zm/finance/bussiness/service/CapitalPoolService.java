@@ -1,6 +1,7 @@
 package com.zm.finance.bussiness.service;
 
 import com.zm.finance.pojo.ResultModel;
+import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.refilling.Refilling;
 
 public interface CapitalPoolService {
@@ -31,7 +32,7 @@ public interface CapitalPoolService {
 	 * @fun 获取区域中心资金池
 	 * @return
 	 */
-	ResultModel listcalCapitalPool();
+	ResultModel listcalCapitalPool(CapitalPool capitalPool);
 
 	/**
 	 * @fun 返佣进行资金池充值申请

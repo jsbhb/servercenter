@@ -131,11 +131,12 @@ CREATE TABLE `zm_financial`.`rebate_detail` (
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '返佣记录表';
 
-drop table if exists  `center_bind_card`;
+drop table if exists  `bind_card`;
 
-CREATE TABLE `zm_financial`.`center_bind_card` (
+CREATE TABLE `zm_financial`.`bind_card` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `center_id` INT NULL COMMENT '区域ID',
+  `type_id` INT NULL COMMENT '区域ID/店铺ID/推手ID',
+  `type` TINYINT UNSIGNED COMMENT '0区域；1店铺；2推手',
   `card_bank` VARCHAR(50) NULL COMMENT '开户行',
   `card_no` VARCHAR(20) NULL COMMENT '卡号',
   `card_name` VARCHAR(20) NULL COMMENT '持卡人姓名',
@@ -145,54 +146,13 @@ CREATE TABLE `zm_financial`.`center_bind_card` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `center_id` (`center_id`),
+  INDEX `type_id` (`type_id`),
+  INDEX `type` (`type`),
   INDEX `card_no` (`card_no`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `card_no_UNIQUE` (`card_no` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '区域绑卡记录表';
-
-drop table if exists  `shop_bind_card`;
-
-CREATE TABLE `zm_financial`.`shop_bind_card` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `shop_id` INT NULL COMMENT '区域ID',
-  `card_bank` VARCHAR(50) NULL COMMENT '开户行',
-  `card_no` VARCHAR(20) NULL COMMENT '卡号',
-  `card_name` VARCHAR(20) NULL COMMENT '持卡人姓名',
-  `card_mobile` VARCHAR(20) NULL COMMENT '预留电话',
-  `remark` VARCHAR(200) NULL COMMENT '备注',
-  `create_time` DATETIME NULL COMMENT '注册时间', 
-  `update_time` DATETIME NULL COMMENT '更新时间',
-  `opt` VARCHAR(20) NULL COMMENT '操作人',
-  PRIMARY KEY (`id`),
-  INDEX `shop_id` (`shop_id`),
-  INDEX `card_no` (`card_no`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `card_no_UNIQUE` (`card_no` ASC)) 
-  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '店铺绑卡记录表';
-
-drop table if exists  `push_bind_card`;
-
-CREATE TABLE `zm_financial`.`push_bind_card` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `user_id` INT NULL COMMENT '推手ID',
-  `card_bank` VARCHAR(50) NULL COMMENT '开户行',
-  `card_no` VARCHAR(20) NULL COMMENT '卡号',
-  `card_name` VARCHAR(20) NULL COMMENT '持卡人姓名',
-  `card_mobile` VARCHAR(20) NULL COMMENT '预留电话',
-  `remark` VARCHAR(200) NULL COMMENT '备注',
-  `create_time` DATETIME NULL COMMENT '注册时间', 
-  `update_time` DATETIME NULL COMMENT '更新时间',
-  `opt` VARCHAR(20) NULL COMMENT '操作人',
-  PRIMARY KEY (`id`),
-  INDEX `user_id` (`user_id`),
-  INDEX `card_no` (`card_no`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `card_no_UNIQUE` (`card_no` ASC)) 
-  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '推手绑卡记录表';
 
 drop table if exists  `withdrawals_detail`;
 
