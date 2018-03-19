@@ -130,5 +130,5 @@ public interface OrderMapper {
 	OrderInfo getOrderByOrderIdForRebate(String orderId);
 	
 	void updateOrderRebate(String orderId);
-
+	
 }

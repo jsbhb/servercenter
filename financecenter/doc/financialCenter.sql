@@ -102,6 +102,7 @@ CREATE TABLE `zm_financial`.`push_rebate_count` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `user_id` (`user_id`),
+  UNIQUE INDEX `user_id` (`user_id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '推手返佣统计表';
@@ -110,7 +111,7 @@ drop table if exists  `rebate_detail`;
 
 CREATE TABLE `zm_financial`.`rebate_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `order_no` VARCHAR(30) NULL COMMENT '订单号',
+  `order_id` VARCHAR(30) NULL COMMENT '订单号',
   `center_id` INT NULL COMMENT '区域ID',
   `center_rebate_money` DECIMAL(12,2) DEFAULT 0 COMMENT '区域返佣金额',
   `shop_id` INT NULL COMMENT '店铺ID',
@@ -121,12 +122,12 @@ CREATE TABLE `zm_financial`.`rebate_detail` (
   `create_time` DATETIME NULL COMMENT '注册时间', 
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `order_no` (`order_no`),
+  INDEX `order_id` (`order_id`),
   INDEX `center_id` (`center_id`),
   INDEX `shop_id` (`shop_id`),
   INDEX `user_id` (`user_id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `order_no_UNIQUE` (`order_no` ASC)) 
+  UNIQUE INDEX `order_id_UNIQUE` (`order_id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '返佣记录表';
 

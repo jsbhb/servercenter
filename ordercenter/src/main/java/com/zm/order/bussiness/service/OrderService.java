@@ -323,4 +323,6 @@ public interface OrderService {
 	ResultModel repayingPushJudge(Integer pushUserId, Integer shopId);
 
 	ResultModel pushUserOrderCount(Integer shopId, List<Integer> pushUserIdList);
+
+	ResultModel orderBackCancel(String orderId,String payNo);
 }

@@ -336,7 +336,7 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel result = new ResultModel();
 
 		int count = orderMapper.confirmUserOrder(param);
-		// shareProfitComponent.calShareProfit(param.get("orderId").toString());
+		shareProfitComponent.calShareProfit(param.get("orderId").toString());
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_COMPLETE);
 			orderMapper.addOrderStatusRecord(param);
@@ -351,13 +351,17 @@ public class OrderServiceImpl implements OrderService {
 
 		ResultModel result = new ResultModel();
 
-		int count = orderMapper.updateOrderPayStatusByOrderId(param.get("orderId") + "");
+		String orderId = param.get("orderId") + "";
+
+		int count = orderMapper.updateOrderPayStatusByOrderId(orderId);
 
 		orderMapper.updateOrderDetailPayTime(param);
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
 		}
+
+		shareProfitComponent.calShareProfitStayToAccount(orderId);
 
 		result.setSuccess(true);
 		return result;
@@ -749,9 +753,9 @@ public class OrderServiceImpl implements OrderService {
 					} else {// 如果余额足够，把资金放到冻结资金处
 						orderIdListForCapitalEnough.add(orderInfo.getOrderId());
 						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "frozenMoney",
-								orderInfo.getOrderDetail().getPayment());//冻结资金增加
+								orderInfo.getOrderDetail().getPayment());// 冻结资金增加
 						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "useMoney",
-								orderInfo.getOrderDetail().getPayment());//总共使用的资金增加
+								orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
 						Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
 						listOperations.leftPush(Constants.CAPITAL_DETAIL, JSONUtil.toJson(capitalPoolDetailMap));
 					}
@@ -770,13 +774,13 @@ public class OrderServiceImpl implements OrderService {
 		if (orderIdListForCapitalNotEnough.size() > 0) {
 			orderMapper.updateOrderCapitalNotEnough(orderIdListForCapitalNotEnough);
 		}
-		try {//资金够的更新出错需要回滚
+		try {// 资金够的更新出错需要回滚
 			if (orderIdListForCapitalEnough.size() > 0) {
 				orderMapper.updateOrderCapitalEnough(orderIdListForCapitalEnough);
 			}
 		} catch (Exception e) {
 			LogUtil.writeErrorLog("【更新订单状态为资金池扣减出错】订单号：" + orderIdListForCapitalEnough.toString(), e);
-			for(OrderInfo order : list){
+			for (OrderInfo order : list) {
 				try {
 					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), "money",
 							order.getOrderDetail().getPayment());
@@ -790,5 +794,28 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 
+	}
+
+	@Override
+	public ResultModel orderBackCancel(String orderId, String payNo) {
+		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+		int count = orderMapper.updateOrderCancel(orderId);
+		OrderDetail detail = new OrderDetail();
+		detail.setOrderId(orderId);
+		detail.setReturnPayNo(payNo);
+		orderMapper.updateRefundPayNo(detail);
+		if (count > 0) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("status", Constants.ORDER_CANCEL);
+			param.put("orderId", orderId);
+			orderMapper.addOrderStatusRecord(param);
+		}
+		stockBack(info);
+		Integer status = info.getStatus();
+		if (!Constants.ORDER_COMPLETE.equals(status) && !Constants.ORDER_CANCEL.equals(status)
+				&& !Constants.ORDER_CLOSE.equals(status) && !Constants.ORDER_INIT.equals(status)) {
+			shareProfitComponent.calRefundShareProfit(orderId);
+		}
+		return null;
 	}
 }

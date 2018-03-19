@@ -88,4 +88,6 @@ public class Constants {
 	public static final String SHOP_ORDER_REBATE = "shop:orderrebate:";
 	// *********************推手返佣***************************
 	public static final String PUSHUSER_ORDER_REBATE = "pushuser:orderrebate:";
+	// *********************返佣详情***************************
+	public static final String REBATE_DETAIL = "rebatedetail:";
 }

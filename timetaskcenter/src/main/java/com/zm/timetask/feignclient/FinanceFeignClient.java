@@ -10,4 +10,7 @@ public interface FinanceFeignClient {
 
 	@RequestMapping(value = "{version}/finance/calCapitalPool", method = RequestMethod.POST)
 	public void updateCapitalPoolTask(@PathVariable("version") Double version);
+	
+	@RequestMapping(value = "{version}/finance/rebate", method = RequestMethod.POST)
+	public void updateRebateTask(@PathVariable("version") Double version);
 }

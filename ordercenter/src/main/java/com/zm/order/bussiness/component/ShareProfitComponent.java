@@ -23,6 +23,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.UserInfo;
 import com.zm.order.utils.CalculationUtils;
+import com.zm.order.utils.JSONUtil;
 
 @Component
 public class ShareProfitComponent {
@@ -51,7 +52,7 @@ public class ShareProfitComponent {
 			if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {
 				predetermineOrderProfit(info);
 			} else {
-				calCaBePresented(info);
+				calCanBePresented(info);
 			}
 
 		} catch (Exception e) {
@@ -92,6 +93,27 @@ public class ShareProfitComponent {
 			LogUtil.writeErrorLog("【待到账返佣计算出错】订单号：" + orderId, e);
 		}
 
+	}
+
+	/**
+	 * @fun 退款时扣除待到账金额
+	 * @param orderId
+	 */
+	public void calRefundShareProfit(String orderId) {
+		OrderInfo info = orderMapper.getOrderByOrderIdForRebate(orderId);
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Rebate rebate = new Rebate();
+		calRebate(info, rebate, hashOperations);
+		hashOperations.increment(Constants.CENTER_ORDER_REBATE + info.getCenterId(), "StayToAccount",
+				CalculationUtils.sub(0, rebate.getCenterRebate()));
+		if (rebate.getShopRebate() > 0) {
+			hashOperations.increment(Constants.SHOP_ORDER_REBATE + info.getShopId(), "StayToAccount",
+					CalculationUtils.sub(0, rebate.getShopRebate()));
+		}
+		if (rebate.getPushUserRebate() > 0) {
+			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + info.getPushUserId(), "StayToAccount",
+					CalculationUtils.sub(0, rebate.getPushUserRebate()));
+		}
 	}
 
 	/**
@@ -254,16 +276,16 @@ public class ShareProfitComponent {
 	/**
 	 * @fun 计算可提现金额（从待到账金额转到可提现金额）
 	 */
-	private void calCaBePresented(OrderInfo orderInfo) {
+	private void calCanBePresented(OrderInfo orderInfo) {
 		try {
 			Long count = template.opsForSet().remove(Constants.ORDER_REBATE, orderInfo.getOrderId());
 			if (count > 0) {
 				HashOperations<String, String, String> hashOperations = template.opsForHash();
 				Rebate rebate = new Rebate();
 				calRebate(orderInfo, rebate, hashOperations);
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "CaBePresented",
+				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "CaBePresented",//可提现字段
 						rebate.getCenterRebate());
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "StayToAccount",
+				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "StayToAccount",//待到账字段
 						CalculationUtils.sub(0, rebate.getCenterRebate()));
 				if (rebate.getShopRebate() > 0) {
 					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "CaBePresented",
@@ -272,17 +294,35 @@ public class ShareProfitComponent {
 							CalculationUtils.sub(0, rebate.getShopRebate()));
 				}
 				if (rebate.getPushUserRebate() > 0) {
-					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(), "CaBePresented",
-							rebate.getPushUserRebate());
-					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(), "StayToAccount",
-							CalculationUtils.sub(0, rebate.getPushUserRebate()));
+					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
+							"CaBePresented", rebate.getPushUserRebate());
+					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
+							"StayToAccount", CalculationUtils.sub(0, rebate.getPushUserRebate()));
 				}
+				Map<String,String> result = packageDetailMap(orderInfo, rebate);
+				template.opsForList().leftPush(Constants.REBATE_DETAIL, JSONUtil.toJson(result));
 			}
 		} catch (Exception e) {
 			template.opsForSet().add(Constants.ORDER_REBATE, orderInfo.getOrderId());
 			LogUtil.writeErrorLog("【从待到账金额转到可提现金额出错】订单号:" + orderInfo.getOrderId(), e);
 		}
 
+	}
+
+	private Map<String, String> packageDetailMap(OrderInfo orderInfo, Rebate rebate) {
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("orderId", orderInfo.getOrderId());
+		result.put("centerId", orderInfo.getCenterId().toString());
+		result.put("centerRebateMoney", rebate.getCenterRebate() + "");
+		if (orderInfo.getShopId() != null) {
+			result.put("shopId", orderInfo.getShopId().toString());
+			result.put("shopRebateMoney", rebate.getShopRebate() + "");
+		}
+		if (orderInfo.getPushUserId() != null) {
+			result.put("userId", orderInfo.getPushUserId().toString());
+			result.put("userRebateMoney", rebate.getPushUserRebate() + "");
+		}
+		return result;
 	}
 
 	private void calRebate(OrderInfo orderInfo, Rebate rebate, HashOperations<String, String, String> hashOperations) {

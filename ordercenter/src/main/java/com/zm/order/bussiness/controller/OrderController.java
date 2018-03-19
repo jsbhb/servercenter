@@ -192,6 +192,22 @@ public class OrderController {
 		return new ResultModel(false, "error");
 	}
 
+	@RequestMapping(value = "{version}/order/backcancel/{orderId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel orderBackCancel(@PathVariable("version") Double version, @PathVariable("orderId") String orderId,
+			@RequestParam("payNo") String payNo) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return orderService.orderBackCancel(orderId,payNo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return new ResultModel(false, "error");
+	}
+
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
 	@ApiIgnore
 	public Integer getClientIdByOrderId(@PathVariable("orderId") String orderId,
@@ -502,7 +518,7 @@ public class OrderController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			orderService.calcapitalpool();
-			
+
 			return new ResultModel(true, null);
 		}
 
@@ -598,7 +614,7 @@ public class OrderController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/order/sendToWarehouse", method = RequestMethod.GET)
 	@ApiIgnore
 	public ResultModel sendToWarehouse(@PathVariable("version") Double version) {
