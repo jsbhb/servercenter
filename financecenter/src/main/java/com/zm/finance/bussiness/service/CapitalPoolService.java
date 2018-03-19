@@ -1,5 +1,6 @@
 package com.zm.finance.bussiness.service;
 
+import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.refilling.Refilling;
@@ -26,7 +27,7 @@ public interface CapitalPoolService {
 	 * @param centerId
 	 * @return
 	 */
-	ResultModel CapitalPoolRechargeAudit(Integer id, boolean flag);
+	ResultModel CapitalPoolRechargeAudit(AuditModel audit);
 
 	/**
 	 * @fun 获取区域中心资金池

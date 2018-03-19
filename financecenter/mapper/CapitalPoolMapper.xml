@@ -90,7 +90,7 @@
 	</update>
 	
 	<update id="updateUnPassRechargeApply" parameterType="Object">
-		update refilling_detail set status = 3 where id = #{id}
+		update refilling_detail set status = 3,remark = #{remark} where id = #{id}
 	</update>
 	
 	<insert id="insertRefillingDetail" parameterType="Object">

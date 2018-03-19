@@ -1,35 +1,55 @@
-package com.zm.finance.pojo.card;
+package com.zm.finance.pojo.withdrawals;
 
-public class Card {
+public class Withdrawals {
+
 	private Integer id;
-	private Integer typeId;
-	private Integer setDefault;
+	private Integer operatorId;
+	private Integer operatorType;//0区域中心，1店铺，2推手
+	private Double startMoney;
+	private Double outMoney;
+	private Integer status;
 	private String cardBank;
 	private String cardNo;
 	private String cardName;
-	private String cardPhone;
-	private String remark;
+	private String payNo;
 	private String createTime;
 	private String updateTime;
 	private String opt;
-	private Integer type;//0区域中心，1店铺，2推手
 	public Integer getId() {
 		return id;
-	}
-	public Integer getSetDefault() {
-		return setDefault;
-	}
-	public void setSetDefault(Integer setDefault) {
-		this.setDefault = setDefault;
 	}
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public Integer getTypeId() {
-		return typeId;
+	public Integer getOperatorId() {
+		return operatorId;
 	}
-	public void setTypeId(Integer typeId) {
-		this.typeId = typeId;
+	public void setOperatorId(Integer operatorId) {
+		this.operatorId = operatorId;
+	}
+	public Integer getOperatorType() {
+		return operatorType;
+	}
+	public void setOperatorType(Integer operatorType) {
+		this.operatorType = operatorType;
+	}
+	public Double getStartMoney() {
+		return startMoney;
+	}
+	public void setStartMoney(Double startMoney) {
+		this.startMoney = startMoney;
+	}
+	public Double getOutMoney() {
+		return outMoney;
+	}
+	public void setOutMoney(Double outMoney) {
+		this.outMoney = outMoney;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 	public String getCardBank() {
 		return cardBank;
@@ -49,17 +69,11 @@ public class Card {
 	public void setCardName(String cardName) {
 		this.cardName = cardName;
 	}
-	public String getCardPhone() {
-		return cardPhone;
+	public String getPayNo() {
+		return payNo;
 	}
-	public void setCardPhone(String cardPhone) {
-		this.cardPhone = cardPhone;
-	}
-	public String getRemark() {
-		return remark;
-	}
-	public void setRemark(String remark) {
-		this.remark = remark;
+	public void setPayNo(String payNo) {
+		this.payNo = payNo;
 	}
 	public String getCreateTime() {
 		return createTime;
@@ -78,12 +92,6 @@ public class Card {
 	}
 	public void setOpt(String opt) {
 		this.opt = opt;
-	}
-	public Integer getType() {
-		return type;
-	}
-	public void setType(Integer type) {
-		this.type = type;
 	}
 	
 }

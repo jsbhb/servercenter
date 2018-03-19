@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.finance.bussiness.dao.CapitalPoolMapper;
 import com.zm.finance.bussiness.service.CapitalPoolService;
 import com.zm.finance.constants.Constants;
+import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.capitalpool.CapitalPoolDetail;
@@ -83,16 +84,18 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	}
 
 	@Override
-	public ResultModel CapitalPoolRechargeAudit(Integer id, boolean flag) {
-		Refilling refilling = capitalPoolMapper.getRefilling(id);
+	public ResultModel CapitalPoolRechargeAudit(AuditModel audit) {
+		Refilling refilling = capitalPoolMapper.getRefilling(audit.getId());
 		if (refilling != null) {
-			if (flag) {
+			if (audit.isPass()) {
 				capitalPoolCharge(null, refilling.getMoney(), refilling.getCenterId(), Constants.REBATE);
-				capitalPoolMapper.updatePassRechargeApply(id);
+				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
+						"refilling", refilling.getMoney());//已反充金额增加
+				capitalPoolMapper.updatePassRechargeApply(audit.getId());
 			} else {
 				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
 						"canBePresented", refilling.getMoney());
-				capitalPoolMapper.updateUnPassRechargeApply(id);
+				capitalPoolMapper.updateUnPassRechargeApply(audit);
 			}
 		}
 		return new ResultModel(true);
@@ -126,6 +129,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	@Override
 	public ResultModel reChargeCapitalApply(Refilling refilling) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		
 		capitalPoolMapper.insertRefillingDetail(refilling);
 		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
 				CalculationUtils.sub(0, refilling.getMoney()));

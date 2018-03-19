@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.finance.bussiness.service.CapitalPoolService;
 import com.zm.finance.constants.Constants;
+import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.refilling.Refilling;
@@ -39,18 +40,19 @@ public class CapitalPoolController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/finance/rebate/recharge/audit/{id}", method = RequestMethod.POST)
-	public ResultModel CapitalPoolRechargeAudit(@PathVariable("version") Double version, @RequestParam("id") Integer id,
-			@RequestParam("flag") boolean flag) {
+	@RequestMapping(value = "{version}/finance/rebate/recharge/audit", method = RequestMethod.POST)
+	public ResultModel CapitalPoolRechargeAudit(@PathVariable("version") Double version,
+			@RequestBody AuditModel audit) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return capitalPoolService.CapitalPoolRechargeAudit(id, flag);
+			return capitalPoolService.CapitalPoolRechargeAudit(audit);
 		}
 		return new ResultModel(false, "版本错误");
 	}
 
 	@RequestMapping(value = "{version}/finance/listcalCapitalPool", method = RequestMethod.POST)
-	public ResultModel listcalCapitalPool(@PathVariable("version") Double version, @RequestBody CapitalPool capitalPool) {
+	public ResultModel listcalCapitalPool(@PathVariable("version") Double version,
+			@RequestBody CapitalPool capitalPool) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return capitalPoolService.listcalCapitalPool(capitalPool);

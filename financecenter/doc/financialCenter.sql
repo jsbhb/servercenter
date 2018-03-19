@@ -139,6 +139,7 @@ CREATE TABLE `zm_financial`.`bind_card` (
   `type` TINYINT UNSIGNED COMMENT '0区域；1店铺；2推手',
   `card_bank` VARCHAR(50) NULL COMMENT '开户行',
   `card_no` VARCHAR(20) NULL COMMENT '卡号',
+  `is_default` TINYINT UNSIGNED DEFAULT 1 COMMENT '默认0否，1是',
   `card_name` VARCHAR(20) NULL COMMENT '持卡人姓名',
   `card_mobile` VARCHAR(20) NULL COMMENT '预留电话',
   `remark` VARCHAR(200) NULL COMMENT '备注',
@@ -152,7 +153,7 @@ CREATE TABLE `zm_financial`.`bind_card` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `card_no_UNIQUE` (`card_no` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
-COMMENT = '区域绑卡记录表';
+COMMENT = '绑卡记录表';
 
 drop table if exists  `withdrawals_detail`;
 
@@ -160,9 +161,12 @@ CREATE TABLE `zm_financial`.`withdrawals_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `operator_id` INT NULL COMMENT '操作id，对应operator_type',
   `operator_type` TINYINT UNSIGNED NULL COMMENT '操作者类型,0：区域中心ID,1:店铺ID，2：推手ID',
-  `start_money` VARCHAR(20) NULL COMMENT '起始金额',
+  `start_money` DECIMAL(12,2) NULL COMMENT '起始金额',
   `out_money` DECIMAL(12,2) NULL COMMENT '提现金额',
   `status` TINYINT UNSIGNED NULL DEFAULT 1 COMMENT '状态1申请中，2已同意，3已拒绝',
+  `card_bank` VARCHAR(50) NULL COMMENT '开户行',
+  `card_no` VARCHAR(20) NULL COMMENT '卡号',
+  `card_name` VARCHAR(20) NULL COMMENT '持卡人姓名',
   `pay_no` VARCHAR(30) NULL COMMENT '流水号',
   `remark` VARCHAR(200) NULL COMMENT '备注',
   `create_time` DATETIME NULL COMMENT '注册时间', 
