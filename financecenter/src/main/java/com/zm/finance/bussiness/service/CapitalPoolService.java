@@ -41,4 +41,11 @@ public interface CapitalPoolService {
 	 * @return
 	 */
 	ResultModel reChargeCapitalApply(Refilling refilling);
+	
+	/**
+	 * @fun 添加资金池记录
+	 * @param centerId
+	 * @return
+	 */
+	ResultModel CapitalPoolRecordRegister(Integer centerId);
 }

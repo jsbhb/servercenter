@@ -22,4 +22,8 @@ public interface CapitalPoolMapper {
 	void updateUnPassRechargeApply(AuditModel audit);
 	
 	void insertRefillingDetail(Refilling refilling);
+
+	CapitalPool selectRecordByCenterId(Integer centerId);
+	
+	void insertCapitalPoolRecord(Integer centerId);
 }

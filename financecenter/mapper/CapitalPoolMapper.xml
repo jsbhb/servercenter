@@ -98,4 +98,11 @@
 		values(#{centerId},#{money},1,now())
 	</insert>
 	
+	<select id="selectRecordByCenterId" parameterType="java.lang.Integer" resultMap="capitalpool">
+		select * from capitalpool where center_id = #{centerId}
+	</select>
+	
+	<insert id="insertCapitalPoolRecord" parameterType="java.lang.Integer">
+		insert into capitalpool (center_id,create_time) VALUES (#{centerId},now())
+	</insert>
 </mapper>

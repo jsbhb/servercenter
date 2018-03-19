@@ -135,4 +135,13 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				CalculationUtils.sub(0, refilling.getMoney()));
 		return new ResultModel(true);
 	}
+	
+	@Override
+	public ResultModel CapitalPoolRecordRegister(Integer centerId) {
+		CapitalPool record = capitalPoolMapper.selectRecordByCenterId(centerId);
+		if (record == null) {
+			capitalPoolMapper.insertCapitalPoolRecord(centerId);
+		}
+		return new ResultModel(true);
+	}
 }
