@@ -12,6 +12,7 @@ import java.util.List;
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
+import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -147,4 +148,21 @@ public interface GoodsBackMapper {
 	 */
 	GoodsEntity selectRecordForUpd(GoodsEntity entity);
 
+	/**
+	 * selectForPage:分页查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<GoodsRebateEntity> selectAllGoodsForRebate(GoodsEntity entity);
+
+	GoodsRebateEntity selectGoodsRebateById(GoodsRebateEntity entity);
+
+	GoodsRebateEntity selectRecordForRebate(GoodsRebateEntity entity);
+
+	void insertGoodsRebate(GoodsRebateEntity entity);
+
+	void updateGoodsRebate(GoodsRebateEntity entity);
 }

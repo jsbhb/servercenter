@@ -586,3 +586,22 @@ CREATE TABLE `goods_third_category_2b` (
   KEY `idx_third_id` (`third_id`),
   KEY `goods_third_category_second_id` (`second_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='2B三级分类表';
+
+drop table if exists  `goods_rebate`;
+
+CREATE TABLE `goods_rebate` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `goods_id` INT NULL COMMENT '商品ID',
+  `first` VARCHAR(20) NULL COMMENT '一级比例',
+  `second` VARCHAR(20) NULL COMMENT '二级比例',
+  `third` VARCHAR(20) NULL COMMENT '三级比例',
+  `remark` VARCHAR(200) NULL COMMENT '备注',
+  `create_time` DATETIME NULL COMMENT '注册时间', 
+  `update_time` DATETIME NULL COMMENT '更新时间',
+  `opt` VARCHAR(20) NULL COMMENT '操作人',
+  PRIMARY KEY (`id`),
+  INDEX `idx_goods_id` (`goods_id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `goods_id_UNIQUE` (`goods_id` ASC)) 
+  ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+COMMENT = '商品返佣表';

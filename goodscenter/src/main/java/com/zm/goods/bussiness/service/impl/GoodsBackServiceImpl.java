@@ -22,6 +22,7 @@ import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
+import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -123,5 +124,31 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public GoodsEntity checkRecordForUpd(GoodsEntity entity) {
 		GoodsEntity retEntity = goodsBackMapper.selectRecordForUpd(entity);
 		return retEntity;
+	}
+
+	@Override
+	public Page<GoodsRebateEntity> queryAllGoods(GoodsEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return goodsBackMapper.selectAllGoodsForRebate(entity);
+	}
+
+	@Override
+	public GoodsRebateEntity queryById(GoodsRebateEntity entity) {
+		return goodsBackMapper.selectGoodsRebateById(entity);
+	}
+
+	@Override
+	public GoodsRebateEntity checkRecordForRebate(GoodsRebateEntity entity) {
+		return goodsBackMapper.selectRecordForRebate(entity);
+	}
+
+	@Override
+	public void insertGoodsRebate(GoodsRebateEntity entity) {
+		goodsBackMapper.insertGoodsRebate(entity);
+	}
+
+	@Override
+	public void updateGoodsRebate(GoodsRebateEntity entity) {
+		goodsBackMapper.updateGoodsRebate(entity);
 	}
 }

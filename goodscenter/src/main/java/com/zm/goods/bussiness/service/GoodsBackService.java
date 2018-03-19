@@ -9,6 +9,7 @@ package com.zm.goods.bussiness.service;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -123,5 +124,23 @@ public interface GoodsBackService {
 	 * @since JDK 1.7
 	 */
 	GoodsEntity checkRecordForUpd(GoodsEntity entity);
+
+	/**
+	 * queryByPage:分页查询商品信息. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<GoodsRebateEntity> queryAllGoods(GoodsEntity entity);
+
+	GoodsRebateEntity queryById(GoodsRebateEntity entity);
+	
+	GoodsRebateEntity checkRecordForRebate(GoodsRebateEntity entity);
+	
+	void insertGoodsRebate(GoodsRebateEntity entity);
+	
+	void updateGoodsRebate(GoodsRebateEntity entity);
 
 }

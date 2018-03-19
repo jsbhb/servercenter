@@ -14,6 +14,7 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
@@ -166,6 +167,52 @@ public class GoodsBackController {
 				} else {
 					return new ResultModel(false, "该商品下的明细状态非初始化，无法进行删除");	
 				}
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/goodsRebate/queryAllGoods", method = RequestMethod.POST)
+	public ResultModel queryAllGoods(@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<GoodsRebateEntity> page = goodsBackService.queryAllGoods(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/goodsRebate/queryById", method = RequestMethod.POST)
+	public ResultModel queryById(@PathVariable("version") Double version, @RequestBody GoodsRebateEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {			
+			try{
+				GoodsRebateEntity result = goodsBackService.queryById(entity);
+				return new ResultModel(true, result);
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/goodsRebate/updateRebate", method = RequestMethod.POST)
+	public ResultModel updateRebate(@PathVariable("version") Double version, @RequestBody GoodsRebateEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {			
+			try{
+				GoodsRebateEntity result = goodsBackService.checkRecordForRebate(entity);
+				if (result == null) {
+					goodsBackService.insertGoodsRebate(entity);
+				} else {
+					goodsBackService.updateGoodsRebate(entity);
+				}
+				return new ResultModel(true, "");
 			}catch(Exception e){
 				return new ResultModel(false, e.getMessage());			
 			}
