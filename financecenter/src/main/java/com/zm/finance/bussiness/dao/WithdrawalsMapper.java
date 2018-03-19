@@ -1,15 +1,16 @@
 package com.zm.finance.bussiness.dao;
 
-import java.util.Map;
-
+import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.withdrawals.Withdrawals;
 
 public interface WithdrawalsMapper {
 
 	void insertWithdrawals(Withdrawals withdrawals);
 	
-	void updatePassWithdrawals(Map<String,Object> param);
+	void updatePassWithdrawals(AuditModel audit);
 	
-	void updateUnPassWithdrawals(Map<String,Object> param);
+	void updateUnPassWithdrawals(AuditModel audit);
+	
+	Withdrawals getWithdrawals(Integer id);
 
 }

@@ -89,13 +89,14 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		if (refilling != null) {
 			if (audit.isPass()) {
 				capitalPoolCharge(null, refilling.getMoney(), refilling.getCenterId(), Constants.REBATE);
-				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
-						"refilling", refilling.getMoney());//已反充金额增加
 				capitalPoolMapper.updatePassRechargeApply(audit.getId());
 			} else {
+				capitalPoolMapper.updateUnPassRechargeApply(audit);
 				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
 						"canBePresented", refilling.getMoney());
-				capitalPoolMapper.updateUnPassRechargeApply(audit);
+				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "refilling",
+						CalculationUtils.sub(0, refilling.getMoney()));// 已反充金额增加
+				
 			}
 		}
 		return new ResultModel(true);
@@ -129,11 +130,19 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	@Override
 	public ResultModel reChargeCapitalApply(Refilling refilling) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		
+		double balance = 0;
+		String canBePresentedStr = hashOperations.get(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
+				"canBePresented");
+		balance = CalculationUtils.sub(Double.valueOf(canBePresentedStr), refilling.getMoney());
+		if (balance < 0) {
+			return new ResultModel(false, "反充金额超出可提现金额");
+		}
 		capitalPoolMapper.insertRefillingDetail(refilling);
 		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
 				CalculationUtils.sub(0, refilling.getMoney()));
-		return new ResultModel(true);
+		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "refilling",
+				refilling.getMoney());// 已反充金额增加
+		return new ResultModel(true, "提交成功");
 	}
 	
 	@Override

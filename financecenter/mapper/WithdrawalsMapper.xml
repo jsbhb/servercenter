@@ -45,11 +45,8 @@
 		where id = #{id}
 	</update>
 	
-	<select id="getCard" parameterType="Object" resultMap="card">
-		select * from bind_card where type_id = #{typeId} and type = #{type}
+	<select id="getWithdrawals" parameterType="Object" resultMap="withdrawals">
+		select * from withdrawals_detail where id = #{id}
 	</select>
 	
-	<delete id="removeCard" parameterType="Object">
-		delete from bind_card where id = #{id}
-	</delete>
 </mapper>

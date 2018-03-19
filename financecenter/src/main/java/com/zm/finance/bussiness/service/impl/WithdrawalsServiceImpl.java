@@ -63,10 +63,40 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 		}
 	}
 
+	private ResultModel backWithdrawals(Withdrawals withdrawals, HashOperations<String, String, String> hashOperations,
+			String perfix) {
+		hashOperations.increment(perfix, "alreadyPresented", CalculationUtils.sub(0, withdrawals.getOutMoney()));
+		hashOperations.increment(perfix, "canBePresented", withdrawals.getOutMoney());
+		return new ResultModel(true);
+	}
+
 	@Override
 	public ResultModel withdrawalAudit(AuditModel audit) {
-		
-		return null;
+		Withdrawals withdrawals = withdrawalsMapper.getWithdrawals(audit.getId());
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		if (withdrawals != null) {
+			if (audit.isPass()) {
+				if (audit.getPayNo() == null) {
+					return new ResultModel(false, "没有流水号");
+				}
+				withdrawalsMapper.updatePassWithdrawals(audit);
+			} else {//审核不通过要返回金额
+				withdrawalsMapper.updateUnPassWithdrawals(audit);
+				if (CENTER.equals(withdrawals.getOperatorType())) {
+					return backWithdrawals(withdrawals, hashOperations,
+							Constants.CENTER_ORDER_REBATE + withdrawals.getOperatorId());
+				}
+				if (SHOP.equals(withdrawals.getOperatorType())) {
+					return backWithdrawals(withdrawals, hashOperations,
+							Constants.SHOP_ORDER_REBATE + withdrawals.getOperatorId());
+				}
+				if (PUSHUSER.equals(withdrawals.getOperatorType())) {
+					return backWithdrawals(withdrawals, hashOperations,
+							Constants.PUSHUSER_ORDER_REBATE + withdrawals.getOperatorId());
+				}
+			}
+		}
+		return new ResultModel(false);
 	}
 
 }
