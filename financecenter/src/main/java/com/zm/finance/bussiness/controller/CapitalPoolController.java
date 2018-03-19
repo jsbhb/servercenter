@@ -35,4 +35,23 @@ public class CapitalPoolController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/finance/rebate/recharge/{centerId}", method = RequestMethod.POST)
+	public ResultModel CapitalPoolRecharge(@PathVariable("version") Double version,
+			@RequestParam("money") double money, @PathVariable("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return capitalPoolService.CapitalPoolRecharge(money,centerId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/finance/listcalCapitalPool", method = RequestMethod.GET)
+	public ResultModel listcalCapitalPool(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return capitalPoolService.listcalCapitalPool();
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }

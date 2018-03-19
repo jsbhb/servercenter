@@ -1,6 +1,7 @@
 package com.zm.finance.bussiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.service.RebateService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.log.LogUtil;
+import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.rebate.CenterRebate;
 import com.zm.finance.pojo.rebate.PushUserRebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
@@ -25,7 +27,7 @@ import com.zm.finance.util.JSONUtil;
 public class RebateServiceImpl implements RebateService {
 
 	@Resource
-	RedisTemplate<String, Object> template;
+	RedisTemplate<String, String> template;
 	
 	@Resource
 	RebateMapper rebateMapper;
@@ -41,10 +43,10 @@ public class RebateServiceImpl implements RebateService {
 		packageCenterRebate(centerRebateList, hashOperations);//获取区域中心返佣
 		packageShopRebate(shopRebateList, hashOperations);//获取店铺返佣
 		packagePushUserRebate(pushUserRebateList, hashOperations);//获取推手返佣
-		List<Object> rebateDetailList = template.opsForList().range(Constants.REBATE_DETAIL, 0, -1);
+		List<String> rebateDetailList = template.opsForList().range(Constants.REBATE_DETAIL, 0, -1);
 		if (rebateDetailList != null) {
-			for (Object obj : rebateDetailList) {
-				detailList.add(JSONUtil.parse(obj.toString(), RebateDetail.class));
+			for (String str : rebateDetailList) {
+				detailList.add(JSONUtil.parse(str, RebateDetail.class));
 			}
 		}
 		rebateMapper.insertCenterRebate(centerRebateList);
@@ -126,6 +128,37 @@ public class RebateServiceImpl implements RebateService {
 				}
 			}
 		}
+	}
+
+	private static final Integer CENTER = 0;
+	private static final Integer SHOP = 1;
+	private static final Integer PUSHUSER = 2;
+	@Override
+	public ResultModel getRebate(Integer id, Integer type) {
+		Map<String,String> result = new HashMap<String, String>();
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		if(CENTER.equals(type)){
+			result = hashOperations.entries(Constants.CENTER_ORDER_REBATE + id);
+			if(result == null){
+				return new ResultModel(true, null);
+			}
+			return new ResultModel(true,JSONUtil.parse(JSONUtil.toJson(result), CenterRebate.class));
+		}
+		if(SHOP.equals(type)){
+			result = hashOperations.entries(Constants.SHOP_ORDER_REBATE + id);
+			if(result == null){
+				return new ResultModel(true, null);
+			}
+			return new ResultModel(true,JSONUtil.parse(JSONUtil.toJson(result), ShopRebate.class));
+		}
+		if(PUSHUSER.equals(type)){
+			result = hashOperations.entries(Constants.PUSHUSER_ORDER_REBATE + id);
+			if(result == null){
+				return new ResultModel(true, null);
+			}
+			return new ResultModel(true,JSONUtil.parse(JSONUtil.toJson(result), PushUserRebate.class));
+		}
+		return new ResultModel(false);
 	}
 
 }

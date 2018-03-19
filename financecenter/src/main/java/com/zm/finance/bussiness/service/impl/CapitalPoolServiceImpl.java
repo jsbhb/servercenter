@@ -59,10 +59,34 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	@Override
 	public ResultModel CapitalPoolRecharge(String payNo, double money, Integer centerId) {
+		capitalPoolCharge(payNo, money, centerId,Constants.CASH);
+		return new ResultModel(true);
+	}
+
+	private void capitalPoolCharge(String payNo, double money, Integer centerId,Integer bussinessType) {
 		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "money", money);//增加余额
 		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "countMoney", money);//增加累计金额
 		CapitalPoolDetail detail = new CapitalPoolDetail();
-		detail.setBussinessType(Constants.CASH);
+		detail.setBussinessType(bussinessType);
+		detail.setCenterId(centerId);
+		detail.setMoney(money);
+		detail.setPayNo(payNo);
+		detail.setPayType(Constants.INCOME);
+		detail.setRemark("资金池充值");
+		List<CapitalPoolDetail> detailList = new ArrayList<CapitalPoolDetail>();
+		detailList.add(detail);
+		capitalPoolMapper.insertCapitalPoolDetail(detailList);
+	}
+
+	@Override
+	public ResultModel CapitalPoolRecharge(double money, Integer centerId) {
+		capitalPoolCharge(null, money, centerId,Constants.REBATE);
+		return new ResultModel(true);
+	}
+
+	@Override
+	public ResultModel listcalCapitalPool() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

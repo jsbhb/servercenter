@@ -17,10 +17,14 @@ public class Constants {
 	public static final String PUSHUSER_ORDER_REBATE = "pushuser:orderrebate:";
 	// *********************返佣详情***************************
 	public static final String REBATE_DETAIL = "rebatedetail:";
-	
-	// *********************BUSSINESSTYPE***************************
+
+	// *********************BUSSINESSTYPE业务类型0:现金,1:返佣,2:赠送,3:抵用券***************************
 	public static final Integer CASH = 0;
 	public static final Integer REBATE = 1;
 	public static final Integer PRESENT = 2;
 	public static final Integer COUPON = 3;
+	
+	// *********************PAYTYPE***************************
+	public static final Integer INCOME = 0;
+	public static final Integer EXPENDITURE = 1;
 }

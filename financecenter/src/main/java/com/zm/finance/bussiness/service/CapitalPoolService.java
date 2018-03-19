@@ -17,4 +17,15 @@ public interface CapitalPoolService {
 	 * @return
 	 */
 	ResultModel CapitalPoolRecharge(String payNo, double money, Integer centerId);
+
+	/**
+	 * @fun 返佣的钱充值资金池
+	 * @param money
+	 * @param centerId
+	 * @return
+	 */
+	ResultModel CapitalPoolRecharge(double money, Integer centerId);
+
+	
+	ResultModel listcalCapitalPool();
 }
