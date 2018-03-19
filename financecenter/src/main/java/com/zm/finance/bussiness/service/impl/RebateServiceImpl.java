@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.service.RebateService;
@@ -24,6 +25,7 @@ import com.zm.finance.pojo.rebate.ShopRebate;
 import com.zm.finance.util.JSONUtil;
 
 @Service
+@Transactional
 public class RebateServiceImpl implements RebateService {
 
 	@Resource

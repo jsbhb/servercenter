@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.finance.bussiness.dao.CapitalPoolMapper;
 import com.zm.finance.bussiness.service.CapitalPoolService;
@@ -18,9 +19,12 @@ import com.zm.finance.constants.Constants;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.capitalpool.CapitalPoolDetail;
+import com.zm.finance.pojo.refilling.Refilling;
+import com.zm.finance.util.CalculationUtils;
 import com.zm.finance.util.JSONUtil;
 
 @Service
+@Transactional
 public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	@Resource
@@ -59,13 +63,13 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	@Override
 	public ResultModel CapitalPoolRecharge(String payNo, double money, Integer centerId) {
-		capitalPoolCharge(payNo, money, centerId,Constants.CASH);
+		capitalPoolCharge(payNo, money, centerId, Constants.CASH);
 		return new ResultModel(true);
 	}
 
-	private void capitalPoolCharge(String payNo, double money, Integer centerId,Integer bussinessType) {
-		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "money", money);//增加余额
-		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "countMoney", money);//增加累计金额
+	private void capitalPoolCharge(String payNo, double money, Integer centerId, Integer bussinessType) {
+		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "money", money);// 增加余额
+		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "countMoney", money);// 增加累计金额
 		CapitalPoolDetail detail = new CapitalPoolDetail();
 		detail.setBussinessType(bussinessType);
 		detail.setCenterId(centerId);
@@ -79,14 +83,44 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	}
 
 	@Override
-	public ResultModel CapitalPoolRecharge(double money, Integer centerId) {
-		capitalPoolCharge(null, money, centerId,Constants.REBATE);
+	public ResultModel CapitalPoolRechargeAudit(Integer id, boolean flag) {
+		Refilling refilling = capitalPoolMapper.getRefilling(id);
+		if (refilling != null) {
+			if (flag) {
+				capitalPoolCharge(null, refilling.getMoney(), refilling.getCenterId(), Constants.REBATE);
+				capitalPoolMapper.updatePassRechargeApply(id);
+			} else {
+				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
+						"canBePresented", refilling.getMoney());
+				capitalPoolMapper.updateUnPassRechargeApply(id);
+			}
+		}
 		return new ResultModel(true);
 	}
 
 	@Override
 	public ResultModel listcalCapitalPool() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<String> keys = template.keys(Constants.CAPITAL_PERFIX + "*");
+		Map<String, String> result = new HashMap<String, String>();
+		List<CapitalPool> poolList = new ArrayList<CapitalPool>();
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		if (keys != null) {
+			for (String key : keys) {
+				result = hashOperations.entries(key);
+				if (result != null) {
+					poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+				}
+			}
+		}
+		return new ResultModel(true, poolList);
+	}
+
+	@Override
+	public ResultModel reChargeCapitalApply(Refilling refilling) {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		capitalPoolMapper.insertRefillingDetail(refilling);
+		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
+				CalculationUtils.sub(0, refilling.getMoney()));
+		return new ResultModel(true);
 	}
 }
