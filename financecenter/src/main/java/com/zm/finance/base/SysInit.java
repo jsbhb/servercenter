@@ -45,7 +45,7 @@ public class SysInit {
 			Map<String, String> result = new HashMap<String, String>();
 			for (CapitalPool pool : poolList) {
 				key = Constants.CAPITAL_PERFIX + pool.getCenterId();
-				if (!hashOperations.hasKey(key, key)) {
+				if (!template.hasKey(key)) {
 					temp = JSONUtil.parse(JSONUtil.toJson(pool), Map.class);
 					for(Entry<String, Object> entry : temp.entrySet()){
 						if(entry.getValue() != null){

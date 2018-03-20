@@ -96,7 +96,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 						"canBePresented", refilling.getMoney());
 				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "refilling",
 						CalculationUtils.sub(0, refilling.getMoney()));// 已反充金额增加
-				
+
 			}
 		}
 		return new ResultModel(true);
@@ -144,12 +144,27 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				refilling.getMoney());// 已反充金额增加
 		return new ResultModel(true, "提交成功");
 	}
-	
+
 	@Override
 	public ResultModel CapitalPoolRecordRegister(Integer centerId) {
 		CapitalPool record = capitalPoolMapper.selectRecordByCenterId(centerId);
 		if (record == null) {
 			capitalPoolMapper.insertCapitalPoolRecord(centerId);
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
+			String key = Constants.CAPITAL_PERFIX + centerId;
+			if (!template.hasKey(key)){// 初始化redis里的资金池
+				Map<String, String> mapForRedis = new HashMap<String, String>();
+				mapForRedis.put("centerId", centerId.toString());
+				mapForRedis.put("money", "0");
+				mapForRedis.put("frozenMoney", "0");
+				mapForRedis.put("preferential", "0");
+				mapForRedis.put("frozenPreferential", "0");
+				mapForRedis.put("useMoney", "0");
+				mapForRedis.put("usePreferential", "0");
+				mapForRedis.put("countMoney", "0");
+				mapForRedis.put("countPreferential", "0");
+				hashOperations.putAll(Constants.CAPITAL_PERFIX + centerId, mapForRedis);
+			}
 		}
 		return new ResultModel(true);
 	}

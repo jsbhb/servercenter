@@ -327,6 +327,16 @@ public class PayServiceImpl implements PayService {
 			}
 			return new ResultModel(aliPay(info.getCenterId(), type, model));
 		}
+		//银联支付
+		if (Constants.UNION_PAY.equals(payType)) {
+			if (!Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
+				OrderDetail detail = new OrderDetail();
+				detail.setPayType(Constants.UNION_PAY);
+				detail.setOrderId(info.getOrderId());
+				orderFeignClient.updateOrderPayType(version, detail);
+			}
+			return new ResultModel(unionPay(info.getCenterId(), model, type));
+		}
 
 		// 微信支付
 		if (Constants.WX_PAY.equals(payType)) {
