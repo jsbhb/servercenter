@@ -1,5 +1,8 @@
 package com.zm.finance.bussiness.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.HashOperations;
@@ -80,7 +83,7 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 					return new ResultModel(false, "没有流水号");
 				}
 				withdrawalsMapper.updatePassWithdrawals(audit);
-			} else {//审核不通过要返回金额
+			} else {// 审核不通过要返回金额
 				withdrawalsMapper.updateUnPassWithdrawals(audit);
 				if (CENTER.equals(withdrawals.getOperatorType())) {
 					return backWithdrawals(withdrawals, hashOperations,
@@ -97,6 +100,14 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 			}
 		}
 		return new ResultModel(false);
+	}
+
+	@Override
+	public ResultModel getWithdrawal(Integer id, Integer type) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("id", id);
+		param.put("type", type);
+		return new ResultModel(true, withdrawalsMapper.listWithdrawalDetail(param));
 	}
 
 }

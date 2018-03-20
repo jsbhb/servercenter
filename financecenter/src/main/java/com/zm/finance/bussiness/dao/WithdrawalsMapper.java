@@ -1,5 +1,8 @@
 package com.zm.finance.bussiness.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.withdrawals.Withdrawals;
 
@@ -12,5 +15,7 @@ public interface WithdrawalsMapper {
 	void updateUnPassWithdrawals(AuditModel audit);
 	
 	Withdrawals getWithdrawals(Integer id);
+
+	List<Withdrawals> listWithdrawalDetail(Map<String, Object> param);
 
 }

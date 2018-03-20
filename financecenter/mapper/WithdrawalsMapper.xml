@@ -49,4 +49,8 @@
 		select * from withdrawals_detail where id = #{id}
 	</select>
 	
+	<select id="listWithdrawalDetail" parameterType="Object" resultMap="withdrawals">
+		select out_money,status,card_no,pay_no where operator_id = #{id} and operator_type = #{type}
+	</select>
+	
 </mapper>

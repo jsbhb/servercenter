@@ -20,4 +20,12 @@ public interface WithdrawalsService {
 	 */
 	ResultModel withdrawalAudit(AuditModel audit);
 
+	/**
+	 * @fun 获取提现记录
+	 * @param id
+	 * @param type
+	 * @return
+	 */
+	ResultModel getWithdrawal(Integer id, Integer type);
+
 }
