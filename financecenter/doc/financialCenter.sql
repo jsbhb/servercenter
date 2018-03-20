@@ -101,7 +101,6 @@ CREATE TABLE `zm_financial`.`push_rebate_count` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  INDEX `user_id` (`user_id`),
   UNIQUE INDEX `user_id` (`user_id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
