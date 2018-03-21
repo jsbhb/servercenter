@@ -2,6 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zm.finance.bussiness.dao.RebateMapper">
 
+
+	<resultMap type="com.zm.finance.pojo.rebate.RebateDetail" id="rebateDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
+		<result column="center_rebate_money" property="centerRebateMoney" jdbcType="DOUBLE"/>
+		<result column="shop_id" property="shopId" jdbcType="INTEGER"/>
+		<result column="shop_rebate_money" property="shopRebateMoney" jdbcType="DOUBLE"/>
+		<result column="user_id" property="userId" jdbcType="INTEGER"/>
+		<result column="user_rebate_money" property="userRebateMoney" jdbcType="DOUBLE"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
 	
 
 	<insert id="insertCenterRebate" parameterType="Object">
@@ -48,4 +62,15 @@
 		</foreach>
 	</insert>
 	
+	
+	<select id="selectRebateDetailById" parameterType="Object" resultMap="rebateDetail">
+		select * from rebate_detail where 1=1
+		<if test="centerId != null && centerId != ''">
+			and center_id = #{centerId}
+		</if>
+		<if test="shopId != null && shopId != ''">
+			and shop_id = #{shopId}
+		</if>
+		order by create_time desc
+	</select>
 </mapper>

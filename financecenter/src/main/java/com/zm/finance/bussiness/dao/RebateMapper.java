@@ -2,6 +2,7 @@ package com.zm.finance.bussiness.dao;
 
 import java.util.List;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.pojo.rebate.CenterRebate;
 import com.zm.finance.pojo.rebate.PushUserRebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
@@ -16,4 +17,6 @@ public interface RebateMapper {
 	void insertPushUserRebate(List<PushUserRebate> list);
 	
 	void insertRebateDetail(List<RebateDetail> list);
+	
+	Page<RebateDetail> selectRebateDetailById(RebateDetail entity);
 }

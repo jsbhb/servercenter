@@ -1,6 +1,8 @@
 package com.zm.finance.bussiness.service;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.pojo.ResultModel;
+import com.zm.finance.pojo.rebate.RebateDetail;
 
 public interface RebateService {
 
@@ -16,5 +18,7 @@ public interface RebateService {
 	 * @return
 	 */
 	ResultModel getRebate(Integer id, Integer type);
+
+	Page<RebateDetail> getRebateDetail(RebateDetail entity);
 
 }

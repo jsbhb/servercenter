@@ -1,6 +1,8 @@
 package com.zm.finance.pojo.rebate;
 
-public class RebateDetail {
+import com.zm.finance.pojo.Pagination;
+
+public class RebateDetail extends Pagination {
 
 	private Integer id;
 	private String orderId;

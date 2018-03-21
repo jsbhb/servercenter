@@ -13,11 +13,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.service.RebateService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.log.LogUtil;
 import com.zm.finance.pojo.ResultModel;
+import com.zm.finance.pojo.card.Card;
 import com.zm.finance.pojo.rebate.CenterRebate;
 import com.zm.finance.pojo.rebate.PushUserRebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
@@ -170,4 +173,9 @@ public class RebateServiceImpl implements RebateService {
 		return new ResultModel(false);
 	}
 
+	@Override
+	public Page<RebateDetail> getRebateDetail(RebateDetail entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return rebateMapper.selectRebateDetailById(entity);
+	}
 }
