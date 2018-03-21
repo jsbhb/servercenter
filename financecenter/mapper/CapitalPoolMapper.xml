@@ -103,6 +103,6 @@
 	</select>
 	
 	<insert id="insertCapitalPoolRecord" parameterType="java.lang.Integer">
-		insert into capitalpool (center_id,create_time) VALUES (#{centerId},now())
+		insert into capitalpool (center_id,create_time,update_time,opt) VALUES (#{centerId},now(),now(),'8001')
 	</insert>
 </mapper>
