@@ -7,18 +7,18 @@
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="order_id" property="orderId" jdbcType="VARCHAR"/>
 		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
-		<result column="center_rebate_money" property="centerRebateMoney" jdbcType="DOUBLE"/>
+		<result column="center_rebate_money" property="centerRebateMoney" jdbcType="NUMERIC"/>
 		<result column="shop_id" property="shopId" jdbcType="INTEGER"/>
-		<result column="shop_rebate_money" property="shopRebateMoney" jdbcType="DOUBLE"/>
+		<result column="shop_rebate_money" property="shopRebateMoney" jdbcType="NUMERIC"/>
 		<result column="user_id" property="userId" jdbcType="INTEGER"/>
-		<result column="user_rebate_money" property="userRebateMoney" jdbcType="DOUBLE"/>
+		<result column="user_rebate_money" property="userRebateMoney" jdbcType="NUMERIC"/>
 		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
 		<result column="remark" property="remark" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
 	
 
-<insert id="insertCenterRebate" parameterType="Object">
+	<insert id="insertCenterRebate" parameterType="Object">
 		insert into center_rebate_count 
 		(center_id,can_be_presented,already_presented,stay_to_account,refilling,remark,create_time)
 		VALUES
