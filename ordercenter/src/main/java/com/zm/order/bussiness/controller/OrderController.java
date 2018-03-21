@@ -186,6 +186,7 @@ public class OrderController {
 				return orderService.orderCancel(userId, orderId);
 			} catch (Exception e) {
 				e.printStackTrace();
+				return new ResultModel(false, e);
 			}
 		}
 
@@ -202,6 +203,7 @@ public class OrderController {
 				return orderService.orderBackCancel(orderId,payNo);
 			} catch (Exception e) {
 				e.printStackTrace();
+				return new ResultModel(false, e);
 			}
 		}
 

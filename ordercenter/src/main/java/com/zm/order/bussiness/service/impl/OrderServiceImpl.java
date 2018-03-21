@@ -735,6 +735,6 @@ public class OrderServiceImpl implements OrderService {
 				&& !Constants.ORDER_CLOSE.equals(status) && !Constants.ORDER_INIT.equals(status)) {
 			shareProfitComponent.calRefundShareProfit(orderId);
 		}
-		return null;
+		return new ResultModel(true,"");
 	}
 }

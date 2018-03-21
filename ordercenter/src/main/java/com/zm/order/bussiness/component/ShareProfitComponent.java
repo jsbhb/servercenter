@@ -107,7 +107,7 @@ public class ShareProfitComponent {
 	 * @param orderId
 	 */
 	public void calRefundShareProfit(String orderId) {
-		OrderInfo info = orderMapper.getOrderByOrderIdForRebate(orderId);
+		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Rebate rebate = new Rebate();
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
