@@ -18,15 +18,15 @@
 	</resultMap>
 	
 
-	<insert id="insertCenterRebate" parameterType="Object">
+<insert id="insertCenterRebate" parameterType="Object">
 		insert into center_rebate_count 
 		(center_id,can_be_presented,already_presented,stay_to_account,refilling,remark,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
 			(#{item.centerId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.refilling},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{item.alreadyPresented},
-		stay_to_account = #{item.stayToAccount},refilling = #{item.refilling},remark = #{item.remark},update_time = now()
+		ON DUPLICATE KEY UPDATE can_be_presented = values(can_be_presented),already_presented = values(already_presented),
+		stay_to_account = values(stay_to_account),refilling = values(refilling),remark = values(remark),update_time = now()
 	</insert>
 	
 	
@@ -37,8 +37,8 @@
 		<foreach collection="list" item="item" separator=",">
 			(#{item.shopId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{item.alreadyPresented},
-		stay_to_account = #{item.stayToAccount},remark = #{item.remark},update_time = now()
+		ON DUPLICATE KEY UPDATE can_be_presented =values(can_be_presented),already_presented = values(already_presented),
+		stay_to_account = values(stay_to_account),remark = values(remark),update_time = now()
 	</insert>
 	
 	<insert id="insertPushUserRebate" parameterType="Object">
@@ -46,10 +46,10 @@
 		(user_id,shop_id,can_be_presented,already_presented,stay_to_account,remark,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.shopId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
+			(#{item.userId},#{item.shopId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{item.alreadyPresented},
-		stay_to_account = #{item.stayToAccount},remark = #{item.remark},update_time = now()
+		ON DUPLICATE KEY UPDATE can_be_presented = values(can_be_presented),already_presented = values(already_presented),
+		stay_to_account = values(stay_to_account),remark = values(remark),update_time = now()
 	</insert>
 	
 	<insert id="insertRebateDetail" parameterType="Object">
