@@ -103,6 +103,7 @@ public class ShareProfitComponent {
 		OrderInfo info = orderMapper.getOrderByOrderIdForRebate(orderId);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Rebate rebate = new Rebate();
+		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
 		calRebate(info, rebate, hashOperations);
 		hashOperations.increment(Constants.CENTER_ORDER_REBATE + info.getCenterId(), "StayToAccount",
 				CalculationUtils.sub(0, rebate.getCenterRebate()));

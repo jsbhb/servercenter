@@ -42,7 +42,7 @@
 		(center_id,pay_type,business_type,money,pay_no,order_id,remark,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.centerId},#{item.payType},#{item.businessType},#{item.money},#{item.payNo},#{item.orderId},#{item.remark},now())
+			(#{item.centerId},#{item.payType},#{item.bussinessType},#{item.money},#{item.payNo},#{item.orderId},#{item.remark},now())
 		</foreach>
 	</insert>
 	
@@ -75,7 +75,7 @@
 				<if test="item.countPreferential != null">
 					count_preferential = #{item.countPreferential},
 				</if>
-				update_time = now 
+				update_time = now()
 			</set>
 			where center_id = #{item.centerId} 
 		</foreach>

@@ -51,12 +51,19 @@ public class RebateServiceImpl implements RebateService {
 				detailList.add(JSONUtil.parse(str, RebateDetail.class));
 			}
 		}
-		rebateMapper.insertCenterRebate(centerRebateList);
-		rebateMapper.insertPushUserRebate(pushUserRebateList);
-		rebateMapper.insertShopRebate(shopRebateList);
-		rebateMapper.insertRebateDetail(detailList);
-		
-		template.opsForList().trim(Constants.REBATE_DETAIL, rebateDetailList.size(), -1);// 删除以保存的记录
+		if(centerRebateList.size() > 0){
+			rebateMapper.insertCenterRebate(centerRebateList);
+		}
+		if(pushUserRebateList.size() > 0){
+			rebateMapper.insertPushUserRebate(pushUserRebateList);
+		}
+		if(shopRebateList.size() > 0){
+			rebateMapper.insertShopRebate(shopRebateList);
+		}
+		if(detailList.size() > 0){
+			rebateMapper.insertRebateDetail(detailList);
+			template.opsForList().trim(Constants.REBATE_DETAIL, detailList.size(), -1);// 删除以保存的记录
+		}
 
 	}
 

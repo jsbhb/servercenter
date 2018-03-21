@@ -57,9 +57,14 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				detailList.add(JSONUtil.parse(obj.toString(), CapitalPoolDetail.class));
 			}
 		}
-		capitalPoolMapper.insertCapitalPoolDetail(detailList);
-		capitalPoolMapper.updateCapitalPool(poolList);
-		template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);// 删除以保存的记录
+		if(detailList.size() > 0){
+			capitalPoolMapper.insertCapitalPoolDetail(detailList);
+			template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);// 删除以保存的记录
+		}
+		if(poolList.size() > 0){
+			capitalPoolMapper.updateCapitalPool(poolList);
+		}
+		
 	}
 
 	@Override
