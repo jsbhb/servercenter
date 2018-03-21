@@ -336,10 +336,10 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel result = new ResultModel();
 
 		int count = orderMapper.confirmUserOrder(param);
-		shareProfitComponent.calShareProfit(param.get("orderId").toString());
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_COMPLETE);
 			orderMapper.addOrderStatusRecord(param);
+			shareProfitComponent.calShareProfit(param.get("orderId").toString());
 		}
 
 		result.setSuccess(true);

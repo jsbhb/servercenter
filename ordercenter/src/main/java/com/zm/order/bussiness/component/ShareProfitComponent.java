@@ -50,8 +50,11 @@ public class ShareProfitComponent {
 
 		try {
 
-			OrderInfo info = orderMapper.getOrderByOrderIdForRebate(orderId);
-			if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {
+			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+			if(info == null){
+				return;
+			}
+			if (Constants.PREDETERMINE_ORDER.equals(info.getOrderSource())) {
 				predetermineOrderProfit(info);
 			} else {
 				calCanBePresented(info);
@@ -288,19 +291,19 @@ public class ShareProfitComponent {
 				HashOperations<String, String, String> hashOperations = template.opsForHash();
 				Rebate rebate = new Rebate();
 				calRebate(orderInfo, rebate, hashOperations);
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "caBePresented",//可提现字段
+				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "canBePresented",//可提现字段
 						rebate.getCenterRebate());
 				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "stayToAccount",//待到账字段
 						CalculationUtils.sub(0, rebate.getCenterRebate()));
 				if (rebate.getShopRebate() > 0) {
-					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "caBePresented",
+					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "canBePresented",
 							rebate.getShopRebate());
 					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "stayToAccount",
 							CalculationUtils.sub(0, rebate.getShopRebate()));
 				}
 				if (rebate.getPushUserRebate() > 0) {
 					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
-							"caBePresented", rebate.getPushUserRebate());
+							"canBePresented", rebate.getPushUserRebate());
 					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
 							"stayToAccount", CalculationUtils.sub(0, rebate.getPushUserRebate()));
 				}

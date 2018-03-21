@@ -11,6 +11,15 @@ public class RebateDetail {
 	private Integer userId;
 	private Double userRebateMoney;
 	private String createTime;
+	private String remark;
+	private String opt;
+	
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public Integer getId() {
 		return id;
 	}
@@ -71,5 +80,5 @@ public class RebateDetail {
 	public void setOpt(String opt) {
 		this.opt = opt;
 	}
-	private String opt;
+	
 }
