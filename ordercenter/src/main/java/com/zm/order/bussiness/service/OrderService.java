@@ -265,16 +265,6 @@ public interface OrderService {
 	List<OrderInfo> listOrderForSendToWarehouse();
 	
 	/**
-	 * calcapitalpool:计算资金池. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	void calcapitalpool();
-
-	/**
 	 * saveThirdOrder:保存第三方订单号. <br/>
 	 * 
 	 * @author wqy

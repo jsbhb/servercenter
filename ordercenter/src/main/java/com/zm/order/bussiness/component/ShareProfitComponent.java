@@ -2,12 +2,14 @@ package com.zm.order.bussiness.component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -62,7 +64,7 @@ public class ShareProfitComponent {
 	}
 
 	/**
-	 * @fun 计算待到账的金额
+	 * @fun 计算待到账的金额并扣减资金池
 	 * @param orderId
 	 */
 	public void calShareProfitStayToAccount(String orderId) {
@@ -77,6 +79,8 @@ public class ShareProfitComponent {
 					template.opsForSet().add(Constants.ORDER_REBATE, orderId);
 				}
 			}
+			
+			calcapitalpool(orderId);//扣减资金池
 
 			OrderInfo info = orderMapper.getOrderByOrderIdForRebate(orderId);
 			if (info == null) {
@@ -105,14 +109,14 @@ public class ShareProfitComponent {
 		Rebate rebate = new Rebate();
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
 		calRebate(info, rebate, hashOperations);
-		hashOperations.increment(Constants.CENTER_ORDER_REBATE + info.getCenterId(), "StayToAccount",
+		hashOperations.increment(Constants.CENTER_ORDER_REBATE + info.getCenterId(), "stayToAccount",
 				CalculationUtils.sub(0, rebate.getCenterRebate()));
 		if (rebate.getShopRebate() > 0) {
-			hashOperations.increment(Constants.SHOP_ORDER_REBATE + info.getShopId(), "StayToAccount",
+			hashOperations.increment(Constants.SHOP_ORDER_REBATE + info.getShopId(), "stayToAccount",
 					CalculationUtils.sub(0, rebate.getShopRebate()));
 		}
 		if (rebate.getPushUserRebate() > 0) {
-			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + info.getPushUserId(), "StayToAccount",
+			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + info.getPushUserId(), "stayToAccount",
 					CalculationUtils.sub(0, rebate.getPushUserRebate()));
 		}
 	}
@@ -262,14 +266,14 @@ public class ShareProfitComponent {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Rebate rebate = new Rebate();
 		calRebate(orderInfo, rebate, hashOperations);
-		hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "StayToAccount",
+		hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "stayToAccount",
 				rebate.getCenterRebate());
 		if (rebate.getShopRebate() > 0) {
-			hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "StayToAccount",
+			hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "stayToAccount",
 					rebate.getShopRebate());
 		}
 		if (rebate.getPushUserRebate() > 0) {
-			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(), "StayToAccount",
+			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(), "stayToAccount",
 					rebate.getPushUserRebate());
 		}
 	}
@@ -284,21 +288,21 @@ public class ShareProfitComponent {
 				HashOperations<String, String, String> hashOperations = template.opsForHash();
 				Rebate rebate = new Rebate();
 				calRebate(orderInfo, rebate, hashOperations);
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "CaBePresented",//可提现字段
+				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "caBePresented",//可提现字段
 						rebate.getCenterRebate());
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "StayToAccount",//待到账字段
+				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "stayToAccount",//待到账字段
 						CalculationUtils.sub(0, rebate.getCenterRebate()));
 				if (rebate.getShopRebate() > 0) {
-					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "CaBePresented",
+					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "caBePresented",
 							rebate.getShopRebate());
-					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "StayToAccount",
+					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "stayToAccount",
 							CalculationUtils.sub(0, rebate.getShopRebate()));
 				}
 				if (rebate.getPushUserRebate() > 0) {
 					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
-							"CaBePresented", rebate.getPushUserRebate());
+							"caBePresented", rebate.getPushUserRebate());
 					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
-							"StayToAccount", CalculationUtils.sub(0, rebate.getPushUserRebate()));
+							"stayToAccount", CalculationUtils.sub(0, rebate.getPushUserRebate()));
 				}
 				Map<String,String> result = packageDetailMap(orderInfo, rebate);
 				template.opsForList().leftPush(Constants.REBATE_DETAIL, JSONUtil.toJson(result));
@@ -341,14 +345,14 @@ public class ShareProfitComponent {
 				try {
 					double amount = CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity());
 					centerRebate = CalculationUtils.add(centerRebate,
-							CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("first"))));
+							CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("first") == null ? "0" : rebateMap.get("first"))));
 					if (orderInfo.getShopId() != null) {
 						shopRebate = CalculationUtils.add(shopRebate,
-								CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("second"))));
+								CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("second") == null ? "0" : rebateMap.get("second"))));
 					}
 					if (orderInfo.getPushUserId() != null) {
 						pushUserRebate = CalculationUtils.add(pushUserRebate,
-								CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("third"))));
+								CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("third") == null ? "0" : rebateMap.get("third"))));
 					}
 				} catch (Exception e) {
 					LogUtil.writeErrorLog("【单个商品返佣计算出错】商品ID:" + goods.getGoodsId(), e);
@@ -359,6 +363,91 @@ public class ShareProfitComponent {
 			rebate.setShopRebate(CalculationUtils.round(2, shopRebate));
 		}
 	}
+	
+	/**
+	 * 资金池扣减
+	 * @param orderId
+	 */
+	private void calcapitalpool(String orderId) {
+		List<OrderInfo> list = new ArrayList<OrderInfo>();
+		list.addAll(orderMapper.listOrderForCalCapital(orderId));
+
+		HashOperations<String, Object, Object> hashOperations = template.opsForHash();
+		ListOperations<String, Object> listOperations = template.opsForList();
+		Iterator<OrderInfo> it = list.iterator();
+		List<String> orderIdListForCapitalNotEnough = new ArrayList<String>();
+		List<String> orderIdListForCapitalEnough = new ArrayList<String>();
+		OrderInfo orderInfo = null;
+		Double balance = null;
+		while (it.hasNext()) {
+			orderInfo = it.next();
+			if (!Constants.PREDETERMINE_PLAT_TYPE.equals(orderInfo.getCenterId())) {
+				balance = null;
+				try {
+					balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
+							CalculationUtils.sub(0, orderInfo.getOrderDetail().getPayment()));// 扣除资金池
+					if (balance < 0) {// 如果扣除后小于0，则不发送订单给仓库，并把扣除的资金加回去
+						orderIdListForCapitalNotEnough.add(orderInfo.getOrderId());
+						it.remove();
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
+								orderInfo.getOrderDetail().getPayment());
+					} else {// 如果余额足够，把资金放到冻结资金处
+						orderIdListForCapitalEnough.add(orderInfo.getOrderId());
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "frozenMoney",
+								orderInfo.getOrderDetail().getPayment());// 冻结资金增加
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "useMoney",
+								orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
+						Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
+						listOperations.leftPush(Constants.CAPITAL_DETAIL, JSONUtil.toJson(capitalPoolDetailMap));
+					}
+				} catch (Exception e) {
+					if (balance == null) {
+						LogUtil.writeErrorLog("【扣减资金池出错】订单号：" + orderInfo.getOrderId(), e);
+						it.remove();// 不确定资金池够不够，先移除
+					} else if (balance < 0) {// 扣减资金池成功，加回资金池时出错，资金池出现负数的时候可能这里出现问题
+						LogUtil.writeErrorLog("【加回资金池出错】订单号：" + orderInfo.getOrderId(), e);
+					} else {// 加冻结资金时出错或增加记录时出错，不影响整体流程
+						LogUtil.writeErrorLog("【记录或加冻结资金出错】订单号：" + orderInfo.getOrderId(), e);
+					}
+				}
+			}
+		}
+		if (orderIdListForCapitalNotEnough.size() > 0) {
+			orderMapper.updateOrderCapitalNotEnough(orderIdListForCapitalNotEnough);
+		}
+		try {// 资金够的更新出错需要回滚
+			if (orderIdListForCapitalEnough.size() > 0) {
+				orderMapper.updateOrderCapitalEnough(orderIdListForCapitalEnough);
+			}
+		} catch (Exception e) {
+			LogUtil.writeErrorLog("【更新订单状态为资金池扣减出错】订单号：" + orderIdListForCapitalEnough.toString(), e);
+			for (OrderInfo order : list) {
+				try {
+					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), "money",
+							order.getOrderDetail().getPayment());
+					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), "frozenMoney",
+							CalculationUtils.sub(0, order.getOrderDetail().getPayment()));
+					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), "useMoney",
+							CalculationUtils.sub(0, order.getOrderDetail().getPayment()));
+				} catch (Exception e2) {
+					LogUtil.writeErrorLog("【资金回滚出错】订单号：" + order.getOrderId(), e2);
+				}
+			}
+		}
+	}
+	
+	private Map<String, Object> getCapitalDetail(OrderInfo orderInfo) {
+		Map<String, Object> capitalPoolDetailMap = new HashMap<String, Object>();
+		capitalPoolDetailMap.put("centerId", orderInfo.getCenterId().toString());
+		capitalPoolDetailMap.put("payType", "1");// 类型是支出
+		capitalPoolDetailMap.put("businessType", "0");// 方式是现金
+		capitalPoolDetailMap.put("money", orderInfo.getOrderDetail().getPayment().toString());
+		capitalPoolDetailMap.put("orderId", orderInfo.getOrderId());
+		capitalPoolDetailMap.put("remark", "订单产生，资金池扣减");
+		capitalPoolDetailMap.put("createTime", orderInfo.getCreateTime());
+		return capitalPoolDetailMap;
+	}
+
 
 	class Rebate {
 		private double centerRebate;

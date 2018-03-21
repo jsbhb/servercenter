@@ -122,7 +122,7 @@
 		o.id,o.order_id,od.pay_no,od.payment,o.center_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
-		where o.status = 1 and o.order_flag = 0 and o.supplier_id = 1
+		where o.status = 12 and o.order_flag = 0 and o.supplier_id = 1
 	</select>
 
 
@@ -405,7 +405,7 @@
 	<update id="updatePayCustom" parameterType="Object">
 		update
 		order_base set
-		status = 2, update_time=now() where order_id = #{orderId} and status = 1
+		status = 2, update_time=now() where order_id = #{orderId} and status = 12
 	</update>
 
 	<update id="updateOrderCancel" parameterType="Object">
@@ -431,7 +431,7 @@
 		update
 		order_base set
 		status = 3, update_time=now() where order_id = #{orderId} and status in
-		(1,2)
+		(12,2)
 	</update>
 
 	<update id="updateOrderStatusByThirdStatus" parameterType="Object">
@@ -555,7 +555,7 @@
 	</select>
 
 	<!-- 获取发第三方仓库的订单 -->
-	<select id="listOrderForSendToWarehouse" resultMap="orderBase">
+	<select id="listOrderForSendToTTWarehouse" resultMap="orderBase">
 		select
 		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id
 		as
@@ -567,13 +567,26 @@
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
 		left join
-		order_goods og on o.order_id = og.order_id where o.status=12
-		and limit 50
+		order_goods og on o.order_id = og.order_id where o.status=2 and supplier_id = 1 limit 50
+	</select>
+	<select id="listOrderForSendToOtherWarehouse" resultMap="orderBase">
+		select
+		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id
+		as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
+		od.pay_type,od.pay_no,o.center_id,og.id as
+		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,og.item_code,
+		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
+		od.receive_city,od.receive_area,od.receive_address
+		from order_base o
+		left join order_detail od on o.order_id =od.order_id
+		left join
+		order_goods og on o.order_id = og.order_id where o.status=12 and supplier_id != 1 limit 50
 	</select>
 	<!-- end -->
 	
 	<!-- 获取计算资金池订单 -->
-	<select id="listTTOrderForCalCapital" resultMap="orderBase">
+	<select id="listOrderForCalCapital" resultMap="orderBase">
 		select
 		o.id,o.order_id,o.create_time,od.id
 		as
@@ -581,21 +594,7 @@
 		od.pay_type,od.pay_no,od.dis_amount
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
-		where o.status = 2
-		and
-		supplier_id=1 limit 20
-	</select>
-	<select id="listOtherOrderForCalCapital" resultMap="orderBase">
-		select
-		o.id,o.order_id,o.create_time,od.id
-		as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
-		od.pay_type,od.pay_no,od.dis_amount
-		from order_base o
-		left join order_detail od on o.order_id =od.order_id
-		where o.status = 1
-		and
-		supplier_id != 1 limit 20
+		where o.order_id = #{orderId}
 	</select>
 	<!-- end -->
 

@@ -41,7 +41,7 @@ public class SendOrderTimeTaskJob implements Job{
 				List<OrderInfo> infoList = new ArrayList<OrderInfo>();
 				OrderInfo info = null;
 				for(Map<String, Object> map : list){
-					template.opsForValue().set(map.get("orderId").toString(), true);
+					template.opsForValue().set(map.get("orderId").toString(), "true");
 					info = JSONUtil.parse(JSONUtil.toJson(map), OrderInfo.class);
 					infoList.add(info);
 				}

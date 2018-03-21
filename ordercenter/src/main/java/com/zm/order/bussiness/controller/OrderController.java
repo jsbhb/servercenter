@@ -511,20 +511,6 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/calCapitalPool", method = RequestMethod.GET)
-	@ApiIgnore
-	public ResultModel calCapitalPool(@PathVariable("version") Double version) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			orderService.calcapitalpool();
-
-			return new ResultModel(true, null);
-		}
-
-		return new ResultModel(false, "版本错误");
-
-	}
 
 	@RequestMapping(value = "{version}/order/saveThirdOrder", method = RequestMethod.POST)
 	@ApiIgnore

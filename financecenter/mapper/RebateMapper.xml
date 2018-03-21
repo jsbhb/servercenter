@@ -11,8 +11,8 @@
 		<foreach collection="list" item="item" separator=",">
 			(#{item.centerId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.refilling},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{alreadyPresented},
-		stay_to_account = #{stayToAccount},refilling = #{refilling},remark = #{remark},update_time = now()
+		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{item.alreadyPresented},
+		stay_to_account = #{item.stayToAccount},refilling = #{item.refilling},remark = #{item.remark},update_time = now()
 	</insert>
 	
 	
@@ -23,8 +23,8 @@
 		<foreach collection="list" item="item" separator=",">
 			(#{item.shopId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{alreadyPresented},
-		stay_to_account = #{stayToAccount},remark = #{remark},update_time = now()
+		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{item.alreadyPresented},
+		stay_to_account = #{item.stayToAccount},remark = #{item.remark},update_time = now()
 	</insert>
 	
 	<insert id="insertPushUserRebate" parameterType="Object">
@@ -34,8 +34,8 @@
 		<foreach collection="list" item="item" separator=",">
 			(#{item.shopId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{alreadyPresented},
-		stay_to_account = #{stayToAccount},remark = #{remark},update_time = now()
+		ON DUPLICATE KEY UPDATE can_be_presented = #{item.canBePresented},already_presented = #{item.alreadyPresented},
+		stay_to_account = #{item.stayToAccount},remark = #{item.remark},update_time = now()
 	</insert>
 	
 	<insert id="insertRebateDetail" parameterType="Object">

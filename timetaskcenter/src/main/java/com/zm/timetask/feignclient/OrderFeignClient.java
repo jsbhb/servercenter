@@ -59,11 +59,4 @@ public interface OrderFeignClient {
 	@RequestMapping(value = "{version}/order/listUnDeliverOrder", method = RequestMethod.GET)
 	public ResultModel listUnDeliverOrder(@PathVariable("version") Double version);
 	
-	/**
-	 * @fun 计算资金池
-	 * @param version
-	 * @return
-	 */
-	@RequestMapping(value = "{version}/order/calCapitalPool", method = RequestMethod.GET)
-	public ResultModel calCapitalPool(@PathVariable("version") Double version);
 }

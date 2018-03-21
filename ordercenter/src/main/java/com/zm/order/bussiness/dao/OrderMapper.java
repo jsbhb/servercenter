@@ -1,5 +1,6 @@
 package com.zm.order.bussiness.dao;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -93,8 +94,6 @@ public interface OrderMapper {
 
 	void updateRefundPayNo(OrderDetail detail);
 
-	List<OrderInfo> listOrderForSendToWarehouse();
-	
 	void saveThirdOrder(List<SendOrderResult> list);
 
 	int updateOrderSendToWarehouse(String orderId);
@@ -121,14 +120,16 @@ public interface OrderMapper {
 
 	void updateOrderCapitalNotEnough(List<String> list);
 
-	List<OrderInfo> listTTOrderForCalCapital();
+	List<OrderInfo> listOrderForCalCapital(String orderId);
 	
-	List<OrderInfo> listOtherOrderForCalCapital();
-
 	void updateOrderCapitalEnough(List<String> list);
 
 	OrderInfo getOrderByOrderIdForRebate(String orderId);
 	
 	void updateOrderRebate(String orderId);
+
+	List<OrderInfo> listOrderForSendToTTWarehouse();
+	
+	List<OrderInfo> listOrderForSendToOtherWarehouse();
 	
 }

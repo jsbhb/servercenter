@@ -28,7 +28,7 @@ public class Constants {
 	public static final Integer ORDER_CANCEL = 8;// 退单
 	public static final Integer ORDER_CLOSE = 9;// 交易关闭
 	public static final Integer CAPITAL_POOL_NOT_ENOUGH = 11;// 资金池不足
-	public static final Integer CAPITAL_POOL_ENOUGH = 12;// 资金池已经扣减，待推送仓库
+	public static final Integer CAPITAL_POOL_ENOUGH = 12;// 资金池已经扣减,报关/推送仓库
 	public static final Integer ORDER_EXCEPTION = 99;// 订单异常
 
 	// *********************活动范围，获取是否有全场活动******************************/
