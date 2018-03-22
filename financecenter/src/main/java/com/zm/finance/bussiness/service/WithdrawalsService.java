@@ -1,5 +1,6 @@
 package com.zm.finance.bussiness.service;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.withdrawals.Withdrawals;
@@ -27,5 +28,13 @@ public interface WithdrawalsService {
 	 * @return
 	 */
 	ResultModel getWithdrawal(Integer id, Integer type);
+
+	/**
+	 * @fun 获取提现记录
+	 * @param id
+	 * @param type
+	 * @return
+	 */
+	Page<Withdrawals> queryForPage(Withdrawals entity);
 
 }

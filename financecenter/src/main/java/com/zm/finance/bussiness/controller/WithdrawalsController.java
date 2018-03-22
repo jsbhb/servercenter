@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.bussiness.service.WithdrawalsService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.pojo.AuditModel;
+import com.zm.finance.pojo.Pagination;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.withdrawals.Withdrawals;
 
@@ -46,6 +48,17 @@ public class WithdrawalsController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return withdrawalsService.getWithdrawal(id, type);
 		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/finance/withdrawal/queryForPage", method = RequestMethod.POST)
+	public ResultModel queryForPage(@PathVariable("version") Double version, @RequestBody Withdrawals entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<Withdrawals> page = withdrawalsService.queryForPage(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
 		return new ResultModel(false, "版本错误");
 	}
 }

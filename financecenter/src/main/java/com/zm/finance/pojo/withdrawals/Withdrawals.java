@@ -1,6 +1,8 @@
 package com.zm.finance.pojo.withdrawals;
 
-public class Withdrawals {
+import com.zm.finance.pojo.Pagination;
+
+public class Withdrawals  extends Pagination{
 
 	private Integer id;
 	private Integer operatorId;
