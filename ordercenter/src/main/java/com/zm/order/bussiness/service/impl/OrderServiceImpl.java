@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.annotation.Log;
+import com.zm.order.bussiness.component.CapitalPoolThreadPool;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
@@ -91,6 +92,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	ActivityFeignClient activityFeignClient;
+	
+	@Resource
+	CapitalPoolThreadPool capitalPoolThreadPool;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -743,5 +747,32 @@ public class OrderServiceImpl implements OrderService {
 		
 		orderMapper.updateOrderRefunds(orderId);
 		return new ResultModel(true,"");
+	}
+
+	/**
+	 * @fun 按照区域中心ID区分订单，防止并发时计算错误
+	 * 由线程池处理，防止feign调用超时
+	 * @return
+	 */
+	@Override
+	public boolean capitalPoolRecount() {
+		List<OrderInfo> infoList = orderMapper.listCapitalPoolNotEnough();
+		if(infoList != null && infoList.size() > 0){
+			Map<Integer,List<OrderInfo>> tempMap = new HashMap<Integer,List<OrderInfo>>();
+			List<OrderInfo> orderTmpList = null;
+			for(OrderInfo info : infoList){
+				if(tempMap.get(info.getCenterId()) == null){
+					orderTmpList = new ArrayList<OrderInfo>();
+					orderTmpList.add(info);
+					tempMap.put(info.getCenterId(), orderTmpList);
+				} else {
+					tempMap.get(info.getCenterId()).add(info);
+				}
+			}
+			for(Map.Entry<Integer, List<OrderInfo>> entry : tempMap.entrySet()){
+				capitalPoolThreadPool.capitalPoolRecount(entry.getValue());
+			}
+		}
+		return false;
 	}
 }

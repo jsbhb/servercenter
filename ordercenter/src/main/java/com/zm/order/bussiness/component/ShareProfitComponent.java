@@ -371,7 +371,7 @@ public class ShareProfitComponent {
 	 * 资金池扣减
 	 * @param orderId
 	 */
-	private void calcapitalpool(String orderId) {
+	public void calcapitalpool(String orderId) {
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
 		list.addAll(orderMapper.listOrderForCalCapital(orderId));
 

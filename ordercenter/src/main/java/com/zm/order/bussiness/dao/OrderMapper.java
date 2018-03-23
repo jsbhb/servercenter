@@ -133,5 +133,7 @@ public interface OrderMapper {
 	List<OrderInfo> listOrderForSendToOtherWarehouse();
 
 	void updateOrderRefunds(String orderId);
+
+	List<OrderInfo> listCapitalPoolNotEnough();
 	
 }

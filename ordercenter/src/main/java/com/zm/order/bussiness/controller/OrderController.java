@@ -635,5 +635,24 @@ public class OrderController {
 
 	}
 	
+	/**
+	 * @fun 轮询查询资金池不足的订单并重新计算
+	 * @param version
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/capitalpool/notenough", method = RequestMethod.POST)
+	@ApiIgnore
+	public boolean capitalPoolRecount(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.capitalPoolRecount();
+		}
+
+		return false;
+
+	}
+	
 
 }

@@ -59,4 +59,12 @@ public interface OrderFeignClient {
 	@RequestMapping(value = "{version}/order/listUnDeliverOrder", method = RequestMethod.GET)
 	public ResultModel listUnDeliverOrder(@PathVariable("version") Double version);
 	
+	
+	/**
+	 * @fun 轮询查询资金池不足的订单并重新计算
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/capitalpool/notenough", method = RequestMethod.POST)
+	public boolean capitalPoolRecount(@PathVariable("version") Double version);
 }

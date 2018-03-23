@@ -107,48 +107,66 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public boolean payCustom(CustomModel model) throws Exception {
-		if (Constants.WX_PAY.equals(model.getPayType())) {
-			WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
-					.get(Constants.PAY + model.getCenterId() + Constants.WX_PAY);
-
-			if (config == null) {
-				config = payMapper.getWeixinPayConfig(model.getCenterId());
-				if (config == null) {
-					return false;
-				}
-				template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
-			}
-
-			config.setHttpConnectTimeoutMs(5000);
-			config.setHttpReadTimeoutMs(5000);
-			Map<String, String> result = WxPayUtils.acquireCustom(config, model);
-			logger.info("微信支付报关:" + model.getOutRequestNo() + "====" + result);
-			if ("SUCCESS".equals(result.get("return_code")) && "SUCCESS".equals(result.get("result_code"))) {
-				String status = result.get("state");
-				if ("SUBMITTED".equals(status) || "PROCESSING".equals(status) || "SUCCESS".equals(status)) {
-					return true;
-				}
-			}
+		if (Constants.WX_PAY.equals(model.getPayType())) {//微信支付单报关
+			return wxPayCustom(model);
 		}
-		if (Constants.ALI_PAY.equals(model.getPayType())) {
-			AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
-					.get(Constants.PAY + model.getCenterId() + Constants.ALI_PAY);
+		if (Constants.ALI_PAY.equals(model.getPayType())) {//支付宝支付单报关
+			return aliPayCustom(model);
+		}
+		if (Constants.UNION_PAY.equals(model.getPayType())) {//银联支付单报关
+			return unionPayCustom(model);
+		}
 
+		return false;
+	}
+
+	private boolean unionPayCustom(CustomModel model) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean wxPayCustom(CustomModel model) throws Exception {
+		WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
+				.get(Constants.PAY + model.getCenterId() + Constants.WX_PAY);
+
+		if (config == null) {
+			config = payMapper.getWeixinPayConfig(model.getCenterId());
 			if (config == null) {
-				config = payMapper.getAliPayConfig(model.getCenterId());
-				if (config == null) {
-					return false;
-				}
-				template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+				return false;
 			}
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+		}
 
-			Map<String, String> result = AliPayUtils.acquireCustom(config, model);
-			logger.info("支付宝报关：" + model.getOutRequestNo() + "====" + result);
-			if ("T".equals(result.get("is_success")) && "SUCCESS".equals(result.get("result_code"))) {
+		config.setHttpConnectTimeoutMs(5000);
+		config.setHttpReadTimeoutMs(5000);
+		Map<String, String> result = WxPayUtils.acquireCustom(config, model);
+		logger.info("微信支付报关:" + model.getOutRequestNo() + "====" + result);
+		if ("SUCCESS".equals(result.get("return_code")) && "SUCCESS".equals(result.get("result_code"))) {
+			String status = result.get("state");
+			if ("SUBMITTED".equals(status) || "PROCESSING".equals(status) || "SUCCESS".equals(status)) {
 				return true;
 			}
 		}
+		return false;
+	}
 
+	private boolean aliPayCustom(CustomModel model) throws Exception {
+		AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
+				.get(Constants.PAY + model.getCenterId() + Constants.ALI_PAY);
+
+		if (config == null) {
+			config = payMapper.getAliPayConfig(model.getCenterId());
+			if (config == null) {
+				return false;
+			}
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
+		}
+
+		Map<String, String> result = AliPayUtils.acquireCustom(config, model);
+		logger.info("支付宝报关：" + model.getOutRequestNo() + "====" + result);
+		if ("T".equals(result.get("is_success")) && "SUCCESS".equals(result.get("result_code"))) {
+			return true;
+		}
 		return false;
 	}
 

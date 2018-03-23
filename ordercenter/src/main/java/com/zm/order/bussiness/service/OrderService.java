@@ -322,4 +322,10 @@ public interface OrderService {
 	 * @return
 	 */
 	ResultModel refunds(String orderId);
+
+	/**
+	 * @fun 资金池重新计算
+	 * @return
+	 */
+	boolean capitalPoolRecount();
 }

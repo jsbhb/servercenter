@@ -668,5 +668,10 @@
 		</foreach>
 		and shop_id = #{shopId} group by push_user_id
 	</select>
+	
+	<!-- 获取资金池不足的订单 -->
+	<select id="listCapitalPoolNotEnough" parameterType="Object" resultMap="orderBase">
+		select order_id,center_id from order_base where status = 11
+	</select>
 
 </mapper>
