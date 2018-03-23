@@ -13,7 +13,9 @@ import com.github.pagehelper.Page;
 import com.zm.finance.bussiness.service.RebateService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.pojo.Pagination;
+import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
+import com.zm.finance.pojo.rebate.Rebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
 
 @RestController
@@ -45,6 +47,17 @@ public class RebateController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Page<RebateDetail> page = rebateService.getRebateDetail(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/finance/rebate/list", method = RequestMethod.POST)
+	public ResultModel listRebate(@PathVariable("version") Double version, @RequestBody RebateSearchModel search) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<Rebate> page = rebateService.listRebate(search);
 			return new ResultModel(true, page, new Pagination(page));
 		}
 

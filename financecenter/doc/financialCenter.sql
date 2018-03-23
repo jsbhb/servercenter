@@ -173,6 +173,7 @@ CREATE TABLE `zm_financial`.`withdrawals_detail` (
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   INDEX `operator_id` (`operator_id`),
+  INDEX `status` (`status`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '提现记录表';

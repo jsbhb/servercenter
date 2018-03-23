@@ -19,10 +19,11 @@ import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.service.RebateService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.log.LogUtil;
+import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
-import com.zm.finance.pojo.card.Card;
 import com.zm.finance.pojo.rebate.CenterRebate;
 import com.zm.finance.pojo.rebate.PushUserRebate;
+import com.zm.finance.pojo.rebate.Rebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
 import com.zm.finance.pojo.rebate.ShopRebate;
 import com.zm.finance.util.JSONUtil;
@@ -177,5 +178,21 @@ public class RebateServiceImpl implements RebateService {
 	public Page<RebateDetail> getRebateDetail(RebateDetail entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		return rebateMapper.selectRebateDetailById(entity);
+	}
+
+
+	@Override
+	public Page<Rebate> listRebate(RebateSearchModel search) {
+		PageHelper.startPage(search.getCurrentPage(), search.getNumPerPage(), true);
+		if(CENTER.equals(search.getType())){
+			return rebateMapper.listCenterRebate(search);
+		}
+		if(SHOP.equals(search.getType())){
+			return rebateMapper.listShopRebate(search);
+		}
+		if(PUSHUSER.equals(search.getType())){
+			return rebateMapper.listPushRebate(search);
+		}
+		return null;
 	}
 }

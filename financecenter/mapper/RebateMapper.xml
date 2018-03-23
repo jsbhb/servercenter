@@ -17,6 +17,31 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.finance.pojo.rebate.Rebate" id="rebate">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="can_be_presented" property="canBePresented" jdbcType="NUMERIC"/>
+		<result column="already_presented" property="alreadyPresented" jdbcType="NUMERIC"/>
+		<result column="shop_rebate_money" property="shopRebateMoney" jdbcType="NUMERIC"/>
+		<result column="stay_to_account" property="stayToAccount" jdbcType="NUMERIC"/>
+		<result column="refilling" property="refilling" jdbcType="NUMERIC"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.finance.pojo.rebate.CenterRebate" extends="rebate" id="centerRebate" >
+		<result column="center_id" property="centerId" jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.finance.pojo.rebate.PushUserRebate" extends="rebate" id="pushRebate" >
+		<result column="user_id" property="userId" jdbcType="NUMERIC"/>
+		<result column="shop_id" property="shopId" jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.finance.pojo.rebate.ShopRebate" extends="rebate" id="shopRebate" >
+		<result column="shop_id" property="shopId" jdbcType="NUMERIC"/>
+	</resultMap>
+	
 
 	<insert id="insertCenterRebate" parameterType="Object">
 		insert into center_rebate_count 
@@ -72,5 +97,36 @@
 			and shop_id = #{shopId}
 		</if>
 		order by create_time desc
+	</select>
+	
+	<select id="listCenterRebate" parameterType="Object" resultMap="centerRebate">
+		select * from center_rebate_count where 1=1 
+		<if test="list != null and list.size > 0">
+			and center_id in
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		
+	</select>
+	
+	<select id="listShopRebate" parameterType="Object" resultMap="shopRebate">
+		select * from shop_rebate_count where 1=1 
+		<if test="list != null and list.size > 0">
+			and shop_id in
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="listPushRebate" parameterType="Object" resultMap="pushRebate">
+		select * from push_rebate_count where 1=1 
+		<if test="list != null and list.size > 0">
+			and user_id in
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 </mapper>
