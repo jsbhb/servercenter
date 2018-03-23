@@ -73,4 +73,9 @@ public class CardServiceImpl implements CardService{
 		PageHelper.startPage(card.getCurrentPage(), card.getNumPerPage(), true);
 		return cardMapper.selectForPage(card);
 	}
+	
+	@Override
+	public ResultModel queryByCardId(Card card) {
+		return new ResultModel(true,cardMapper.queryByCardId(card));
+	}
 }

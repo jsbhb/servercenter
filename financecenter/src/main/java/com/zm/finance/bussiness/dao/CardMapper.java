@@ -17,4 +17,6 @@ public interface CardMapper {
 	void removeCard(Integer id);
 	
 	Page<Card> selectForPage(Card card);
+	
+	Card queryByCardId(Card card);
 }

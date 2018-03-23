@@ -39,7 +39,7 @@
 			</if>
 			update_time = now()
 		</set>
-		where type_id = #{typeId} and type = #{type}
+		where id = #{id}
 	</update>
 	
 	<select id="getCard" parameterType="Object" resultMap="card">
@@ -52,5 +52,9 @@
 	
 	<select id="selectForPage" parameterType="Object" resultMap="card">
 		select * from bind_card where type_id = #{typeId} and type = #{type}
+	</select>
+	
+	<select id="queryByCardId" parameterType="Object" resultMap="card">
+		select * from bind_card where id = #{id}
 	</select>
 </mapper>

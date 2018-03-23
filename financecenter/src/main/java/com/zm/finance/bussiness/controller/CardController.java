@@ -80,4 +80,14 @@ public class CardController {
 		return new ResultModel(false, "版本错误");
 	}
 	
+	@RequestMapping(value = "{version}/finance/card/queryByCardId", method = RequestMethod.POST)
+	public ResultModel queryByCardId(@PathVariable("version") Double version, @RequestBody Card entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return cardService.queryByCardId(entity);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
 }

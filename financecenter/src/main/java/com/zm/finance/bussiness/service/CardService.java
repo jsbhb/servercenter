@@ -17,4 +17,6 @@ public interface CardService {
 	ResultModel checkCardNo(String cardNo);
 
 	Page<Card> getCardForPage(Card card);
+
+	ResultModel queryByCardId(Card card);
 }
