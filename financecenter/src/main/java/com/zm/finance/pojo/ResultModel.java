@@ -36,6 +36,11 @@ public class ResultModel {
 		this.success = flag;
 	}
 	
+	public ResultModel(boolean flag, String errorMsg){
+		this.errorMsg = errorMsg;
+		this.success = flag;
+	}
+	
 	public ResultModel(boolean flag,Object obj, Pagination pagination){
 		this.success = flag;
 		this.obj = obj;
