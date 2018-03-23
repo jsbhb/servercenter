@@ -50,7 +50,7 @@
 	</select>
 	
 	<select id="listWithdrawalDetail" parameterType="Object" resultMap="withdrawals">
-		select out_money,status,card_no,pay_no from withdrawals_detail where operator_id = #{id} and operator_type = #{type}
+		select * from withdrawals_detail where operator_id = #{id} and operator_type = #{type}
 	</select>
 	
 	<select id="selectDetailByEntity" parameterType="Object" resultMap="withdrawals">
@@ -72,6 +72,11 @@
 			and pay_no = #{payNo}
 		</if>
 		order by create_time desc,status asc
+	</select>
+	
+	<select id="selectWithdrawalDetailByEntity" parameterType="Object" resultMap="withdrawals">
+		select * from withdrawals_detail
+		where 1=1 and id = #{id}
 	</select>
 	
 </mapper>

@@ -37,4 +37,12 @@ public interface WithdrawalsService {
 	 */
 	Page<Withdrawals> queryForPage(Withdrawals entity);
 
+	/**
+	 * @fun 获取提现记录
+	 * @param id
+	 * @param type
+	 * @return
+	 */
+	Withdrawals queryWithdrawalsDetailById(Integer id);
+
 }

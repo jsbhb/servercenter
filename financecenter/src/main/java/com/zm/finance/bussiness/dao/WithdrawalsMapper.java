@@ -21,4 +21,6 @@ public interface WithdrawalsMapper {
 
 	Page<Withdrawals> selectDetailByEntity(Withdrawals withdrawals);
 
+	Withdrawals selectWithdrawalDetailByEntity(Integer id);
+
 }

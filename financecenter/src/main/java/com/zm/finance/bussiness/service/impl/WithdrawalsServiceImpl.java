@@ -118,4 +118,9 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 		return withdrawalsMapper.selectDetailByEntity(entity);
 	}
 
+	@Override
+	public Withdrawals queryWithdrawalsDetailById(Integer id) {
+		return withdrawalsMapper.selectWithdrawalDetailByEntity(id);
+	}
+
 }

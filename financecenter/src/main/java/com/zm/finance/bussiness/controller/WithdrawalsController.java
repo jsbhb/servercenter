@@ -61,4 +61,13 @@ public class WithdrawalsController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/finance/withdrawal/detailById/{id}", method = RequestMethod.POST)
+	public ResultModel getWithdrawal(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return new ResultModel(true, withdrawalsService.queryWithdrawalsDetailById(id));
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }
