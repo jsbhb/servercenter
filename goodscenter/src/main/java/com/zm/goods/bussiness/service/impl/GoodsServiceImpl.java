@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +64,9 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	UserFeignClient userFeignClient;
+
+	@Resource
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	ProcessWarehouse processWarehouse;
@@ -119,9 +124,16 @@ public class GoodsServiceImpl implements GoodsService {
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, false);
 		}
 
-		if(proportion){
+		if(proportion){//推手需要获取返佣比例
 			Map<String,Object> result = new HashMap<String,Object>();
-			result.put(Constants.PROPORTION, 0.2);
+			String goodsId = param.get("goodsId").toString();
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
+			Map<String, String> temp = hashOperations.entries(Constants.GOODS_REBATE+goodsId);
+			double rebateProportion = 0;
+			if(temp != null){
+				rebateProportion = Double.valueOf(temp.get("third") == null ? "0" : temp.get("third"));
+			}
+			result.put(Constants.PROPORTION, rebateProportion);
 			result.put("goodsList", goodsList);
 			return result;
 		} else {
@@ -814,7 +826,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
-//			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
+			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
 		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
