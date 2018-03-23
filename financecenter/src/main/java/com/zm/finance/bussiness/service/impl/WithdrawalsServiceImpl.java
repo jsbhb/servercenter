@@ -85,6 +85,7 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 					return new ResultModel(false, "没有流水号");
 				}
 				withdrawalsMapper.updatePassWithdrawals(audit);
+				return new ResultModel(true);
 			} else {// 审核不通过要返回金额
 				withdrawalsMapper.updateUnPassWithdrawals(audit);
 				if (CENTER.equals(withdrawals.getOperatorType())) {

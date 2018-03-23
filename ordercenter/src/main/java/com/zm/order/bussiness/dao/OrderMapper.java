@@ -131,5 +131,7 @@ public interface OrderMapper {
 	List<OrderInfo> listOrderForSendToTTWarehouse();
 	
 	List<OrderInfo> listOrderForSendToOtherWarehouse();
+
+	void updateOrderRefunds(String orderId);
 	
 }

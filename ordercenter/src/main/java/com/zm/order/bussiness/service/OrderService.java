@@ -315,4 +315,11 @@ public interface OrderService {
 	ResultModel pushUserOrderCount(Integer shopId, List<Integer> pushUserIdList);
 
 	ResultModel orderBackCancel(String orderId,String payNo);
+
+	/**
+	 * @fun 退款中
+	 * @param orderId
+	 * @return
+	 */
+	ResultModel refunds(String orderId);
 }

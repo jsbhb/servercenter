@@ -615,5 +615,25 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
+	
+	/**
+	 * @fun 退款中
+	 * @param version
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/refunds/{orderId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel refunds(@PathVariable("version") Double version,@PathVariable("orderId") String orderId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.refunds(orderId);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+	
 
 }

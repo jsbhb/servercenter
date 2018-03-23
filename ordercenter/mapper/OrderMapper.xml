@@ -457,6 +457,10 @@
 			#{item}
 		</foreach>
 	</update>
+	
+	<update id="updateOrderRefunds" parameterType="Object">
+		update order_base set status = 21 where order_id = #{orderId}
+	</update>
 
 	<!-- 更新订单状态END -->
 
