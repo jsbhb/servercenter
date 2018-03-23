@@ -10,6 +10,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.finance.bussiness.dao.WithdrawalsMapper;
 import com.zm.finance.bussiness.service.WithdrawalsService;
 import com.zm.finance.constants.Constants;
@@ -108,6 +110,12 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 		param.put("id", id);
 		param.put("type", type);
 		return new ResultModel(true, withdrawalsMapper.listWithdrawalDetail(param));
+	}
+
+	@Override
+	public Page<Withdrawals> queryForPage(Withdrawals entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return withdrawalsMapper.selectDetailByEntity(entity);
 	}
 
 }
