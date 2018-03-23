@@ -78,7 +78,7 @@ public class Constants {
 
 	// 后台服务对应的写法参照 BackRcvResponse.java
 	public static String BACK_URL = "http://106.15.156.118/paycenter/auth/payMng/unionNotify";//测试
-	public static String FRONT_URL = "http://106.15.156.118/paycenter/auth/payMng/union-frontrcv";//测试
+	public static String FRONT_URL = "http://testapi.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//测试
 //	public static String FRONT_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//正式
 //	public static String BACK_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/unionNotify";//正式
 
