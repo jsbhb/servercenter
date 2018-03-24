@@ -145,11 +145,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		}
 		refilling.setStartMoney(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr));
 		//获取资金池余额
-		Map<String,String> result = hashOperations.entries(Constants.CAPITAL_PERFIX + refilling.getCenterId());
-		String capitalMoney = "0";
-		if(result != null){
-			capitalMoney = result.get("money") == null ? "0" : result.get("money");
-		}
+		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + refilling.getCenterId(),"money");
+		capitalMoney = capitalMoney == null ? "0" : capitalMoney;
 		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
 		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
