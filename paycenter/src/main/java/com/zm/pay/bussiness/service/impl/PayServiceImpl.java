@@ -60,7 +60,7 @@ public class PayServiceImpl implements PayService {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
-	
+
 	@Resource
 	UserFeignClient userFeignClient;
 
@@ -107,13 +107,13 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public boolean payCustom(CustomModel model) throws Exception {
-		if (Constants.WX_PAY.equals(model.getPayType())) {//微信支付单报关
+		if (Constants.WX_PAY.equals(model.getPayType())) {// 微信支付单报关
 			return wxPayCustom(model);
 		}
-		if (Constants.ALI_PAY.equals(model.getPayType())) {//支付宝支付单报关
+		if (Constants.ALI_PAY.equals(model.getPayType())) {// 支付宝支付单报关
 			return aliPayCustom(model);
 		}
-		if (Constants.UNION_PAY.equals(model.getPayType())) {//银联支付单报关由国际物流操作
+		if (Constants.UNION_PAY.equals(model.getPayType())) {// 银联支付单报关由国际物流操作
 			return true;
 		}
 
@@ -179,8 +179,8 @@ public class PayServiceImpl implements PayService {
 			}
 			template.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
 		}
-		
-		if(config.getUrl() == null){
+
+		if (config.getUrl() == null) {
 			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
 			config.setUrl(url);
 			template.opsForValue().set(Constants.PAY + clientId + Constants.ALI_PAY, config);
@@ -340,7 +340,7 @@ public class PayServiceImpl implements PayService {
 			}
 			return new ResultModel(aliPay(info.getCenterId(), type, model));
 		}
-		//银联支付
+		// 银联支付
 		if (Constants.UNION_PAY.equals(payType)) {
 			if (!Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
 				OrderDetail detail = new OrderDetail();
@@ -392,13 +392,14 @@ public class PayServiceImpl implements PayService {
 			}
 			template.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
 		}
-		
-		if(config.getUrl() == null){
+
+		if (config.getUrl() == null) {
 			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
 			config.setUrl(url);
 			template.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY, config);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.UNION_PAY_MER_ID, config.getMerId());
 		}
-		
+
 		String str = UnionPayUtil.unionPay(config, model, type);
 		result.put("htmlStr", str);
 		return result;
