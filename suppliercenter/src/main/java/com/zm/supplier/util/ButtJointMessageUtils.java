@@ -138,7 +138,7 @@ public class ButtJointMessageUtils {
 		sb.append(user.getUserDetail().getName()); // 真实姓名
 		sb.append("</name>\n");
 		if(Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())){
-			sb.append("<merId>\n");
+			sb.append("<merId>");
 			sb.append(unionPayMerId);
 			sb.append("</merId>\n");
 		}
