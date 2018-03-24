@@ -86,7 +86,7 @@ public class CapitalPoolController {
 	public ResultModel getWithdrawal(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, capitalPoolService.queryRefillingDetailById(id));
+			return capitalPoolService.queryRefillingDetailById(id);
 		}
 		return new ResultModel(false, "版本错误");
 	}
