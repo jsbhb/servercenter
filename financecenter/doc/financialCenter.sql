@@ -149,8 +149,7 @@ CREATE TABLE `zm_financial`.`bind_card` (
   INDEX `type_id` (`type_id`),
   INDEX `type` (`type`),
   INDEX `card_no` (`card_no`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `card_no_UNIQUE` (`card_no` ASC)) 
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '绑卡记录表';
 
