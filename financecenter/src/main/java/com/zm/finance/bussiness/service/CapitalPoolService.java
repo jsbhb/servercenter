@@ -64,4 +64,12 @@ public interface CapitalPoolService {
 	 * @return
 	 */
 	ResultModel queryRefillingDetailById(Integer id);
+
+	/**
+	 * @fun 资金池充值多了后清算
+	 * @param centerId
+	 * @param money
+	 * @return
+	 */
+	ResultModel liquidation(Integer centerId, Double money);
 }

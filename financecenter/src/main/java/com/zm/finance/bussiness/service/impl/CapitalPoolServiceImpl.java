@@ -71,11 +71,12 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	@Override
 	public ResultModel CapitalPoolRecharge(String payNo, double money, Integer centerId) {
-		capitalPoolCharge(payNo, money, centerId, Constants.CASH);
+		capitalPoolCharge(payNo, money, centerId, Constants.CASH, "资金池充值", Constants.INCOME);
 		return new ResultModel(true);
 	}
 
-	private void capitalPoolCharge(String payNo, double money, Integer centerId, Integer bussinessType) {
+	private void capitalPoolCharge(String payNo, double money, Integer centerId, Integer bussinessType, String remark,
+			Integer payType) {
 		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "money", money);// 增加余额
 		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "countMoney", money);// 增加累计金额
 		CapitalPoolDetail detail = new CapitalPoolDetail();
@@ -83,8 +84,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		detail.setCenterId(centerId);
 		detail.setMoney(money);
 		detail.setPayNo(payNo);
-		detail.setPayType(Constants.INCOME);
-		detail.setRemark("资金池充值");
+		detail.setPayType(payType);
+		detail.setRemark(remark);
 		List<CapitalPoolDetail> detailList = new ArrayList<CapitalPoolDetail>();
 		detailList.add(detail);
 		capitalPoolMapper.insertCapitalPoolDetail(detailList);
@@ -95,7 +96,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		Refilling refilling = capitalPoolMapper.getRefilling(audit.getId());
 		if (refilling != null) {
 			if (audit.isPass()) {
-				capitalPoolCharge(null, refilling.getMoney(), refilling.getCenterId(), Constants.REBATE);
+				capitalPoolCharge(null, refilling.getMoney(), refilling.getCenterId(), Constants.REBATE, "资金池返佣充值",
+						Constants.INCOME);
 				capitalPoolMapper.updatePassRechargeApply(audit.getId());
 			} else {
 				capitalPoolMapper.updateUnPassRechargeApply(audit);
@@ -146,8 +148,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			return new ResultModel(false, "反充金额超出可提现金额");
 		}
 		refilling.setStartMoney(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr));
-		//获取资金池余额
-		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + refilling.getCenterId(),"money");
+		// 获取资金池余额
+		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + refilling.getCenterId(), "money");
 		capitalMoney = capitalMoney == null ? "0" : capitalMoney;
 		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
@@ -194,5 +196,12 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	public ResultModel queryRefillingDetailById(Integer id) {
 		Refilling refilling = capitalPoolMapper.getRefilling(id);
 		return new ResultModel(true, refilling);
+	}
+
+	@Override
+	public ResultModel liquidation(Integer centerId, Double money) {
+		Double liquidationMoney = CalculationUtils.sub(0, money);
+		capitalPoolCharge(null, liquidationMoney, centerId, Constants.LIQUIDATION, "资金池清算", Constants.EXPENDITURE);
+		return new ResultModel(true);
 	}
 }

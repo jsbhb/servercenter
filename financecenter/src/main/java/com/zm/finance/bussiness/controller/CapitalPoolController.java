@@ -70,7 +70,7 @@ public class CapitalPoolController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/finance/capital/recharge/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(@PathVariable("version") Double version, @RequestBody Refilling entity) {
 
@@ -87,6 +87,16 @@ public class CapitalPoolController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return capitalPoolService.queryRefillingDetailById(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/finance/capitalpool/liquidation/{centerId}", method = RequestMethod.POST)
+	public ResultModel liquidation(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
+			@RequestParam("money") Double money) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return capitalPoolService.liquidation(centerId, money);
 		}
 		return new ResultModel(false, "版本错误");
 	}
