@@ -13,6 +13,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.finance.bussiness.dao.CapitalPoolMapper;
 import com.zm.finance.bussiness.service.CapitalPoolService;
 import com.zm.finance.constants.Constants;
@@ -180,5 +182,17 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			}
 		}
 		return new ResultModel(true);
+	}
+
+	@Override
+	public Page<Refilling> queryForPage(Refilling entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return capitalPoolMapper.selectDetailByEntity(entity);
+	}
+
+	@Override
+	public ResultModel queryRefillingDetailById(Integer id) {
+		Refilling refilling = capitalPoolMapper.getRefilling(id);
+		return new ResultModel(true, refilling);
 	}
 }

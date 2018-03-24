@@ -1,6 +1,8 @@
 package com.zm.finance.pojo.refilling;
 
-public class Refilling {
+import com.zm.finance.pojo.Pagination;
+
+public class Refilling  extends Pagination{
 
 	private Integer id;
 	private Integer centerId;

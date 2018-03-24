@@ -2,6 +2,7 @@ package com.zm.finance.bussiness.dao;
 
 import java.util.List;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.capitalpool.CapitalPoolDetail;
@@ -26,4 +27,6 @@ public interface CapitalPoolMapper {
 	CapitalPool selectRecordByCenterId(Integer centerId);
 	
 	void insertCapitalPoolRecord(Integer centerId);
+	
+	Page<Refilling> selectDetailByEntity(Refilling refilling);
 }

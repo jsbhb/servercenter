@@ -1,5 +1,6 @@
 package com.zm.finance.bussiness.service;
 
+import com.github.pagehelper.Page;
 import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
@@ -48,4 +49,19 @@ public interface CapitalPoolService {
 	 * @return
 	 */
 	ResultModel CapitalPoolRecordRegister(Integer centerId);
+
+	/**
+	 * @fun 获取返充记录
+	 * @param id
+	 * @param type
+	 * @return
+	 */
+	Page<Refilling> queryForPage(Refilling entity);
+	
+	/**
+	 * @fun 查询返充记录
+	 * @param centerId
+	 * @return
+	 */
+	ResultModel queryRefillingDetailById(Integer id);
 }

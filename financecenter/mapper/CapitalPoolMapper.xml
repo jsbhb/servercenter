@@ -107,4 +107,18 @@
 	<insert id="insertCapitalPoolRecord" parameterType="java.lang.Integer">
 		insert into capitalpool (center_id,create_time,update_time,opt) VALUES (#{centerId},now(),now(),'8001')
 	</insert>
+	
+	<select id="selectDetailByEntity" resultMap="refilling" parameterType="Object">
+		select * from refilling_detail where 1=1
+		<if test="centerId != null and centerId != '0'">
+			and center_id = #{centerId}
+		</if>
+		<if test="money != null and money != '0'">
+			and money = #{money}
+		</if>
+		<if test="status != null and status != '0'">
+			and status = #{status}
+		</if>
+		order by create_time desc,status asc
+	</select>
 </mapper>
