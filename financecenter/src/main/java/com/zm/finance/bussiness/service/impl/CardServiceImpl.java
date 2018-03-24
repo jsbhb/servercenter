@@ -63,7 +63,10 @@ public class CardServiceImpl implements CardService{
 		Map resultMap = JSONUtil.parse(result, Map.class);
 		if((Boolean) resultMap.get("validated")){
 			String bank = resultMap.get("bank").toString();
-			return new ResultModel(true, BankDictionary.bank.get(bank));
+			ResultModel resultModel =  new ResultModel(true);
+			resultModel.setErrorMsg(BankDictionary.bank.get(bank));
+			resultModel.setObj(BankDictionary.bank.get(bank));
+			return resultModel;
 		}
 		return new ResultModel(false,"卡号有误");
 	}
