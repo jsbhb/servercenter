@@ -3,6 +3,8 @@ package com.zm.order.feignclient.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * ClassName: GoodsSpecs <br/>
  * Function: 商品规格，包括价格. <br/>
@@ -16,6 +18,7 @@ public class GoodsSpecs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@JsonIgnore
 	private Integer id;
 
 	private Integer goodsId;
@@ -31,35 +34,35 @@ public class GoodsSpecs implements Serializable {
 	private String info;
 
 	private Integer status;
-
+	@JsonIgnore
 	private String createTime;
-
+	@JsonIgnore
 	private String updateTime;
-
+	@JsonIgnore
 	private String opt;
-
+	
 	private Double minPrice;
-
+	
 	private Double maxPrice;
-
+	@JsonIgnore
 	private Double vipMinPrice;
-
+	@JsonIgnore
 	private Double vipMaxPrice;
 
 	private Double realMinPrice;
 
 	private Double realMaxPrice;
-
+	@JsonIgnore
 	private Double realVipMinPrice;
-
+	@JsonIgnore
 	private Double realVipMaxPrice;
 
 	private String thirdCategory;
-
+	
 	private String secondCategory;
-
+	
 	private String firstCategory;
-
+	@JsonIgnore
 	private Integer stock;
 
 	private Double incrementTax;

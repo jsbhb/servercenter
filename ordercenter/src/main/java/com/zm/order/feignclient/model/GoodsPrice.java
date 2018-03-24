@@ -1,7 +1,9 @@
 package com.zm.order.feignclient.model;
 
-public class GoodsPrice {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+public class GoodsPrice {
+	@JsonIgnore
 	private Integer id;
 	
 	private String itemId;
@@ -11,17 +13,17 @@ public class GoodsPrice {
 	private Integer max;
 	
 	private Double price;
-	
+	@JsonIgnore
 	private Double vipPrice;
 	
 	private Double discount;
-	
+	@JsonIgnore
 	private String deliveryPlace;
-	
+	@JsonIgnore
 	private String createTime;
-	
+	@JsonIgnore
 	private String updateTime;
-	
+	@JsonIgnore
 	private String opt;
 
 	public String getDeliveryPlace() {
