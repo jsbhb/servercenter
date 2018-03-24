@@ -201,6 +201,13 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	@Override
 	public ResultModel liquidation(Integer centerId, Double money) {
 		Double liquidationMoney = CalculationUtils.sub(0, money);
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + centerId, "money");
+		double balance = 0;
+		balance = CalculationUtils.sub(Double.valueOf(capitalMoney == null ? "0" : capitalMoney), money);
+		if(balance < 0){
+			return new ResultModel(false, "资金池不足");
+		}
 		capitalPoolCharge(null, liquidationMoney, centerId, Constants.LIQUIDATION, "资金池清算", Constants.EXPENDITURE);
 		return new ResultModel(true);
 	}
