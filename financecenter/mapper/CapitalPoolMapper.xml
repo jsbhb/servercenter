@@ -25,7 +25,9 @@
 	<resultMap type="com.zm.finance.pojo.refilling.Refilling" id="refilling">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
-		<result column="money" property="money" jdbcType="INTEGER"/>
+		<result column="start_money" property="startMoney" jdbcType="NUMERIC"/>
+		<result column="money" property="money" jdbcType="NUMERIC"/>
+		<result column="pool_money" property="poolMoney" jdbcType="NUMERIC"/>
 		<result column="status" property="status" jdbcType="INTEGER"/>
 		<result column="remark" property="remark" jdbcType="VARCHAR"/>
 		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
@@ -94,8 +96,8 @@
 	</update>
 	
 	<insert id="insertRefillingDetail" parameterType="Object">
-		insert into refilling_detail(center_id,money,status,create_time) 
-		values(#{centerId},#{money},1,now())
+		insert into refilling_detail(center_id,start_money,money,pool_money,status,create_time) 
+		values(#{centerId},#{startMoney},#{money},#{poolMoney},1,now())
 	</insert>
 	
 	<select id="selectRecordByCenterId" parameterType="java.lang.Integer" resultMap="capitalpool">

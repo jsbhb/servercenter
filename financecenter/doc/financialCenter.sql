@@ -184,7 +184,7 @@ CREATE TABLE `zm_financial`.`refilling_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `center_id` INT NULL COMMENT '区域id',
   `start_money` DECIMAL(12,2) NULL COMMENT '可用金额',
-  `out_money` DECIMAL(12,2) NULL COMMENT '提现金额',
+  `money` DECIMAL(12,2) NULL COMMENT '提现金额',
   `pool_money` DECIMAL(12,2) NULL COMMENT '资金池余额',
   `status` TINYINT UNSIGNED NULL DEFAULT 1 COMMENT '状态1申请中，2已同意，3已拒绝',
   `remark` VARCHAR(200) NULL COMMENT '备注',

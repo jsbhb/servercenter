@@ -57,14 +57,14 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				detailList.add(JSONUtil.parse(obj.toString(), CapitalPoolDetail.class));
 			}
 		}
-		if(detailList.size() > 0){
+		if (detailList.size() > 0) {
 			capitalPoolMapper.insertCapitalPoolDetail(detailList);
 			template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);// 删除以保存的记录
 		}
-		if(poolList.size() > 0){
+		if (poolList.size() > 0) {
 			capitalPoolMapper.updateCapitalPool(poolList);
 		}
-		
+
 	}
 
 	@Override
@@ -138,10 +138,19 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		double balance = 0;
 		String canBePresentedStr = hashOperations.get(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
 				"canBePresented");
-		balance = CalculationUtils.sub(Double.valueOf(canBePresentedStr), refilling.getMoney());
+		balance = CalculationUtils.sub(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr),
+				refilling.getMoney());
 		if (balance < 0) {
 			return new ResultModel(false, "反充金额超出可提现金额");
 		}
+		refilling.setStartMoney(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr));
+		//获取资金池余额
+		Map<String,String> result = hashOperations.entries(Constants.CAPITAL_PERFIX + refilling.getCenterId());
+		String capitalMoney = "0";
+		if(result != null){
+			capitalMoney = result.get("money") == null ? "0" : result.get("money");
+		}
+		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
 		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
 				CalculationUtils.sub(0, refilling.getMoney()));
@@ -157,7 +166,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			capitalPoolMapper.insertCapitalPoolRecord(centerId);
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
 			String key = Constants.CAPITAL_PERFIX + centerId;
-			if (!template.hasKey(key)){// 初始化redis里的资金池
+			if (!template.hasKey(key)) {// 初始化redis里的资金池
 				Map<String, String> mapForRedis = new HashMap<String, String>();
 				mapForRedis.put("centerId", centerId.toString());
 				mapForRedis.put("money", "0");
@@ -168,8 +177,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				mapForRedis.put("usePreferential", "0");
 				mapForRedis.put("countMoney", "0");
 				mapForRedis.put("countPreferential", "0");
-				mapForRedis.put("status", "1");//默认启用状态
-				mapForRedis.put("opt", "8001");//默认admin账号
+				mapForRedis.put("status", "1");// 默认启用状态
+				mapForRedis.put("opt", "8001");// 默认admin账号
 				hashOperations.putAll(Constants.CAPITAL_PERFIX + centerId, mapForRedis);
 			}
 		}
