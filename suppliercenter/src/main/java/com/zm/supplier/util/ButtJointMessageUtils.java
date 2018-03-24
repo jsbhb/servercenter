@@ -22,13 +22,15 @@ import com.zm.supplier.supplierinf.model.XinYunOrder;
 
 public class ButtJointMessageUtils {
 
-	public static String getTianTianOrderMsg(OrderInfo info, UserInfo user, String customer) {
+	public static String getTianTianOrderMsg(OrderInfo info, UserInfo user, String customer, String unionPayMerId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
 			source = "ALIPAY";
 		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
 			source = "TENPAY";
+		} else if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
+			source = "UNIONPAY";
 		}
 		sb.append("<?xml version='1.0' encoding='UTF-8'?>\n");
 		sb.append("<request>\n");
@@ -46,7 +48,7 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-//		sb.append("17000"); // 店铺代码正式
+		// sb.append("17000"); // 店铺代码正式
 		sb.append("11612"); // 店铺代码测试
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
@@ -135,6 +137,11 @@ public class ButtJointMessageUtils {
 		sb.append("<name>");
 		sb.append(user.getUserDetail().getName()); // 真实姓名
 		sb.append("</name>\n");
+		if(Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())){
+			sb.append("<merId>\n");
+			sb.append(unionPayMerId);
+			sb.append("</merId>\n");
+		}
 		sb.append("</pay>\n");
 		sb.append("<logistics>");
 		sb.append("<logisticsCode>");

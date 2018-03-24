@@ -113,15 +113,10 @@ public class PayServiceImpl implements PayService {
 		if (Constants.ALI_PAY.equals(model.getPayType())) {//支付宝支付单报关
 			return aliPayCustom(model);
 		}
-		if (Constants.UNION_PAY.equals(model.getPayType())) {//银联支付单报关
-			return unionPayCustom(model);
+		if (Constants.UNION_PAY.equals(model.getPayType())) {//银联支付单报关由国际物流操作
+			return true;
 		}
 
-		return false;
-	}
-
-	private boolean unionPayCustom(CustomModel model) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

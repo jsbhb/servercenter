@@ -35,6 +35,8 @@ public class Constants {
 	public static final Integer ALI_PAY = 2;
 
 	public static final Integer UNION_PAY = 3;
+	
+	public static final String UNION_PAY_MER_ID = "unionpay:mer_id";
 
 	// *********************订单状态******************************/
 

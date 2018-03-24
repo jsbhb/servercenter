@@ -51,6 +51,7 @@ public class SysInit {
 		List<UnionPayConfig> list = payMapper.listUnionPayConfig();
 		for(UnionPayConfig model : list){
 			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY, model);
+			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY_MER_ID, model.getMerId());
 		}
 	}
 }
