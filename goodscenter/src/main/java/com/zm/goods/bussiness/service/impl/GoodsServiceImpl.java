@@ -705,9 +705,10 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public ResultModel downShelves(String itemId, Integer centerId) {
-		List<String> itemIdList = new ArrayList<String>();
-		itemIdList.add(itemId);
+	public ResultModel downShelves(List<String> itemIdList, Integer centerId) {
+		if(itemIdList == null || itemIdList.size() == 0){
+			return new ResultModel(false, "请传入itemId");
+		}
 		Map<String, Object> param = new HashMap<String, Object>();
 		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", centerIdstr);
@@ -716,11 +717,18 @@ public class GoodsServiceImpl implements GoodsService {
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有该商品");
 		}
-		param.put("goodsId", goodsIdList.get(0));
-		goodsMapper.updateGoodsItemDownShelves(param);
-		int count = goodsMapper.countUpShelvesStatus(param);
-		if (count == 0) {
-			deleteLuceneAndDownShelves(goodsIdList, centerId);
+		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);//去重
+		goodsMapper.updateGoodsItemDownShelves(param);//商品更新为下架状态
+		List<String> downShelvesGoodsIdList = new ArrayList<String>();
+		for(String goodsId : goodsIdSet){
+			param.put("goodsId", goodsId);
+			int count = goodsMapper.countUpShelvesStatus(param);
+			if (count == 0) {//如果所有item已经下架，goods也下架，并删除索引
+				downShelvesGoodsIdList.add(goodsId);
+			}
+		}
+		if(downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0){
+			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
 		}
 		return new ResultModel(true, "");
 	}
@@ -767,15 +775,18 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel unDistribution(String itemId) {
-		goodsMapper.updateGoodsItemUnDistribution(itemId);
+	public ResultModel unDistribution(List<String> itemIdList) {
+		if(itemIdList == null || itemIdList.size() == 0){
+			return new ResultModel(false, "请传入itemId");
+		}
+		goodsMapper.updateGoodsItemUnDistribution(itemIdList);
 		ResultModel resultModel = userFeignClient.getCenterId(Constants.FIRST_VERSION);
 		if (resultModel.isSuccess()) {
 			List<Integer> list = new ArrayList<Integer>();
 			list = (List<Integer>) resultModel.getObj();
 			list.add(Constants.PREDETERMINE_PLAT_TYPE);
 			for (Integer centerId : list) {
-				downShelves(itemId, centerId);
+				downShelves(itemIdList, centerId);
 			}
 			return new ResultModel(true, "");
 		} else {

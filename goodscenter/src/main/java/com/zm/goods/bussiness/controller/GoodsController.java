@@ -1,5 +1,6 @@
 package com.zm.goods.bussiness.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -547,7 +548,9 @@ public class GoodsController {
 			@RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.downShelves(itemId, centerId);
+			String[] arr = itemId.split(",");
+			List<String> itemIdList = Arrays.asList(arr);
+			return goodsService.downShelves(itemIdList, centerId);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -563,7 +566,9 @@ public class GoodsController {
 	public ResultModel unDistribution(@PathVariable("version") Double version, @RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.unDistribution(itemId);
+			String[] arr = itemId.split(",");
+			List<String> itemIdList = Arrays.asList(arr);
+			return goodsService.unDistribution(itemIdList);
 		}
 
 		return new ResultModel(false, "版本错误");

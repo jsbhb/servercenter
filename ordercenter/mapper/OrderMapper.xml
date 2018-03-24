@@ -459,7 +459,7 @@
 	</update>
 	
 	<update id="updateOrderRefunds" parameterType="Object">
-		update order_base set status = 21 where order_id = #{orderId}
+		update order_base set status = 21 where order_id = #{orderId} and status in (1,2,3,4,5,6,7,11,12,99)
 	</update>
 
 	<!-- 更新订单状态END -->

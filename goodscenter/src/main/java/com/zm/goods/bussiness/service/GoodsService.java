@@ -244,9 +244,9 @@ public interface GoodsService {
 
 	ResultModel upShelves(List<String> itemIdList, Integer centerId);
 
-	ResultModel downShelves(String itemId, Integer centerId);
+	ResultModel downShelves(List<String> itemIdList, Integer centerId);
 
-	ResultModel unDistribution(String itemId);
+	ResultModel unDistribution(List<String> itemIdList);
 
 	ResultModel syncStock(List<String> itemIdList);
 

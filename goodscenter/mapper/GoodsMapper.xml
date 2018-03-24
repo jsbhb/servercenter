@@ -1055,7 +1055,11 @@
 	</select>
 	
 	<update id="updateGoodsItemUnDistribution" parameterType="Object">
-		update goods_item set status = 1, update_time=now() where item_id = #{itemId}
+		update goods_item set status = 1, update_time=now() where item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
 	</update>
 
 </mapper>

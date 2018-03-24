@@ -149,7 +149,7 @@ public interface GoodsMapper {
 
 	int countItem(Map<String, Object> param);
 
-	void updateGoodsItemUnDistribution(String itemId);
+	void updateGoodsItemUnDistribution(List<String> list);
 	
 	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
 	
