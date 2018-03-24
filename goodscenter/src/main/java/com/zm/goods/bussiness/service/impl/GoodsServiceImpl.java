@@ -189,11 +189,12 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId) {
+	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", list);
 		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
+		param.put("source", source);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(param);
 		if (specsList == null || specsList.size() == 0) {
 			return null;

@@ -396,11 +396,14 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id in
+		gs.item_id = bgp.item_id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
 		</foreach>
+		<if test="source == mall">
+			and gs.status = 1
+		</if>
 	</select>
 	
 	<select id="listPriceContrast" parameterType="Object" resultMap="priceConstrast">

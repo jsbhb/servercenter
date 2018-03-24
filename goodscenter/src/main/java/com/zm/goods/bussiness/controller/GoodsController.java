@@ -175,7 +175,8 @@ public class GoodsController {
 			@ApiImplicitParam(paramType = "query", name = "itemIds", dataType = "String", required = true, value = "商品唯一编码itemId,以逗号隔开"),
 			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res) {
+			HttpServletResponse res,
+			@RequestParam(value = "source", required = false, defaultValue = "mall") String source) {
 
 		ResultModel result = new ResultModel();
 		String ids = req.getParameter("itemIds");
@@ -184,7 +185,7 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId);
+			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
 
 			result.setSuccess(true);
 			result.setObj(resultMap);

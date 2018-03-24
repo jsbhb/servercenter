@@ -25,7 +25,7 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
-			@RequestParam("centerId") Integer centerId);
+			@RequestParam("centerId") Integer centerId, @RequestParam("source") String source);
 
 	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
 	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,

@@ -73,14 +73,13 @@ public interface GoodsService {
 			Integer orderFlag, String couponIds, Integer userId);
 
 	/**
-	 * listGoodsSpecs:获取规格信息. <br/>
-	 * 
-	 * @author wqy
+	 * listGoodsSpecs:获取规格信息.
 	 * @param list
+	 * @param centerId
+	 * @param source feign：通过feign调用该函数，mall默认值，为商城端调用
 	 * @return
-	 * @since JDK 1.7
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId);
+	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
 
 	/**
 	 * getActivity:获取活动信息. <br/>

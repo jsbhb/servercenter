@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	ActivityFeignClient activityFeignClient;
-	
+
 	@Resource
 	CapitalPoolThreadPool capitalPoolThreadPool;
 
@@ -364,7 +364,7 @@ public class OrderServiceImpl implements OrderService {
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
 		}
-		
+
 		shareProfitComponent.calShareProfitStayToAccount(orderId);
 
 		result.setSuccess(true);
@@ -401,7 +401,7 @@ public class OrderServiceImpl implements OrderService {
 		String ids = sb.substring(0, sb.length() - 1);
 
 		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids,
-				(Integer) param.get("centerId"));
+				(Integer) param.get("centerId"), "feign");
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
 			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");
@@ -739,29 +739,28 @@ public class OrderServiceImpl implements OrderService {
 				&& !Constants.ORDER_CLOSE.equals(status) && !Constants.ORDER_INIT.equals(status)) {
 			shareProfitComponent.calRefundShareProfit(orderId);
 		}
-		return new ResultModel(true,"");
+		return new ResultModel(true, "");
 	}
 
 	@Override
 	public ResultModel refunds(String orderId) {
-		
+
 		orderMapper.updateOrderRefunds(orderId);
-		return new ResultModel(true,"");
+		return new ResultModel(true, "");
 	}
 
 	/**
-	 * @fun 按照区域中心ID区分订单，防止并发时计算错误
-	 * 由线程池处理，防止feign调用超时
+	 * @fun 按照区域中心ID区分订单，防止并发时计算错误 由线程池处理，防止feign调用超时
 	 * @return
 	 */
 	@Override
 	public boolean capitalPoolRecount() {
 		List<OrderInfo> infoList = orderMapper.listCapitalPoolNotEnough();
-		if(infoList != null && infoList.size() > 0){
-			Map<Integer,List<OrderInfo>> tempMap = new HashMap<Integer,List<OrderInfo>>();
+		if (infoList != null && infoList.size() > 0) {
+			Map<Integer, List<OrderInfo>> tempMap = new HashMap<Integer, List<OrderInfo>>();
 			List<OrderInfo> orderTmpList = null;
-			for(OrderInfo info : infoList){
-				if(tempMap.get(info.getCenterId()) == null){
+			for (OrderInfo info : infoList) {
+				if (tempMap.get(info.getCenterId()) == null) {
 					orderTmpList = new ArrayList<OrderInfo>();
 					orderTmpList.add(info);
 					tempMap.put(info.getCenterId(), orderTmpList);
@@ -769,7 +768,7 @@ public class OrderServiceImpl implements OrderService {
 					tempMap.get(info.getCenterId()).add(info);
 				}
 			}
-			for(Map.Entry<Integer, List<OrderInfo>> entry : tempMap.entrySet()){
+			for (Map.Entry<Integer, List<OrderInfo>> entry : tempMap.entrySet()) {
 				capitalPoolThreadPool.capitalPoolRecount(entry.getValue());
 			}
 		}
