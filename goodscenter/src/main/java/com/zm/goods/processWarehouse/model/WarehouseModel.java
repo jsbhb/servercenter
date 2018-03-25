@@ -51,5 +51,11 @@ public class WarehouseModel {
 	public void setLockedqty(Integer lockedqty) {
 		this.lockedqty = lockedqty;
 	}
+
+	@Override
+	public String toString() {
+		return "WarehouseModel [id=" + id + ", itemId=" + itemId + ", fxqty=" + fxqty + ", frozenqty=" + frozenqty
+				+ ", lockedqty=" + lockedqty + "]";
+	}
 	
 }

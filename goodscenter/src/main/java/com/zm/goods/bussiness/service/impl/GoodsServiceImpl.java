@@ -245,6 +245,9 @@ public class GoodsServiceImpl implements GoodsService {
 			specs = goodsMapper.getGoodsSpecsForOrder(param);
 			weight += specs.getWeight() * model.getQuantity();
 			Double amount = GoodsServiceUtil.judgeQuantityRange(vip, result, specs, model);
+			if (!result.isSuccess()) {
+				return result;
+			}
 			if (Constants.O2O_ORDER.equals(orderFlag)) {
 				Tax tax = goodsMapper.getTax(param);
 				if (taxMap.get(tax) == null) {
@@ -253,9 +256,7 @@ public class GoodsServiceImpl implements GoodsService {
 					taxMap.put(tax, taxMap.get(tax) + amount);
 				}
 			}
-			if (!result.isSuccess()) {
-				return result;
-			}
+			
 			specsMap.put(model.getItemId(), specs);
 		}
 
