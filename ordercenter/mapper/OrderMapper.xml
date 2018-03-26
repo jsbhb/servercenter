@@ -292,8 +292,8 @@
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
 		select * from order_shopping_cart where user_id = #{userId} and
 		center_id = #{centerId} order by create_time
-		limit
-		#{pagination.startRow},#{pagination.numPerPage}
+<!-- 		limit 
+ 		#{pagination.startRow},#{pagination.numPerPage} -->
 	</select>
 
 	<update id="updateOrderDetailPayTime" parameterType="Object">
