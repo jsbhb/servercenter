@@ -123,7 +123,7 @@
 	</update>
 	
 	<select id="fuzzyListGrade" parameterType="Object" resultType="com.zm.user.pojo.FuzzySearchGrade">
-		select id,grade_name as name from grade where grade_level = #{level} and 
+		select id,grade_name as name from grade where grade_level = #{level} and parent_id = #{centerId} and
 		(id like CONCAT('%',#{name},'%') or grade_name like CONCAT('%',#{name},'%'))
 	</select>
 

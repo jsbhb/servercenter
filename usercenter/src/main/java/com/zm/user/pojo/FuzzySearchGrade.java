@@ -10,6 +10,14 @@ public class FuzzySearchGrade {
 	private Integer id;
 	private String name;
 	private Integer level;
+	private Integer centerId;
+	
+	public Integer getCenterId() {
+		return centerId;
+	}
+	public void setCenterId(Integer centerId) {
+		this.centerId = centerId;
+	}
 	public Integer getId() {
 		return id;
 	}
