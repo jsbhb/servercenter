@@ -7,6 +7,8 @@
  */
 package com.zm.order.bussiness.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderStockOutService;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ThirdOrderInfo;
 
 /**  
  * ClassName: OrderBackServiceImpl <br/>  
@@ -52,6 +55,11 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public Page<OrderGoods> queryByPageForGoods(OrderGoods entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		return orderBackMapper.selectOrderGoodsForPage(entity);
+	}
+
+	@Override
+	public List<ThirdOrderInfo> queryThirdInfo(String orderId) {
+		return orderMapper.getThirdInfo(orderId);
 	}
 
 }

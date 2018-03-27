@@ -116,6 +116,15 @@
 		<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
 		<result column="express_name" property="expressName" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.ThirdOrderInfo" id="expressList">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+		<result column="express_name" property="expressName" jdbcType="VARCHAR" />
+		<result column="express_id" property="expressId" jdbcType="VARCHAR" />
+	</resultMap>
 
 	<select id="listPayCustomOrder" resultMap="customModel">
 		select
@@ -672,6 +681,11 @@
 	<!-- 获取资金池不足的订单 -->
 	<select id="listCapitalPoolNotEnough" parameterType="Object" resultMap="orderBase">
 		select order_id,center_id from order_base where status = 11
+	</select>
+	
+	<!-- 根据订单Id查询物流信息 -->
+	<select id="getThirdInfo" parameterType="Object" resultMap="expressList">
+		select * from third_order_info where order_id = #{orderId} and express_id is not null
 	</select>
 
 </mapper>

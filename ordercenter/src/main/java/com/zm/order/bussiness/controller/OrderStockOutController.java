@@ -1,5 +1,7 @@
 package com.zm.order.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,6 +18,7 @@ import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ThirdOrderInfo;
 
 /**
  * ClassName: OrderBackController <br/>
@@ -71,6 +74,26 @@ public class OrderStockOutController {
 				}
 
 				OrderInfo result = orderStockOutService.queryByOrderId(entity.getOrderId());
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/order/stockOut/queryThirdInfo", method = RequestMethod.POST)
+	public ResultModel queryThirdInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody OrderInfo entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				if (entity.getOrderId() == null || "".equals(entity.getOrderId())) {
+					return new ResultModel(false, "没有编号信息");
+				}
+
+				List<ThirdOrderInfo> result = orderStockOutService.queryThirdInfo(entity.getOrderId());
 				return new ResultModel(true, result);
 			}
 

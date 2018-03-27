@@ -1,6 +1,5 @@
 package com.zm.order.bussiness.dao;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -135,5 +134,7 @@ public interface OrderMapper {
 	void updateOrderRefunds(String orderId);
 
 	List<OrderInfo> listCapitalPoolNotEnough();
+	
+	List<ThirdOrderInfo> getThirdInfo(String orderId);
 	
 }
