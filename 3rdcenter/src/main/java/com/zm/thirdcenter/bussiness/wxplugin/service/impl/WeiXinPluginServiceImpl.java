@@ -31,7 +31,7 @@ import com.zm.thirdcenter.wx.JsTicketApi.JsApiType;
 public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 
 	@Resource
-	RedisTemplate<String, Object> template;
+	RedisTemplate<String, Object> redisTemplate;
 
 	@Resource
 	UserFeignClient userFeignClient;
@@ -75,9 +75,9 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 		boolean snsapiBase = false;
 		snsapiBase = Arrays.asList(stateArr).contains("base");
 		if (snsapiBase) {
-			config = (WXLoginConfig) template.opsForValue().get(Constants.LOGIN + stateArr[2] + "" + stateArr[3]);
+			config = (WXLoginConfig) redisTemplate.opsForValue().get(Constants.LOGIN + stateArr[2] + "" + stateArr[3]);
 		} else {
-			config = (WXLoginConfig) template.opsForValue().get(Constants.LOGIN + stateArr[1] + "" + stateArr[2]);
+			config = (WXLoginConfig) redisTemplate.opsForValue().get(Constants.LOGIN + stateArr[1] + "" + stateArr[2]);
 		}
 		SnsAccessToken token = SnsAccessTokenApi.getSnsAccessToken(config.getAppId(), config.getSecret(), code);
 
@@ -85,7 +85,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
 
 			if (apiResult.isSucceed()) {
-				template.opsForValue().set(
+				redisTemplate.opsForValue().set(
 						apiResult.getStr("unionid") == null ? token.getOpenid() : apiResult.getStr("unionid"),
 						apiResult.getJson(), 30L, TimeUnit.MINUTES);
 
@@ -121,12 +121,12 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			return null;
 		}
 		Map<String, String> resp = new HashMap<String, String>();
-		String ticket = (String) template.opsForValue().get(config.getAppId() + JSTICKET);
+		String ticket = (String) redisTemplate.opsForValue().get(config.getAppId() + JSTICKET);
 		if (ticket == null) {// redis已经过期
 			String token = getAccessToken(config);
 			JsTicket JsTicket = JsTicketApi.getTicket(JsApiType.jsapi, token);
 			if (JsTicket != null) {
-				template.opsForValue().set(config.getAppId() + JSTICKET, JsTicket.getTicket(), 7000,
+				redisTemplate.opsForValue().set(config.getAppId() + JSTICKET, JsTicket.getTicket(), 7000,
 						TimeUnit.SECONDS);// 7000秒后过期
 			}
 			ticket = JsTicket.getTicket();
@@ -143,11 +143,11 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 	}
 
 	private String getAccessToken(WXLoginConfig config) {
-		String token = (String) template.opsForValue().get(config.getAppId() + TOKEN);
+		String token = (String) redisTemplate.opsForValue().get(config.getAppId() + TOKEN);
 		if (token == null) {// redis已经过期
 			SnsAccessToken snsAccessToken = SnsAccessTokenApi.refreshAccessToken(config);
 			if (snsAccessToken != null) {
-				template.opsForValue().set(config.getAppId() + TOKEN, snsAccessToken.getAccessToken(), 7000,
+				redisTemplate.opsForValue().set(config.getAppId() + TOKEN, snsAccessToken.getAccessToken(), 7000,
 						TimeUnit.SECONDS);// 7000秒后过期
 			}
 			return snsAccessToken.getAccessToken();
@@ -157,7 +157,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 	}
 
 	private WXLoginConfig getWeiXinConfig(WXLoginConfig param) {
-		WXLoginConfig config = (WXLoginConfig) template.opsForValue()
+		WXLoginConfig config = (WXLoginConfig) redisTemplate.opsForValue()
 				.get(Constants.LOGIN + param.getCenterId() + "" + param.getLoginType());
 
 		if (config == null) {
@@ -168,7 +168,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			if (config == null) {
 				return null;
 			}
-			template.opsForValue().set(Constants.LOGIN + param.getCenterId() + "" + param.getLoginType(), config);
+			redisTemplate.opsForValue().set(Constants.LOGIN + param.getCenterId() + "" + param.getLoginType(), config);
 		}
 		return config;
 	}

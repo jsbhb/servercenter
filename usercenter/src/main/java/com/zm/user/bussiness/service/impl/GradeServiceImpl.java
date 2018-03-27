@@ -17,6 +17,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.service.GradeService;
+import com.zm.user.common.ResultModel;
+import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 
@@ -66,6 +68,12 @@ public class GradeServiceImpl implements GradeService {
 		} else {
 			gradeMapper.insertGradeConfig(entity);
 		}
+	}
+
+	@Override
+	public ResultModel fuzzySearch(FuzzySearchGrade entity) {
+		
+		return new ResultModel(true, gradeMapper.fuzzyListGrade(entity));
 	}
 
 }

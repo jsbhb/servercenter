@@ -15,12 +15,10 @@ import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
-import com.zm.user.constants.LogConstants;
 import com.zm.user.feignclient.ActivityFeignClient;
 import com.zm.user.feignclient.GoodsFeignClient;
 import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
-import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.feignclient.model.PayModel;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
@@ -64,7 +62,7 @@ public class UserServiceImpl implements UserService {
 	ActivityFeignClient activityFeignClient;
 
 	@Resource
-	RedisTemplate<String, String> template;
+	RedisTemplate<String, String> redisTemplate;
 
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -137,7 +135,7 @@ public class UserServiceImpl implements UserService {
 		userMapper.saveUser(info);
 
 		if (info.getWechat() != null && !"".equals(info.getWechat())) {
-			ApiResult apiResult = new ApiResult(template.opsForValue().get(info.getWechat()));
+			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
 			packageUser(apiResult, info);
 			userMapper.saveWechat(new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
 		}
@@ -150,10 +148,6 @@ public class UserServiceImpl implements UserService {
 			info.getUserDetail().setUserId(info.getId());
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
-
-		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
-//		logFeignClient.saveLog(Constants.FIRST_VERSION,
-//				packageLog(LogConstants.REGISTER, "注册账号", info.getCenterId(), content, info.getPhone()));
 
 		return info.getId();
 	}
@@ -215,20 +209,6 @@ public class UserServiceImpl implements UserService {
 			info.setDuration(vipUser.getDuration());
 			info.setVipTime(vipUser.getCreateTime());
 		}
-
-		return info;
-	}
-
-	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
-		LogInfo info = new LogInfo();
-
-		info.setApiId(apiId);
-		info.setApiName(apiName);
-		info.setCenterId(LogConstants.USER_CENTER_ID);
-		info.setCenterName("用户服务中心");
-		info.setClientId(clientId);
-		info.setContent(content);
-		info.setOpt(opt);
 
 		return info;
 	}

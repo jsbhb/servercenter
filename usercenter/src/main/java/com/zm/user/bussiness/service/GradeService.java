@@ -1,6 +1,8 @@
 package com.zm.user.bussiness.service;
 
 import com.github.pagehelper.Page;
+import com.zm.user.common.ResultModel;
+import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 
@@ -56,4 +58,11 @@ public interface GradeService {
 	 * @since JDK 1.7  
 	 */
 	void updateShop(ShopEntity entity);
+
+	/**
+	 * @fun 模糊搜索等级
+	 * @param entity
+	 * @return
+	 */
+	ResultModel fuzzySearch(FuzzySearchGrade entity);
 }

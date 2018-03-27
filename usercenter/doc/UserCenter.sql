@@ -44,7 +44,7 @@ drop table if exists  `user_wechat`;
 CREATE TABLE `zm_user`.`user_wechat` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
+  `user_type` TINYINT UNSIGNED NULL COMMENT '用户类型',
   `wechat` VARCHAR(100) NOT NULL COMMENT '微信unionid',
   `attribute` VARCHAR(100) COMMENT '备用',
   `create_time` DATETIME NULL,

@@ -271,10 +271,8 @@ public class GoodsServiceImpl implements GoodsService {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
-		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-		if (!enough) {
-			result.setSuccess(false);
-			result.setErrorMsg("库存不足");
+		result = processWarehouse.processWarehouse(orderFlag, list);
+		if (!result.isSuccess()) {
 			return result;
 		}
 
@@ -630,11 +628,11 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public ResultModel stockJudge(List<OrderBussinessModel> list, Integer orderFlag, Integer supplierId) {
 		supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
-		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-		if (!enough) {
-			return new ResultModel(false, "库存不足");
+		ResultModel resultModel = processWarehouse.processWarehouse(orderFlag, list);
+		if (!resultModel.isSuccess()) {
+			return resultModel;
 		}
-		return new ResultModel(true, "");
+		return resultModel;
 	}
 
 	@Override
@@ -843,8 +841,8 @@ public class GoodsServiceImpl implements GoodsService {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
-		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-		if (!enough) {
+		result = processWarehouse.processWarehouse(orderFlag, list);
+		if (!result.isSuccess()) {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
 		}

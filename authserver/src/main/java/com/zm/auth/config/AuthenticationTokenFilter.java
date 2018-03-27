@@ -73,56 +73,58 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 			logger.info("checking authentication " + claims);
 			UserInfo user = null;
 			if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				user = new UserInfo();
-				Object platUserTypeStr = claims.get(JWTUtil.PLATUSERTYPE);
-				if(platUserTypeStr != null){
-					user.setPlatUserType(Integer.valueOf(platUserTypeStr.toString()));
-				}
-				SecurityUserDetail userDetails = null;
-				if (claims.containsKey(JWTUtil.PLATFORM_ID)) {
-					user.setUserId((String) claims.get(JWTUtil.PLATFORM_ID));
-					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByPlatId(user);
-				} else if (claims.containsKey(JWTUtil.USER_NAME)) {
-					user.setUserName((String) claims.get(JWTUtil.USER_NAME));
-					userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
-				} else if (claims.containsKey(JWTUtil.OPEN_ID)) {
-					user.setUserName((String) claims.get(JWTUtil.OPEN_ID) + "," + WX_OPENID_SECRET);
-					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByUsername(user);
+				try {
 
-					if (userDetails != null) {
+					user = new UserInfo();
+					Object platUserTypeStr = claims.get(JWTUtil.PLATUSERTYPE);
+					if (platUserTypeStr != null) {
+						user.setPlatUserType(Integer.valueOf(platUserTypeStr.toString()));
+					}
+					SecurityUserDetail userDetails = null;
+					if (claims.containsKey(JWTUtil.PLATFORM_ID)) {
+						user.setUserId((String) claims.get(JWTUtil.PLATFORM_ID));
+						userDetails = (SecurityUserDetail) this.userService.loadUserByPlatId(user);
+					} else if (claims.containsKey(JWTUtil.USER_NAME)) {
+						user.setUserName((String) claims.get(JWTUtil.USER_NAME));
+						userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
+					} else if (claims.containsKey(JWTUtil.OPEN_ID)) {
+						user.setUserName((String) claims.get(JWTUtil.OPEN_ID) + "," + WX_OPENID_SECRET);
+						userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
+
+						if (userDetails != null) {
+							UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+									userDetails, null, userDetails.getAuthorities());
+							authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+							logger.info("authenticated openId " + claims.get(JWTUtil.OPEN_ID)
+									+ ", setting security context");
+							SecurityContextHolder.getContext().setAuthentication(authentication);
+						}
+						return;
+
+					} else if (claims.containsKey(JWTUtil.APPKEY)) {
+						user.setUserName((String) claims.get(JWTUtil.APPKEY));
+						userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
+						if (userDetails != null) {
+							UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+									userDetails, null, userDetails.getAuthorities());
+							authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+							logger.info("authenticated appKey " + claims.get(JWTUtil.APPKEY)
+									+ ", setting security context");
+							SecurityContextHolder.getContext().setAuthentication(authentication);
+						}
+						return;
+					}
+
+					if (JWTUtil.validateToken(authToken, userDetails)) {
 						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 								userDetails, null, userDetails.getAuthorities());
 						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-						logger.info(
-								"authenticated openId " + claims.get(JWTUtil.OPEN_ID) + ", setting security context");
+						logger.info("authenticated user " + userDetails.getUsername() + ", setting security context");
 						SecurityContextHolder.getContext().setAuthentication(authentication);
+						return;
 					}
-					return;
-
-				} else if (claims.containsKey(JWTUtil.APPKEY)) {
-					user.setUserName((String) claims.get(JWTUtil.APPKEY));
-					userDetails = (SecurityUserDetail) this.userService
-							.loadUserByUsername(user);
-					if (userDetails != null) {
-						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-								userDetails, null, userDetails.getAuthorities());
-						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-						logger.info(
-								"authenticated appKey " + claims.get(JWTUtil.APPKEY) + ", setting security context");
-						SecurityContextHolder.getContext().setAuthentication(authentication);
-					}
-					return;
-				}
-
-				if (JWTUtil.validateToken(authToken, userDetails)) {
-					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-							userDetails, null, userDetails.getAuthorities());
-					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					logger.info("authenticated user " + userDetails.getUsername() + ", setting security context");
-					SecurityContextHolder.getContext().setAuthentication(authentication);
-					return;
+				} catch (Exception e) {
+					chain.doFilter(request, response);
 				}
 			}
 		}

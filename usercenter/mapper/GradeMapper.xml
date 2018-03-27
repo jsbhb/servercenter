@@ -121,5 +121,10 @@
 		head_img= #{headImg},aboutus= #{aboutUs},name= #{name}
 		where grade_id = #{gradeId}
 	</update>
+	
+	<select id="fuzzyListGrade" parameterType="Object" resultType="com.zm.user.pojo.FuzzySearchGrade">
+		select id,grade_name as name from grade where grade_level = #{level} and 
+		(id like CONCAT('%',#{name},'%') or grade_name like CONCAT('%',#{name},'%'))
+	</select>
 
 </mapper>

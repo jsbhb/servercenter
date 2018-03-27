@@ -7,7 +7,10 @@
  */
 package com.zm.user.bussiness.dao;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
+import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 
@@ -90,5 +93,7 @@ public interface GradeMapper<T> {
 	 * @since JDK 1.7  
 	 */
 	void insertGradeConfig(ShopEntity entity);
+
+	List<FuzzySearchGrade> fuzzyListGrade(FuzzySearchGrade entity);
 
 }
