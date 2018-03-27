@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.component.ActivityComponent;
@@ -52,7 +53,7 @@ import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class GoodsServiceImpl implements GoodsService {
 
 	private static final Integer PICTURE_TYPE = 0;

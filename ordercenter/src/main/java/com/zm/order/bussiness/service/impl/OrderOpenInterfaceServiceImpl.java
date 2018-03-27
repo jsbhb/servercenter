@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.bussiness.component.OpenInterfaceUtil;
@@ -26,7 +27,7 @@ import com.zm.order.pojo.UserInfo;
 import com.zm.order.utils.JSONUtil;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService {
 
 	@Resource

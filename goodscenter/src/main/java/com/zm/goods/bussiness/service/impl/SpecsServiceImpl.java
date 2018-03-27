@@ -13,6 +13,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -50,7 +51,7 @@ public class SpecsServiceImpl implements SpecsService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void save(SpecsTemplateEntity entity) {
 		specsMapper.insertTemplate(entity);
 

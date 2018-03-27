@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -54,7 +55,7 @@ public class MallServiceImpl implements MallService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void saveDict(PopularizeDict entity) {
 		entity.getLayout().setCenterId(entity.getCenterId());
 		mallMapper.insertLayout(entity.getLayout());
@@ -84,7 +85,7 @@ public class MallServiceImpl implements MallService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void initData(PopularizeDict entity) {
 		mallMapper.insertLayout(entity.getLayout());
 		entity.setLayoutId(entity.getLayout().getId());

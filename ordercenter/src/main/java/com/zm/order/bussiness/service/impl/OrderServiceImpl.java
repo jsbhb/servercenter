@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.annotation.Log;
@@ -66,7 +67,7 @@ import com.zm.order.utils.JSONUtil;
  */
 
 @Service("orderService")
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class OrderServiceImpl implements OrderService {
 
 	@Resource

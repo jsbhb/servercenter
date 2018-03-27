@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -21,7 +22,7 @@ import com.zm.finance.pojo.withdrawals.Withdrawals;
 import com.zm.finance.util.CalculationUtils;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class WithdrawalsServiceImpl implements WithdrawalsService {
 
 	@Resource

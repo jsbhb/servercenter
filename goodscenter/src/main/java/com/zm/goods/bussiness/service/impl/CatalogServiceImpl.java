@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.dao.CatalogMapper;
@@ -77,7 +78,7 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void delete(String id, String type) throws Exception {
 		GoodsBaseEntity entity = new GoodsBaseEntity();
 		if (CategoryTypeEnum.FIRST.getType().equals(type)) {

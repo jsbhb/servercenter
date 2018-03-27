@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -24,7 +25,7 @@ import com.zm.supplier.pojo.SupplierEntity;
 import com.zm.supplier.util.ListUtil;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class SupplierServiceImpl implements SupplierService {
 
 	@Resource

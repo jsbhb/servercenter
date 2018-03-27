@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -52,7 +53,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void save(GoodsItemEntity entity) {
 		goodsItemMapper.insert(entity);
 		goodsItemMapper.insertPrice(entity.getGoodsPrice());
@@ -71,7 +72,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void beUse(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.USEFUL.getIndex()+"");
 		goodsItemMapper.updateStatus(entity);
@@ -88,7 +89,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void update(GoodsItemEntity entity) {
 		goodsItemMapper.update(entity);
 		goodsItemMapper.updatePrice(entity.getGoodsPrice());

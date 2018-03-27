@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.user.bussiness.dao.UserMapper;
@@ -38,7 +39,7 @@ import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class UserServiceImpl implements UserService {
 
 	private static final Integer DEFAULT = 1;

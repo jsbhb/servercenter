@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -19,7 +20,7 @@ import com.zm.finance.util.HttpClientUtil;
 import com.zm.finance.util.JSONUtil;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class CardServiceImpl implements CardService{
 
 	@Resource

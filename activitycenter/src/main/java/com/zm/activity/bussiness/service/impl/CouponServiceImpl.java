@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.activity.bussiness.dao.CouponMapper;
@@ -19,7 +20,7 @@ import com.zm.activity.pojo.Coupon;
 import com.zm.activity.pojo.ResultModel;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class CouponServiceImpl implements CouponService {
 
 	@Resource

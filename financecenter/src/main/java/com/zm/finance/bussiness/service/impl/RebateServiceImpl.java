@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -29,7 +30,7 @@ import com.zm.finance.pojo.rebate.ShopRebate;
 import com.zm.finance.util.JSONUtil;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class RebateServiceImpl implements RebateService {
 
 	@Resource

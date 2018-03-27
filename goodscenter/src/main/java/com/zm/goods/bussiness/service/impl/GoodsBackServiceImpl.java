@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -66,7 +67,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void save(GoodsEntity entity, String type) {
 		goodsBackMapper.insert(entity);
 		goodsItemMapper.insert(entity.getGoodsItem());
@@ -92,7 +93,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void edit(GoodsEntity entity) {
 		goodsBackMapper.update(entity);
 		List<GoodsFile> isrFileList = new ArrayList<GoodsFile>();
@@ -111,7 +112,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void remove(GoodsEntity entity) {
 		goodsBackMapper.delete(entity);
 		goodsItemMapper.delete(entity);
