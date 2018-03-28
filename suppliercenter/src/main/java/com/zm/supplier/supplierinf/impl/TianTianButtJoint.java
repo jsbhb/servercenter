@@ -30,20 +30,23 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class TianTianButtJoint extends AbstractSupplierButtJoint {
 
-	// private static final String CUSTOMER = "ZGGXHWG";//正式
-	private static final String CUSTOMER = "aa001";// 测试
+	private static final String CUSTOMER = "ZGGXHWG";// 正式
+	// private static final String CUSTOMER = "aa001";// 测试
 
+	private static String base_url = "http://114.55.149.118:8181/nredi/base/api/service?method={action}";// 正式
 	// private static String base_url =
-	// "http://114.55.149.118:8181/nredi/base/api/service?method={action}";//正式
-	private static String base_url = "http://121.196.224.76:8022/nredi/base/api/service?method={action}";// 测试
+	// "http://121.196.224.76:8022/nredi/base/api/service?method={action}";// 测试
 
 	@Resource
 	RedisTemplate<String, Object> template;
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		String unionPayMerId = template.opsForValue()
-				.get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID).toString();
+		String unionPayMerId = "";
+		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
+		if (obj != null) {
+			unionPayMerId = obj.toString();
+		}
 		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, CUSTOMER, unionPayMerId);// 报文
 		String url = base_url.replace("{action}", "order.create");
 		return (Set<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class);
