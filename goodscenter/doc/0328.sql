@@ -3,6 +3,7 @@ drop table if exists  `goods_tag`;
 create table `zm_goods`.`goods_tag`(
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `tag_name` varchar(100)  NOT NULL COMMENT '标签名称',
+  `priority` int UNSIGNED  NOT NULL default 1 COMMENT '优先级',
   `description` VARCHAR(200) NULL COMMENT '描述',
   `create_time` DATETIME NULL COMMENT '注册时间',
   `update_time` DATETIME NULL COMMENT '更新时间',

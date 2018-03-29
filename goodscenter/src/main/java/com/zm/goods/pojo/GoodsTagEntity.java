@@ -18,17 +18,24 @@ package com.zm.goods.pojo;
  */
 public class GoodsTagEntity {
 
-	private int id;
+	private Integer id;
 	private String tagName;// 标签名称
+	private Integer priority;//优先级
 	private String description;// 标签描述
 	private String createTime;// 注册时间
 	private String updateTime;// 更新时间
 	private String opt;// 操作人
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
+	}
+	public Integer getPriority() {
+		return priority;
+	}
+	public void setPriority(Integer priority) {
+		this.priority = priority;
 	}
 	public String getTagName() {
 		return tagName;
