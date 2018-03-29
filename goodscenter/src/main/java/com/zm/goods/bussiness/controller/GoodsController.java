@@ -53,6 +53,9 @@ public class GoodsController {
 
 	@Resource
 	GoodsService goodsService;
+	
+	@Resource
+	GoodsService goodsTagDecorator;
 
 	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
@@ -62,7 +65,8 @@ public class GoodsController {
 			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
+//			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
+			Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination);
 			return new ResultModel(true, resultMap);
 		}
 
@@ -106,7 +110,8 @@ public class GoodsController {
 			pagination.init();
 			param.put("pagination", pagination);
 
-			result.setObj(goodsService.listGoods(param, centerId, userId, proportion));
+//			result.setObj(goodsService.listGoods(param, centerId, userId, proportion));
+			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion));
 			result.setSuccess(true);
 		}
 

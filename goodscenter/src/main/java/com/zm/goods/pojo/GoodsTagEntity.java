@@ -7,6 +7,8 @@
  */
 package com.zm.goods.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * ClassName: GoodsTagEntity <br/>
  * Function: 商品标签信息. <br/>
@@ -19,12 +21,24 @@ package com.zm.goods.pojo;
 public class GoodsTagEntity {
 
 	private Integer id;
+	@JsonIgnore
+	private String goodsId;
 	private String tagName;// 标签名称
+	@JsonIgnore
 	private Integer priority;//优先级
 	private String description;// 标签描述
+	@JsonIgnore
 	private String createTime;// 注册时间
+	@JsonIgnore
 	private String updateTime;// 更新时间
+	@JsonIgnore
 	private String opt;// 操作人
+	public String getGoodsId() {
+		return goodsId;
+	}
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
+	}
 	public Integer getId() {
 		return id;
 	}

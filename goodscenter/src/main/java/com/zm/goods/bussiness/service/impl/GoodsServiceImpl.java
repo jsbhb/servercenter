@@ -52,7 +52,7 @@ import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
-@Service
+@Service("goodsService")
 @Transactional(isolation=Isolation.READ_COMMITTED)
 public class GoodsServiceImpl implements GoodsService {
 
@@ -135,7 +135,7 @@ public class GoodsServiceImpl implements GoodsService {
 				rebateProportion = Double.valueOf(temp.get("third") == null ? "0" : temp.get("third"));
 			}
 			result.put(Constants.PROPORTION, rebateProportion);
-			result.put("goodsList", goodsList);
+			result.put(GOODS_LIST, goodsList);
 			return result;
 		} else {
 			return goodsList;

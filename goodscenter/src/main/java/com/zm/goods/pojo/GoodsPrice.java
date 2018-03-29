@@ -11,9 +11,13 @@ public class GoodsPrice {
 	private Integer max;
 	private Double price;
 	private Double vipPrice;
+	@JsonIgnore
 	private String deliveryPlace;
+	@JsonIgnore
 	private Double proxyPrice = 0.0;
+	@JsonIgnore
 	private Double fxPrice = 0.0;
+	
 	private Double retailPrice;
 	@JsonIgnore
 	private String createTime;

@@ -25,16 +25,17 @@ public class GoodsItem extends GoodsBase {
 
 	private Integer type;
 
+	@JsonIgnore
 	private Integer popular;
-
+	@JsonIgnore
 	private Integer hot;
-	
+	@JsonIgnore
 	private Integer fresh;
-
+	@JsonIgnore
 	private Integer good;
 	
 	private String origin;
-
+	@JsonIgnore
 	private Integer choice;
 
 	@JsonIgnore
@@ -68,8 +69,17 @@ public class GoodsItem extends GoodsBase {
 	private List<GoodsSpecs> goodsSpecsList;
 	
 	private List<Coupon> couponList;
-
 	
+	private List<GoodsTagEntity> tagList;
+
+	public List<GoodsTagEntity> getTagList() {
+		return tagList;
+	}
+
+	public void setTagList(List<GoodsTagEntity> tagList) {
+		this.tagList = tagList;
+	}
+
 	public List<Coupon> getCouponList() {
 		return couponList;
 	}
