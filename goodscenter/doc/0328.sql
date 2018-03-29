@@ -1,3 +1,5 @@
+alter table goods add column is_free_tax tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包税0：否，1是';
+
 drop table if exists  `goods_tag`;
 
 create table `zm_goods`.`goods_tag`(

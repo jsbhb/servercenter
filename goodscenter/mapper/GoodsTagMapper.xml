@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsTagMapper">
+
+
+	<resultMap type="com.zm.goods.pojo.GoodsTagEntity" id="tag">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<collection property="specs"
+			ofType="com.zm.goods.pojo.SpecsEntity">
+			<id column="specsId" property="id" jdbcType="INTEGER"/>
+			<result column="id" property="templateId" jdbcType="INTEGER"/>
+			<result column="specsName" property="name" jdbcType="VARCHAR"/>
+			<collection property="values"
+				ofType="com.zm.goods.pojo.SpecsValueEntity">
+				<id column="valueId" property="id" jdbcType="INTEGER"/>
+				<result column="specsId" property="specsId" jdbcType="INTEGER"/>
+				<result column="value" property="value" jdbcType="VARCHAR"/>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.SpecsTemplateEntity" id="template">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.SpecsEntity" id="specs">
+		<id column="id" property="id"/>
+		<id column="template_id" property="templateId"/>
+		<result column="name" property="name"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.SpecsValueEntity" id="specsValue">
+		<id column="id" property="id"/>
+		<id column="specs_id" property="spcesId"/>
+		<result column="value" property="value"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+
+	
+	<select id="selectById" parameterType="Object" resultMap="temp">
+		select t.id,t.name,t.status,s.id as specsId,s.name as specsName,v.id as valueId,v.value from specs_template t
+		left join goods_specs s on t.id = s.template_id
+		left join goods_specs_value v on s.id = v.specs_id where t.id = #{id};
+	</select>
+	
+	<select id="selectAll" parameterType="Object" resultMap="template">
+		select * from specs_template
+	</select>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="template">
+		select * from specs_template where 1=1 
+		<if test="name!=null and name!=''">
+			and name like concat('%',#{name},'%') 
+		</if>
+		<if test="id > 0">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	<insert id="insertTemplate" useGeneratedKeys="true" keyProperty="id" parameterType="Object">
+		insert into specs_template value (#{id},#{name},1,now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertSpces" parameterType="Object" >
+		insert into goods_specs  values
+		<foreach collection="list" item="item"  index="index" separator=",">
+			(#{item.id},#{item.templateId},#{item.name},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
+	<insert id="insertSpce" useGeneratedKeys="true" keyProperty="id" parameterType="Object" >
+		insert into goods_specs  values (#{id},#{templateId},#{name},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertSpcesValue" parameterType="Object">
+		insert into goods_specs_value values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.id},#{item.specsId},#{item.value},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
+</mapper>
