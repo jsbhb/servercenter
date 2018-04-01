@@ -28,7 +28,7 @@ create table `zm_goods`.`goods_tag_bind`(
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `idx_tagId` (`tag_id`),
-  INDEX `idx_goodsId` (`goods_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
+  INDEX `idx_goodsId` (`item_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品标签绑定表';
 
 drop table if exists  `tag_fun`;
