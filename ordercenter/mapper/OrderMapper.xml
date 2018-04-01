@@ -7,6 +7,7 @@
 		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
 		<result column="push_user_id" property="pushUserId" jdbcType="INTEGER" />
+		<result column="tag_fun" property="tagFun" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
@@ -251,10 +252,10 @@
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
 		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,guide_id,supplier_id,tdq,
-		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status)
+		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status,tag_fun)
 		VALUES
 		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
-		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource},#{status})
+		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource},#{status},#{tagFun})
 	</insert>
 	
 	<insert id="saveOrderDetail" parameterType="Object">

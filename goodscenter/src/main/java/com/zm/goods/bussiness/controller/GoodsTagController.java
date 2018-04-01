@@ -16,8 +16,8 @@ import com.zm.goods.pojo.ResultModel;
 @RestController
 public class GoodsTagController {
 	
-	@Resource
-	GoodsTagService GoodsTagService;
+//	@Resource
+//	GoodsTagService GoodsTagService;
 
 	@RequestMapping(value = "{version}/goods/tag", method = RequestMethod.DELETE)
 	public ResultModel deleteTag(@PathVariable("version") Double version, @RequestParam("tagId") Integer tagId,

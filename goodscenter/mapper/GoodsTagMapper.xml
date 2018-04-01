@@ -25,7 +25,7 @@
 	</resultMap>
 	
 	<select id="listGoodsTagByGoodsId" parameterType="Object" resultMap="tag">
-		select gt.*,gtb.item_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.goods_id in
+		select gt.*,gtb.item_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.item_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
