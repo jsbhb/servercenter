@@ -6,7 +6,8 @@
 	<resultMap type="com.zm.goods.pojo.GoodsTagEntity" id="tag">
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="tag_name" property="tagName" jdbcType="VARCHAR"/>
-		<result column="goods_id" property="goodsId" jdbcType="VARCHAR"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="tag_fun_id" property="tagFunId" jdbcType="INTEGER"/>
 		<result column="priority" property="priority" jdbcType="INTEGER"/>
 		<result column="description" property="description" jdbcType="VARCHAR"/>
 		<result column="createTime" property="createTime" jdbcType="VARCHAR"/>
@@ -17,14 +18,14 @@
 	<resultMap type="com.zm.goods.pojo.GoodsTagBindEntity" id="tagBind">
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="tag_id" property="tagId" jdbcType="INTEGER"/>
-		<result column="goods_id" property="goodsId" jdbcType="VARCHAR"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
 		<result column="createTime" property="createTime" jdbcType="VARCHAR"/>
 		<result column="updateTime" property="updateTime" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
 	
 	<select id="listGoodsTagByGoodsId" parameterType="Object" resultMap="tag">
-		select gt.*,gtb.goods_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.goods_id in
+		select gt.*,gtb.item_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.goods_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>

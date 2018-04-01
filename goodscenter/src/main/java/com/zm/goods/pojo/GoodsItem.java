@@ -70,16 +70,6 @@ public class GoodsItem extends GoodsBase {
 	
 	private List<Coupon> couponList;
 	
-	private List<GoodsTagEntity> tagList;
-
-	public List<GoodsTagEntity> getTagList() {
-		return tagList;
-	}
-
-	public void setTagList(List<GoodsTagEntity> tagList) {
-		this.tagList = tagList;
-	}
-
 	public List<Coupon> getCouponList() {
 		return couponList;
 	}

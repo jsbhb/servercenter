@@ -22,8 +22,9 @@ public class GoodsTagEntity {
 
 	private Integer id;
 	@JsonIgnore
-	private String goodsId;
+	private String itemId;
 	private String tagName;// 标签名称
+	private Integer tagFunId;//标签功能ID
 	@JsonIgnore
 	private Integer priority;//优先级
 	private String description;// 标签描述
@@ -33,11 +34,17 @@ public class GoodsTagEntity {
 	private String updateTime;// 更新时间
 	@JsonIgnore
 	private String opt;// 操作人
-	public String getGoodsId() {
-		return goodsId;
+	public Integer getTagFunId() {
+		return tagFunId;
 	}
-	public void setGoodsId(String goodsId) {
-		this.goodsId = goodsId;
+	public String getItemId() {
+		return itemId;
+	}
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+	public void setTagFunId(Integer tagFunId) {
+		this.tagFunId = tagFunId;
 	}
 	public Integer getId() {
 		return id;

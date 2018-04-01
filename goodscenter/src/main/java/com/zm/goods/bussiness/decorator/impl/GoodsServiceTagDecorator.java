@@ -13,6 +13,7 @@ import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.decorator.GoodsServiceDecoratorAbstract;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
@@ -59,27 +60,35 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 	 * @param goodsList
 	 */
 	private void addItemGoodsTag(List<GoodsItem> goodsList) {
-		List<String> goodsIdList = new ArrayList<String>();
+		List<String> itemIdList = new ArrayList<String>();
 		if (goodsList != null && goodsList.size() > 0) {
 			for (GoodsItem item : goodsList) {
-				goodsIdList.add(item.getGoodsId());
+				if (item.getGoodsSpecsList() != null) {
+					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
+						itemIdList.add(specs.getItemId());
+					}
+				}
 			}
-			List<GoodsTagEntity> list = goodsTagMapper.listGoodsTagByGoodsId(goodsIdList);
+			List<GoodsTagEntity> list = goodsTagMapper.listGoodsTagByGoodsId(itemIdList);
 			List<GoodsTagEntity> temp = null;
 			Map<String, List<GoodsTagEntity>> map = new HashMap<String, List<GoodsTagEntity>>();
 			if (list != null && list.size() > 0) {
 				for (GoodsTagEntity tag : list) {
-					if (map.get(tag.getGoodsId()) == null) {
+					if (map.get(tag.getItemId()) == null) {
 						temp = new ArrayList<GoodsTagEntity>();
 						temp.add(tag);
-						map.put(tag.getGoodsId(), temp);
+						map.put(tag.getItemId(), temp);
 					} else {
-						map.get(tag.getGoodsId()).add(tag);
+						map.get(tag.getItemId()).add(tag);
 					}
 				}
 			}
 			for (GoodsItem item : goodsList) {
-				item.setTagList(map.get(item.getGoodsId()));
+				if (item.getGoodsSpecsList() != null) {
+					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
+						specs.setTagList(map.get(item.getGoodsId()));
+					}
+				}
 			}
 		}
 	}

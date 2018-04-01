@@ -79,6 +79,16 @@ public class GoodsSpecs implements Serializable {
 	private Double incrementTax;
 
 	private List<GoodsPrice> priceList;
+	
+	private List<GoodsTagEntity> tagList;
+
+	public List<GoodsTagEntity> getTagList() {
+		return tagList;
+	}
+
+	public void setTagList(List<GoodsTagEntity> tagList) {
+		this.tagList = tagList;
+	}
 
 	public void infoFilter() {
 		if (info != null && !"".equals(info.trim())) {
