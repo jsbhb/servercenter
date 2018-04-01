@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsFile;
@@ -252,5 +253,7 @@ public interface GoodsService {
 	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
 
 	ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
+
+	Map<String, String> listSkuByItemId(Set<String> set);
 
 }

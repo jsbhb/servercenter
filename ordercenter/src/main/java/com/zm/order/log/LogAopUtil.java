@@ -27,8 +27,8 @@ import com.zm.order.log.model.OpenInfLog;
 import com.zm.order.log.model.ServerLogEnum;
 import com.zm.order.utils.JSONUtil;
 
-//@Component
-//@Aspect
+@Component
+@Aspect
 public class LogAopUtil {
 
 	@Resource

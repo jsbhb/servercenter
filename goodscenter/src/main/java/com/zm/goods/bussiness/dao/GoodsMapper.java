@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -152,5 +153,7 @@ public interface GoodsMapper {
 	void updateGoodsItemUnDistribution(List<String> list);
 	
 	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
+
+	List<GoodsSpecs> listSkuByItemId(List<String> list);
 	
 }

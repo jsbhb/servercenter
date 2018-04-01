@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.decorator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.pojo.Activity;
@@ -172,6 +173,11 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 
 	@Override
 	public ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
+		return null;
+	}
+	
+	@Override
+	public Map<String, String> listSkuByItemId(Set<String> set){
 		return null;
 	}
 

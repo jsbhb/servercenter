@@ -1064,5 +1064,13 @@
 			#{item}
 		</foreach>
 	</update>
+	
+	<select id="listSkuByItemId" parameterType="Object" resultMap="goodsSpecs">
+		select item_id, sku from goods_item where item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</select>
 
 </mapper>

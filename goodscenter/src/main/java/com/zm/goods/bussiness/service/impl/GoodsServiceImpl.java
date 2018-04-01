@@ -850,4 +850,17 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
+	@Override
+	public Map<String, String> listSkuByItemId(Set<String> set) {
+		List<String> temp = new ArrayList<String>(set);
+		List<GoodsSpecs> list = goodsMapper.listSkuByItemId(temp);
+		Map<String,String> result = new HashMap<String,String>();
+		if(list != null && list.size() > 0){
+			for(GoodsSpecs specs : list){
+				result.put(specs.getItemId(), specs.getSku());
+			}
+		}
+		return result;
+	}
+
 }

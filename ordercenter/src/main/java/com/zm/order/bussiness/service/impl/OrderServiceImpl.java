@@ -3,22 +3,20 @@ package com.zm.order.bussiness.service.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zm.order.annotation.Log;
 import com.zm.order.bussiness.component.CapitalPoolThreadPool;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
@@ -35,7 +33,6 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.feignclient.model.SendOrderResult;
-import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
@@ -67,7 +64,7 @@ import com.zm.order.utils.JSONUtil;
  */
 
 @Service("orderService")
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class OrderServiceImpl implements OrderService {
 
 	@Resource
@@ -99,7 +96,6 @@ public class OrderServiceImpl implements OrderService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Log(content = "新增订单", source = Log.FRONT_PLAT, type = Log.ADD)
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
 		ResultModel result = new ResultModel();
@@ -636,7 +632,30 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<OrderInfo> listOrderForSendToWarehouse() {
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
-		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+		List<OrderInfo> infoList = orderMapper.listOrderForSendToTTWarehouse();
+		Set<String> set = new HashSet<String>();
+		if (infoList != null && infoList.size() > 0) {
+			for (OrderInfo info : infoList) {
+				for (OrderGoods goods : info.getOrderGoodsList()) {
+					if (goods.getSku() == null || "".equals(goods.getSku())) {
+						set.add(goods.getItemId());
+					}
+				}
+			}
+			if (set.size() > 0) {
+				Map<String, String> result = goodsFeignClient.listSkuByItemId(Constants.FIRST_VERSION, set);
+				if(result != null){
+					for (OrderInfo info : infoList) {
+						for (OrderGoods goods : info.getOrderGoodsList()) {
+							if (goods.getSku() == null || "".equals(goods.getSku())) {
+								goods.setSku(result.get(goods.getItemId()));
+							}
+						}
+					}
+				}
+			}
+		}
+		list.addAll(infoList);
 		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		return list;
 	}

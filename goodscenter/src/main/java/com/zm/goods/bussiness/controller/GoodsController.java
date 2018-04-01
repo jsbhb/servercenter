@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -628,6 +629,18 @@ public class GoodsController {
 		}
 
 		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
+	public Map<String, String> listSkuByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set){
+		if (Constants.FIRST_VERSION.equals(version)) {
+			if (set == null || set.size() == 0) {
+				return null;
+			}
+			return goodsService.listSkuByItemId(set);
+		}
+		
+		return null;
 	}
 
 }

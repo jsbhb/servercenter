@@ -1,6 +1,8 @@
 package com.zm.order.feignclient;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,4 +44,7 @@ public interface GoodsFeignClient {
 	public ResultModel delButtjoinOrderStock(@PathVariable("version") Double version,
 			@RequestBody List<OrderBussinessModel> list, @RequestParam("supplierId") Integer supplierId,
 			@RequestParam("orderFlag") Integer orderFlag);
+
+	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
+	public Map<String, String> listSkuByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set);
 }
