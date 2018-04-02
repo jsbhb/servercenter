@@ -44,3 +44,4 @@ create table `zm_goods`.`tag_fun`(
 COMMENT = '标签功能表';
 
 insert into tag_fun(fun_name,create_time) values ('卡单功能',now());
+insert into goods_tag(tag_fun_id,tag_name,priority,description) values ('1','预售','1','预售商品发货需要等待');
