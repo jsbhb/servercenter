@@ -86,11 +86,40 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 			for (GoodsItem item : goodsList) {
 				if (item.getGoodsSpecsList() != null) {
 					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
-						specs.setTagList(map.get(item.getGoodsId()));
+						specs.setTagList(map.get(specs.getItemId()));
 					}
 				}
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source) {
+		Map<String, Object> result = goodsServiceImpl.listGoodsSpecs(list, centerId, source);
+		List<GoodsSpecs> specsList = (List<GoodsSpecs>) result.get("specsList");
+		List<String> itemIdList = new ArrayList<String>();
+		for (GoodsSpecs specs : specsList) {
+			itemIdList.add(specs.getItemId());
+		}
+		List<GoodsTagEntity> tagList = goodsTagMapper.listGoodsTagByGoodsId(itemIdList);
+		List<GoodsTagEntity> temp = null;
+		Map<String, List<GoodsTagEntity>> map = new HashMap<String, List<GoodsTagEntity>>();
+		if (tagList != null && tagList.size() > 0) {
+			for (GoodsTagEntity tag : tagList) {
+				if (map.get(tag.getItemId()) == null) {
+					temp = new ArrayList<GoodsTagEntity>();
+					temp.add(tag);
+					map.put(tag.getItemId(), temp);
+				} else {
+					map.get(tag.getItemId()).add(tag);
+				}
+			}
+			for (GoodsSpecs specs : specsList) {
+				specs.setTagList(map.get(specs.getItemId()));
+			}
+		}
+		return result;
 	}
 
 }

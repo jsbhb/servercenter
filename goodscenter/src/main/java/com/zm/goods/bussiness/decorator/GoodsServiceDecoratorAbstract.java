@@ -36,9 +36,7 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	public abstract Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination);
 
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source){
-		return null;
-	}
+	public abstract Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
 	
 	@Override
 	public List<PriceContrast> listPriceContrast(Map<String, Object> param) {
