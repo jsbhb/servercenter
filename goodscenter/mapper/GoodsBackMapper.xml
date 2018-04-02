@@ -144,6 +144,14 @@
 			</collection>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.TagFuncEntity" id="tagFunc">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="fun_name" property="funcName" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -322,5 +330,9 @@
 	
 	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
 		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} 
+	</select>
+	
+	<select id="selectTagFuncListInfo" parameterType="Object" resultMap="tagFunc">
+		select * from tag_fun
 	</select>
 </mapper>

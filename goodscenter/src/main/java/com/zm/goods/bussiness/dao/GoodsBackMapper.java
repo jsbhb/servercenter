@@ -16,6 +16,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -249,4 +250,14 @@ public interface GoodsBackMapper {
 	 * @since JDK 1.7
 	 */
 	GoodsEntity selectGoodsWithItem(int id);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<TagFuncEntity> selectTagFuncListInfo();
 }

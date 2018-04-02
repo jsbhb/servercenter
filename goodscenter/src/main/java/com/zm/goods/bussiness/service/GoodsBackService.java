@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -181,5 +182,15 @@ public interface GoodsBackService {
 	 * @since JDK 1.7
 	 */
 	List<ERPGoodsTagEntity> queryTagListInfo();
+
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<TagFuncEntity> queryTagFuncList();
 
 }

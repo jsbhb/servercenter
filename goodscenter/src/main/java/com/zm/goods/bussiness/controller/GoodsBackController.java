@@ -19,6 +19,7 @@ import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -296,6 +297,21 @@ public class GoodsBackController {
 			try{
 				goodsBackService.deleteGoodsTag(entity);
 				return new ResultModel(true, "");
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/goodsTag/tagFunc", method = RequestMethod.POST)
+	public ResultModel tagFunc(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {			
+			try{
+				List<TagFuncEntity> result = goodsBackService.queryTagFuncList();
+				return new ResultModel(true, result);
 			}catch(Exception e){
 				return new ResultModel(false, e.getMessage());			
 			}

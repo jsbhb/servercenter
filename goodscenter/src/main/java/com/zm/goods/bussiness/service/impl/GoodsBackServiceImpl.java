@@ -31,6 +31,7 @@ import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -223,5 +224,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public List<ERPGoodsTagEntity> queryTagListInfo() {
 		return goodsBackMapper.selectTagListInfo();
+	}
+
+	@Override
+	public List<TagFuncEntity> queryTagFuncList() {
+		return goodsBackMapper.selectTagFuncListInfo();
 	}
 }
