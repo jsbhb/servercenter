@@ -100,7 +100,7 @@
 		from 
 		(select ob.id,ob.order_id,ob.status,ob.tag_fun,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
 		from order_base ob where
-		1 = 1 and tag_fun = #{tagFun} and status in (1,2)
+		1 = 1 and tag_fun = #{tagFun} and status in (1,2,12)
 		<if test="status != null">
 			and ob.status = #{status,jdbcType = INTEGER}
 		</if>
