@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zm.order.pojo.GoodsTagEntity;
 
 /**
  * ClassName: GoodsSpecs <br/>
@@ -72,6 +73,16 @@ public class GoodsSpecs implements Serializable {
 	private Double exciseTax;
 
 	private List<GoodsPrice> priceList;
+	
+	private List<GoodsTagEntity> tagList;
+
+	public List<GoodsTagEntity> getTagList() {
+		return tagList;
+	}
+
+	public void setTagList(List<GoodsTagEntity> tagList) {
+		this.tagList = tagList;
+	}
 
 	public String getThirdCategory() {
 		return thirdCategory;

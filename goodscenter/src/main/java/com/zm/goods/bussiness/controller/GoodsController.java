@@ -190,7 +190,8 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
+//			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
+			Map<String, Object> resultMap = goodsTagDecorator.listGoodsSpecs(list, centerId, source);
 
 			result.setSuccess(true);
 			result.setObj(resultMap);
