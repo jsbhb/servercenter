@@ -595,7 +595,7 @@
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
 		left join
-		order_goods og on o.order_id = og.order_id where o.status=12 and supplier_id != 1
+		order_goods og on o.order_id = og.order_id where o.status=12 and supplier_id != 1 and tag_fun = 0
 	</select>
 	<!-- end -->
 	
