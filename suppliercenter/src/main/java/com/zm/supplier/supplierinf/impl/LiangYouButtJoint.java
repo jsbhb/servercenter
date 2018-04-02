@@ -76,7 +76,17 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		String url = NEED_ACCESS_TOKEN_URL.replace("{action}", "checkStock").replace("{token}", token);
 		String msg = ButtJointMessageUtils.getLiangYouStock(list);
 		url += "&sku=" + msg;
-		return sendLiangYouWarehouse(url, CheckStockModel.class);
+		Set<CheckStockModel> set = sendLiangYouWarehouse(url, CheckStockModel.class);
+		if(set == null || set.size() == 0){
+			Set<CheckStockModel> result = new HashSet<CheckStockModel>();
+			CheckStockModel model = new CheckStockModel();
+			model.setSku(list.get(0).getSku());
+			model.setQuantity("0");
+			result.add(model);
+			return result;
+		}
+		
+		return set;
 	}
 
 	private AccessToken getAccessToken(String url) {
@@ -191,12 +201,12 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		// System.out.println(j.sendOrder(info, user));
 		// System.out.println(j.getAccessToken("http://www.cnbuyers.cn/index.php?app=webService"));
 		 OrderBussinessModel model = new OrderBussinessModel();
-		 model.setSku("310516625460002238");
+		 model.setSku("310517625460000133");
 		 OrderBussinessModel model1 = new OrderBussinessModel();
-		 model1.setSku("310517625460000056");
+		 model1.setSku("310517625460001222");
 		 List<OrderBussinessModel> list = new
 		 ArrayList<OrderBussinessModel>();
-		 list.add(model1);
+//		 list.add(model1);
 		 list.add(model);
 		 System.out.println(j.checkStock(list));
 //		List<String> orderIds = new ArrayList<String>();

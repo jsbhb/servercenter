@@ -64,6 +64,7 @@ public class SupplierServiceImpl implements SupplierService {
 
 	private static final Integer XINYUN_WAREHOUSE = 3;
 	private static final Integer FUBANG_WAREHOUSE = 4;
+	private static final Integer LIANGYOU_WAREHOUSE = 2;
 
 	@Override
 	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
@@ -93,7 +94,7 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Override
 	public ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId, boolean flag) {
-		if (FUBANG_WAREHOUSE.equals(supplierId)) {
+		if (FUBANG_WAREHOUSE.equals(supplierId) || LIANGYOU_WAREHOUSE.equals(supplierId)) {
 			List<OrderBussinessModel> temp = null;
 			for (OrderBussinessModel model : list) {
 				temp = new ArrayList<OrderBussinessModel>();
