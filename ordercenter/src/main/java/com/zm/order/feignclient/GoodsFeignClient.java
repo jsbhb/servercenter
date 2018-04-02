@@ -47,4 +47,7 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
 	public Map<String, String> listSkuByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set);
+	
+	@RequestMapping(value = "{version}/goods/tag/presell", method = RequestMethod.POST)
+	public List<String> listPreSellItemIds(@PathVariable("version") Double version);
 }
