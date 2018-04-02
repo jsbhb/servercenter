@@ -63,6 +63,9 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	public void save(GoodsItemEntity entity) {
 		goodsItemMapper.insert(entity);
 		goodsItemMapper.insertPrice(entity.getGoodsPrice());
+		if (entity.getTagBindEntity() != null) {
+			goodsBackMapper.insertTagBind(entity.getTagBindEntity());
+		}
 	}
 
 	@Override

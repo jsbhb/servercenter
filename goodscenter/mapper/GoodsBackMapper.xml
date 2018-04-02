@@ -109,10 +109,39 @@
 	<resultMap type="com.zm.goods.pojo.ERPGoodsTagBindEntity" id="goodsTagBind">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="tag_id" property="tagId" jdbcType="INTEGER" />
-		<result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	
+	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsWithItem">
+			<id column="id" property="id"/>
+			<result column="goods_id" property="goodsId"/>
+			<result column="specs_template_id" property="templateId"/>
+			<result column="base_id" property="baseId"/>
+			<result column="origin" property="origin"/>
+			<result column="supplier_id" property="supplierId"/>
+			<result column="supplier_name" property="supplierName"/>
+			<result column="goods_name" property="goodsName"/>
+			<result column="description" property="description"/>
+			<result column="detail_path" property="detailPath"/>
+			<result column="index_status" property="indexStatus"/>
+			<collection property="goodsItem"
+				ofType="com.zm.goods.pojo.GoodsItemEntity">
+				<result column="goods_id" property="goodsId"/>
+				<result column="item_id" property="itemId" />
+				<result column="item_code" property="itemCode"/>
+				<result column="sku" property="sku"/>
+				<result column="weight" property="weight"/>
+				<result column="proxy_price" property="proxyPrice"/>
+				<result column="fxprice" property="fxPrice"/>
+				<result column="excise_fax" property="exciseTax"/>
+				<result column="status" property="status"/>
+				<result column="discount" property="discount"/>
+				<result column="info" property="info"/>
+			</collection>
 	</resultMap>
 	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
@@ -288,6 +317,10 @@
 	</delete>
 	
 	<select id="selectGoodsTagBindByGoodsId" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where item_id = #{goodsItem.itemId}
+		select * from goods_tag_bind where item_id = #{itemId}
+	</select>
+	
+	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
+		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} 
 	</select>
 </mapper>
