@@ -510,6 +510,7 @@ public class GoodsServiceImpl implements GoodsService {
 			Map<String, Double> result = null;
 			for (GoodsItem model : goodsList) {
 				temList = temp.get(model.getGoodsId());
+				model.setGoodsSpecsList(temList);
 				result = GoodsServiceUtil.getMinPrice(temList);
 				for (GoodsSpecs specs : temList) {
 					if (model.getSpecsInfo() == null) {
