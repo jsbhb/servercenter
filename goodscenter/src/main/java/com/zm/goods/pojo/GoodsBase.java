@@ -1,31 +1,29 @@
 package com.zm.goods.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class GoodsBase {
 
 	private Integer id;
-	
+
 	private String brandId;
-	@JsonIgnore
+
 	private String goodsName;
-	
+
 	private String brand;
-	
+
 	private Double tariff;
-	
+
 	private Double incrementTax;
-	@JsonIgnore
+
 	private String hscode;
-	@JsonIgnore
+
 	private String encode;
-	
+
 	private String unit;
-	@JsonIgnore
+
 	private String createTime;
-	@JsonIgnore
+
 	private String updateTime;
-	@JsonIgnore
+
 	private String opt;
 
 	public Double getTariff() {

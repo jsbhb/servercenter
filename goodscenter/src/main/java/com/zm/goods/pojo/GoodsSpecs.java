@@ -3,7 +3,6 @@ package com.zm.goods.pojo;
 import java.io.Serializable;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.zm.goods.utils.JSONUtil;
 
@@ -20,7 +19,6 @@ public class GoodsSpecs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@JsonIgnore
 	private Integer id;
 
 	private String goodsId;
@@ -41,13 +39,10 @@ public class GoodsSpecs implements Serializable {
 
 	private Double exciseTax;
 
-	@JsonIgnore
 	private String createTime;
 
-	@JsonIgnore
 	private String updateTime;
 
-	@JsonIgnore
 	private String opt;
 
 	private String thirdCategory;
@@ -79,7 +74,7 @@ public class GoodsSpecs implements Serializable {
 	private Double incrementTax;
 
 	private List<GoodsPrice> priceList;
-	
+
 	private List<GoodsTagEntity> tagList;
 
 	public List<GoodsTagEntity> getTagList() {

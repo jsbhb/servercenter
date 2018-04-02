@@ -1,29 +1,26 @@
 package com.zm.goods.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class GoodsPrice {
 
-	@JsonIgnore
 	private Integer id;
 	private String itemId;
 	private Integer min;
 	private Integer max;
 	private Double price;
 	private Double vipPrice;
-	@JsonIgnore
+
 	private String deliveryPlace;
-	@JsonIgnore
+
 	private Double proxyPrice = 0.0;
-	@JsonIgnore
+
 	private Double fxPrice = 0.0;
-	
+
 	private Double retailPrice;
-	@JsonIgnore
+
 	private String createTime;
-	@JsonIgnore
+
 	private String updateTime;
-	@JsonIgnore
+
 	private String opt;
 
 	public String getDeliveryPlace() {
