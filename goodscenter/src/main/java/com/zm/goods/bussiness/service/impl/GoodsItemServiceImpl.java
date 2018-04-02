@@ -18,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -36,7 +38,9 @@ import com.zm.goods.pojo.GoodsStatusEnum;
  */
 @Service
 public class GoodsItemServiceImpl implements GoodsItemService {
-
+	@Resource
+	GoodsBackMapper goodsBackMapper;
+	
 	@Resource
 	GoodsItemMapper goodsItemMapper;
 
@@ -49,6 +53,10 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Override
 	public GoodsItemEntity queryById(int id) {
 		GoodsItemEntity entity = goodsItemMapper.selectById(id);
+		GoodsEntity goodsEntity = new GoodsEntity();
+		goodsEntity.setGoodsItem(entity);
+		ERPGoodsTagBindEntity tagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(goodsEntity);
+		entity.setTagBindEntity(tagBind);
 		return entity;
 	}
 
@@ -93,6 +101,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	public void update(GoodsItemEntity entity) {
 		goodsItemMapper.update(entity);
 		goodsItemMapper.updatePrice(entity.getGoodsPrice());
+		goodsBackMapper.updateTagBind(entity.getTagBindEntity());
 	}
 
 	@Override

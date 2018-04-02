@@ -96,6 +96,25 @@
 		<result column="opt" property="opt"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.ERPGoodsTagEntity" id="goodsTag">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="priority" property="priority" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ERPGoodsTagBindEntity" id="goodsTagBind">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="tag_id" property="tagId" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -222,4 +241,53 @@
 	<update id="updateGoodsRebate" parameterType="Object">
 		update goods_rebate set first = #{first} , second = #{second} , third = #{third} , update_time = now() where goods_id = #{goodsId} 
 	</update>
+	
+	<select id="selectTagForPage" parameterType="Object" resultMap="goodsTag">
+		select * from goods_tag
+	</select>
+	
+	<insert id="insertGoodsTag" parameterType="Object">
+		insert into goods_tag (tag_name,priority,description,create_time,update_time,opt) value
+		(#{tagName},#{priority},#{description},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateGoodsTag" parameterType="Object">
+		update goods_tag set tag_name = #{tagName} , priority = #{priority} , description = #{description} , update_time = now() where id = #{id} 
+	</update>
+	
+	<delete id="deleteGoodsTag" parameterType="Object">
+		delete from goods_tag where id = #{id}
+	</delete>
+	
+	<select id="selectTagInfo" parameterType="Object" resultMap="goodsTag">
+		select * from goods_tag
+		where 1=1
+		<if test="tagName!=null and tagName!=''">
+			and tag_name like concat('%',#{tagName},'%') 
+		</if>
+		<if test="id != null and id != '0'">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	<select id="selectTagListInfo" parameterType="Object" resultMap="goodsTag">
+		select * from goods_tag
+	</select>
+	
+	<insert id="insertTagBind" parameterType="Object">
+		insert into goods_tag_bind (item_id,tag_id,create_time,update_time,opt) value
+		(#{itemId},#{tagId},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateTagBind" parameterType="Object">
+		update goods_tag_bind set tag_id = #{tagId}, update_time = now() where item_id = #{itemId}
+	</update>
+	
+	<delete id="deleteTagBind" parameterType="Object">
+		delete from goods_tag_bind where item_id = #{itemId}
+	</delete>
+	
+	<select id="selectGoodsTagBindByGoodsId" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where item_id = #{goodsItem.itemId}
+	</select>
 </mapper>

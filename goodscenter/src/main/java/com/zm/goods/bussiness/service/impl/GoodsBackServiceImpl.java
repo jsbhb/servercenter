@@ -26,6 +26,8 @@ import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
+import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsRebateEntity;
@@ -62,7 +64,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public GoodsEntity queryById(int id) {
 		GoodsEntity entity = goodsBackMapper.selectById(id);
 		List<GoodsFile> fileList = goodsBackMapper.selectGoodsFileByGoodsId(entity);
+		ERPGoodsTagBindEntity tagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(entity);
 		entity.setFiles(fileList);
+		entity.setGoodsTagBind(tagBind);
 		return entity;
 	}
 
@@ -78,6 +82,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 		if ("sync".equals(type)) {
 			goodsBackMapper.updateThirdStatus(entity.getThirdId());
+		}
+		if (entity.getGoodsTagBind() != null) {
+			goodsBackMapper.insertTagBind(entity.getGoodsTagBind());
 		}
 	}
 
@@ -108,6 +115,19 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		}
 		if (isrFileList != null && isrFileList.size() > 0) {
 			goodsItemMapper.insertFiles(isrFileList);
+		}
+		//判断商品标签
+		if (entity.getGoodsTagBind() != null) {
+			//增删改
+			ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity);
+			ERPGoodsTagBindEntity newTag = entity.getGoodsTagBind();
+			if (oldTag == null && newTag.getTagId() != 0) {
+				goodsBackMapper.insertTagBind(newTag);
+			} else if (oldTag != null && newTag.getTagId() == 0) {
+				goodsBackMapper.deleteTagBind(newTag);
+			} else if (oldTag != null && newTag.getTagId() != 0) {
+				goodsBackMapper.updateTagBind(newTag);
+			}
 		}
 	}
 
@@ -171,5 +191,36 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public void updateGoodsRebate(GoodsRebateEntity entity) {
 		goodsBackMapper.updateGoodsRebate(entity);
 		setRedis(entity);
+	}
+
+	@Override
+	public Page<ERPGoodsTagEntity> queryTagForPage(ERPGoodsTagEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return goodsBackMapper.selectTagForPage(entity);
+	}
+
+	@Override
+	public void insertGoodsTag(ERPGoodsTagEntity entity) {
+		goodsBackMapper.insertGoodsTag(entity);
+	}
+	
+	@Override
+	public void updateGoodsTag(ERPGoodsTagEntity entity) {
+		goodsBackMapper.updateGoodsTag(entity);
+	}
+	
+	@Override
+	public void deleteGoodsTag(ERPGoodsTagEntity entity) {
+		goodsBackMapper.deleteGoodsTag(entity);
+	}
+
+	@Override
+	public ERPGoodsTagEntity queryTagInfo(ERPGoodsTagEntity entity) {
+		return goodsBackMapper.selectTagInfo(entity);
+	}
+
+	@Override
+	public List<ERPGoodsTagEntity> queryTagListInfo() {
+		return goodsBackMapper.selectTagListInfo();
 	}
 }

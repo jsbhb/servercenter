@@ -7,7 +7,10 @@
  */
 package com.zm.goods.bussiness.service;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -142,5 +145,41 @@ public interface GoodsBackService {
 	void insertGoodsRebate(GoodsRebateEntity entity);
 	
 	void updateGoodsRebate(GoodsRebateEntity entity);
+
+	/**
+	 * queryByPage:分页查询商品标签信息. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<ERPGoodsTagEntity> queryTagForPage(ERPGoodsTagEntity entity);
+	
+	void insertGoodsTag(ERPGoodsTagEntity entity);
+	
+	void updateGoodsTag(ERPGoodsTagEntity entity);
+	
+	void deleteGoodsTag(ERPGoodsTagEntity entity);
+
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	ERPGoodsTagEntity queryTagInfo(ERPGoodsTagEntity entity);
+
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<ERPGoodsTagEntity> queryTagListInfo();
 
 }

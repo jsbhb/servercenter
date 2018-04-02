@@ -47,6 +47,7 @@ public class GoodsEntity extends Pagination {
 	private int thirdId;
 	private GoodsPrice goodsPrice;
 	private List<GoodsFile> files;
+	private ERPGoodsTagBindEntity goodsTagBind;
 
 	public int getId() {
 		return id;
@@ -254,6 +255,14 @@ public class GoodsEntity extends Pagination {
 
 	public void setFiles(List<GoodsFile> files) {
 		this.files = files;
+	}
+
+	public ERPGoodsTagBindEntity getGoodsTagBind() {
+		return goodsTagBind;
+	}
+
+	public void setGoodsTagBind(ERPGoodsTagBindEntity goodsTagBind) {
+		this.goodsTagBind = goodsTagBind;
 	}
 
 }
