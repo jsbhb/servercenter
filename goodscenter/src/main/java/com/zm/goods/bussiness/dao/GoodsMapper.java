@@ -2,13 +2,13 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.ActivityData;
 import com.zm.goods.pojo.DictData;
+import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
@@ -154,6 +154,6 @@ public interface GoodsMapper {
 	
 	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
 
-	List<GoodsSpecs> listSkuByItemId(List<String> list);
+	List<GoodsConvert> listSkuAndConversionByItemId(List<String> list);
 	
 }

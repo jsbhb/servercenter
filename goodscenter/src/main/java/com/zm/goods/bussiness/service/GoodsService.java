@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.zm.goods.pojo.Activity;
+import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
@@ -254,6 +256,6 @@ public interface GoodsService {
 
 	ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
 
-	Map<String, String> listSkuByItemId(Set<String> set);
+	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
 
 }

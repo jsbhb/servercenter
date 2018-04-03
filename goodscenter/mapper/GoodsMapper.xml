@@ -55,6 +55,7 @@
 		<result column="increment_tax" property="incrementTax"
 			jdbcType="NUMERIC" />
 		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="conversion" property="conversion" jdbcType="INTEGER" />
 		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
 		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
 		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
@@ -295,7 +296,7 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select
-		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,
+		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gi.conversion,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
 		gs.status as specsStatus,gi.excise_tax,gi.weight,
@@ -380,7 +381,7 @@
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,
+		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,gi.conversion,
 		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gs.opt,bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount, gi.excise_tax,gi.weight,
@@ -575,6 +576,7 @@
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  sort tinyint UNSIGNED NULL COMMENT '排序',
 		  PRIMARY KEY (id),
 		  INDEX idx_code (code),
 		  INDEX idx_page_type (page_type),
@@ -694,7 +696,7 @@
 	<!-- 建表语句END -->
 	
 	<select id="listLayout" parameterType="Object" resultMap="layout">
-		select * from layout${centerId} where page = #{page} and page_type = ${pageType} and is_show = 1 
+		select * from layout${centerId} where page = #{page} and page_type = ${pageType} and is_show = 1 order by code ,sort
 	</select>
 	
 	<select id="listActiveData" parameterType="Object"  resultMap = "activityData">
@@ -1065,8 +1067,14 @@
 		</foreach>
 	</update>
 	
-	<select id="listSkuByItemId" parameterType="Object" resultMap="goodsSpecs">
-		select item_id, sku from goods_item where item_id in
+	<resultMap type="com.zm.goods.pojo.GoodsConvert" id="convert">
+		<result column="item_id" property="itemId"/>
+		<result column="sku" property="sku"/>
+		<result column="conversion" property="conversion"/>
+	</resultMap>
+	
+	<select id="listSkuAndConversionByItemId" parameterType="Object" resultMap="convert">
+		select item_id, sku,conversion from goods_item where item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}

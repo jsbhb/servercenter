@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.SupplierFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
@@ -227,7 +229,11 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setBody("购物订单");
 		payModel.setOrderId(orderId);
 		payModel.setTotalAmount(totalAmount + "");
-		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));
+		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
+		if(detailStr.length()>100){//支付宝描述过长会报错
+			detailStr = detailStr.substring(0, 100)+"...";
+		}
+		payModel.setDetail(detailStr);
 
 		if (Constants.WX_PAY.equals(payType)) {
 			payModel.setOpenId(openId);
@@ -632,32 +638,71 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<OrderInfo> listOrderForSendToWarehouse() {
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
-		List<OrderInfo> infoList = orderMapper.listOrderForSendToTTWarehouse();
 		Set<String> set = new HashSet<String>();
-		if (infoList != null && infoList.size() > 0) {
-			for (OrderInfo info : infoList) {
+		List<OrderGoods> goodsList = null;
+		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
+		OrderGoods temp = null;
+		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		if (list.size() > 0) {
+			for (OrderInfo info : list) {// 找出所有的itemId
 				for (OrderGoods goods : info.getOrderGoodsList()) {
-					if (goods.getSku() == null || "".equals(goods.getSku())) {
-						set.add(goods.getItemId());
-					}
+					set.add(goods.getItemId());
 				}
 			}
-			if (set.size() > 0) {
-				Map<String, String> result = goodsFeignClient.listSkuByItemId(Constants.FIRST_VERSION, set);
-				if(result != null){
-					for (OrderInfo info : infoList) {
-						for (OrderGoods goods : info.getOrderGoodsList()) {
-							if (goods.getSku() == null || "".equals(goods.getSku())) {
-								goods.setSku(result.get(goods.getItemId()));
+			Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION,
+					set);
+			if (result != null) {// 对每个商品进行换算和补全sku并合并
+				for (OrderInfo info : list) {
+					tempMap.clear();
+					goodsList = info.getOrderGoodsList();
+					Iterator<OrderGoods> it = goodsList.iterator();
+					while (it.hasNext()) {
+						temp = it.next();
+						convert(temp, result);// 补全sku和比例换算
+						if (tempMap.containsKey(temp.getSku().trim())) {
+							OrderGoods model = tempMap.get(temp.getSku().trim());
+							double actualprice = CalculationUtils.mul(model.getActualPrice(), model.getItemQuantity());
+							double itemprice = CalculationUtils.mul(model.getItemPrice(), model.getItemQuantity());
+							double temactualprice = CalculationUtils.mul(temp.getActualPrice(), temp.getItemQuantity());
+							double temitemprice = CalculationUtils.mul(temp.getItemPrice(), temp.getItemQuantity());
+							model.setItemQuantity(model.getItemQuantity() + temp.getItemQuantity());
+							try {
+								model.setActualPrice(CalculationUtils.div(
+										CalculationUtils.add(temactualprice, actualprice), model.getItemQuantity(), 2));
+								model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
+										model.getItemQuantity(), 2));
+								it.remove();// 合并后删除该商品
+							} catch (IllegalAccessException e) {
+								e.printStackTrace();
 							}
+						} else {
+							tempMap.put(temp.getSku().trim(), temp);
 						}
+
 					}
 				}
 			}
 		}
-		list.addAll(infoList);
-		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		return list;
+	}
+
+	private void convert(OrderGoods temp, Map<String, GoodsConvert> result) {
+		GoodsConvert convert;
+		convert = result.get(temp.getItemId());
+		if (temp.getSku() == null || "".equals(temp.getSku().trim())) {
+			temp.setSku(convert.getSku().trim());
+		}
+		// 如果换算比例大于1，单价和售价需要除以换算比例，并且数量要乘以换算比例
+		if (convert.getConversion() != null && convert.getConversion() > 1) {
+			try {
+				temp.setActualPrice(CalculationUtils.div(temp.getActualPrice(), convert.getConversion(), 2));
+				temp.setItemPrice(CalculationUtils.div(temp.getItemPrice(), convert.getConversion(), 2));
+				temp.setItemQuantity((int) CalculationUtils.mul(temp.getItemQuantity(), convert.getConversion()));
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override

@@ -76,6 +76,16 @@ public class GoodsSpecs implements Serializable {
 	private List<GoodsPrice> priceList;
 
 	private List<GoodsTagEntity> tagList;
+	
+	private Integer conversion;//商品转换比例
+
+	public Integer getConversion() {
+		return conversion;
+	}
+
+	public void setConversion(Integer conversion) {
+		this.conversion = conversion;
+	}
 
 	public List<GoodsTagEntity> getTagList() {
 		return tagList;

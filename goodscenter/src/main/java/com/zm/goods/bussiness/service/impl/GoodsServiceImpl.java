@@ -27,6 +27,7 @@ import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.ErrorCodeEnum;
+import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
@@ -852,13 +853,13 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public Map<String, String> listSkuByItemId(Set<String> set) {
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set) {
 		List<String> temp = new ArrayList<String>(set);
-		List<GoodsSpecs> list = goodsMapper.listSkuByItemId(temp);
-		Map<String,String> result = new HashMap<String,String>();
+		List<GoodsConvert> list = goodsMapper.listSkuAndConversionByItemId(temp);
+		Map<String,GoodsConvert> result = new HashMap<String,GoodsConvert>();
 		if(list != null && list.size() > 0){
-			for(GoodsSpecs specs : list){
-				result.put(specs.getItemId(), specs.getSku());
+			for(GoodsConvert model : list){
+				result.put(model.getItemId(), model);
 			}
 		}
 		return result;

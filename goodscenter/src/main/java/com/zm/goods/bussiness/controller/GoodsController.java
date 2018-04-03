@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ErrorCodeEnum;
+import com.zm.goods.pojo.GoodsConvert;
+import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
@@ -633,12 +635,13 @@ public class GoodsController {
 	}
 	
 	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
-	public Map<String, String> listSkuByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set){
+	@ApiIgnore
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set){
 		if (Constants.FIRST_VERSION.equals(version)) {
 			if (set == null || set.size() == 0) {
 				return null;
 			}
-			return goodsService.listSkuByItemId(set);
+			return goodsService.listSkuAndConversionByItemId(set);
 		}
 		
 		return null;
