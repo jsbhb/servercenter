@@ -102,6 +102,9 @@
 		<if test="id !=null and id !=''">
 			and i.id = #{id} 
 		</if>
+		<if test="tagBindEntity !=null and tagBindEntity !=''">
+			and i.item_id in (${tagBindEntity.itemId})
+		</if>
 	</select>
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
@@ -139,6 +142,9 @@
 		</if>
 		<if test="entity.id !=null and entity.id !=''">
 			and id = #{entity.id} 
+		</if>
+		<if test="entity.tagBindEntity!=null and entity.tagBindEntity!=''">
+			and i.item_id in (${entity.tagBindEntity.itemId})
 		</if>
 	</select>
 	

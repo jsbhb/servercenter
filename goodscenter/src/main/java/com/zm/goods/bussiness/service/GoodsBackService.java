@@ -10,6 +10,7 @@ package com.zm.goods.bussiness.service;
 import java.util.List;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
@@ -192,5 +193,15 @@ public interface GoodsBackService {
 	 * @since JDK 1.7
 	 */
 	List<TagFuncEntity> queryTagFuncList();
+
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<ERPGoodsTagBindEntity> queryGoodsTagBindListInfo(ERPGoodsTagBindEntity entity);
 
 }

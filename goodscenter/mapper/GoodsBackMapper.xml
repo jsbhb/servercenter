@@ -335,4 +335,11 @@
 	<select id="selectTagFuncListInfo" parameterType="Object" resultMap="tagFunc">
 		select * from tag_fun
 	</select>
+	
+	<select id="selectGoodsTagBindListInfo" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where 1=1
+		<if test="tagId != null and tagId != '0'">
+			and tag_id = #{tagId} 
+		</if>
+	</select>
 </mapper>

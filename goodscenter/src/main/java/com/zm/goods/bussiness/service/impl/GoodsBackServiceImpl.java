@@ -230,4 +230,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public List<TagFuncEntity> queryTagFuncList() {
 		return goodsBackMapper.selectTagFuncListInfo();
 	}
+
+	@Override
+	public List<ERPGoodsTagBindEntity> queryGoodsTagBindListInfo(ERPGoodsTagBindEntity entity) {
+		return goodsBackMapper.selectGoodsTagBindListInfo(entity);
+	}
 }

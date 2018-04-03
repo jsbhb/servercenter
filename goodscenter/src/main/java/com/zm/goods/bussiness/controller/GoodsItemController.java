@@ -1,5 +1,7 @@
 package com.zm.goods.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -33,6 +37,9 @@ public class GoodsItemController {
 
 	@Resource
 	GoodsItemService goodsItemService;
+	
+	@Resource
+	GoodsBackService goodsBackService;
 
 	@RequestMapping(value = "{version}/goods/item/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
@@ -40,7 +47,22 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String gradeLevel = request.getParameter("gradeLevel");
-
+			
+			if (entity.getTagBindEntity() != null) {
+				ERPGoodsTagBindEntity param = entity.getTagBindEntity();
+				//增加根据标签查询的条件
+				String itemIds = "";
+				List<ERPGoodsTagBindEntity> erpGoodsTagBindList = goodsBackService.queryGoodsTagBindListInfo(param);
+				for(ERPGoodsTagBindEntity ent:erpGoodsTagBindList) {
+					itemIds = itemIds + "'" + ent.getItemId() + "',";
+				}
+				if (erpGoodsTagBindList.size() > 0) {
+					itemIds = itemIds.substring(0,itemIds.length()-1);
+				}
+				param.setItemId(itemIds);
+				entity.setTagBindEntity(param);
+			}
+			
 			if ("1".equals(gradeLevel)) {
 				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
 				return new ResultModel(true, page, new Pagination(page));

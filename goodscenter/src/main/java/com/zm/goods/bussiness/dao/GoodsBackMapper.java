@@ -260,4 +260,12 @@ public interface GoodsBackMapper {
 	 * @since JDK 1.7
 	 */
 	List<TagFuncEntity> selectTagFuncListInfo();
+
+	/**
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<ERPGoodsTagBindEntity> selectGoodsTagBindListInfo(ERPGoodsTagBindEntity entity);
 }
