@@ -62,6 +62,60 @@
 		<result column="detail_path" property="detailPath"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="itemEntity">
+		<id column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="item_id" property="itemId" />
+		<result column="item_code" property="itemCode"/>
+		<result column="sku" property="sku"/>
+		<result column="weight" property="weight"/>
+		<result column="excise_fax" property="exciseTax"/>
+		<result column="status" property="status"/>
+		<result column="discount" property="discount"/>
+		<result column="info" property="info"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="center_item_id" property="centerItemId"/>
+		<result column="center_status" property="centerStatus"/>
+		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
+			<result column="min" property="min"/>
+			<result column="max" property="max"/>
+			<result column="proxy_price" property="proxyPrice"/>
+			<result column="fxprice" property="fxPrice"/>
+			<result column="delivery_Place" property="deliveryPlace"/>
+			<result column="retail_price" property="retailPrice"/>
+		</association>
+		<association property="stock" javaType="com.zm.goods.pojo.GoodsStockEntity">
+			<result column="qpQty" property="qpQty"/>
+			<result column="fxQty" property="fxQty"/>
+			<result column="defQty" property="defQty"/>
+			<result column="lockedQty" property="lockedQty"/>
+			<result column="frozenQty" property="frozenQty"/>
+		</association>
+		<association property="baseEntity" javaType="com.zm.goods.pojo.GoodsBaseEntity">
+			<id column="base_id" property="id"/>
+			<result column="brand_id" property="brandId"/>
+			<result column="brand" property="brand"/>
+			<result column="increment_tax" property="incrementTax"/>
+			<result column="tariff" property="tariff"/>
+			<result column="unit" property="unit"/>
+			<result column="hscode" property="hscode"/>
+			<result column="encode" property="encode"/>
+			<result column="first_category" property="firstCatalogId"/>
+			<result column="second_category" property="secondCatalogId"/>
+			<result column="third_category" property="thirdCatalogId"/>
+			<result column="center_id" property="centerId"/>
+		</association>
+		<association property="tagBindEntity" javaType="com.zm.goods.pojo.ERPGoodsTagBindEntity">
+			<id column="tag_bind_id" property="id" jdbcType="INTEGER" />
+			<result column="tag_id" property="tagId" jdbcType="INTEGER" />
+		</association>
+	</resultMap>
+	
 	<select id="selectById" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
@@ -71,39 +125,85 @@
 		left join goods_stock s on s.item_id = i.item_id where i.id=#{id}
 	</select>
 	
-	<select id="selectForPage" parameterType="Object" resultMap="entity">
+<!-- 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity"> -->
+<!-- 		select i.*,g.supplier_id,g.supplier_name,g.goods_name, -->
+<!-- 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price, -->
+<!-- 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty  -->
+<!-- 		from goods_item i left join goods g on g.goods_id = i.goods_id -->
+<!-- 		left join goods_price p on p.item_id = i.item_id  -->
+<!-- 		left join goods_stock s on s.item_id = i.item_id where 1=1  -->
+<!-- 		<if test="goodsName!=null and goodsName!=''"> -->
+<!-- 			and g.goods_name like concat('%',#{goodsName},'%')  -->
+<!-- 		</if> -->
+<!-- 		<if test="itemCode!=null and itemCode!=''"> -->
+<!-- 			and i.item_code = #{entity.itemCode} -->
+<!-- 		</if> -->
+<!-- 		<if test="status !=null and status!=''"> -->
+<!-- 			and i.status = #{status} -->
+<!-- 		</if> -->
+<!-- 		<if test="supplierId!=null and supplierId!=''"> -->
+<!-- 			and g.supplier_id = #{supplierId} -->
+<!-- 		</if> -->
+<!-- 		<if test="itemId!=null and itemId!=''"> -->
+<!-- 			and i.item_id = #{itemId}  -->
+<!-- 		</if> -->
+<!-- 		<if test="goodsId!=null and goodsId !=''"> -->
+<!-- 			and i.goods_id = #{goodsId}  -->
+<!-- 		</if> -->
+<!-- 		<if test="sku !=null and sku !=''"> -->
+<!-- 			and i.sku = #{sku}  -->
+<!-- 		</if> -->
+<!-- 		<if test="id !=null and id !=''"> -->
+<!-- 			and i.id = #{id}  -->
+<!-- 		</if> -->
+<!-- 		<if test="tagBindEntity !=null and tagBindEntity !=''"> -->
+<!-- 			and i.item_id in (${tagBindEntity.itemId}) -->
+<!-- 		</if> -->
+<!-- 	</select> -->
+	
+	<select id="selectForPage" parameterType="Object" resultMap="itemEntity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
-		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
-		from goods_item i left join goods g on g.goods_id = i.goods_id
+		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,b.id as base_id,b.brand_id,
+		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode,b.first_category,
+		b.second_category,b.third_category,b.center_id,tag.id as tag_bind_id,tag.tag_id
+		from goods_item i 
+		left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
-		left join goods_stock s on s.item_id = i.item_id where 1=1 
-		<if test="goodsName!=null and goodsName!=''">
-			and g.goods_name like concat('%',#{goodsName},'%') 
-		</if>
-		<if test="itemCode!=null and itemCode!=''">
-			and i.item_code = #{entity.itemCode}
-		</if>
-		<if test="status !=null and status!=''">
-			and i.status = #{status}
+		left join goods_stock s on s.item_id = i.item_id 
+		left join base b on g.base_id = b.id
+		left join goods_tag_bind tag on i.item_id = tag.item_id
+		where 1=1 
+		<if test="baseEntity!=null">
+			<if test="baseEntity.brandId!=null and baseEntity.brandId!=''">
+				and b.brand_id = #{baseEntity.brandId}
+			</if> 
 		</if>
 		<if test="supplierId!=null and supplierId!=''">
 			and g.supplier_id = #{supplierId}
 		</if>
+		<if test="tagBindEntity !=null and tagBindEntity !=''">
+			and tag.tag_id = #{tagBindEntity.tagId}
+		</if>
+		<if test="status !=null and status!=''">
+			and i.status = #{status}
+		</if>
 		<if test="itemId!=null and itemId!=''">
-			and i.item_id = #{itemId} 
+			and i.item_id = #{itemId}
 		</if>
-		<if test="goodsId!=null and goodsId !=''">
-			and i.goods_id = #{goodsId} 
+		<if test="itemCode!=null and itemCode!=''">
+			and i.item_code = #{itemCode}
 		</if>
-		<if test="sku !=null and sku !=''">
-			and i.sku = #{sku} 
+		<if test="goodsName!=null and goodsName!=''">
+			and g.goods_name like concat('%',#{goodsName},'%')
+		</if>
+		<if test="stock!=null and stock!=''">
+			<if test="stock.fxQty!=null and stock.fxQty!='0'">
+				and ifnull(s.fxqty,0) = 0
+			</if>
 		</if>
 		<if test="id !=null and id !=''">
 			and i.id = #{id} 
-		</if>
-		<if test="tagBindEntity !=null and tagBindEntity !=''">
-			and i.item_id in (${tagBindEntity.itemId})
 		</if>
 	</select>
 	
