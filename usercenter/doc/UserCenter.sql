@@ -44,7 +44,7 @@ drop table if exists  `user_wechat`;
 CREATE TABLE `zm_user`.`user_wechat` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
-  `user_type` TINYINT UNSIGNED NOT NULL COMMENT '用户类型',
+  `user_type` TINYINT UNSIGNED NULL COMMENT '用户类型',
   `wechat` VARCHAR(100) NOT NULL COMMENT '微信unionid',
   `attribute` VARCHAR(100) COMMENT '备用',
   `create_time` DATETIME NULL,
@@ -207,6 +207,7 @@ CREATE TABLE `zm_user`.`push_user` (
   `user_id` INT UNSIGNED NULL COMMENT '用户ID',
   `grade_id` INT UNSIGNED NULL COMMENT '哪个等级的推手',
   `status` TINYINT UNSIGNED DEFAULT 0 COMMENT '0未审核，1审核未通过，2审核通过，11清退',
+  `type` TINYINT UNSIGNED DEFAULT 0 COMMENT '0普通用户，1店长',
   `phone` VARCHAR(15) NULL COMMENT '手机号',
   `name` VARCHAR(15) NULL COMMENT '姓名',
   `inviter` VARCHAR(15) NULL COMMENT '邀请人',
@@ -217,6 +218,7 @@ CREATE TABLE `zm_user`.`push_user` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(50) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `uq_user_grade_id` (`grade_id`,`user_id` ASC),
   INDEX `idx_status` (`status`),
   INDEX `idx_grade_id` (`grade_id`),
   INDEX `idx_user_id` (`user_id`)

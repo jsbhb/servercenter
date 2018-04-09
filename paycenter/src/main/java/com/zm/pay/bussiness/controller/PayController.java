@@ -28,7 +28,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(value = "支付服务接口", description = "支付服务接口")
 public class PayController {
 
-
 	@Resource
 	PayService payService;
 
@@ -43,10 +42,19 @@ public class PayController {
 
 	@RequestMapping(value = "alipay/{type}/{clientId}", method = RequestMethod.POST)
 	@ApiIgnore
-	public Map<String,Object> aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+	public Map<String, Object> aliPay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
 			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
 
 		return payService.aliPay(clientId, type, model);
+
+	}
+
+	@RequestMapping(value = "unionpay/{type}/{clientId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public Map<String, Object> unionpay(@PathVariable("clientId") Integer clientId, @PathVariable("type") String type,
+			@RequestBody PayModel model) {
+
+		return payService.unionPay(clientId, model, type);
 
 	}
 
@@ -82,12 +90,11 @@ public class PayController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			return payService.pay(version, type, payType, req, orderId);
-			
+
 		}
 
 		return null;
 	}
-
 
 	@RequestMapping(value = "pay/paycustom", method = RequestMethod.POST)
 	@ApiIgnore

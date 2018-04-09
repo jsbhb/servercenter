@@ -3,8 +3,11 @@ package com.zm.order.bussiness.service.impl;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -12,19 +15,20 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.order.bussiness.component.CapitalPoolThreadPool;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
-import com.zm.order.constants.LogConstants;
 import com.zm.order.feignclient.ActivityFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
-import com.zm.order.feignclient.LogFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.SupplierFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
@@ -62,7 +66,7 @@ import com.zm.order.utils.JSONUtil;
  */
 
 @Service("orderService")
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class OrderServiceImpl implements OrderService {
 
 	@Resource
@@ -78,10 +82,7 @@ public class OrderServiceImpl implements OrderService {
 	PayFeignClient payFeignClient;
 
 	@Resource
-	LogFeignClient logFeignClient;
-
-	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	SupplierFeignClient supplierFeignClient;
@@ -91,6 +92,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	ActivityFeignClient activityFeignClient;
+
+	@Resource
+	CapitalPoolThreadPool capitalPoolThreadPool;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -185,6 +189,11 @@ public class OrderServiceImpl implements OrderService {
 				Double fee = entry.getValue();
 				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
 				if (tax.getExciseTax() != null) {
+					if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
+						result.setErrorMsg("消费税或增值税设置有误");
+						result.setSuccess(false);
+						return result;
+					}
 					Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
 							CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
 					Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
@@ -220,7 +229,11 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setBody("购物订单");
 		payModel.setOrderId(orderId);
 		payModel.setTotalAmount(totalAmount + "");
-		payModel.setDetail(detail.toString().substring(0, detail.toString().length() - 1));
+		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
+		if(detailStr.length()>100){//支付宝描述过长会报错
+			detailStr = detailStr.substring(0, 100)+"...";
+		}
+		payModel.setDetail(detailStr);
 
 		if (Constants.WX_PAY.equals(payType)) {
 			payModel.setOpenId(openId);
@@ -229,6 +242,8 @@ public class OrderServiceImpl implements OrderService {
 			result.setObj(paymap);
 		} else if (Constants.ALI_PAY.equals(payType)) {
 			result.setObj(payFeignClient.aliPay(centerId, type, payModel));
+		} else if (Constants.UNION_PAY.equals(payType)) {
+			result.setObj(payFeignClient.unionpay(centerId, type, payModel));
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
@@ -238,6 +253,14 @@ public class OrderServiceImpl implements OrderService {
 		if (info.getCouponIds() != null) {
 			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
 					info.getCouponIds());
+		}
+
+		if (info.getPushUserId() != null) {// 如果是推手订单，判断该推手是否有效
+			boolean flag = userFeignClient.verifyEffective(Constants.FIRST_VERSION, info.getShopId(),
+					info.getPushUserId());
+			if (!flag) {// 失效推手ID设为null
+				info.setPushUserId(null);
+			}
 		}
 
 		info.setOrderId(orderId);
@@ -320,10 +343,10 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel result = new ResultModel();
 
 		int count = orderMapper.confirmUserOrder(param);
-		// shareProfitComponent.calShareProfit(param.get("orderId").toString());
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_COMPLETE);
 			orderMapper.addOrderStatusRecord(param);
+			shareProfitComponent.calShareProfit(param.get("orderId").toString());
 		}
 
 		result.setSuccess(true);
@@ -335,13 +358,17 @@ public class OrderServiceImpl implements OrderService {
 
 		ResultModel result = new ResultModel();
 
-		int count = orderMapper.updateOrderPayStatusByOrderId(param.get("orderId") + "");
+		String orderId = param.get("orderId") + "";
+
+		int count = orderMapper.updateOrderPayStatusByOrderId(orderId);
 
 		orderMapper.updateOrderDetailPayTime(param);
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
 		}
+
+		shareProfitComponent.calShareProfitStayToAccount(orderId);
 
 		result.setSuccess(true);
 		return result;
@@ -377,7 +404,7 @@ public class OrderServiceImpl implements OrderService {
 		String ids = sb.substring(0, sb.length() - 1);
 
 		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids,
-				(Integer) param.get("centerId"));
+				(Integer) param.get("centerId"), "feign");
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
 			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");
@@ -411,9 +438,15 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public List<OrderCount> getCountByStatus(Map<String, Object> param) {
+	public List<OrderCount> getCountByStatus(Map<String, Object> param, String type) {
 
-		return orderMapper.getCountByStatus(param);
+		if ("0".equals(type)) {
+			return orderMapper.getCountByStatus(param);
+		}
+		if ("1".equals(type)) {
+			return orderMapper.getPushCountByStatus(param);
+		}
+		return null;
 	}
 
 	@Override
@@ -442,7 +475,7 @@ public class OrderServiceImpl implements OrderService {
 		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 			if (Constants.ORDER_TO_WAREHOUSE > info.getStatus()
 					&& !Constants.ORDER_EXCEPTION.equals(info.getStatus())) {
-				if (redisTemplate.opsForValue().get(orderId) != null) {// 是否正在发送给第三方
+				if (template.opsForValue().get(orderId) != null) {// 是否正在发送给第三方
 					return new ResultModel(false, "该订单正在发送给保税仓，请稍后重试");
 				}
 				RefundPayModel model = new RefundPayModel(info.getOrderId(), info.getOrderDetail().getPayNo(),
@@ -466,10 +499,6 @@ public class OrderServiceImpl implements OrderService {
 						orderMapper.addOrderStatusRecord(param);
 					}
 					stockBack(info);
-					String content = "订单号\"" + info.getOrderId() + "\"退单";
-
-					logFeignClient.saveLog(Constants.FIRST_VERSION, CommonUtils.packageLog(LogConstants.ORDER_CANCEL,
-							"订单退单", info.getCenterId(), content, info.getUserId() + ""));
 				} else {
 					return new ResultModel(false, result.get("errorMsg"));
 				}
@@ -608,11 +637,72 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<OrderInfo> listOrderForSendToWarehouse() {
-
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
-		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		Set<String> set = new HashSet<String>();
+		List<OrderGoods> goodsList = null;
+		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
+		OrderGoods temp = null;
 		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		if (list.size() > 0) {
+			for (OrderInfo info : list) {// 找出所有的itemId
+				for (OrderGoods goods : info.getOrderGoodsList()) {
+					set.add(goods.getItemId());
+				}
+			}
+			Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION,
+					set);
+			if (result != null) {// 对每个商品进行换算和补全sku并合并
+				for (OrderInfo info : list) {
+					tempMap.clear();
+					goodsList = info.getOrderGoodsList();
+					Iterator<OrderGoods> it = goodsList.iterator();
+					while (it.hasNext()) {
+						temp = it.next();
+						convert(temp, result);// 补全sku和比例换算
+						if (tempMap.containsKey(temp.getSku().trim())) {
+							OrderGoods model = tempMap.get(temp.getSku().trim());
+							double actualprice = CalculationUtils.mul(model.getActualPrice(), model.getItemQuantity());
+							double itemprice = CalculationUtils.mul(model.getItemPrice(), model.getItemQuantity());
+							double temactualprice = CalculationUtils.mul(temp.getActualPrice(), temp.getItemQuantity());
+							double temitemprice = CalculationUtils.mul(temp.getItemPrice(), temp.getItemQuantity());
+							model.setItemQuantity(model.getItemQuantity() + temp.getItemQuantity());
+							try {
+								model.setActualPrice(CalculationUtils.div(
+										CalculationUtils.add(temactualprice, actualprice), model.getItemQuantity(), 2));
+								model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
+										model.getItemQuantity(), 2));
+								it.remove();// 合并后删除该商品
+							} catch (IllegalAccessException e) {
+								e.printStackTrace();
+							}
+						} else {
+							tempMap.put(temp.getSku().trim(), temp);
+						}
+
+					}
+				}
+			}
+		}
 		return list;
+	}
+
+	private void convert(OrderGoods temp, Map<String, GoodsConvert> result) {
+		GoodsConvert convert;
+		convert = result.get(temp.getItemId());
+		if (temp.getSku() == null || "".equals(temp.getSku().trim())) {
+			temp.setSku(convert.getSku().trim());
+		}
+		// 如果换算比例大于1，单价和售价需要除以换算比例，并且数量要乘以换算比例
+		if (convert.getConversion() != null && convert.getConversion() > 1) {
+			try {
+				temp.setActualPrice(CalculationUtils.div(temp.getActualPrice(), convert.getConversion(), 2));
+				temp.setItemPrice(CalculationUtils.div(temp.getItemPrice(), convert.getConversion(), 2));
+				temp.setItemQuantity((int) CalculationUtils.mul(temp.getItemQuantity(), convert.getConversion()));
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -652,7 +742,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Object> getProfit(Integer shopId) {
-		return redisTemplate.opsForList().range(Constants.PROFIT + shopId, 0, -1);
+		return template.opsForList().range(Constants.PROFIT + shopId, 0, -1);
 	}
 
 	@Override
@@ -671,5 +761,82 @@ public class OrderServiceImpl implements OrderService {
 			param.put("orderId", model.getOrderId());
 			confirmUserOrder(param);
 		}
+	}
+
+	@Override
+	public ResultModel repayingPushJudge(Integer pushUserId, Integer shopId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("pushUserId", pushUserId);
+		param.put("shopId", shopId);
+		int count = 0;
+		count = orderMapper.repayingPushJudge(param);
+		if (count > 0) {
+			return new ResultModel(false, "还有未完成的订单");
+		}
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel pushUserOrderCount(Integer shopId, List<Integer> pushUserIdList) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("pushUserIdList", pushUserIdList);
+		param.put("shopId", shopId);
+		return new ResultModel(true, orderMapper.pushUserOrderCount(param));
+	}
+
+	@Override
+	public ResultModel orderBackCancel(String orderId, String payNo) {
+		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+		int count = orderMapper.updateOrderCancel(orderId);
+		OrderDetail detail = new OrderDetail();
+		detail.setOrderId(orderId);
+		detail.setReturnPayNo(payNo);
+		orderMapper.updateRefundPayNo(detail);
+		if (count > 0) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("status", Constants.ORDER_CANCEL);
+			param.put("orderId", orderId);
+			orderMapper.addOrderStatusRecord(param);
+		}
+		stockBack(info);
+		Integer status = info.getStatus();
+		if (!Constants.ORDER_COMPLETE.equals(status) && !Constants.ORDER_CANCEL.equals(status)
+				&& !Constants.ORDER_CLOSE.equals(status) && !Constants.ORDER_INIT.equals(status)) {
+			shareProfitComponent.calRefundShareProfit(orderId);
+		}
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel refunds(String orderId) {
+
+		orderMapper.updateOrderRefunds(orderId);
+		return new ResultModel(true, "");
+	}
+
+	/**
+	 * @fun 按照区域中心ID区分订单，防止并发时计算错误 由线程池处理，防止feign调用超时
+	 * @return
+	 */
+	@Override
+	public boolean capitalPoolRecount() {
+		List<OrderInfo> infoList = orderMapper.listCapitalPoolNotEnough();
+		if (infoList != null && infoList.size() > 0) {
+			Map<Integer, List<OrderInfo>> tempMap = new HashMap<Integer, List<OrderInfo>>();
+			List<OrderInfo> orderTmpList = null;
+			for (OrderInfo info : infoList) {
+				if (tempMap.get(info.getCenterId()) == null) {
+					orderTmpList = new ArrayList<OrderInfo>();
+					orderTmpList.add(info);
+					tempMap.put(info.getCenterId(), orderTmpList);
+				} else {
+					tempMap.get(info.getCenterId()).add(info);
+				}
+			}
+			for (Map.Entry<Integer, List<OrderInfo>> entry : tempMap.entrySet()) {
+				capitalPoolThreadPool.capitalPoolRecount(entry.getValue());
+			}
+		}
+		return false;
 	}
 }

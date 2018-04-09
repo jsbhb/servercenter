@@ -7,8 +7,12 @@
  */
 package com.zm.user.bussiness.dao;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
+import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
+import com.zm.user.pojo.ShopEntity;
 
 /**
  * ClassName: GradeMapper <br/>
@@ -60,5 +64,36 @@ public interface GradeMapper<T> {
 	 * @since JDK 1.7  
 	 */
 	void updateGradeData(Grade entity);
+	
+	/**
+	 * 
+	 * selectById:根据编号查询. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id
+	 * @return  
+	 * @since JDK 1.7
+	 */
+	ShopEntity selectByGradeId(int gradeId);
+
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateGradeConfig(ShopEntity entity);
+
+	/**  
+	 * update:(这里用一句话描述这个方法的作用). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void insertGradeConfig(ShopEntity entity);
+
+	List<FuzzySearchGrade> fuzzyListGrade(FuzzySearchGrade entity);
 
 }

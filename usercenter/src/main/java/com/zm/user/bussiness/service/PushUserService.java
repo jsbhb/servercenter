@@ -1,10 +1,27 @@
 package com.zm.user.bussiness.service;
 
+import com.zm.user.common.ResultModel;
 import com.zm.user.pojo.PushUser;
 
 public interface PushUserService {
 
-	void savePushUser(PushUser pushUser);
+	ResultModel savePushUser(PushUser pushUser);
 
-	Integer pushUserAudit(boolean pass, Integer id);
+	ResultModel pushUserAudit(boolean pass, Integer id);
+
+	ResultModel listPushUserByGradeId(Integer gradeId);
+
+	ResultModel getPushUserById(Integer id);
+
+	ResultModel pushUserVerify(String phone, Integer gradeId);
+
+	ResultModel listBindingShop(Integer userId);
+
+	ResultModel repayingPush(Integer id);
+
+	ResultModel pushUserOrderCount(Integer shopId);
+
+	boolean verifyEffective(Integer shopId, Integer pushUserId);
+
+	ResultModel listAllPushUser();
 }

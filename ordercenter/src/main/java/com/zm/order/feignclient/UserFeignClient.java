@@ -22,4 +22,8 @@ public interface UserFeignClient {
 	@RequestMapping(value = "auth/{version}/user/register/{code}", method = RequestMethod.POST)
 	public ResultModel registerUser(@PathVariable("version") Double version, @RequestBody UserInfo info,
 			@PathVariable("code") String code);
+	
+	@RequestMapping(value = "{version}/verifyEffective/{shopId}/{pushUserId}", method = RequestMethod.GET)
+	public boolean verifyEffective(@PathVariable("version") Double version, @PathVariable("shopId") Integer shopId,
+			@PathVariable("pushUserId") Integer pushUserId);
 }

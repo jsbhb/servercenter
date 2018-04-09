@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderService;
@@ -100,12 +101,6 @@ public class OrderController {
 
 		ResultModel result = new ResultModel();
 
-		if (info.getUserId() == null || info.getCenterId() == null) {
-			result.setSuccess(false);
-			result.setErrorMsg("参数不全");
-			return result;
-		}
-
 		if (Constants.FIRST_VERSION.equals(version)) {
 			result = orderService.listUserOrder(info, pagination);
 		}
@@ -191,6 +186,24 @@ public class OrderController {
 				return orderService.orderCancel(userId, orderId);
 			} catch (Exception e) {
 				e.printStackTrace();
+				return new ResultModel(false, e);
+			}
+		}
+
+		return new ResultModel(false, "error");
+	}
+
+	@RequestMapping(value = "{version}/order/backcancel/{orderId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel orderBackCancel(@PathVariable("version") Double version, @PathVariable("orderId") String orderId,
+			@RequestParam("payNo") String payNo) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return orderService.orderBackCancel(orderId,payNo);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e);
 			}
 		}
 
@@ -279,15 +292,15 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
 			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getCountByStatus(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId,
-			@PathVariable("centerId") Integer centerId) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			@RequestParam(value = "type", required = false, defaultValue = "0") String type) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
 			param.put("centerId", centerId);
-			List<OrderCount> list = orderService.getCountByStatus(param);
+			List<OrderCount> list = orderService.getCountByStatus(param, type);
 			result.setSuccess(true);
 			result.setObj(list);
 
@@ -500,18 +513,6 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/alreadyPay", method = RequestMethod.GET)
-	@ApiIgnore
-	public ResultModel alreadyPay(@PathVariable("version") Double version) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			return new ResultModel(true, orderService.listOrderForSendToWarehouse());
-		}
-
-		return new ResultModel(false, "版本错误");
-
-	}
 
 	@RequestMapping(value = "{version}/order/saveThirdOrder", method = RequestMethod.POST)
 	@ApiIgnore
@@ -573,14 +574,85 @@ public class OrderController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/order/confirmByTimeTask", method = RequestMethod.GET)
 	public void confirmByTimeTask(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			orderService.confirmByTimeTask();
 		}
+	}
+
+	@RequestMapping(value = "{version}/order/repayingPushJudge/{shopId}/{pushUserId}", method = RequestMethod.GET)
+	public ResultModel repayingPushJudge(@PathVariable("version") Double version,
+			@PathVariable("shopId") Integer shopId, @PathVariable("pushUserId") Integer pushUserId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.repayingPushJudge(pushUserId, shopId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/order/pushUserOrderCount/{shopId}", method = RequestMethod.POST)
+	public ResultModel pushUserOrderCount(@PathVariable("version") Double version,
+			@PathVariable("shopId") Integer shopId, @RequestBody List<Integer> pushUserIdList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.pushUserOrderCount(shopId, pushUserIdList);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/order/sendToWarehouse", method = RequestMethod.GET)
+	@ApiIgnore
+	public ResultModel sendToWarehouse(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return new ResultModel(true, orderService.listOrderForSendToWarehouse());
+		}
+
+		return new ResultModel(false, "版本错误");
 
 	}
+	
+	/**
+	 * @fun 退款中
+	 * @param version
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/refunds/{orderId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel refunds(@PathVariable("version") Double version,@PathVariable("orderId") String orderId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.refunds(orderId);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+	
+	/**
+	 * @fun 轮询查询资金池不足的订单并重新计算
+	 * @param version
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/capitalpool/notenough", method = RequestMethod.POST)
+	@ApiIgnore
+	public boolean capitalPoolRecount(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.capitalPoolRecount();
+		}
+
+		return false;
+
+	}
+	
 
 }

@@ -7,6 +7,7 @@
 		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
 		<result column="push_user_id" property="pushUserId" jdbcType="INTEGER" />
+		<result column="tag_fun" property="tagFun" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
@@ -22,6 +23,7 @@
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
+			<result column="pay_time" property="payTime" jdbcType="DECIMAL" />
 			<result column="dis_amount" property="disAmount" jdbcType="DECIMAL" />
 			<result column="post_fee" property="postFee" jdbcType="DECIMAL" />
 			<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
@@ -52,6 +54,7 @@
 			<result column="sku" property="sku" jdbcType="VARCHAR" />
 			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
 			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
 			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 			<result column="item_quantity" property="itemQuantity"
 				jdbcType="INTEGER" />
@@ -114,13 +117,22 @@
 		<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
 		<result column="express_name" property="expressName" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.ThirdOrderInfo" id="expressList">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+		<result column="express_name" property="expressName" jdbcType="VARCHAR" />
+		<result column="express_id" property="expressId" jdbcType="VARCHAR" />
+	</resultMap>
 
 	<select id="listPayCustomOrder" resultMap="customModel">
 		select
 		o.id,o.order_id,od.pay_no,od.payment,o.center_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
-		where o.status = 1 and o.order_flag = 0 and o.supplier_id = 1
+		where o.status = 12 and o.order_flag = 0 and o.supplier_id = 1
 	</select>
 
 
@@ -177,6 +189,9 @@
 		<if test="info.endTime != null and info.endTime != ''">
 			and ob.create_time &lt;= #{info.endTime}
 		</if>
+		<if test="info.pushUserId != null and info.pushUserId != ''">
+			and ob.push_user_id = #{info.pushUserId}
+		</if>
 		order by ob.create_time desc
 		<if test="pagination != null">
 			limit #{pagination.startRow},#{pagination.numPerPage}
@@ -228,16 +243,19 @@
 		<if test="info.endTime != null and info.endTime != ''">
 			and o.create_time &lt;= #{info.endTime}
 		</if>
+		<if test="info.pushUserId != null and info.pushUserId != ''">
+			and o.push_user_id = #{info.pushUserId}
+		</if>
 	</select>
 
 
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
 		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,guide_id,supplier_id,tdq,
-		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status)
+		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status,tag_fun)
 		VALUES
 		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
-		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource},#{status})
+		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource},#{status},#{tagFun})
 	</insert>
 	
 	<insert id="saveOrderDetail" parameterType="Object">
@@ -254,10 +272,10 @@
 	<insert id="saveOrderGoods" parameterType="Object">
 		INSERT INTO
 		order_goods
-		(order_id,item_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
+		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.itemId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
+			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
 		</foreach>
 	</insert>
 
@@ -284,8 +302,8 @@
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
 		select * from order_shopping_cart where user_id = #{userId} and
 		center_id = #{centerId} order by create_time
-		limit
-		#{pagination.startRow},#{pagination.numPerPage}
+<!-- 		limit 
+ 		#{pagination.startRow},#{pagination.numPerPage} -->
 	</select>
 
 	<update id="updateOrderDetailPayTime" parameterType="Object">
@@ -308,6 +326,13 @@
 		resultType="com.zm.order.pojo.OrderCount">
 		select status, count(*) as total from order_base where
 		center_id=#{centerId} and user_id = #{userId} and is_del = 0 group by
+		status
+	</select>
+	
+	<select id="getPushCountByStatus" parameterType="Object"
+		resultType="com.zm.order.pojo.OrderCount">
+		select status, count(*) as total from order_base where
+		shop_id=#{centerId} and push_user_id = #{userId} group by
 		status
 	</select>
 
@@ -336,18 +361,43 @@
 		select
 		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,o.create_type,o.push_user_id,od.id
 		as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
+		detail_id,od.payment,od.pay_time,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
 		od.pay_type,od.pay_no,o.center_id,og.id as
-		goods_id,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
+		goods_id,og.goods_id as goodsId,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
+		,oe.id as orderExpress_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
 		left join
-		order_goods og on o.order_id = og.order_id where o.order_id
+		order_goods og on o.order_id = og.order_id 
+        left join third_order_info oe on oe.order_id = o.order_id 
+        where o.order_id
 		=
 		#{orderId}
 	</select>
+	
+	<!-- 返佣 -->
+	<select id="getOrderByOrderIdForRebate" parameterType="Object" resultMap="orderBase">
+		select
+		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,od.id
+		as
+		detail_id,od.payment,o.shop_id,o.order_source,
+		o.center_id,og.id as
+		goods_id,og.goods_id as goodsId,og.item_id,og.item_quantity,og.item_code,
+		og.item_price,og.actual_price,og.sku,od.dis_amount
+		from order_base o
+		left join order_detail od on o.order_id =od.order_id
+		left join
+		order_goods og on o.order_id = og.order_id 
+        where o.order_id = #{orderId} and o.rebate = 0
+	</select>
+	
+	<update id="updateOrderRebate" parameterType="Object">
+		update order_base set rebate = 1 where order_id = #{orderId}
+	</update>
+	
+	<!-- 返佣end -->
 
 
 	<update id="updateOrderPayType" parameterType="Object">
@@ -365,7 +415,7 @@
 	<update id="updatePayCustom" parameterType="Object">
 		update
 		order_base set
-		status = 2, update_time=now() where order_id = #{orderId} and status = 1
+		status = 2, update_time=now() where order_id = #{orderId} and status = 12
 	</update>
 
 	<update id="updateOrderCancel" parameterType="Object">
@@ -391,7 +441,7 @@
 		update
 		order_base set
 		status = 3, update_time=now() where order_id = #{orderId} and status in
-		(1,2)
+		(12,2)
 	</update>
 
 	<update id="updateOrderStatusByThirdStatus" parameterType="Object">
@@ -402,6 +452,24 @@
 		, update_time=now()
 		</if>
 		where order_id = #{orderId}
+	</update>
+	
+	<update id="updateOrderCapitalNotEnough" parameterType="Object">
+		update order_base set status = 11 where order_id in 
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</update>
+	
+	<update id="updateOrderCapitalEnough" parameterType="Object">
+		update order_base set status = 12 where order_id in 
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</update>
+	
+	<update id="updateOrderRefunds" parameterType="Object">
+		update order_base set status = 21 where order_id = #{orderId} and status in (1,2,3,4,5,6,7,11,12,99)
 	</update>
 
 	<!-- 更新订单状态END -->
@@ -513,11 +581,8 @@
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
 		left join
-		order_goods og on o.order_id = og.order_id where o.status=2
-		and
-		supplier_id=1 and order_flag=0 limit 10
+		order_goods og on o.order_id = og.order_id where o.status=2 and supplier_id = 1 and tag_fun = 0
 	</select>
-
 	<select id="listOrderForSendToOtherWarehouse" resultMap="orderBase">
 		select
 		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id
@@ -530,11 +595,21 @@
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
 		left join
-		order_goods og on o.order_id = og.order_id where o.status=1
-		and
-		supplier_id !=1 and order_flag=0 limit 10
+		order_goods og on o.order_id = og.order_id where o.status=12 and supplier_id != 1 and tag_fun = 0
 	</select>
-
+	<!-- end -->
+	
+	<!-- 获取计算资金池订单 -->
+	<select id="listOrderForCalCapital" resultMap="orderBase">
+		select
+		o.id,o.order_id,o.create_time,od.id
+		as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
+		od.pay_type,od.pay_no,od.dis_amount
+		from order_base o
+		left join order_detail od on o.order_id =od.order_id
+		where o.order_id = #{orderId}
+	</select>
 	<!-- end -->
 
 	<insert id="saveThirdOrder" parameterType="Object">
@@ -587,5 +662,31 @@
 		INSERT ignore INTO order_status_record(order_id,status,create_time)
 		VALUES(#{orderId},#{status},now())
 	</insert>
+	
+		
+	<select id="repayingPushJudge" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from order_base where shop_id = #{shopId} and push_user_id = #{pushUserId} 
+		and status in(0,1,2,3,4,5,6,99)
+	</select>
+	
+	<select id="pushUserOrderCount" parameterType="Object" resultType="com.zm.order.pojo.PushUserOrderCount">
+		select push_user_id as pushUserId, count(*) as count 
+		from order_base where push_user_id in 
+		<foreach collection="pushUserIdList" item="item" index="index" open="("
+			close=")" separator=",">
+			#{item}
+		</foreach>
+		and shop_id = #{shopId} group by push_user_id
+	</select>
+	
+	<!-- 获取资金池不足的订单 -->
+	<select id="listCapitalPoolNotEnough" parameterType="Object" resultMap="orderBase">
+		select order_id,center_id from order_base where status = 11
+	</select>
+	
+	<!-- 根据订单Id查询物流信息 -->
+	<select id="getThirdInfo" parameterType="Object" resultMap="expressList">
+		select * from third_order_info where order_id = #{orderId} and express_id is not null
+	</select>
 
 </mapper>

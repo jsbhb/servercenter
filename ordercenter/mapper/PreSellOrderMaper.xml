@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.order.bussiness.dao.PreSellOrderMapper">
+
+	<resultMap type="com.zm.order.pojo.OrderInfo" id="orderBase">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="push_user_id" property="pushUserId" jdbcType="INTEGER" />
+		<result column="tag_fun" property="tagFun" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="tag_fun" property="tagFun" jdbcType="INTEGER" />
+		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
+		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
+		<result column="create_type" property="createType" jdbcType="INTEGER" />
+		<result column="coupon_ids" property="couponIds" jdbcType="VARCHAR" />
+		<result column="express_type" property="expressType" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
+			<id column="detail_id" property="id" jdbcType="INTEGER" />
+			<result column="payment" property="payment" jdbcType="DECIMAL" />
+			<result column="pay_time" property="payTime" jdbcType="DECIMAL" />
+			<result column="dis_amount" property="disAmount" jdbcType="DECIMAL" />
+			<result column="post_fee" property="postFee" jdbcType="DECIMAL" />
+			<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
+			<result column="tariff_tax" property="tariffTax" jdbcType="DECIMAL" />
+			<result column="increment_tax" property="incrementTax"
+				jdbcType="DECIMAL" />
+			<result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+			<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
+			<result column="excise_tax" property="exciseTax" jdbcType="DECIMAL" />
+			<result column="pay_type" property="payType" jdbcType="INTEGER" />
+			<result column="carry_address" property="carryAddress"
+				jdbcType="VARCHAR" />
+			<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+			<result column="receive_phone" property="receivePhone"
+				jdbcType="VARCHAR" />
+			<result column="receive_province" property="receiveProvince"
+				jdbcType="VARCHAR" />
+			<result column="receive_city" property="receiveCity" jdbcType="VARCHAR" />
+			<result column="receive_area" property="receiveArea" jdbcType="VARCHAR" />
+			<result column="receive_address" property="receiveAddress"
+				jdbcType="VARCHAR" />
+			<result column="receive_zip_code" property="receiveZipCode"
+				jdbcType="VARCHAR" />
+		</association>
+		<collection ofType="com.zm.order.pojo.OrderGoods" property="orderGoodsList">
+			<id column="goods_id" property="id" jdbcType="INTEGER" />
+			<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+			<result column="sku" property="sku" jdbcType="VARCHAR" />
+			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
+			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="itemQuantity"
+				jdbcType="INTEGER" />
+			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
+			<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+			<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
+		</collection>
+		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
+			property="orderExpressList">
+			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
+			<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+			<result column="oestatus" property="status" jdbcType="VARCHAR" />
+			<result column="express_name" property="expressName" jdbcType="VARCHAR" />
+			<result column="express_id" property="expressId" jdbcType="VARCHAR" />
+			<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderGoods" id="orderGoods">
+			<id column="goods_id" property="id" jdbcType="INTEGER" />
+			<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+			<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+			<result column="sku" property="sku" jdbcType="VARCHAR" />
+			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
+			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="itemQuantity"
+				jdbcType="INTEGER" />
+			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
+			<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+			<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<select id="selectForPage" resultMap="orderBase" parameterType="Object">
+		select 
+		o.*,
+		oe.id as orderExpress_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus,
+		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
+		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
+		from 
+		(select ob.id,ob.order_id,ob.status,ob.tag_fun,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
+		from order_base ob where
+		1 = 1 and tag_fun = #{tagFun} and status in (1,2,12)
+		<if test="status != null">
+			and ob.status = #{status,jdbcType = INTEGER}
+		</if>
+		<if test="userId != null and userId != ''">
+			and ob.user_id = #{userId}
+		</if>
+		<if test="centerId != null and centerId != ''">
+			and ob.center_id = #{centerId}
+		</if>
+		<if test="shopId != null and shopId != ''">
+			and ob.shop_id = #{shopId}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			and ob.order_id = #{orderId}
+		</if>
+		<if test="supplierId != null and supplierId != ''">
+			and ob.supplier_id = #{supplierId}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			and ob.create_time &gt;= #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and ob.create_time &lt;= #{endTime}
+		</if>
+		order by ob.create_time desc) o 
+		left join order_detail od on o.order_id = od.order_id 
+		<if test="orderGoodsList != null and orderGoodsList.size() > 0">
+			<foreach collection="orderGoodsList" item="item" index="index">
+				inner join (select * from order_goods 
+				where 1=1
+				<if test="item.itemCode != null and item.itemCode != ''">
+					and item_code = #{item.itemCode}
+				</if>
+				<if test="item.itemId != null and item.itemId != ''">
+					and item_id = #{item.itemId}
+				</if>
+				) 
+				og on o.order_id = og.order_id 
+			</foreach>
+		</if>
+		left join third_order_info oe
+		on oe.order_id = o.order_id order by o.create_time desc
+	</select>
+	
+	<select id="selectOrderGoodsByOrderIds" parameterType="Object" resultMap="orderGoods">
+		select order_id,item_id from order_goods where order_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<update id="passPreSellOrder" parameterType="Object">
+		update order_base set tag_fun = 0 where order_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

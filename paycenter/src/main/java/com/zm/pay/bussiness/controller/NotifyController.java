@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -24,14 +28,19 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
-import com.zm.pay.feignclient.LogFeignClient;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
 import com.zm.pay.feignclient.model.UserVip;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.ResultModel;
+import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.utils.IOUtils;
 import com.zm.pay.utils.ali.util.AlipayNotify;
+import com.zm.pay.utils.unionpay.sdk.AcpService;
+import com.zm.pay.utils.unionpay.sdk.Base;
+import com.zm.pay.utils.unionpay.sdk.LogUtil;
+import com.zm.pay.utils.unionpay.sdk.SDKConstants;
 
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -39,10 +48,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public class NotifyController {
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
-
-	@Resource
-	LogFeignClient logFeignClient;
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	OrderFeignClient orderFeignClient;
@@ -71,7 +77,7 @@ public class NotifyController {
 		Map<String, String> notifyMap = WXPayUtil.xmlToMap(sb.toString()); // 转换成map
 
 		String orderId = notifyMap.get("out_trade_no").split("_")[0];
-		
+
 		Integer clientId = null;
 		UserVip user = null;
 		if (orderId != null && orderId.startsWith("GX")) {
@@ -82,7 +88,7 @@ public class NotifyController {
 			clientId = user.getCenterId();
 		}
 
-		WeixinPayConfig config = (WeixinPayConfig) redisTemplate.opsForValue()
+		WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
 
 		WXPay wxpay = new WXPay(config);
@@ -143,7 +149,7 @@ public class NotifyController {
 
 	// return_url
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value = "auth/payMng/payReturn" ,method = RequestMethod.GET)
+	@RequestMapping(value = "auth/payMng/payReturn", method = RequestMethod.GET)
 	@ApiIgnore
 	public void payReturn(HttpServletRequest req, HttpServletResponse res) {
 		logger.info("支付宝RETURN回调");
@@ -159,7 +165,8 @@ public class NotifyController {
 					valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
 				}
 				// 乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
-//				valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+				// valueStr = new String(valueStr.getBytes("ISO-8859-1"),
+				// "utf-8");
 				params.put(name, valueStr);
 			}
 
@@ -181,15 +188,8 @@ public class NotifyController {
 				clientId = user.getCenterId();
 			}
 
-			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+			AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 					.get(Constants.PAY + clientId + Constants.ALI_PAY);
-			
-			Object o = redisTemplate.opsForValue().get(clientId + "-url");
-			String url = (o == null ? null : o.toString());
-			if(url == null){
-				url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
-				redisTemplate.opsForValue().set(clientId + "-url", url);
-			}
 
 			config.initParameter();
 			// 计算得出通知验证结果
@@ -201,7 +201,7 @@ public class NotifyController {
 					if (orderId.startsWith("GX")) {
 						String payNo = params.get("trade_no");
 						orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
-						res.sendRedirect(url+"/personal.html?child=order");
+						res.sendRedirect(config.getUrl() + "/personal.html?child=order");
 						return;
 					}
 					if (orderId.startsWith("VIP")) {
@@ -215,7 +215,7 @@ public class NotifyController {
 								userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
 							}
 						}
-						res.sendRedirect(url+"/personal.html");
+						res.sendRedirect(config.getUrl() + "/personal.html");
 						return;
 					}
 				}
@@ -230,7 +230,7 @@ public class NotifyController {
 
 	// notify_url
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value = "auth/payMng/payNotify" ,method = RequestMethod.POST)
+	@RequestMapping(value = "auth/payMng/payNotify", method = RequestMethod.POST)
 	@ApiIgnore
 	public void payNotify(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		logger.info("支付宝NOTIFY回调");
@@ -269,7 +269,7 @@ public class NotifyController {
 				clientId = user.getCenterId();
 			}
 
-			AliPayConfigModel config = (AliPayConfigModel) redisTemplate.opsForValue()
+			AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 					.get(Constants.PAY + clientId + Constants.ALI_PAY);
 			config.initParameter();
 
@@ -308,12 +308,214 @@ public class NotifyController {
 		}
 	}
 
+	@RequestMapping(value = "auth/payMng/unionNotify", method = RequestMethod.POST)
+	@ApiIgnore
+	public void unionPayNotify(HttpServletRequest req, HttpServletResponse resp) {
+		LogUtil.writeLog("BackRcvResponse接收后台通知开始");
+
+		String encoding = req.getParameter(SDKConstants.param_encoding);
+		// 获取银联通知服务器发送的后台通知参数
+		Map<String, String> respParam = getAllRequestParam(req);
+		Map<String, String> valideData = null;
+		if (null != respParam && !respParam.isEmpty()) {
+			Iterator<Entry<String, String>> it = respParam.entrySet()
+					.iterator();
+			valideData = new HashMap<String, String>(respParam.size());
+			while (it.hasNext()) {
+				Entry<String, String> e = it.next();
+				String key = (String) e.getKey();
+				String value = (String) e.getValue();
+				try {
+					value = new String(value.getBytes(encoding), encoding);
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+				valideData.put(key, value);
+			}
+		}
+		LogUtil.printRequestLog(respParam);
+		String orderId = valideData.get("orderId");
+		Integer clientId = null;
+		UserVip user = null;
+		if (orderId != null && orderId.startsWith("GX")) {
+			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+		}
+		if (orderId != null && orderId.startsWith("VIP")) {
+			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = user.getCenterId();
+		}
+
+		UnionPayConfig config = (UnionPayConfig) template.opsForValue()
+				.get(Constants.PAY + clientId + Constants.UNION_PAY);
+
+		// 重要！验证签名前不要修改reqParam中的键值对的内容，否则会验签不过
+		if (!AcpService.validate(valideData, encoding, config)) {
+			LogUtil.writeLog("验证签名结果[失败].");
+			// 验签失败，需解决验签问题
+
+		} else {
+			LogUtil.writeLog("验证签名结果[成功].");
+			if (orderId.startsWith("GX")) {
+				String payNo = valideData.get("queryId");
+				orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
+			}
+			if (orderId.startsWith("VIP")) {
+				if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
+					userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
+					boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
+					if (flag) {
+						userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
+					} else {
+						userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
+					}
+				}
+			}
+
+		}
+		LogUtil.writeLog("接收后台通知结束");
+		// 返回给银联服务器http 200 状态码
+		try {
+			resp.getWriter().print("ok");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@RequestMapping(value = "auth/payMng/union-frontrcv", method = RequestMethod.POST)
+	@ApiIgnore
+	public void UnionPayFrontRcvResp(HttpServletRequest req, HttpServletResponse res) {
+		LogUtil.writeLog("FrontRcvResponse前台接收报文返回开始");
+
+		String encoding = req.getParameter(SDKConstants.param_encoding);
+		LogUtil.writeLog("返回报文中encoding=[" + encoding + "]");
+		Map<String, String> respParam = getAllRequestParam(req);
+
+		// 打印请求报文
+		LogUtil.printRequestLog(respParam);
+		Map<String, String> valideData = null;
+		if (null != respParam && !respParam.isEmpty()) {
+			Iterator<Entry<String, String>> it = respParam.entrySet()
+					.iterator();
+			valideData = new HashMap<String, String>(respParam.size());
+			while (it.hasNext()) {
+				Entry<String, String> e = it.next();
+				String key = (String) e.getKey();
+				String value = (String) e.getValue();
+				try {
+					value = new String(value.getBytes(encoding), encoding);
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+				valideData.put(key, value);
+			}
+		}
+
+		String orderId = valideData.get("orderId");
+		Integer clientId = null;
+		UserVip user = null;
+		if (orderId != null && orderId.startsWith("GX")) {
+			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+		}
+		if (orderId != null && orderId.startsWith("VIP")) {
+			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = user.getCenterId();
+		}
+
+		UnionPayConfig config = (UnionPayConfig) template.opsForValue()
+				.get(Constants.PAY + clientId + Constants.UNION_PAY);
+
+		if (!AcpService.validate(valideData, encoding, config)) {
+			LogUtil.writeLog("验证签名结果[失败].");
+		} else {
+			LogUtil.writeLog("验证签名结果[成功].");
+			String payNo = valideData.get("queryId");
+			if (orderId.startsWith("GX")) {
+				orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
+				try {
+					res.sendRedirect(config.getUrl() + "/personal.html?child=order");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return;
+			}
+			if (orderId.startsWith("VIP")) {
+				if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
+					userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
+					boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
+					if (flag) {
+						userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
+					} else {
+						userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
+					}
+				}
+				try {
+					res.sendRedirect(config.getUrl() + "/personal.html");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return;
+			}
+		}
+	}
+
 	private void returnAli(PrintWriter pw, ResultModel result) {
 		if (result.isSuccess()) {
 			pw.print("success");
 		} else {
 			pw.print("fail");
 		}
+	}
+
+	/**
+	 * 获取请求参数中所有的信息。
+	 * 非struts可以改用此方法获取，好处是可以过滤掉request.getParameter方法过滤不掉的url中的参数。
+	 * struts可能对某些content-type会提前读取参数导致从inputstream读不到信息，所以可能用不了这个方法。
+	 * 理论应该可以调整struts配置使不影响，但请自己去研究。
+	 * 调用本方法之前不能调用req.getParameter("key");这种方法，否则会导致request取不到输入流。
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private static Map<String, String> getAllRequestParamStream(final HttpServletRequest request) {
+		Map<String, String> res = new HashMap<String, String>();
+		try {
+			String notifyStr = new String(IOUtils.toByteArray(request.getInputStream()), Base.encoding);
+			LogUtil.writeLog("收到通知报文：" + notifyStr);
+			String[] kvs = notifyStr.toString().split("&");
+			for (String kv : kvs) {
+				String[] tmp = kv.split("=");
+				if (tmp.length >= 2) {
+					String key = tmp[0];
+					String value = URLDecoder.decode(tmp[1], Base.encoding);
+					res.put(key, value);
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			LogUtil.writeLog("getAllRequestParamStream.UnsupportedEncodingException error: " + e.getClass() + ":"
+					+ e.getMessage());
+		} catch (IOException e) {
+			LogUtil.writeLog("getAllRequestParamStream.IOException error: " + e.getClass() + ":" + e.getMessage());
+		}
+		return res;
+	}
+	
+	public static Map<String, String> getAllRequestParam(
+			final HttpServletRequest request) {
+		Map<String, String> res = new HashMap<String, String>();
+		Enumeration<?> temp = request.getParameterNames();
+		if (null != temp) {
+			while (temp.hasMoreElements()) {
+				String en = (String) temp.nextElement();
+				String value = request.getParameter(en);
+				res.put(en, value);
+				// 在报文上送时，如果字段的值为空，则不上送<下面的处理为在获取所有参数数据时，判断若值为空，则删除这个字段>
+				if (res.get(en) == null || "".equals(res.get(en))) {
+					// System.out.println("======为空的字段名===="+en);
+					res.remove(en);
+				}
+			}
+		}
+		return res;
 	}
 
 }

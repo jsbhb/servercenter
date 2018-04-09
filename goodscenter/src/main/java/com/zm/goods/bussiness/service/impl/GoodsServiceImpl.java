@@ -11,7 +11,10 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.component.ActivityComponent;
@@ -24,6 +27,7 @@ import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.ErrorCodeEnum;
+import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
@@ -49,8 +53,8 @@ import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
-@Service
-@Transactional
+@Service("goodsService")
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class GoodsServiceImpl implements GoodsService {
 
 	private static final Integer PICTURE_TYPE = 0;
@@ -62,6 +66,9 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	UserFeignClient userFeignClient;
+
+	@Resource
+	RedisTemplate<String, Object> template;
 
 	@Resource
 	ProcessWarehouse processWarehouse;
@@ -78,7 +85,7 @@ public class GoodsServiceImpl implements GoodsService {
 	private Logger logger = LoggerFactory.getLogger(GoodsServiceImpl.class);
 
 	@Override
-	public List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId) {
+	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
 		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", centerIdstr);
 		if (param.get("itemId") != null) {
@@ -119,7 +126,21 @@ public class GoodsServiceImpl implements GoodsService {
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, false);
 		}
 
-		return goodsList;
+		if(proportion){//推手需要获取返佣比例
+			Map<String,Object> result = new HashMap<String,Object>();
+			String goodsId = param.get("goodsId").toString();
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
+			Map<String, String> temp = hashOperations.entries(Constants.GOODS_REBATE+goodsId);
+			double rebateProportion = 0;
+			if(temp != null){
+				rebateProportion = Double.valueOf(temp.get("third") == null ? "0" : temp.get("third"));
+			}
+			result.put(Constants.PROPORTION, rebateProportion);
+			result.put(GOODS_LIST, goodsList);
+			return result;
+		} else {
+			return goodsList;
+		}
 	}
 
 	@Override
@@ -170,11 +191,12 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId) {
+	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", list);
 		String id = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", id);
+		param.put("source", source);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(param);
 		if (specsList == null || specsList.size() == 0) {
 			return null;
@@ -225,6 +247,9 @@ public class GoodsServiceImpl implements GoodsService {
 			specs = goodsMapper.getGoodsSpecsForOrder(param);
 			weight += specs.getWeight() * model.getQuantity();
 			Double amount = GoodsServiceUtil.judgeQuantityRange(vip, result, specs, model);
+			if (!result.isSuccess()) {
+				return result;
+			}
 			if (Constants.O2O_ORDER.equals(orderFlag)) {
 				Tax tax = goodsMapper.getTax(param);
 				if (taxMap.get(tax) == null) {
@@ -233,9 +258,7 @@ public class GoodsServiceImpl implements GoodsService {
 					taxMap.put(tax, taxMap.get(tax) + amount);
 				}
 			}
-			if (!result.isSuccess()) {
-				return result;
-			}
+			
 			specsMap.put(model.getItemId(), specs);
 		}
 
@@ -249,10 +272,8 @@ public class GoodsServiceImpl implements GoodsService {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
-		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-		if (!enough) {
-			result.setSuccess(false);
-			result.setErrorMsg("库存不足");
+		result = processWarehouse.processWarehouse(orderFlag, list);
+		if (!result.isSuccess()) {
 			return result;
 		}
 
@@ -490,6 +511,7 @@ public class GoodsServiceImpl implements GoodsService {
 			Map<String, Double> result = null;
 			for (GoodsItem model : goodsList) {
 				temList = temp.get(model.getGoodsId());
+				model.setGoodsSpecsList(temList);
 				result = GoodsServiceUtil.getMinPrice(temList);
 				for (GoodsSpecs specs : temList) {
 					if (model.getSpecsInfo() == null) {
@@ -608,11 +630,11 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public ResultModel stockJudge(List<OrderBussinessModel> list, Integer orderFlag, Integer supplierId) {
 		supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
-		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-		if (!enough) {
-			return new ResultModel(false, "库存不足");
+		ResultModel resultModel = processWarehouse.processWarehouse(orderFlag, list);
+		if (!resultModel.isSuccess()) {
+			return resultModel;
 		}
-		return new ResultModel(true, "");
+		return resultModel;
 	}
 
 	@Override
@@ -686,9 +708,10 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public ResultModel downShelves(String itemId, Integer centerId) {
-		List<String> itemIdList = new ArrayList<String>();
-		itemIdList.add(itemId);
+	public ResultModel downShelves(List<String> itemIdList, Integer centerId) {
+		if(itemIdList == null || itemIdList.size() == 0){
+			return new ResultModel(false, "请传入itemId");
+		}
 		Map<String, Object> param = new HashMap<String, Object>();
 		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
 		param.put("centerId", centerIdstr);
@@ -697,11 +720,18 @@ public class GoodsServiceImpl implements GoodsService {
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有该商品");
 		}
-		param.put("goodsId", goodsIdList.get(0));
-		goodsMapper.updateGoodsItemDownShelves(param);
-		int count = goodsMapper.countUpShelvesStatus(param);
-		if (count == 0) {
-			deleteLuceneAndDownShelves(goodsIdList, centerId);
+		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);//去重
+		goodsMapper.updateGoodsItemDownShelves(param);//商品更新为下架状态
+		List<String> downShelvesGoodsIdList = new ArrayList<String>();
+		for(String goodsId : goodsIdSet){
+			param.put("goodsId", goodsId);
+			int count = goodsMapper.countUpShelvesStatus(param);
+			if (count == 0) {//如果所有item已经下架，goods也下架，并删除索引
+				downShelvesGoodsIdList.add(goodsId);
+			}
+		}
+		if(downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0){
+			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
 		}
 		return new ResultModel(true, "");
 	}
@@ -748,15 +778,18 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel unDistribution(String itemId) {
-		goodsMapper.updateGoodsItemUnDistribution(itemId);
+	public ResultModel unDistribution(List<String> itemIdList) {
+		if(itemIdList == null || itemIdList.size() == 0){
+			return new ResultModel(false, "请传入itemId");
+		}
+		goodsMapper.updateGoodsItemUnDistribution(itemIdList);
 		ResultModel resultModel = userFeignClient.getCenterId(Constants.FIRST_VERSION);
 		if (resultModel.isSuccess()) {
 			List<Integer> list = new ArrayList<Integer>();
 			list = (List<Integer>) resultModel.getObj();
 			list.add(Constants.PREDETERMINE_PLAT_TYPE);
 			for (Integer centerId : list) {
-				downShelves(itemId, centerId);
+				downShelves(itemIdList, centerId);
 			}
 			return new ResultModel(true, "");
 		} else {
@@ -807,15 +840,28 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
-//			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
+			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
-		boolean enough = processWarehouse.processWarehouse(orderFlag, list);
-		if (!enough) {
+		result = processWarehouse.processWarehouse(orderFlag, list);
+		if (!result.isSuccess()) {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
 		}
 
+		return result;
+	}
+
+	@Override
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set) {
+		List<String> temp = new ArrayList<String>(set);
+		List<GoodsConvert> list = goodsMapper.listSkuAndConversionByItemId(temp);
+		Map<String,GoodsConvert> result = new HashMap<String,GoodsConvert>();
+		if(list != null && list.size() > 0){
+			for(GoodsConvert model : list){
+				result.put(model.getItemId(), model);
+			}
+		}
 		return result;
 	}
 

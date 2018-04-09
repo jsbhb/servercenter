@@ -10,21 +10,64 @@
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="specialty_channel" property="specialtyChannel" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="gradeName" property="gradeName" jdbcType="VARCHAR" />
+		<result column="centerId" property="centerId" jdbcType="INTEGER" />
 	</resultMap>
 	
 	
 	<insert id="savePushUser" parameterType="Object" >
-		insert into push_user(grade_id,name,inviter,phone,specialty_channel,status,create_time)
-		values(#{gradeId},#{name},#{inviter},#{phone},#{specialtyChannel},0,now())
+		insert into push_user(user_id,grade_id,name,inviter,phone,specialty_channel,status,create_time,type)
+		values(#{userId},#{gradeId},#{name},#{inviter},#{phone},#{specialtyChannel},#{status},now(),#{type})
 	</insert>
 	
 	<select id="getPushUserById" parameterType="Object" resultMap="pushUser">
-		select * from push_user where id = #{id}
+		select pu.*,gc.name as gradeName from push_user pu left join grade_config gc on pu.grade_id = gc.grade_id 
+		where pu.id = #{id}
 	</select>
 	
-	<select id="updatePushUserStatus" parameterType="Object">
-		update push_user set status = #{status} where id = #{id}
+	<select id="listPushUserByGradeId" parameterType="Object" resultMap="pushUser">
+		select pu.id,pu.name,pu.status,gc.name as gradeName from 
+		push_user pu left join grade_config gc on pu.grade_id = gc.grade_id 
+		where pu.grade_id = #{gradeId} and pu.type = 0
 	</select>
-
+	
+	<select id="listPassPushUserByGradeId" parameterType="Object" resultMap="pushUser">
+		select pu.id,pu.name,pu.user_id from push_user pu 
+		where pu.grade_id = #{gradeId} and pu.status = 2 and pu.type = 0
+	</select>
+	
+	<update id="updatePushUserStatus" parameterType="Object">
+		update push_user set status = #{status} where id = #{id}
+	</update>
+	
+	<select id="countShopPassPushUser" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from push_user where grade_id = #{gradeId} and status = 2 and type = 0
+	</select>
+	
+	<select id="verify" parameterType="Object" resultMap="pushUser">
+		select * from push_user where grade_id = #{gradeId} and phone = #{phone}
+	</select>
+	
+	<select id="listBindingShop" parameterType="Object" resultMap="pushUser">
+		select pu.grade_id,pu.type,gc.name as gradeName,g.parent_id as centerId,pu.status  
+		from push_user pu left join grade_config gc on pu.grade_id = gc.grade_id  
+		left join grade g on gc.grade_id = g.id
+		where pu.user_id = #{userId} and pu.status in (2,11)
+	</select>
+	
+	<update id="updateRepayingPush" parameterType="Object">
+		update push_user set status = 11 where id = #{id}
+	</update>
+	
+	<select id="verifyEffective" parameterType="Object" resultType="java.lang.Integer">
+		select status from push_user where grade_id = #{shopId} and user_id = #{userId}
+	</select>
+	
+	<select id="listAllPushUser" resultMap="pushUser">
+		select pu.* from 
+		push_user pu 
+		where pu.type = 0
+	</select>
 
 </mapper>

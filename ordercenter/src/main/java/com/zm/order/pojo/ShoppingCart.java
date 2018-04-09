@@ -1,5 +1,6 @@
 package com.zm.order.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zm.order.feignclient.model.GoodsSpecs;
 
 import io.swagger.annotations.ApiModel;
@@ -23,8 +24,9 @@ public class ShoppingCart {
 	
 	private String supplierName;
 
+	@JsonIgnore
 	private String createTime;
-
+	@JsonIgnore
 	private String updateTime;
 	
 	private Integer type;

@@ -80,6 +80,78 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsRebateEntity" id="goodsRebate">
+		<id column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="supplier_id" property="supplierId"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="first" property="first"/>
+		<result column="second" property="second"/>
+		<result column="third" property="third"/>
+		<result column="remark" property="remark"/>
+		<result column="description" property="description"/>
+		<result column="status" property="status"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ERPGoodsTagEntity" id="goodsTag">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="priority" property="priority" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ERPGoodsTagBindEntity" id="goodsTagBind">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="tag_id" property="tagId" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	
+	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsWithItem">
+			<id column="id" property="id"/>
+			<result column="goods_id" property="goodsId"/>
+			<result column="specs_template_id" property="templateId"/>
+			<result column="base_id" property="baseId"/>
+			<result column="origin" property="origin"/>
+			<result column="supplier_id" property="supplierId"/>
+			<result column="supplier_name" property="supplierName"/>
+			<result column="goods_name" property="goodsName"/>
+			<result column="description" property="description"/>
+			<result column="detail_path" property="detailPath"/>
+			<result column="index_status" property="indexStatus"/>
+			<collection property="goodsItem"
+				ofType="com.zm.goods.pojo.GoodsItemEntity">
+				<result column="goods_id" property="goodsId"/>
+				<result column="item_id" property="itemId" />
+				<result column="item_code" property="itemCode"/>
+				<result column="sku" property="sku"/>
+				<result column="weight" property="weight"/>
+				<result column="proxy_price" property="proxyPrice"/>
+				<result column="fxprice" property="fxPrice"/>
+				<result column="excise_fax" property="exciseTax"/>
+				<result column="status" property="status"/>
+				<result column="discount" property="discount"/>
+				<result column="info" property="info"/>
+			</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.TagFuncEntity" id="tagFunc">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="fun_name" property="funcName" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -170,4 +242,104 @@
 		(select goods_id from goods_item where status = '2' and goods_id = a.goods_id);
 	</select>
 	
+	<select id="selectAllGoodsForRebate" parameterType="Object" resultMap="goodsRebate">
+		select g.id,g.goods_id,g.goods_name,g.supplier_id,g.supplier_name,g.description,
+		g.status,i.first,i.second,i.third,i.remark,i.update_time,i.opt 
+		from goods g left join goods_rebate i on i.goods_id = g.goods_id 
+		where 1=1
+		<if test="goodsName!=null and goodsName!=''">
+			and g.goods_name like concat('%',#{goodsName},'%') 
+		</if>
+		<if test="goodsId != null and goodsId != ''">
+			and g.goods_id = #{goodsId} 
+		</if>
+		<if test="supplierId != null and supplierId != -1">
+			and g.supplier_id = #{supplierId} 
+		</if>
+		order by g.id
+	</select>
+	
+	<select id="selectGoodsRebateById" parameterType="Object" resultMap="goodsRebate">
+		select g.id,g.goods_id,g.goods_name,g.supplier_id,g.supplier_name,g.description,
+		g.status,i.first,i.second,i.third,i.remark,i.update_time,i.opt 
+		from goods g left join goods_rebate i on i.goods_id = g.goods_id 
+		where 1=1 and g.goods_id = #{goodsId} 
+	</select>
+	
+	<select id="selectRecordForRebate" parameterType="Object" resultMap="goodsRebate">
+		select * from goods_rebate where 1=1 and goods_id = #{goodsId} 
+	</select>
+	
+	<insert id="insertGoodsRebate" parameterType="Object">
+		insert into goods_rebate (goods_id,first,second,third,create_time,update_time,opt) value
+		(#{goodsId},#{first},#{second},#{third},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateGoodsRebate" parameterType="Object">
+		update goods_rebate set first = #{first} , second = #{second} , third = #{third} , update_time = now() where goods_id = #{goodsId} 
+	</update>
+	
+	<select id="selectTagForPage" parameterType="Object" resultMap="goodsTag">
+		select * from goods_tag
+	</select>
+	
+	<insert id="insertGoodsTag" parameterType="Object">
+		insert into goods_tag (tag_name,priority,description,create_time,update_time,opt) value
+		(#{tagName},#{priority},#{description},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateGoodsTag" parameterType="Object">
+		update goods_tag set tag_name = #{tagName} , priority = #{priority} , description = #{description} , update_time = now() where id = #{id} 
+	</update>
+	
+	<delete id="deleteGoodsTag" parameterType="Object">
+		delete from goods_tag where id = #{id}
+	</delete>
+	
+	<select id="selectTagInfo" parameterType="Object" resultMap="goodsTag">
+		select * from goods_tag
+		where 1=1
+		<if test="tagName!=null and tagName!=''">
+			and tag_name like concat('%',#{tagName},'%') 
+		</if>
+		<if test="id != null and id != '0'">
+			and id = #{id} 
+		</if>
+	</select>
+	
+	<select id="selectTagListInfo" parameterType="Object" resultMap="goodsTag">
+		select * from goods_tag
+	</select>
+	
+	<insert id="insertTagBind" parameterType="Object">
+		insert into goods_tag_bind (item_id,tag_id,create_time,update_time,opt) value
+		(#{itemId},#{tagId},now(),now(),#{opt})
+	</insert>
+	
+	<update id="updateTagBind" parameterType="Object">
+		update goods_tag_bind set tag_id = #{tagId}, update_time = now() where item_id = #{itemId}
+	</update>
+	
+	<delete id="deleteTagBind" parameterType="Object">
+		delete from goods_tag_bind where item_id = #{itemId}
+	</delete>
+	
+	<select id="selectGoodsTagBindByGoodsId" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where item_id = #{itemId}
+	</select>
+	
+	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
+		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} 
+	</select>
+	
+	<select id="selectTagFuncListInfo" parameterType="Object" resultMap="tagFunc">
+		select * from tag_fun
+	</select>
+	
+	<select id="selectGoodsTagBindListInfo" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where 1=1
+		<if test="tagId != null and tagId != '0'">
+			and tag_id = #{tagId} 
+		</if>
+	</select>
 </mapper>

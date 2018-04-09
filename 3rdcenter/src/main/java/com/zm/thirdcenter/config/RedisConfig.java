@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -54,6 +57,12 @@ public class RedisConfig {
 	@Bean
 	public RedisTemplate<?, ?> getRedisTemplate() {
 		RedisTemplate<?, ?> template = new StringRedisTemplate(getConnectionFactory());
+		RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+		RedisSerializer<Object> jdkSerializer = new JdkSerializationRedisSerializer();
+		template.setKeySerializer(stringSerializer);
+		template.setValueSerializer(jdkSerializer);
+		template.setHashKeySerializer(stringSerializer);
+		template.setHashValueSerializer(stringSerializer);
 		return template;
 	}
 }

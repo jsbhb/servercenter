@@ -2,10 +2,13 @@ package com.zm.goods.bussiness.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.zm.goods.pojo.Activity;
+import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
@@ -29,7 +32,7 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<GoodsItem> listGoods(Map<String, Object> param, Integer centerId, Integer userId);
+	Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion);
 
 	/**
 	 * listBigTradeGoods:获取大贸海蒸鲜商品比价信息. <br/>
@@ -73,14 +76,13 @@ public interface GoodsService {
 			Integer orderFlag, String couponIds, Integer userId);
 
 	/**
-	 * listGoodsSpecs:获取规格信息. <br/>
-	 * 
-	 * @author wqy
+	 * listGoodsSpecs:获取规格信息.
 	 * @param list
+	 * @param centerId
+	 * @param source feign：通过feign调用该函数，mall默认值，为商城端调用
 	 * @return
-	 * @since JDK 1.7
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId);
+	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
 
 	/**
 	 * getActivity:获取活动信息. <br/>
@@ -244,14 +246,16 @@ public interface GoodsService {
 
 	ResultModel upShelves(List<String> itemIdList, Integer centerId);
 
-	ResultModel downShelves(String itemId, Integer centerId);
+	ResultModel downShelves(List<String> itemIdList, Integer centerId);
 
-	ResultModel unDistribution(String itemId);
+	ResultModel unDistribution(List<String> itemIdList);
 
 	ResultModel syncStock(List<String> itemIdList);
 
 	ResultModel syncgoods(List<String> itemIdList, Integer centerId);
 
 	ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
+
+	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
 
 }

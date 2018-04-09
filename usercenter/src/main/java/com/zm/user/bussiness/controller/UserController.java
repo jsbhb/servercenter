@@ -21,6 +21,7 @@ import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.ThirdPartFeignClient;
+import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.ErrorCodeEnum;
@@ -50,7 +51,7 @@ import com.zm.user.utils.RegularUtil;
 public class UserController {
 
 	private static final String BACK_CODE = "erp";
-
+	
 	@Resource
 	UserService userService;
 
@@ -235,7 +236,7 @@ public class UserController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			e.printStackTrace();
+			LogUtil.writeErrorLog("用户注册", e);
 			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			result.setSuccess(false);
 			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());
@@ -542,6 +543,14 @@ public class UserController {
 			return userService.getPhoneByUserId(userId);
 		}
 		return null;
+	}
+
+	@RequestMapping(value = "{version}/user/customer", method = RequestMethod.POST)
+	public ResultModel getAllCustomer(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return userService.getAllCustomer();
+		}
+		return new ResultModel(false, "版本错误");
 	}
 
 }

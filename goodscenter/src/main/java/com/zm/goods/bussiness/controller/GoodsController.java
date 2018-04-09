@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ErrorCodeEnum;
-import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.GoodsConvert;
+import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
@@ -54,6 +56,9 @@ public class GoodsController {
 
 	@Resource
 	GoodsService goodsService;
+	
+	@Resource
+	GoodsService goodsTagDecorator;
 
 	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
@@ -63,7 +68,8 @@ public class GoodsController {
 			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
+//			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
+			Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination);
 			return new ResultModel(true, resultMap);
 		}
 
@@ -80,7 +86,8 @@ public class GoodsController {
 			@ApiImplicitParam(paramType = "query", name = "itemId", dataType = "String", required = false, value = "itemID") })
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId,
-			@RequestParam(value = "userId", required = false) Integer userId) {
+			@RequestParam(value = "userId", required = false) Integer userId,
+			@RequestParam(value = "proportion", required = false, defaultValue = "false") boolean proportion) {
 
 		ResultModel result = new ResultModel();
 
@@ -105,10 +112,10 @@ public class GoodsController {
 			param.put("itemId", itemId);
 			pagination.init();
 			param.put("pagination", pagination);
-			List<GoodsItem> goodsList = goodsService.listGoods(param, centerId, userId);
 
+//			result.setObj(goodsService.listGoods(param, centerId, userId, proportion));
+			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion));
 			result.setSuccess(true);
-			result.setObj(goodsList);
 		}
 
 		return result;
@@ -175,7 +182,8 @@ public class GoodsController {
 			@ApiImplicitParam(paramType = "query", name = "itemIds", dataType = "String", required = true, value = "商品唯一编码itemId,以逗号隔开"),
 			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res) {
+			HttpServletResponse res,
+			@RequestParam(value = "source", required = false, defaultValue = "mall") String source) {
 
 		ResultModel result = new ResultModel();
 		String ids = req.getParameter("itemIds");
@@ -184,7 +192,8 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId);
+//			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
+			Map<String, Object> resultMap = goodsTagDecorator.listGoodsSpecs(list, centerId, source);
 
 			result.setSuccess(true);
 			result.setObj(resultMap);
@@ -548,7 +557,9 @@ public class GoodsController {
 			@RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.downShelves(itemId, centerId);
+			String[] arr = itemId.split(",");
+			List<String> itemIdList = Arrays.asList(arr);
+			return goodsService.downShelves(itemIdList, centerId);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -564,7 +575,9 @@ public class GoodsController {
 	public ResultModel unDistribution(@PathVariable("version") Double version, @RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.unDistribution(itemId);
+			String[] arr = itemId.split(",");
+			List<String> itemIdList = Arrays.asList(arr);
+			return goodsService.unDistribution(itemIdList);
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -619,6 +632,19 @@ public class GoodsController {
 		}
 
 		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
+	@ApiIgnore
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set){
+		if (Constants.FIRST_VERSION.equals(version)) {
+			if (set == null || set.size() == 0) {
+				return null;
+			}
+			return goodsService.listSkuAndConversionByItemId(set);
+		}
+		
+		return null;
 	}
 
 }

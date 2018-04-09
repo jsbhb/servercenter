@@ -11,6 +11,8 @@ public class Constants {
 
 	public static final String ALI_PAY = "2";
 
+	public static final String UNION_PAY = "3";
+
 	public static final String JSAPI = "JSAPI";
 
 	// *********************订单状态******************************/
@@ -25,6 +27,9 @@ public class Constants {
 	public static final Integer ORDER_COMPLETE = 7;// 已收货订单完成
 	public static final Integer ORDER_CANCEL = 8;// 退单
 	public static final Integer ORDER_CLOSE = 9;// 交易关闭
+	public static final Integer CAPITAL_POOL_NOT_ENOUGH = 11;// 资金池不足
+	public static final Integer CAPITAL_POOL_ENOUGH = 12;// 资金池已经扣减,报关/推送仓库
+	public static final Integer REFUNDS = 21;// 退款中
 	public static final Integer ORDER_EXCEPTION = 99;// 订单异常
 
 	// *********************活动范围，获取是否有全场活动******************************/
@@ -67,4 +72,23 @@ public class Constants {
 
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
 
+	// *********************资金池redis前缀*********************
+
+	public static final String CAPITAL_PERFIX = "capital:";
+	public static final String CAPITAL_DETAIL = "capitaldetail:";
+
+	// *********************商品返佣redis前缀***************************
+	public static final String GOODS_REBATE = "goodsrebate:";
+
+	// *********************订单返佣redis前缀***************************
+	public static final String ORDER_REBATE = "orderrebate:";
+
+	// *********************区域中心返佣***************************
+	public static final String CENTER_ORDER_REBATE = "center:orderrebate:";
+	// *********************店铺返佣***************************
+	public static final String SHOP_ORDER_REBATE = "shop:orderrebate:";
+	// *********************推手返佣***************************
+	public static final String PUSHUSER_ORDER_REBATE = "pushuser:orderrebate:";
+	// *********************返佣详情***************************
+	public static final String REBATE_DETAIL = "rebatedetail:";
 }

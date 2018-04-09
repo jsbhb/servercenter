@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsTagMapper">
+
+
+	<resultMap type="com.zm.goods.pojo.GoodsTagEntity" id="tag">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="tag_name" property="tagName" jdbcType="VARCHAR"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="tag_fun_id" property="tagFunId" jdbcType="INTEGER"/>
+		<result column="priority" property="priority" jdbcType="INTEGER"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+		<result column="createTime" property="createTime" jdbcType="VARCHAR"/>
+		<result column="updateTime" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsTagBindEntity" id="tagBind">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="tag_id" property="tagId" jdbcType="INTEGER"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="createTime" property="createTime" jdbcType="VARCHAR"/>
+		<result column="updateTime" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<select id="listGoodsTagByGoodsId" parameterType="Object" resultMap="tag">
+		select gt.*,gtb.item_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.item_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listCutOrderItemIds" resultType="java.lang.String">
+		select gtb.item_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gt.tag_fun_id = 1
+	</select>
+	
+</mapper>

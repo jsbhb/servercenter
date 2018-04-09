@@ -8,19 +8,17 @@ import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
-import com.zm.user.constants.LogConstants;
 import com.zm.user.feignclient.ActivityFeignClient;
 import com.zm.user.feignclient.GoodsFeignClient;
-import com.zm.user.feignclient.LogFeignClient;
 import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
-import com.zm.user.feignclient.model.LogInfo;
 import com.zm.user.feignclient.model.PayModel;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
@@ -39,7 +37,7 @@ import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class UserServiceImpl implements UserService {
 
 	private static final Integer DEFAULT = 1;
@@ -50,9 +48,6 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	UserMapper userMapper;
-
-	@Resource
-	LogFeignClient logFeignClient;
 
 	@Resource
 	OrderFeignClient orderFeignClient;
@@ -154,10 +149,6 @@ public class UserServiceImpl implements UserService {
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
 
-		String content = "用户通过手机号  \"" + info.getPhone() + "\"  绑定了账号";
-//		logFeignClient.saveLog(Constants.FIRST_VERSION,
-//				packageLog(LogConstants.REGISTER, "注册账号", info.getCenterId(), content, info.getPhone()));
-
 		return info.getId();
 	}
 
@@ -198,9 +189,6 @@ public class UserServiceImpl implements UserService {
 
 		userMapper.updateUserPwd(param);
 
-		String content = "用户  \"" + phone + "\"  修改了密码";
-		logFeignClient.saveLog(Constants.FIRST_VERSION, packageLog(LogConstants.CHANGE_PWD, "修改密码", 1, content, phone));
-
 	}
 
 	@Override
@@ -221,20 +209,6 @@ public class UserServiceImpl implements UserService {
 			info.setDuration(vipUser.getDuration());
 			info.setVipTime(vipUser.getCreateTime());
 		}
-
-		return info;
-	}
-
-	private LogInfo packageLog(Integer apiId, String apiName, Integer clientId, String content, String opt) {
-		LogInfo info = new LogInfo();
-
-		info.setApiId(apiId);
-		info.setApiName(apiName);
-		info.setCenterId(LogConstants.USER_CENTER_ID);
-		info.setCenterName("用户服务中心");
-		info.setClientId(clientId);
-		info.setContent(content);
-		info.setOpt(opt);
 
 		return info;
 	}
@@ -422,6 +396,12 @@ public class UserServiceImpl implements UserService {
 	public String getPhoneByUserId(Integer userId) {
 
 		return userMapper.getPhoneByUserId(userId);
+	}
+
+	@Override
+	public ResultModel getAllCustomer() {
+		List<UserDetail> list = userMapper.getAllCustomer();
+		return new ResultModel(true, list);
 	}
 
 }

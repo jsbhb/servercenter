@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.finance.bussiness.dao.CardMapper">
+
+	<resultMap type="com.zm.finance.pojo.card.Card" id="card">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="type_id" property="typeId" jdbcType="INTEGER"/>
+		<result column="type" property="type" jdbcType="INTEGER"/>
+		<result column="is_default" property="setDefault" jdbcType="INTEGER"/>
+		<result column="card_bank" property="cardBank" jdbcType="VARCHAR"/>
+		<result column="card_no" property="cardNo" jdbcType="VARCHAR"/>
+		<result column="card_name" property="cardName" jdbcType="VARCHAR"/>
+		<result column="card_mobile" property="cardMobile" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+
+	<insert id="insertCard" parameterType="Object">
+		insert into bind_card(type_id,type,card_bank,card_no,card_name,card_mobile,create_time)
+		value(#{typeId},#{type},#{cardBank},#{cardNo},#{cardName},#{cardMobile},now())
+	</insert>
+	
+	<update id="updateCard" parameterType="Object">
+		update bind_card
+		<set>
+			<if test="cardBank != null">
+				card_bank = #{cardBank},
+			</if>
+			<if test="cardNo != null">
+				card_no = #{cardNo},
+			</if>
+			<if test="cardName != null">
+				card_name = #{cardName},
+			</if>
+			<if test="cardMobile != null">
+				card_mobile = #{cardMobile},
+			</if>
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<select id="getCard" parameterType="Object" resultMap="card">
+		select * from bind_card where type_id = #{typeId} and type = #{type}
+	</select>
+	
+	<delete id="removeCard" parameterType="Object">
+		delete from bind_card where id = #{id}
+	</delete>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="card">
+		select * from bind_card where type_id = #{typeId} and type = #{type}
+	</select>
+	
+	<select id="queryByCardId" parameterType="Object" resultMap="card">
+		select * from bind_card where id = #{id}
+	</select>
+</mapper>

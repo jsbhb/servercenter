@@ -31,6 +31,8 @@ public interface PayService {
 	boolean payCustom(CustomModel model) throws Exception;
 
 	Map<String,Object> aliPay(Integer clientId, String type, PayModel model) throws Exception;
+	
+	Map<String,Object> unionPay(Integer clientId, PayModel model, String type);
 
 	/**
 	 * 阿里 退款接口

@@ -13,12 +13,16 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
+import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsStatusEnum;
@@ -34,7 +38,9 @@ import com.zm.goods.pojo.GoodsStatusEnum;
  */
 @Service
 public class GoodsItemServiceImpl implements GoodsItemService {
-
+	@Resource
+	GoodsBackMapper goodsBackMapper;
+	
 	@Resource
 	GoodsItemMapper goodsItemMapper;
 
@@ -47,14 +53,19 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Override
 	public GoodsItemEntity queryById(int id) {
 		GoodsItemEntity entity = goodsItemMapper.selectById(id);
+		ERPGoodsTagBindEntity tagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(entity);
+		entity.setTagBindEntity(tagBind);
 		return entity;
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void save(GoodsItemEntity entity) {
 		goodsItemMapper.insert(entity);
 		goodsItemMapper.insertPrice(entity.getGoodsPrice());
+		if (entity.getTagBindEntity() != null) {
+			goodsBackMapper.insertTagBind(entity.getTagBindEntity());
+		}
 	}
 
 	@Override
@@ -70,7 +81,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void beUse(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.USEFUL.getIndex()+"");
 		goodsItemMapper.updateStatus(entity);
@@ -87,10 +98,21 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void update(GoodsItemEntity entity) {
 		goodsItemMapper.update(entity);
 		goodsItemMapper.updatePrice(entity.getGoodsPrice());
+		//判断商品标签
+		//增删改
+		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity);
+		ERPGoodsTagBindEntity newTag = entity.getTagBindEntity();
+		if (oldTag == null && newTag.getTagId() != 0) {
+			goodsBackMapper.insertTagBind(newTag);
+		} else if (oldTag != null && newTag.getTagId() == 0) {
+			goodsBackMapper.deleteTagBind(newTag);
+		} else if (oldTag != null && newTag.getTagId() != 0) {
+			goodsBackMapper.updateTagBind(newTag);
+		}
 	}
 
 	@Override
@@ -129,4 +151,18 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		goodsItemMapper.updateItemPrice(entity);
 	}
 
+	@Override
+	public Page<GoodsEntity> queryByPageDownload(GoodsItemEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return goodsItemMapper.selectForPageDownload(entity);
+	}
+
+	@Override
+	public Page<GoodsEntity> queryCenterByPageDownload(GoodsItemEntity entity, int centerId) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("entity", entity);
+		params.put("centerId", centerId);
+		return goodsItemMapper.selectCenterForPageDownload(params);
+	}
 }

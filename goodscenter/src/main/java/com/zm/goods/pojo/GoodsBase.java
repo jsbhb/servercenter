@@ -3,27 +3,27 @@ package com.zm.goods.pojo;
 public class GoodsBase {
 
 	private Integer id;
-	
+
 	private String brandId;
-	
+
 	private String goodsName;
-	
+
 	private String brand;
-	
+
 	private Double tariff;
-	
+
 	private Double incrementTax;
-	
+
 	private String hscode;
-	
+
 	private String encode;
-	
+
 	private String unit;
-	
+
 	private String createTime;
-	
+
 	private String updateTime;
-	
+
 	private String opt;
 
 	public Double getTariff() {

@@ -200,4 +200,6 @@ public interface UserService {
 	List<Grade> listGradeByParentId(Integer parentId);
 
 	String getPhoneByUserId(Integer userId);
+
+	ResultModel getAllCustomer();
 }

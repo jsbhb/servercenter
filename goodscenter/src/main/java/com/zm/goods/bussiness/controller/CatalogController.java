@@ -224,4 +224,38 @@ public class CatalogController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+
+	@RequestMapping(value = "{version}/goods/catalog/querySecondAll", method = RequestMethod.GET)
+	public ResultModel querySecondAll(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+
+				List<SecondCatalogEntity> result = catalogService.querySecondAll();
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/queryThirdAll", method = RequestMethod.GET)
+	public ResultModel queryThirdAll(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+
+				List<ThirdCatalogEntity> result = catalogService.queryThirdAll();
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 }

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.finance.bussiness.dao.CapitalPoolMapper">
+
+	
+	<resultMap type="com.zm.finance.pojo.capitalpool.CapitalPool" id="capitalpool">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
+		<result column="money" property="money" jdbcType="INTEGER"/>
+		<result column="frozen_money" property="frozenMoney" jdbcType="NUMERIC"/>
+		<result column="preferential" property="preferential" jdbcType="NUMERIC"/>
+		<result column="frozen_preferential" property="frozenPreferential" jdbcType="NUMERIC"/>
+		<result column="use_money" property="useMoney" jdbcType="NUMERIC"/>
+		<result column="use_preferential" property="usePreferential" jdbcType="NUMERIC"/>
+		<result column="count_money" property="countMoney" jdbcType="NUMERIC"/>
+		<result column="count_preferential" property="countPreferential" jdbcType="NUMERIC"/>
+		<result column="level" property="level" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.finance.pojo.refilling.Refilling" id="refilling">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
+		<result column="start_money" property="startMoney" jdbcType="NUMERIC"/>
+		<result column="money" property="money" jdbcType="NUMERIC"/>
+		<result column="pool_money" property="poolMoney" jdbcType="NUMERIC"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<select id="listCenterCapitalPool" resultMap="capitalpool">
+		select * from capitalpool
+	</select>
+	
+	<insert id="insertCapitalPoolDetail" parameterType="Object">
+		insert into capitalpool_detail 
+		(center_id,pay_type,business_type,money,pay_no,order_id,remark,create_time)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.centerId},#{item.payType},#{item.bussinessType},#{item.money},#{item.payNo},#{item.orderId},#{item.remark},now())
+		</foreach>
+	</insert>
+	
+	<update id="updateCapitalPool" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			update capitalpool
+			<set>
+				<if test="item.money != null">
+					money = #{item.money},
+				</if>
+				<if test="item.frozenMoney != null">
+					frozen_money = #{item.frozenMoney},
+				</if>
+				<if test="item.preferential != null">
+					preferential = #{item.preferential},
+				</if>
+				<if test="item.frozenPreferential != null">
+					frozen_preferential = #{item.frozenPreferential},
+				</if>
+				<if test="item.useMoney != null">
+					use_money = #{item.useMoney},
+				</if>
+				<if test="item.usePreferential != null">
+					use_preferential = #{item.usePreferential},
+				</if>
+				<if test="item.countMoney != null">
+					count_money = #{item.countMoney},
+				</if>
+				<if test="item.countPreferential != null">
+					count_preferential = #{item.countPreferential},
+				</if>
+				update_time = now()
+			</set>
+			where center_id = #{item.centerId} 
+		</foreach>
+	</update>
+	
+	<select id="getRefilling" resultMap="refilling" parameterType="Object">
+		select * from refilling_detail where id = #{id}
+	</select>
+	
+	<update id="updatePassRechargeApply" parameterType="Object">
+		update refilling_detail set status = 2 where id = #{id}
+	</update>
+	
+	<update id="updateUnPassRechargeApply" parameterType="Object">
+		update refilling_detail set status = 3,remark = #{remark} where id = #{id}
+	</update>
+	
+	<insert id="insertRefillingDetail" parameterType="Object">
+		insert into refilling_detail(center_id,start_money,money,pool_money,status,create_time) 
+		values(#{centerId},#{startMoney},#{money},#{poolMoney},1,now())
+	</insert>
+	
+	<select id="selectRecordByCenterId" parameterType="java.lang.Integer" resultMap="capitalpool">
+		select * from capitalpool where center_id = #{centerId}
+	</select>
+	
+	<insert id="insertCapitalPoolRecord" parameterType="java.lang.Integer">
+		insert into capitalpool (center_id,create_time,update_time,opt) VALUES (#{centerId},now(),now(),'8001')
+	</insert>
+	
+	<select id="selectDetailByEntity" resultMap="refilling" parameterType="Object">
+		select * from refilling_detail where 1=1
+		<if test="centerId != null and centerId != '0'">
+			and center_id = #{centerId}
+		</if>
+		<if test="money != null and money != '0'">
+			and money = #{money}
+		</if>
+		<if test="status != null and status != '0'">
+			and status = #{status}
+		</if>
+		order by create_time desc,status asc
+	</select>
+</mapper>

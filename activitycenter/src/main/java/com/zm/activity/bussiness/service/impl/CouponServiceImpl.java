@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.activity.bussiness.dao.CouponMapper;
@@ -19,14 +20,14 @@ import com.zm.activity.pojo.Coupon;
 import com.zm.activity.pojo.ResultModel;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class CouponServiceImpl implements CouponService {
 
 	@Resource
 	CouponMapper couponMapper;
 
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	private final Integer ALREADY_RECEIVE = 1;
 	private final Integer ALREADY_EMPTY = 99;
@@ -44,7 +45,7 @@ public class CouponServiceImpl implements CouponService {
 		List<String> couponIdList = couponMapper.listUserCouponByUserId(param);
 		for (Coupon coupon : couponList) {
 			if (coupon.getNum() > 0) {
-				Object obj = redisTemplate.opsForValue().get(Constants.RECEIVE_NUM + coupon.getCouponId());
+				Object obj = template.opsForValue().get(Constants.RECEIVE_NUM + coupon.getCouponId());
 				if (obj != null) {
 					Integer receiveNum = Integer.valueOf(obj.toString());
 					if (receiveNum >= coupon.getNum()) {
@@ -94,7 +95,7 @@ public class CouponServiceImpl implements CouponService {
 		}
 		// 如果有数量限制
 		if (total > 0) {
-			Object obj = redisTemplate.opsForList().leftPop(Constants.ISSUE_NUM + couponId);
+			Object obj = template.opsForList().leftPop(Constants.ISSUE_NUM + couponId);
 			if (obj == null) {
 				return new ResultModel(false, "已抢完");
 			}
@@ -102,13 +103,12 @@ public class CouponServiceImpl implements CouponService {
 		param.put("userId", userId);
 		int back = couponMapper.binding(param);
 		if (back == 1) {
-			redisTemplate.setValueSerializer(new StringRedisSerializer());
-			redisTemplate.opsForValue().increment(Constants.RECEIVE_NUM + couponId, 1);
+			template.opsForValue().increment(Constants.RECEIVE_NUM + couponId, 1);
 			return new ResultModel(true, "领取成功");
 		} else {
 			// 如果没插入，队列数量返回
 			if (total != null && total > 0) {
-				redisTemplate.opsForList().rightPush(Constants.ISSUE_NUM + couponId, couponId);
+				template.opsForList().rightPush(Constants.ISSUE_NUM + couponId, couponId);
 			}
 			return new ResultModel(false, "您已经领取过该优惠券");
 		}
@@ -126,7 +126,7 @@ public class CouponServiceImpl implements CouponService {
 					Integer num = coupon.getNum();
 					String couponId = coupon.getCouponId();
 					for (int i = 0; i < num; i++) {
-						redisTemplate.opsForList().rightPush(Constants.ISSUE_NUM + couponId, couponId);
+						template.opsForList().rightPush(Constants.ISSUE_NUM + couponId, couponId);
 					}
 				}
 			}
@@ -165,7 +165,7 @@ public class CouponServiceImpl implements CouponService {
 				}
 			}
 			if (coupon.getNum() > 0) {
-				Object obj = redisTemplate.opsForValue().get(Constants.RECEIVE_NUM + coupon.getCouponId());
+				Object obj = template.opsForValue().get(Constants.RECEIVE_NUM + coupon.getCouponId());
 				if (obj != null) {
 					Integer receiveNum = Integer.valueOf(obj.toString());
 					if (receiveNum >= coupon.getNum()) {

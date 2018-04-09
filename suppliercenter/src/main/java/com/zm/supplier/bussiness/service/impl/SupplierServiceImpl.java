@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
@@ -24,7 +25,7 @@ import com.zm.supplier.pojo.SupplierEntity;
 import com.zm.supplier.util.ListUtil;
 
 @Service
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class SupplierServiceImpl implements SupplierService {
 
 	@Resource
@@ -63,6 +64,7 @@ public class SupplierServiceImpl implements SupplierService {
 
 	private static final Integer XINYUN_WAREHOUSE = 3;
 	private static final Integer FUBANG_WAREHOUSE = 4;
+	private static final Integer LIANGYOU_WAREHOUSE = 2;
 
 	@Override
 	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
@@ -78,15 +80,11 @@ public class SupplierServiceImpl implements SupplierService {
 			}
 		}
 		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
-			if (XINYUN_WAREHOUSE.equals(entry.getKey()) || FUBANG_WAREHOUSE.equals(entry.getKey())) {
-				List<OrderIdAndSupplierId> temp = null;
-				for (OrderIdAndSupplierId model : entry.getValue()) {
-					temp = new ArrayList<OrderIdAndSupplierId>();
-					temp.add(model);
-					warehouseThreadPool.checkOrderStatus(temp, entry.getKey());
-				}
-			} else {
-				warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
+			List<OrderIdAndSupplierId> temp = null;
+			for (OrderIdAndSupplierId model : entry.getValue()) {
+				temp = new ArrayList<OrderIdAndSupplierId>();
+				temp.add(model);
+				warehouseThreadPool.checkOrderStatus(temp, entry.getKey());
 			}
 		}
 		return new ResultModel(true, "正在同步状态");
@@ -96,7 +94,7 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Override
 	public ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId, boolean flag) {
-		if (FUBANG_WAREHOUSE.equals(supplierId)) {
+		if (FUBANG_WAREHOUSE.equals(supplierId) || LIANGYOU_WAREHOUSE.equals(supplierId)) {
 			List<OrderBussinessModel> temp = null;
 			for (OrderBussinessModel model : list) {
 				temp = new ArrayList<OrderBussinessModel>();
@@ -108,8 +106,8 @@ public class SupplierServiceImpl implements SupplierService {
 				}
 			}
 		} else {
-			List<List<OrderBussinessModel>> subList = ListUtil.split(list, LIMITSIZE);//批量同步没次20个，防止超时
-			for(List<OrderBussinessModel> temp : subList){
+			List<List<OrderBussinessModel>> subList = ListUtil.split(list, LIMITSIZE);// 批量同步没次20个，防止超时
+			for (List<OrderBussinessModel> temp : subList) {
 				if (flag) {
 					warehouseThreadPool.checkStockByAsync(temp, supplierId);// 定时器调用的库存方法用线程池，防止feign调用超时
 				} else {

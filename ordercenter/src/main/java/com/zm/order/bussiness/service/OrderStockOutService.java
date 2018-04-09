@@ -7,9 +7,12 @@
  */
 package com.zm.order.bussiness.service;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ThirdOrderInfo;
 
 /**
  * ClassName: OrderBackService <br/>
@@ -50,5 +53,15 @@ public interface OrderStockOutService {
 	 * @since JDK 1.7  
 	 */
 	Page<OrderGoods> queryByPageForGoods(OrderGoods entity);
+
+	/**
+	 * queryByOrderId:根据编号查询订单. <br/>
+	 * 
+	 * @author orderId
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<ThirdOrderInfo> queryThirdInfo(String orderId);
 
 }

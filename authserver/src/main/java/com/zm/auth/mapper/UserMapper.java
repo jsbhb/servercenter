@@ -1,5 +1,10 @@
 package com.zm.auth.mapper;
 
+import java.util.Set;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.zm.auth.model.PlatformUser;
 import com.zm.auth.model.UserInfo;
 
 /**
@@ -18,7 +23,7 @@ public interface UserMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	public UserInfo getUserByName(String userName);
+	public UserInfo getUserByName(UserInfo userInfo);
 
 	/**
 	 * 
@@ -29,7 +34,7 @@ public interface UserMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	public UserInfo getUserByPhone(String phone);
+	public UserInfo getUserByPhone(UserInfo userInfo);
 
 	/**
 	 * 
@@ -41,6 +46,17 @@ public interface UserMapper {
 	 * @since JDK 1.7
 	 */
 	public void insert(UserInfo userInfo);
+	
+	/**
+	 * 
+	 * insert:插入新用户. <br/>
+	 * 
+	 * @author hebin
+	 * @param PlatformUser
+	 * @return
+	 * @since JDK 1.7
+	 */
+	public void insertPlatformUser(@Param("set")Set<PlatformUser> list);
 
 	/**
 	 * 
@@ -64,7 +80,7 @@ public interface UserMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	public UserInfo getUserByPlatId(String userId);
+	public UserInfo getUserByPlatId(UserInfo userInfo);
 
 	/**
 	 * 
@@ -88,35 +104,8 @@ public interface UserMapper {
 	 */
 	int modifyPwd(UserInfo userInfo);
 	
+	String getUserIdByUserName(String userName);
 	
-	/**
-	 * 
-	 * updateUserAuth:账号状态升级为可以登录订货平台 <br/>  
-	 *  
-	 * @author wqy  
-	 * @param userName
-	 * @since JDK 1.7
-	 */
-	void updateUserAuth(String userName);
+	String getUserIdByOpenId(String openId);
 	
-	/**
-	 * 
-	 * insert2B：生成订货平台账号（同时可以登录普通平台）. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param userInfo
-	 * @since JDK 1.7
-	 */
-	public void insert2B(UserInfo userInfo);
-	
-	/**
-	 * 
-	 * loginFor2B：登录订货平台. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param userInfo
-	 * @since JDK 1.7
-	 */
-	UserInfo loginFor2B(UserInfo userInfo);
-
 }

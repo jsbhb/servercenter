@@ -3,24 +3,22 @@ package com.zm.goods.pojo;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zm.goods.pojo.vo.Coupon;
 
 public class GoodsItem extends GoodsBase {
-	
-	@JsonIgnore
+
 	private Integer id;
 
 	private String goodsId;
 
 	private Integer supplierId;
-	
+
 	private String supplierName;
 
 	private String customGoodsName;
-	
+
 	private String description;
-	
+
 	private Integer status;
 
 	private Integer type;
@@ -28,48 +26,43 @@ public class GoodsItem extends GoodsBase {
 	private Integer popular;
 
 	private Integer hot;
-	
+
 	private Integer fresh;
 
 	private Integer good;
-	
+
 	private String origin;
 
 	private Integer choice;
 
-	@JsonIgnore
 	private Integer indexStatus;
 
 	private String detailPath;
 
-	@JsonIgnore
 	private String createTime;
 
-	@JsonIgnore
 	private String updateTime;
-	
+
 	private Set<String> specsInfo;
 
-	@JsonIgnore
 	private String opt;
-	
+
 	private Double price;
-	
+
 	private Double realPrice;
-	
+
 	private String thirdCategory;
-	
+
 	private String secondCategory;
-	
+
 	private String firstCategory;
-	
+
 	private List<GoodsFile> goodsFileList;
 
 	private List<GoodsSpecs> goodsSpecsList;
-	
+
 	private List<Coupon> couponList;
 
-	
 	public List<Coupon> getCouponList() {
 		return couponList;
 	}

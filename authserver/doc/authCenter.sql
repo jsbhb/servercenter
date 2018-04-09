@@ -31,7 +31,7 @@ CREATE TABLE `user` (
   `LAST_UPDATED_BY` int(11) NOT NULL COMMENT '最后修改人',
   `openid` varchar(100) DEFAULT NULL,
   `platform` int(11) DEFAULT NULL,
-  `usercenterid` int(11) NOT NULL,
+  `usercenterid` int(11) NOT NULL, 
   PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `USER_NAME_UNIQUE` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COMMENT='用户表';

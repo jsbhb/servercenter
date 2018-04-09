@@ -17,7 +17,8 @@ package com.zm.auth.model;
  * @since JDK 1.7
  */
 public enum PlatUserType {
-	CROSS_BORDER("跨境业务", 1), EARA("区域中心", 2), BIG_TRADE("大贸", 3), DISTRIBUTION("分销", 4), CONSUMER("消费者", 5), B2B_BUSSINESS("订货平台",6),PUSH_USER("推手平台",7);
+	CROSS_BORDER("跨境业务", 1), EARA("区域中心", 2), BIG_TRADE("大贸", 3), DISTRIBUTION("分销", 4), CONSUMER("消费者",
+			5), B2B_BUSSINESS("订货平台", 6), PUSH_USER("推手平台", 7), BUTTJOINT("对接用户", 8);
 
 	private String name;
 	private int index;

@@ -16,6 +16,8 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
+		<result column="mobile_url" property="mobileUrl" jdbcType="VARCHAR" />
 		<result column="company" property="company" jdbcType="VARCHAR" />
 		<result column="person_in_charge_id" property="personInChargeId" jdbcType="INTEGER" />
 	</resultMap>
@@ -85,6 +87,20 @@
 		<result column="attribute" property="attribute" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+	</resultMap>
+	
+
+	<resultMap type="com.zm.user.pojo.UserDetail" id="UserDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="location" property="location" jdbcType="VARCHAR" />
+		<result column="company" property="company" jdbcType="VARCHAR" />
+		<result column="head_img" property="headImg" jdbcType="VARCHAR" />
+		<result column="certificates" property="certificates" jdbcType="INTEGER" />
+		<result column="idnum" property="idNum" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="INTEGER" />
 	</resultMap>
 
 	<select id="getVipUser" parameterType="Object" resultMap="vipUser">
@@ -351,9 +367,9 @@
 
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
-		create_time,opt,company)
+		create_time,opt,company,redirect_url,mobile_url)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company})
+		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company},#{redirectUrl},#{mobileUrl})
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
@@ -389,5 +405,9 @@
 		VALUES (#{id},#{storeName},#{contacts},#{contactsPhone},#{province},#{city},
 		#{district},#{address},#{storeOperator},#{operatorIDNum},#{picPath1},#{picPath2},#{picPath3},#{picPath4},now(),now(),#{opt})
 	</insert>
+	
+	<select id="getAllCustomer" resultMap="UserDetail">
+		select * from user_detail
+	</select>
 
 </mapper>

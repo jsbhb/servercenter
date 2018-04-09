@@ -1,5 +1,7 @@
 package com.zm.goods.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
+import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.ResultModel;
@@ -32,6 +37,9 @@ public class GoodsItemController {
 
 	@Resource
 	GoodsItemService goodsItemService;
+	
+	@Resource
+	GoodsBackService goodsBackService;
 
 	@RequestMapping(value = "{version}/goods/item/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
@@ -39,7 +47,22 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String gradeLevel = request.getParameter("gradeLevel");
-
+			
+//			if (entity.getTagBindEntity() != null) {
+//				ERPGoodsTagBindEntity param = entity.getTagBindEntity();
+//				//增加根据标签查询的条件
+//				String itemIds = "";
+//				List<ERPGoodsTagBindEntity> erpGoodsTagBindList = goodsBackService.queryGoodsTagBindListInfo(param);
+//				for(ERPGoodsTagBindEntity ent:erpGoodsTagBindList) {
+//					itemIds = itemIds + "'" + ent.getItemId() + "',";
+//				}
+//				if (erpGoodsTagBindList.size() > 0) {
+//					itemIds = itemIds.substring(0,itemIds.length()-1);
+//				}
+//				param.setItemId(itemIds);
+//				entity.setTagBindEntity(param);
+//			}
+			
 			if ("1".equals(gradeLevel)) {
 				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
 				return new ResultModel(true, page, new Pagination(page));
@@ -191,6 +214,18 @@ public class GoodsItemController {
 	
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/goods/item/queryPurchaseItemForCheck", method = RequestMethod.POST)
+	public ResultModel queryPurchaseItemForCheck(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+	
+		if (Constants.FIRST_VERSION.equals(version)) {
+			GoodsPrice result = goodsItemService.queryItemPrice(entity.getItemId());
+			return new ResultModel(true, result);
+		}
+	
+		return new ResultModel(false, "版本错误");
+	}
 	
 	@RequestMapping(value = "{version}/goods/item/editPurchaseItem", method = RequestMethod.POST)
 	public ResultModel editPurchaseItem(HttpServletRequest request, @PathVariable("version") Double version,
@@ -214,6 +249,30 @@ public class GoodsItemController {
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryForPageDownload", method = RequestMethod.POST)
+	public ResultModel queryForPageDownload(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String gradeLevel = request.getParameter("gradeLevel");
+
+			if ("1".equals(gradeLevel)) {
+				Page<GoodsEntity> page = goodsItemService.queryByPageDownload(entity);
+				return new ResultModel(true, page, new Pagination(page));
+			} else {
+				String centerId = request.getParameter("centerId");
+				if (centerId == null || "".equals(centerId)) {
+					new ResultModel(false, "没有获取区域中心编号");
+				}
+				Page<GoodsEntity> page = goodsItemService.queryCenterByPageDownload(entity, Integer.parseInt(centerId));
+				return new ResultModel(true, page, new Pagination(page));
+			}
+
 		}
 
 		return new ResultModel(false, "版本错误");

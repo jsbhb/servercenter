@@ -3,14 +3,17 @@ package com.zm.auth.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.auth.common.Constants;
@@ -22,6 +25,7 @@ import com.zm.auth.model.AccessToken;
 import com.zm.auth.model.ErrorCodeEnum;
 import com.zm.auth.model.GetTokenParam;
 import com.zm.auth.model.PlatUserType;
+import com.zm.auth.model.PlatformUser;
 import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.SecurityUserDetail;
 import com.zm.auth.model.SecurityUserFactory;
@@ -58,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
 		this.userMapper = userMapper;
 	}
 
-	@Transactional
+	@Transactional(isolation=Isolation.READ_COMMITTED)
 	@Override
 	public SecurityUserDetail register(UserInfo userInfo) {
 
@@ -75,14 +79,15 @@ public class AuthServiceImpl implements AuthService {
 		String userName = null;
 		if (loginType == Constants.LOGIN_PHONE) {
 			userName = userInfo.getPhone();
-			if (userMapper.getUserByPhone(userName) != null) {
+			userInfo.setUserName(userName);
+			if (userMapper.getUserByPhone(userInfo) != null) {
 				throw new SecurityException("该手机号已经存在！");
 			}
 		}
 
 		if (loginType == Constants.LOGIN_USER_NAME) {
 			userName = userInfo.getUserName();
-			if (userMapper.getUserByName(userName) != null) {
+			if (userMapper.getUserByName(userInfo) != null) {
 				throw new SecurityException("该用户名名已经存在！");
 			}
 		}
@@ -96,19 +101,36 @@ public class AuthServiceImpl implements AuthService {
 
 		}
 
-		if (loginType == Constants.LOGIN_PHONE) {
-			userInfo.setUserName(userName);
-		}
-
 		userInfo.setLastPasswordResetDate(new Date());
 		userInfo.setAuthorities(asList("ROLE_USER"));
-		userMapper.insert(userInfo);
+		Set<PlatformUser> set = new HashSet<PlatformUser>();
+		String userId = null;
+		if(PlatUserType.CROSS_BORDER.getIndex() == userInfo.getPlatUserType()){
+			userMapper.insert(userInfo);
+			userId = userInfo.getUserId();
+		}else{
+			userId = userMapper.getUserIdByUserName(userName);
+			if(userId == null){
+				userMapper.insert(userInfo);
+				userId = userInfo.getUserId();
+			}
+			//插入平台用户
+			PlatformUser consumerPlat = new PlatformUser(userId,PlatUserType.CONSUMER.getIndex());
+			PlatformUser pushUserPlat = new PlatformUser(userId,PlatUserType.PUSH_USER.getIndex());
+			set.add(pushUserPlat);
+			set.add(consumerPlat);
+			//end
+		}
+		PlatformUser platformUser = new PlatformUser(userId,userInfo.getPlatUserType());
+		set.add(platformUser);
+		userMapper.insertPlatformUser(set);
 
 		SecurityUserDetail userDetail = SecurityUserFactory.createWithOutPassWord(userInfo);
 
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(JWTUtil.PASSWORD, userInfo.getPassword());
 		claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
+		claim.put(JWTUtil.PLATUSERTYPE, userInfo.getPlatUserType());
 		userDetail.setToken(JWTUtil.generateToken(claim));
 
 		return userDetail;
@@ -133,6 +155,7 @@ public class AuthServiceImpl implements AuthService {
 
 		UserInfo userDetail = null;
 		Map<String, Object> claim = new HashMap<String, Object>();
+		claim.put(JWTUtil.PLATUSERTYPE, platUserType);
 		if (loginType == Constants.LOGIN_WX) {
 			if (userInfo.getOpenId() == null || "".equals(userInfo.getOpenId())) {
 				throw new SecurityException("未传递openId给后台！");
@@ -141,7 +164,15 @@ public class AuthServiceImpl implements AuthService {
 			userDetail = userMapper.queryByOpenId(userInfo);
 
 			if (userDetail == null) {
-				userMapper.insert(userInfo);
+				String userId = userMapper.getUserIdByOpenId(userInfo.getOpenId());
+				if(userId == null){
+					userMapper.insert(userInfo);
+					userId = userInfo.getUserId();
+				}
+				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(),userInfo.getPlatUserType());
+				Set<PlatformUser> set = new HashSet<PlatformUser>();
+				set.add(platformUser);
+				userMapper.insertPlatformUser(set);
 				userDetail = userInfo;
 				userInfo = null;
 			}
@@ -159,24 +190,18 @@ public class AuthServiceImpl implements AuthService {
 
 			if (loginType == Constants.LOGIN_PLATID) {
 				claim.put(JWTUtil.PLATFORM_ID, userInfo.getUserId());
-				userDetail = userMapper.getUserByPlatId(userInfo.getUserId());
+				userDetail = userMapper.getUserByPlatId(userInfo);
 			}
 
-			if (platUserType == PlatUserType.CONSUMER.getIndex()) {
+			if (platUserType == PlatUserType.CONSUMER.getIndex()
+					|| platUserType == PlatUserType.B2B_BUSSINESS.getIndex()
+					|| platUserType == PlatUserType.PUSH_USER.getIndex()) {
 
 				claim.put(JWTUtil.PASSWORD, MethodUtil.MD5(userInfo.getPassword()));
 				claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
 
 				userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
 				userDetail = userMapper.getUserForLogin(userInfo);
-			}
-
-			if (platUserType == B2B_FORM) {
-				claim.put(JWTUtil.PASSWORD, MethodUtil.MD5(userInfo.getPassword()));
-				claim.put(JWTUtil.USER_NAME, userInfo.getUserName());
-
-				userInfo.setPassword(MethodUtil.MD5(userInfo.getPassword()));
-				userDetail = userMapper.loginFor2B(userInfo);
 			}
 		}
 
@@ -218,19 +243,15 @@ public class AuthServiceImpl implements AuthService {
 
 		int loginType = userInfo.getLoginType();
 
-		String userName = null;
 		if (loginType == Constants.LOGIN_PHONE) {
-			userName = userInfo.getPhone();
+			userInfo.setUserName(userInfo.getPhone());
 		}
 
-		if (loginType == Constants.LOGIN_USER_NAME)
-			userName = userInfo.getUserName();
-
-		if (userName == null || "".equals(userName)) {
+		if (userInfo.getUserName() == null || "".equals(userInfo.getUserName())) {
 			throw new SecurityException("用户名信息有误，请重新输入！");
 		}
 
-		if (userMapper.getUserByName(userName) != null) {
+		if (userMapper.getUserByName(userInfo) != null) {
 			return true;
 		}
 
@@ -254,19 +275,33 @@ public class AuthServiceImpl implements AuthService {
 			return false;
 		}
 
-		UserInfo userInfo = new UserInfo();
-
-		userInfo = userMapper.getUserByName(phone);
+		UserInfo tempUser = new UserInfo();
+		tempUser.setUserName(phone);
+		tempUser.setPlatUserType(platUserType);
+		UserInfo userInfo = userMapper.getUserByName(tempUser);
 		if (userInfo == null) {
-			userInfo = new UserInfo();
-			userInfo.setUserName(phone);
-			userInfo.setUserCenterId(userId);
-			userInfo.setPlatUserType(JWTUtil.CONSUMER);
-			userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
-			userInfo.setPhone(phone);
-			userMapper.insert2B(userInfo);
-		} else {
-			userMapper.updateUserAuth(phone);
+			String authUserId = userMapper.getUserIdByUserName(phone);
+			PlatformUser consumerPlat = null;
+			PlatformUser pushUserPlat = null;
+			PlatformUser platformUser = null;
+			Set<PlatformUser> set = new HashSet<PlatformUser>();
+			if(authUserId == null){
+				userInfo = new UserInfo();
+				userInfo.setUserName(phone);
+				userInfo.setUserCenterId(userId);
+				userInfo.setPlatUserType(platUserType);
+				userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
+				userInfo.setPhone(phone);
+				userMapper.insert(userInfo);
+				authUserId = userInfo.getUserId();
+				consumerPlat = new PlatformUser(authUserId,PlatUserType.CONSUMER.getIndex());
+				pushUserPlat = new PlatformUser(authUserId,PlatUserType.PUSH_USER.getIndex());
+				set.add(pushUserPlat);
+				set.add(consumerPlat);
+			}
+			platformUser = new PlatformUser(authUserId,platUserType);
+			set.add(platformUser);
+			userMapper.insertPlatformUser(set);
 		}
 
 		return true;
@@ -278,21 +313,25 @@ public class AuthServiceImpl implements AuthService {
 			return new ResultPojo(ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
-		UserInfo info = userMapper.getUserByName(param.getAppKey());
+		UserInfo temUser = new UserInfo();
+		temUser.setUserName(param.getAppKey());
+		temUser.setPlatUserType(PlatUserType.BUTTJOINT.getIndex());
+		UserInfo info = userMapper.getUserByName(temUser);
 		String appSecret = info.getPassword();
-		Map<String,Object> map = new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("appSecret", appSecret);
 		map.put("version", param.getVersion());
 		map.put("appKey", param.getAppKey());
 		map.put("nonceStr", param.getNonceStr());
 		String sing = SignUtil.sign(map);
-		if(!param.getSign().equals(sing)){
+		if (!param.getSign().equals(sing)) {
 			return new ResultPojo(ErrorCodeEnum.SIGN_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.SIGN_VALIDATE_ERROR.getErrorMsg());
 		}
 		Map<String, Object> claim = new HashMap<String, Object>();
 		claim.put(JWTUtil.APPKEY, param.getAppKey());
 		claim.put("expires", JWTUtil.EXPIRES);
+		claim.put(JWTUtil.PLATUSERTYPE, PlatUserType.BUTTJOINT.getIndex());
 		String token = JWTUtil.generateLimitTimeToken(claim);
 		return new ResultPojo(new AccessToken(token, JWTUtil.EXPIRES));
 	}

@@ -27,6 +27,8 @@ public class AliPayConfigModel implements Serializable{
 	private String signType;
 	
 	private String charset;
+	
+	private String url;
 
 	public void initParameter(){
 		if(signType == null){
@@ -37,6 +39,14 @@ public class AliPayConfigModel implements Serializable{
 		}
 	}
 	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	public String getKey() {
 		return key;
 	}

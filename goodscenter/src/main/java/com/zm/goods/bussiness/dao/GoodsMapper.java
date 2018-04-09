@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.ActivityData;
 import com.zm.goods.pojo.DictData;
+import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
@@ -149,8 +150,10 @@ public interface GoodsMapper {
 
 	int countItem(Map<String, Object> param);
 
-	void updateGoodsItemUnDistribution(String itemId);
+	void updateGoodsItemUnDistribution(List<String> list);
 	
 	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
+
+	List<GoodsConvert> listSkuAndConversionByItemId(List<String> list);
 	
 }

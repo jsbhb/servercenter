@@ -29,19 +29,19 @@ public class SendOrderTimeTaskJob implements Job{
 	SupplierFeignClient supplierFeignClient;
 	
 	@Resource
-	RedisTemplate<String, Object> redisTemplate;
+	RedisTemplate<String, Object> template;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
-		ResultModel result = orderFeignClient.alreadyPay(Constants.FIRST_VERSION);
+		ResultModel result = orderFeignClient.sendToWarehouse(Constants.FIRST_VERSION);
 		if(result.isSuccess()){
 			List<Map<String, Object>> list = (List<Map<String, Object>>) result.getObj();
 			if(list != null){
 				List<OrderInfo> infoList = new ArrayList<OrderInfo>();
 				OrderInfo info = null;
 				for(Map<String, Object> map : list){
-					redisTemplate.opsForValue().set(map.get("orderId").toString(), true);
+					template.opsForValue().set(map.get("orderId").toString(), "true");
 					info = JSONUtil.parse(JSONUtil.toJson(map), OrderInfo.class);
 					infoList.add(info);
 				}

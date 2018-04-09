@@ -16,6 +16,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ProfitProportion;
+import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 
@@ -92,10 +93,6 @@ public interface OrderMapper {
 
 	void updateRefundPayNo(OrderDetail detail);
 
-	List<OrderInfo> listOrderForSendToTTWarehouse();
-	
-	List<OrderInfo> listOrderForSendToOtherWarehouse();
-
 	void saveThirdOrder(List<SendOrderResult> list);
 
 	int updateOrderSendToWarehouse(String orderId);
@@ -114,4 +111,30 @@ public interface OrderMapper {
 	
 	void addOrderStatusRecord(Map<String,Object> param);
 
+	List<OrderCount> getPushCountByStatus(Map<String, Object> param);
+
+	int repayingPushJudge(Map<String, Object> param);
+
+	List<PushUserOrderCount> pushUserOrderCount(Map<String, Object> param);
+
+	void updateOrderCapitalNotEnough(List<String> list);
+
+	List<OrderInfo> listOrderForCalCapital(String orderId);
+	
+	void updateOrderCapitalEnough(List<String> list);
+
+	OrderInfo getOrderByOrderIdForRebate(String orderId);
+	
+	void updateOrderRebate(String orderId);
+
+	List<OrderInfo> listOrderForSendToTTWarehouse();
+	
+	List<OrderInfo> listOrderForSendToOtherWarehouse();
+
+	void updateOrderRefunds(String orderId);
+
+	List<OrderInfo> listCapitalPoolNotEnough();
+	
+	List<ThirdOrderInfo> getThirdInfo(String orderId);
+	
 }

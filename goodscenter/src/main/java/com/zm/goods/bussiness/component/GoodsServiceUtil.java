@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
@@ -20,6 +23,8 @@ import com.zm.goods.utils.JSONUtil;
 
 public class GoodsServiceUtil {
 
+	private static Logger logger = LoggerFactory.getLogger(GoodsServiceUtil.class);
+
 	// 计算价格
 	public static Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion) {
 		Double totalAmount = 0.0;
@@ -31,8 +36,10 @@ public class GoodsServiceUtil {
 		}
 		discount = CalculationUtils.div(discount, 10.0);
 		for (GoodsPrice price : specs.getPriceList()) {
+			logger.info("购买数量====：" + model.getQuantity() + ",最小数量！！！！====：" + price.getMin() + ",最大数量******："
+					+ price.getMax());
 			boolean flag = model.getQuantity() >= price.getMin()
-					&& (price.getMax() == null || model.getQuantity() <= price.getMax());
+					&& (price.getMax() == null || price.getMax() == 0 || model.getQuantity() <= price.getMax());
 			if (flag) {
 				if (model.getDeliveryPlace() != null) {
 					if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {

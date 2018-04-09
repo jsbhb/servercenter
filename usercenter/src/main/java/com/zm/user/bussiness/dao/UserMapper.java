@@ -86,4 +86,6 @@ public interface UserMapper {
 	Integer getParentIdByGradeId(Integer gradeId);
 	
 	void saveGradeData(Grade grade);
+	
+	List<UserDetail> getAllCustomer();
 }

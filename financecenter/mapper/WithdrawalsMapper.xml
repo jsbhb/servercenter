@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.finance.bussiness.dao.WithdrawalsMapper">
+
+	<resultMap type="com.zm.finance.pojo.withdrawals.Withdrawals" id="withdrawals">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="operator_id" property="operatorId" jdbcType="INTEGER"/>
+		<result column="operator_type" property="operatorType" jdbcType="INTEGER"/>
+		<result column="start_money" property="startMoney" jdbcType="NUMERIC"/>
+		<result column="out_money" property="outMoney" jdbcType="NUMERIC"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="card_no" property="cardNo" jdbcType="VARCHAR"/>
+		<result column="card_name" property="cardName" jdbcType="VARCHAR"/>
+		<result column="card_bank" property="cardBank" jdbcType="VARCHAR"/>
+		<result column="pay_no" property="payNo" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+
+	<insert id="insertWithdrawals" parameterType="Object">
+		insert into withdrawals_detail
+		(operator_id,operator_type,start_money,out_money,card_no,card_name,card_bank,create_time)
+		value(#{operatorId},#{operatorType},#{startMoney},#{outMoney},#{cardNo},#{cardName},#{cardBank},now())
+	</insert>
+	
+	<update id="updatePassWithdrawals" parameterType="Object">
+		update withdrawals_detail
+		<set>
+			status = 2,
+			pay_no = #{payNo},
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateUnPassWithdrawals" parameterType="Object">
+		update withdrawals_detail
+		<set>
+			status = 3,
+			remark = #{remark},
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<select id="getWithdrawals" parameterType="Object" resultMap="withdrawals">
+		select * from withdrawals_detail where id = #{id}
+	</select>
+	
+	<select id="listWithdrawalDetail" parameterType="Object" resultMap="withdrawals">
+		select * from withdrawals_detail where operator_id = #{id} and operator_type = #{type}
+	</select>
+	
+	<select id="selectDetailByEntity" parameterType="Object" resultMap="withdrawals">
+		select * from withdrawals_detail
+		where 1=1
+		<if test="operatorId != null and operatorId != '0'">
+			and operator_id = #{operatorId}
+		</if>
+		<if test="operatorType != null and operatorType != '0'">
+			and operator_type = #{operatorType}
+		</if>
+		<if test="outMoney != null and outMoney != '0'">
+			and out_money = #{outMoney}
+		</if>
+		<if test="status != null and status != '0'">
+			and status = #{status}
+		</if>
+		<if test="payNo != null and payNo != ''">
+			and pay_no = #{payNo}
+		</if>
+		order by create_time desc,status asc
+	</select>
+	
+	<select id="selectWithdrawalDetailByEntity" parameterType="Object" resultMap="withdrawals">
+		select * from withdrawals_detail
+		where 1=1 and id = #{id}
+	</select>
+	
+</mapper>

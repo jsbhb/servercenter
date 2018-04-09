@@ -38,6 +38,10 @@ public class Grade extends Pagination{
 
 	private Integer gradePersonInCharge;// 负责该区域中心的人
 
+	private String redirectUrl;//PC端域名
+	
+	private String mobileUrl;//手机端域名
+
 	private String createTime;
 
 	private String updateTime;
@@ -76,6 +80,14 @@ public class Grade extends Pagination{
 	
 	public Grade(){
 		super();
+	}
+
+	public String getMobileUrl() {
+		return mobileUrl;
+	}
+
+	public void setMobileUrl(String mobileUrl) {
+		this.mobileUrl = mobileUrl;
 	}
 
 	public Integer getGradeLevel() {
@@ -317,4 +329,13 @@ public class Grade extends Pagination{
 	public void setPicPath4(String picPath4) {
 		this.picPath4 = picPath4;
 	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
+	
 }

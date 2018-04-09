@@ -18,6 +18,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.timetask.bussiness.dao.TimeTaskMapper;
@@ -29,7 +30,7 @@ import com.zm.timetask.util.SpringContextUtil;
 @Service
 // @PostConstruct先于springContextUtil执行，该标签强制初始化springContextUtil类
 @DependsOn("springContextUtil")
-@Transactional
+@Transactional(isolation=Isolation.READ_COMMITTED)
 public class TimeTaskServiceImpl implements TimeTaskService {
 
 	@Resource

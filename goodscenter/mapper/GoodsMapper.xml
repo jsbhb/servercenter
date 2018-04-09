@@ -55,6 +55,7 @@
 		<result column="increment_tax" property="incrementTax"
 			jdbcType="NUMERIC" />
 		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="conversion" property="conversion" jdbcType="INTEGER" />
 		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
 		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
 		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
@@ -233,8 +234,8 @@
 	</resultMap>
 	
 	<select id="getTax" parameterType="Object" resultMap="tax">
-		select gs.excise_tax,gb.increment_tax from goods_item${centerId} gs left join goods${centerId} gi on 
-		gs.goods_id = gi.goods_id left join goods g on gi.goods_id=g.goods_id 
+		select gs.excise_tax,gb.increment_tax from goods_item gs left join goods g on 
+		gs.goods_id = g.goods_id 
 		left join base gb on g.base_id = gb.id where gs.item_id = #{itemId}
 	</select>
 	
@@ -295,10 +296,10 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select
-		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,
+		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gi.conversion,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
-		gs.status as specsStatus,gs.excise_tax,gi.weight,
+		gs.status as specsStatus,gi.excise_tax,gi.weight,
 		<if test="goodsType == 2 or goodsType == 1">
 			stock.lockedqty as qpqty,
 		</if>
@@ -327,7 +328,7 @@
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select gs.id,gi.info,gs.item_id,gs.goods_id,
-		gs.item_code,gi.sku,gs.is_promotion,gs.excise_tax,gi.weight,
+		gs.item_code,gi.sku,gs.is_promotion,gi.excise_tax,gi.weight,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
 		<if test="goodsType == 2 or goodsType == 0">
@@ -380,10 +381,10 @@
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,
+		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,gi.conversion,
 		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gs.opt,bgp.id as
-		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount, gs.excise_tax,gi.weight,
+		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount, gi.excise_tax,gi.weight,
 		bgp.delivery_place,gb.increment_tax
 		 from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join goods g on gs.goods_id=g.goods_id 
@@ -396,11 +397,14 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id in
+		gs.item_id = bgp.item_id where gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
 		</foreach>
+		<if test="source == mall">
+			and gs.status = 1
+		</if>
 	</select>
 	
 	<select id="listPriceContrast" parameterType="Object" resultMap="priceConstrast">
@@ -572,6 +576,7 @@
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  sort tinyint UNSIGNED NULL COMMENT '排序',
 		  PRIMARY KEY (id),
 		  INDEX idx_code (code),
 		  INDEX idx_page_type (page_type),
@@ -691,7 +696,7 @@
 	<!-- 建表语句END -->
 	
 	<select id="listLayout" parameterType="Object" resultMap="layout">
-		select * from layout${centerId} where page = #{page} and page_type = ${pageType} and is_show = 1 
+		select * from layout${centerId} where page = #{page} and page_type = ${pageType} and is_show = 1 order by code ,sort
 	</select>
 	
 	<select id="listActiveData" parameterType="Object"  resultMap = "activityData">
@@ -786,7 +791,7 @@
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,g.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
-		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
+		gb.brand_id,gcb.brand,g.origin,i.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
 		from goods${centerId} 
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
@@ -866,7 +871,7 @@
 	<select id="listSpecialGoods" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,g.goods_name as customGoodsName,max(bgp.retail_price) as price,
 		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
-		gb.brand_id,gcb.brand,g.origin,gs.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
+		gb.brand_id,gcb.brand,g.origin,i.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
 		from goods${centerId}
 		gi left join goods g on gi.goods_id = g.goods_id left join base gb on g.base_id=gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
@@ -1055,7 +1060,25 @@
 	</select>
 	
 	<update id="updateGoodsItemUnDistribution" parameterType="Object">
-		update goods_item set status = 1, update_time=now() where item_id = #{itemId}
+		update goods_item set status = 1, update_time=now() where item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
 	</update>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsConvert" id="convert">
+		<result column="item_id" property="itemId"/>
+		<result column="sku" property="sku"/>
+		<result column="conversion" property="conversion"/>
+	</resultMap>
+	
+	<select id="listSkuAndConversionByItemId" parameterType="Object" resultMap="convert">
+		select item_id, sku,conversion from goods_item where item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</select>
 
 </mapper>

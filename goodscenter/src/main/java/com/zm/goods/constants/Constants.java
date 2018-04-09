@@ -28,6 +28,8 @@ public class Constants {
 	
 	public static final String ORIGIN = "origin";
 	
+	public static final String PROPORTION = "proportion";
+	
 	//*********************订单类型*********************
 	
 	public static final Integer O2O_ORDER = 0;
@@ -35,5 +37,8 @@ public class Constants {
 	//*********************订货平台ID*********************
 	
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
+	
+	//*********************商品返佣redis前缀***************************
+	public static final String GOODS_REBATE = "goodsrebate:";
 	
 }

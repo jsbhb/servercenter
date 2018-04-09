@@ -10,8 +10,13 @@ package com.zm.goods.bussiness.dao;
 import java.util.List;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
+import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
+import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -147,4 +152,120 @@ public interface GoodsBackMapper {
 	 */
 	GoodsEntity selectRecordForUpd(GoodsEntity entity);
 
+	/**
+	 * selectForPage:分页查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<GoodsRebateEntity> selectAllGoodsForRebate(GoodsEntity entity);
+
+	GoodsRebateEntity selectGoodsRebateById(GoodsRebateEntity entity);
+
+	GoodsRebateEntity selectRecordForRebate(GoodsRebateEntity entity);
+
+	void insertGoodsRebate(GoodsRebateEntity entity);
+
+	void updateGoodsRebate(GoodsRebateEntity entity);
+
+	/**
+	 * selectForPage:分页查询商品标签. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @return
+	 * @since JDK 1.7
+	 */
+	Page<ERPGoodsTagEntity> selectTagForPage(ERPGoodsTagEntity entity);
+
+	void insertGoodsTag(ERPGoodsTagEntity entity);
+
+	void updateGoodsTag(ERPGoodsTagEntity entity);
+
+	void deleteGoodsTag(ERPGoodsTagEntity entity);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	ERPGoodsTagEntity selectTagInfo(ERPGoodsTagEntity entity);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<ERPGoodsTagEntity> selectTagListInfo();
+
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void insertTagBind(ERPGoodsTagBindEntity entity);
+
+	/**
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
+	 */
+	ERPGoodsTagBindEntity selectGoodsTagBindByGoodsId(GoodsItemEntity entity);
+
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void updateTagBind(ERPGoodsTagBindEntity entity);
+
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void deleteTagBind(ERPGoodsTagBindEntity entity);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsEntity selectGoodsWithItem(int id);
+
+	/**
+	 * selectById:根据商品编号检索商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<TagFuncEntity> selectTagFuncListInfo();
+
+	/**
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<ERPGoodsTagBindEntity> selectGoodsTagBindListInfo(ERPGoodsTagBindEntity entity);
 }
