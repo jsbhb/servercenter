@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -203,5 +204,16 @@ public interface GoodsBackService {
 	 * @since JDK 1.7
 	 */
 	List<ERPGoodsTagBindEntity> queryGoodsTagBindListInfo(ERPGoodsTagBindEntity entity);
+
+	/**
+	 * saveBrand:保存商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @param type
+	 *            sync: 同步商品新增 normal：自营商品新增
+	 * @since JDK 1.7
+	 */
+	void saveGoodsInfo(GoodsInfoEntity entity);
 
 }

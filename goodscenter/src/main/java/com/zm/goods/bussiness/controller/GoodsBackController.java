@@ -17,6 +17,7 @@ import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
@@ -315,6 +316,20 @@ public class GoodsBackController {
 			}catch(Exception e){
 				return new ResultModel(false, e.getMessage());			
 			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/goods/saveGoodsInfo", method = RequestMethod.POST)
+	public ResultModel saveGoodsInfo(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsInfoEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try{
+				goodsBackService.saveGoodsInfo(entity);
+				return new ResultModel(true, "");
+			}catch(Exception e){
+				return new ResultModel(false, e.getMessage());			}
 		}
 
 		return new ResultModel(false, "版本错误");

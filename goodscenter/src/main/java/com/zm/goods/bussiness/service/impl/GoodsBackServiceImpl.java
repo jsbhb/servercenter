@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
+import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
@@ -30,6 +31,7 @@ import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
+import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -51,6 +53,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Resource
 	GoodsItemMapper goodsItemMapper;
+	
+	@Resource
+	GoodsBaseMapper goodsBaseMapper;
 
 	@Resource
 	RedisTemplate<String, Object> template;
@@ -234,5 +239,22 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public List<ERPGoodsTagBindEntity> queryGoodsTagBindListInfo(ERPGoodsTagBindEntity entity) {
 		return goodsBackMapper.selectGoodsTagBindListInfo(entity);
+	}
+	
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void saveGoodsInfo(GoodsInfoEntity entity) {
+		if (entity.getGoodsBase().getId() != 0) {
+			goodsBaseMapper.insert(entity.getGoodsBase());
+		}
+		goodsBackMapper.insert(entity.getGoods());
+		goodsItemMapper.insert(entity.getGoods().getGoodsItem());
+		goodsItemMapper.insertPrice(entity.getGoods().getGoodsItem().getGoodsPrice());
+		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
+			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+		}
+		if (entity.getGoods().getGoodsTagBind() != null) {
+			goodsBackMapper.insertTagBind(entity.getGoods().getGoodsTagBind());
+		}
 	}
 }

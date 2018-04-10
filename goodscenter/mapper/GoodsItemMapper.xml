@@ -69,7 +69,7 @@
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
 		<result column="weight" property="weight"/>
-		<result column="excise_fax" property="exciseTax"/>
+		<result column="excise_tax" property="exciseTax"/>
 		<result column="status" property="status"/>
 		<result column="discount" property="discount"/>
 		<result column="info" property="info"/>
@@ -178,6 +178,15 @@
 			<if test="baseEntity.brandId!=null and baseEntity.brandId!=''">
 				and b.brand_id = #{baseEntity.brandId}
 			</if> 
+			<if test="baseEntity.firstCatalogId!=null and baseEntity.firstCatalogId!=''">
+				and b.first_category = #{baseEntity.firstCatalogId}
+			</if> 
+			<if test="baseEntity.secondCatalogId!=null and baseEntity.secondCatalogId!=''">
+				and b.second_category = #{baseEntity.secondCatalogId}
+			</if> 
+			<if test="baseEntity.thirdCatalogId!=null and baseEntity.thirdCatalogId!=''">
+				and b.third_category = #{baseEntity.thirdCatalogId}
+			</if> 
 		</if>
 		<if test="supplierId!=null and supplierId!=''">
 			and g.supplier_id = #{supplierId}
@@ -185,8 +194,16 @@
 		<if test="tagBindEntity !=null and tagBindEntity !=''">
 			and tag.tag_id = #{tagBindEntity.tagId}
 		</if>
-		<if test="status !=null and status!=''">
-			and i.status = #{status}
+		<if test="status !=null and status==3">
+			and i.status = '2'
+			and ifnull(s.fxqty,0) > 0
+		</if>
+		<if test="status !=null and status==4">
+			and i.status = '2'
+			and ifnull(s.fxqty,0) = 0
+		</if>
+		<if test="status !=null and status==5">
+			and i.status in ('0','1')
 		</if>
 		<if test="itemId!=null and itemId!=''">
 			and i.item_id = #{itemId}
