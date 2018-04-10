@@ -305,6 +305,7 @@
 		<if test="weight !=null and weight !=''">
 			,weight = #{weight} 
 		</if>
+		 ,excise_tax = #{exciseTax}
 		 where item_id  = #{itemId}
 	</update>
 	

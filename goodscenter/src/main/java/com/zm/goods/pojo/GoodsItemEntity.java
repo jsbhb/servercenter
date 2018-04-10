@@ -24,7 +24,7 @@ public class GoodsItemEntity extends Pagination {
 	private String itemId;// itemID
 	private String itemCode;// 商家自有编码
 	private String sku;// sku信息
-	private String weight;// 商品重量（克）
+	private double weight;// 商品重量（克）
 	private double exciseTax;// 消费税
 	private int isPromotion;// 是否促销0：否；1：是
 	private String status;// 商品状态0：停售，1：在售
@@ -84,11 +84,11 @@ public class GoodsItemEntity extends Pagination {
 		this.sku = sku;
 	}
 
-	public String getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 
-	public void setWeight(String weight) {
+	public void setWeight(double weight) {
 		this.weight = weight;
 	}
 

@@ -159,7 +159,7 @@
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
 		<result column="weight" property="weight"/>
-		<result column="excise_fax" property="exciseTax"/>
+		<result column="excise_tax" property="exciseTax"/>
 		<result column="status" property="status"/>
 		<result column="discount" property="discount"/>
 		<result column="info" property="info"/>
@@ -366,4 +366,11 @@
 	<select id="selectGoodsEntityByItemId" parameterType="Object" resultMap="entity">
 		select * from goods where goods_id = #{goodsId}
 	</select>
+	
+	<update id="updateGoodsEntity" parameterType="Object">
+		update goods set goods_name = #{goodsName},
+		supplier_id = #{supplierId}, supplier_name = #{supplierName},
+		origin = #{origin}, update_time = now() 
+		where goods_id = #{goodsId}
+	</update>
 </mapper>

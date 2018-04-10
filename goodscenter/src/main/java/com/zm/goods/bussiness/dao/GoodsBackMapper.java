@@ -288,4 +288,13 @@ public interface GoodsBackMapper {
 	 * @since JDK 1.7
 	 */
 	GoodsEntity selectGoodsEntityByItemId(String goodsId);
+
+	/**
+	 * insert:插入商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void updateGoodsEntity(GoodsEntity entity);
 }

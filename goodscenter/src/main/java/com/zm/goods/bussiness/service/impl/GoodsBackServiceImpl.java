@@ -281,4 +281,32 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		goodsInfo.setGoodsBase(goodsBaseEntity);
 		return goodsInfo;
 	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public void updateGoodsInfo(GoodsInfoEntity entity) {
+		goodsBackMapper.updateGoodsEntity(entity.getGoods());
+		goodsItemMapper.update(entity.getGoods().getGoodsItem());
+		goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
+		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
+			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+		}
+		// 判断商品标签
+		 ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getGoodsItem());
+		 if (entity.getGoods().getGoodsTagBind() != null) {
+			 //增删改
+			 ERPGoodsTagBindEntity newTag = entity.getGoods().getGoodsTagBind();
+			 if (oldTag == null && newTag.getTagId() != 0) {
+				 goodsBackMapper.insertTagBind(newTag);
+			 } else if (oldTag != null && newTag.getTagId() == 0) {
+				 goodsBackMapper.deleteTagBind(oldTag);
+			 } else if (oldTag != null && newTag.getTagId() != 0) {
+				 goodsBackMapper.updateTagBind(newTag);
+			 }
+		 } else {
+			 if (oldTag != null) {
+				 goodsBackMapper.deleteTagBind(oldTag);
+			 }
+		 }
+	}
 }

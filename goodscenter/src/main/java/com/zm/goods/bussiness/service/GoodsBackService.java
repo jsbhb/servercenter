@@ -226,4 +226,15 @@ public interface GoodsBackService {
 	 */
 	GoodsInfoEntity queryGoodsInfoEntity(String itemId);
 
+	/**
+	 * saveBrand:保存商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @param type
+	 *            sync: 同步商品新增 normal：自营商品新增
+	 * @since JDK 1.7
+	 */
+	void updateGoodsInfo(GoodsInfoEntity entity);
+
 }

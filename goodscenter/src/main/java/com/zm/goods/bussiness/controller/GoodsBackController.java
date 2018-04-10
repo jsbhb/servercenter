@@ -353,4 +353,20 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/goods/goods/updateGoodsInfo", method = RequestMethod.POST)
+	public ResultModel updateGoodsInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsInfoEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				goodsBackService.updateGoodsInfo(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }
