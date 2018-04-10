@@ -334,4 +334,16 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/goods/goods/queryGoodsInfoEntity", method = RequestMethod.POST)
+	public ResultModel queryGoodsInfoEntity(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String itemId = request.getParameter("itemId");
+			GoodsInfoEntity goodsInfo = goodsBackService.queryGoodsInfoEntity(itemId);
+			return new ResultModel(true, goodsInfo);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

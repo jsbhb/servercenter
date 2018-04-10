@@ -152,6 +152,19 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="goodsItemEntity">
+		<id column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="item_id" property="itemId" />
+		<result column="item_code" property="itemCode"/>
+		<result column="sku" property="sku"/>
+		<result column="weight" property="weight"/>
+		<result column="excise_fax" property="exciseTax"/>
+		<result column="status" property="status"/>
+		<result column="discount" property="discount"/>
+		<result column="info" property="info"/>
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -341,5 +354,13 @@
 		<if test="tagId != null and tagId != '0'">
 			and tag_id = #{tagId} 
 		</if>
+	</select>
+	
+	<select id="selectGoodsItemByItemId" parameterType="Object" resultMap="goodsItemEntity">
+		select * from goods_item where item_id = #{itemId}
+	</select>
+	
+	<select id="selectGoodsEntityByItemId" parameterType="Object" resultMap="entity">
+		select * from goods where goods_id = #{goodsId}
 	</select>
 </mapper>

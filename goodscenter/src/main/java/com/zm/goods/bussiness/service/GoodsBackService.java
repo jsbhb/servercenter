@@ -216,4 +216,14 @@ public interface GoodsBackService {
 	 */
 	void saveGoodsInfo(GoodsInfoEntity entity);
 
+	/**
+	 * queryById:根据编号查询商品. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsInfoEntity queryGoodsInfoEntity(String itemId);
+
 }

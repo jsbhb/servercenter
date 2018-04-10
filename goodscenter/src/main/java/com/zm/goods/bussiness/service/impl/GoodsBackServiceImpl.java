@@ -29,9 +29,12 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
+import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -256,5 +259,25 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		if (entity.getGoods().getGoodsTagBind() != null) {
 			goodsBackMapper.insertTagBind(entity.getGoods().getGoodsTagBind());
 		}
+	}
+
+	@Override
+	public GoodsInfoEntity queryGoodsInfoEntity(String itemId) {
+		GoodsInfoEntity goodsInfo = new GoodsInfoEntity();
+		//查询商品信息
+		GoodsItemEntity goodsItemEntity = goodsBackMapper.selectGoodsItemByItemId(itemId);
+		GoodsPrice goodsPrice = goodsItemMapper.selectItemPrice(itemId);
+		GoodsEntity goodsEntity = goodsBackMapper.selectGoodsEntityByItemId(goodsItemEntity.getGoodsId());
+		List<GoodsFile> goodsFiles = goodsBackMapper.selectGoodsFileByGoodsId(goodsEntity);
+		ERPGoodsTagBindEntity erpGoodsTagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(goodsItemEntity);
+		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectById(goodsEntity.getBaseId());
+		//组装商品信息
+		goodsItemEntity.setGoodsPrice(goodsPrice);
+		goodsEntity.setFiles(goodsFiles);
+		goodsEntity.setGoodsTagBind(erpGoodsTagBind);
+		goodsEntity.setGoodsItem(goodsItemEntity);
+		goodsInfo.setGoods(goodsEntity);
+		goodsInfo.setGoodsBase(goodsBaseEntity);
+		return goodsInfo;
 	}
 }

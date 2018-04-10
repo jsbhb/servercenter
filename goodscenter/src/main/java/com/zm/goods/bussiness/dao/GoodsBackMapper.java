@@ -268,4 +268,24 @@ public interface GoodsBackMapper {
 	 * @since JDK 1.7
 	 */
 	List<ERPGoodsTagBindEntity> selectGoodsTagBindListInfo(ERPGoodsTagBindEntity entity);
+
+	/**
+	 * <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsItemEntity selectGoodsItemByItemId(String itemId);
+
+	/**
+	 * <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	GoodsEntity selectGoodsEntityByItemId(String goodsId);
 }
