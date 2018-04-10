@@ -56,7 +56,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Resource
 	GoodsItemMapper goodsItemMapper;
-	
+
 	@Resource
 	GoodsBaseMapper goodsBaseMapper;
 
@@ -81,7 +81,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void save(GoodsEntity entity, String type) {
 		goodsBackMapper.insert(entity);
 		goodsItemMapper.insert(entity.getGoodsItem());
@@ -110,7 +110,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void edit(GoodsEntity entity) {
 		goodsBackMapper.update(entity);
 		List<GoodsFile> isrFileList = new ArrayList<GoodsFile>();
@@ -126,23 +126,24 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		if (isrFileList != null && isrFileList.size() > 0) {
 			goodsItemMapper.insertFiles(isrFileList);
 		}
-		//判断商品标签
-//		if (entity.getGoodsTagBind() != null) {
-//			//增删改
-//			ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoodsItem());
-//			ERPGoodsTagBindEntity newTag = entity.getGoodsTagBind();
-//			if (oldTag == null && newTag.getTagId() != 0) {
-//				goodsBackMapper.insertTagBind(newTag);
-//			} else if (oldTag != null && newTag.getTagId() == 0) {
-//				goodsBackMapper.deleteTagBind(newTag);
-//			} else if (oldTag != null && newTag.getTagId() != 0) {
-//				goodsBackMapper.updateTagBind(newTag);
-//			}
-//		}
+		// 判断商品标签
+		// if (entity.getGoodsTagBind() != null) {
+		// //增删改
+		// ERPGoodsTagBindEntity oldTag =
+		// goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoodsItem());
+		// ERPGoodsTagBindEntity newTag = entity.getGoodsTagBind();
+		// if (oldTag == null && newTag.getTagId() != 0) {
+		// goodsBackMapper.insertTagBind(newTag);
+		// } else if (oldTag != null && newTag.getTagId() == 0) {
+		// goodsBackMapper.deleteTagBind(newTag);
+		// } else if (oldTag != null && newTag.getTagId() != 0) {
+		// goodsBackMapper.updateTagBind(newTag);
+		// }
+		// }
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void remove(GoodsEntity entity) {
 		goodsBackMapper.delete(entity);
 		goodsItemMapper.delete(entity);
@@ -182,25 +183,25 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	public void insertGoodsRebate(GoodsRebateEntity entity) {
-		goodsBackMapper.insertGoodsRebate(entity);
-		setRedis(entity);
+	public void insertGoodsRebate(List<GoodsRebateEntity> entityList) {
+		goodsBackMapper.insertGoodsRebate(entityList);
+		setRedis(entityList);
 	}
 
-	private void setRedis(GoodsRebateEntity entity) {
+	private void setRedis(List<GoodsRebateEntity> entityList) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("first", entity.getFirst());
-		result.put("second", entity.getSecond());
-		result.put("third", entity.getThird());
-		hashOperations.putAll(Constants.GOODS_REBATE + entity.getGoodsId(), result);
-	}
+		for (GoodsRebateEntity entity : entityList) {
+			result.put(entity.getGradeType() + "", entity.getProportion() + "");
+		}
 
+		hashOperations.putAll(Constants.GOODS_REBATE + entityList.get(0).getItemId(), result);
+	}
 
 	@Override
 	public void updateGoodsRebate(GoodsRebateEntity entity) {
-		goodsBackMapper.updateGoodsRebate(entity);
-		setRedis(entity);
+		// goodsBackMapper.updateGoodsRebate(entity);
+		// setRedis(entity);
 	}
 
 	@Override
@@ -213,12 +214,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public void insertGoodsTag(ERPGoodsTagEntity entity) {
 		goodsBackMapper.insertGoodsTag(entity);
 	}
-	
+
 	@Override
 	public void updateGoodsTag(ERPGoodsTagEntity entity) {
 		goodsBackMapper.updateGoodsTag(entity);
 	}
-	
+
 	@Override
 	public void deleteGoodsTag(ERPGoodsTagEntity entity) {
 		goodsBackMapper.deleteGoodsTag(entity);
@@ -243,9 +244,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public List<ERPGoodsTagBindEntity> queryGoodsTagBindListInfo(ERPGoodsTagBindEntity entity) {
 		return goodsBackMapper.selectGoodsTagBindListInfo(entity);
 	}
-	
+
 	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void saveGoodsInfo(GoodsInfoEntity entity) {
 		if (entity.getGoodsBase().getId() != 0) {
 			goodsBaseMapper.insert(entity.getGoodsBase());
@@ -264,14 +265,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public GoodsInfoEntity queryGoodsInfoEntity(String itemId) {
 		GoodsInfoEntity goodsInfo = new GoodsInfoEntity();
-		//查询商品信息
+		// 查询商品信息
 		GoodsItemEntity goodsItemEntity = goodsBackMapper.selectGoodsItemByItemId(itemId);
 		GoodsPrice goodsPrice = goodsItemMapper.selectItemPrice(itemId);
 		GoodsEntity goodsEntity = goodsBackMapper.selectGoodsEntityByItemId(goodsItemEntity.getGoodsId());
 		List<GoodsFile> goodsFiles = goodsBackMapper.selectGoodsFileByGoodsId(goodsEntity);
 		ERPGoodsTagBindEntity erpGoodsTagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(goodsItemEntity);
 		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectById(goodsEntity.getBaseId());
-		//组装商品信息
+		// 组装商品信息
 		goodsItemEntity.setGoodsPrice(goodsPrice);
 		goodsEntity.setFiles(goodsFiles);
 		goodsEntity.setGoodsTagBind(erpGoodsTagBind);

@@ -145,7 +145,7 @@ public interface GoodsBackService {
 	
 	GoodsRebateEntity checkRecordForRebate(GoodsRebateEntity entity);
 	
-	void insertGoodsRebate(GoodsRebateEntity entity);
+	void insertGoodsRebate(List<GoodsRebateEntity> entityList);
 	
 	void updateGoodsRebate(GoodsRebateEntity entity);
 

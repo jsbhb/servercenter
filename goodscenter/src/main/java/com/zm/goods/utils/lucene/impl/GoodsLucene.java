@@ -207,7 +207,8 @@ public class GoodsLucene extends AbstractLucene {
 				e.printStackTrace();
 			}
 			if (o != null) {
-				if ("brand".equals(field.getName()) || "origin".equals(field.getName())) {
+				if ("brand".equals(field.getName()) || "origin".equals(field.getName())
+						|| "priceMin".equals(field.getName()) || "priceMax".equals(field.getName())) {
 					accuratePara.put(field.getName(), o + "");
 				} else if (!"centerId".equals(field.getName())) {
 					keyWordsList.add(o + "");

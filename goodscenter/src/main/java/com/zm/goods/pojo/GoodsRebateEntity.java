@@ -7,6 +7,8 @@
  */
 package com.zm.goods.pojo;
 
+import com.zm.goods.common.Pagination;
+
 /**
  * ClassName: GoodsEntity <br/>
  * Function: 商品实体 <br/>
@@ -16,28 +18,35 @@ package com.zm.goods.pojo;
  * @version
  * @since JDK 1.7
  */
-public class GoodsRebateEntity extends GoodsEntity {
-	private String first;// 区域返佣比例
-	private String second;// 店铺返佣比例
-	private String third;// 推手返佣比例
+public class GoodsRebateEntity extends Pagination {
+	private Integer id;
+	private String itemId;
+	private Integer gradeType;// 客户类型
+	private double proportion;// 返佣比例
 	private String remark;// 备注
-	public String getFirst() {
-		return first;
+	public Integer getId() {
+		return id;
 	}
-	public void setFirst(String first) {
-		this.first = first;
+	public void setId(Integer id) {
+		this.id = id;
 	}
-	public String getSecond() {
-		return second;
+	public String getItemId() {
+		return itemId;
 	}
-	public void setSecond(String second) {
-		this.second = second;
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
 	}
-	public String getThird() {
-		return third;
+	public Integer getGradeType() {
+		return gradeType;
 	}
-	public void setThird(String third) {
-		this.third = third;
+	public void setGradeType(Integer gradeType) {
+		this.gradeType = gradeType;
+	}
+	public double getProportion() {
+		return proportion;
+	}
+	public void setProportion(double proportion) {
+		this.proportion = proportion;
 	}
 	public String getRemark() {
 		return remark;

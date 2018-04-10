@@ -30,6 +30,26 @@ public class GoodsSearch {
 	
 	private String firstCategory;
 	
+	private String priceMin;
+	
+	private String priceMax;
+	
+	public String getPriceMin() {
+		return priceMin;
+	}
+
+	public void setPriceMin(String priceMin) {
+		this.priceMin = priceMin;
+	}
+
+	public String getPriceMax() {
+		return priceMax;
+	}
+
+	public void setPriceMax(String priceMax) {
+		this.priceMax = priceMax;
+	}
+
 	public String getUpShelves() {
 		return upShelves;
 	}

@@ -166,7 +166,7 @@ public interface GoodsBackMapper {
 
 	GoodsRebateEntity selectRecordForRebate(GoodsRebateEntity entity);
 
-	void insertGoodsRebate(GoodsRebateEntity entity);
+	void insertGoodsRebate(List<GoodsRebateEntity> list);
 
 	void updateGoodsRebate(GoodsRebateEntity entity);
 

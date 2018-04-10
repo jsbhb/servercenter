@@ -49,20 +49,21 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/third/queryForPage", method = RequestMethod.POST)
-	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version, @RequestBody ThirdWarehouseGoods entity) {
+	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody ThirdWarehouseGoods entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			entity.setSku(request.getParameter("sku"));
 			entity.setItemCode(request.getParameter("itemCode"));
 			String supplierId = request.getParameter("supplierId");
-			if(supplierId != null&&!"".equals(supplierId)){
+			if (supplierId != null && !"".equals(supplierId)) {
 				entity.setSupplierId(Integer.parseInt(supplierId));
 			}
-			
+
 			String status = request.getParameter("status");
-			if(status != null&&!"".equals(status)){
+			if (status != null && !"".equals(status)) {
 				entity.setStatus(Integer.parseInt(status));
 			}
 
@@ -72,35 +73,39 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/save", method = RequestMethod.POST)
-	public ResultModel save(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+	public ResultModel save(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			try{
-				goodsBackService.save(entity,request.getParameter("type"));
+			try {
+				goodsBackService.save(entity, request.getParameter("type"));
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			}
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/saveDetailPath", method = RequestMethod.POST)
-	public ResultModel saveDetailPath(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
-		
+	public ResultModel saveDetailPath(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsEntity entity) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			try{
+			try {
 				goodsBackService.saveDetailPath(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			}
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
-		
+
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/query", method = RequestMethod.POST)
 	public ResultModel queryById(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsEntity entity) {
@@ -120,60 +125,63 @@ public class GoodsBackController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/queryThird", method = RequestMethod.POST)
 	public ResultModel queryThird(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody ThirdWarehouseGoods entity) {
-		
+
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
 				if (entity.getId() == 0) {
 					return new ResultModel(false, "没有编号信息");
 				}
-				
+
 				ThirdWarehouseGoods result = goodsBackService.queryThird(entity);
 				return new ResultModel(true, result);
 			}
-			
+
 			return new ResultModel(false, "版本错误");
 		} catch (Exception e) {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/edit", method = RequestMethod.POST)
-	public ResultModel edit(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+	public ResultModel edit(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			try{
+			try {
 				GoodsEntity result = goodsBackService.checkRecordForUpd(entity);
 				if (result == null) {
 					goodsBackService.edit(entity);
 					return new ResultModel(true, "");
 				} else {
-					return new ResultModel(false, "该商品下的明细状态非不可分销，无法进行修改");	
+					return new ResultModel(false, "该商品下的明细状态非不可分销，无法进行修改");
 				}
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			}
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/remove", method = RequestMethod.POST)
-	public ResultModel remove(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsEntity entity) {
+	public ResultModel remove(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			try{
+			try {
 				GoodsEntity result = goodsBackService.checkRecordForDel(entity);
 				if (result == null) {
 					goodsBackService.remove(entity);
 					return new ResultModel(true, "");
 				} else {
-					return new ResultModel(false, "该商品下的明细状态非初始化，无法进行删除");	
+					return new ResultModel(false, "该商品下的明细状态非初始化，无法进行删除");
 				}
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
@@ -194,12 +202,12 @@ public class GoodsBackController {
 	@RequestMapping(value = "{version}/goods/goodsRebate/queryById", method = RequestMethod.POST)
 	public ResultModel queryById(@PathVariable("version") Double version, @RequestBody GoodsRebateEntity entity) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {			
-			try{
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
 				GoodsRebateEntity result = goodsBackService.queryById(entity);
 				return new ResultModel(true, result);
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
@@ -207,19 +215,15 @@ public class GoodsBackController {
 	}
 
 	@RequestMapping(value = "{version}/goods/goodsRebate/updateRebate", method = RequestMethod.POST)
-	public ResultModel updateRebate(@PathVariable("version") Double version, @RequestBody GoodsRebateEntity entity) {
+	public ResultModel updateRebate(@PathVariable("version") Double version,
+			@RequestBody List<GoodsRebateEntity> entityList) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {			
-			try{
-				GoodsRebateEntity result = goodsBackService.checkRecordForRebate(entity);
-				if (result == null) {
-					goodsBackService.insertGoodsRebate(entity);
-				} else {
-					goodsBackService.updateGoodsRebate(entity);
-				}
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				goodsBackService.insertGoodsRebate(entityList);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
@@ -227,7 +231,8 @@ public class GoodsBackController {
 	}
 
 	@RequestMapping(value = "{version}/goods/goodsTag/queryForPage", method = RequestMethod.POST)
-	public ResultModel goodsTagQueryForPage(@PathVariable("version") Double version, @RequestBody ERPGoodsTagEntity entity) {
+	public ResultModel goodsTagQueryForPage(@PathVariable("version") Double version,
+			@RequestBody ERPGoodsTagEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Page<ERPGoodsTagEntity> page = goodsBackService.queryTagForPage(entity);
@@ -264,12 +269,12 @@ public class GoodsBackController {
 	@RequestMapping(value = "{version}/goods/goodsTag/saveTag", method = RequestMethod.POST)
 	public ResultModel saveTag(@PathVariable("version") Double version, @RequestBody ERPGoodsTagEntity entity) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {			
-			try{
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
 				goodsBackService.insertGoodsTag(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
@@ -279,12 +284,12 @@ public class GoodsBackController {
 	@RequestMapping(value = "{version}/goods/goodsTag/modifyTag", method = RequestMethod.POST)
 	public ResultModel modifyTag(@PathVariable("version") Double version, @RequestBody ERPGoodsTagEntity entity) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {			
-			try{
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
 				goodsBackService.updateGoodsTag(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
@@ -294,12 +299,12 @@ public class GoodsBackController {
 	@RequestMapping(value = "{version}/goods/goodsTag/removeTag", method = RequestMethod.POST)
 	public ResultModel removeTag(@PathVariable("version") Double version, @RequestBody ERPGoodsTagEntity entity) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {			
-			try{
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
 				goodsBackService.deleteGoodsTag(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
@@ -309,27 +314,29 @@ public class GoodsBackController {
 	@RequestMapping(value = "{version}/goods/goodsTag/tagFunc", method = RequestMethod.POST)
 	public ResultModel tagFunc(@PathVariable("version") Double version) {
 
-		if (Constants.FIRST_VERSION.equals(version)) {			
-			try{
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
 				List<TagFuncEntity> result = goodsBackService.queryTagFuncList();
 				return new ResultModel(true, result);
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 		}
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/goods/saveGoodsInfo", method = RequestMethod.POST)
-	public ResultModel saveGoodsInfo(HttpServletRequest request,@PathVariable("version") Double version, @RequestBody GoodsInfoEntity entity) {
+	public ResultModel saveGoodsInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsInfoEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			try{
+			try {
 				goodsBackService.saveGoodsInfo(entity);
 				return new ResultModel(true, "");
-			}catch(Exception e){
-				return new ResultModel(false, e.getMessage());			}
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, "版本错误");
