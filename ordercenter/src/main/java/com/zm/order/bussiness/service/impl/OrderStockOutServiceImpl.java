@@ -52,6 +52,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
 		Map<String,Object> param = new HashMap<String,Object>();
 		param.put("entity", entity);
+		entity.init();
 		if(entity.getShopId() != null){
 			List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, entity.getShopId());
 			param.put("list", childrenIds);

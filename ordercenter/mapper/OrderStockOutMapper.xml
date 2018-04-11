@@ -105,7 +105,7 @@
 		<if test="entity.endTime != null and entity.endTime != ''">
 			and ob.create_time &lt;= #{entity.endTime}
 		</if>
-		order by ob.create_time desc limit #{entity.pagination.startRow},#{entity.pagination.numPerPage}) o 
+		order by ob.create_time desc limit #{entity.startRow},#{entity.numPerPage}) o 
 		left join order_detail od on o.order_id = od.order_id 
 		<if test="entity.orderGoodsList != null and entity.orderGoodsList.size() > 0">
 			<foreach collection="entity.orderGoodsList" item="item" index="index">
@@ -127,7 +127,7 @@
 	
 	<select id="queryCountOrderInfo" parameterType="Object"
 		resultType="java.lang.Integer">
-		select count(*) from order_base o where 1=1
+		select count(*) from order_base ob where 1=1
 		<if test="entity.status != null">
 			and ob.status = #{entity.status,jdbcType = INTEGER}
 		</if>

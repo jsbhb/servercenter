@@ -19,8 +19,15 @@ public class Pagination {
 	private int currentPage;
 	private int startIndex;
 	private int lastIndex;
+	private Integer startRow;
+	private Integer endRow;
 	
 	public Pagination(){}
+	
+	public void init() {
+		this.startRow = this.currentPage > 0 ? (this.currentPage - 1) * this.numPerPage : 0;
+		this.endRow = this.currentPage * this.numPerPage;
+	}
 
 	public Pagination(Page<?> page) {
 		this.currentPage = page.getPageNum();
@@ -37,6 +44,22 @@ public class Pagination {
 			this.totalPages = (int) (this.totalRows / this.numPerPage) + 1;
 		}
 		return this;
+	}
+
+	public Integer getStartRow() {
+		return startRow;
+	}
+
+	public void setStartRow(Integer startRow) {
+		this.startRow = startRow;
+	}
+
+	public Integer getEndRow() {
+		return endRow;
+	}
+
+	public void setEndRow(Integer endRow) {
+		this.endRow = endRow;
 	}
 
 	public int getNumPerPage() {
