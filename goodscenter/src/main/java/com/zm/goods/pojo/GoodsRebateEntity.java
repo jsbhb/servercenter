@@ -24,8 +24,15 @@ public class GoodsRebateEntity extends Pagination {
 	private Integer gradeType;// 客户类型
 	private double proportion;// 返佣比例
 	private String remark;// 备注
+	private String opt;
 	public Integer getId() {
 		return id;
+	}
+	public String getOpt() {
+		return opt;
+	}
+	public void setOpt(String opt) {
+		this.opt = opt;
 	}
 	public void setId(Integer id) {
 		this.id = id;
