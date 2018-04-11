@@ -275,10 +275,12 @@ public class OrderController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
+			Integer mallId = Integer.valueOf(req.getParameter("centerId"));
 			pagination.init();
 			param.put("userId", userId);
 			param.put("gradeId", gradeId);
 			param.put("pagination", pagination);
+			param.put("centerId", mallId);
 
 			List<ShoppingCart> list = null;
 			try {
