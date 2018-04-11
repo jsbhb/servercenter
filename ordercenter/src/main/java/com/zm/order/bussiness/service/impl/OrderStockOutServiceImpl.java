@@ -7,7 +7,9 @@
  */
 package com.zm.order.bussiness.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -15,11 +17,14 @@ import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.zm.order.bussiness.dao.OrderStockOutMapper;
 import com.zm.order.bussiness.dao.OrderMapper;
+import com.zm.order.bussiness.dao.OrderStockOutMapper;
 import com.zm.order.bussiness.service.OrderStockOutService;
+import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.ThirdOrderInfo;
 
 /**  
@@ -40,10 +45,25 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	@Resource
 	OrderMapper orderMapper;
 	
+	@Resource
+	UserFeignClient userFeignClient;
+	
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
-		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		return orderBackMapper.selectForPage(entity);
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("entity", entity);
+		if(entity.getShopId() != null){
+			List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, entity.getShopId());
+			param.put("list", childrenIds);
+		}
+		Integer count = orderBackMapper.queryCountOrderInfo(param);
+		List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
+		entity.setTotalRows(count);
+		entity.webListConverter();//计算总页数
+		Page<OrderInfo> page = new Page<OrderInfo>(entity.getCurrentPage(), entity.getNumPerPage(), count);
+		page.addAll(orderList);
+		page.setPages(entity.getTotalPages());
+		return page;
 	}
 
 	@Override

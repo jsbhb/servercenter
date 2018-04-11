@@ -6,16 +6,24 @@ public class RebateDetail extends Pagination {
 
 	private Integer id;
 	private String orderId;
-	private Integer centerId;
-	private Double centerRebateMoney;
-	private Integer shopId;
-	private Double shopRebateMoney;
-	private Integer userId;
-	private Double userRebateMoney;
+	private Integer gradeId;
+	private Double rebateMoney;
 	private String createTime;
 	private String remark;
 	private String opt;
 	
+	public Integer getGradeId() {
+		return gradeId;
+	}
+	public void setGradeId(Integer gradeId) {
+		this.gradeId = gradeId;
+	}
+	public Double getRebateMoney() {
+		return rebateMoney;
+	}
+	public void setRebateMoney(Double rebateMoney) {
+		this.rebateMoney = rebateMoney;
+	}
 	public String getRemark() {
 		return remark;
 	}
@@ -33,42 +41,6 @@ public class RebateDetail extends Pagination {
 	}
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
-	}
-	public Integer getCenterId() {
-		return centerId;
-	}
-	public void setCenterId(Integer centerId) {
-		this.centerId = centerId;
-	}
-	public Double getCenterRebateMoney() {
-		return centerRebateMoney;
-	}
-	public void setCenterRebateMoney(Double centerRebateMoney) {
-		this.centerRebateMoney = centerRebateMoney;
-	}
-	public Integer getShopId() {
-		return shopId;
-	}
-	public void setShopId(Integer shopId) {
-		this.shopId = shopId;
-	}
-	public Double getShopRebateMoney() {
-		return shopRebateMoney;
-	}
-	public void setShopRebateMoney(Double shopRebateMoney) {
-		this.shopRebateMoney = shopRebateMoney;
-	}
-	public Integer getUserId() {
-		return userId;
-	}
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-	public Double getUserRebateMoney() {
-		return userRebateMoney;
-	}
-	public void setUserRebateMoney(Double userRebateMoney) {
-		this.userRebateMoney = userRebateMoney;
 	}
 	public String getCreateTime() {
 		return createTime;

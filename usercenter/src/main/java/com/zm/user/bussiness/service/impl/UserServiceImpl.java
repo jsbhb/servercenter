@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
@@ -30,6 +31,7 @@ import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.pojo.WeiXinPayConfig;
+import com.zm.user.pojo.bo.GradeBO;
 import com.zm.user.utils.CommonUtils;
 import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
@@ -61,6 +63,9 @@ public class UserServiceImpl implements UserService {
 	@Resource
 	ActivityFeignClient activityFeignClient;
 
+	@Resource
+	UserComponent userComponent;
+	
 	@Resource
 	RedisTemplate<String, String> redisTemplate;
 
@@ -316,34 +321,17 @@ public class UserServiceImpl implements UserService {
 		return false;
 	}
 
-	private final Integer FIRST_GRADE = 1;
-	private final Integer SECOND_GRADE = 2;
-	private final Integer THIRD_GRADE = 3;
-	private final Integer FOURTH_GRADE = 4;
+	private final Integer COPY_MALL = 1;
 
 	@Override
 	public Map<String, Object> saveGrade(Grade grade) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		userMapper.saveGrade(grade);
-		result.put("centerId", grade.getId());
 		UserInfo user = new UserInfo();
 
-		boolean flag = false;// 区域中心需要新建数据表
-		// 生成新建等级的admin
-		// 设置区域中心ID,店铺ID，导购ID
-		if (FIRST_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是总公司
-			user.setCenterId(grade.getId());
-		} else if (SECOND_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是区域中心
-			user.setCenterId(grade.getId());
-			flag = true;
-		} else if (THIRD_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是店铺
-			user.setCenterId(grade.getParentId());
-			user.setShopId(grade.getId());
-		} else if (FOURTH_GRADE.equals(grade.getGradeLevel())) {// 说明新建的是导购
-			user.setCenterId(grade.getCenterId());
-			user.setShopId(grade.getShopId());
-			user.setGuideId(grade.getId());
-		}
+		Integer mallId = userComponent.getMallId(grade.getId());
+		user.setShopId(grade.getId());
+		user.setCenterId(mallId);
 
 		user.setPhone(grade.getPhone());
 		Integer userId = userMapper.getUserIdByUserInfo(user);
@@ -364,14 +352,20 @@ public class UserServiceImpl implements UserService {
 
 		userMapper.updatePersonInChargeId(grade);
 
-		if (flag) {
+		if (COPY_MALL.equals(grade.getCopyMall())) {
 			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 		}
 		
 		//添加注册信息存储
-		userMapper.saveGradeData(grade);
+//		userMapper.saveGradeData(grade);
+		//通知订单中心新增grade
+		GradeBO gradeBO = new GradeBO();
+		gradeBO.setId(grade.getId());
+		gradeBO.setParentId(grade.getParentId());
+		gradeBO.setGradeType(grade.getGradeType());
+		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
 		return result;
 	}
 

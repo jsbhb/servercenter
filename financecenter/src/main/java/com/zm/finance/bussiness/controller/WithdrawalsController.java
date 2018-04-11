@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -41,12 +40,11 @@ public class WithdrawalsController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/finance/withdrawal/detail/{id}", method = RequestMethod.GET)
-	public ResultModel getWithdrawal(@PathVariable("version") Double version, @PathVariable("id") Integer id,
-			@RequestParam("type") Integer type) {
+	@RequestMapping(value = "{version}/finance/withdrawal/detail/{gradeId}", method = RequestMethod.GET)
+	public ResultModel listWithdrawal(@PathVariable("version") Double version, @PathVariable("gradeId") Integer gradeId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return withdrawalsService.getWithdrawal(id, type);
+			return withdrawalsService.getWithdrawal(gradeId);
 		}
 		return new ResultModel(false, "版本错误");
 	}

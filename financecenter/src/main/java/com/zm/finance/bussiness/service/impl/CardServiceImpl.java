@@ -39,11 +39,8 @@ public class CardServiceImpl implements CardService{
 	}
 
 	@Override
-	public ResultModel getCard(Integer id, Integer type) {
-		Map<String,Object> param = new HashMap<String,Object>();
-		param.put("typeId", id);
-		param.put("type", type);
-		return new ResultModel(true,cardMapper.getCard(param));
+	public ResultModel getCard(Integer gradeId) {
+		return new ResultModel(true,cardMapper.getCard(gradeId));
 	}
 
 	@Override

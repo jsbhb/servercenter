@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -24,6 +25,7 @@ import com.zm.user.constants.Constants;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
+import com.zm.user.pojo.po.GradeTypePO;
 
 /**
  * ClassName: GradeController <br/>
@@ -141,6 +143,51 @@ public class GradeController {
 			return gradeService.fuzzySearch(entity);
 		}
 
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/grade/type", method = RequestMethod.POST)
+	public ResultModel saveGradeType(@PathVariable("version") Double version, @RequestBody GradeTypePO entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.saveGradeType(entity);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/grade/type", method = RequestMethod.GET)
+	public ResultModel listGradeType(@PathVariable("version") Double version,@RequestParam(value="id",required = false) Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.listGradeType(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/grade/type/children", method = RequestMethod.GET)
+	public ResultModel listGradeTypeChildren(@PathVariable("version") Double version,@RequestParam(value="id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.listGradeTypeChildren(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/grade/type", method = RequestMethod.DELETE)
+	public ResultModel removeGradeType(@PathVariable("version") Double version,@RequestParam(value="id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.removeGradeType(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/grade/type/update", method = RequestMethod.POST)
+	public ResultModel updateGradeType(@PathVariable("version") Double version,@RequestBody GradeTypePO entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.updateGradeType(entity);
+		}
 		return new ResultModel(false, "版本错误");
 	}
 }

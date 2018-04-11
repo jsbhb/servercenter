@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.PushUserMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.PushUserService;
@@ -41,6 +42,9 @@ public class PushUserServiceImpl implements PushUserService {
 	
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
+	
+	@Resource
+	UserComponent userComponent;
 
 	@Override
 	public ResultModel savePushUser(PushUser pushUser) {
@@ -56,8 +60,8 @@ public class PushUserServiceImpl implements PushUserService {
 		userInfo.setPhone(pushUser.getPhone());
 		Integer userId = userMapper.getUserIdByUserInfo(userInfo);
 		if (userId == null) {
-			Integer parentId = userMapper.getParentIdByGradeId(pushUser.getGradeId());
-			userInfo.setCenterId(parentId);
+			Integer mallId = userComponent.getMallId(pushUser.getGradeId());
+			userInfo.setCenterId(mallId);
 			userInfo.setShopId(pushUser.getGradeId());
 			userInfo.setPhoneValidate(1);
 			userInfo.setStatus(1);

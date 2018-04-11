@@ -3,6 +3,7 @@ package com.zm.order.bussiness.component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.zm.order.bussiness.component.model.ShareProfitModel;
 import com.zm.order.bussiness.dao.OrderMapper;
+import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
@@ -24,8 +26,10 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.JSONUtil;
+import com.zm.order.utils.TreeNodeUtil;
 
 @Component
 public class ShareProfitComponent {
@@ -51,7 +55,7 @@ public class ShareProfitComponent {
 		try {
 
 			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-			if(info == null){
+			if (info == null) {
 				return;
 			}
 			if (Constants.PREDETERMINE_ORDER.equals(info.getOrderSource())) {
@@ -82,8 +86,8 @@ public class ShareProfitComponent {
 					template.opsForSet().add(Constants.ORDER_REBATE, orderId);
 				}
 			}
-			
-			calcapitalpool(orderId);//扣减资金池
+
+			calcapitalpool(orderId);// 扣减资金池
 
 			OrderInfo info = orderMapper.getOrderByOrderIdForRebate(orderId);
 			if (info == null) {
@@ -109,18 +113,12 @@ public class ShareProfitComponent {
 	public void calRefundShareProfit(String orderId) {
 		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Rebate rebate = new Rebate();
+		Map<Integer, Double> rebateMap = new HashMap<Integer, Double>();
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
-		calRebate(info, rebate, hashOperations);
-		hashOperations.increment(Constants.CENTER_ORDER_REBATE + info.getCenterId(), "stayToAccount",
-				CalculationUtils.sub(0, rebate.getCenterRebate()));
-		if (rebate.getShopRebate() > 0) {
-			hashOperations.increment(Constants.SHOP_ORDER_REBATE + info.getShopId(), "stayToAccount",
-					CalculationUtils.sub(0, rebate.getShopRebate()));
-		}
-		if (rebate.getPushUserRebate() > 0) {
-			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + info.getPushUserId(), "stayToAccount",
-					CalculationUtils.sub(0, rebate.getPushUserRebate()));
+		calRebate(info, rebateMap, hashOperations);
+		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
+			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
+					CalculationUtils.sub(0, CalculationUtils.round(2, entry.getValue())));
 		}
 	}
 
@@ -267,18 +265,13 @@ public class ShareProfitComponent {
 	 */
 	private void orderProfitStayToAccount(OrderInfo orderInfo) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Rebate rebate = new Rebate();
-		calRebate(orderInfo, rebate, hashOperations);
-		hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "stayToAccount",
-				rebate.getCenterRebate());
-		if (rebate.getShopRebate() > 0) {
-			hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "stayToAccount",
-					rebate.getShopRebate());
+		Map<Integer, Double> rebateMap = new HashMap<Integer, Double>();
+		calRebate(orderInfo, rebateMap, hashOperations);
+		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
+			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
+					CalculationUtils.round(2, entry.getValue()));
 		}
-		if (rebate.getPushUserRebate() > 0) {
-			hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(), "stayToAccount",
-					rebate.getPushUserRebate());
-		}
+
 	}
 
 	/**
@@ -289,25 +282,15 @@ public class ShareProfitComponent {
 			Long count = template.opsForSet().remove(Constants.ORDER_REBATE, orderInfo.getOrderId());
 			if (count > 0) {
 				HashOperations<String, String, String> hashOperations = template.opsForHash();
-				Rebate rebate = new Rebate();
-				calRebate(orderInfo, rebate, hashOperations);
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "canBePresented",//可提现字段
-						rebate.getCenterRebate());
-				hashOperations.increment(Constants.CENTER_ORDER_REBATE + orderInfo.getCenterId(), "stayToAccount",//待到账字段
-						CalculationUtils.sub(0, rebate.getCenterRebate()));
-				if (rebate.getShopRebate() > 0) {
-					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "canBePresented",
-							rebate.getShopRebate());
-					hashOperations.increment(Constants.SHOP_ORDER_REBATE + orderInfo.getShopId(), "stayToAccount",
-							CalculationUtils.sub(0, rebate.getShopRebate()));
+				Map<Integer, Double> rebateMap = new HashMap<Integer, Double>();
+				calRebate(orderInfo, rebateMap, hashOperations);
+				for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
+					hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "canBePresented",
+							CalculationUtils.round(2, entry.getValue()));
+					hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
+							CalculationUtils.sub(0, CalculationUtils.round(2, entry.getValue())));
 				}
-				if (rebate.getPushUserRebate() > 0) {
-					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
-							"canBePresented", rebate.getPushUserRebate());
-					hashOperations.increment(Constants.PUSHUSER_ORDER_REBATE + orderInfo.getPushUserId(),
-							"stayToAccount", CalculationUtils.sub(0, rebate.getPushUserRebate()));
-				}
-				Map<String,String> result = packageDetailMap(orderInfo, rebate);
+				Map<String, String> result = packageDetailMap(orderInfo, rebateMap);
 				template.opsForList().leftPush(Constants.REBATE_DETAIL, JSONUtil.toJson(result));
 			}
 		} catch (Exception e) {
@@ -317,58 +300,59 @@ public class ShareProfitComponent {
 
 	}
 
-	private Map<String, String> packageDetailMap(OrderInfo orderInfo, Rebate rebate) {
+	private Map<String, String> packageDetailMap(OrderInfo orderInfo, Map<Integer, Double> rebateMap) {
 		Map<String, String> result = new HashMap<String, String>();
 		result.put("orderId", orderInfo.getOrderId());
-		result.put("centerId", orderInfo.getCenterId().toString());
-		result.put("centerRebateMoney", rebate.getCenterRebate() + "");
-		if (orderInfo.getShopId() != null) {
-			result.put("shopId", orderInfo.getShopId().toString());
-			result.put("shopRebateMoney", rebate.getShopRebate() + "");
-		}
-		if (orderInfo.getPushUserId() != null) {
-			result.put("userId", orderInfo.getPushUserId().toString());
-			result.put("userRebateMoney", rebate.getPushUserRebate() + "");
+		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
+			result.put(entry.getKey().toString(), entry.getValue().toString());
 		}
 		return result;
 	}
 
-	private void calRebate(OrderInfo orderInfo, Rebate rebate, HashOperations<String, String, String> hashOperations) {
+	private void calRebate(OrderInfo orderInfo, Map<Integer, Double> rebateMap,
+			HashOperations<String, String, String> hashOperations) {
 		List<OrderGoods> goodsList = orderInfo.getOrderGoodsList();
-		if (goodsList != null) {
-			double centerRebate = 0;
-			double shopRebate = 0;
-			double pushUserRebate = 0;
-			Map<String, String> rebateMap = new HashMap<String, String>();
+		// 获取该订单所有的上级,包括推手
+		LinkedList<GradeBO> superNodeList = TreeNodeUtil.getSuperNode(CacheComponent.getInstance().getSet(),
+				orderInfo.getShopId());
+		if (goodsList != null && superNodeList != null) {
+			Map<String, String> goodsRebate = null;
+			GradeBO grade = null;
 			for (OrderGoods goods : goodsList) {
-				rebateMap = hashOperations.entries(Constants.GOODS_REBATE + goods.getGoodsId());
-				if (rebateMap == null) {
+				goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + goods.getItemId());
+				if (goodsRebate == null) {
 					continue;
 				}
 				try {
 					double amount = CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity());
-					centerRebate = CalculationUtils.add(centerRebate,
-							CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("first") == null ? "0" : rebateMap.get("first"))));
-					if (orderInfo.getShopId() != null) {
-						shopRebate = CalculationUtils.add(shopRebate,
-								CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("second") == null ? "0" : rebateMap.get("second"))));
-					}
-					if (orderInfo.getPushUserId() != null) {
-						pushUserRebate = CalculationUtils.add(pushUserRebate,
-								CalculationUtils.mul(amount, Double.valueOf(rebateMap.get("third") == null ? "0" : rebateMap.get("third"))));
+					double nextProportion = 0;// 下一级的返佣比例
+					// 获取父级的时候已经按照先进先出排完续
+					while (!superNodeList.isEmpty()) {
+						grade = superNodeList.poll();
+						// 如果是海外购，则不进行返佣
+						if (grade.getId().equals(Constants.CNCOOPBUY)) {
+							continue;
+						}
+						// 获取已经计算的返佣的值
+						double rebate = rebateMap.get(grade.getId()) == null ? 0 : rebateMap.get(grade.getId());
+						// 获取该类型的返佣的比例
+						double proportion = Double.valueOf(goodsRebate.get(grade.getGradeType() + "") == null ? "0"
+								: goodsRebate.get(grade.getGradeType() + ""));
+						rebateMap.put(grade.getId(), CalculationUtils.add(rebate,
+								CalculationUtils.mul(amount, CalculationUtils.sub(proportion, nextProportion))));
+						nextProportion = proportion;// 记录下一级的返佣比例
+
 					}
 				} catch (Exception e) {
 					LogUtil.writeErrorLog("【单个商品返佣计算出错】商品ID:" + goods.getGoodsId(), e);
 				}
 			}
-			rebate.setCenterRebate(CalculationUtils.round(2, centerRebate));
-			rebate.setPushUserRebate(CalculationUtils.round(2, pushUserRebate));
-			rebate.setShopRebate(CalculationUtils.round(2, shopRebate));
 		}
 	}
-	
+
 	/**
 	 * 资金池扣减
+	 * 
 	 * @param orderId
 	 */
 	public void calcapitalpool(String orderId) {
@@ -384,7 +368,8 @@ public class ShareProfitComponent {
 		Double balance = null;
 		while (it.hasNext()) {
 			orderInfo = it.next();
-			if (!Constants.PREDETERMINE_PLAT_TYPE.equals(orderInfo.getCenterId())) {
+			if (!Constants.PREDETERMINE_PLAT_TYPE.equals(orderInfo.getCenterId())
+					&& !Constants.CNCOOPBUY.equals(orderInfo.getCenterId())) {
 				balance = null;
 				try {
 					balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
@@ -413,6 +398,8 @@ public class ShareProfitComponent {
 						LogUtil.writeErrorLog("【记录或加冻结资金出错】订单号：" + orderInfo.getOrderId(), e);
 					}
 				}
+			} else {
+				orderIdListForCapitalEnough.add(orderId);
 			}
 		}
 		if (orderIdListForCapitalNotEnough.size() > 0) {
@@ -438,7 +425,7 @@ public class ShareProfitComponent {
 			}
 		}
 	}
-	
+
 	private Map<String, Object> getCapitalDetail(OrderInfo orderInfo) {
 		Map<String, Object> capitalPoolDetailMap = new HashMap<String, Object>();
 		capitalPoolDetailMap.put("centerId", orderInfo.getCenterId().toString());
@@ -451,35 +438,4 @@ public class ShareProfitComponent {
 		return capitalPoolDetailMap;
 	}
 
-
-	class Rebate {
-		private double centerRebate;
-		private double shopRebate;
-		private double pushUserRebate;
-
-		public double getCenterRebate() {
-			return centerRebate;
-		}
-
-		public void setCenterRebate(double centerRebate) {
-			this.centerRebate = centerRebate;
-		}
-
-		public double getShopRebate() {
-			return shopRebate;
-		}
-
-		public void setShopRebate(double shopRebate) {
-			this.shopRebate = shopRebate;
-		}
-
-		public double getPushUserRebate() {
-			return pushUserRebate;
-		}
-
-		public void setPushUserRebate(double pushUserRebate) {
-			this.pushUserRebate = pushUserRebate;
-		}
-
-	}
 }

@@ -71,6 +71,10 @@ public class Constants {
 	// *********************订货平台ID*********************
 
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
+	
+	// *********************中国供销海外购ID*********************
+
+	public static final Integer CNCOOPBUY = 2;
 
 	// *********************资金池redis前缀*********************
 
@@ -83,12 +87,8 @@ public class Constants {
 	// *********************订单返佣redis前缀***************************
 	public static final String ORDER_REBATE = "orderrebate:";
 
-	// *********************区域中心返佣***************************
-	public static final String CENTER_ORDER_REBATE = "center:orderrebate:";
-	// *********************店铺返佣***************************
-	public static final String SHOP_ORDER_REBATE = "shop:orderrebate:";
-	// *********************推手返佣***************************
-	public static final String PUSHUSER_ORDER_REBATE = "pushuser:orderrebate:";
+	// *********************等级返佣***************************
+	public static final String GRADE_ORDER_REBATE = "grade:orderrebate:";
 	// *********************返佣详情***************************
 	public static final String REBATE_DETAIL = "rebatedetail:";
 }

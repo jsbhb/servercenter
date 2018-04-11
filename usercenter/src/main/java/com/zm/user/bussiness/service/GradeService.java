@@ -5,6 +5,7 @@ import com.zm.user.common.ResultModel;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
+import com.zm.user.pojo.po.GradeTypePO;
 
 /**
  * 
@@ -65,4 +66,29 @@ public interface GradeService {
 	 * @return
 	 */
 	ResultModel fuzzySearch(FuzzySearchGrade entity);
+
+	/**
+	 * @fun 新增客户类型
+	 * @param entity
+	 * @return
+	 */
+	ResultModel saveGradeType(GradeTypePO entity);
+
+	/**
+	 * @fun 获取客户类型（ID为null获取所有，ID有的获取本身及所有父级）
+	 * @param id
+	 * @return
+	 */
+	ResultModel listGradeType(Integer id);
+
+	/**
+	 * @fun 获取他的下一级
+	 * @param id
+	 * @return
+	 */
+	ResultModel listGradeTypeChildren(Integer id);
+
+	ResultModel removeGradeType(Integer id);
+
+	ResultModel updateGradeType(GradeTypePO entity);
 }

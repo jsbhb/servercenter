@@ -1,7 +1,6 @@
 package com.zm.finance.bussiness.controller;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,12 +40,11 @@ public class CardController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/finance/card/{id}", method = RequestMethod.GET)
-	public ResultModel getCard(@PathVariable("version") Double version, @PathVariable("id") Integer id,
-			@RequestParam("type") Integer type) {
+	@RequestMapping(value = "{version}/finance/card/{gradeId}", method = RequestMethod.GET)
+	public ResultModel getCard(@PathVariable("version") Double version, @PathVariable("gradeId") Integer gradeId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return cardService.getCard(id, type);
+			return cardService.getCard(gradeId);
 		}
 		return new ResultModel(false, "版本错误");
 	}

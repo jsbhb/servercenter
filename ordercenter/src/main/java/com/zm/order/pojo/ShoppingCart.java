@@ -16,7 +16,7 @@ public class ShoppingCart {
 
 	private Integer quantity;
 
-	private Integer centerId;
+	private Integer gradeId;
 
 	private String goodsName;
 
@@ -36,7 +36,7 @@ public class ShoppingCart {
 	private String picPath;
 
 	public boolean check() {
-		return userId != null && itemId != null && quantity != null && centerId != null && goodsName != null
+		return userId != null && itemId != null && quantity != null && gradeId != null && goodsName != null
 				&& supplierId != null;
 	}
 
@@ -88,12 +88,12 @@ public class ShoppingCart {
 		this.goodsName = goodsName;
 	}
 
-	public Integer getCenterId() {
-		return centerId;
+	public Integer getGradeId() {
+		return gradeId;
 	}
 
-	public void setCenterId(Integer centerId) {
-		this.centerId = centerId;
+	public void setGradeId(Integer gradeId) {
+		this.gradeId = gradeId;
 	}
 
 	public Integer getUserId() {
@@ -147,8 +147,9 @@ public class ShoppingCart {
 	@Override
 	public String toString() {
 		return "ShoppingCart [id=" + id + ", userId=" + userId + ", itemId=" + itemId + ", quantity=" + quantity
-				+ ", centerId=" + centerId + ", goodsName=" + goodsName + ", createTime=" + createTime + ", updateTime="
-				+ updateTime + "]";
+				+ ", gradeId=" + gradeId + ", goodsName=" + goodsName + ", supplierId=" + supplierId + ", supplierName="
+				+ supplierName + ", createTime=" + createTime + ", updateTime=" + updateTime + ", type=" + type
+				+ ", goodsSpecs=" + goodsSpecs + ", picPath=" + picPath + "]";
 	}
 
 }

@@ -7,6 +7,9 @@
  */
 package com.zm.order.bussiness.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import com.github.pagehelper.Page;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
@@ -30,7 +33,14 @@ public interface OrderStockOutMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	Page<OrderInfo> selectForPage(OrderInfo entity);
+	List<OrderInfo> selectForPage(Map<String,Object> param);
+	
+	/**
+	 * 查询总数
+	 * @param param
+	 * @return
+	 */
+	int queryCountOrderInfo(Map<String,Object> param);
 
 	/**  
 	 * selectByOrderId:根据订单编号检索订单. <br/>  

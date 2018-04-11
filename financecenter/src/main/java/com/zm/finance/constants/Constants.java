@@ -9,12 +9,8 @@ public class Constants {
 	public static final String CAPITAL_PERFIX = "capital:";
 	public static final String CAPITAL_DETAIL = "capitaldetail:";
 
-	// *********************区域中心返佣***************************
-	public static final String CENTER_ORDER_REBATE = "center:orderrebate:";
-	// *********************店铺返佣***************************
-	public static final String SHOP_ORDER_REBATE = "shop:orderrebate:";
-	// *********************推手返佣***************************
-	public static final String PUSHUSER_ORDER_REBATE = "pushuser:orderrebate:";
+	// *********************GRADE返佣***************************
+	public static final String GRADE_ORDER_REBATE = "grade:orderrebate:";
 	// *********************返佣详情***************************
 	public static final String REBATE_DETAIL = "rebatedetail:";
 

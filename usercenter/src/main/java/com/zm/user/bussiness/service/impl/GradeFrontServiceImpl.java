@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeFrontMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.GradeFrontService;
@@ -19,18 +20,21 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 	@Resource
 	UserMapper userMapper;
 	
+	@Resource
+	UserComponent userComponent;
+	
 	@Override
-	public GradeConfig getGradeConfig(Integer centerId, Integer shopId, Integer userId) {
+	public GradeConfig getGradeConfig(Integer mallId, Integer shopId, Integer userId) {
 		if(shopId != null){
-			Integer parentId = userMapper.getParentIdByGradeId(shopId);
-			if(!centerId.equals(parentId)){
+			Integer tmallId = userComponent.getMallId(shopId);
+			if(!mallId.equals(tmallId)){
 				return null;
 			}
 			return gradeFrontMapper.getGradeConfig(shopId);
 		}
 		if(userId != null){
 			UserInfo user = userMapper.getUserInfo(userId);
-			if(!centerId.equals(user.getCenterId())){
+			if(!mallId.equals(user.getCenterId())){
 				return null;
 			}
 			if(user.getShopId() == null){
@@ -42,8 +46,8 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 	}
 
 	@Override
-	public String getClientUrl(Integer centerId) {
-		return gradeFrontMapper.getClientUrlById(centerId);
+	public String getClientUrl(Integer mallId) {
+		return gradeFrontMapper.getClientUrlById(mallId);
 	}
 
 	@Override

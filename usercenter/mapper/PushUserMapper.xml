@@ -12,7 +12,7 @@
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="gradeName" property="gradeName" jdbcType="VARCHAR" />
-		<result column="centerId" property="centerId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
 	</resultMap>
 	
 	
@@ -50,7 +50,7 @@
 	</select>
 	
 	<select id="listBindingShop" parameterType="Object" resultMap="pushUser">
-		select pu.grade_id,pu.type,gc.name as gradeName,g.parent_id as centerId,pu.status  
+		select pu.grade_id,pu.type,gc.name as gradeName,g.parent_id as mall_id,pu.status  
 		from push_user pu left join grade_config gc on pu.grade_id = gc.grade_id  
 		left join grade g on gc.grade_id = g.id
 		where pu.user_id = #{userId} and pu.status in (2,11)

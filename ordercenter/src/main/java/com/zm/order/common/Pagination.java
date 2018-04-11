@@ -29,6 +29,15 @@ public class Pagination {
 		this.totalPages = page.getPages();
 		this.totalRows = page.getTotal();
 	}
+	
+	public Pagination webListConverter() {
+		if(this.totalRows % this.numPerPage == 0){
+			this.totalPages = (int) (this.totalRows / this.numPerPage);
+		} else {
+			this.totalPages = (int) (this.totalRows / this.numPerPage) + 1;
+		}
+		return this;
+	}
 
 	public int getNumPerPage() {
 		return numPerPage;

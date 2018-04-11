@@ -1,7 +1,6 @@
 package com.zm.finance.bussiness.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.finance.pojo.card.Card;
@@ -12,7 +11,7 @@ public interface CardMapper {
 
 	void updateCard(Card card);
 
-	List<Card> getCard(Map<String, Object> param);
+	List<Card> getCard(Integer gradeId);
 
 	void removeCard(Integer id);
 	

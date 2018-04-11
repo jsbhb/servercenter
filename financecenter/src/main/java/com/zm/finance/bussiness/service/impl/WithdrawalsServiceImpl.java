@@ -1,8 +1,5 @@
 package com.zm.finance.bussiness.service.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.HashOperations;
@@ -22,7 +19,7 @@ import com.zm.finance.pojo.withdrawals.Withdrawals;
 import com.zm.finance.util.CalculationUtils;
 
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class WithdrawalsServiceImpl implements WithdrawalsService {
 
 	@Resource
@@ -31,26 +28,10 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 	@Resource
 	RedisTemplate<String, Object> template;
 
-	private static final Integer CENTER = 0;
-	private static final Integer SHOP = 1;
-	private static final Integer PUSHUSER = 2;
-
 	@Override
 	public ResultModel withdrawalsApply(Withdrawals withdrawals) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		if (CENTER.equals(withdrawals.getOperatorType())) {
-			return calWithdrawals(withdrawals, hashOperations,
-					Constants.CENTER_ORDER_REBATE + withdrawals.getOperatorId());
-		}
-		if (SHOP.equals(withdrawals.getOperatorType())) {
-			return calWithdrawals(withdrawals, hashOperations,
-					Constants.SHOP_ORDER_REBATE + withdrawals.getOperatorId());
-		}
-		if (PUSHUSER.equals(withdrawals.getOperatorType())) {
-			return calWithdrawals(withdrawals, hashOperations,
-					Constants.PUSHUSER_ORDER_REBATE + withdrawals.getOperatorId());
-		}
-		return new ResultModel(false);
+		return calWithdrawals(withdrawals, hashOperations, Constants.GRADE_ORDER_REBATE + withdrawals.getOperatorId());
 
 	}
 
@@ -91,29 +72,16 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 				return new ResultModel(true);
 			} else {// 审核不通过要返回金额
 				withdrawalsMapper.updateUnPassWithdrawals(audit);
-				if (CENTER.equals(withdrawals.getOperatorType())) {
-					return backWithdrawals(withdrawals, hashOperations,
-							Constants.CENTER_ORDER_REBATE + withdrawals.getOperatorId());
-				}
-				if (SHOP.equals(withdrawals.getOperatorType())) {
-					return backWithdrawals(withdrawals, hashOperations,
-							Constants.SHOP_ORDER_REBATE + withdrawals.getOperatorId());
-				}
-				if (PUSHUSER.equals(withdrawals.getOperatorType())) {
-					return backWithdrawals(withdrawals, hashOperations,
-							Constants.PUSHUSER_ORDER_REBATE + withdrawals.getOperatorId());
-				}
+				return backWithdrawals(withdrawals, hashOperations,
+						Constants.GRADE_ORDER_REBATE + withdrawals.getOperatorId());
 			}
 		}
 		return new ResultModel(false);
 	}
 
 	@Override
-	public ResultModel getWithdrawal(Integer id, Integer type) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("id", id);
-		param.put("type", type);
-		return new ResultModel(true, withdrawalsMapper.listWithdrawalDetail(param));
+	public ResultModel getWithdrawal(Integer gradeId) {
+		return new ResultModel(true, withdrawalsMapper.listWithdrawalDetail(gradeId));
 	}
 
 	@Override

@@ -8,8 +8,8 @@
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
-		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
@@ -78,37 +78,37 @@
 		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
-		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
+		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
 		from order_base ob where
 		1 = 1
-		<if test="status != null">
-			and ob.status = #{status,jdbcType = INTEGER}
+		<if test="entity.status != null">
+			and ob.status = #{entity.status,jdbcType = INTEGER}
 		</if>
-		<if test="userId != null and userId != ''">
-			and ob.user_id = #{userId}
+		<if test="entity.userId != null and entity.userId != ''">
+			and ob.user_id = #{entity.userId}
 		</if>
-		<if test="centerId != null and centerId != ''">
-			and ob.center_id = #{centerId}
+		<if test="list != null and list.size > 0 ">
+			and ob.grade_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
 		</if>
-		<if test="shopId != null and shopId != ''">
-			and ob.shop_id = #{shopId}
+		<if test="entity.orderId != null and entity.orderId != ''">
+			and ob.order_id = #{entity.orderId}
 		</if>
-		<if test="orderId != null and orderId != ''">
-			and ob.order_id = #{orderId}
+		<if test="entity.supplierId != null and entity.supplierId != ''">
+			and ob.supplier_id = #{entity.supplierId}
 		</if>
-		<if test="supplierId != null and supplierId != ''">
-			and ob.supplier_id = #{supplierId}
+		<if test="entity.startTime != null and entity.startTime != ''">
+			and ob.create_time &gt;= #{entity.startTime}
 		</if>
-		<if test="startTime != null and startTime != ''">
-			and ob.create_time &gt;= #{startTime}
+		<if test="entity.endTime != null and entity.endTime != ''">
+			and ob.create_time &lt;= #{entity.endTime}
 		</if>
-		<if test="endTime != null and endTime != ''">
-			and ob.create_time &lt;= #{endTime}
-		</if>
-		order by ob.create_time desc) o 
+		order by ob.create_time desc limit #{entity.pagination.startRow},#{entity.pagination.numPerPage}) o 
 		left join order_detail od on o.order_id = od.order_id 
-		<if test="orderGoodsList != null and orderGoodsList.size() > 0">
-			<foreach collection="orderGoodsList" item="item" index="index">
+		<if test="entity.orderGoodsList != null and entity.orderGoodsList.size() > 0">
+			<foreach collection="entity.orderGoodsList" item="item" index="index">
 				inner join (select * from order_goods 
 				where 1=1
 				<if test="item.itemCode != null and item.itemCode != ''">
@@ -124,6 +124,36 @@
 		left join third_order_info oe
 		on oe.order_id = o.order_id order by o.create_time desc
 	</select>
+	
+	<select id="queryCountOrderInfo" parameterType="Object"
+		resultType="java.lang.Integer">
+		select count(*) from order_base o where 1=1
+		<if test="entity.status != null">
+			and ob.status = #{entity.status,jdbcType = INTEGER}
+		</if>
+		<if test="entity.userId != null and entity.userId != ''">
+			and ob.user_id = #{entity.userId}
+		</if>
+		<if test="list != null and list.size > 0 ">
+			and ob.grade_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		<if test="entity.orderId != null and entity.orderId != ''">
+			and ob.order_id = #{entity.orderId}
+		</if>
+		<if test="entity.supplierId != null and entity.supplierId != ''">
+			and ob.supplier_id = #{entity.supplierId}
+		</if>
+		<if test="entity.startTime != null and entity.startTime != ''">
+			and ob.create_time &gt;= #{entity.startTime}
+		</if>
+		<if test="entity.endTime != null and entity.endTime != ''">
+			and ob.create_time &lt;= #{entity.endTime}
+		</if>
+	</select>
+	
 	
 	<select id="selectOrderGoodsForPage" resultMap="orderGoods" parameterType="Object">
 	select * from order_goods where order_id = #{orderId}

@@ -15,11 +15,10 @@ public interface RebateService {
 
 	/**
 	 * @fun 获取返佣
-	 * @param id
-	 * @param type 0区域中心，1店铺，2推手
+	 * @param gradeId
 	 * @return
 	 */
-	ResultModel getRebate(Integer id, Integer type);
+	ResultModel getRebate(Integer gradeId);
 
 	Page<RebateDetail> getRebateDetail(RebateDetail entity);
 

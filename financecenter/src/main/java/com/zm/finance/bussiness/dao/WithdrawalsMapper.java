@@ -17,7 +17,7 @@ public interface WithdrawalsMapper {
 	
 	Withdrawals getWithdrawals(Integer id);
 
-	List<Withdrawals> listWithdrawalDetail(Map<String, Object> param);
+	List<Withdrawals> listWithdrawalDetail(Integer gradeId);
 
 	Page<Withdrawals> selectDetailByEntity(Withdrawals withdrawals);
 

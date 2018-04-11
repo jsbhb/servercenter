@@ -78,8 +78,18 @@ public class Grade extends Pagination{
 
 	private String picPath4;
 	
+	private Integer copyMall;
+	
 	public Grade(){
 		super();
+	}
+
+	public Integer getCopyMall() {
+		return copyMall;
+	}
+
+	public void setCopyMall(Integer copyMall) {
+		this.copyMall = copyMall;
 	}
 
 	public String getMobileUrl() {

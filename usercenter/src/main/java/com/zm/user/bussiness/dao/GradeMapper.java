@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
+import com.zm.user.pojo.po.GradeTypePO;
 
 /**
  * ClassName: GradeMapper <br/>
@@ -95,5 +96,44 @@ public interface GradeMapper<T> {
 	void insertGradeConfig(ShopEntity entity);
 
 	List<FuzzySearchGrade> fuzzyListGrade(FuzzySearchGrade entity);
+
+	/**
+	 * @fun 新增客户类型
+	 * @param entity
+	 */
+	void saveGradeType(GradeTypePO entity);
+
+	/**
+	 * @fun 获取客户类型
+	 * @param id
+	 * @return
+	 */
+	List<GradeTypePO> listGradeTypeById(Integer id);
+	
+	/**
+	 * @fun 获取客户类型
+	 * @param id
+	 * @return
+	 */
+	List<GradeTypePO> listGradeType();
+
+	/**
+	 * @fun 获取客户类型的子类型
+	 * @param id
+	 * @return
+	 */
+	List<GradeTypePO> listGradeTypeChildren(Integer id);
+	
+	int countGradeByGradeType(Integer id);
+
+	void removeGradeType(Integer id);
+
+	void updateGradeType(GradeTypePO entity);
+	
+	List<Grade> listParentGradeById(Integer id);
+
+	List<Grade> listGrade();
+
+	String listChildrenGrade(Integer gradeId);
 
 }

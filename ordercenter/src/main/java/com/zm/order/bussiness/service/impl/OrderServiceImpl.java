@@ -230,8 +230,8 @@ public class OrderServiceImpl implements OrderService {
 		payModel.setOrderId(orderId);
 		payModel.setTotalAmount(totalAmount + "");
 		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
-		if(detailStr.length()>100){//支付宝描述过长会报错
-			detailStr = detailStr.substring(0, 100)+"...";
+		if (detailStr.length() > 100) {// 支付宝描述过长会报错
+			detailStr = detailStr.substring(0, 100) + "...";
 		}
 		payModel.setDetail(detailStr);
 
@@ -366,9 +366,9 @@ public class OrderServiceImpl implements OrderService {
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
+			
+			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
-
-		shareProfitComponent.calShareProfitStayToAccount(orderId);
 
 		result.setSuccess(true);
 		return result;

@@ -11,8 +11,8 @@
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
-		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
@@ -76,7 +76,7 @@
 	<resultMap type="com.zm.order.pojo.CustomModel" id="customModel">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="order_id" property="outRequestNo" jdbcType="VARCHAR" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
 		<result column="pay_type" property="payType" jdbcType="INTEGER" />
 		<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
 		<result column="payment" property="amount" jdbcType="VARCHAR" />
@@ -92,7 +92,7 @@
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="supplier_name" property="supplierName"
 			jdbcType="VARCHAR" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 	</resultMap>
@@ -129,7 +129,7 @@
 
 	<select id="listPayCustomOrder" resultMap="customModel">
 		select
-		o.id,o.order_id,od.pay_no,od.payment,o.center_id,od.pay_type from
+		o.id,o.order_id,od.pay_no,od.payment,o.mall_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
 		where o.status = 12 and o.order_flag = 0 and o.supplier_id = 1
@@ -148,7 +148,7 @@
 		og.id as
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from (select
-		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,
+		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.create_type,
 		ob.guide_id,ob.user_id ,ob.combination_id
 		from order_base ob where
 		is_del = 0
@@ -166,10 +166,10 @@
 			and ob.user_id = #{info.userId}
 		</if>
 		<if test="info.centerId != null and info.centerId != ''">
-			and ob.center_id = #{info.centerId}
+			and ob.mall_id = #{info.centerId}
 		</if>
 		<if test="info.shopId != null and info.shopId != ''">
-			and ob.shop_id = #{info.shopId}
+			and ob.grade_id = #{info.shopId}
 		</if>
 		<if test="info.guideId != null and info.guideId != ''">
 			and ob.guide_id = #{info.guideId}
@@ -220,10 +220,10 @@
 			and o.user_id = #{info.userId} and is_del = 0
 		</if>
 		<if test="info.centerId != null and info.centerId != ''">
-			and o.center_id = #{info.centerId}
+			and o.mall_id = #{info.centerId}
 		</if>
 		<if test="info.shopId != null and info.shopId != ''">
-			and o.shop_id = #{info.shopId}
+			and o.grade_id = #{info.shopId}
 		</if>
 		<if test="info.guideId != null and info.guideId != ''">
 			and o.guide_id = #{info.guideId}
@@ -251,7 +251,7 @@
 
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
-		(order_id,combination_id,order_flag,user_id,express_type,center_id,shop_id,guide_id,supplier_id,tdq,
+		(order_id,combination_id,order_flag,user_id,express_type,mall_id,grade_id,guide_id,supplier_id,tdq,
 		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status,tag_fun)
 		VALUES
 		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
@@ -287,21 +287,21 @@
 
 	<select id="getClientIdByOrderId" parameterType="Object"
 		resultType="java.lang.Integer">
-		select center_id from order_base where order_id =
+		select mall_id from order_base where order_id =
 		#{orderId}
 	</select>
 
 	<insert id="saveShoppingCart" parameterType="Object">
 		insert into
-		order_shopping_cart(user_id,item_id,item_quantity,goods_name,supplier_id,supplier_name,type,center_id,create_time)
-		values(#{userId},#{itemId},#{quantity},#{goodsName},#{supplierId},#{supplierName},#{type},#{centerId},now())
+		order_shopping_cart(user_id,item_id,item_quantity,goods_name,supplier_id,supplier_name,type,grade_id,create_time)
+		values(#{userId},#{itemId},#{quantity},#{goodsName},#{supplierId},#{supplierName},#{type},#{gradeId},now())
 		on duplicate key update item_quantity= #{quantity} +
 		item_quantity,update_time=now()
 	</insert>
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
 		select * from order_shopping_cart where user_id = #{userId} and
-		center_id = #{centerId} order by create_time
+		grade_id = #{gradeId} order by create_time
 <!-- 		limit 
  		#{pagination.startRow},#{pagination.numPerPage} -->
 	</select>
@@ -325,19 +325,19 @@
 	<select id="getCountByStatus" parameterType="Object"
 		resultType="com.zm.order.pojo.OrderCount">
 		select status, count(*) as total from order_base where
-		center_id=#{centerId} and user_id = #{userId} and is_del = 0 group by
+		grade_id=#{gradeId} and user_id = #{userId} and is_del = 0 group by
 		status
 	</select>
 	
 	<select id="getPushCountByStatus" parameterType="Object"
 		resultType="com.zm.order.pojo.OrderCount">
 		select status, count(*) as total from order_base where
-		shop_id=#{centerId} and push_user_id = #{userId} group by
+		grade_id=#{gradeId} and push_user_id = #{userId} group by
 		status
 	</select>
 
 	<delete id="removeShoppingCart" parameterType="Object">
-		delete from order_shopping_cart where user_id=#{userId} and id in
+		delete from order_shopping_cart where user_id=#{userId} and grade_id = #{gradeId} and id in
 		<foreach collection="idArr" separator="," item="item" open="("
 			close=")">
 			#{item}
@@ -346,8 +346,8 @@
 
 	<select id="countShoppingCart" parameterType="Object"
 		resultType="java.lang.Integer">
-		select count(*) from order_shopping_cart where center_id =
-		#{centerId} and user_id = #{userId}
+		select count(*) from order_shopping_cart where grade_id =
+		#{gradeId} and user_id = #{userId}
 	</select>
 
 	<select id="getOrderStatusByOrderId" parameterType="Object"
@@ -361,8 +361,8 @@
 		select
 		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,o.create_type,o.push_user_id,od.id
 		as
-		detail_id,od.payment,od.pay_time,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.shop_id,
-		od.pay_type,od.pay_no,o.center_id,og.id as
+		detail_id,od.payment,od.pay_time,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.grade_id,
+		od.pay_type,od.pay_no,o.mall_id,og.id as
 		goods_id,og.goods_id as goodsId,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
@@ -382,8 +382,8 @@
 		select
 		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,od.id
 		as
-		detail_id,od.payment,o.shop_id,o.order_source,
-		o.center_id,og.id as
+		detail_id,od.payment,o.grade_id,o.order_source,
+		o.mall_id,og.id as
 		goods_id,og.goods_id as goodsId,og.item_id,og.item_quantity,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount
 		from order_base o
@@ -573,8 +573,8 @@
 		select
 		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id
 		as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
-		od.pay_type,od.pay_no,o.center_id,og.id as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.mall_id,
+		od.pay_type,od.pay_no,og.id as
 		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
@@ -587,8 +587,8 @@
 		select
 		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,o.create_time,od.id
 		as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
-		od.pay_type,od.pay_no,o.center_id,og.id as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.mall_id,
+		od.pay_type,od.pay_no,og.id as
 		goods_id,og.item_id,og.item_name,og.item_quantity,od.pay_time,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
@@ -604,7 +604,7 @@
 		select
 		o.id,o.order_id,o.create_time,od.id
 		as
-		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.center_id,
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.mall_id,
 		od.pay_type,od.pay_no,od.dis_amount
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
@@ -638,7 +638,7 @@
 	<select id="countShoppingCartQuantity" parameterType="Object"
 		resultType="java.lang.Integer">
 		select item_quantity from order_shopping_cart where
-		center_id = #{centerId} and user_id=#{userId} and item_id=#{itemId}
+		grade_id = #{gradeId} and user_id=#{userId} and item_id=#{itemId}
 	</select>
 
 	<select id="listUnDeliverOrder" parameterType="Object"
@@ -665,7 +665,7 @@
 	
 		
 	<select id="repayingPushJudge" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from order_base where shop_id = #{shopId} and push_user_id = #{pushUserId} 
+		select count(*) from order_base where grade_id = #{shopId} and push_user_id = #{pushUserId} 
 		and status in(0,1,2,3,4,5,6,99)
 	</select>
 	
@@ -676,12 +676,12 @@
 			close=")" separator=",">
 			#{item}
 		</foreach>
-		and shop_id = #{shopId} group by push_user_id
+		and grade_id = #{shopId} group by push_user_id
 	</select>
 	
 	<!-- 获取资金池不足的订单 -->
 	<select id="listCapitalPoolNotEnough" parameterType="Object" resultMap="orderBase">
-		select order_id,center_id from order_base where status = 11
+		select order_id,mall_id from order_base where status = 11
 	</select>
 	
 	<!-- 根据订单Id查询物流信息 -->

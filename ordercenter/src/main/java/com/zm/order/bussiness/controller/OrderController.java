@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.model.SendOrderResult;
+import com.zm.order.log.LogUtil;
+import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderIdAndSupplierId;
@@ -66,9 +68,10 @@ public class OrderController {
 		String payType = orderInfo.getOrderDetail().getPayType() + "";
 		String type = req.getParameter("type");
 
-		if (payType == null || type == null) {
+		if (payType == null || type == null || orderInfo.getShopId() == null) {
 			result.setSuccess(false);
-			result.setErrorMsg("参数不全");
+			result.setErrorCode(ErrorCodeEnum.MISSING_PARAM.getErrorCode());
+			result.setErrorMsg(ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 			return result;
 		}
 
@@ -102,6 +105,10 @@ public class OrderController {
 		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			if (info.getShopId() == null) {
+				return new ResultModel(true, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+			}
 			result = orderService.listUserOrder(info, pagination);
 		}
 
@@ -185,12 +192,14 @@ public class OrderController {
 			try {
 				return orderService.orderCancel(userId, orderId);
 			} catch (Exception e) {
-				e.printStackTrace();
-				return new ResultModel(false, e);
+				LogUtil.writeErrorLog("用户取消订单接口", e);
+				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
 		}
 
-		return new ResultModel(false, "error");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/backcancel/{orderId}", method = RequestMethod.POST)
@@ -200,14 +209,16 @@ public class OrderController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				return orderService.orderBackCancel(orderId,payNo);
+				return orderService.orderBackCancel(orderId, payNo);
 			} catch (Exception e) {
-				e.printStackTrace();
-				return new ResultModel(false, e);
+				LogUtil.writeErrorLog("后台取消订单接口", e);
+				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
 		}
 
-		return new ResultModel(false, "error");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
@@ -242,20 +253,22 @@ public class OrderController {
 
 			orderService.saveShoppingCart(cart);
 			result.setSuccess(true);
+			return result;
 		}
 
-		return result;
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart/{centerId}/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/order/shoping-cart/{gradeId}/{userId}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取用户购物车接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
-			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "gradeID") })
 	public ResultModel listShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId,
 			Pagination pagination) {
 
 		ResultModel result = new ResultModel();
@@ -264,59 +277,61 @@ public class OrderController {
 			Map<String, Object> param = new HashMap<String, Object>();
 			pagination.init();
 			param.put("userId", userId);
-			param.put("centerId", centerId);
+			param.put("gradeId", gradeId);
 			param.put("pagination", pagination);
 
 			List<ShoppingCart> list = null;
 			try {
 				list = orderService.listShoppingCart(param);
 			} catch (Exception e) {
-				result.setSuccess(false);
-				result.setErrorMsg(e.getMessage());
-				e.printStackTrace();
-				return result;
+				LogUtil.writeErrorLog("获取用户购物车接口", e);
+				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
 			result.setSuccess(true);
 			result.setObj(list);
-
+			return result;
 		}
 
-		return result;
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
-	@RequestMapping(value = "{version}/order/statusCount/{centerId}/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/order/statusCount/{gradeId}/{userId}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取订单各个状态数量接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
-			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "gradeID") })
 	public ResultModel getCountByStatus(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId,
 			@RequestParam(value = "type", required = false, defaultValue = "0") String type) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
-			param.put("centerId", centerId);
+			param.put("gradeId", gradeId);
 			List<OrderCount> list = orderService.getCountByStatus(param, type);
 			result.setSuccess(true);
 			result.setObj(list);
-
+			return result;
 		}
-		return result;
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart/{userId}/{ids}", method = RequestMethod.DELETE)
-	@ApiOperation(value = "获取订单各个状态数量接口", response = ResultModel.class)
+	@RequestMapping(value = "{version}/order/shoping-cart/{gradeId}/{userId}/{ids}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "删除用户购物车", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
 			@ApiImplicitParam(paramType = "path", name = "ids", dataType = "String", required = true, value = "id,多个用‘，’隔开") })
 	public ResultModel removeShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("ids") String ids) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("ids") String ids,
+			@PathVariable("gradeId") Integer gradeId) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -324,59 +339,65 @@ public class OrderController {
 			String[] idArr = ids.split(",");
 			param.put("userId", userId);
 			param.put("idArr", idArr);
+			param.put("gradeId", gradeId);
 			orderService.removeShoppingCart(param);
 			result.setSuccess(true);
-
+			return result;
 		}
-		return result;
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart/count/{centerId}/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/order/shoping-cart/count/{gradeId}/{userId}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取购物车数量接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
-			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel countShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId,
-			@PathVariable("centerId") Integer centerId) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
-			param.put("centerId", centerId);
+			param.put("gradeId", gradeId);
 			Integer count = orderService.countShoppingCart(param);
 			result.setSuccess(true);
 			result.setObj(count);
+			return result;
 		}
-		return result;
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
-	@RequestMapping(value = "{version}/order/shoping-cart/quantity/{centerId}/{userId}/{itemId}", method = RequestMethod.GET)
+	@RequestMapping(value = "{version}/order/shoping-cart/quantity/{gradeId}/{userId}/{itemId}", method = RequestMethod.GET)
 	@ApiOperation(value = "根据itemId获取购物车内商品数量接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
 			@ApiImplicitParam(paramType = "path", name = "itemId", dataType = "String", required = true, value = "itemID"),
-			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getShopCartQuantityByItemId(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("itemId") String itemId,
-			@PathVariable("centerId") Integer centerId) {
+			@PathVariable("gradeId") Integer gradeId) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
 			param.put("itemId", itemId);
-			param.put("centerId", centerId);
+			param.put("gradeId", gradeId);
 			Integer count = orderService.countShoppingCartQuantity(param);
 			result.setSuccess(true);
 			result.setObj(count);
+			return result;
 		}
-		return result;
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -422,7 +443,8 @@ public class OrderController {
 			return new ResultModel(true, "");
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -436,7 +458,8 @@ public class OrderController {
 			return new ResultModel(true, null);
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -449,7 +472,8 @@ public class OrderController {
 			return new ResultModel(true, orderService.listPayCustomOrder());
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -463,7 +487,8 @@ public class OrderController {
 			return new ResultModel(true, null);
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -480,7 +505,8 @@ public class OrderController {
 			return new ResultModel(true, fee);
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -496,7 +522,8 @@ public class OrderController {
 			return new ResultModel(true, null);
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -509,10 +536,10 @@ public class OrderController {
 			return new ResultModel(true, orderService.listExpress());
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
-
 
 	@RequestMapping(value = "{version}/order/saveThirdOrder", method = RequestMethod.POST)
 	@ApiIgnore
@@ -536,8 +563,8 @@ public class OrderController {
 			return orderService.checkOrderStatus(list);
 		}
 
-		return new ResultModel(false, "版本错误");
-
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/changeOrderStatusByThirdWarehouse", method = RequestMethod.POST)
@@ -561,7 +588,8 @@ public class OrderController {
 			return new ResultModel(true, orderService.getProfit(shopId));
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
 
@@ -572,7 +600,8 @@ public class OrderController {
 			return new ResultModel(true, orderService.listUnDeliverOrder());
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/confirmByTimeTask", method = RequestMethod.GET)
@@ -590,7 +619,9 @@ public class OrderController {
 
 			return orderService.repayingPushJudge(pushUserId, shopId);
 		}
-		return new ResultModel(false, "版本错误");
+		
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/pushUserOrderCount/{shopId}", method = RequestMethod.POST)
@@ -600,7 +631,8 @@ public class OrderController {
 
 			return orderService.pushUserOrderCount(shopId, pushUserIdList);
 		}
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/sendToWarehouse", method = RequestMethod.GET)
@@ -615,7 +647,7 @@ public class OrderController {
 		return new ResultModel(false, "版本错误");
 
 	}
-	
+
 	/**
 	 * @fun 退款中
 	 * @param version
@@ -624,17 +656,18 @@ public class OrderController {
 	 */
 	@RequestMapping(value = "{version}/order/refunds/{orderId}", method = RequestMethod.POST)
 	@ApiIgnore
-	public ResultModel refunds(@PathVariable("version") Double version,@PathVariable("orderId") String orderId) {
+	public ResultModel refunds(@PathVariable("version") Double version, @PathVariable("orderId") String orderId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			return orderService.refunds(orderId);
 		}
 
-		return new ResultModel(false, "版本错误");
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 
 	}
-	
+
 	/**
 	 * @fun 轮询查询资金池不足的订单并重新计算
 	 * @param version
@@ -653,6 +686,5 @@ public class OrderController {
 		return false;
 
 	}
-	
 
 }

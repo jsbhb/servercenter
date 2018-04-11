@@ -102,9 +102,9 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				capitalPoolMapper.updatePassRechargeApply(audit.getId());
 			} else {
 				capitalPoolMapper.updateUnPassRechargeApply(audit);
-				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(),
 						"canBePresented", refilling.getMoney());
-				template.opsForHash().increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "refilling",
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "refilling",
 						CalculationUtils.sub(0, refilling.getMoney()));// 已反充金额增加
 
 			}
@@ -141,7 +141,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	public ResultModel reChargeCapitalApply(Refilling refilling) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		double balance = 0;
-		String canBePresentedStr = hashOperations.get(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(),
+		String canBePresentedStr = hashOperations.get(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(),
 				"canBePresented");
 		balance = CalculationUtils.sub(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr),
 				refilling.getMoney());
@@ -154,9 +154,9 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		capitalMoney = capitalMoney == null ? "0" : capitalMoney;
 		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
-		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
+		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
 				CalculationUtils.sub(0, refilling.getMoney()));
-		hashOperations.increment(Constants.CENTER_ORDER_REBATE + refilling.getCenterId(), "refilling",
+		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "refilling",
 				refilling.getMoney());// 已反充金额增加
 		return new ResultModel(true, "提交成功");
 	}

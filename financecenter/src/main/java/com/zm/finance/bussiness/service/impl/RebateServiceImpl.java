@@ -22,157 +22,87 @@ import com.zm.finance.constants.Constants;
 import com.zm.finance.log.LogUtil;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
-import com.zm.finance.pojo.rebate.CenterRebate;
-import com.zm.finance.pojo.rebate.PushUserRebate;
 import com.zm.finance.pojo.rebate.Rebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
-import com.zm.finance.pojo.rebate.ShopRebate;
 import com.zm.finance.util.JSONUtil;
 
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class RebateServiceImpl implements RebateService {
 
 	@Resource
 	RedisTemplate<String, String> template;
-	
+
 	@Resource
 	RebateMapper rebateMapper;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void updateRebateTask() {
 
-		List<CenterRebate> centerRebateList = new ArrayList<CenterRebate>();
-		List<ShopRebate> shopRebateList = new ArrayList<ShopRebate>();
-		List<PushUserRebate> pushUserRebateList = new ArrayList<PushUserRebate>();
 		List<RebateDetail> detailList = new ArrayList<RebateDetail>();
+		List<Rebate> rebateList = new ArrayList<Rebate>();
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		packageCenterRebate(centerRebateList, hashOperations);//获取区域中心返佣
-		packageShopRebate(shopRebateList, hashOperations);//获取店铺返佣
-		packagePushUserRebate(pushUserRebateList, hashOperations);//获取推手返佣
-		List<String> rebateDetailList = template.opsForList().range(Constants.REBATE_DETAIL, 0, -1);
-		if (rebateDetailList != null) {
-			for (String str : rebateDetailList) {
-				detailList.add(JSONUtil.parse(str, RebateDetail.class));
+		Set<String> keys = template.keys(Constants.GRADE_ORDER_REBATE + "*");
+		if (keys != null && keys.size() > 0) {
+			Rebate rebate = null;
+			Map<String, String> result = null;
+			String[] arr = null;
+			for (String key : keys) {
+				result = hashOperations.entries(key);
+				if (result != null) {
+					try {
+						rebate = JSONUtil.parse(JSONUtil.toJson(result), Rebate.class);
+						arr = key.split(":");
+						rebate.setGradeId(Integer.valueOf(arr[arr.length - 1]));
+						rebateList.add(rebate);
+					} catch (Exception e) {
+						LogUtil.writeErrorLog("【从redis中获取数据转换出错】", e);
+					}
+				}
 			}
 		}
-		if(centerRebateList.size() > 0){
-			rebateMapper.insertCenterRebate(centerRebateList);
+		if(rebateList.size() > 0){
+			rebateMapper.insertRebate(rebateList);
 		}
-		if(pushUserRebateList.size() > 0){
-			rebateMapper.insertPushUserRebate(pushUserRebateList);
+		List<String> rebateDetailList = template.opsForList().range(Constants.REBATE_DETAIL, 0, -1);
+		if (rebateDetailList != null) {
+			Map<String, String> temp = null;
+			RebateDetail rebateDetail = null;
+			for (String str : rebateDetailList) {
+				try {
+					temp = JSONUtil.parse(str, Map.class);
+					for (Map.Entry<String, String> entry : temp.entrySet()) {
+						if("orderId".equals(entry.getKey())){
+							continue;
+						}
+						rebateDetail = new RebateDetail();
+						rebateDetail.setGradeId(Integer.valueOf(entry.getKey()));
+						rebateDetail.setRebateMoney(Double.valueOf(entry.getValue()));
+						rebateDetail.setOrderId(temp.get("orderId"));
+						detailList.add(rebateDetail);
+					}
+				} catch (Exception e) {
+					LogUtil.writeErrorLog("【从redis中获取数据转换成明细出错】", e);
+				}
+			}
 		}
-		if(shopRebateList.size() > 0){
-			rebateMapper.insertShopRebate(shopRebateList);
-		}
-		if(detailList.size() > 0){
+		if (detailList.size() > 0) {
 			rebateMapper.insertRebateDetail(detailList);
 			template.opsForList().trim(Constants.REBATE_DETAIL, detailList.size(), -1);// 删除以保存的记录
 		}
 
 	}
 
-	private void packageShopRebate(List<ShopRebate> shopRebateList,
-			HashOperations<String, String, String> hashOperations) {
-		Map<String, String> result;
-		Set<String> shopkeys = template.keys(Constants.SHOP_ORDER_REBATE + "*");
-		String[] arr = null;
-		if (shopkeys != null) {// 店铺返佣
-			ShopRebate temp = null;
-			for (String key : shopkeys) {
-				result = hashOperations.entries(key);
-				if (result != null) {
-					try {
-						temp = JSONUtil.parse(JSONUtil.toJson(result), ShopRebate.class);
-						arr = key.split(":");
-						temp.setShopId(Integer.valueOf(arr[arr.length - 1]));
-						shopRebateList.add(temp);
-					} catch (Exception e) {
-						LogUtil.writeErrorLog("【从redis中获取数据转换出错】", e);
-					}
-
-				}
-			}
-		}
-	}
-	
-	private void packagePushUserRebate(List<PushUserRebate> pushUserRebateList,
-			HashOperations<String, String, String> hashOperations) {
-		Map<String, String> result;
-		Set<String> userkeys = template.keys(Constants.PUSHUSER_ORDER_REBATE + "*");
-		String[] arr = null;
-		if (userkeys != null) {// 店铺返佣
-			PushUserRebate temp = null;
-			for (String key : userkeys) {
-				result = hashOperations.entries(key);
-				if (result != null) {
-					try {
-						temp = JSONUtil.parse(JSONUtil.toJson(result), PushUserRebate.class);
-						arr = key.split(":");
-						temp.setUserId(Integer.valueOf(arr[arr.length - 1]));
-						pushUserRebateList.add(temp);
-					} catch (Exception e) {
-						LogUtil.writeErrorLog("【从redis中获取数据转换出错】", e);
-					}
-
-				}
-			}
-		}
-	}
-
-	private void packageCenterRebate(List<CenterRebate> centerRebateList,
-			HashOperations<String, String, String> hashOperations) {
-		Map<String, String> result;
-		String[] arr = null;
-		Set<String> centerkeys = template.keys(Constants.CENTER_ORDER_REBATE + "*");
-		if (centerkeys != null) {// 区域中心返佣
-			CenterRebate temp = null;
-			for (String key : centerkeys) {
-				result = hashOperations.entries(key);
-				if (result != null) {
-					try {
-						temp = JSONUtil.parse(JSONUtil.toJson(result), CenterRebate.class);
-						arr = key.split(":");
-						temp.setCenterId(Integer.valueOf(arr[arr.length - 1]));
-						centerRebateList.add(temp);
-					} catch (Exception e) {
-						LogUtil.writeErrorLog("【从redis中获取数据转换出错】", e);
-					}
-
-				}
-			}
-		}
-	}
-
-	private static final Integer CENTER = 0;
-	private static final Integer SHOP = 1;
-	private static final Integer PUSHUSER = 2;
 	@Override
-	public ResultModel getRebate(Integer id, Integer type) {
-		Map<String,String> result = new HashMap<String, String>();
+	public ResultModel getRebate(Integer gradeId) {
+		Map<String, String> result = new HashMap<String, String>();
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		if(CENTER.equals(type)){
-			result = hashOperations.entries(Constants.CENTER_ORDER_REBATE + id);
-			if(result == null){
-				return new ResultModel(true, null);
-			}
-			return new ResultModel(true,JSONUtil.parse(JSONUtil.toJson(result), CenterRebate.class));
+		result = hashOperations.entries(Constants.GRADE_ORDER_REBATE + gradeId);
+		if (result == null) {
+			return new ResultModel(true, null);
 		}
-		if(SHOP.equals(type)){
-			result = hashOperations.entries(Constants.SHOP_ORDER_REBATE + id);
-			if(result == null){
-				return new ResultModel(true, null);
-			}
-			return new ResultModel(true,JSONUtil.parse(JSONUtil.toJson(result), ShopRebate.class));
-		}
-		if(PUSHUSER.equals(type)){
-			result = hashOperations.entries(Constants.PUSHUSER_ORDER_REBATE + id);
-			if(result == null){
-				return new ResultModel(true, null);
-			}
-			return new ResultModel(true,JSONUtil.parse(JSONUtil.toJson(result), PushUserRebate.class));
-		}
-		return new ResultModel(false);
+		return new ResultModel(true, JSONUtil.parse(JSONUtil.toJson(result), Rebate.class));
 	}
 
 	@Override
@@ -181,19 +111,9 @@ public class RebateServiceImpl implements RebateService {
 		return rebateMapper.selectRebateDetailById(entity);
 	}
 
-
 	@Override
 	public Page<Rebate> listRebate(RebateSearchModel search) {
 		PageHelper.startPage(search.getCurrentPage(), search.getNumPerPage(), true);
-		if(CENTER.equals(search.getType())){
-			return rebateMapper.listCenterRebate(search);
-		}
-		if(SHOP.equals(search.getType())){
-			return rebateMapper.listShopRebate(search);
-		}
-		if(PUSHUSER.equals(search.getType())){
-			return rebateMapper.listPushRebate(search);
-		}
-		return null;
+		return rebateMapper.listRebate(search);
 	}
 }

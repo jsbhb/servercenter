@@ -10,7 +10,7 @@ public interface CardService {
 
 	ResultModel modifyCard(Card card);
 
-	ResultModel getCard(Integer id, Integer type);
+	ResultModel getCard(Integer gradeId);
 
 	ResultModel removeCard(Integer id);
 

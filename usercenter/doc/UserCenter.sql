@@ -22,7 +22,7 @@ CREATE TABLE `zm_user`.`user` (
   `guide_id` INT UNSIGNED NULL COMMENT '导购ID',
   `create_time` DATETIME NULL COMMENT '注册时间', 
   `update_time` DATETIME NULL COMMENT '更新时间',
-  `opt` DATETIME NULL COMMENT '操作人',
+  `opt` VARCHAR(50) NULL COMMENT '操作人',
   `last_login_time` DATETIME NULL COMMENT '最后登录时间',
   `last_login_IP` VARCHAR(20) NULL COMMENT '最后登录IP',
   `ipcity` VARCHAR(20) NULL COMMENT 'IP所属城市',

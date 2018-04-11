@@ -48,8 +48,8 @@
 			jdbcType="INTEGER" />
 		<result column="is_email_validate" property="emailValidate"
 			jdbcType="INTEGER" />
-		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="last_login_time" property="lastLoginTime"
 			jdbcType="VARCHAR" />
@@ -75,12 +75,12 @@
 		<result column="vip_level" property="vipLevel" jdbcType="INTEGER" />
 		<result column="duration" property="duration" jdbcType="INTEGER" />
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
 	</resultMap>
 
 	<resultMap type="com.zm.user.pojo.VipPrice" id="vipPrice">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
 		<result column="vip_level" property="vipLevel" jdbcType="INTEGER" />
 		<result column="duration" property="duration" jdbcType="INTEGER" />
 		<result column="price" property="price" jdbcType="DECIMAL" />
@@ -106,13 +106,13 @@
 	<select id="getVipUser" parameterType="Object" resultMap="vipUser">
 		select
 		vip_level,duration,create_time from user_vip where user_id = #{userId}
-		and center_id = #{centerId} and status = 1
+		and mall_id = #{centerId} and status = 1
 	</select>
 
 	<select id="getUserInfo" parameterType="Object" resultMap="userInfo">
 		select
-		u.id,u.user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.shop_id,
-		u.center_id,u.last_login_time,u.ipcity,ud.id as
+		u.id,u.user_type,u.account,u.phone,u.email,u.band,u.is_phone_validate,u.is_email_validate,u.grade_id,
+		u.mall_id,u.last_login_time,u.ipcity,ud.id as
 		detail_id,ud.name,ud.nick_name,ud.company,ud.location,u.guide_id,ud.user_id as duserId,
 		ud.head_img,ud.certificates,ud.idNum,ud.sex from user u left join
 		user_detail ud on u.id = ud.user_id
@@ -281,8 +281,8 @@
 	<insert id="saveUser" parameterType="Object" useGeneratedKeys="true"
 		keyProperty="id">
 		insert into
-		user(phone,user_type,email,account,pwd,parent_id,band,is_phone_validate,is_email_validate,center_id,
-		shop_id,guide_id,create_time)
+		user(phone,user_type,email,account,pwd,parent_id,band,is_phone_validate,is_email_validate,mall_id,
+		grade_id,guide_id,create_time)
 		values
 		(#{phone},#{userType},#{email},#{account},#{pwd},#{parentId},#{band},#{phoneValidate},
 		#{emailValidate},#{centerId},#{shopId},#{guideId},now())
@@ -307,7 +307,7 @@
 	</update>
 
 	<select id="listVipPrice" parameterType="Object" resultMap="vipPrice">
-		select * from vip_price where center_id = #{centerId}
+		select * from vip_price where mall_id = #{centerId}
 	</select>
 
 	<select id="getVipPrice" parameterType="Object" resultMap="vipPrice">
@@ -322,21 +322,21 @@
 
 	<select id="getVipUserByOrderId" parameterType="Object"
 		resultMap="vipUser">
-		select vp.center_id,uo.user_id,vp.duration,vp.vip_level from
+		select vp.mall_id,uo.user_id,vp.duration,vp.vip_level from
 		user_vip_order uo left join vip_price vp on uo.vip_price_id = vp.id
 		where uo.order_id = #{orderId}
 	</select>
 
 	<insert id="saveVipUser" parameterType="Object">
 		insert into
-		user_vip(user_id,center_id,duration,vip_level,create_time)
+		user_vip(user_id,mall_id,duration,vip_level,create_time)
 		values(#{userId},#{centerId},#{duration},#{vipLevel},now())
 	</insert>
 
 	<update id="updateUserVip" parameterType="Object">
 		update user_vip set
 		duration = duration + #{duration} where user_id = #{userId} and
-		center_id = #{centerId} and status = 1
+		mall_id = #{centerId} and status = 1
 	</update>
 
 	<update id="updateVipOrder" parameterType="Object">
@@ -373,7 +373,7 @@
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
-		select id from grade where grade_level = 2;
+		select id from grade where copy_mall = 1;
 	</select>
 	
 	<update id="updatePersonInChargeId" parameterType="Object">
@@ -382,7 +382,7 @@
 	
 	<select id="getUserIdentityId" parameterType="Object" resultMap="userInfo">
 		select
-		u.id,u.account,u.phone,u.center_id,u.shop_id,ud.id as
+		u.id,u.account,u.phone,u.mall_id,u.grade_id,ud.id as
 		detail_id,ud.name,ud.certificates,ud.idNum from user u left join
 		user_detail ud on u.id = ud.user_id
 		where u.id = #{userId}

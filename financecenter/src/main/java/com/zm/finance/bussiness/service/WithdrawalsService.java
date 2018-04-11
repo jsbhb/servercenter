@@ -27,7 +27,7 @@ public interface WithdrawalsService {
 	 * @param type
 	 * @return
 	 */
-	ResultModel getWithdrawal(Integer id, Integer type);
+	ResultModel getWithdrawal(Integer gradeId);
 
 	/**
 	 * @fun 获取提现记录

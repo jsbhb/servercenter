@@ -4,7 +4,7 @@
 
 	<resultMap type="com.zm.finance.pojo.card.Card" id="card">
 		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="type_id" property="typeId" jdbcType="INTEGER"/>
+		<result column="grade_id" property="typeId" jdbcType="INTEGER"/>
 		<result column="type" property="type" jdbcType="INTEGER"/>
 		<result column="is_default" property="setDefault" jdbcType="INTEGER"/>
 		<result column="card_bank" property="cardBank" jdbcType="VARCHAR"/>
@@ -18,7 +18,7 @@
 	
 
 	<insert id="insertCard" parameterType="Object">
-		insert into bind_card(type_id,type,card_bank,card_no,card_name,card_mobile,create_time)
+		insert into bind_card(grade_id,type,card_bank,card_no,card_name,card_mobile,create_time)
 		value(#{typeId},#{type},#{cardBank},#{cardNo},#{cardName},#{cardMobile},now())
 	</insert>
 	
@@ -43,7 +43,7 @@
 	</update>
 	
 	<select id="getCard" parameterType="Object" resultMap="card">
-		select * from bind_card where type_id = #{typeId} and type = #{type}
+		select * from bind_card where grade_id = #{gradeId}
 	</select>
 	
 	<delete id="removeCard" parameterType="Object">
@@ -51,7 +51,7 @@
 	</delete>
 	
 	<select id="selectForPage" parameterType="Object" resultMap="card">
-		select * from bind_card where type_id = #{typeId} and type = #{type}
+		select * from bind_card where grade_id = #{typeId} and type = #{type}
 	</select>
 	
 	<select id="queryByCardId" parameterType="Object" resultMap="card">

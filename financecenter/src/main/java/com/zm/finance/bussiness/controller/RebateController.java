@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -32,12 +31,11 @@ public class RebateController {
 		}
 	}
 
-	@RequestMapping(value = "{version}/finance/rebate/{id}", method = RequestMethod.GET)
-	public ResultModel getRebate(@PathVariable("version") Double version, @PathVariable("id") Integer id,
-			@RequestParam("type") Integer type) {
+	@RequestMapping(value = "{version}/finance/rebate/{gradeId}", method = RequestMethod.GET)
+	public ResultModel getRebate(@PathVariable("version") Double version, @PathVariable("gradeId") Integer gradeId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return rebateService.getRebate(id, type);
+			return rebateService.getRebate(gradeId);
 		}
 		return new ResultModel(false, "版本错误");
 	}
