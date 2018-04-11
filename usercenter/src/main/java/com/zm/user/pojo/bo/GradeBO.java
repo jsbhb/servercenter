@@ -5,6 +5,13 @@ public class GradeBO {
 	private Integer id;
 	private Integer parentId;
 	private Integer gradeType;
+	private String name;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public Integer getId() {
 		return id;
 	}
