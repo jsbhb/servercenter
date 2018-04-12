@@ -17,8 +17,8 @@
 		<result column="user_id" property="userId" jdbcType="INTEGER" />
 		<result column="status" property="status" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
-		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
@@ -80,7 +80,7 @@
 	</resultMap>
 
 <!-- 	<select id="selectPurchaseOrderInfoForPage" resultMap="purchaseOrderInfo" parameterType="Object"> -->
-<!-- 		select a.center_id centerId,a.shop_id shopId, -->
+<!-- 		select a.mall_id centerId,a.grade_id shopId, -->
 <!-- 		count(a.order_id) as orderCount, -->
 <!-- 		sum(b.payment) as orderAmountCount -->
 <!-- 		from order_base a -->
@@ -89,10 +89,10 @@
 <!-- 		and a.status = '7' -->
 <!-- 		and a.order_source = '2' -->
 <!-- 		<if test="centerId != null and centerId != 0"> -->
-<!-- 			and a.center_id = #{centerId} -->
+<!-- 			and a.mall_id = #{centerId} -->
 <!-- 		</if> -->
 <!-- 		<if test="shopId != null and shopId != 0"> -->
-<!-- 			and a.shop_id = #{shopId} -->
+<!-- 			and a.grade_id = #{shopId} -->
 <!-- 		</if> -->
 <!-- 		<if test="orderId != null and orderId != ''"> -->
 <!-- 			and a.order_id = #{orderId} -->
@@ -103,7 +103,7 @@
 <!-- 		<if test="endTime != null and endTime != ''"> -->
 <!-- 			and b.pay_time &lt;= #{endTime} -->
 <!-- 		</if> -->
-<!-- 		group by a.center_id,a.shop_id -->
+<!-- 		group by a.mall_id,a.grade_id -->
 <!-- 	</select> -->
 	
 	<select id="selectPurchaseOrderInfoForPage" resultMap="orderBase" parameterType="Object">
@@ -113,7 +113,7 @@
 		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
-		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.user_id ,ob.combination_id
+		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.guide_id,ob.user_id ,ob.combination_id
 		from order_base ob where
 		1 = 1 and ob.order_source = '2'
 		<if test="status != null">
