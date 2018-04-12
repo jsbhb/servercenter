@@ -27,7 +27,7 @@ import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 import com.zm.user.pojo.dto.GradeTypeDTO;
 import com.zm.user.pojo.po.GradeTypePO;
-import com.zm.user.utils.PackUtil;
+import com.zm.user.utils.TreePackUtil;
 
 /**
  * ClassName: GradeServiceImpl <br/>
@@ -99,7 +99,7 @@ public class GradeServiceImpl implements GradeService {
 			list = gradeMapper.listGradeType();
 		}
 
-		return new ResultModel(true, PackUtil.packGradeType(list));
+		return new ResultModel(true, TreePackUtil.packGradeTypeChildren(list));
 	}
 
 	@Override

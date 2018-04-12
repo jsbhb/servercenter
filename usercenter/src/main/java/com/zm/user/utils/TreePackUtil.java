@@ -8,9 +8,9 @@ import java.util.Map;
 import com.zm.user.pojo.dto.GradeTypeDTO;
 import com.zm.user.pojo.po.GradeTypePO;
 
-public class PackUtil {
+public class TreePackUtil {
 
-	public static List<GradeTypeDTO> packGradeType(List<GradeTypePO> list) {
+	public static List<GradeTypeDTO> packGradeTypeChildren(List<GradeTypePO> list) {
 		List<GradeTypeDTO> rootList = new ArrayList<GradeTypeDTO>();
 		if (list != null && list.size() > 0) {
 			Map<Integer, GradeTypeDTO> tempMap = new HashMap<Integer, GradeTypeDTO>();
