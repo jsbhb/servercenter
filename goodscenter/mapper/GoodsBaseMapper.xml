@@ -77,6 +77,8 @@
 		brand=#{brand},
 		increment_tax=#{incrementTax},
 		tariff=#{tariff},
+		unit=#{unit},
+		hscode=#{hscode},
 		center_id=#{centerId},
 		update_time=now(),opt=#{opt}  where id=#{id}
 	</update>
