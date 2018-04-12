@@ -33,8 +33,8 @@
 		<foreach collection="list" item="item" separator=",">
 			(#{item.gradeId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
 		</foreach>
-		ON DUPLICATE KEY UPDATE can_be_presented = values(can_be_presented),already_presented = values(already_presented),
-		stay_to_account = values(stay_to_account),remark = values(remark),update_time = now()
+<!-- 		ON DUPLICATE KEY UPDATE can_be_presented = values(can_be_presented),already_presented = values(already_presented), -->
+<!-- 		stay_to_account = values(stay_to_account),remark = values(remark),update_time = now() -->
 	</insert>
 	
 	<insert id="insertRebateDetail" parameterType="Object">
