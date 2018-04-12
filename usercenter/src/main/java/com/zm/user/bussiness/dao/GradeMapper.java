@@ -108,7 +108,7 @@ public interface GradeMapper<T> {
 	 * @param id
 	 * @return
 	 */
-	List<GradeTypePO> listGradeTypeById(Integer id);
+	List<GradeTypePO> listParentGradeTypeById(Integer id);
 	
 	/**
 	 * @fun 获取客户类型

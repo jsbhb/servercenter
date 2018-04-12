@@ -94,7 +94,7 @@ public class GradeServiceImpl implements GradeService {
 	public ResultModel listGradeType(Integer id) {
 		List<GradeTypePO> list = null;
 		if (id != null) {
-			list = gradeMapper.listGradeTypeById(id);
+			list = gradeMapper.listParentGradeTypeById(id);
 		} else {
 			list = gradeMapper.listGradeType();
 		}

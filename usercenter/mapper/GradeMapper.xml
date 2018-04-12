@@ -161,7 +161,7 @@
 		values(#{parentId},#{name},#{description},now(),#{opt})
 	</insert>
 
-	<select id="listGradeTypeById" parameterType="Object" resultMap="gradeTypePO">
+	<select id="listParentGradeTypeById" parameterType="Object" resultMap="gradeTypePO">
 		SELECT T2.id, T2.parent_id,T2.name FROM (SELECT  @r AS _id, 
 		(SELECT @r := parent_id FROM grade_type WHERE id = _id) AS parent_id 
         FROM (SELECT @r := #{id}) vars,grade_type h 
