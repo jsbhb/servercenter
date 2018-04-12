@@ -102,7 +102,9 @@ public class RebateServiceImpl implements RebateService {
 		if (result == null) {
 			return new ResultModel(true, null);
 		}
-		return new ResultModel(true, JSONUtil.parse(JSONUtil.toJson(result), Rebate.class));
+		Rebate rebate = JSONUtil.parse(JSONUtil.toJson(result), Rebate.class);
+		rebate.setGradeId(gradeId);
+		return new ResultModel(true, rebate);
 	}
 
 	@Override
