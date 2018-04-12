@@ -11,7 +11,6 @@ CREATE TABLE `zm_financial`.`rebate` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `grade_id` (`grade_id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '返佣表';
