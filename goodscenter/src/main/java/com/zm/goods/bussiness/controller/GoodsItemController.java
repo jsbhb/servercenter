@@ -45,21 +45,6 @@ public class GoodsItemController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String gradeLevel = request.getParameter("gradeLevel");
 			
-//			if (entity.getTagBindEntity() != null) {
-//				ERPGoodsTagBindEntity param = entity.getTagBindEntity();
-//				//增加根据标签查询的条件
-//				String itemIds = "";
-//				List<ERPGoodsTagBindEntity> erpGoodsTagBindList = goodsBackService.queryGoodsTagBindListInfo(param);
-//				for(ERPGoodsTagBindEntity ent:erpGoodsTagBindList) {
-//					itemIds = itemIds + "'" + ent.getItemId() + "',";
-//				}
-//				if (erpGoodsTagBindList.size() > 0) {
-//					itemIds = itemIds.substring(0,itemIds.length()-1);
-//				}
-//				param.setItemId(itemIds);
-//				entity.setTagBindEntity(param);
-//			}
-			
 			if ("1".equals(gradeLevel)) {
 				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
 				return new ResultModel(true, page, new Pagination(page));

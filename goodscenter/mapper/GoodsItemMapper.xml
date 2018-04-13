@@ -37,6 +37,10 @@
 			<result column="lockedQty" property="lockedQty"/>
 			<result column="frozenQty" property="frozenQty"/>
 		</association>
+		<association property="tagBindEntity" javaType="com.zm.goods.pojo.ERPGoodsTagBindEntity">
+			<id column="tag_bind_id" property="id" jdbcType="INTEGER" />
+			<result column="tag_id" property="tagId" jdbcType="INTEGER" />
+		</association>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsPrice" id="price">
@@ -229,11 +233,13 @@
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		c.item_id as center_item_id,c.status as center_status,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
-		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
+		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,tag.id as tag_bind_id,tag.tag_id 
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
 		left join goods_stock s on s.item_id = i.item_id 
-		left join goods_item_${centerId} c on c.item_id = i.item_id where i.status = 2
+		left join goods_item_${centerId} c on c.item_id = i.item_id 
+		left join goods_tag_bind tag on i.item_id = tag.item_id
+		where i.status = 2
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
@@ -261,8 +267,8 @@
 		<if test="entity.id !=null and entity.id !=''">
 			and id = #{entity.id} 
 		</if>
-		<if test="entity.tagBindEntity!=null and entity.tagBindEntity!=''">
-			and i.item_id in (${entity.tagBindEntity.itemId})
+		<if test="entity.tagBindEntity !=null and entity.tagBindEntity !=''">
+			and tag.tag_id = #{entity.tagBindEntity.tagId}
 		</if>
 	</select>
 	
