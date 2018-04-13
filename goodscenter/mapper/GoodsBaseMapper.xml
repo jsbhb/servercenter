@@ -63,6 +63,7 @@
 		<if test="id > 0">
 			and id = #{id} 
 		</if>
+		order by id desc
 	</select>
 	
 	<insert id="insert" parameterType="Object">
