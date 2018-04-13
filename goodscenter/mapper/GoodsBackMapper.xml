@@ -163,6 +163,7 @@
 		<result column="status" property="status"/>
 		<result column="discount" property="discount"/>
 		<result column="info" property="info"/>
+		<result column="conversion" property="conversion"/>
 	</resultMap>
 	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">

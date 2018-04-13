@@ -43,6 +43,7 @@ public class GoodsItemEntity extends Pagination {
 	private GoodsEntity goodsEntity;
 	private GoodsBaseEntity baseEntity;
 	private ERPGoodsTagBindEntity tagBindEntity;
+	private int conversion;
 
 	public int getId() {
 		return id;
@@ -234,6 +235,14 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setTagBindEntity(ERPGoodsTagBindEntity tagBindEntity) {
 		this.tagBindEntity = tagBindEntity;
+	}
+
+	public int getConversion() {
+		return conversion;
+	}
+
+	public void setConversion(int conversion) {
+		this.conversion = conversion;
 	}
 	
 }

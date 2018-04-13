@@ -222,6 +222,7 @@
 		<if test="id !=null and id !=''">
 			and i.id = #{id} 
 		</if>
+		order by i.id desc
 	</select>
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
@@ -268,9 +269,9 @@
 	
 	<insert id="insert" parameterType="Object">
 		insert into goods_item 
-		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt)
+		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion)
 		value
-		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt})
+		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion})
 	</insert>
 	
 	<insert id="insertPrice" parameterType="Object">
@@ -306,6 +307,9 @@
 			,weight = #{weight} 
 		</if>
 		 ,excise_tax = #{exciseTax}
+		<if test="conversion !=null and conversion !=''">
+			,conversion = #{conversion} 
+		</if>
 		 where item_id  = #{itemId}
 	</update>
 	
