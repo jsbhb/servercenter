@@ -65,7 +65,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);// 删除以保存的记录
 		}
 		if (poolList.size() > 0) {
-			capitalPoolMapper.updateCapitalPool(poolList);
+			capitalPoolMapper.updateCapitalPool(poolList);//更新数据库资金池
+			capitalPoolMapper.insertCapitalPool(poolList);//插入当前的资金池值，防止redis崩溃时数据被清空
 		}
 
 	}

@@ -15,6 +15,8 @@ public interface CapitalPoolMapper {
 	void updateCapitalPool(List<CapitalPool> list);
 	
 	void insertCapitalPoolDetail(List<CapitalPoolDetail> list);
+	
+	void insertCapitalPool(List<CapitalPool> list);
 
 	Refilling getRefilling(Integer id);
 
