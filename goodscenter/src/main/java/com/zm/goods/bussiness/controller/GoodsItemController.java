@@ -1,7 +1,5 @@
 package com.zm.goods.bussiness.controller;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,7 +14,6 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -115,7 +112,12 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsItemService.beUse(entity);
+				String[] arr = entity.getItemId().split(",");
+				if (arr.length > 1) {
+					goodsItemService.batchBeUse(entity);
+				} else {
+					goodsItemService.beUse(entity);
+				}
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
@@ -130,7 +132,12 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsItemService.beFx(entity);
+				String[] arr = entity.getItemId().split(",");
+				if (arr.length > 1) {
+					goodsItemService.batchBeFx(entity);
+				} else {
+					goodsItemService.beFx(entity);
+				}
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());

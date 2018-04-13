@@ -475,4 +475,30 @@
 		</if>
 	</select>
 	
+	<update id="updateGoodsItemBeUseForBatch" parameterType="Object">
+		update goods_item set status = 1, update_time=now() where status = 0 and item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
+	
+	<insert id="insertStockForBatch" parameterType="Object">
+		insert ignore into goods_stock 
+		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time)
+		value
+		<foreach collection="list" item="item" open="" close=""
+			separator=",">
+			(#{item},0,0,0,0,0,now(),now())
+		</foreach>
+	</insert>
+	
+	<update id="updateGoodsItemBeFxForBatch" parameterType="Object">
+		update goods_item set status = 2, update_time=now() where status = 1 and item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
+	
 </mapper>

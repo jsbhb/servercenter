@@ -212,4 +212,17 @@ public interface GoodsItemMapper {
 	 */
 	Page<GoodsEntity> selectCenterForPageDownload(Map<String,Object> params);
 
+	void updateGoodsItemBeUseForBatch(List<String> list);
+
+	/**  
+	 * insertStock:插入库存. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void insertStockForBatch(List<String> list);
+
+	void updateGoodsItemBeFxForBatch(List<String> list);
+
 }

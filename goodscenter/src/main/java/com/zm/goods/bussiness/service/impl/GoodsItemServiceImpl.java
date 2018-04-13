@@ -7,7 +7,9 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -164,5 +166,22 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		params.put("entity", entity);
 		params.put("centerId", centerId);
 		return goodsItemMapper.selectCenterForPageDownload(params);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void batchBeUse(GoodsItemEntity entity) {
+		String[] arr = entity.getItemId().split(",");
+		List<String> itemIdList = Arrays.asList(arr);
+		goodsItemMapper.updateGoodsItemBeUseForBatch(itemIdList);
+		goodsItemMapper.insertStockForBatch(itemIdList);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void batchBeFx(GoodsItemEntity entity) {
+		String[] arr = entity.getItemId().split(",");
+		List<String> itemIdList = Arrays.asList(arr);
+		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
 	}
 }
