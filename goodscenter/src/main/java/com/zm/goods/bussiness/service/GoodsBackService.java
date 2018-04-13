@@ -141,7 +141,7 @@ public interface GoodsBackService {
 	 */
 	Page<GoodsRebateEntity> queryAllGoods(GoodsEntity entity);
 
-	GoodsRebateEntity queryById(GoodsRebateEntity entity);
+	List<GoodsRebateEntity> queryById(String itemId);
 	
 	GoodsRebateEntity checkRecordForRebate(GoodsRebateEntity entity);
 	

@@ -18,6 +18,7 @@ public class TreePackUtil {
 			for (GradeTypePO model : list) {
 				dto = new GradeTypeDTO();
 				dto.setId(model.getId());
+				dto.setParentId(model.getParentId());
 				dto.setName(model.getName());
 				tempMap.put(dto.getId(), dto);
 			}

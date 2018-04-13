@@ -162,7 +162,7 @@ public interface GoodsBackMapper {
 	 */
 	Page<GoodsRebateEntity> selectAllGoodsForRebate(GoodsEntity entity);
 
-	GoodsRebateEntity selectGoodsRebateById(GoodsRebateEntity entity);
+	List<GoodsRebateEntity> selectGoodsRebateById(String itemId);
 
 	GoodsRebateEntity selectRecordForRebate(GoodsRebateEntity entity);
 

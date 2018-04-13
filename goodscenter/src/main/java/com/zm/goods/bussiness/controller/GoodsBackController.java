@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -200,12 +201,11 @@ public class GoodsBackController {
 	}
 
 	@RequestMapping(value = "{version}/goods/goodsRebate/queryById", method = RequestMethod.POST)
-	public ResultModel queryById(@PathVariable("version") Double version, @RequestBody GoodsRebateEntity entity) {
+	public ResultModel queryById(@PathVariable("version") Double version, @RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				GoodsRebateEntity result = goodsBackService.queryById(entity);
-				return new ResultModel(true, result);
+				return new ResultModel(true, goodsBackService.queryById(itemId));
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}

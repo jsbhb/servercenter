@@ -173,8 +173,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	public GoodsRebateEntity queryById(GoodsRebateEntity entity) {
-		return goodsBackMapper.selectGoodsRebateById(entity);
+	public List<GoodsRebateEntity> queryById(String itemId) {
+		return goodsBackMapper.selectGoodsRebateById(itemId);
 	}
 
 	@Override

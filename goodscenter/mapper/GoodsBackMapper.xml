@@ -82,18 +82,9 @@
 	
 	<resultMap type="com.zm.goods.pojo.GoodsRebateEntity" id="goodsRebate">
 		<id column="id" property="id"/>
-		<result column="goods_id" property="goodsId"/>
-		<result column="goods_name" property="goodsName"/>
-		<result column="supplier_id" property="supplierId"/>
-		<result column="supplier_name" property="supplierName"/>
-		<result column="first" property="first"/>
-		<result column="second" property="second"/>
-		<result column="third" property="third"/>
-		<result column="remark" property="remark"/>
-		<result column="description" property="description"/>
-		<result column="status" property="status"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="opt" property="opt"/>
+		<result column="item_id" property="itemId"/>
+		<result column="grade_type" property="gradeType"/>
+		<result column="proportion" property="proportion"/>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.ERPGoodsTagEntity" id="goodsTag">
@@ -274,10 +265,7 @@
 	</select>
 	
 	<select id="selectGoodsRebateById" parameterType="Object" resultMap="goodsRebate">
-		select g.id,g.goods_id,g.goods_name,g.supplier_id,g.supplier_name,g.description,
-		g.status,i.first,i.second,i.third,i.remark,i.update_time,i.opt 
-		from goods g left join goods_rebate i on i.goods_id = g.goods_id 
-		where 1=1 and g.goods_id = #{goodsId} 
+		select * from goods_rebate where item_id = #{itemId} 
 	</select>
 	
 	<select id="selectRecordForRebate" parameterType="Object" resultMap="goodsRebate">
