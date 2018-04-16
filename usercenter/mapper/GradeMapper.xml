@@ -103,7 +103,7 @@
 	</select>
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
-		select a.*,b.grade_name as parentGradeName ,gt.name as gradeTypeName
+		select a.*,b.grade_name as parentGradeName ,c.name as gradeTypeName
 		from grade a 
 		left join grade b on a.parent_id = b.id 
 		left join grade_type c on a.grade_type = c.id where 1=1
