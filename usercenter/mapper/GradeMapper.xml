@@ -161,7 +161,7 @@
 		CONCAT('%',#{name},'%') or grade_name like CONCAT('%',#{name},'%'))
 	</select>
 
-	<insert id="saveGradeType" parameterType="Object">
+	<insert id="saveGradeType" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
 		insert into
 		grade_type(parent_id,name,description,create_time,opt)
 		values(#{parentId},#{name},#{description},now(),#{opt})

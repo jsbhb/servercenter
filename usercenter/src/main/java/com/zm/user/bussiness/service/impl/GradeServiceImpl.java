@@ -87,7 +87,7 @@ public class GradeServiceImpl implements GradeService {
 	public ResultModel saveGradeType(GradeTypePO entity) {
 
 		gradeMapper.saveGradeType(entity);
-		return new ResultModel(true, null);
+		return new ResultModel(true, entity.getId());
 	}
 
 	@Override

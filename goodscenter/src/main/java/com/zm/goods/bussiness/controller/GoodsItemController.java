@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -40,12 +41,12 @@ public class GoodsItemController {
 
 	@RequestMapping(value = "{version}/goods/item/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsItemEntity entity) {
+			@RequestBody GoodsItemEntity entity, @RequestParam(value = "type",required = false) String type) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String gradeLevel = request.getParameter("gradeLevel");
 			
-			if ("1".equals(gradeLevel)) {
+			if ("1".equals(gradeLevel) || "1".equals(type)) {
 				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
 				return new ResultModel(true, page, new Pagination(page));
 			} else {
