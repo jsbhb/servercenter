@@ -21,6 +21,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.service.GradeService;
 import com.zm.user.common.ResultModel;
+import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.BackManagerErrorEnum;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
@@ -99,31 +100,35 @@ public class GradeServiceImpl implements GradeService {
 			list = gradeMapper.listGradeType();
 		}
 
-		return new ResultModel(true, TreePackUtil.packGradeTypeChildren(list));
+		return new ResultModel(true, TreePackUtil.packGradeTypeChildren(list, null));
 	}
 
 	@Override
 	public ResultModel listGradeTypeChildren(Integer id) {
 
-		List<GradeTypePO> list = gradeMapper.listGradeTypeChildren(id);
-		List<GradeTypeDTO> dtoList = null;
-		GradeTypeDTO dto = null;
-		if (list != null && list.size() > 0) {
-			dtoList = new ArrayList<GradeTypeDTO>();
-			for (GradeTypePO model : list) {
-				dto = new GradeTypeDTO();
-				dto.setId(model.getId());
-				dto.setName(model.getName());
-				dtoList.add(dto);
+		String parentIdStr = gradeMapper.listGradeTypeChildren(id);
+		List<Integer> list = new ArrayList<Integer>();
+		if(parentIdStr == null){
+			return new ResultModel(true, null);
+		}
+		String[] parentIdArr = parentIdStr.split(",");
+		for (String str : parentIdArr) {
+			if (!"$".equals(str)) {
+				try {
+					list.add(Integer.valueOf(str));
+				} catch (NumberFormatException e) {
+					LogUtil.writeErrorLog("【封装下级ID出错】===ID：" + str, e);
+				}
 			}
 		}
+		List<GradeTypePO> poList = gradeMapper.listGradeTypeByIds(list);
 
-		return new ResultModel(true, dtoList);
+		return new ResultModel(true, TreePackUtil.packGradeTypeChildren(poList, id));
 	}
 
 	@Override
 	public ResultModel removeGradeType(Integer id) {
-		List<GradeTypePO> list = gradeMapper.listGradeTypeChildren(id);
+		List<GradeTypePO> list = gradeMapper.listGradeTypeChildrenById(id);
 		int count = gradeMapper.countGradeByGradeType(id);
 		if (count > 0 || (list != null && list.size() > 0)) {
 			return new ResultModel(false, BackManagerErrorEnum.DELETE_ERROR.getErrorCode(),

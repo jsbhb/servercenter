@@ -45,6 +45,24 @@ CREATE FUNCTION `getGradeChildLst`(rootId INT)
        END WHILE;
        RETURN sTemp;
      END $$
+     
+delimiter $$
+DROP FUNCTION IF EXISTS `zm_user`.`getGradeTypeChildLst` $$
+CREATE FUNCTION `getGradeTypeChildLst`(rootId INT)
+     RETURNS varchar(2000)
+     BEGIN
+       DECLARE sTemp VARCHAR(2000);
+       DECLARE sTempChd VARCHAR(2000);
+  
+       set sTemp = '$';
+       SET sTempChd =cast(rootId as CHAR);
+    
+       WHILE sTempChd is not null DO
+        SET sTemp = concat(sTemp,',',sTempChd);
+         SELECT group_concat(id) INTO sTempChd FROM grade_type where FIND_IN_SET(parent_id,sTempChd)>0;
+       END WHILE;
+       RETURN sTemp;
+     END $$
 
 insert into grade_type(parent_id,name,create_time) values (0,'海外购',now());
 insert into grade_type(parent_id,name,create_time) values (1,'区域中心',now());

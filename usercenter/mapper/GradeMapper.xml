@@ -185,8 +185,8 @@
 		select * from grade_type;
 	</select>
 	
-	<select id="listGradeTypeChildren" resultMap="gradeTypePO">
-		select * from grade_type where parent_id = #{id};
+	<select id="listGradeTypeChildren" resultType="java.lang.String">
+		select getGradeTypeChildLst(#{id});
 	</select>
 	
 	<select id="countGradeByGradeType" parameterType="Object" resultType="java.lang.Integer">
@@ -221,5 +221,16 @@
 	
 	<select id="getGradeType" parameterType="Object" resultMap="gradeTypePO">
 		select * from grade_type where id = #{id}
+	</select>
+	
+	<select id="listGradeTypeByIds" parameterType="Object" resultMap="gradeTypePO">
+		select * from grade_type where id in
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGradeTypeChildrenById" parameterType="Object" resultMap="gradeTypePO">
+		select * from grade_type where parent_id = #{id}
 	</select>
 </mapper>

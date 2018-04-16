@@ -122,7 +122,7 @@ public interface GradeMapper<T> {
 	 * @param id
 	 * @return
 	 */
-	List<GradeTypePO> listGradeTypeChildren(Integer id);
+	String listGradeTypeChildren(Integer id);
 	
 	int countGradeByGradeType(Integer id);
 
@@ -137,5 +137,9 @@ public interface GradeMapper<T> {
 	String listChildrenGrade(Integer gradeId);
 
 	GradeTypePO getGradeType(Integer id);
+
+	List<GradeTypePO> listGradeTypeByIds(List<Integer> list);
+
+	List<GradeTypePO> listGradeTypeChildrenById(Integer id);
 
 }
