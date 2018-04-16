@@ -113,7 +113,7 @@ public class GradeServiceImpl implements GradeService {
 		}
 		String[] parentIdArr = parentIdStr.split(",");
 		for (String str : parentIdArr) {
-			if (!"$".equals(str) || !id.equals(str)) {
+			if (!"$".equals(str) && !id.equals(str)) {
 				try {
 					list.add(Integer.valueOf(str));
 				} catch (NumberFormatException e) {

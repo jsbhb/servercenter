@@ -369,4 +369,14 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/goods/item/rebate", method = RequestMethod.GET)
+	public ResultModel getGoodsRebate(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestParam("itemId") String itemId){
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsBackService.getGoodsRebate(itemId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }

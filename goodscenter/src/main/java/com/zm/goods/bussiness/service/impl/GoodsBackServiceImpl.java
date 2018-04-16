@@ -36,6 +36,7 @@ import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
@@ -308,5 +309,11 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				 goodsBackMapper.deleteTagBind(oldTag);
 			 }
 		 }
+	}
+
+	@Override
+	public ResultModel getGoodsRebate(String itemId) {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		return new ResultModel(true, hashOperations.entries(Constants.GOODS_REBATE + itemId));
 	}
 }
