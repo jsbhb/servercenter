@@ -39,6 +39,7 @@
 		<result column="pic2_path" property="picPath2" jdbcType="VARCHAR" />
 		<result column="pic3_path" property="picPath3" jdbcType="VARCHAR" />
 		<result column="pic4_path" property="picPath4" jdbcType="VARCHAR" />
+		<result column="gradeTypeName" property="gradeTypeName" jdbcType="VARCHAR" />
 	</resultMap>
 	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -102,8 +103,10 @@
 	</select>
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
-		select a.*,b.grade_name as parentGradeName from grade a left join
-		grade b on a.parent_id = b.id where 1=1
+		select a.*,b.grade_name as parentGradeName ,gt.name as gradeTypeName
+		from grade a 
+		left join grade b on a.parent_id = b.id 
+		left join grade_type c on a.grade_type = c.id where 1=1
 		<if test="id != null">
 			and (a.id = #{id} or a.parent_id = #{id})
 		</if>
