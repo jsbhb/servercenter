@@ -188,7 +188,7 @@
 	</select>
 	
 	<delete id="removeGradeType" parameterType="Object">
-		delete * from grade_type where id = #{id}
+		delete from grade_type where id = #{id}
 	</delete>
 	
 	<update id="updateGradeType" parameterType="Object">
