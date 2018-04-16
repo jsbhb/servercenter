@@ -24,10 +24,13 @@ public class TreePackUtil {
 			}
 			List<GradeTypeDTO> tempList = null;
 			for (GradeTypePO model : list) {
-				if (model.getParentId() == 0 || model.getParentId() == null || model.getId() == id) {
+				if (model.getParentId() == 0 || model.getParentId() == null || model.getParentId() == id) {
 					rootList.add(tempMap.get(model.getId()));
 				} else {
 					GradeTypeDTO temp = tempMap.get(model.getParentId());
+					if(temp == null){
+						continue;
+					}
 					dto = tempMap.get(model.getId());
 					if (temp.getChildern() == null) {
 						tempList = new ArrayList<GradeTypeDTO>();
