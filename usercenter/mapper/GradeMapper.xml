@@ -82,6 +82,9 @@
 		<if test="mobileUrl!=null and mobileUrl!=''">
 			,mobile_url = #{mobileUrl}
 		</if>
+		<if test="gradeType!=null and gradeType!=''">
+			,grade_type = #{gradeType}
+		</if>
 		where id = #{id}
 	</update>
 
