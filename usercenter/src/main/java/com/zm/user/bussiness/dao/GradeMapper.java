@@ -136,4 +136,6 @@ public interface GradeMapper<T> {
 
 	String listChildrenGrade(Integer gradeId);
 
+	GradeTypePO getGradeType(Integer id);
+
 }

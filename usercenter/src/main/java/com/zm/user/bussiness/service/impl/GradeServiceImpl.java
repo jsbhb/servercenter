@@ -139,4 +139,14 @@ public class GradeServiceImpl implements GradeService {
 		return new ResultModel(true, null);
 	}
 
+	@Override
+	public ResultModel getGradeType(Integer id) {
+		GradeTypePO gradeTypePO = gradeMapper.getGradeType(id);
+		GradeTypeDTO dto = new GradeTypeDTO();
+		dto.setId(gradeTypePO.getId());
+		dto.setName(gradeTypePO.getName());
+		dto.setParentId(gradeTypePO.getParentId());
+		return new ResultModel(true, dto);
+	}
+
 }

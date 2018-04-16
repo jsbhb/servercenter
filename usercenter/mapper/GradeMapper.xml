@@ -212,4 +212,8 @@
 	<select id="listChildrenGrade" parameterType="Object" resultType="java.lang.String">
 		select getGradeChildLst(#{gradeId});
 	</select>
+	
+	<select id="getGradeType" parameterType="Object" resultMap="gradeTypePO">
+		select * from grade_type where id = #{id}
+	</select>
 </mapper>
