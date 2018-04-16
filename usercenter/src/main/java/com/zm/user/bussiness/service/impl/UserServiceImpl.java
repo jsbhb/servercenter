@@ -347,6 +347,7 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		result.put("userId", userId);
+		result.put("gradeId", grade.getId());
 
 		grade.setPersonInChargeId(userId);
 
