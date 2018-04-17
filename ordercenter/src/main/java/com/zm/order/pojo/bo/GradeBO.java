@@ -30,5 +30,9 @@ public class GradeBO implements Comparable<GradeBO>{
 		}
 		return 0;
 	}
+	@Override
+	public String toString() {
+		return "GradeBO [id=" + id + ", parentId=" + parentId + ", gradeType=" + gradeType + "]";
+	}
 	
 }
