@@ -111,7 +111,7 @@
 			and (a.id = #{id} or a.parent_id = #{id})
 		</if>
 		<if test="gradeName != null and gradeName != ''">
-			and a.gradeName like CONCAT('%',#{gradeName},'%')
+			and a.grade_name like CONCAT('%',#{gradeName},'%')
 		</if>
 		<if test="company != null and company != ''">
 			and a.company like CONCAT('%',#{company},'%')
