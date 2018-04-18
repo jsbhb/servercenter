@@ -76,11 +76,13 @@ public class RebateServiceImpl implements RebateService {
 						if("orderId".equals(entry.getKey())){
 							continue;
 						}
-						rebateDetail = new RebateDetail();
-						rebateDetail.setGradeId(Integer.valueOf(entry.getKey()));
-						rebateDetail.setRebateMoney(Double.valueOf(entry.getValue()));
-						rebateDetail.setOrderId(temp.get("orderId"));
-						detailList.add(rebateDetail);
+						if(entry.getValue() == null && Double.valueOf(entry.getValue()) > 0){
+							rebateDetail = new RebateDetail();
+							rebateDetail.setGradeId(Integer.valueOf(entry.getKey()));
+							rebateDetail.setRebateMoney(Double.valueOf(entry.getValue()));
+							rebateDetail.setOrderId(temp.get("orderId"));
+							detailList.add(rebateDetail);
+						}
 					}
 				} catch (Exception e) {
 					LogUtil.writeErrorLog("【从redis中获取数据转换成明细出错】", e);
