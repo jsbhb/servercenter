@@ -88,10 +88,10 @@ public class RebateServiceImpl implements RebateService {
 					LogUtil.writeErrorLog("【从redis中获取数据转换成明细出错】", e);
 				}
 			}
+			template.opsForList().trim(Constants.REBATE_DETAIL, rebateDetailList.size(), -1);// 删除以保存的记录
 		}
 		if (detailList.size() > 0) {
 			rebateMapper.insertRebateDetail(detailList);
-			template.opsForList().trim(Constants.REBATE_DETAIL, detailList.size(), -1);// 删除以保存的记录
 		}
 
 	}
