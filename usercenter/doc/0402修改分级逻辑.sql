@@ -14,6 +14,8 @@ CREATE TABLE `zm_user`.`grade_type` (
 COMMENT = '等级类型表';
 
 
+
+
 alter table grade add column copy_mall TINYINT UNSIGNED default 0 comment '是否需要复制商城，0否，1是';
 
 alter table user change column center_id  mall_id INT NULL COMMENT '商城ID';
@@ -63,6 +65,8 @@ CREATE FUNCTION `getGradeTypeChildLst`(rootId INT)
        END WHILE;
        RETURN sTemp;
      END $$
+     
+delimiter ;
 
 insert into grade_type(parent_id,name,create_time) values (0,'海外购',now());
 insert into grade_type(parent_id,name,create_time) values (1,'区域中心',now());
