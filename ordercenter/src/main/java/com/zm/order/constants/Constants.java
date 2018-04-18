@@ -74,7 +74,7 @@ public class Constants {
 	
 	// *********************中国供销海外购ID*********************
 
-	public static final Integer CNCOOPBUY = 4;//测试4：正式2
+	public static final Integer CNCOOPBUY = 2;//测试4：正式2
 
 	// *********************资金池redis前缀*********************
 
