@@ -224,5 +224,9 @@ public interface GoodsItemMapper {
 	void insertStockForBatch(List<String> list);
 
 	void updateGoodsItemBeFxForBatch(List<String> list);
+	
+	void deleteListFiles(List<GoodsFile> file);
+	
+	void deleteAllFiles(GoodsEntity entity);
 
 }

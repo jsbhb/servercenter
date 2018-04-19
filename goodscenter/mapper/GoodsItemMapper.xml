@@ -507,4 +507,16 @@
 		</foreach>
 	</update>
 	
+	<delete id="deleteAllFiles" parameterType="Object">
+		delete from goods_file where goods_id = #{goodsId}
+	</delete>
+	
+	<delete id="deleteListFiles" parameterType="Object">
+		delete from goods_file where goods_id in 
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.goodsId}
+		</foreach>
+	</delete>
+	
 </mapper>

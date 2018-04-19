@@ -290,7 +290,38 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		goodsItemMapper.update(entity.getGoods().getGoodsItem());
 		goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+			//商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
+			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
+			
+			List<GoodsFile> addFiles = new ArrayList<GoodsFile>();
+			List<GoodsFile> updFiles = new ArrayList<GoodsFile>();
+			
+			//挑出新增文件列表
+			for(GoodsFile ngf : entity.getGoods().getFiles()) {
+				if (ngf.getId() == 0) {
+					addFiles.add(ngf);
+					entity.getGoods().getFiles().remove(ngf);
+				}
+			}
+			//过滤相同文件列表
+			for(GoodsFile ngf : entity.getGoods().getFiles()) {
+				for(GoodsFile gf : oldFiles) {
+					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+						updFiles.add(gf);
+						oldFiles.remove(gf);
+						break;
+					}
+				}
+			}
+			if (addFiles.size() > 0) {
+				goodsItemMapper.insertFiles(addFiles);
+			}
+			if (oldFiles.size() > 0) {
+				goodsItemMapper.deleteListFiles(oldFiles);
+			}
+		} else {
+			//商品编辑时，如果没有传图片信息，则删除表中记录
+			goodsItemMapper.deleteAllFiles(entity.getGoods());
 		}
 		// 判断商品标签
 		 ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getGoodsItem());
