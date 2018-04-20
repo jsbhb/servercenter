@@ -292,29 +292,30 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			//商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
 			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
-			
-			List<GoodsFile> addFiles = new ArrayList<GoodsFile>();
-			List<GoodsFile> updFiles = new ArrayList<GoodsFile>();
-			
-			//挑出新增文件列表
-			for(GoodsFile ngf : entity.getGoods().getFiles()) {
-				if (ngf.getId() == 0) {
-					addFiles.add(ngf);
-					entity.getGoods().getFiles().remove(ngf);
-				}
-			}
+			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
+
 			//过滤相同文件列表
 			for(GoodsFile ngf : entity.getGoods().getFiles()) {
 				for(GoodsFile gf : oldFiles) {
 					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
-						updFiles.add(gf);
+						existFiles.add(gf);
 						oldFiles.remove(gf);
 						break;
 					}
 				}
 			}
-			if (addFiles.size() > 0) {
-				goodsItemMapper.insertFiles(addFiles);
+			//挑出新增文件列表
+			for(GoodsFile gf : existFiles) {
+				for(GoodsFile ngf : entity.getGoods().getFiles()) {
+					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+						entity.getGoods().getFiles().remove(ngf);
+						break;
+					}
+				}
+			}
+			
+			if (entity.getGoods().getFiles().size() > 0) {
+				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
 			}
 			if (oldFiles.size() > 0) {
 				goodsItemMapper.deleteListFiles(oldFiles);
