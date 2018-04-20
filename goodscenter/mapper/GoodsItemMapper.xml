@@ -512,10 +512,10 @@
 	</delete>
 	
 	<delete id="deleteListFiles" parameterType="Object">
-		delete from goods_file where goods_id in 
+		delete from goods_file where id in 
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
-			#{item.goodsId}
+			#{item.id}
 		</foreach>
 	</delete>
 	
