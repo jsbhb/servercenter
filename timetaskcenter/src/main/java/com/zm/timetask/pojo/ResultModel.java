@@ -16,6 +16,7 @@ public class ResultModel {
 	private String errorMsg;
 	private boolean success;
 	private Object obj;
+	private Pagination pagination;
 	
 	public ResultModel(){}
 	
@@ -26,6 +27,12 @@ public class ResultModel {
 	public ResultModel(boolean flag, Object obj){
 		this.obj = obj;
 		this.success = flag;
+	}
+
+	public ResultModel(boolean flag, Object obj, Pagination pagination) {
+		this.success = flag;
+		this.obj = obj;
+		this.pagination = pagination;
 	}
 	
 	public String getErrorCode() {
@@ -51,6 +58,14 @@ public class ResultModel {
 	}
 	public void setObj(Object obj) {
 		this.obj = obj;
+	}
+
+	public Pagination getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
 	}
 	
 	

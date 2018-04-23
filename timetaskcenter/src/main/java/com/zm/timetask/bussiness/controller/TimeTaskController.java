@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.pagehelper.Page;
 import com.zm.timetask.bussiness.service.TimeTaskService;
 import com.zm.timetask.constants.Constants;
+import com.zm.timetask.pojo.Pagination;
 import com.zm.timetask.pojo.ResultModel;
 import com.zm.timetask.pojo.TimeTaskModel;
 
@@ -85,11 +87,12 @@ public class TimeTaskController {
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/timetask/queryAllTimeTask", method = RequestMethod.GET)
-	public ResultModel queryAllTimeTask(@PathVariable("version") Double version) {
+	@RequestMapping(value = "{version}/timetask/queryAllTimeTask", method = RequestMethod.POST)
+	public ResultModel queryAllTimeTask(@PathVariable("version") Double version, @RequestBody TimeTaskModel entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, timeTaskService.queryAllTimeTask());
+			Page<TimeTaskModel> page = timeTaskService.queryAllTimeTask(entity);
+			return new ResultModel(true, page, new Pagination(page));
 		}
 		return null;
 	}

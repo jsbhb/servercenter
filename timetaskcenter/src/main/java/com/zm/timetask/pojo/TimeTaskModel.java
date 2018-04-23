@@ -9,7 +9,7 @@ package com.zm.timetask.pojo;
  * @version
  * @since JDK 1.7
  */
-public class TimeTaskModel {
+public class TimeTaskModel extends Pagination {
 
 	private Integer id;
 

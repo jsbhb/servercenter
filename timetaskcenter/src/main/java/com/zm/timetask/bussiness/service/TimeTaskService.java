@@ -1,7 +1,6 @@
 package com.zm.timetask.bussiness.service;
 
-import java.util.List;
-
+import com.github.pagehelper.Page;
 import com.zm.timetask.pojo.TimeTaskModel;
 
 /**
@@ -75,7 +74,7 @@ public interface TimeTaskService {
 	 * @param TimeTaskModel
 	 * @since JDK 1.7
 	 */
-	List<TimeTaskModel> queryAllTimeTask();
+	Page<TimeTaskModel> queryAllTimeTask(TimeTaskModel entity);
 	
 	/**
 	 * queryAllTimeTash:根据编号查询任务调度. <br/>

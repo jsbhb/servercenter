@@ -17,4 +17,6 @@ public interface TimeTaskMapper {
 	void startTimeTask(Integer id);
 	
 	void updateTimeTask(TimeTaskModel model);
+	
+	List<TimeTaskModel> queryListTimeTask(TimeTaskModel model);
 }

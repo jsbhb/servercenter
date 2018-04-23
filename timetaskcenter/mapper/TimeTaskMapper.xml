@@ -61,6 +61,20 @@
 		</set>
 		where id = #{id}
 	</update>
-
+	
+	<select id="queryListTimeTask" resultMap="timetask" parameterType="Object">
+		select * from schedulejob
+		where 1=1
+		<if test="jobName != null jobName != ''">
+			and job_name = #{jobName}
+		</if>
+		<if test="jobStatus != null jobStatus != ''">
+			and job_status = #{jobStatus}
+		</if>
+		<if test="concurrent != null concurrent != ''">
+			and concurrent = #{concurrent}
+		</if>
+		order by job_status desc,id
+	</select>
 
 </mapper>

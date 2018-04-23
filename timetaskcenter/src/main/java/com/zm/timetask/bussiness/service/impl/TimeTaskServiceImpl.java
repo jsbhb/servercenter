@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
 import com.zm.timetask.bussiness.dao.TimeTaskMapper;
 import com.zm.timetask.bussiness.service.TimeTaskService;
 import com.zm.timetask.constants.Constants;
@@ -214,11 +215,17 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 			put(1, "startGivenCouponTaskJob");
 		}
 	};
-
+	
 	@Override
-	public List<TimeTaskModel> queryAllTimeTask() {
-		List<TimeTaskModel> modelList = timeTaskMapper.listTimeTask();
-		return modelList;
+	public Page<TimeTaskModel> queryAllTimeTask(TimeTaskModel entity) {
+		List<TimeTaskModel> modelList = timeTaskMapper.queryListTimeTask(entity);
+		Integer count = modelList.size();
+		entity.setTotalRows(count);
+		entity.webListConverter();//计算总页数
+		Page<TimeTaskModel> page = new Page<TimeTaskModel>(entity.getCurrentPage(), entity.getNumPerPage(), count);
+		page.addAll(modelList);
+		page.setPages(entity.getTotalPages());
+		return page;
 	}
 
 	@Override
