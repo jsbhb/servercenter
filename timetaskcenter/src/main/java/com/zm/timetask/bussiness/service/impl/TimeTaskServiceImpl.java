@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.timetask.bussiness.dao.TimeTaskMapper;
 import com.zm.timetask.bussiness.service.TimeTaskService;
 import com.zm.timetask.constants.Constants;
@@ -218,14 +219,8 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 	
 	@Override
 	public Page<TimeTaskModel> queryAllTimeTask(TimeTaskModel entity) {
-		List<TimeTaskModel> modelList = timeTaskMapper.queryListTimeTask(entity);
-		Integer count = modelList.size();
-		entity.setTotalRows(count);
-		entity.webListConverter();//计算总页数
-		Page<TimeTaskModel> page = new Page<TimeTaskModel>(entity.getCurrentPage(), entity.getNumPerPage(), count);
-		page.addAll(modelList);
-		page.setPages(entity.getTotalPages());
-		return page;
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return timeTaskMapper.queryListTimeTask(entity);
 	}
 
 	@Override
