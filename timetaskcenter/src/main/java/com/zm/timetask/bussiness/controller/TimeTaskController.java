@@ -85,20 +85,20 @@ public class TimeTaskController {
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/timetask/queryAllTimeTash", method = RequestMethod.POST)
-	public ResultModel queryAllTimeTash(@PathVariable("version") Double version) {
+	@RequestMapping(value = "{version}/timetask/queryAllTimeTask", method = RequestMethod.GET)
+	public ResultModel queryAllTimeTask(@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, timeTaskService.queryAllTimeTash());
+			return new ResultModel(true, timeTaskService.queryAllTimeTask());
 		}
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/timetask/queryTimeTashById", method = RequestMethod.POST)
-	public ResultModel queryTimeTashById(@PathVariable("version") Double version, Integer id) {
+	@RequestMapping(value = "{version}/timetask/queryTimeTaskById", method = RequestMethod.GET)
+	public ResultModel queryTimeTaskById(@PathVariable("version") Double version, Integer id) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, timeTaskService.queryTimeTashById(id));
+			return new ResultModel(true, timeTaskService.queryTimeTaskById(id));
 		}
 		return null;
 	}

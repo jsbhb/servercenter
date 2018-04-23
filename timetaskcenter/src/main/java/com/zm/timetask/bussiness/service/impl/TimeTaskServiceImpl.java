@@ -216,13 +216,13 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 	};
 
 	@Override
-	public List<TimeTaskModel> queryAllTimeTash() {
+	public List<TimeTaskModel> queryAllTimeTask() {
 		List<TimeTaskModel> modelList = timeTaskMapper.listTimeTask();
 		return modelList;
 	}
 
 	@Override
-	public TimeTaskModel queryTimeTashById(Integer id) {
+	public TimeTaskModel queryTimeTaskById(Integer id) {
 		TimeTaskModel model = timeTaskMapper.getTimeTaskById(id);
 		return model;
 	}

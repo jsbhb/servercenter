@@ -69,13 +69,13 @@ public interface TimeTaskService {
 	void dynamicSchedule(Integer centerId, String activeId, String startTime, String endTime, Integer type);
 	
 	/**
-	 * queryAllTimeTash:查询所有任务调度. <br/>
+	 * queryAllTimeTask:查询所有任务调度. <br/>
 	 * 
-	 * @author wqy
+	 * @author why
 	 * @param TimeTaskModel
 	 * @since JDK 1.7
 	 */
-	List<TimeTaskModel> queryAllTimeTash();
+	List<TimeTaskModel> queryAllTimeTask();
 	
 	/**
 	 * queryAllTimeTash:根据编号查询任务调度. <br/>
@@ -84,6 +84,6 @@ public interface TimeTaskService {
 	 * @param TimeTaskModel
 	 * @since JDK 1.7
 	 */
-	TimeTaskModel queryTimeTashById(Integer id);
+	TimeTaskModel queryTimeTaskById(Integer id);
 	
 }
