@@ -2,7 +2,6 @@ package com.zm.timetask.bussiness.controller;
 
 import javax.annotation.Resource;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +81,24 @@ public class TimeTaskController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			timeTaskService.dynamicSchedule(centerId, id, startTime, endTime, type);
 			return new ResultModel(true);
+		}
+		return null;
+	}
+
+	@RequestMapping(value = "{version}/timetask/queryAllTimeTash", method = RequestMethod.POST)
+	public ResultModel queryAllTimeTash(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return new ResultModel(true, timeTaskService.queryAllTimeTash());
+		}
+		return null;
+	}
+
+	@RequestMapping(value = "{version}/timetask/queryTimeTashById", method = RequestMethod.POST)
+	public ResultModel queryTimeTashById(@PathVariable("version") Double version, Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return new ResultModel(true, timeTaskService.queryTimeTashById(id));
 		}
 		return null;
 	}

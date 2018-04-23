@@ -1,5 +1,7 @@
 package com.zm.timetask.bussiness.service;
 
+import java.util.List;
+
 import com.zm.timetask.pojo.TimeTaskModel;
 
 /**
@@ -65,5 +67,23 @@ public interface TimeTaskService {
 	 * @since JDK 1.7
 	 */
 	void dynamicSchedule(Integer centerId, String activeId, String startTime, String endTime, Integer type);
+	
+	/**
+	 * queryAllTimeTash:查询所有任务调度. <br/>
+	 * 
+	 * @author wqy
+	 * @param TimeTaskModel
+	 * @since JDK 1.7
+	 */
+	List<TimeTaskModel> queryAllTimeTash();
+	
+	/**
+	 * queryAllTimeTash:根据编号查询任务调度. <br/>
+	 * 
+	 * @author wqy
+	 * @param TimeTaskModel
+	 * @since JDK 1.7
+	 */
+	TimeTaskModel queryTimeTashById(Integer id);
 	
 }

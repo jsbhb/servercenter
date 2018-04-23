@@ -214,4 +214,16 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 			put(1, "startGivenCouponTaskJob");
 		}
 	};
+
+	@Override
+	public List<TimeTaskModel> queryAllTimeTash() {
+		List<TimeTaskModel> modelList = timeTaskMapper.listTimeTask();
+		return modelList;
+	}
+
+	@Override
+	public TimeTaskModel queryTimeTashById(Integer id) {
+		TimeTaskModel model = timeTaskMapper.getTimeTaskById(id);
+		return model;
+	}
 }
