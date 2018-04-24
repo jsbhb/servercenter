@@ -65,6 +65,9 @@
 	<select id="queryListTimeTask" resultMap="timetask" parameterType="Object">
 		select * from schedulejob
 		where 1=1
+		<if test="id != null and id != 0">
+			and id = #{id}
+		</if>
 		<if test="jobName != null and jobName != ''">
 			and job_name = #{jobName}
 		</if>
