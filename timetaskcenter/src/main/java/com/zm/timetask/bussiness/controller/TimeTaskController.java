@@ -55,7 +55,7 @@ public class TimeTaskController {
 	}
 
 	@RequestMapping(value = "{version}/timetask/update", method = RequestMethod.PUT)
-	public ResultModel updateTimeTask(@PathVariable("version") Double version, TimeTaskModel model) {
+	public ResultModel updateTimeTask(@PathVariable("version") Double version, @RequestBody TimeTaskModel model) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			timeTaskService.updateTimeTask(model);
