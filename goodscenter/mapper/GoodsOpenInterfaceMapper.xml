@@ -18,7 +18,7 @@
 		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC"/>
 		<result column="tariff" property="tariff" jdbcType="NUMERIC"/>
 		<result column="info" property="info" jdbcType="VARCHAR"/>
-		<result column="fxprice" property="fxPrice" jdbcType="NUMERIC"/>
+		<result column="retail_price" property="retailPrice" jdbcType="NUMERIC"/>
 		<result column="type" property="type" jdbcType="INTEGER"/>
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER"/>
 		<result column="origin" property="origin" jdbcType="VARCHAR"/>
@@ -36,7 +36,7 @@
 	</select>
 	
 	<select id="listGoodsDetail" parameterType="Object" resultMap="detail">
-		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.fxprice,g.type,g.supplier_id,g.origin,
+		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,g.type,g.supplier_id,g.origin,
 		b.brand,p.min,p.max from goods_item i left join goods g on i.goods_id = g.goods_id left join 
 		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id where i.status = 2 and i.item_id in 
 		<foreach collection="array" open="(" close=")" separator="," item="item">
@@ -45,7 +45,7 @@
 	</select>
 	
 	<select id="listGoodsDetailByPage" parameterType="Object" resultMap="detail">
-		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.fxprice,g.type,g.supplier_id,g.origin,
+		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,g.type,g.supplier_id,g.origin,
 		b.brand,p.min,p.max from goods_item i left join goods g on i.goods_id = g.goods_id left join 
 		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id where i.status = 2 
 		limit #{startRow},#{pageSize}

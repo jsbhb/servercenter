@@ -19,6 +19,7 @@ import com.zm.supplier.feignclient.OrderFeignClient;
 import com.zm.supplier.feignclient.UserFeignClient;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
@@ -53,6 +54,8 @@ public class WarehouseThreadPool {
 	SupplierMapper supplierMapper;
 
 	Logger logger = LoggerFactory.getLogger(WarehouseThreadPool.class);
+	
+	private static final Integer XINYUN_WAREHOUSE = 3;
 
 	@Async("myAsync")
 	public void sendOrder(OrderInfo info) {
@@ -70,6 +73,14 @@ public class WarehouseThreadPool {
 			model.setOrderId(info.getOrderId());
 			if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
 				model.setThirdOrderId(info.getOrderId());
+			}
+			if(XINYUN_WAREHOUSE.equals(info.getSupplierId())){
+				for(OrderGoods goods : info.getOrderGoodsList()){
+					if(goods.getItemCode().equals(model.getItemCode())){
+						model.setItemId(goods.getItemId());
+						model.setItemName(goods.getItemName());
+					}
+				}
 			}
 		}
 		boolean flag = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);

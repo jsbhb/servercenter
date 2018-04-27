@@ -21,5 +21,8 @@
 		where o.order_id = #{orderId}
 	</select>
 	
+	<update id="updateOrderPayCustom" parameterType="Object">
+		update order_base set status = 2 where order_id = #{orderId} and status = 12 and create_type = 5 and supplier_id = 1
+	</update>
 
 </mapper>

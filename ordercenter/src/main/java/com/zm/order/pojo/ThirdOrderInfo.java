@@ -21,6 +21,16 @@ public class ThirdOrderInfo {
 	private String mftNo;
 	
 	private String remark;
+	
+	private String itemName;
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
 
 	public Integer getOrderStatus() {
 		return orderStatus;

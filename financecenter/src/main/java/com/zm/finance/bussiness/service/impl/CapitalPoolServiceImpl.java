@@ -181,6 +181,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				mapForRedis.put("countMoney", "0");
 				mapForRedis.put("countPreferential", "0");
 				mapForRedis.put("status", "1");// 默认启用状态
+				mapForRedis.put("level", "0");// 等级0
 				mapForRedis.put("opt", "8001");// 默认admin账号
 				hashOperations.putAll(Constants.CAPITAL_PERFIX + centerId, mapForRedis);
 			}

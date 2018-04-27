@@ -8,7 +8,9 @@
 		<result column="order_id" property="orderId" jdbcType="VARCHAR"/>
 		<result column="grade_id" property="gradeId" jdbcType="INTEGER"/>
 		<result column="rebate_money" property="rebateMoney" jdbcType="NUMERIC"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
 		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
 		<result column="remark" property="remark" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
@@ -65,5 +67,9 @@
 		</if>
 		
 	</select>
+	
+	<update id="updateRebateDetail" parameterType="Object">
+		update rebate_detail set status = 1, update_time = now() where order_id = #{orderId}
+	</update>
 	
 </mapper>

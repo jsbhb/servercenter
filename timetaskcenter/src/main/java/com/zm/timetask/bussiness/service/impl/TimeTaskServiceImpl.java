@@ -32,7 +32,7 @@ import com.zm.timetask.util.SpringContextUtil;
 @Service
 // @PostConstruct先于springContextUtil执行，该标签强制初始化springContextUtil类
 @DependsOn("springContextUtil")
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class TimeTaskServiceImpl implements TimeTaskService {
 
 	@Resource
@@ -103,7 +103,8 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 				String currentCron = trigger.getCronExpression();
 				if (!searchCron.equals(currentCron)) {
 					// 表达式调度构建器
-					CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(searchCron);
+					CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(searchCron)
+							.withMisfireHandlingInstructionDoNothing();
 
 					// 按新的cronExpression表达式重新构建trigger
 					trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder)
@@ -143,7 +144,8 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 						.withIdentity(model.getJobName(), model.getJobGroup()).build();
 
 				// 表达式调度构建器
-				CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(model.getCronExpression());
+				CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(model.getCronExpression())
+						.withMisfireHandlingInstructionDoNothing();
 
 				// 按新的cronExpression表达式构建一个新的trigger
 				trigger = TriggerBuilder.newTrigger().withIdentity(model.getJobName(), model.getJobGroup())
@@ -156,7 +158,8 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 				String currentCron = trigger.getCronExpression();
 				if (!searchCron.equals(currentCron)) {
 					// 表达式调度构建器
-					CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(searchCron);
+					CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(searchCron)
+							.withMisfireHandlingInstructionDoNothing();
 
 					// 按新的cronExpression表达式重新构建trigger
 					trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder)
@@ -216,7 +219,7 @@ public class TimeTaskServiceImpl implements TimeTaskService {
 			put(1, "startGivenCouponTaskJob");
 		}
 	};
-	
+
 	@Override
 	public Page<TimeTaskModel> queryAllTimeTask(TimeTaskModel entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);

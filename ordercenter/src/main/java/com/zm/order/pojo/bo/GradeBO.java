@@ -1,10 +1,19 @@
 package com.zm.order.pojo.bo;
 
+import java.util.List;
+
 public class GradeBO implements Comparable<GradeBO>{
 
 	private Integer id;
 	private Integer parentId;
 	private Integer gradeType;
+	private List<GradeBO> children;
+	public List<GradeBO> getChildren() {
+		return children;
+	}
+	public void setChildren(List<GradeBO> children) {
+		this.children = children;
+	}
 	public Integer getId() {
 		return id;
 	}

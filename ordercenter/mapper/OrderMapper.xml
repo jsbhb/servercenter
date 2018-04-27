@@ -66,6 +66,7 @@
 			property="orderExpressList">
 			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
 			<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+			<result column="oeItemName" property="itemName" jdbcType="VARCHAR" />
 			<result column="oestatus" property="status" jdbcType="VARCHAR" />
 			<result column="express_name" property="expressName" jdbcType="VARCHAR" />
 			<result column="express_id" property="expressId" jdbcType="VARCHAR" />
@@ -132,7 +133,7 @@
 		o.id,o.order_id,od.pay_no,od.payment,o.mall_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
-		where o.status = 12 and o.order_flag = 0 and o.supplier_id = 1
+		where o.status = 12 and o.order_flag = 0 and o.supplier_id = 1 and o.create_type != 5
 	</select>
 
 
@@ -142,7 +143,7 @@
 		oe.id as orderExpress_id, od.id
 		as
 		detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
-		oe.express_key,oe.express_name,oe.express_id,oe.status as
+		oe.express_key,oe.express_name,oe.express_id,oe.item_name as oeItemName, oe.status as
 		oestatus,od.pay_time,od.pay_no,
 		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,
 		og.id as
@@ -382,7 +383,7 @@
 		select
 		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,od.id
 		as
-		detail_id,od.payment,o.grade_id,o.order_source,
+		detail_id,od.payment,o.grade_id,o.order_source,o.create_time,
 		o.mall_id,og.id as
 		goods_id,og.goods_id as goodsId,og.item_id,og.item_quantity,og.item_code,
 		og.item_price,og.actual_price,og.sku,od.dis_amount
@@ -615,10 +616,10 @@
 	<insert id="saveThirdOrder" parameterType="Object">
 		INSERT INTO
 		third_order_info
-		(order_id,third_order_id,supplier_id,create_time)
+		(order_id,third_order_id,supplier_id,order_status,item_id,item_name,item_code,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.thirdOrderId},#{item.supplierId},now())
+			(#{item.orderId},#{item.thirdOrderId},#{item.supplierId},3,#{item.itemId},#{item.itemName},#{item.itemCode},now())
 		</foreach>
 	</insert>
 
@@ -628,12 +629,17 @@
 			update third_order_info
 			<set>
 				status = #{item.status}, express_key = #{item.expressKey},
-				express_name = #{item.expressName}, express_id = #{item.expressId}
+				express_name = #{item.expressName}, express_id = #{item.expressId}, order_status = #{item.orderStatus},
+				update_time = now()
 			</set>
 			where order_id = #{item.orderId} and third_order_id =
 			#{item.thirdOrderId}
 		</foreach>
 	</update>
+	
+	<select id="listOrderStatus" parameterType="Object" resultType="java.lang.Integer">
+		select order_status from third_order_info where order_id = #{orderId}
+	</select>
 
 	<select id="countShoppingCartQuantity" parameterType="Object"
 		resultType="java.lang.Integer">
@@ -687,6 +693,10 @@
 	<!-- 根据订单Id查询物流信息 -->
 	<select id="getThirdInfo" parameterType="Object" resultMap="expressList">
 		select * from third_order_info where order_id = #{orderId} and express_id is not null
+	</select>
+	
+	<select id="getGradeId" parameterType="Object" resultType="java.lang.Integer">
+		select grade_id from order_base where order_id = #{orderId}
 	</select>
 
 </mapper>

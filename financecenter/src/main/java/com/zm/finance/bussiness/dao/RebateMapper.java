@@ -16,5 +16,7 @@ public interface RebateMapper {
 	Page<RebateDetail> selectRebateDetailById(RebateDetail entity);
 
 	Page<Rebate> listRebate(RebateSearchModel search);
+
+	void updateRebateDetail(String orderId);
 	
 }

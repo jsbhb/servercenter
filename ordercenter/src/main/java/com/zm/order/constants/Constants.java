@@ -71,7 +71,7 @@ public class Constants {
 	// *********************订货平台ID*********************
 
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
-	
+
 	// *********************中国供销海外购ID*********************
 
 	public static final Integer CNCOOPBUY = 2;
@@ -89,6 +89,26 @@ public class Constants {
 
 	// *********************等级返佣***************************
 	public static final String GRADE_ORDER_REBATE = "grade:orderrebate:";
+
 	// *********************返佣详情***************************
 	public static final String REBATE_DETAIL = "rebatedetail:";
+
+	// **********************订单周统计前缀***********************
+	public static final String ORDER_STATISTICS_WEEK = "orderstatistics:week:";
+
+	// **********************订单月统计前缀***********************
+	public static final String ORDER_STATISTICS_MONTH = "orderstatistics:month:";
+
+	// **********************销售额周统计前缀***********************
+	public static final String SALES_STATISTICS_WEEK = "salesstatistics:week:";
+
+	// **********************销售额月统计前缀***********************
+	public static final String SALES_STATISTICS_MONTH = "salesstatistics:month:";
+
+	// **********************订单当天统计前缀***********************
+	public static final String ORDER_STATISTICS_DAY = "orderstatistics:day:";
+
+	// **********************销售额当天统计前缀***********************
+	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";
+
 }

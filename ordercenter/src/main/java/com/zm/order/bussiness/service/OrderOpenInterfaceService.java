@@ -7,4 +7,6 @@ public interface OrderOpenInterfaceService {
 	ResultModel addOrder(String orderInfo);
 
 	ResultModel getOrderStatus(String json);
+
+	ResultModel payCustom(String data);
 }

@@ -62,7 +62,6 @@ public class SupplierServiceImpl implements SupplierService {
 		return supplierMapper.selectById(id);
 	}
 
-	private static final Integer XINYUN_WAREHOUSE = 3;
 	private static final Integer FUBANG_WAREHOUSE = 4;
 	private static final Integer LIANGYOU_WAREHOUSE = 2;
 

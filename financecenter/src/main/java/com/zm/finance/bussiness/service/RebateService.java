@@ -1,5 +1,7 @@
 package com.zm.finance.bussiness.service;
 
+import java.util.Map;
+
 import com.github.pagehelper.Page;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
@@ -23,5 +25,13 @@ public interface RebateService {
 	Page<RebateDetail> getRebateDetail(RebateDetail entity);
 
 	Page<Rebate> listRebate(RebateSearchModel search);
+
+	void saveRebateDetail(Map<String, String> map);
+
+	void updateRebateDetail(String orderId);
+
+	void redisTool(String key, Map<String, String> map);
+
+	void redisToolList(String key, String value);
 
 }

@@ -826,16 +826,22 @@ public class GoodsServiceImpl implements GoodsService {
 		ResultModel result = new ResultModel(true, "");
 		GoodsSpecs specs = null;
 
+		Double temp = 0.0;
 		for (OrderBussinessModel model : list) {
 			specs = goodsMapper.getGoodsSpecsForButtJoinOrder(model.getItemId());
 			if(specs == null){
 				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
 						"itemId="+model.getItemId()+ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 			}
-			GoodsServiceUtil.judgeQuantityRange(false, result, specs, model);
+			Double amount = GoodsServiceUtil.judgeQuantityRange(false, result, specs, model);
 			if (!result.isSuccess()) {
 				return new ResultModel(false, ErrorCodeEnum.OUT_OF_RANGE.getErrorCode(),
 						ErrorCodeEnum.OUT_OF_RANGE.getErrorMsg());
+			}
+			temp = CalculationUtils.mul(model.getItemPrice(), model.getQuantity());
+			if(CalculationUtils.sub(temp, amount) < -3 || CalculationUtils.sub(temp, amount) > 3){
+				return new ResultModel(false, ErrorCodeEnum.RETAIL_PRICE_ERROR.getErrorCode(),
+						ErrorCodeEnum.RETAIL_PRICE_ERROR.getErrorMsg());
 			}
 		}
 

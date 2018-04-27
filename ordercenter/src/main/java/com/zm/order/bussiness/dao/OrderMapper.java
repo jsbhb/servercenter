@@ -136,5 +136,9 @@ public interface OrderMapper {
 	List<OrderInfo> listCapitalPoolNotEnough();
 	
 	List<ThirdOrderInfo> getThirdInfo(String orderId);
+
+	List<Integer> listOrderStatus(String orderId);
+
+	Integer getGradeId(String orderId);
 	
 }

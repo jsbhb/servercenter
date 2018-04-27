@@ -13,6 +13,26 @@ public class OrderBussinessModel {
 	private Integer quantity;
 	
 	private String deliveryPlace;
+	
+	private Double itemPrice;
+
+	private Double actualPrice;
+
+	public Double getItemPrice() {
+		return itemPrice;
+	}
+
+	public void setItemPrice(Double itemPrice) {
+		this.itemPrice = itemPrice;
+	}
+
+	public Double getActualPrice() {
+		return actualPrice;
+	}
+
+	public void setActualPrice(Double actualPrice) {
+		this.actualPrice = actualPrice;
+	}
 
 	public String getItemCode() {
 		return itemCode;

@@ -2,6 +2,7 @@ package com.zm.order.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.order.bussiness.component.CapitalPoolThreadPool;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
+import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderService;
+import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.ActivityFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
@@ -95,6 +98,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	CapitalPoolThreadPool capitalPoolThreadPool;
+
+	@Resource
+	CacheAbstractService cacheAbstractService;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -284,6 +290,12 @@ public class OrderServiceImpl implements OrderService {
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
 
+		// 增加缓存订单数量
+		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+		// 增加月订单数
+		String time = DateUtils.getTimeString("yyyyMM");
+		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
+
 		result.setSuccess(true);
 		result.setErrorMsg(orderId);
 		return result;
@@ -366,7 +378,7 @@ public class OrderServiceImpl implements OrderService {
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
-			
+
 			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
 
@@ -537,6 +549,9 @@ public class OrderServiceImpl implements OrderService {
 		}
 		int count = orderMapper.updateOrderClose(orderId);
 		if (count > 0) {
+			// 增加取消数量缓存
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "cancel");
+
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("status", Constants.ORDER_CLOSE);
 			param.put("orderId", orderId);
@@ -561,7 +576,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void timeTaskcloseOrder() {
-		String time = DateUtils.getTime(Calendar.MINUTE, -90);
+		String time = DateUtils.getTime(Calendar.MINUTE, -90, "yyyy-MM-dd HH:mm:ss");
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
 		for (String orderId : orderIdList) {
 			closeOrder(DEFAULT_USER_ID, orderId);
@@ -725,8 +740,24 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list) {
 		orderMapper.updateThirdOrderInfo(list);
-		int count = orderMapper.updateOrderStatusByThirdStatus(list.get(0));
+		List<Integer> statusList = orderMapper.listOrderStatus(list.get(0).getOrderId());
+		ThirdOrderInfo orderInfo = list.get(0);
+		if (statusList != null && statusList.size() > 1) {
+			Collections.sort(statusList);
+			// 有一个没发货订单状态就是单证放行
+			if (Constants.ORDER_DELIVER.equals(statusList.get(statusList.size() - 1))
+					&& !statusList.get(0).equals(Constants.ORDER_DELIVER)) {
+				orderInfo.setOrderStatus(Constants.ORDER_DZFX);
+			}
+		}
+		int count = orderMapper.updateOrderStatusByThirdStatus(orderInfo);
 		if (count > 0) {
+			// 发货新增发货数量缓存
+			if (Constants.ORDER_DELIVER.equals(orderInfo.getOrderStatus())) {
+				// 增加发货数量缓存
+				Integer gradeId = orderMapper.getGradeId(orderInfo.getOrderId());
+				cacheAbstractService.addOrderCountCache(gradeId, Constants.ORDER_STATISTICS_DAY, "deliver");
+			}
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("status", list.get(0).getOrderStatus());
 			param.put("orderId", list.get(0).getOrderId());
@@ -752,7 +783,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void confirmByTimeTask() {
-		String time = DateUtils.getTime(Calendar.DATE, -7);
+		String time = DateUtils.getTime(Calendar.DATE, -7, "yyyy-MM-dd HH:mm:ss");
 		List<Order4Confirm> list = orderMapper.listUnConfirmOrder(time);
 		Map<String, Object> param = null;
 		for (Order4Confirm model : list) {
@@ -793,6 +824,10 @@ public class OrderServiceImpl implements OrderService {
 		detail.setReturnPayNo(payNo);
 		orderMapper.updateRefundPayNo(detail);
 		if (count > 0) {
+
+			// 增加取消数量缓存
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "cancel");
+
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("status", Constants.ORDER_CANCEL);
 			param.put("orderId", orderId);

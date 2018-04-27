@@ -1,7 +1,9 @@
 package com.zm.order.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,13 +44,78 @@ public class TreeNodeUtil {
 						}
 					}
 				} while (true);
-				
+
 				return result;
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("寻找父节点出错", e);
 				return null;
 			}
 
+		}
+		return null;
+	}
+
+	public static List<GradeBO> getchildNode(Set<GradeBO> set, Integer gradeId) {
+		List<GradeBO> rootList = new ArrayList<GradeBO>();
+		if (set != null && set.size() > 0) {
+			Map<Integer, GradeBO> tempMap = new HashMap<Integer, GradeBO>();
+			List<GradeBO> tempList = new ArrayList<GradeBO>();
+			List<GradeBO> children = null;
+			for (GradeBO grade : set) {
+				grade.setChildren(null);
+				if (gradeId != 0) {
+					if (grade.getId() == gradeId) {
+						rootList.add(grade);
+					}
+				} else {
+					if (grade.getParentId() == null || grade.getParentId() == 0) {
+						rootList.add(grade);
+					}
+				}
+				tempList.add(grade);
+				tempMap.put(grade.getId(), grade);
+			}
+			for(GradeBO grade : tempList){
+				GradeBO temp = tempMap.get(grade.getParentId());
+				if(temp != null){
+					if (temp.getChildren() == null) {
+						children = new ArrayList<GradeBO>();
+						children.add(grade);
+						temp.setChildren(children);
+					} else {
+						temp.getChildren().add(grade);
+					}
+				}
+			}
+		}
+		return rootList;
+	}
+	
+	public static void getchildNode(List<GradeBO> list, List<Integer> result){
+		if (list != null && list.size() > 0) {
+			for (GradeBO model : list) {
+				if (model.getChildren() != null) {
+					getchildNode(model.getChildren(), result);
+					result.add(model.getId());
+				} else {
+					result.add(model.getId());
+				}
+			}
+		}
+	}
+	
+	public static List<Integer> getChild(Set<GradeBO> set, Integer gradeId){
+		if(set != null && set.size() > 0){
+			List<Integer> list = new ArrayList<Integer>();
+			for(GradeBO grade : set){
+				if(grade.getParentId().equals(gradeId)){
+					list.add(grade.getId());
+				}
+			}
+			if(gradeId != 0){
+				list.add(gradeId);
+			}
+			return list;
 		}
 		return null;
 	}
