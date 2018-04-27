@@ -128,16 +128,16 @@ public class CacheServiceImpl extends CacheAbstractService {
 		List<DiagramBO> diagramList = null;
 		StatisticBO statisticBO = new StatisticBO();
 		diagramList = new ArrayList<DiagramBO>();
-		if (list.contains(Constants.CNCOOPBUY)) {// 如果是海外购。不需要分装
-			temp = entries(key + Constants.CNCOOPBUY);
-			renderData(key, diagramList, temp);
-		} else {
-			for (Integer temGradeId : list) {
-				temp = entries(key + temGradeId);
-				mergeMap(tempMap, temp);
-			}
-			renderData(key, diagramList, tempMap);
+		// if (list.contains(Constants.CNCOOPBUY)) {// 如果是海外购。不需要分装
+		// temp = entries(key + Constants.CNCOOPBUY);
+		// renderData(key, diagramList, temp);
+		// } else {
+		for (Integer temGradeId : list) {
+			temp = entries(key + temGradeId);
+			mergeMap(tempMap, temp);
 		}
+		renderData(key, diagramList, tempMap);
+		// }
 		statisticBO.setDiagramData(diagramList);
 
 		// 按区域中心封装
@@ -184,16 +184,16 @@ public class CacheServiceImpl extends CacheAbstractService {
 		List<DiagramBO> diagramList = null;
 		StatisticBO statisticBO = new StatisticBO();
 		diagramList = new ArrayList<DiagramBO>();
-		if (list.contains(Constants.CNCOOPBUY)) {// 如果是海外购。不需要分装
-			tempList = list(key + Constants.CNCOOPBUY, 0, -1);
-			renderData(key, tempList, diagramList);
-		} else {
-			for (Integer temGradeId : list) {
-				tempList = list(key + temGradeId, 0, -1);
-				mergeList(result, tempList);
-			}
-			renderData(key, result, diagramList);
+		// if (list.contains(Constants.CNCOOPBUY)) {// 如果是海外购。不需要分装
+		// tempList = list(key + Constants.CNCOOPBUY, 0, -1);
+		// renderData(key, tempList, diagramList);
+		// } else {
+		for (Integer temGradeId : list) {
+			tempList = list(key + temGradeId, 0, -1);
+			mergeList(result, tempList);
 		}
+		renderData(key, result, diagramList);
+		// }
 		statisticBO.setDiagramData(diagramList);
 		List<Integer> childList = TreeNodeUtil.getChild(CacheComponent.getInstance().getSet(), gradeId);
 		Map<Object, Object> tempMap = new HashMap<Object, Object>();
@@ -272,7 +272,8 @@ public class CacheServiceImpl extends CacheAbstractService {
 		List<DiagramBO> diagramBOList = new ArrayList<DiagramBO>();
 		DiagramBO diagramBO = null;
 		if (list.contains(Constants.CNCOOPBUY)) {
-			result.putAll(entries(Constants.SALES_STATISTICS_DAY + Constants.CNCOOPBUY));
+			// result.putAll(entries(Constants.SALES_STATISTICS_DAY +
+			// Constants.CNCOOPBUY));
 			double canBePresented = 0.0;
 			double alreadyPresented = 0.0;
 			for (Integer temGradeId : list) {
@@ -285,30 +286,31 @@ public class CacheServiceImpl extends CacheAbstractService {
 			}
 			result.put("可提现", canBePresented + "");
 			result.put("已提现", alreadyPresented + "");
-			for (Map.Entry<String, String> entry : result.entrySet()) {
-				String key = "";
-				if(entry.getKey().equals("sales")){
-					key = "销售额";
-				} else {
-					key = entry.getKey();
-				}
-				diagramBO = new DiagramBO(key, entry.getValue());
-				diagramBOList.add(diagramBO);
-			}
-			return JSONUtil.toJson(diagramBOList);
+			// for (Map.Entry<String, String> entry : result.entrySet()) {
+			// String key = "";
+			// if(entry.getKey().equals("sales")){
+			// key = "销售额";
+			// } else {
+			// key = entry.getKey();
+			// }
+			// diagramBO = new DiagramBO(key, entry.getValue());
+			// diagramBOList.add(diagramBO);
+			// }
+			// return JSONUtil.toJson(diagramBOList);
 		} else {
-			for (Integer temGradeId : list) {
-				String temp = entries(Constants.SALES_STATISTICS_DAY + temGradeId, "sales");
-				CalculationUtils.add(Double.valueOf(temp), amount);
-			}
-			result.put("销售额", amount + "");
+			String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, "canBePresented");
+			String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, "alreadyPresented");
+			result.put("可提现", tempCanBePresented == null ? "0" : tempCanBePresented);
+			result.put("已提现", tempAlreadyPresented == null ? "0" : tempAlreadyPresented);
 		}
-		String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, "canBePresented");
-		String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, "alreadyPresented");
-		result.put("可提现", tempCanBePresented == null ? "0" : tempCanBePresented);
-		result.put("已提现", tempAlreadyPresented == null ? "0" : tempAlreadyPresented);
+		for (Integer temGradeId : list) {
+			String temp = entries(Constants.SALES_STATISTICS_DAY + temGradeId, "sales");
+			amount = CalculationUtils.add(Double.valueOf(temp), amount);
+		}
+		result.put("销售额", amount + "");
+
 		for (Map.Entry<String, String> entry : result.entrySet()) {
-			diagramBO = new DiagramBO(entry.getKey(), entry.getValue());
+			diagramBO = new DiagramBO(entry.getKey(), CalculationUtils.round(2, Double.valueOf(entry.getValue())));
 			diagramBOList.add(diagramBO);
 		}
 		return JSONUtil.toJson(diagramBOList);
@@ -321,16 +323,18 @@ public class CacheServiceImpl extends CacheAbstractService {
 		Map<String, String> tempMap = null;
 		List<DiagramBO> diagramBOList = new ArrayList<DiagramBO>();
 		DiagramBO diagramBO = null;
-		if (list.contains(Constants.CNCOOPBUY)) {
-			tempMap = entries(Constants.ORDER_STATISTICS_DAY + Constants.CNCOOPBUY);
-			for (Map.Entry<String, String> entry : tempMap.entrySet()) {
-				String key = entry.getKey().equals("produce") ? "产生订单"
-						: entry.getKey().equals("deliver") ? "发货订单" : entry.getKey().equals("cancel") ? "取消订单" : "";
-				diagramBO = new DiagramBO(key, entry.getValue());
-				diagramBOList.add(diagramBO);
-			}
-			return JSONUtil.toJson(diagramBOList);
-		}
+		// if (list.contains(Constants.CNCOOPBUY)) {
+		// tempMap = entries(Constants.ORDER_STATISTICS_DAY +
+		// Constants.CNCOOPBUY);
+		// for (Map.Entry<String, String> entry : tempMap.entrySet()) {
+		// String key = entry.getKey().equals("produce") ? "产生订单"
+		// : entry.getKey().equals("deliver") ? "发货订单" :
+		// entry.getKey().equals("cancel") ? "取消订单" : "";
+		// diagramBO = new DiagramBO(key, entry.getValue());
+		// diagramBOList.add(diagramBO);
+		// }
+		// return JSONUtil.toJson(diagramBOList);
+		// }
 		for (Integer temGradeId : list) {
 			temp = JSONUtil.parse(JSONUtil.toJson(entries(Constants.ORDER_STATISTICS_DAY + temGradeId)),
 					IntradayOrderBO.class);
@@ -355,13 +359,13 @@ public class CacheServiceImpl extends CacheAbstractService {
 				increment(Constants.SALES_STATISTICS_MONTH + info.getShopId(), time,
 						info.getOrderDetail().getPayment());
 			}
-			if (info.getShopId() != Constants.CNCOOPBUY) {
-				increment(Constants.ORDER_STATISTICS_MONTH + Constants.CNCOOPBUY, time, 1);
-				if (!Constants.ORDER_CLOSE.equals(info.getStatus())) {
-					increment(Constants.SALES_STATISTICS_MONTH + Constants.CNCOOPBUY, time,
-							info.getOrderDetail().getPayment());
-				}
-			}
+//			if (info.getShopId() != Constants.CNCOOPBUY) {
+//				increment(Constants.ORDER_STATISTICS_MONTH + Constants.CNCOOPBUY, time, 1);
+//				if (!Constants.ORDER_CLOSE.equals(info.getStatus())) {
+//					increment(Constants.SALES_STATISTICS_MONTH + Constants.CNCOOPBUY, time,
+//							info.getOrderDetail().getPayment());
+//				}
+//			}
 		}
 	}
 
@@ -544,7 +548,7 @@ public class CacheServiceImpl extends CacheAbstractService {
 	 */
 	private void calSalesAmount(Map<String, Double> salesAmountCacheMap, OrderInfo info, String perkey) {
 		// 没付款的不计入销售额
-		if (!Constants.ORDER_CLOSE.equals(info.getStatus())) {
+		if (!Constants.ORDER_CLOSE.equals(info.getStatus()) && !Constants.ORDER_INIT.equals(info.getStatus())) {
 			if (salesAmountCacheMap.get(perkey + info.getShopId()) == null) {
 				salesAmountCacheMap.put(perkey, info.getOrderDetail().getPayment());
 			} else {
@@ -552,11 +556,13 @@ public class CacheServiceImpl extends CacheAbstractService {
 				salesAmountCacheMap.put(perkey + info.getShopId(),
 						CalculationUtils.add(tempAmount, info.getOrderDetail().getPayment()));
 			}
-			if (info.getShopId() != Constants.CNCOOPBUY) {
-				double tempAmount = salesAmountCacheMap.get(perkey + Constants.CNCOOPBUY);
-				salesAmountCacheMap.put(perkey + Constants.CNCOOPBUY,
-						CalculationUtils.add(tempAmount, info.getOrderDetail().getPayment()));
-			}
+			// if (info.getShopId() != Constants.CNCOOPBUY) {
+			// double tempAmount = salesAmountCacheMap.get(perkey +
+			// Constants.CNCOOPBUY);
+			// salesAmountCacheMap.put(perkey + Constants.CNCOOPBUY,
+			// CalculationUtils.add(tempAmount,
+			// info.getOrderDetail().getPayment()));
+			// }
 		}
 
 	}
@@ -579,10 +585,10 @@ public class CacheServiceImpl extends CacheAbstractService {
 			calQuantity(type, intradayOrder);
 		}
 		// 有可能shopId就是2
-		if (!gradeId.equals(Constants.CNCOOPBUY)) {
-			intradayOrder = cacheMap.get(perkey + Constants.CNCOOPBUY);
-			calQuantity(type, intradayOrder);
-		}
+		// if (!gradeId.equals(Constants.CNCOOPBUY)) {
+		// intradayOrder = cacheMap.get(perkey + Constants.CNCOOPBUY);
+		// calQuantity(type, intradayOrder);
+		// }
 	}
 
 	private void calQuantity(Integer type, IntradayOrderBO intradayOrder) {

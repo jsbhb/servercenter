@@ -67,9 +67,9 @@ public abstract class CacheAbstractService {
 	 */
 	public void addOrderCountCache(Integer gradeId, String perkey, String filed){
 		increment(perkey + gradeId, filed, 1);
-		if (!Constants.CNCOOPBUY.equals(gradeId)) {
-			increment(perkey + Constants.CNCOOPBUY, filed, 1);
-		}
+//		if (!Constants.CNCOOPBUY.equals(gradeId)) {
+//			increment(perkey + Constants.CNCOOPBUY, filed, 1);
+//		}
 	}
 	
 	/**
@@ -79,9 +79,9 @@ public abstract class CacheAbstractService {
 	 */
 	public void addSalesCache(Integer gradeId, String perkey, String filed, double amount){
 		increment(perkey + gradeId, filed, amount);
-		if (!Constants.CNCOOPBUY.equals(gradeId)) {
-			increment(perkey + Constants.CNCOOPBUY, filed, amount);
-		}
+//		if (!Constants.CNCOOPBUY.equals(gradeId)) {
+//			increment(perkey + Constants.CNCOOPBUY, filed, amount);
+//		}
 	}
 	
 	

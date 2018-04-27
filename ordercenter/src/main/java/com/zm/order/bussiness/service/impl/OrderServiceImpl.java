@@ -24,7 +24,6 @@ import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderService;
-import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.ActivityFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
