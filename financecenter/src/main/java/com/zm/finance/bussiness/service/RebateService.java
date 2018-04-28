@@ -28,7 +28,7 @@ public interface RebateService {
 
 	void saveRebateDetail(Map<String, String> map);
 
-	void updateRebateDetail(String orderId);
+	void updateRebateDetail(String orderId, Integer status);
 
 	void redisTool(String key, Map<String, String> map);
 

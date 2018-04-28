@@ -115,8 +115,11 @@ public class RebateServiceImpl implements RebateService {
 	}
 
 	@Override
-	public void updateRebateDetail(String orderId) {
-		rebateMapper.updateRebateDetail(orderId);
+	public void updateRebateDetail(String orderId, Integer status) {
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("orderId", orderId);
+		param.put("status", status);
+		rebateMapper.updateRebateDetail(param);
 	}
 
 	@Override

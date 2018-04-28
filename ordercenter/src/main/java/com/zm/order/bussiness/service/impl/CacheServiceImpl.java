@@ -115,7 +115,7 @@ public class CacheServiceImpl extends CacheAbstractService {
 			put(Constants.ORDER_STATISTICS_DAY + grade.getId(), "cancel", "0");
 			// 放入周统计
 			str = entries(Constants.SALES_STATISTICS_DAY + grade.getId(), "sales");
-			addList(Constants.SALES_STATISTICS_DAY + grade.getId(), str, LAST_WEEK);
+			addList(Constants.SALES_STATISTICS_WEEK + grade.getId(), str, LAST_WEEK);
 			// 缓存置0
 			put(Constants.SALES_STATISTICS_DAY + grade.getId(), "sales", "0");
 		}

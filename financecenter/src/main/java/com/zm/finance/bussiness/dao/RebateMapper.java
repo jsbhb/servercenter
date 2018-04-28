@@ -1,6 +1,7 @@
 package com.zm.finance.bussiness.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.finance.pojo.RebateSearchModel;
@@ -17,6 +18,6 @@ public interface RebateMapper {
 
 	Page<Rebate> listRebate(RebateSearchModel search);
 
-	void updateRebateDetail(String orderId);
+	void updateRebateDetail(Map<String,Object> param);
 	
 }

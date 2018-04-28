@@ -48,12 +48,15 @@ public class ShareProfitComponent {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
-	
+
 	@Resource
 	FinanceFeignClient financeFeignClient;
 
 	@Resource
 	CacheAbstractService cacheAbstractService;
+
+	private static final Integer REBATE_DETAIL_FINISH = 1;
+	private static final Integer REBATE_DETAIL_CANCEL = 2;
 
 	private static Integer register_type = 0;// 注册地分润
 	private static Integer consume_type = 1;// 消费地分润
@@ -128,15 +131,15 @@ public class ShareProfitComponent {
 	 * @param orderId
 	 */
 	public void calRefundShareProfit(String orderId) {
-		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<Integer, Double> rebateMap = new HashMap<Integer, Double>();
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
-		calRebate(info, rebateMap, hashOperations);
-		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
+		Map<String, String> result = hashOperations.entries(Constants.REBATE_DETAIL + orderId);
+		for (Map.Entry<String, String> entry : result.entrySet()) {
 			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
-					CalculationUtils.sub(0, CalculationUtils.round(2, entry.getValue())));
+					CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
 		}
+		template.delete(Constants.REBATE_DETAIL + orderId);
+		financeFeignClient.updateRebateDetail(Constants.FIRST_VERSION, orderId, REBATE_DETAIL_CANCEL);
 	}
 
 	/**
@@ -297,6 +300,7 @@ public class ShareProfitComponent {
 	/**
 	 * @fun 计算可提现金额（从待到账金额转到可提现金额）
 	 */
+
 	private void calCanBePresented(OrderInfo orderInfo) {
 		try {
 			Long count = template.opsForSet().remove(Constants.ORDER_REBATE, orderInfo.getOrderId());
@@ -311,7 +315,8 @@ public class ShareProfitComponent {
 							CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
 				}
 				template.delete(Constants.REBATE_DETAIL + orderInfo.getOrderId());
-				financeFeignClient.updateRebateDetail(Constants.FIRST_VERSION, orderInfo.getOrderId());
+				financeFeignClient.updateRebateDetail(Constants.FIRST_VERSION, orderInfo.getOrderId(),
+						REBATE_DETAIL_FINISH);
 			}
 		} catch (Exception e) {
 			template.opsForSet().add(Constants.ORDER_REBATE, orderInfo.getOrderId());
@@ -332,11 +337,11 @@ public class ShareProfitComponent {
 	private void calRebate(OrderInfo orderInfo, Map<Integer, Double> rebateMap,
 			HashOperations<String, String, String> hashOperations) {
 		List<OrderGoods> goodsList = orderInfo.getOrderGoodsList();
-		
+
 		if (goodsList != null) {
 			Map<String, String> goodsRebate = null;
 			GradeBO grade = null;
-			for (OrderGoods goods : goodsList) { 
+			for (OrderGoods goods : goodsList) {
 				// 获取该订单所有的上级,包括推手
 				LinkedList<GradeBO> superNodeList = TreeNodeUtil.getSuperNode(CacheComponent.getInstance().getSet(),
 						orderInfo.getShopId());

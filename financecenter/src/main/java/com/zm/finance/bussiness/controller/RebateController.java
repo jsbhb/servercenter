@@ -1,6 +1,5 @@
 package com.zm.finance.bussiness.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -75,14 +74,15 @@ public class RebateController {
 	}
 
 	@RequestMapping(value = "{version}/finance/rebate/detail/finsh", method = RequestMethod.POST)
-	public void updateRebateDetail(@PathVariable("version") Double version, @RequestParam("orderId") String orderId) {
+	public void updateRebateDetail(@PathVariable("version") Double version, @RequestParam("orderId") String orderId,
+			@RequestParam("status") Integer status) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			rebateService.updateRebateDetail(orderId);
+			rebateService.updateRebateDetail(orderId, status);
 		}
 	}
 
-	//操作redis的小工具，没有其他作用
+	// 操作redis的小工具，没有其他作用
 	@RequestMapping(value = "{version}/finance/rebate/detail/redis", method = RequestMethod.POST)
 	public void redisTool(@PathVariable("version") Double version, @RequestParam("key") String key,
 			@RequestBody Map<String, String> map) {
@@ -91,7 +91,7 @@ public class RebateController {
 			rebateService.redisTool(key, map);
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/finance/rebate/detail/redis/set", method = RequestMethod.POST)
 	public void redisToolList(@PathVariable("version") Double version, @RequestParam("key") String key,
 			@RequestParam("value") String value) {
@@ -100,5 +100,5 @@ public class RebateController {
 			rebateService.redisToolList(key, value);
 		}
 	}
-	
+
 }

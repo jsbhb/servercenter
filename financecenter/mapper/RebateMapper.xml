@@ -69,7 +69,7 @@
 	</select>
 	
 	<update id="updateRebateDetail" parameterType="Object">
-		update rebate_detail set status = 1, update_time = now() where order_id = #{orderId}
+		update rebate_detail set status = #{status}, update_time = now() where order_id = #{orderId}
 	</update>
 	
 </mapper>

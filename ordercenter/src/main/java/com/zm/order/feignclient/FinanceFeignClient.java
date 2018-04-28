@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface FinanceFeignClient {
 
 	@RequestMapping(value = "{version}/finance/rebate/detail/save", method = RequestMethod.POST)
-	public void saveRebateDetail(@PathVariable("version") Double version, @RequestBody Map<String,String> map);
-	
+	public void saveRebateDetail(@PathVariable("version") Double version, @RequestBody Map<String, String> map);
+
 	@RequestMapping(value = "{version}/finance/rebate/detail/finsh", method = RequestMethod.POST)
-	public void updateRebateDetail(@PathVariable("version") Double version, @RequestParam("orderId") String orderId);
+	public void updateRebateDetail(@PathVariable("version") Double version, @RequestParam("orderId") String orderId,
+			@RequestParam("status") Integer status);
 
 }
