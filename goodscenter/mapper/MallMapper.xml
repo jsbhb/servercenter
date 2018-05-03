@@ -5,6 +5,7 @@
 
 	<resultMap type="com.zm.goods.pojo.PopularizeDict" id="dict">
 		<id column="id" property="id"/>
+		<result column="layout_id" property="layoutId"/>
 		<result column="name" property="name"/>
 		<result column="enname" property="enname"/>
 		<result column="first_category" property="firstCategory"/>
@@ -20,6 +21,7 @@
 		<association property="layout" javaType="com.zm.goods.pojo.Layout">
 			<result column="is_show" property="show"/>
 			<result column="page_type" property="pageType"/>
+			<result column="sort" property="sort"/>
 		</association>
 	</resultMap>
 	
@@ -41,7 +43,7 @@
 
 	
 	<select id="selectDictById" parameterType="Object" resultMap="dict">
-		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where d.id = #{id}
+		select d.*,l.is_show,l.page_type,l.sort from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where d.id = #{id}
 	</select>
 	
 	<select id="selectDataById" parameterType="Object" resultMap="data">
@@ -49,7 +51,7 @@
 	</select>
 	
 	<select id="selectDictForPage" parameterType="Object" resultMap="dict">
-		select d.*,l.is_show,l.page_type from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where l.code = 'module_00024' or l.code='module_00009'
+		select d.*,l.is_show,l.page_type,l.sort from popularize_dict_${centerId} d left join layout_${centerId} l on l.id = d.layout_id where l.code = 'module_00024' or l.code='module_00009' order by l.page_type,l.sort,d.create_time desc  
 	</select>
 	
 	<select id="selectDataForPage" parameterType="Object" resultMap="data">
@@ -71,9 +73,9 @@
 	
 	<insert id="insertLayout" useGeneratedKeys="true" keyProperty="id" parameterType="Object" >
 		insert into layout_${centerId} 
-		(page,code,type,page_type,is_show,description,create_time,update_time,opt)
+		(page,code,type,page_type,is_show,description,create_time,update_time,opt,sort)
 		value 
-		(#{page},#{code},#{type},#{pageType},#{show},#{description},now(),now(),opt);
+		(#{page},#{code},#{type},#{pageType},#{show},#{description},now(),now(),#{opt},#{sort});
 	</insert>
 	
 	
@@ -139,6 +141,17 @@
 		</if>
 		<if test="href!=null and href!=''">
 		,href = #{href}
+		</if>
+		 where id = #{id} 
+	</update>
+	
+	<update id="updateLayout" parameterType="Object" >
+		update layout_${centerId}  set update_time = now()
+		<if test="opt!=null and opt!=''">
+		,opt = #{opt}
+		</if>
+		<if test="sort!=null">
+		,sort = #{sort}
 		</if>
 		 where id = #{id} 
 	</update>

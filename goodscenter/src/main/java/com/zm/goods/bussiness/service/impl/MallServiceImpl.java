@@ -126,5 +126,10 @@ public class MallServiceImpl implements MallService {
 	@Override
 	public void updateDict(PopularizeDict entity) {
 		mallMapper.updateDict(entity);
+		if (entity.getLayout() != null) {
+			entity.getLayout().setCenterId(entity.getCenterId());
+			entity.getLayout().setOpt(entity.getOpt());
+			mallMapper.updateLayout(entity.getLayout());
+		}
 	}
 }

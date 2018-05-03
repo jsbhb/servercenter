@@ -124,4 +124,14 @@ public interface MallMapper {
 	 * @since JDK 1.7  
 	 */
 	void updateDict(PopularizeDict entity);
+	
+	/**  
+	 * updateLayout:根据编号检索字典数据. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param id
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	void updateLayout(Layout layout);
 }
