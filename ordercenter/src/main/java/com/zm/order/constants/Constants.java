@@ -4,8 +4,6 @@ public class Constants {
 
 	public static final Double FIRST_VERSION = 1.0;
 
-	public static final Integer OWN_SUPPLIER = 1;// 自营仓ID
-
 	// *********************各支付类型******************************/
 	public static final String WX_PAY = "1";
 
@@ -39,12 +37,6 @@ public class Constants {
 	public static final Integer FULL_CUT = 1;// 满减
 
 	public static final Integer FULL_DISCOUNT = 2;// 满打折
-
-	// *******************区域中心ID**********************
-
-	public static final Integer O2O_CENTERID = 1;
-
-	public static final Integer BIG_TRADE_CENTERID = 2;
 
 	// *******************快递方式******************
 	public static final Integer EXPRESS = 0;

@@ -672,8 +672,9 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderGoods> goodsList = null;
 		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
 		OrderGoods temp = null;
-		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
-		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+//		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+//		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		list.addAll(orderMapper.listOrderForSendToWarehouse());
 		if (list.size() > 0) {
 			for (OrderInfo info : list) {// 找出所有的itemId
 				for (OrderGoods goods : info.getOrderGoodsList()) {
