@@ -18,6 +18,7 @@
 		<result column="coupon_ids" property="couponIds" jdbcType="VARCHAR" />
 		<result column="express_type" property="expressType" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
@@ -69,6 +70,43 @@
 		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 		<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoListForDownload" id="orderInfoListForDownload">
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+		<result column="proxy_price" property="proxyPrice" jdbcType="DECIMAL" />
+		<result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
+		<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
+		<result column="first_id" property="firstId" jdbcType="VARCHAR" />
+		<result column="first_name" property="firstName" jdbcType="VARCHAR" />
+		<result column="second_id" property="secondId" jdbcType="VARCHAR" />
+		<result column="second_name" property="secondName" jdbcType="VARCHAR" />
+		<result column="third_id" property="thirdId" jdbcType="VARCHAR" />
+		<result column="third_name" property="thirdName" jdbcType="VARCHAR" />
+		<result column="payment" property="payment" jdbcType="DECIMAL" />
+		<result column="pay_type" property="payType" jdbcType="INTEGER" />
+		<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
+		<result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+		<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+		<result column="receive_province" property="receiveProvince" jdbcType="VARCHAR" />
+		<result column="receive_city" property="receiveCity" jdbcType="VARCHAR" />
+		<result column="receive_area" property="receiveArea" jdbcType="VARCHAR" />
+		<result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
+			property="orderExpressList">
+			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
+			<result column="express_key" property="expressKey" jdbcType="VARCHAR" />
+			<result column="express_name" property="expressName" jdbcType="VARCHAR" />
+			<result column="express_id" property="expressId" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
 
 
 	<select id="selectForPage" resultMap="orderBase" parameterType="Object">
@@ -78,7 +116,8 @@
 		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
-		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
+		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,
+		ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id,ob.order_source
 		from order_base ob where
 		1 = 1
 		<if test="entity.status != null">
@@ -157,6 +196,37 @@
 	
 	<select id="selectOrderGoodsForPage" resultMap="orderGoods" parameterType="Object">
 	select * from order_goods where order_id = #{orderId}
+	</select>
+	
+	
+	<select id="selectOrdreListForDownload" resultMap="orderInfoListForDownload" parameterType="Object">
+		select ob.order_id,ob.status,ob.grade_id,ug.grade_name,ob.supplier_id,sb.supplier_name,
+		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_quantity,gfc.first_id,
+		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
+		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,
+		od.receive_city,od.receive_area,od.receive_address,od.create_time,
+		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id
+		from zm_order.order_base ob
+		left join zm_user.grade ug on ob.grade_id = ug.id
+		left join zm_supplier.supplier_base sb on ob.supplier_id = sb.id
+		left join zm_order.order_goods og on ob.order_id = og.order_id
+		left join zm_goods.goods_price gp on og.item_id = gp.item_id
+		left join zm_goods.goods g on og.goods_id = g.goods_id
+		left join zm_goods.base b on g.base_id = b.id
+		left join zm_goods.goods_first_category gfc on b.first_category = gfc.first_id
+		left join zm_goods.goods_second_category gsc on b.first_category = gsc.first_id and b.second_category = gsc.second_id
+		left join zm_goods.goods_third_category gtc on b.second_category = gtc.second_id and b.third_category = gtc.third_id
+		left join zm_order.order_detail od on ob.order_id = od.order_id
+		left join zm_order.third_order_info toi on ob.order_id = toi.order_id and ob.supplier_id = toi.supplier_id
+		where 1=1 
+		<if test="list != null and list.size > 0 ">
+			and ob.grade_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		and ob.create_time between #{startTime} and DATE_ADD(#{endTime},interval 1 day)
+		order by ob.grade_id,ob.create_time
 	</select>
 	
 

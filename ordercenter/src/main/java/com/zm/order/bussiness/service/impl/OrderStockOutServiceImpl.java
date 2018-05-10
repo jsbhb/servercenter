@@ -24,7 +24,7 @@ import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
-import com.zm.order.pojo.Pagination;
+import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
 
 /**  
@@ -81,6 +81,16 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	@Override
 	public List<ThirdOrderInfo> queryThirdInfo(String orderId) {
 		return orderMapper.getThirdInfo(orderId);
+	}
+
+	@Override
+	public List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId) {
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("startTime", startTime);
+		param.put("endTime", endTime);
+		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, Integer.parseInt(gradeId));
+		param.put("list", childrenIds);
+		return orderBackMapper.selectOrdreListForDownload(param);
 	}
 
 }

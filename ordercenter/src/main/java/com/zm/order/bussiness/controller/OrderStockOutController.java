@@ -18,6 +18,7 @@ import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
 
 /**
@@ -94,6 +95,28 @@ public class OrderStockOutController {
 				}
 
 				List<ThirdOrderInfo> result = orderStockOutService.queryThirdInfo(entity.getOrderId());
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/order/stockOut/queryOrdreInfoListForDownload", method = RequestMethod.POST)
+	public ResultModel queryOrdreListForDownload(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				String startTime = request.getParameter("startTime");
+				String endTime = request.getParameter("endTime");
+				String gradeId = request.getParameter("gradeId");
+				if (startTime == null || endTime == null) {
+					return new ResultModel(false, "查询日期为空");
+				}
+
+				List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,endTime,gradeId);
 				return new ResultModel(true, result);
 			}
 

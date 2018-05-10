@@ -13,6 +13,7 @@ import java.util.Map;
 import com.github.pagehelper.Page;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.OrderInfoListForDownload;
 
 /**  
  * ClassName: OrderBackMapper <br/>  
@@ -61,5 +62,15 @@ public interface OrderStockOutMapper {
 	 * @since JDK 1.7  
 	 */
 	Page<OrderGoods> selectOrderGoodsForPage(OrderGoods entity);
+
+	/**  
+	 * selectOrdreListForDownload:订单导出. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity
+	 * @return  
+	 * @since JDK 1.7  
+	 */
+	List<OrderInfoListForDownload> selectOrdreListForDownload(Map<String,Object> param);
 
 }
