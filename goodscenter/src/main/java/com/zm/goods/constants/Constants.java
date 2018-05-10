@@ -41,4 +41,7 @@ public class Constants {
 	//*********************商品返佣redis前缀***************************
 	public static final String GOODS_REBATE = "goodsrebate:";
 	
+	//*********************包邮包税redis前缀***************************
+	public static final String POST_TAX = "post_tax:";
+	
 }

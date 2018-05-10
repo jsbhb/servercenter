@@ -110,5 +110,13 @@ public class Constants {
 
 	// **********************销售额当天统计前缀***********************
 	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";
+	
+	
+	//*********************包邮包税redis前缀***************************
+	public static final String POST_TAX = "post_tax:";
+	
+	//*********************包邮包税***************************
+	public static final String FREE_POST = "1";
+	public static final String FREE_TAX = "1";
 
 }

@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -169,27 +170,36 @@ public class OrderServiceImpl implements OrderService {
 		priceAndWeightMap = (Map<String, Object>) result.getObj();
 		amount = (Double) priceAndWeightMap.get("totalAmount");
 
-		//邮费和税费初始值
+		// 邮费和税费初始值
 		Double postFee = 0.0;
 		Double taxFee = 0.0;
 		Double totalExciseTax = 0.0;
 		Double totalIncremTax = 0.0;
 		Double unDiscountAmount = 0.0;
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
-		
-		if(info.getSupplierId() != 5){
-			//TODO 目前定死广州仓包邮包税
+
+		//获取包邮包税
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> tempMap = hashOperations.entries(Constants.POST_TAX + info.getSupplierId());
+		boolean freePost = false;
+		boolean freeTax = false;
+		if (tempMap != null) {
+			freePost = Constants.FREE_POST.equals(tempMap.get("post")) ? true : false;
+			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
+		}
+		if (!freePost) {
 			// 计算邮费(自提不算邮费)
 			if (Constants.EXPRESS.equals(info.getExpressType())) {
 				String province = info.getOrderDetail().getReceiveProvince();
 				PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId());
 				postFee = getPostFee(post);
 			}
-			
+		}
+		if (!freeTax) {
 			// 计算税费
 			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
-				
+
 				for (Map.Entry<String, Double> entry : map.entrySet()) {
 					unDiscountAmount += entry.getValue();
 				}
@@ -212,7 +222,8 @@ public class OrderServiceImpl implements OrderService {
 						totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
 					} else {
 						totalIncremTax += CalculationUtils.mul(
-								CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()), 0.7);
+								CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
+								0.7);
 					}
 				}
 				taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);

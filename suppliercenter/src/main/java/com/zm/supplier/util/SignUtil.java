@@ -66,7 +66,7 @@ public class SignUtil {
 	 * @param params
 	 * @return
 	 */
-	public static String sort(Map<String, Object> params) {
+	public static String sort(Map<String, ? extends Object> params) {
 		if (params == null) {
 			return null;
 		}
@@ -86,6 +86,26 @@ public class SignUtil {
 	public static String fuBangSign(String msg, String appSecret) {
 		String toSignStr = appSecret + msg;
 		return DigestUtils.md5Hex(toSignStr);
+	}
+
+	public static String qianFengSign(String appSecret, Map<String, String> param) {
+		if (param == null) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		List<String> keyList = new ArrayList<String>(param.keySet());
+		Collections.sort(keyList);
+		for (String s : keyList) {
+			sb.append(s + String.valueOf(param.get(s)));
+		}
+		String str = sb.toString() + appSecret;
+
+		return DigestUtils.md5Hex(str);
+	}
+
+	public static String qianFengSign(String appKey, String appSecret) {
+		
+		return DigestUtils.md5Hex(appKey+appSecret);
 	}
 
 }

@@ -62,6 +62,26 @@ public class GoodsItem extends GoodsBase {
 	private List<GoodsSpecs> goodsSpecsList;
 
 	private List<Coupon> couponList;
+	
+	private Integer freePost;
+	
+	private Integer freeTax;
+
+	public Integer getFreePost() {
+		return freePost;
+	}
+
+	public void setFreePost(Integer freePost) {
+		this.freePost = freePost;
+	}
+
+	public Integer getFreeTax() {
+		return freeTax;
+	}
+
+	public void setFreeTax(Integer freeTax) {
+		this.freeTax = freeTax;
+	}
 
 	public List<Coupon> getCouponList() {
 		return couponList;

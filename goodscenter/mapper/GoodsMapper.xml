@@ -437,6 +437,7 @@
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  is_free_tax tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包税0：否，1是',
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX id_UNIQUE (id ASC),
 		  UNIQUE INDEX goodsId_UNIQUE (goods_id ASC),

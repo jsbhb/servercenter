@@ -48,7 +48,7 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-//		sb.append("17000"); // 店铺代码正式
+		// sb.append("17000"); // 店铺代码正式
 		sb.append("11612"); // 店铺代码测试
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
@@ -137,7 +137,7 @@ public class ButtJointMessageUtils {
 		sb.append("<name>");
 		sb.append(user.getUserDetail().getName()); // 真实姓名
 		sb.append("</name>\n");
-		if(Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())){
+		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
 			sb.append("<merId>");
 			sb.append(unionPayMerId);
 			sb.append("</merId>\n");
@@ -356,5 +356,142 @@ public class ButtJointMessageUtils {
 
 		return JSONUtil.toJson(param);
 
+	}
+
+	public static String getQianFengOrderMsg(OrderInfo info, UserInfo user, String customer, String unionPayMerId) {
+		StringBuilder sb = new StringBuilder();
+		String source = "";
+		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
+			source = "02";
+		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+			source = "13";
+		} else if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
+			source = "01";
+		}
+		sb.append("<?xml version='1.0' encoding='UTF-8'?>\n");
+		sb.append("<Message>\n");
+		sb.append("<Header>\n");
+		sb.append("<CustomsCode>" + customer + "</CustomsCode>\n");
+		sb.append("<OrgName>" + customer + "</OrgName>\n");
+		sb.append("<CreateTime>" + info.getCreateTime() + "</CreateTime>\n");
+		sb.append("</Header>\n");
+		sb.append("<Body>\n");
+		sb.append("<Order>\n");
+		sb.append("<Operation>0</Operation>\n");// 0新增
+		sb.append("<TybType>1</TybType>\n");// 1总署版
+		sb.append("<OrderShop>11612</OrderShop>\n");// 测试
+		// sb.append("<OrderShop>17000</OrderShop>\n");//正式
+		sb.append("<OrderFrom>GXHZ</OrderFrom>\n");// 购物网站代码
+		sb.append("<OrderNo>" + info.getOrderId() + "</OrderNo>\n");
+		sb.append("<PostFee>" + info.getOrderDetail().getPostFee() + "</PostFee>\n");
+		sb.append("<InsuranceFee>0</InsuranceFee>\n");
+		sb.append("<Amount>" + info.getOrderDetail().getPayment() + "</Amount>\n");
+		sb.append("<BuyerAccount>" + user.getPhone() + "</BuyerAccount>\n");
+		sb.append("<Phone>" + user.getPhone() + "</Phone>\n");
+		sb.append("<TaxAmount>" + info.getOrderDetail().getTaxFee() + "</TaxAmount>\n");
+		sb.append("<TariffAmount>0</TariffAmount>\n");
+		sb.append("<AddedValueTaxAmount>" + info.getOrderDetail().getIncrementTax() + "</AddedValueTaxAmount>\n");
+		sb.append("<ConsumptionDutyAmount>" + info.getOrderDetail().getExciseTax() + "</ConsumptionDutyAmount>\n");
+		sb.append("<GrossWeight>");
+		sb.append(CalculationUtils.div(info.getWeight(), 1000)); // 毛重
+		sb.append("</GrossWeight>\n");
+		sb.append("<DisAmount>");
+		sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额合计
+		sb.append("</DisAmount>\n");
+		sb.append("<BuyerIdnum>" + user.getUserDetail().getIdNum() + "</BuyerIdnum>\n");
+		sb.append("<BuyerName>" + user.getUserDetail().getName() + "</BuyerName>\n");
+		sb.append("<BuyerIsPayer>1</BuyerIsPayer>\n");
+		sb.append("<WarehouseCode>2345678910</WarehouseCode>\n");
+		sb.append("<LogisticsNo></LogisticsNo>\n");
+		sb.append("<LogisticsName>中通速递</LogisticsName>\n");
+		sb.append("<Promotions>\n");
+		sb.append("<Promotion>\n");
+		sb.append("<ProAmount>");
+		sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额
+		sb.append("</ProAmount>\n");
+		sb.append("</Promotion>\n");
+		sb.append("</Promotions>\n");
+		sb.append("<Goods>\n");
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			sb.append("<Detail>\n");
+			sb.append("<ProductId>");
+			sb.append(goods.getSku()); // 货号'3105166008N0000002'
+			sb.append("</ProductId>\n");
+			sb.append("<GoodsName>" + goods.getItemName() + "</GoodsName>\n");
+			sb.append("<Qty>");
+			sb.append(goods.getItemQuantity()); // 数量
+			sb.append("</Qty>\n");
+			sb.append("<Price>");
+			sb.append(goods.getItemPrice()); // 商品单价
+			sb.append("</Price>\n");
+			sb.append("<Amount>");
+			sb.append(CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity())); // 商品金额
+			sb.append("</Amount>\n");
+			sb.append("</Detail>\n");
+		}
+		sb.append("</Goods>\n");
+		sb.append("</Order>\n");
+		sb.append("<Pay>\n");
+		sb.append("<Paytime>");
+		sb.append(info.getOrderDetail().getPayTime()); // 支付时间
+		sb.append("</Paytime>\n");
+		sb.append("<PaymentNo>");
+		sb.append(info.getOrderDetail().getPayNo()); // 支付单号
+		sb.append("</PaymentNo>\n");
+		sb.append("<OrderSeqNo>");
+		sb.append(info.getOrderDetail().getPayNo()); // 商家送支付机构订单交易号,如无，请与支付单号一致
+		sb.append("</OrderSeqNo>\n");
+		sb.append("<Source>");
+		sb.append(source); // 支付方式代码
+		sb.append("</Source>\n");
+		sb.append("<Idnum>");
+		sb.append(user.getUserDetail().getIdNum()); // 身份证
+		sb.append("</Idnum>\n");
+		sb.append("<Name>");
+		sb.append(user.getUserDetail().getName()); // 真实姓名
+		sb.append("</Name>\n");
+		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
+			sb.append("<MerId>");
+			sb.append(unionPayMerId);
+			sb.append("</MerId>\n");
+		}
+		sb.append("</Pay>\n");
+		sb.append("<Logistics>");
+		sb.append("<Consignee>");
+		sb.append(info.getOrderDetail().getReceiveName()); // 收货人名称
+		sb.append("</Consignee>\n");
+		sb.append("<Province>");
+		sb.append(info.getOrderDetail().getReceiveProvince()); // 省
+		sb.append("</Province>\n");
+		sb.append("<City>");
+		sb.append(info.getOrderDetail().getReceiveCity()); // 市
+		sb.append("</City>\n");
+		sb.append("<District>");
+		sb.append(info.getOrderDetail().getReceiveArea()); // 区
+		sb.append("</District>\n");
+		sb.append("<ConsigneeAddr>");
+		sb.append(info.getOrderDetail().getReceiveProvince() + info.getOrderDetail().getReceiveCity()
+				+ info.getOrderDetail().getReceiveArea() + info.getOrderDetail().getReceiveAddress()); // 收货地址
+		sb.append("</ConsigneeAddr>\n");
+		sb.append("<ConsigneeTel>");
+		sb.append(info.getOrderDetail().getReceivePhone()); // 收货电话
+		sb.append("</ConsigneeTel>\n");
+		sb.append("<MailNo>" + info.getOrderDetail().getReceiveZipCode() + "</MailNo>\n");
+		sb.append("</Logistics>\n");
+		sb.append("</Body>\n");
+		sb.append("</Message>");
+
+		return sb.toString();
+	}
+
+	public static String getQianFengCheckOrderMsg(List<String> orderIds, String customer) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<orderRequest>\n");
+		sb.append("<psno></psno>\n");
+		sb.append("<corpcode>" + customer + "</corpcode>\n");
+		sb.append("<orderno>" + orderIds.get(0) + "</orderno>\n");
+		sb.append("</orderRequest>\n");
+		
+		return sb.toString();
 	}
 }
