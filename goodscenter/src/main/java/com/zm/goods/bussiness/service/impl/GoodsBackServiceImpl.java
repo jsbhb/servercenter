@@ -289,6 +289,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public void updateGoodsInfo(GoodsInfoEntity entity) {
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		goodsItemMapper.update(entity.getGoods().getGoodsItem());
+		//主表修改后同步到分表中去，目前只同步mallId为2的分表 START
+		goodsItemMapper.updateSubGoodsItem(entity.getGoods().getGoodsItem().getItemId());
+		//主表修改后同步到分表中去，目前只同步mallId为2的分表 END
 		goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			//商品编辑时，先查询原有的file数据进行比较，然后判断如何处理

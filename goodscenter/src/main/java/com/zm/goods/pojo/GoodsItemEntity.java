@@ -24,6 +24,7 @@ public class GoodsItemEntity extends Pagination {
 	private String itemId;// itemID
 	private String itemCode;// 商家自有编码
 	private String sku;// sku信息
+	private String encode;// sku信息
 	private double weight;// 商品重量（克）
 	private double exciseTax;// 消费税
 	private int isPromotion;// 是否促销0：否；1：是
@@ -243,6 +244,14 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setConversion(int conversion) {
 		this.conversion = conversion;
+	}
+
+	public String getEncode() {
+		return encode;
+	}
+
+	public void setEncode(String encode) {
+		this.encode = encode;
 	}
 	
 }

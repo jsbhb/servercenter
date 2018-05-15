@@ -9,6 +9,7 @@
 		<result column="item_id" property="itemId" />
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
+		<result column="encode" property="encode"/>
 		<result column="weight" property="weight"/>
 		<result column="excise_fax" property="exciseTax"/>
 		<result column="status" property="status"/>
@@ -73,6 +74,7 @@
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
 		<result column="weight" property="weight"/>
+		<result column="encode" property="encode"/>
 		<result column="excise_tax" property="exciseTax"/>
 		<result column="status" property="status"/>
 		<result column="discount" property="discount"/>
@@ -108,7 +110,7 @@
 			<result column="tariff" property="tariff"/>
 			<result column="unit" property="unit"/>
 			<result column="hscode" property="hscode"/>
-			<result column="encode" property="encode"/>
+			<result column="b_encode" property="encode"/>
 			<result column="first_category" property="firstCatalogId"/>
 			<result column="second_category" property="secondCatalogId"/>
 			<result column="third_category" property="thirdCatalogId"/>
@@ -169,7 +171,7 @@
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,b.id as base_id,b.brand_id,
-		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode,b.first_category,
+		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode b_encode,b.first_category,
 		b.second_category,b.third_category,b.center_id,tag.id as tag_bind_id,tag.tag_id
 		from goods_item i 
 		left join goods g on g.goods_id = i.goods_id
@@ -275,9 +277,9 @@
 	
 	<insert id="insert" parameterType="Object">
 		insert into goods_item 
-		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion)
+		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion,encode)
 		value
-		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion})
+		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion},#{encode})
 	</insert>
 	
 	<insert id="insertPrice" parameterType="Object">
@@ -315,6 +317,9 @@
 		 ,excise_tax = #{exciseTax}
 		<if test="conversion !=null and conversion !=''">
 			,conversion = #{conversion} 
+		</if>
+		<if test="encode !=null and encode !=''">
+			,encode = #{encode} 
 		</if>
 		 where item_id  = #{itemId}
 	</update>
@@ -518,5 +523,12 @@
 			#{item.id}
 		</foreach>
 	</delete>
+	
+	<update id="updateSubGoodsItem">
+		update goods_item,goods_item_2 set goods_item_2.update_time=now(),
+		goods_item_2.goods_id=goods_item.goods_id,goods_item_2.item_id=goods_item.item_id,
+		goods_item_2.item_code=goods_item.item_code,goods_item_2.encode=goods_item.encode
+		where goods_item_2.item_id=goods_item.item_id and goods_item.item_id  = #{itemId}
+	</update>
 	
 </mapper>

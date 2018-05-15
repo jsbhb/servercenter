@@ -228,5 +228,7 @@ public interface GoodsItemMapper {
 	void deleteListFiles(List<GoodsFile> file);
 	
 	void deleteAllFiles(GoodsEntity entity);
+	
+	void updateSubGoodsItem(String itemId);
 
 }

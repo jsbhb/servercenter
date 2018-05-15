@@ -528,6 +528,7 @@
 		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
 		  item_id varchar(50) NOT NULL COMMENT '供销内部商品ID',
 		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
+		  encode varchar(50) NOT NULL COMMENT '条形码',
   		  excise_tax DECIMAL(5,2) NULL COMMENT '消费税',
 		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
 		  status tinyint UNSIGNED DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
@@ -1005,8 +1006,8 @@
 	</insert>
 	
 	<insert id="insertCenterGoodsItem" parameterType="Object">
-		insert ignore into goods_item${centerId}(goods_id,item_id,item_code) 
-		select goods_id,item_id,item_code from goods_item where item_id in 
+		insert ignore into goods_item${centerId}(goods_id,item_id,item_code,encode) 
+		select goods_id,item_id,item_code,encode from goods_item where item_id in 
 		<foreach collection="itemList" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}

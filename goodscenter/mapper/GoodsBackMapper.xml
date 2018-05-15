@@ -40,6 +40,7 @@
 				<result column="item_id" property="itemId" />
 				<result column="item_code" property="itemCode"/>
 				<result column="sku" property="sku"/>
+				<result column="encode" property="encode"/>
 				<result column="weight" property="weight"/>
 				<result column="proxy_price" property="proxyPrice"/>
 				<result column="fxprice" property="fxPrice"/>
@@ -125,6 +126,7 @@
 				<result column="item_id" property="itemId" />
 				<result column="item_code" property="itemCode"/>
 				<result column="sku" property="sku"/>
+				<result column="encode" property="encode"/>
 				<result column="weight" property="weight"/>
 				<result column="proxy_price" property="proxyPrice"/>
 				<result column="fxprice" property="fxPrice"/>
@@ -149,6 +151,7 @@
 		<result column="item_id" property="itemId" />
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
+		<result column="encode" property="encode"/>
 		<result column="weight" property="weight"/>
 		<result column="excise_tax" property="exciseTax"/>
 		<result column="status" property="status"/>
@@ -234,7 +237,7 @@
 	
 	<insert id="insert" parameterType="Object">
 		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt) value
-		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,0,now(),now(),#{opt})
+		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,#{type},now(),now(),#{opt})
 	</insert>
 	
 	<update id="updateThirdStatus" parameterType="Object">
@@ -380,7 +383,7 @@
 	<update id="updateGoodsEntity" parameterType="Object">
 		update goods set goods_name = #{goodsName},
 		supplier_id = #{supplierId}, supplier_name = #{supplierName},
-		origin = #{origin}, update_time = now() 
+		origin = #{origin}, type = #{type}, update_time = now() 
 		where goods_id = #{goodsId}
 	</update>
 	
