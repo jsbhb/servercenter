@@ -279,7 +279,7 @@
 		insert into goods_item 
 		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion,encode)
 		value
-		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion},#{encode})
+		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion},#{encode,jdbcType=VARCHAR})
 	</insert>
 	
 	<insert id="insertPrice" parameterType="Object">
