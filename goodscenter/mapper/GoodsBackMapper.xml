@@ -157,6 +157,27 @@
 		<result column="conversion" property="conversion"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsInfoListForDownload" id="goodsInfoListForDownload">
+		<result column="goods_id" property="goodsId"/>
+		<result column="item_id" property="itemId" />
+		<result column="sku" property="sku"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="brand" property="brand"/>
+		<result column="origin" property="origin"/>
+		<result column="goods_status" property="goodsStatus"/>
+		<result column="item_status" property="itemStatus"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="fxqty" property="fxQty"/>
+		<result column="first_name" property="firstName"/>
+		<result column="second_name" property="secondName"/>
+		<result column="third_name" property="thirdName"/>
+		<result column="proxy_price" property="proxyPrice"/>
+		<result column="fxprice" property="fxPrice"/>
+		<result column="retail_price" property="retailPrice"/>
+		<result column="grade_type" property="gradeType"/>
+		<result column="proportion" property="proportion"/>
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -362,4 +383,22 @@
 		origin = #{origin}, update_time = now() 
 		where goods_id = #{goodsId}
 	</update>
+	
+	<select id="selectGoodsListForDownload" resultMap="goodsInfoListForDownload">
+		select g.goods_id,gi.item_id,gi.sku,g.goods_name,b.brand,g.origin,
+		gi.status goods_status,gi2.status item_status,g.supplier_name,gs.fxqty,
+		gfc.name first_name,gsc.name second_name,gtc.name third_name,
+		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion
+		from zm_goods.goods_item gi
+		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
+		left join zm_goods.goods g on g.goods_id = gi.goods_id
+		left join zm_goods.base b on g.base_id = b.id
+		left join zm_goods.goods_first_category gfc on b.first_category = gfc.first_id
+		left join zm_goods.goods_second_category gsc on b.first_category = gsc.first_id and b.second_category = gsc.second_id
+		left join zm_goods.goods_third_category gtc on b.second_category = gtc.second_id and b.third_category = gtc.third_id
+		left join zm_goods.goods_stock gs on gi.item_id = gs.item_id
+		left join zm_goods.goods_price gp on gi.item_id = gp.item_id
+		left join zm_goods.goods_rebate gr on gi.item_id = gr.item_id
+		where 1=1 and  gr.grade_type = '2'
+	</select>
 </mapper>

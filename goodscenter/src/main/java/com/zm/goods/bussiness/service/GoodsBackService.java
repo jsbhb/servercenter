@@ -14,6 +14,7 @@ import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
@@ -239,5 +240,7 @@ public interface GoodsBackService {
 	void updateGoodsInfo(GoodsInfoEntity entity);
 
 	ResultModel getGoodsRebate(String itemId);
+
+	List<GoodsInfoListForDownload> queryGoodsListForDownload();
 
 }

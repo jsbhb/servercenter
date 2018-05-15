@@ -33,6 +33,7 @@ import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
@@ -347,5 +348,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public ResultModel getGoodsRebate(String itemId) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		return new ResultModel(true, hashOperations.entries(Constants.GOODS_REBATE + itemId));
+	}
+	
+	@Override
+	public List<GoodsInfoListForDownload> queryGoodsListForDownload() {
+		return goodsBackMapper.selectGoodsListForDownload();
 	}
 }

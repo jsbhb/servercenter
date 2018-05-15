@@ -19,6 +19,7 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
@@ -378,5 +379,20 @@ public class GoodsBackController {
 			return goodsBackService.getGoodsRebate(itemId);
 		}
 		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryGoodsInfoListForDownload", method = RequestMethod.POST)
+	public ResultModel queryGoodsInfoListForDownload(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				List<GoodsInfoListForDownload> result = goodsBackService.queryGoodsListForDownload();
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
 	}
 }
