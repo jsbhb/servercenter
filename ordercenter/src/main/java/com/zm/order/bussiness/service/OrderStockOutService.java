@@ -14,6 +14,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.OrderMaintenanceBO;
 
 /**
  * ClassName: OrderBackService <br/>
@@ -74,5 +75,11 @@ public interface OrderStockOutService {
 	 * @since JDK 1.7
 	 */
 	List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId);
+
+	/**
+	 * @fun 维护没有系统对接的订单物流单号
+	 * @param list
+	 */
+	void maintenanceExpress(List<OrderMaintenanceBO> list);
 
 }

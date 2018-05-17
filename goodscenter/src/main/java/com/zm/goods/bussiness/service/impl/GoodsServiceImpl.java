@@ -295,7 +295,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		map.put("tax", taxMap);
 
-		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
+		if (supplierId != null) {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 

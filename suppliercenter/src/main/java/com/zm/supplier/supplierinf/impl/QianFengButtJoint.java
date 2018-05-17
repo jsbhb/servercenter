@@ -44,19 +44,20 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 		String unionPayMerId = "";
-		// Object obj = template.opsForValue().get(Constants.PAY +
-		// info.getCenterId() + Constants.UNION_PAY_MER_ID);
-		// if (obj != null) {
-		// unionPayMerId = obj.toString();
-		// }
+		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
+		if (obj != null) {
+			unionPayMerId = obj.toString();
+		}
 		String msg = ButtJointMessageUtils.getQianFengOrderMsg(info, user, CUSTOMER, unionPayMerId);// 报文
-		return (Set<SendOrderResult>) sendQianFengWarehouse(base_url, msg, "cnec_order", SendOrderResult.class, true);
+		return (Set<SendOrderResult>) sendQianFengWarehouse(base_url, msg, "cnec_order", SendOrderResult.class, true,
+				info.getOrderId());
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getQianFengCheckOrderMsg(orderIds, CUSTOMER);// 报文
-		return (Set<OrderStatus>) sendQianFengWarehouse(wms_url, msg, "GetOrderInfo", OrderStatus.class, false);
+		return (Set<OrderStatus>) sendQianFengWarehouse(wms_url, msg, "GetOrderInfo", OrderStatus.class, false,
+				orderIds.get(0));
 	}
 
 	@Override
@@ -70,28 +71,29 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 		return null;
 	}
 
-	private <T> Set<T> sendQianFengWarehouse(String url, String msg, String method, Class<T> clazz, boolean flag) {
-		Map<String, String> param = new HashMap<String, String>();
+	private <T> Set<T> sendQianFengWarehouse(String url, String msg, String method, Class<T> clazz, boolean flag,
+			String param) {
+		Map<String, String> paramMap = new HashMap<String, String>();
 		String sign = "";
 		if (flag) {
-			param.put("id", appKey);
-			param.put("format", "xml");
-			param.put("method", method);
-			param.put("msg", msg);
-			param.put("signmethod", "md5");
-			sign = SignUtil.qianFengSign(appSecret, param);// 签名
-			param.put("signature", sign);
+			paramMap.put("id", appKey);
+			paramMap.put("format", "xml");
+			paramMap.put("method", method);
+			paramMap.put("msg", msg);
+			paramMap.put("signmethod", "md5");
+			sign = SignUtil.qianFengSign(appSecret, paramMap);// 签名
+			paramMap.put("signature", sign);
 		} else {
-			param.put("userid", appKey);
-			param.put("msgtype", method);
-			param.put("msg", msg);
+			paramMap.put("userid", appKey);
+			paramMap.put("msgtype", method);
+			paramMap.put("msg", msg);
 			sign = SignUtil.qianFengSign(appKey, appSecret);// 签名
-			param.put("sign", sign);
+			paramMap.put("sign", sign);
 		}
 
 		logger.info("发送报文：" + msg + ",签名：" + sign);
-		String result = HttpClientUtil.post(url, param);
-		logger.info("返回：" + result);
+		String result = HttpClientUtil.post(url, paramMap);
+		logger.info("返回：" + param + "====" + result);
 
 		try {
 			return renderResult(result, "XML", clazz);

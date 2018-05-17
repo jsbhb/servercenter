@@ -109,6 +109,7 @@ public class Constants {
 	
 	//*********************包邮包税***************************
 	public static final String FREE_POST = "1";
+	public static final String ARRIVE_POST = "2";
 	public static final String FREE_TAX = "1";
 
 }

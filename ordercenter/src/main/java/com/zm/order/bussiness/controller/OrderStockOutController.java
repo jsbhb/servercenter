@@ -16,10 +16,12 @@ import com.zm.order.bussiness.service.OrderStockOutService;
 import com.zm.order.common.Pagination;
 import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
+import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.OrderMaintenanceBO;
 
 /**
  * ClassName: OrderBackController <br/>
@@ -116,7 +118,8 @@ public class OrderStockOutController {
 					return new ResultModel(false, "查询日期为空");
 				}
 
-				List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,endTime,gradeId);
+				List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,
+						endTime, gradeId);
 				return new ResultModel(true, result);
 			}
 
@@ -124,5 +127,16 @@ public class OrderStockOutController {
 		} catch (Exception e) {
 			return new ResultModel(false, e.getMessage());
 		}
+	}
+
+	@RequestMapping(value = "{version}/order/stockOut/maintenance/express", method = RequestMethod.POST)
+	public ResultModel maintenanceExpress(@PathVariable("version") Double version, @RequestBody List<OrderMaintenanceBO> list) {
+		
+		if (Constants.FIRST_VERSION.equals(version)) {
+			orderStockOutService.maintenanceExpress(list);
+			return new ResultModel(true,"success"); 
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 }

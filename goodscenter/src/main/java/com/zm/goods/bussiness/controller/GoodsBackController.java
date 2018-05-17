@@ -17,7 +17,9 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
+import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsRebateEntity;
@@ -414,5 +416,14 @@ public class GoodsBackController {
 		} catch (Exception e) {
 			return new ResultModel(false, e.getMessage());
 		}
+	}
+	
+	@RequestMapping(value = "{version}/goods/maintain/files", method = RequestMethod.POST)
+	public ResultModel maintainFiles(@PathVariable("version") Double version, @RequestBody List<GoodsFielsMaintainBO> list){
+		if (Constants.FIRST_VERSION.equals(version)){
+			goodsBackService.maintainFiles(list);
+			return new ResultModel(true, "");
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 }

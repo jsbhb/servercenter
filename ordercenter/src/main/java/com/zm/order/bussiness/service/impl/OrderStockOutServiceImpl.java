@@ -26,41 +26,43 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.ExpressMaintenanceBO;
+import com.zm.order.pojo.bo.OrderMaintenanceBO;
 
-/**  
- * ClassName: OrderBackServiceImpl <br/>  
- * Function: 后台订单操作服务类. <br/>   
- * date: Jan 1, 2018 2:49:06 PM <br/>  
- *  
- * @author hebin  
- * @version   
- * @since JDK 1.7  
+/**
+ * ClassName: OrderBackServiceImpl <br/>
+ * Function: 后台订单操作服务类. <br/>
+ * date: Jan 1, 2018 2:49:06 PM <br/>
+ * 
+ * @author hebin
+ * @version
+ * @since JDK 1.7
  */
 @Service
 public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Resource
 	OrderStockOutMapper orderBackMapper;
-	
+
 	@Resource
 	OrderMapper orderMapper;
-	
+
 	@Resource
 	UserFeignClient userFeignClient;
-	
+
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
-		Map<String,Object> param = new HashMap<String,Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("entity", entity);
 		entity.init();
-		if(entity.getShopId() != null){
+		if (entity.getShopId() != null) {
 			List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, entity.getShopId());
 			param.put("list", childrenIds);
 		}
 		Integer count = orderBackMapper.queryCountOrderInfo(param);
 		List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
 		entity.setTotalRows(count);
-		entity.webListConverter();//计算总页数
+		entity.webListConverter();// 计算总页数
 		Page<OrderInfo> page = new Page<OrderInfo>(entity.getCurrentPage(), entity.getNumPerPage(), count);
 		page.addAll(orderList);
 		page.setPages(entity.getTotalPages());
@@ -85,12 +87,39 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Override
 	public List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId) {
-		Map<String,Object> param = new HashMap<String,Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("startTime", startTime);
 		param.put("endTime", endTime);
-		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, Integer.parseInt(gradeId));
+		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION,
+				Integer.parseInt(gradeId));
 		param.put("list", childrenIds);
 		return orderBackMapper.selectOrdreListForDownload(param);
+	}
+
+	@Override
+	public void maintenanceExpress(List<OrderMaintenanceBO> list) {
+		if (list != null && list.size() > 0) {
+			ThirdOrderInfo thirdOrderInfo = null;
+			List<ExpressMaintenanceBO> tempList = null;
+			for (OrderMaintenanceBO model : list) {
+				thirdOrderInfo = new ThirdOrderInfo();
+				thirdOrderInfo.setOrderStatus(model.getStatus() == null ? 6 : model.getStatus());
+				thirdOrderInfo.setOrderId(model.getOrderId());
+				orderMapper.updateOrderStatusByThirdStatus(thirdOrderInfo);
+				tempList = model.getExpressList();
+				if (tempList != null && tempList.size() > 0) {
+					for (ExpressMaintenanceBO express : tempList) {
+						express.setOrderId(model.getOrderId());
+						express.setSupplierId(model.getSupplierId());
+						if (express.getId() == null) {
+							orderMapper.saveThirdOrderInfo(express);
+						} else {
+							orderMapper.updateThirdOrderInfoById(express);
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

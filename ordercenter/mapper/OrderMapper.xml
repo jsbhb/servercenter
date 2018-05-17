@@ -150,7 +150,7 @@
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from (select
 		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.create_type,
-		ob.guide_id,ob.user_id ,ob.combination_id
+		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag
 		from order_base ob where
 		is_del = 0
 		<if test="info.status != null">
@@ -665,7 +665,7 @@
 		resultMap="orderIdAndSupplierId">
 		
 		select t.id,t.order_id,t.third_order_id,t.supplier_id from third_order_info t left join 
-		order_base o on t.order_id = o.order_id where o.status in(3,4,5) and o.order_flag = 0
+		order_base o on t.order_id = o.order_id where o.status in(3,4,5,99)
 	</select>
 	
 	<resultMap type="com.zm.order.pojo.Order4Confirm" id="order4Confirm">
@@ -712,5 +712,19 @@
 	<select id="getGradeId" parameterType="Object" resultType="java.lang.Integer">
 		select grade_id from order_base where order_id = #{orderId}
 	</select>
-
+	
+	<!-- 手动维护运单 -->
+	<update id="updateThirdOrderInfoById" parameterType="Object">
+		update third_order_info set express_id = #{expressId}, express_name = #{expressName} 
+		where id = #{id}
+	</update>
+	
+	<insert id="saveThirdOrderInfo" parameterType="Object">
+		INSERT INTO
+		third_order_info
+		(order_id,supplier_id,express_id,express_name,create_time)
+		VALUES
+		(#{orderId},#{supplierId},#{expressId},#{expressName},now())
+	</insert>
+	<!-- 手动维护运单end -->
 </mapper>

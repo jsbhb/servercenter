@@ -59,4 +59,10 @@ public interface PayService {
 	 */
 	ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
 			throws Exception;
+
+	/**
+	 * @fun 测试验证微信https服务器
+	 * @return
+	 */
+	String testHttps();
 }

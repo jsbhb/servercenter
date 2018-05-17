@@ -300,12 +300,7 @@
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
 		gs.status as specsStatus,gi.excise_tax,gi.weight,
-		<if test="goodsType == 2 or goodsType == 1">
-			stock.lockedqty as qpqty,
-		</if>
-		<if test="goodsType == 0">
-			stock.fxqty as qpqty,
-		</if>
+		stock.fxqty as qpqty,
 		bgp.delivery_place
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id 
 		left join 
@@ -331,12 +326,7 @@
 		gs.item_code,gi.sku,gs.is_promotion,gi.excise_tax,gi.weight,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
-		<if test="goodsType == 2 or goodsType == 0">
-			stock.lockedqty as qpqty,
-		</if>
-		<if test="goodsType == 1">
-			stock.fxqty as qpqty,
-		</if>
+		stock.fxqty as qpqty,
 		bgp.delivery_place,gs.status as specsStatus 
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join 
@@ -835,12 +825,7 @@
 			close="" separator=";" >
 			update goods_stock
 			<set>
-				<if test="orderFlag == 0">
-					fxqty = fxqty - #{item.frozenqty},
-				</if>
-				<if test="orderFlag == 1 or orderFlag == 2">
-					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty},
-				</if>
+				fxqty = fxqty - #{item.frozenqty},
 				frozenqty = frozenqty + #{item.frozenqty}, update_time=now()
 			</set>
 			where item_id = #{item.itemId, jdbcType=VARCHAR}
@@ -852,12 +837,7 @@
 			close="" separator=";">
 			update goods_stock
 			<set>
-				<if test="orderFlag == 0">
-					fxqty = ifnull(fxqty,0) + #{item.quantity},
-				</if>
-				<if test="orderFlag == 1 or orderFlag == 2">
-					lockedqty = ifnull(lockedqty,0) + #{item.quantity},
-				</if>
+				fxqty = ifnull(fxqty,0) + #{item.quantity},
 				frozenqty = ifnull(frozenqty,0) - #{item.quantity}, update_time=now()
 			</set>
 			where item_id = #{item.itemId}

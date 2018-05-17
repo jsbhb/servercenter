@@ -31,6 +31,7 @@ import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
@@ -363,5 +364,32 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void maintainStockByItemId(List<GoodsStockEntity> stocks) {
 		goodsItemMapper.updateGoodsStockByItemId(stocks);
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public void maintainFiles(List<GoodsFielsMaintainBO> list) {
+		if(list != null && list.size() > 0){
+			GoodsEntity entity = null;
+			GoodsFile goodsFile = null;
+			List<GoodsFile> fileList = null;
+			for(GoodsFielsMaintainBO model : list){
+				entity = new GoodsEntity();
+				entity.setGoodsId(model.getGoodsId());
+				entity.setDetailPath(model.getGoodsDetailPath());
+				goodsBackMapper.updateDetailPath(entity);
+				if(model.getPicPathList() != null && model.getPicPathList().size() > 0){
+					fileList = new ArrayList<GoodsFile>();
+					for(String str : model.getPicPathList()){
+						goodsFile = new GoodsFile();
+						goodsFile.setGoodsId(model.getGoodsId());
+						goodsFile.setPath(str);
+						goodsFile.setOpt("batch");
+						fileList.add(goodsFile);
+					}
+					goodsItemMapper.insertFiles(fileList);
+				}
+			}
+		}
 	}
 }

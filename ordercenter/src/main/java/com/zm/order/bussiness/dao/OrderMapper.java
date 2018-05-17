@@ -19,6 +19,7 @@ import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 
 /**  
  * ClassName: OrderMapper <br/>  
@@ -151,5 +152,9 @@ public interface OrderMapper {
 	List<Integer> listOrderStatus(String orderId);
 
 	Integer getGradeId(String orderId);
+	
+	void updateThirdOrderInfoById(ExpressMaintenanceBO model);
+	
+	void saveThirdOrderInfo(ExpressMaintenanceBO model);
 	
 }

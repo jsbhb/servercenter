@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.github.wxpay.sdk.WXPay;
 import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
@@ -50,7 +52,7 @@ import com.zm.pay.utils.wx.WxPayUtils;
  * @since JDK 1.7
  */
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class PayServiceImpl implements PayService {
 
 	@Resource
@@ -404,5 +406,26 @@ public class PayServiceImpl implements PayService {
 		String str = UnionPayUtil.unionPay(config, model, type);
 		result.put("htmlStr", str);
 		return result;
+	}
+
+	@Override
+	public String testHttps() {
+		WeixinPayConfig config = payMapper.getWeixinPayConfig(2);
+		String mchId = config.getMchID();
+		String nonceStr = System.currentTimeMillis() + "";
+		String signStr = "mch_id=" + mchId + "&nonce_str=" + nonceStr + "&key=" + config.getKey();
+		String sign = DigestUtils.md5Hex(signStr);
+		WXPay wxpay = new WXPay(config);
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("mch_id", mchId);
+		data.put("nonce_str", nonceStr);
+		data.put("sign", sign);
+		try {
+			return wxpay.requestWithoutCert("https://apitest.mch.weixin.qq.com/sandboxnew/pay/getsignkey", data, 5000,
+					5000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

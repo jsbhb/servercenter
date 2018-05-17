@@ -49,14 +49,14 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		}
 		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, CUSTOMER, unionPayMerId);// 报文
 		String url = base_url.replace("{action}", "order.create");
-		return (Set<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class);
+		return (Set<SendOrderResult>) sendTianTianWarehouse(url, msg, SendOrderResult.class, info.getOrderId());
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, CUSTOMER);// 报文
 		String url = base_url.replace("{action}", "order.query");
-		return (Set<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class);
+		return (Set<OrderStatus>) sendTianTianWarehouse(url, msg, OrderStatus.class, orderIds.get(0));
 	}
 
 	@Override
@@ -70,26 +70,26 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		return null;
 	}
 
-	private <T> Set<T> sendTianTianWarehouse(String url, String msg, Class<T> clazz) {
+	private <T> Set<T> sendTianTianWarehouse(String url, String msg, Class<T> clazz, String param) {
 		String date = DateUtil.getDateString(new Date(), "yyyy-MM-dd HH:mm:ss");
 		String sign = SignUtil.TianTianSign(msg, appSecret, date);// 签名
-		Map<String, String> param = new HashMap<String, String>();
-		param.put("datetime", date);
-		param.put("msgtype", "xml");
-		param.put("customer", CUSTOMER);
-		param.put("sign", sign);
-		param.put("sign_method", "md5");
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("datetime", date);
+		paramMap.put("msgtype", "xml");
+		paramMap.put("customer", CUSTOMER);
+		paramMap.put("sign", sign);
+		paramMap.put("sign_method", "md5");
 		try {
-			param.put("data", URLEncoder.encode(msg, "utf-8"));
+			paramMap.put("data", URLEncoder.encode(msg, "utf-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		param.put("app_key", appKey);
-		param.put("secretKey", appSecret);
+		paramMap.put("app_key", appKey);
+		paramMap.put("secretKey", appSecret);
 
 		logger.info("发送报文：" + msg + ",签名：" + sign);
-		String result = HttpClientUtil.post(url, param);
-		logger.info("返回：" + result);
+		String result = HttpClientUtil.post(url, paramMap);
+		logger.info("返回：" + param + "====" + result);
 
 		try {
 			return renderResult(result, "XML", clazz);

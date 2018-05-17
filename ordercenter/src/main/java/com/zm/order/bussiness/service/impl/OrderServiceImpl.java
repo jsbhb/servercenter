@@ -178,13 +178,14 @@ public class OrderServiceImpl implements OrderService {
 		Double unDiscountAmount = 0.0;
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
-		//获取包邮包税
+		// 获取包邮包税
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> tempMap = hashOperations.entries(Constants.POST_TAX + info.getSupplierId());
 		boolean freePost = false;
 		boolean freeTax = false;
 		if (tempMap != null) {
-			freePost = Constants.FREE_POST.equals(tempMap.get("post")) ? true : false;
+			freePost = Constants.FREE_POST.equals(tempMap.get("post"))
+					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
 			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
 		}
 		if (!freePost) {
@@ -672,8 +673,8 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderGoods> goodsList = null;
 		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
 		OrderGoods temp = null;
-//		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
-//		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		// list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+		// list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		list.addAll(orderMapper.listOrderForSendToWarehouse());
 		if (list.size() > 0) {
 			for (OrderInfo info : list) {// 找出所有的itemId

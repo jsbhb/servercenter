@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsRebateEntity;
@@ -245,5 +246,11 @@ public interface GoodsBackService {
 	List<GoodsInfoListForDownload> queryGoodsListForDownload();
 	
 	void maintainStockByItemId(List<GoodsStockEntity> stocks);
+
+	/**
+	 * @fun 批量维护商品商详和商品主图
+	 * @param list
+	 */
+	void maintainFiles(List<GoodsFielsMaintainBO> list);
 
 }

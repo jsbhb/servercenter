@@ -135,8 +135,11 @@ public class ShareProfitComponent {
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
 		Map<String, String> result = hashOperations.entries(Constants.REBATE_DETAIL + orderId);
 		for (Map.Entry<String, String> entry : result.entrySet()) {
-			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
-					CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
+			if (!"orderId".equals(entry.getKey())) {
+				hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
+						CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
+				LogUtil.writeLog("退单返回返佣====GradeId:" + entry.getKey() + ",返佣=" + entry.getValue());
+			}
 		}
 		template.delete(Constants.REBATE_DETAIL + orderId);
 		financeFeignClient.updateRebateDetail(Constants.FIRST_VERSION, orderId, REBATE_DETAIL_CANCEL);

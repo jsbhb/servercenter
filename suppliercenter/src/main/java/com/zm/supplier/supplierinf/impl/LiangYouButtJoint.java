@@ -52,7 +52,7 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		String url = NEED_APP_ID_URL.replace("{action}", "addOutOrder").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("paramjson", msg);
-		return sendLiangYouWarehouse(url, params, SendOrderResult.class, false);
+		return sendLiangYouWarehouse(url, params, SendOrderResult.class, false, info.getOrderId());
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		String url = NEED_APP_ID_URL.replace("{action}", "getOrderStatus").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("order_sn", msg);
-		Set<OrderStatus> set = sendLiangYouWarehouse(url, params, OrderStatus.class, true);
-		if(set != null){
+		Set<OrderStatus> set = sendLiangYouWarehouse(url, params, OrderStatus.class, true, orderIds.get(0));
+		if (set != null) {
 			for (OrderStatus o : set) {
 				o.setThirdOrderId(orderIds.get(0));
 			}
@@ -76,8 +76,8 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		String url = NEED_ACCESS_TOKEN_URL.replace("{action}", "checkStock").replace("{token}", token);
 		String msg = ButtJointMessageUtils.getLiangYouStock(list);
 		url += "&sku=" + msg;
-		Set<CheckStockModel> set = sendLiangYouWarehouse(url, CheckStockModel.class);
-		if(set == null || set.size() == 0){
+		Set<CheckStockModel> set = sendLiangYouWarehouse(url, CheckStockModel.class, list.get(0).getSku());
+		if (set == null || set.size() == 0) {
 			Set<CheckStockModel> result = new HashSet<CheckStockModel>();
 			CheckStockModel model = new CheckStockModel();
 			model.setSku(list.get(0).getSku());
@@ -85,7 +85,7 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 			result.add(model);
 			return result;
 		}
-		
+
 		return set;
 	}
 
@@ -115,9 +115,9 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		return null;
 	}
 
-	private <T> Set<T> sendLiangYouWarehouse(String url, Class<T> clazz) {
+	private <T> Set<T> sendLiangYouWarehouse(String url, Class<T> clazz, String param) {
 		String result = HttpClientUtil.get(url, "");
-		logger.info("返回：" + result);
+		logger.info("返回：" + param + "====" + result);
 		try {
 			return renderResult(result, "JSON", clazz);
 		} catch (Exception e) {
@@ -128,11 +128,12 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> Set<T> sendLiangYouWarehouse(String url, Map<String, String> params, Class<T> clazz, boolean flag) {
+	private <T> Set<T> sendLiangYouWarehouse(String url, Map<String, String> params, Class<T> clazz, boolean flag,
+			String param) {
 
 		logger.info("发送报文：" + params);
 		String result = HttpClientUtil.post(url, params);
-		logger.info("返回：" + result);
+		logger.info("返回：" + param + "=====" + result);
 
 		try {
 			Map<String, String> map = JSONUtil.parse(result, Map.class);
@@ -158,7 +159,7 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 					return renderResult(result, "JSON", clazz);
 				}
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -200,18 +201,17 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		// info.setOrderGoodsList(list);
 		// System.out.println(j.sendOrder(info, user));
 		// System.out.println(j.getAccessToken("http://www.cnbuyers.cn/index.php?app=webService"));
-		 OrderBussinessModel model = new OrderBussinessModel();
-		 model.setSku("310517625460000133");
-		 OrderBussinessModel model1 = new OrderBussinessModel();
-		 model1.setSku("310517625460001222");
-		 List<OrderBussinessModel> list = new
-		 ArrayList<OrderBussinessModel>();
-//		 list.add(model1);
-		 list.add(model);
-		 System.out.println(j.checkStock(list));
-//		List<String> orderIds = new ArrayList<String>();
-//		orderIds.add("XHFX1802267179");
-//		System.out.println(j.checkOrderStatus(orderIds));
+		OrderBussinessModel model = new OrderBussinessModel();
+		model.setSku("310517625460000133");
+		OrderBussinessModel model1 = new OrderBussinessModel();
+		model1.setSku("310517625460001222");
+		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
+		// list.add(model1);
+		list.add(model);
+		System.out.println(j.checkStock(list));
+		// List<String> orderIds = new ArrayList<String>();
+		// orderIds.add("XHFX1802267179");
+		// System.out.println(j.checkOrderStatus(orderIds));
 	}
 
 }
