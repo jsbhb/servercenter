@@ -21,6 +21,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -388,6 +389,25 @@ public class GoodsBackController {
 			if (Constants.FIRST_VERSION.equals(version)) {
 				List<GoodsInfoListForDownload> result = goodsBackService.queryGoodsListForDownload();
 				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/item/maintainStockByItemId", method = RequestMethod.POST)
+	public ResultModel maintainStockByItemId(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody List<GoodsStockEntity> stocks) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				if (stocks.size() <= 0) {
+					return new ResultModel(false, "参数值为空");
+				}
+				goodsBackService.maintainStockByItemId(stocks);
+				return new ResultModel(true, "");
 			}
 
 			return new ResultModel(false, "版本错误");

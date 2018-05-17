@@ -15,6 +15,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.GoodsStockEntity;
 
 /**
  * ClassName: BrandMapper <br/>
@@ -230,5 +231,7 @@ public interface GoodsItemMapper {
 	void deleteAllFiles(GoodsEntity entity);
 	
 	void updateSubGoodsItem(String itemId);
+	
+	void updateGoodsStockByItemId(List<GoodsStockEntity> stocks);
 
 }

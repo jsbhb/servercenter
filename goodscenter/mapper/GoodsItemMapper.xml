@@ -531,4 +531,15 @@
 		where goods_item_2.item_id=goods_item.item_id and goods_item.item_id  = #{itemId}
 	</update>
 	
+	<update id="updateGoodsStockByItemId" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			UPDATE goods_stock
+	        SET
+		        qpqty = qpqty + #{item.fxQty},
+		        fxqty = fxqty + #{item.fxQty}
+	        WHERE
+	        	item_id=#{item.itemId}
+		</foreach>
+	</update>
+	
 </mapper>

@@ -387,7 +387,7 @@
 		where goods_id = #{goodsId}
 	</update>
 	
-	<select id="selectGoodsListForDownload" resultMap="goodsInfoListForDownload">
+	<select id="selectGoodsListForDownload" parameterType="Object" resultMap="goodsInfoListForDownload">
 		select g.goods_id,gi.item_id,gi.sku,g.goods_name,b.brand,g.origin,
 		gi.status goods_status,gi2.status item_status,g.supplier_name,gs.fxqty,
 		gfc.name first_name,gsc.name second_name,gtc.name third_name,
