@@ -7,6 +7,7 @@ public class GoodsListDownloadParam {
 	private Integer gradeType;
 	private Integer supplierId;
 	private List<String> itemIdList;
+	private String proportion;
 	
 	
 	public Integer getGradeType() {
@@ -27,4 +28,11 @@ public class GoodsListDownloadParam {
 	public void setItemIdList(List<String> itemIdList) {
 		this.itemIdList = itemIdList;
 	}
+	public String getProportion() {
+		return proportion;
+	}
+	public void setProportion(String proportion) {
+		this.proportion = proportion;
+	}
+	
 }

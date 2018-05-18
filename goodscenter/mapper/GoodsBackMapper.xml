@@ -404,7 +404,10 @@
 		left join zm_goods.goods_price gp on gi.item_id = gp.item_id
 		left join zm_goods.goods_rebate gr on gi.item_id = gr.item_id
 		left join zm_user.grade_type gt on gr.grade_type = gt.id
-		where 1=1 and gr.proportion > 0
+		where 1=1 
+		<if test="proportion!=null">
+			and gr.proportion > 0
+		</if>
 		<if test="gradeType!=null and gradeType != -1">
 			and gr.grade_type = #{gradeType}
 		</if>
