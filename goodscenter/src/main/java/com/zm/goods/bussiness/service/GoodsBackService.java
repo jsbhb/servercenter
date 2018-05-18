@@ -16,6 +16,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.ResultModel;
@@ -243,7 +244,7 @@ public interface GoodsBackService {
 
 	ResultModel getGoodsRebate(String itemId);
 
-	List<GoodsInfoListForDownload> queryGoodsListForDownload();
+	List<GoodsInfoListForDownload> queryGoodsListForDownload(GoodsListDownloadParam param);
 	
 	void maintainStockByItemId(List<GoodsStockEntity> stocks);
 

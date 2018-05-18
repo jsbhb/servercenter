@@ -20,6 +20,7 @@ public class GoodsInfoListForDownload {
 	private Double fxPrice;
 	private Double retailPrice;
 	private Integer gradeType;
+	private String gradeTypeName;
 	private Double proportion;
 	
 	public String getGoodsId() {
@@ -130,5 +131,11 @@ public class GoodsInfoListForDownload {
 	}
 	public void setProportion(Double proportion) {
 		this.proportion = proportion;
+	}
+	public String getGradeTypeName() {
+		return gradeTypeName;
+	}
+	public void setGradeTypeName(String gradeTypeName) {
+		this.gradeTypeName = gradeTypeName;
 	}
 }
