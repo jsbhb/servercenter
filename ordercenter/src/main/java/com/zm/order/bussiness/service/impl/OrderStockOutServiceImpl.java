@@ -86,13 +86,14 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	}
 
 	@Override
-	public List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId) {
+	public List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId, String supplierId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("startTime", startTime);
 		param.put("endTime", endTime);
 		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION,
 				Integer.parseInt(gradeId));
 		param.put("list", childrenIds);
+		param.put("supplierId", supplierId);
 		return orderBackMapper.selectOrdreListForDownload(param);
 	}
 

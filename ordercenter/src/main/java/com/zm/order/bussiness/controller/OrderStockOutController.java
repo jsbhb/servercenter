@@ -114,12 +114,13 @@ public class OrderStockOutController {
 				String startTime = request.getParameter("startTime");
 				String endTime = request.getParameter("endTime");
 				String gradeId = request.getParameter("gradeId");
+				String supplierId = request.getParameter("supplierId");
 				if (startTime == null || endTime == null) {
 					return new ResultModel(false, "查询日期为空");
 				}
 
 				List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,
-						endTime, gradeId);
+						endTime, gradeId, supplierId);
 				return new ResultModel(true, result);
 			}
 

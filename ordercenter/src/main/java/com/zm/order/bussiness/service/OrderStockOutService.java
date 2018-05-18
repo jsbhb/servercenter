@@ -74,7 +74,7 @@ public interface OrderStockOutService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId);
+	List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId, String supplierId);
 
 	/**
 	 * @fun 维护没有系统对接的订单物流单号

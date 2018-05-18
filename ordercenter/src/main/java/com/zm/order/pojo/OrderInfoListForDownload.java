@@ -33,6 +33,11 @@ public class OrderInfoListForDownload {
 	private String createTime;
 	private List<ThirdOrderInfo> orderExpressList;
 	private Integer orderSource;
+	private String idnum;
+	private String orderName;
+	private String packing;
+	private Double actualPrice;
+	private String itemCode;
 	
 	public String getOrderId() {
 		return orderId;
@@ -207,6 +212,36 @@ public class OrderInfoListForDownload {
 	}
 	public void setOrderSource(Integer orderSource) {
 		this.orderSource = orderSource;
+	}
+	public String getIdnum() {
+		return idnum;
+	}
+	public void setIdnum(String idnum) {
+		this.idnum = idnum;
+	}
+	public String getOrderName() {
+		return orderName;
+	}
+	public void setOrderName(String orderName) {
+		this.orderName = orderName;
+	}
+	public String getPacking() {
+		return packing;
+	}
+	public void setPacking(String packing) {
+		this.packing = packing;
+	}
+	public Double getActualPrice() {
+		return actualPrice;
+	}
+	public void setActualPrice(Double actualPrice) {
+		this.actualPrice = actualPrice;
+	}
+	public String getItemCode() {
+		return itemCode;
+	}
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
 	}
 
 }

@@ -100,6 +100,11 @@
 		<result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
+		<result column="idnum" property="idnum" jdbcType="VARCHAR" />
+		<result column="order_name" property="orderName" jdbcType="VARCHAR" />
+		<result column="packing" property="packing" jdbcType="VARCHAR" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
 			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
@@ -206,8 +211,10 @@
 		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
 		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address,od.create_time,
-		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id,ob.order_source
+		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id,ob.order_source,
+		u.idnum,u.name order_name,og.item_quantity*i.conversion packing,og.actual_price,og.item_code
 		from zm_order.order_base ob
+		left join zm_user.user_detail u on ob.user_id=u.user_id 
 		left join zm_user.grade ug on ob.grade_id = ug.id
 		left join zm_supplier.supplier_base sb on ob.supplier_id = sb.id
 		left join zm_order.order_goods og on ob.order_id = og.order_id
@@ -219,7 +226,11 @@
 		left join zm_goods.goods_third_category gtc on b.second_category = gtc.second_id and b.third_category = gtc.third_id
 		left join zm_order.order_detail od on ob.order_id = od.order_id
 		left join zm_order.third_order_info toi on ob.order_id = toi.order_id and ob.supplier_id = toi.supplier_id
+		left join zm_goods.goods_item i on og.item_id=i.item_id 
 		where 1=1 
+		<if test="supplierId != null and supplierId != -1 ">
+			and ob.supplier_id = #{supplierId}
+		</if>
 		<if test="list != null and list.size > 0 ">
 			and ob.grade_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
