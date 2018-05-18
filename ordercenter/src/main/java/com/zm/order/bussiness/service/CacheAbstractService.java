@@ -1,5 +1,7 @@
 package com.zm.order.bussiness.service;
 
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +26,8 @@ public abstract class CacheAbstractService {
 	protected static final String MONTH = "month";//每月
 	protected static final String ORDER = "order";//订单
 	protected static final String FINANCE = "finance";//财务
+	
+	protected static final int LAST_WEEK = 7;
 	
 	@Resource
 	private RedisTemplate<String, String> template;
@@ -58,6 +62,36 @@ public abstract class CacheAbstractService {
 				put(Constants.SALES_STATISTICS_MONTH + grade.getId(), time, "0");
 				put(Constants.ORDER_STATISTICS_MONTH + grade.getId(), time, "0");
 		}
+	}
+	
+	/**
+	 * @fun 新增等级时初始化缓存
+	 * @param gradeId
+	 */
+	public void initNewGradeCache(Integer gradeId){
+		//初始化月统计
+		String earliest = "201801";
+		int monthCount = DateUtils.compareWithNow(earliest);
+		for (int i = 0; i <= monthCount; i++) {
+			String time = DateUtils.getTime(earliest, "yyyyMM", Calendar.MONTH, i);
+			put(Constants.SALES_STATISTICS_MONTH + gradeId, time, "0");
+			put(Constants.ORDER_STATISTICS_MONTH + gradeId, time, "0");
+		}
+		//初始化上周统计
+		for(int i=0;i<LAST_WEEK;i++){
+			addList(Constants.ORDER_STATISTICS_WEEK + gradeId, "0", LAST_WEEK);
+			addList(Constants.SALES_STATISTICS_WEEK + gradeId, "0", LAST_WEEK);
+		}
+		//初始化当天订单
+		Map<String, String> temp = new HashMap<String, String>();
+		temp.put("produce", "0");
+		temp.put("deliver", "0");
+		temp.put("cancel", "0");
+		putAll(Constants.ORDER_STATISTICS_DAY + gradeId, temp);
+		//初始化当天销售额
+		temp.clear();
+		temp.put("sales", "0");
+		putAll(Constants.SALES_STATISTICS_DAY + gradeId, temp);
 	}
 	
 	/**

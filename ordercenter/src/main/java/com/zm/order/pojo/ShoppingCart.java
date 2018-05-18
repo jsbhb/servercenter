@@ -34,6 +34,26 @@ public class ShoppingCart {
 	private GoodsSpecs goodsSpecs;
 
 	private String picPath;
+	
+	private Integer freePost;
+	
+	private Integer freeTax;
+
+	public Integer getFreePost() {
+		return freePost;
+	}
+
+	public void setFreePost(Integer freePost) {
+		this.freePost = freePost;
+	}
+
+	public Integer getFreeTax() {
+		return freeTax;
+	}
+
+	public void setFreeTax(Integer freeTax) {
+		this.freeTax = freeTax;
+	}
 
 	public boolean check() {
 		return userId != null && itemId != null && quantity != null && gradeId != null && goodsName != null

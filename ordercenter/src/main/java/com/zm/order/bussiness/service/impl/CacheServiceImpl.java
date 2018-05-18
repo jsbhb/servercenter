@@ -31,8 +31,6 @@ public class CacheServiceImpl extends CacheAbstractService {
 	@Resource
 	StatisticsMapper statisticsMapper;
 
-	private static final int LAST_WEEK = 7;
-
 	@Override
 	public void initCache() {
 		// 清空缓存

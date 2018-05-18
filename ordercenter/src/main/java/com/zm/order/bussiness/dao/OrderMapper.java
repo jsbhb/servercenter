@@ -140,8 +140,16 @@ public interface OrderMapper {
 	 */
 	@Deprecated
 	List<OrderInfo> listOrderForSendToOtherWarehouse();
-	
-	List<OrderInfo>listOrderForSendToWarehouse();
+	/**
+	 * @fun 获取跨境推送订单
+	 * @return
+	 */
+	List<OrderInfo> listOrderForSendToWarehouse();
+	/**
+	 * @fun 获取一般贸易推送订单
+	 * @return
+	 */
+	List<OrderInfo> listOrderForSendToWarehouseGeneralTrade();
 
 	void updateOrderRefunds(String orderId);
 

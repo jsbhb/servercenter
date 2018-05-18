@@ -38,6 +38,7 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.feignclient.model.SendOrderResult;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
@@ -448,12 +449,24 @@ public class OrderServiceImpl implements OrderService {
 				}
 			}
 			GoodsFile file = null;
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
 			for (ShoppingCart model : list) {
 				for (Map<String, Object> map : fileList) {
 					file = JSONUtil.parse(JSONUtil.toJson(map), GoodsFile.class);
 					if (file.getGoodsId().equals(model.getGoodsSpecs().getGoodsId())) {
 						model.setPicPath(file.getPath());
 						break;
+					}
+				}
+				Map<String, String> map = hashOperations.entries(Constants.POST_TAX + model.getSupplierId());
+				if (map != null) {
+					String post = map.get("post");
+					String tax = map.get("tax");
+					try {
+						model.setFreePost(Integer.valueOf(post == null ? "0" : post));
+						model.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
+					} catch (Exception e) {
+						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
 					}
 				}
 			}
@@ -676,6 +689,7 @@ public class OrderServiceImpl implements OrderService {
 		// list.addAll(orderMapper.listOrderForSendToTTWarehouse());
 		// list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		list.addAll(orderMapper.listOrderForSendToWarehouse());
+		list.addAll(orderMapper.listOrderForSendToWarehouseGeneralTrade());
 		if (list.size() > 0) {
 			for (OrderInfo info : list) {// 找出所有的itemId
 				for (OrderGoods goods : info.getOrderGoodsList()) {
