@@ -22,6 +22,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.ResultModel;
@@ -385,11 +386,12 @@ public class GoodsBackController {
 	}
 
 	@RequestMapping(value = "{version}/goods/item/queryGoodsInfoListForDownload", method = RequestMethod.POST)
-	public ResultModel queryGoodsInfoListForDownload(HttpServletRequest request, @PathVariable("version") Double version) {
+	public ResultModel queryGoodsInfoListForDownload(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsListDownloadParam param) {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
-				List<GoodsInfoListForDownload> result = goodsBackService.queryGoodsListForDownload();
+				List<GoodsInfoListForDownload> result = goodsBackService.queryGoodsListForDownload(param);
 				return new ResultModel(true, result);
 			}
 

@@ -16,6 +16,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -299,5 +300,5 @@ public interface GoodsBackMapper {
 	 */
 	void updateGoodsEntity(GoodsEntity entity);
 
-	List<GoodsInfoListForDownload> selectGoodsListForDownload();
+	List<GoodsInfoListForDownload> selectGoodsListForDownload(GoodsListDownloadParam param);
 }

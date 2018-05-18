@@ -36,6 +36,7 @@ import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
@@ -356,8 +357,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 	
 	@Override
-	public List<GoodsInfoListForDownload> queryGoodsListForDownload() {
-		return goodsBackMapper.selectGoodsListForDownload();
+	public List<GoodsInfoListForDownload> queryGoodsListForDownload(GoodsListDownloadParam param) {
+		return goodsBackMapper.selectGoodsListForDownload(param);
 	}
 	
 	@Override
