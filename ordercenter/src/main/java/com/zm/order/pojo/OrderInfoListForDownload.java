@@ -32,6 +32,7 @@ public class OrderInfoListForDownload {
 	private String receiveAddress;
 	private String createTime;
 	private List<ThirdOrderInfo> orderExpressList;
+	private Integer orderSource;
 	
 	public String getOrderId() {
 		return orderId;
@@ -200,6 +201,12 @@ public class OrderInfoListForDownload {
 	}
 	public void setOrderExpressList(List<ThirdOrderInfo> orderExpressList) {
 		this.orderExpressList = orderExpressList;
+	}
+	public Integer getOrderSource() {
+		return orderSource;
+	}
+	public void setOrderSource(Integer orderSource) {
+		this.orderSource = orderSource;
 	}
 
 }

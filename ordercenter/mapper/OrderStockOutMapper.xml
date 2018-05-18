@@ -99,6 +99,7 @@
 		<result column="receive_area" property="receiveArea" jdbcType="VARCHAR" />
 		<result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
 			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
@@ -205,7 +206,7 @@
 		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
 		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address,od.create_time,
-		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id
+		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id,ob.order_source
 		from zm_order.order_base ob
 		left join zm_user.grade ug on ob.grade_id = ug.id
 		left join zm_supplier.supplier_base sb on ob.supplier_id = sb.id
