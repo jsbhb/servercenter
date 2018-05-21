@@ -466,6 +466,7 @@ public class GoodsServiceImpl implements GoodsService {
 				searchModel.setSecondCategory(item.getSecondCategory());
 				searchModel.setGoodsName(item.getCustomGoodsName());
 				searchModel.setPopular(item.getPopular());
+				searchModel.setType(item.getType());
 				param.put("goodsId", item.getGoodsId());
 				List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 				if (specsList != null && specsList.size() > 0) {

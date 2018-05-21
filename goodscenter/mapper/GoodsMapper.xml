@@ -721,7 +721,7 @@
 	
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
-		select gi.id, gi.goods_id, gi.create_time, g.goods_name as customGoodsName ,gi.is_popular,
+		select gi.id, gi.goods_id, gi.create_time, g.goods_name as customGoodsName ,gi.is_popular, g.type,
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 

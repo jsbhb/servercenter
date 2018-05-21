@@ -86,6 +86,7 @@ public class GoodsLucene extends AbstractLucene {
 
 			doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
 			doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
+			doc.add(new StringField("type", model.getType() == null ? "0" : model.getType() + "", Store.NO));
 			doc.add(new StringField("upShelves", "1", Store.NO));
 			doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
 			doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
@@ -208,7 +209,8 @@ public class GoodsLucene extends AbstractLucene {
 			}
 			if (o != null) {
 				if ("brand".equals(field.getName()) || "origin".equals(field.getName())
-						|| "priceMin".equals(field.getName()) || "priceMax".equals(field.getName())) {
+						|| "priceMin".equals(field.getName()) || "priceMax".equals(field.getName())
+						|| "type".equals(field.getName())) {
 					accuratePara.put(field.getName(), o + "");
 				} else if (!"centerId".equals(field.getName())) {
 					keyWordsList.add(o + "");
@@ -298,7 +300,7 @@ public class GoodsLucene extends AbstractLucene {
 				booleanFilter.add(filter, Occur.MUST);
 			}
 			for (Map.Entry<String, String> entry : accuratePara.entrySet()) {
-				if ("origin".equals(entry.getKey()) || "brand".equals(entry.getKey())) {
+				if (!"priceMin".equals(entry.getKey()) && !"priceMax".equals(entry.getKey())) {
 					query = new BooleanQuery();
 					String[] strArr = entry.getValue().split(",");
 					for (String s : strArr) {

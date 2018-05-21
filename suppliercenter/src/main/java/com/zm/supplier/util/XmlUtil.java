@@ -140,7 +140,7 @@ public class XmlUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String xml1 = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><result>success</result><code>S200</code><message>订单查询成功</message><orderProcess><process><orderNo>EO1512550902068541</orderNo><orderStatus>订单关闭</orderStatus><orderFailDesc>支付时间不能为空！</orderFailDesc><logisticsCode>ZTO</logisticsCode><recTime>2017-12-06 17:01:42</recTime><hgPros><hgPro><hgStatus>O_OL_04</hgStatus><desc>推送失败</desc><proTime>2017-12-06 17:01:56</proTime></hgPro><hgPro><hgStatus>O_OL_015</hgStatus><desc>订单关闭</desc><proTime>2017-12-06 17:17:14</proTime></hgPro></hgPros></process></orderProcess><totalCount>1</totalCount></response>";
+		String xml1 = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><response><result>success</result><code>S200</code><message>订单查询成功</message><orderProcess><process><orderNo>EO1526638090849359</orderNo><orderStatus>订单审核</orderStatus><orderFailDesc></orderFailDesc><waybillNo>632725249350</waybillNo><logisticsCode>ZTO</logisticsCode><recTime>2018-05-18 18:08:10</recTime><hgPros><hgPro><hgStatus>O_OL_002</hgStatus><desc>订单审核</desc><proTime>2018-05-18 18:08:24</proTime></hgPro></hgPros></process></orderProcess><totalCount>1</totalCount></response>";
 		System.out.println(parseXml(xml1, OrderStatus.class));
 	}
 }
