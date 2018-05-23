@@ -428,4 +428,12 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+	
+	@RequestMapping(value = "{version}/goods/import/goods", method = RequestMethod.POST)
+	public ResultModel importGoods(@PathVariable("version") Double version, List<GoodsInfoEntity> list){
+		if(Constants.FIRST_VERSION.equals(version)){
+			return goodsBackService.importGoods(list);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
 }

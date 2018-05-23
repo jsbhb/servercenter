@@ -422,4 +422,8 @@
 		</if>
 		order by gi.item_id
 	</select>
+	
+	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">
+		select goods_id from item_id where item_code = #{itemCode}
+	</select>
 </mapper>

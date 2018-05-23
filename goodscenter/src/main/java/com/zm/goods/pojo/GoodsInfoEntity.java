@@ -7,8 +7,7 @@
  */
 package com.zm.goods.pojo;
 
-import com.zm.goods.pojo.GoodsBaseEntity;
-import com.zm.goods.pojo.GoodsEntity;
+import java.util.List;
 
 /**
  * ClassName: GoodsInfoEntity <br/>
@@ -23,8 +22,15 @@ public class GoodsInfoEntity {
 
 	private GoodsBaseEntity goodsBase;
 	private GoodsEntity goods;
+	private List<GoodsRebateEntity> goodsRebateList;
 	
 	
+	public List<GoodsRebateEntity> getGoodsRebateList() {
+		return goodsRebateList;
+	}
+	public void setGoodsRebateList(List<GoodsRebateEntity> goodsRebateList) {
+		this.goodsRebateList = goodsRebateList;
+	}
 	public GoodsBaseEntity getGoodsBase() {
 		return goodsBase;
 	}

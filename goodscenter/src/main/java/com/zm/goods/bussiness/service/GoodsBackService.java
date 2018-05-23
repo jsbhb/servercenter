@@ -254,4 +254,11 @@ public interface GoodsBackService {
 	 */
 	void maintainFiles(List<GoodsFielsMaintainBO> list);
 
+	/**
+	 * @fun 导入商品
+	 * @param list
+	 * @return
+	 */
+	ResultModel importGoods(List<GoodsInfoEntity> list);
+
 }

@@ -4,15 +4,15 @@ import java.util.Set;
 
 public class GoodsFielsMaintainBO {
 
-	private String goodsId;
+	private String itemCode;
 	private String goodsDetailPath;
 	private Set<String> picPathList;
 	
-	public String getGoodsId() {
-		return goodsId;
+	public String getItemCode() {
+		return itemCode;
 	}
-	public void setGoodsId(String goodsId) {
-		this.goodsId = goodsId;
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
 	}
 	public String getGoodsDetailPath() {
 		return goodsDetailPath;

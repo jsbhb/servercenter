@@ -542,4 +542,15 @@
 		</foreach>
 	</update>
 	
+	<select id="queryByItemCodeAndConversion" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from goods_item where item_code = #{itemCode} and conversion = #{conversion}
+	</select>
+	
+	<insert id="insertStockByImport" parameterType="Object">
+		insert ignore into goods_stock 
+		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time,opt)
+		value
+		(#{itemId},#{qpQty},#{fxQty},0,0,0,now(),now(),#{opt})
+	</insert>
+	
 </mapper>

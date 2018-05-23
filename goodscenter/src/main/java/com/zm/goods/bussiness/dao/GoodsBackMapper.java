@@ -301,4 +301,6 @@ public interface GoodsBackMapper {
 	void updateGoodsEntity(GoodsEntity entity);
 
 	List<GoodsInfoListForDownload> selectGoodsListForDownload(GoodsListDownloadParam param);
+
+	List<String> listGoodsIdsByItemCode(String itemCode);
 }
