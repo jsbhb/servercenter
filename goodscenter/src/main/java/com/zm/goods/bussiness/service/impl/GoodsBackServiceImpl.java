@@ -402,6 +402,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public ResultModel importGoods(List<GoodsInfoEntity> list) {
 		StringBuilder sb = new StringBuilder();
 		if (list != null && list.size() > 0) {
@@ -410,9 +411,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				goodsItem = entity.getGoods().getGoodsItem();
 				int count = goodsItemMapper.queryByItemCodeAndConversion(goodsItem);
 				if (count > 0) {
+					sb.append("商家编码：");
 					sb.append(goodsItem.getItemCode());
 					sb.append(",");
+					sb.append("换算比例：");
 					sb.append(goodsItem.getConversion());
+					sb.append(";");
 					LogUtil.writeLog("商家编码：" + goodsItem.getItemCode() + ",换算比例：" + goodsItem.getConversion() + "已经存在");
 					continue;
 				}
@@ -421,6 +425,6 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				insertGoodsRebate(entity.getGoodsRebateList());
 			}
 		}
-		return new ResultModel(true, sb.toString());
+		return new ResultModel(true, sb.toString() + "已经存在");
 	}
 }

@@ -430,7 +430,7 @@ public class GoodsBackController {
 	}
 	
 	@RequestMapping(value = "{version}/goods/import/goods", method = RequestMethod.POST)
-	public ResultModel importGoods(@PathVariable("version") Double version, List<GoodsInfoEntity> list){
+	public ResultModel importGoods(@PathVariable("version") Double version, @RequestBody List<GoodsInfoEntity> list){
 		if(Constants.FIRST_VERSION.equals(version)){
 			return goodsBackService.importGoods(list);
 		}
