@@ -8,6 +8,7 @@
 package com.zm.goods.bussiness.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
@@ -301,6 +302,8 @@ public interface GoodsBackMapper {
 	void updateGoodsEntity(GoodsEntity entity);
 
 	List<GoodsInfoListForDownload> selectGoodsListForDownload(GoodsListDownloadParam param);
+
+	List<GoodsFile> selectGoodsFileByParam(Map<String,Object> param);
 
 	List<String> listGoodsIdsByItemCode(String itemCode);
 }

@@ -45,6 +45,8 @@ public class GoodsItemEntity extends Pagination {
 	private GoodsBaseEntity baseEntity;
 	private ERPGoodsTagBindEntity tagBindEntity;
 	private int conversion;
+	private String shelfLife;
+	private String carTon;
 
 	public int getId() {
 		return id;
@@ -252,6 +254,22 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setEncode(String encode) {
 		this.encode = encode;
+	}
+
+	public String getShelfLife() {
+		return shelfLife;
+	}
+
+	public void setShelfLife(String shelfLife) {
+		this.shelfLife = shelfLife;
+	}
+
+	public String getCarTon() {
+		return carTon;
+	}
+
+	public void setCarTon(String carTon) {
+		this.carTon = carTon;
 	}
 	
 }

@@ -48,6 +48,8 @@
 				<result column="status" property="status"/>
 				<result column="discount" property="discount"/>
 				<result column="info" property="info"/>
+				<result column="shelf_life" property="shelfLife"/>
+				<result column="carton" property="carTon"/>
 			</collection>
 	</resultMap>
 	
@@ -134,6 +136,8 @@
 				<result column="status" property="status"/>
 				<result column="discount" property="discount"/>
 				<result column="info" property="info"/>
+				<result column="shelf_life" property="shelfLife"/>
+				<result column="carton" property="carTon"/>
 			</collection>
 	</resultMap>
 	
@@ -158,6 +162,8 @@
 		<result column="discount" property="discount"/>
 		<result column="info" property="info"/>
 		<result column="conversion" property="conversion"/>
+		<result column="shelf_life" property="shelfLife"/>
+		<result column="carton" property="carTon"/>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsInfoListForDownload" id="goodsInfoListForDownload">
@@ -384,7 +390,8 @@
 	<update id="updateGoodsEntity" parameterType="Object">
 		update goods set goods_name = #{goodsName},
 		supplier_id = #{supplierId}, supplier_name = #{supplierName},
-		origin = #{origin}, type = #{type}, update_time = now() 
+		origin = #{origin}, type = #{type}, update_time = now(),
+		specs_template_id = #{templateId} 
 		where goods_id = #{goodsId}
 	</update>
 	
@@ -421,6 +428,17 @@
 			</foreach>
 		</if>
 		order by gi.item_id
+	</select>
+
+	<select id="selectGoodsFileByParam" parameterType="Object" resultMap="goodsFile">
+		SELECT min(id) id,goods_id,path 
+		FROM zm_goods.goods_file 
+		WHERE 1=1 AND goods_id in 
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+		group by goods_id
 	</select>
 	
 	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">
