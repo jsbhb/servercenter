@@ -425,6 +425,6 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				insertGoodsRebate(entity.getGoodsRebateList());
 			}
 		}
-		return new ResultModel(true, sb.toString() + "已经存在");
+		return new ResultModel(true, sb.toString());
 	}
 }
