@@ -306,4 +306,6 @@ public interface GoodsBackMapper {
 	List<GoodsFile> selectGoodsFileByParam(Map<String,Object> param);
 
 	List<String> listGoodsIdsByItemCode(String itemCode);
+
+	void insertBatch(List<GoodsEntity> goodsList);
 }

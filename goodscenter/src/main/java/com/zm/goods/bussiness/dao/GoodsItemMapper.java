@@ -234,8 +234,12 @@ public interface GoodsItemMapper {
 	
 	void updateGoodsStockByItemId(List<GoodsStockEntity> stocks);
 
-	int queryByItemCodeAndConversion(GoodsItemEntity goodsItem);
+	List<String> queryItemCodeAndConversion();
 	
-	void insertStockByImport(GoodsStockEntity entity);
+	void insertStockBatch(List<GoodsStockEntity> stockList);
+
+	void insertBatch(List<GoodsItemEntity> itemList);
+
+	void insertPriceBatch(List<GoodsPrice> priceList);
 
 }

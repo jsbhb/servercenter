@@ -252,7 +252,7 @@ public interface GoodsBackService {
 	 * @fun 批量维护商品商详和商品主图
 	 * @param list
 	 */
-	void maintainFiles(List<GoodsFielsMaintainBO> list);
+	String maintainFiles(List<GoodsFielsMaintainBO> list);
 
 	/**
 	 * @fun 导入商品

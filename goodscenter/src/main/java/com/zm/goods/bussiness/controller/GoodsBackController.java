@@ -374,11 +374,11 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/rebate", method = RequestMethod.GET)
 	public ResultModel getGoodsRebate(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestParam("itemId") String itemId){
-		
+			@RequestParam("itemId") String itemId) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsBackService.getGoodsRebate(itemId);
 		}
@@ -386,8 +386,8 @@ public class GoodsBackController {
 	}
 
 	@RequestMapping(value = "{version}/goods/item/queryGoodsInfoListForDownload", method = RequestMethod.POST)
-	public ResultModel queryGoodsInfoListForDownload(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsListDownloadParam param) {
+	public ResultModel queryGoodsInfoListForDownload(HttpServletRequest request,
+			@PathVariable("version") Double version, @RequestBody GoodsListDownloadParam param) {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
@@ -419,19 +419,24 @@ public class GoodsBackController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/maintain/files", method = RequestMethod.POST)
-	public ResultModel maintainFiles(@PathVariable("version") Double version, @RequestBody List<GoodsFielsMaintainBO> list){
-		if (Constants.FIRST_VERSION.equals(version)){
-			goodsBackService.maintainFiles(list);
-			return new ResultModel(true, "");
+	public ResultModel maintainFiles(@PathVariable("version") Double version,
+			@RequestBody List<GoodsFielsMaintainBO> list) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, goodsBackService.maintainFiles(list));
+			} catch (Exception e) {
+				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			}
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/import/goods", method = RequestMethod.POST)
-	public ResultModel importGoods(@PathVariable("version") Double version, @RequestBody List<GoodsInfoEntity> list){
-		if(Constants.FIRST_VERSION.equals(version)){
+	public ResultModel importGoods(@PathVariable("version") Double version, @RequestBody List<GoodsInfoEntity> list) {
+		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsBackService.importGoods(list);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());

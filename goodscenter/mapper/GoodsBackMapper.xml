@@ -247,6 +247,14 @@
 		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,#{type},now(),now(),#{opt})
 	</insert>
 	
+	<insert id="insertBatch" parameterType="Object">
+		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt) value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.goodsId},#{item.templateId},#{item.baseId},#{item.supplierId},#{item.supplierName},#{item.goodsName},#{item.description},#{item.origin},0,
+			#{item.detailPath},0,#{item.type},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
 	<update id="updateThirdStatus" parameterType="Object">
 		update third_goods set status = 1 , update_time = now() where id = #{id};
 	</update>
@@ -442,6 +450,6 @@
 	</select>
 	
 	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">
-		select goods_id from item_id where item_code = #{itemCode}
+		select goods_id from goods_item where item_code = #{itemCode}
 	</select>
 </mapper>

@@ -306,6 +306,16 @@
 		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion},#{encode,jdbcType=VARCHAR},#{shelfLife,jdbcType=VARCHAR},#{carTon,jdbcType=VARCHAR})
 	</insert>
 	
+	<insert id="insertBatch" parameterType="Object">
+		insert into goods_item 
+		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion,encode,shelf_life,carton)
+		value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.goodsId},#{item.itemId},#{item.itemCode},#{item.sku},#{item.weight},#{item.exciseTax},#{item.status},#{item.discount},#{item.info},
+			now(),now(),#{item.opt},#{item.conversion},#{item.encode,jdbcType=VARCHAR},#{item.shelfLife,jdbcType=VARCHAR},#{item.carTon,jdbcType=VARCHAR})
+		</foreach>
+	</insert>
+	
 	<insert id="insertPrice" parameterType="Object">
 		insert into goods_price 
 		(item_id,
@@ -325,6 +335,15 @@
 			#{max},
 		</if>
 		#{proxyPrice},#{fxPrice},#{retailPrice},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertPriceBatch" parameterType="Object">
+		insert into goods_price 
+		(item_id,min,max,proxy_price,fxprice,retail_price,create_time,update_time,opt)
+		value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.itemId},#{item.min},#{item.max},#{item.proxyPrice},#{item.fxPrice},#{item.retailPrice},now(),now(),#{item.opt})
+		</foreach>
 	</insert>
 	
 	<update id="update" parameterType="Object">
@@ -575,15 +594,17 @@
 		</foreach>
 	</update>
 	
-	<select id="queryByItemCodeAndConversion" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from goods_item where item_code = #{itemCode} and conversion = #{conversion}
+	<select id="queryItemCodeAndConversion" parameterType="Object" resultType="java.lang.String">
+		select CONCAT_WS(',',item_code, conversion) from goods_item
 	</select>
 	
-	<insert id="insertStockByImport" parameterType="Object">
+	<insert id="insertStockBatch" parameterType="Object">
 		insert ignore into goods_stock 
 		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time,opt)
 		value
-		(#{itemId},#{qpQty},#{fxQty},0,0,0,now(),now(),#{opt})
+		<foreach collection="list" item="item" separator=",">
+			(#{item.itemId},#{item.qpQty},#{item.fxQty},0,0,0,now(),now(),#{item.opt})
+		</foreach>
 	</insert>
 	
 </mapper>
