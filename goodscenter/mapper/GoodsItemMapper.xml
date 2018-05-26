@@ -293,7 +293,7 @@
 		</if>
 		<if test="entity.goodsEntity!=null">
 			<if test="entity.goodsEntity.type!=null">
-				and g.type = #{goodsEntity.type}
+				and g.type = #{entity.goodsEntity.type}
 			</if>
 		</if>
 	</select>
