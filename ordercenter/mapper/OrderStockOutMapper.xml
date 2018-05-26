@@ -105,6 +105,7 @@
 		<result column="packing" property="packing" jdbcType="VARCHAR" />
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+		<result column="receive_phone" property="receivePhone" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
 			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
@@ -210,7 +211,7 @@
 		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_quantity,gfc.first_id,
 		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
 		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,
-		od.receive_city,od.receive_area,od.receive_address,od.create_time,
+		od.receive_city,od.receive_area,od.receive_address,od.create_time,od.receive_phone,
 		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id,ob.order_source,
 		u.idnum,u.name order_name,og.item_quantity*i.conversion packing,og.actual_price,og.item_code
 		from zm_order.order_base ob
