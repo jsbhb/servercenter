@@ -31,7 +31,7 @@ CREATE TABLE `zm_order`.`order_base` (
   `update_time` DATETIME NULL,
   `remark` VARCHAR(200) NULL,
   `is_del` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0:否；1是',
-  `order_source` TINYINT UNSIGNED NULL COMMENT '订单来源0：PC,1：手机，2：订货平台',
+  `order_source` TINYINT UNSIGNED NULL COMMENT '订单来源0：PC,1：手机，2：订货平台,3：有赞，4B2B线下，5展厅',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_orderId` (`order_id` ASC),
   INDEX `idx_orderId` (`order_id` ASC),
