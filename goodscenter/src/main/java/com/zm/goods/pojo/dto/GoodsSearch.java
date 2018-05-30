@@ -34,6 +34,16 @@ public class GoodsSearch {
 	
 	private String priceMax;
 	
+	private Integer type;
+	
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
 	public String getPriceMin() {
 		return priceMin;
 	}

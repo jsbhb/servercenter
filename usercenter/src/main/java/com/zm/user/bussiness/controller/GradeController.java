@@ -164,6 +164,15 @@ public class GradeController {
 		return new ResultModel(false, "版本错误");
 	}
 	
+	@RequestMapping(value = "{version}/grade/type/{id}", method = RequestMethod.GET)
+	public ResultModel getGradeType(@PathVariable("version") Double version, @PathVariable("id") Integer id) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.getGradeType(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
 	@RequestMapping(value = "{version}/grade/type/children", method = RequestMethod.GET)
 	public ResultModel listGradeTypeChildren(@PathVariable("version") Double version,@RequestParam(value="id") Integer id) {
 

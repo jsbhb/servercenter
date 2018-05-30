@@ -13,8 +13,13 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
@@ -141,7 +146,7 @@ public interface GoodsBackService {
 	 */
 	Page<GoodsRebateEntity> queryAllGoods(GoodsEntity entity);
 
-	GoodsRebateEntity queryById(GoodsRebateEntity entity);
+	List<GoodsRebateEntity> queryById(String itemId);
 	
 	GoodsRebateEntity checkRecordForRebate(GoodsRebateEntity entity);
 	
@@ -236,5 +241,24 @@ public interface GoodsBackService {
 	 * @since JDK 1.7
 	 */
 	void updateGoodsInfo(GoodsInfoEntity entity);
+
+	ResultModel getGoodsRebate(String itemId);
+
+	List<GoodsInfoListForDownload> queryGoodsListForDownload(GoodsListDownloadParam param);
+	
+	void maintainStockByItemId(List<GoodsStockEntity> stocks);
+
+	/**
+	 * @fun 批量维护商品商详和商品主图
+	 * @param list
+	 */
+	String maintainFiles(List<GoodsFielsMaintainBO> list);
+
+	/**
+	 * @fun 导入商品
+	 * @param list
+	 * @return
+	 */
+	ResultModel importGoods(List<GoodsInfoEntity> list);
 
 }

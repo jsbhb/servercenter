@@ -11,7 +11,7 @@ public class ButtJointOrder extends OrderInfo {
 	public boolean validate() {
 		return (name != null && orderFlag != null && orderId != null && expressType != null && centerId != null
 				&& supplierId != null && tdq != null && orderSource != null && weight != null && createType != null
-				&& numId != null && phone != null);
+				&& numId != null && phone != null && shopId != null);
 	}
 
 	public String getName() {

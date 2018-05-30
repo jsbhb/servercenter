@@ -34,7 +34,7 @@ public interface OrderFeignClient {
 	@RequestMapping(value = "{version}/order/paycustom/{orderId}", method = RequestMethod.POST)
 	public ResultModel updatePayCustom(@PathVariable("version") Double version,
 			@PathVariable("orderId") String orderId);
-	
+
 	/**
 	 * @fun 获取可以发送仓库的订单
 	 * @param version
@@ -42,7 +42,7 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/sendToWarehouse", method = RequestMethod.GET)
 	public ResultModel sendToWarehouse(@PathVariable("version") Double version);
-	
+
 	/**
 	 * @fun 定时确认收货
 	 * @param version
@@ -50,7 +50,7 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/confirmByTimeTask", method = RequestMethod.GET)
 	public void confirmByTimeTask(@PathVariable("version") Double version);
-	
+
 	/**
 	 * @fun 获取需要同步状态的订单
 	 * @param version
@@ -58,8 +58,7 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/listUnDeliverOrder", method = RequestMethod.GET)
 	public ResultModel listUnDeliverOrder(@PathVariable("version") Double version);
-	
-	
+
 	/**
 	 * @fun 轮询查询资金池不足的订单并重新计算
 	 * @param version
@@ -67,4 +66,10 @@ public interface OrderFeignClient {
 	 */
 	@RequestMapping(value = "{version}/order/capitalpool/notenough", method = RequestMethod.POST)
 	public boolean capitalPoolRecount(@PathVariable("version") Double version);
+
+	@RequestMapping(value = "{version}/cache/day", method = RequestMethod.GET)
+	public void saveDayCacheToWeek(@PathVariable("version") Double version);
+
+	@RequestMapping(value = "{version}/cache/month", method = RequestMethod.GET)
+	public void initMonth(@PathVariable("version") Double version);
 }

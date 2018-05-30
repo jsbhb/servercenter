@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModel;
 @ApiModel(value = "layout", description = "模块布局对象，如果先获取模块再获取数据，带上id,如果一次性获取，传空对象")
 public class Layout {
 
-	@JsonIgnore
 	private Integer id;
 
 	private String page;
@@ -35,6 +34,8 @@ public class Layout {
 	private String opt;
 
 	private int centerId;
+
+	private int sort;
 
 	public Integer getType() {
 		return type;
@@ -139,4 +140,11 @@ public class Layout {
 				+ ", opt=" + opt + "]";
 	}
 
+	public int getSort() {
+		return sort;
+	}
+
+	public void setSort(int sort) {
+		this.sort = sort;
+	}
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.thirdcenter.bussiness.dao.PageViewMapper">
+
+	<insert id="savePageView" parameterType="Object">
+		insert into page_view(page_name,type,num,create_time) values 
+		<foreach collection="list" item="item" separator=",">
+			(#{item.pageName},#{item.type},#{item.num},now())
+		</foreach>
+	</insert>
+	
+	<insert id="saveUniqueVisitor" parameterType="Object" >
+		insert into unique_visitor(page_name,ip_num,create_time) values 
+		(#{pageName},#{ipNum},now())
+	</insert>
+</mapper>

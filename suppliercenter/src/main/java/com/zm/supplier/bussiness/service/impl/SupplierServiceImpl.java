@@ -22,6 +22,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
+import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.util.ListUtil;
 
 @Service
@@ -62,7 +63,6 @@ public class SupplierServiceImpl implements SupplierService {
 		return supplierMapper.selectById(id);
 	}
 
-	private static final Integer XINYUN_WAREHOUSE = 3;
 	private static final Integer FUBANG_WAREHOUSE = 4;
 	private static final Integer LIANGYOU_WAREHOUSE = 2;
 
@@ -131,6 +131,12 @@ public class SupplierServiceImpl implements SupplierService {
 	@Override
 	public List<SupplierEntity> queryAll() {
 		return supplierMapper.selectAll();
+	}
+
+	@Override
+	public ResultModel getButtJointSupplier() {
+		List<SupplierInterface> list = supplierMapper.listSupplierInterface();
+		return new ResultModel(true, list);
 	}
 
 }

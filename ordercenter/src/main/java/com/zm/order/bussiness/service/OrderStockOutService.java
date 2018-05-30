@@ -12,7 +12,9 @@ import java.util.List;
 import com.github.pagehelper.Page;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.OrderMaintenanceBO;
 
 /**
  * ClassName: OrderBackService <br/>
@@ -63,5 +65,21 @@ public interface OrderStockOutService {
 	 * @since JDK 1.7
 	 */
 	List<ThirdOrderInfo> queryThirdInfo(String orderId);
+
+	/**
+	 * queryByOrderId:根据编号查询订单. <br/>
+	 * 
+	 * @author orderId
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId, String supplierId);
+
+	/**
+	 * @fun 维护没有系统对接的订单物流单号
+	 * @param list
+	 */
+	void maintenanceExpress(List<OrderMaintenanceBO> list);
 
 }

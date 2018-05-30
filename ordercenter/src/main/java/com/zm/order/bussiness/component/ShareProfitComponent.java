@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 
 import com.zm.order.bussiness.component.model.ShareProfitModel;
 import com.zm.order.bussiness.dao.OrderMapper;
+import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.FinanceFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.feignclient.model.OrderBussinessModel;
@@ -28,6 +30,7 @@ import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.UserInfo;
 import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.utils.CalculationUtils;
+import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 import com.zm.order.utils.TreeNodeUtil;
 
@@ -45,6 +48,15 @@ public class ShareProfitComponent {
 
 	@Resource
 	GoodsFeignClient goodsFeignClient;
+
+	@Resource
+	FinanceFeignClient financeFeignClient;
+
+	@Resource
+	CacheAbstractService cacheAbstractService;
+
+	private static final Integer REBATE_DETAIL_FINISH = 1;
+	private static final Integer REBATE_DETAIL_CANCEL = 2;
 
 	private static Integer register_type = 0;// 注册地分润
 	private static Integer consume_type = 1;// 消费地分润
@@ -93,6 +105,14 @@ public class ShareProfitComponent {
 			if (info == null) {
 				return;
 			}
+			String time = DateUtils.getTimeString("yyyyMM");
+			// 增加当天销售额
+			cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
+					info.getOrderDetail().getPayment());
+			// 增加月销售额
+			cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
+					info.getOrderDetail().getPayment());
+
 			if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {
 				predetermineOrderProfitStayToAccount(info);
 			} else {
@@ -111,15 +131,18 @@ public class ShareProfitComponent {
 	 * @param orderId
 	 */
 	public void calRefundShareProfit(String orderId) {
-		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<Integer, Double> rebateMap = new HashMap<Integer, Double>();
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
-		calRebate(info, rebateMap, hashOperations);
-		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
-			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
-					CalculationUtils.sub(0, CalculationUtils.round(2, entry.getValue())));
+		Map<String, String> result = hashOperations.entries(Constants.REBATE_DETAIL + orderId);
+		for (Map.Entry<String, String> entry : result.entrySet()) {
+			if (!"orderId".equals(entry.getKey())) {
+				hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
+						CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
+				LogUtil.writeLog("退单返回返佣====GradeId:" + entry.getKey() + ",返佣=" + entry.getValue());
+			}
 		}
+		template.delete(Constants.REBATE_DETAIL + orderId);
+		financeFeignClient.updateRebateDetail(Constants.FIRST_VERSION, orderId, REBATE_DETAIL_CANCEL);
 	}
 
 	/**
@@ -271,27 +294,32 @@ public class ShareProfitComponent {
 			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
 					CalculationUtils.round(2, entry.getValue()));
 		}
+		Map<String, String> result = packageDetailMap(orderInfo, rebateMap);
+		financeFeignClient.saveRebateDetail(Constants.FIRST_VERSION, result);
+		template.opsForHash().putAll(Constants.REBATE_DETAIL + orderInfo.getOrderId(), result);
 
 	}
 
 	/**
 	 * @fun 计算可提现金额（从待到账金额转到可提现金额）
 	 */
+
 	private void calCanBePresented(OrderInfo orderInfo) {
 		try {
 			Long count = template.opsForSet().remove(Constants.ORDER_REBATE, orderInfo.getOrderId());
 			if (count > 0) {
 				HashOperations<String, String, String> hashOperations = template.opsForHash();
-				Map<Integer, Double> rebateMap = new HashMap<Integer, Double>();
-				calRebate(orderInfo, rebateMap, hashOperations);
-				for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
+				Map<String, String> result = hashOperations.entries(Constants.REBATE_DETAIL + orderInfo.getOrderId());
+				result.remove("orderId", orderInfo.getOrderId());
+				for (Map.Entry<String, String> entry : result.entrySet()) {
 					hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "canBePresented",
-							CalculationUtils.round(2, entry.getValue()));
+							CalculationUtils.round(2, Double.valueOf(entry.getValue())));
 					hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
-							CalculationUtils.sub(0, CalculationUtils.round(2, entry.getValue())));
+							CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
 				}
-				Map<String, String> result = packageDetailMap(orderInfo, rebateMap);
-				template.opsForList().leftPush(Constants.REBATE_DETAIL, JSONUtil.toJson(result));
+				template.delete(Constants.REBATE_DETAIL + orderInfo.getOrderId());
+				financeFeignClient.updateRebateDetail(Constants.FIRST_VERSION, orderInfo.getOrderId(),
+						REBATE_DETAIL_FINISH);
 			}
 		} catch (Exception e) {
 			template.opsForSet().add(Constants.ORDER_REBATE, orderInfo.getOrderId());
@@ -312,15 +340,16 @@ public class ShareProfitComponent {
 	private void calRebate(OrderInfo orderInfo, Map<Integer, Double> rebateMap,
 			HashOperations<String, String, String> hashOperations) {
 		List<OrderGoods> goodsList = orderInfo.getOrderGoodsList();
-		// 获取该订单所有的上级,包括推手
-		LinkedList<GradeBO> superNodeList = TreeNodeUtil.getSuperNode(CacheComponent.getInstance().getSet(),
-				orderInfo.getShopId());
-		if (goodsList != null && superNodeList != null) {
+
+		if (goodsList != null) {
 			Map<String, String> goodsRebate = null;
 			GradeBO grade = null;
 			for (OrderGoods goods : goodsList) {
+				// 获取该订单所有的上级,包括推手
+				LinkedList<GradeBO> superNodeList = TreeNodeUtil.getSuperNode(CacheComponent.getInstance().getSet(),
+						orderInfo.getShopId());
 				goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + goods.getItemId());
-				if (goodsRebate == null) {
+				if (goodsRebate == null && superNodeList != null) {
 					continue;
 				}
 				try {

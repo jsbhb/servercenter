@@ -16,7 +16,7 @@ public class GoodsDetail {
 	private Double incrementTax;
 	private Double tariff;
 	private String info;
-	private Double fxPrice;
+	private Double retailPrice;
 	private Integer type;
 	private String origin;
 	private Integer supplierId;
@@ -72,11 +72,11 @@ public class GoodsDetail {
 	public void setInfo(String info) {
 		this.info = info;
 	}
-	public Double getFxPrice() {
-		return fxPrice;
+	public Double getRetailPrice() {
+		return retailPrice;
 	}
-	public void setFxPrice(Double fxPrice) {
-		this.fxPrice = fxPrice;
+	public void setRetailPrice(Double retailPrice) {
+		this.retailPrice = retailPrice;
 	}
 	public Integer getType() {
 		return type;

@@ -24,6 +24,7 @@ public class ExpressContrast {
 			put("ems", "EMS");
 			put("yuantong", "圆通速递");
 			put("tiantian", "天天快递");
+			put("huitongkuaidi", "百世快递");
 			put("zhaijisong", "宅急送");
 			put("youzhengguonei", "邮政平邮/小包");
 			put("debangwuliu", "德邦");

@@ -8,13 +8,16 @@
 package com.zm.goods.bussiness.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -162,7 +165,7 @@ public interface GoodsBackMapper {
 	 */
 	Page<GoodsRebateEntity> selectAllGoodsForRebate(GoodsEntity entity);
 
-	GoodsRebateEntity selectGoodsRebateById(GoodsRebateEntity entity);
+	List<GoodsRebateEntity> selectGoodsRebateById(String itemId);
 
 	GoodsRebateEntity selectRecordForRebate(GoodsRebateEntity entity);
 
@@ -297,4 +300,12 @@ public interface GoodsBackMapper {
 	 * @since JDK 1.7
 	 */
 	void updateGoodsEntity(GoodsEntity entity);
+
+	List<GoodsInfoListForDownload> selectGoodsListForDownload(GoodsListDownloadParam param);
+
+	List<GoodsFile> selectGoodsFileByParam(Map<String,Object> param);
+
+	List<String> listGoodsIdsByItemCode(String itemCode);
+
+	void insertBatch(List<GoodsEntity> goodsList);
 }

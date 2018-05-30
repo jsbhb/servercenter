@@ -25,6 +25,7 @@ import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsConvert;
@@ -54,7 +55,7 @@ import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
 @Service("goodsService")
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class GoodsServiceImpl implements GoodsService {
 
 	private static final Integer PICTURE_TYPE = 0;
@@ -125,14 +126,40 @@ public class GoodsServiceImpl implements GoodsService {
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 			GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, false);
 		}
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<Integer, List<GoodsItem>> tempMap = new HashMap<Integer, List<GoodsItem>>();
+		List<GoodsItem> tempList = null;
+		for (GoodsItem item : goodsList) {
+			if (tempMap.get(item.getSupplierId()) == null) {
+				tempList = new ArrayList<GoodsItem>();
+				tempList.add(item);
+				tempMap.put(item.getSupplierId(), tempList);
+			} else {
+				tempMap.get(item.getSupplierId()).add(item);
+			}
+		}
+		for (Map.Entry<Integer, List<GoodsItem>> entry : tempMap.entrySet()) {
+			Map<String, String> map = hashOperations.entries(Constants.POST_TAX + entry.getKey());
+			if (map != null) {
+				String post = map.get("post");
+				String tax = map.get("tax");
+				for (GoodsItem item : entry.getValue()) {
+					try {
+						item.setFreePost(Integer.valueOf(post == null ? "0" : post));
+						item.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
+					} catch (Exception e) {
+						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
+					}
+				}
+			}
+		}
 
-		if(proportion){//推手需要获取返佣比例
-			Map<String,Object> result = new HashMap<String,Object>();
+		if (proportion) {// 推手需要获取返佣比例
+			Map<String, Object> result = new HashMap<String, Object>();
 			String goodsId = param.get("goodsId").toString();
-			HashOperations<String, String, String> hashOperations = template.opsForHash();
-			Map<String, String> temp = hashOperations.entries(Constants.GOODS_REBATE+goodsId);
+			Map<String, String> temp = hashOperations.entries(Constants.GOODS_REBATE + goodsId);
 			double rebateProportion = 0;
-			if(temp != null){
+			if (temp != null) {
 				rebateProportion = Double.valueOf(temp.get("third") == null ? "0" : temp.get("third"));
 			}
 			result.put(Constants.PROPORTION, rebateProportion);
@@ -258,7 +285,7 @@ public class GoodsServiceImpl implements GoodsService {
 					taxMap.put(tax, taxMap.get(tax) + amount);
 				}
 			}
-			
+
 			specsMap.put(model.getItemId(), specs);
 		}
 
@@ -268,7 +295,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		map.put("tax", taxMap);
 
-		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
+		if (supplierId != null) {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
@@ -439,6 +466,7 @@ public class GoodsServiceImpl implements GoodsService {
 				searchModel.setSecondCategory(item.getSecondCategory());
 				searchModel.setGoodsName(item.getCustomGoodsName());
 				searchModel.setPopular(item.getPopular());
+				searchModel.setType(item.getType());
 				param.put("goodsId", item.getGoodsId());
 				List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 				if (specsList != null && specsList.size() > 0) {
@@ -709,7 +737,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel downShelves(List<String> itemIdList, Integer centerId) {
-		if(itemIdList == null || itemIdList.size() == 0){
+		if (itemIdList == null || itemIdList.size() == 0) {
 			return new ResultModel(false, "请传入itemId");
 		}
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -720,17 +748,17 @@ public class GoodsServiceImpl implements GoodsService {
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有该商品");
 		}
-		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);//去重
-		goodsMapper.updateGoodsItemDownShelves(param);//商品更新为下架状态
+		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);// 去重
+		goodsMapper.updateGoodsItemDownShelves(param);// 商品更新为下架状态
 		List<String> downShelvesGoodsIdList = new ArrayList<String>();
-		for(String goodsId : goodsIdSet){
+		for (String goodsId : goodsIdSet) {
 			param.put("goodsId", goodsId);
 			int count = goodsMapper.countUpShelvesStatus(param);
-			if (count == 0) {//如果所有item已经下架，goods也下架，并删除索引
+			if (count == 0) {// 如果所有item已经下架，goods也下架，并删除索引
 				downShelvesGoodsIdList.add(goodsId);
 			}
 		}
-		if(downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0){
+		if (downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0) {
 			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
 		}
 		return new ResultModel(true, "");
@@ -779,7 +807,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel unDistribution(List<String> itemIdList) {
-		if(itemIdList == null || itemIdList.size() == 0){
+		if (itemIdList == null || itemIdList.size() == 0) {
 			return new ResultModel(false, "请传入itemId");
 		}
 		goodsMapper.updateGoodsItemUnDistribution(itemIdList);
@@ -826,16 +854,22 @@ public class GoodsServiceImpl implements GoodsService {
 		ResultModel result = new ResultModel(true, "");
 		GoodsSpecs specs = null;
 
+		Double temp = 0.0;
 		for (OrderBussinessModel model : list) {
 			specs = goodsMapper.getGoodsSpecsForButtJoinOrder(model.getItemId());
-			if(specs == null){
+			if (specs == null) {
 				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
-						"itemId="+model.getItemId()+ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
+						"itemId=" + model.getItemId() + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 			}
-			GoodsServiceUtil.judgeQuantityRange(false, result, specs, model);
+			Double amount = GoodsServiceUtil.judgeQuantityRange(false, result, specs, model);
 			if (!result.isSuccess()) {
 				return new ResultModel(false, ErrorCodeEnum.OUT_OF_RANGE.getErrorCode(),
 						ErrorCodeEnum.OUT_OF_RANGE.getErrorMsg());
+			}
+			temp = CalculationUtils.mul(model.getItemPrice(), model.getQuantity());
+			if (CalculationUtils.sub(temp, amount) < -3 || CalculationUtils.sub(temp, amount) > 3) {
+				return new ResultModel(false, ErrorCodeEnum.RETAIL_PRICE_ERROR.getErrorCode(),
+						ErrorCodeEnum.RETAIL_PRICE_ERROR.getErrorMsg());
 			}
 		}
 
@@ -856,9 +890,9 @@ public class GoodsServiceImpl implements GoodsService {
 	public Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set) {
 		List<String> temp = new ArrayList<String>(set);
 		List<GoodsConvert> list = goodsMapper.listSkuAndConversionByItemId(temp);
-		Map<String,GoodsConvert> result = new HashMap<String,GoodsConvert>();
-		if(list != null && list.size() > 0){
-			for(GoodsConvert model : list){
+		Map<String, GoodsConvert> result = new HashMap<String, GoodsConvert>();
+		if (list != null && list.size() > 0) {
+			for (GoodsConvert model : list) {
 				result.put(model.getItemId(), model);
 			}
 		}

@@ -48,6 +48,15 @@
 		</foreach>
 	</insert>
 	
+	<insert id="insertCapitalPool" parameterType="Object">
+		insert into capitalpool_redis (center_id,money,frozen_money,preferential,frozen_preferential,use_money,
+		use_preferential,count_money,count_preferential,level,status,create_time) VALUES 
+		<foreach collection="list" item="item" separator=",">
+			(#{item.centerId},#{item.money},#{item.frozenMoney},#{item.preferential},#{item.frozenPreferential},
+			#{item.useMoney},#{item.usePreferential},#{item.countMoney},#{item.countPreferential},#{item.level},#{item.status},now())
+		</foreach>
+	</insert>
+	
 	<update id="updateCapitalPool" parameterType="Object">
 		<foreach collection="list" item="item" index="index" open=""
 			close="" separator=";">
@@ -76,6 +85,9 @@
 				</if>
 				<if test="item.countPreferential != null">
 					count_preferential = #{item.countPreferential},
+				</if>
+				<if test="item.level != null">
+					level = #{item.level},
 				</if>
 				update_time = now()
 			</set>

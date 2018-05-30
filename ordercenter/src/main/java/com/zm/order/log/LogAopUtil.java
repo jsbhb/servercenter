@@ -101,7 +101,7 @@ public class LogAopUtil {
 		}
 		
 		try {
-			Integer centerId = Integer.valueOf(appKey.split("_")[1]);
+			Integer centerId = Integer.valueOf(appKey);
 			String parameter = sb.substring(0, sb.length() - 1);
 			OpenInfLog log = new OpenInfLog(centerId, ServerLogEnum.ORDER_CENTER.getServerId(),
 					ServerLogEnum.ORDER_CENTER.getServerName(), methodName, ip, parameter);

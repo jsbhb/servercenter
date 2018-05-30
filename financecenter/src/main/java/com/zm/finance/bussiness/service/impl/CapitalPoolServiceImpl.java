@@ -65,7 +65,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);// 删除以保存的记录
 		}
 		if (poolList.size() > 0) {
-			capitalPoolMapper.updateCapitalPool(poolList);
+			capitalPoolMapper.updateCapitalPool(poolList);//更新数据库资金池
+			capitalPoolMapper.insertCapitalPool(poolList);//插入当前的资金池值，防止redis崩溃时数据被清空
 		}
 
 	}
@@ -180,6 +181,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				mapForRedis.put("countMoney", "0");
 				mapForRedis.put("countPreferential", "0");
 				mapForRedis.put("status", "1");// 默认启用状态
+				mapForRedis.put("level", "0");// 等级0
 				mapForRedis.put("opt", "8001");// 默认admin账号
 				hashOperations.putAll(Constants.CAPITAL_PERFIX + centerId, mapForRedis);
 			}

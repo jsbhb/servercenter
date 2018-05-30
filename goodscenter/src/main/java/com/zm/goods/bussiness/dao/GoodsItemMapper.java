@@ -15,6 +15,7 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.GoodsStockEntity;
 
 /**
  * ClassName: BrandMapper <br/>
@@ -211,5 +212,34 @@ public interface GoodsItemMapper {
 	 * @since JDK 1.7  
 	 */
 	Page<GoodsEntity> selectCenterForPageDownload(Map<String,Object> params);
+
+	void updateGoodsItemBeUseForBatch(List<String> list);
+
+	/**  
+	 * insertStock:插入库存. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void insertStockForBatch(List<String> list);
+
+	void updateGoodsItemBeFxForBatch(List<String> list);
+	
+	void deleteListFiles(List<GoodsFile> file);
+	
+	void deleteAllFiles(GoodsEntity entity);
+	
+	void updateSubGoodsItem(String itemId);
+	
+	void updateGoodsStockByItemId(List<GoodsStockEntity> stocks);
+
+	List<String> queryItemCodeAndConversion();
+	
+	void insertStockBatch(List<GoodsStockEntity> stockList);
+
+	void insertBatch(List<GoodsItemEntity> itemList);
+
+	void insertPriceBatch(List<GoodsPrice> priceList);
 
 }

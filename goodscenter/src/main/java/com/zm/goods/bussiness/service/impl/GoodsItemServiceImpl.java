@@ -7,7 +7,10 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -23,6 +26,7 @@ import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsStatusEnum;
@@ -47,7 +51,29 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Override
 	public Page<GoodsItemEntity> queryByPage(GoodsItemEntity entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		return goodsItemMapper.selectForPage(entity);
+		Page<GoodsItemEntity> page = goodsItemMapper.selectForPage(entity);
+		List<GoodsItemEntity> list = (List<GoodsItemEntity>) page;
+		if (list.size() > 0) {
+			List<String> ids = new ArrayList<String>();
+			for (GoodsItemEntity item : list) {
+				ids.add(item.getGoodsId());
+			}
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("list", ids);
+			List<GoodsFile> files = goodsBackMapper.selectGoodsFileByParam(param);
+			for (GoodsItemEntity item : list) {
+				for (GoodsFile file : files) {
+					if (file.getGoodsId().equals(item.getGoodsId())) {
+						List<GoodsFile> gfiles = new ArrayList<GoodsFile>();
+						gfiles.add(file);
+						item.getGoodsEntity().setFiles(gfiles);
+						break;
+					}
+				}
+			}
+			page = (Page<GoodsItemEntity>) list;
+		}
+		return page;
 	}
 
 	@Override
@@ -94,7 +120,29 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("entity", entity);
 		params.put("centerId", centerId);
-		return goodsItemMapper.selectCenterForPage(params);
+		Page<GoodsItemEntity> page = goodsItemMapper.selectCenterForPage(params);
+		List<GoodsItemEntity> list = (List<GoodsItemEntity>) page;
+		if (list.size() > 0) {
+			List<String> ids = new ArrayList<String>();
+			for (GoodsItemEntity item : list) {
+				ids.add(item.getGoodsId());
+			}
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("list", ids);
+			List<GoodsFile> files = goodsBackMapper.selectGoodsFileByParam(param);
+			for (GoodsItemEntity item : list) {
+				for (GoodsFile file : files) {
+					if (file.getGoodsId().equals(item.getGoodsId())) {
+						List<GoodsFile> gfiles = new ArrayList<GoodsFile>();
+						gfiles.add(file);
+						item.getGoodsEntity().setFiles(gfiles);
+						break;
+					}
+				}
+			}
+			page = (Page<GoodsItemEntity>) list;
+		}
+		return page;
 	}
 
 	@Override
@@ -164,5 +212,22 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		params.put("entity", entity);
 		params.put("centerId", centerId);
 		return goodsItemMapper.selectCenterForPageDownload(params);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void batchBeUse(GoodsItemEntity entity) {
+		String[] arr = entity.getItemId().split(",");
+		List<String> itemIdList = Arrays.asList(arr);
+		goodsItemMapper.updateGoodsItemBeUseForBatch(itemIdList);
+		goodsItemMapper.insertStockForBatch(itemIdList);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void batchBeFx(GoodsItemEntity entity) {
+		String[] arr = entity.getItemId().split(",");
+		List<String> itemIdList = Arrays.asList(arr);
+		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
 	}
 }

@@ -24,6 +24,11 @@ public class GoodsOpenInterfaceController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String data = req.getParameter("data");
+			String appKey = req.getParameter("appKey");
+			if (data == null || appKey == null || "".equals(data) || "".equals(appKey)) {
+				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+						ErrorCodeEnum.MISSING_PARAM.getErrorCode());
+			}
 			try {
 				return goodsOpenInterfaceService.getGoodsStock(data);
 			} catch (Exception e) {
@@ -43,6 +48,11 @@ public class GoodsOpenInterfaceController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String data = req.getParameter("data");
+			String appKey = req.getParameter("appKey");
+			if (data == null || appKey == null || "".equals(data) || "".equals(appKey)) {
+				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+						ErrorCodeEnum.MISSING_PARAM.getErrorCode());
+			}
 			try {
 				return goodsOpenInterfaceService.getGoodsDetail(data);
 			} catch (Exception e) {

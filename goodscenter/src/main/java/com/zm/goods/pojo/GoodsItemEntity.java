@@ -24,6 +24,7 @@ public class GoodsItemEntity extends Pagination {
 	private String itemId;// itemID
 	private String itemCode;// 商家自有编码
 	private String sku;// sku信息
+	private String encode;// sku信息
 	private double weight;// 商品重量（克）
 	private double exciseTax;// 消费税
 	private int isPromotion;// 是否促销0：否；1：是
@@ -43,6 +44,9 @@ public class GoodsItemEntity extends Pagination {
 	private GoodsEntity goodsEntity;
 	private GoodsBaseEntity baseEntity;
 	private ERPGoodsTagBindEntity tagBindEntity;
+	private int conversion;
+	private String shelfLife;
+	private String carTon;
 
 	public int getId() {
 		return id;
@@ -234,6 +238,38 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setTagBindEntity(ERPGoodsTagBindEntity tagBindEntity) {
 		this.tagBindEntity = tagBindEntity;
+	}
+
+	public int getConversion() {
+		return conversion;
+	}
+
+	public void setConversion(int conversion) {
+		this.conversion = conversion;
+	}
+
+	public String getEncode() {
+		return encode;
+	}
+
+	public void setEncode(String encode) {
+		this.encode = encode;
+	}
+
+	public String getShelfLife() {
+		return shelfLife;
+	}
+
+	public void setShelfLife(String shelfLife) {
+		this.shelfLife = shelfLife;
+	}
+
+	public String getCarTon() {
+		return carTon;
+	}
+
+	public void setCarTon(String carTon) {
+		this.carTon = carTon;
 	}
 	
 }

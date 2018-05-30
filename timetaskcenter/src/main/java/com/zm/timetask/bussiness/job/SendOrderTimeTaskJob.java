@@ -3,6 +3,7 @@ package com.zm.timetask.bussiness.job;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -20,14 +21,14 @@ import com.zm.timetask.pojo.ResultModel;
 import com.zm.timetask.util.JSONUtil;
 
 @Component
-public class SendOrderTimeTaskJob implements Job{
+public class SendOrderTimeTaskJob implements Job {
 
 	@Resource
 	OrderFeignClient orderFeignClient;
-	
+
 	@Resource
 	SupplierFeignClient supplierFeignClient;
-	
+
 	@Resource
 	RedisTemplate<String, Object> template;
 
@@ -35,18 +36,18 @@ public class SendOrderTimeTaskJob implements Job{
 	@Override
 	public void execute(JobExecutionContext jobexecutioncontext) throws JobExecutionException {
 		ResultModel result = orderFeignClient.sendToWarehouse(Constants.FIRST_VERSION);
-		if(result.isSuccess()){
+		if (result.isSuccess()) {
 			List<Map<String, Object>> list = (List<Map<String, Object>>) result.getObj();
-			if(list != null){
+			if (list != null) {
 				List<OrderInfo> infoList = new ArrayList<OrderInfo>();
 				OrderInfo info = null;
-				for(Map<String, Object> map : list){
-					template.opsForValue().set(map.get("orderId").toString(), "true");
+				for (Map<String, Object> map : list) {
+					template.opsForValue().set(map.get("orderId").toString(), "true", 30, TimeUnit.MINUTES);
 					info = JSONUtil.parse(JSONUtil.toJson(map), OrderInfo.class);
 					infoList.add(info);
 				}
 				supplierFeignClient.sendOrder(Constants.FIRST_VERSION, infoList);
 			}
-		} 
+		}
 	}
 }

@@ -300,12 +300,7 @@
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
 		gs.status as specsStatus,gi.excise_tax,gi.weight,
-		<if test="goodsType == 2 or goodsType == 1">
-			stock.lockedqty as qpqty,
-		</if>
-		<if test="goodsType == 0">
-			stock.fxqty as qpqty,
-		</if>
+		stock.fxqty as qpqty,
 		bgp.delivery_place
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id 
 		left join 
@@ -331,12 +326,7 @@
 		gs.item_code,gi.sku,gs.is_promotion,gi.excise_tax,gi.weight,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
-		<if test="goodsType == 2 or goodsType == 0">
-			stock.lockedqty as qpqty,
-		</if>
-		<if test="goodsType == 1">
-			stock.fxqty as qpqty,
-		</if>
+		stock.fxqty as qpqty,
 		bgp.delivery_place,gs.status as specsStatus 
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
 		left join 
@@ -437,6 +427,7 @@
 		  create_time DATETIME NULL COMMENT '创建时间',
 		  update_time DATETIME NULL COMMENT '更新时间',
 		  opt VARCHAR(20) NULL COMMENT '操作人',
+		  is_free_tax tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包税0：否，1是',
 		  PRIMARY KEY (id),
 		  UNIQUE INDEX id_UNIQUE (id ASC),
 		  UNIQUE INDEX goodsId_UNIQUE (goods_id ASC),
@@ -527,6 +518,7 @@
 		  goods_id VARCHAR(100) NOT NULL COMMENT '商品ID',
 		  item_id varchar(50) NOT NULL COMMENT '供销内部商品ID',
 		  item_code varchar(50) NOT NULL COMMENT '商家自有编码',
+		  encode varchar(50) NOT NULL COMMENT '条形码',
   		  excise_tax DECIMAL(5,2) NULL COMMENT '消费税',
 		  is_promotion tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0：否；1：是',
 		  status tinyint UNSIGNED DEFAULT 0 COMMENT '商品状态0：停售，1：在售',
@@ -729,7 +721,7 @@
 	
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
-		select gi.id, gi.goods_id, gi.create_time, g.goods_name as customGoodsName ,gi.is_popular,
+		select gi.id, gi.goods_id, gi.create_time, g.goods_name as customGoodsName ,gi.is_popular, g.type,
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
@@ -833,12 +825,7 @@
 			close="" separator=";" >
 			update goods_stock
 			<set>
-				<if test="orderFlag == 0">
-					fxqty = fxqty - #{item.frozenqty},
-				</if>
-				<if test="orderFlag == 1 or orderFlag == 2">
-					lockedqty = ifnull(lockedqty,0) - #{item.frozenqty},
-				</if>
+				fxqty = fxqty - #{item.frozenqty},
 				frozenqty = frozenqty + #{item.frozenqty}, update_time=now()
 			</set>
 			where item_id = #{item.itemId, jdbcType=VARCHAR}
@@ -850,12 +837,7 @@
 			close="" separator=";">
 			update goods_stock
 			<set>
-				<if test="orderFlag == 0">
-					fxqty = ifnull(fxqty,0) + #{item.quantity},
-				</if>
-				<if test="orderFlag == 1 or orderFlag == 2">
-					lockedqty = ifnull(lockedqty,0) + #{item.quantity},
-				</if>
+				fxqty = ifnull(fxqty,0) + #{item.quantity},
 				frozenqty = ifnull(frozenqty,0) - #{item.quantity}, update_time=now()
 			</set>
 			where item_id = #{item.itemId}
@@ -1004,8 +986,8 @@
 	</insert>
 	
 	<insert id="insertCenterGoodsItem" parameterType="Object">
-		insert ignore into goods_item${centerId}(goods_id,item_id,item_code) 
-		select goods_id,item_id,item_code from goods_item where item_id in 
+		insert ignore into goods_item${centerId}(goods_id,item_id,item_code,encode) 
+		select goods_id,item_id,item_code,encode from goods_item where item_id in 
 		<foreach collection="itemList" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -1060,7 +1042,7 @@
 	</select>
 	
 	<update id="updateGoodsItemUnDistribution" parameterType="Object">
-		update goods_item set status = 1, update_time=now() where item_id in
+		update goods_item set status = 1, update_time=now() where status = 2 and item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}

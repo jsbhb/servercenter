@@ -1,5 +1,6 @@
 package com.zm.timetask.bussiness.service;
 
+import com.github.pagehelper.Page;
 import com.zm.timetask.pojo.TimeTaskModel;
 
 /**
@@ -65,5 +66,23 @@ public interface TimeTaskService {
 	 * @since JDK 1.7
 	 */
 	void dynamicSchedule(Integer centerId, String activeId, String startTime, String endTime, Integer type);
+	
+	/**
+	 * queryAllTimeTask:查询所有任务调度. <br/>
+	 * 
+	 * @author why
+	 * @param TimeTaskModel
+	 * @since JDK 1.7
+	 */
+	Page<TimeTaskModel> queryAllTimeTask(TimeTaskModel entity);
+	
+	/**
+	 * queryAllTimeTash:根据编号查询任务调度. <br/>
+	 * 
+	 * @author wqy
+	 * @param TimeTaskModel
+	 * @since JDK 1.7
+	 */
+	TimeTaskModel queryTimeTaskById(Integer id);
 	
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -16,9 +17,14 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
+import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -200,12 +206,11 @@ public class GoodsBackController {
 	}
 
 	@RequestMapping(value = "{version}/goods/goodsRebate/queryById", method = RequestMethod.POST)
-	public ResultModel queryById(@PathVariable("version") Double version, @RequestBody GoodsRebateEntity entity) {
+	public ResultModel queryById(@PathVariable("version") Double version, @RequestParam("itemId") String itemId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				GoodsRebateEntity result = goodsBackService.queryById(entity);
-				return new ResultModel(true, result);
+				return new ResultModel(true, goodsBackService.queryById(itemId));
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}
@@ -368,5 +373,72 @@ public class GoodsBackController {
 		}
 
 		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/rebate", method = RequestMethod.GET)
+	public ResultModel getGoodsRebate(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestParam("itemId") String itemId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsBackService.getGoodsRebate(itemId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryGoodsInfoListForDownload", method = RequestMethod.POST)
+	public ResultModel queryGoodsInfoListForDownload(HttpServletRequest request,
+			@PathVariable("version") Double version, @RequestBody GoodsListDownloadParam param) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				List<GoodsInfoListForDownload> result = goodsBackService.queryGoodsListForDownload(param);
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/item/maintainStockByItemId", method = RequestMethod.POST)
+	public ResultModel maintainStockByItemId(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody List<GoodsStockEntity> stocks) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				if (stocks.size() <= 0) {
+					return new ResultModel(false, "参数值为空");
+				}
+				goodsBackService.maintainStockByItemId(stocks);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/maintain/files", method = RequestMethod.POST)
+	public ResultModel maintainFiles(@PathVariable("version") Double version,
+			@RequestBody List<GoodsFielsMaintainBO> list) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, goodsBackService.maintainFiles(list));
+			} catch (Exception e) {
+				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			}
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
+	@RequestMapping(value = "{version}/goods/import/goods", method = RequestMethod.POST)
+	public ResultModel importGoods(@PathVariable("version") Double version, @RequestBody List<GoodsInfoEntity> list) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsBackService.importGoods(list);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 }

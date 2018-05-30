@@ -39,6 +39,7 @@
 		<result column="pic2_path" property="picPath2" jdbcType="VARCHAR" />
 		<result column="pic3_path" property="picPath3" jdbcType="VARCHAR" />
 		<result column="pic4_path" property="picPath4" jdbcType="VARCHAR" />
+		<result column="gradeTypeName" property="gradeTypeName" jdbcType="VARCHAR" />
 	</resultMap>
 	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -82,6 +83,9 @@
 		<if test="mobileUrl!=null and mobileUrl!=''">
 			,mobile_url = #{mobileUrl}
 		</if>
+		<if test="gradeType!=null and gradeType!=''">
+			,grade_type = #{gradeType}
+		</if>
 		where id = #{id}
 	</update>
 
@@ -99,13 +103,15 @@
 	</select>
 
 	<select id="selectForPage" parameterType="Object" resultMap="grade">
-		select a.*,b.grade_name as parentGradeName from grade a left join
-		grade b on a.parent_id = b.id where 1=1
+		select a.*,b.grade_name as parentGradeName ,c.name as gradeTypeName
+		from grade a 
+		left join grade b on a.parent_id = b.id 
+		left join grade_type c on a.grade_type = c.id where 1=1
 		<if test="id != null">
 			and (a.id = #{id} or a.parent_id = #{id})
 		</if>
 		<if test="gradeName != null and gradeName != ''">
-			and a.gradeName like CONCAT('%',#{gradeName},'%')
+			and a.grade_name like CONCAT('%',#{gradeName},'%')
 		</if>
 		<if test="company != null and company != ''">
 			and a.company like CONCAT('%',#{company},'%')
@@ -155,7 +161,7 @@
 		CONCAT('%',#{name},'%') or grade_name like CONCAT('%',#{name},'%'))
 	</select>
 
-	<insert id="saveGradeType" parameterType="Object">
+	<insert id="saveGradeType" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
 		insert into
 		grade_type(parent_id,name,description,create_time,opt)
 		values(#{parentId},#{name},#{description},now(),#{opt})
@@ -179,8 +185,8 @@
 		select * from grade_type;
 	</select>
 	
-	<select id="listGradeTypeChildren" resultMap="gradeTypePO">
-		select * from grade_type where parent_id = #{id};
+	<select id="listGradeTypeChildren" resultType="java.lang.String">
+		select getGradeTypeChildLst(#{id});
 	</select>
 	
 	<select id="countGradeByGradeType" parameterType="Object" resultType="java.lang.Integer">
@@ -188,7 +194,7 @@
 	</select>
 	
 	<delete id="removeGradeType" parameterType="Object">
-		delete * from grade_type where id = #{id}
+		delete from grade_type where id = #{id}
 	</delete>
 	
 	<update id="updateGradeType" parameterType="Object">
@@ -211,5 +217,20 @@
 	
 	<select id="listChildrenGrade" parameterType="Object" resultType="java.lang.String">
 		select getGradeChildLst(#{gradeId});
+	</select>
+	
+	<select id="getGradeType" parameterType="Object" resultMap="gradeTypePO">
+		select * from grade_type where id = #{id}
+	</select>
+	
+	<select id="listGradeTypeByIds" parameterType="Object" resultMap="gradeTypePO">
+		select * from grade_type where id in
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGradeTypeChildrenById" parameterType="Object" resultMap="gradeTypePO">
+		select * from grade_type where parent_id = #{id}
 	</select>
 </mapper>

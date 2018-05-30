@@ -91,4 +91,6 @@ public interface GradeService {
 	ResultModel removeGradeType(Integer id);
 
 	ResultModel updateGradeType(GradeTypePO entity);
+
+	ResultModel getGradeType(Integer id);
 }

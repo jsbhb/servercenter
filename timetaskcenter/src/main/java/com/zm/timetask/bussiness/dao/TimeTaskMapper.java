@@ -2,6 +2,7 @@ package com.zm.timetask.bussiness.dao;
 
 import java.util.List;
 
+import com.github.pagehelper.Page;
 import com.zm.timetask.pojo.TimeTaskModel;
 
 public interface TimeTaskMapper {
@@ -17,4 +18,6 @@ public interface TimeTaskMapper {
 	void startTimeTask(Integer id);
 	
 	void updateTimeTask(TimeTaskModel model);
+	
+	Page<TimeTaskModel> queryListTimeTask(TimeTaskModel model);
 }

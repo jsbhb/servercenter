@@ -9,6 +9,7 @@
 		<result column="item_id" property="itemId" />
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
+		<result column="encode" property="encode"/>
 		<result column="weight" property="weight"/>
 		<result column="excise_fax" property="exciseTax"/>
 		<result column="status" property="status"/>
@@ -22,6 +23,8 @@
 		<result column="supplier_name" property="supplierName"/>
 		<result column="center_item_id" property="centerItemId"/>
 		<result column="center_status" property="centerStatus"/>
+		<result column="shelf_life" property="shelfLife"/>
+		<result column="carton" property="carTon"/>
 		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
 			<result column="min" property="min"/>
 			<result column="max" property="max"/>
@@ -36,6 +39,15 @@
 			<result column="defQty" property="defQty"/>
 			<result column="lockedQty" property="lockedQty"/>
 			<result column="frozenQty" property="frozenQty"/>
+		</association>
+		<association property="tagBindEntity" javaType="com.zm.goods.pojo.ERPGoodsTagBindEntity">
+			<id column="tag_bind_id" property="id" jdbcType="INTEGER" />
+			<result column="tag_id" property="tagId" jdbcType="INTEGER" />
+		</association>
+		<association property="goodsEntity" javaType="com.zm.goods.pojo.GoodsEntity">
+			<id column="g_id" property="id" jdbcType="INTEGER" />
+			<result column="specs_template_id" property="templateId" jdbcType="INTEGER" />
+			<result column="origin" property="origin" jdbcType="VARCHAR" />
 		</association>
 	</resultMap>
 	
@@ -69,6 +81,7 @@
 		<result column="item_code" property="itemCode"/>
 		<result column="sku" property="sku"/>
 		<result column="weight" property="weight"/>
+		<result column="encode" property="encode"/>
 		<result column="excise_tax" property="exciseTax"/>
 		<result column="status" property="status"/>
 		<result column="discount" property="discount"/>
@@ -81,6 +94,8 @@
 		<result column="supplier_name" property="supplierName"/>
 		<result column="center_item_id" property="centerItemId"/>
 		<result column="center_status" property="centerStatus"/>
+		<result column="shelf_life" property="shelfLife"/>
+		<result column="carton" property="carTon"/>
 		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
 			<result column="min" property="min"/>
 			<result column="max" property="max"/>
@@ -104,7 +119,7 @@
 			<result column="tariff" property="tariff"/>
 			<result column="unit" property="unit"/>
 			<result column="hscode" property="hscode"/>
-			<result column="encode" property="encode"/>
+			<result column="b_encode" property="encode"/>
 			<result column="first_category" property="firstCatalogId"/>
 			<result column="second_category" property="secondCatalogId"/>
 			<result column="third_category" property="thirdCatalogId"/>
@@ -113,6 +128,11 @@
 		<association property="tagBindEntity" javaType="com.zm.goods.pojo.ERPGoodsTagBindEntity">
 			<id column="tag_bind_id" property="id" jdbcType="INTEGER" />
 			<result column="tag_id" property="tagId" jdbcType="INTEGER" />
+		</association>
+		<association property="goodsEntity" javaType="com.zm.goods.pojo.GoodsEntity">
+			<id column="g_id" property="id" jdbcType="INTEGER" />
+			<result column="specs_template_id" property="templateId" jdbcType="INTEGER" />
+			<result column="origin" property="origin" jdbcType="VARCHAR" />
 		</association>
 	</resultMap>
 	
@@ -162,10 +182,10 @@
 <!-- 	</select> -->
 	
 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity">
-		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
+		select i.*,g.supplier_id,g.supplier_name,g.goods_name,g.id g_id,g.origin,g.specs_template_id,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,b.id as base_id,b.brand_id,
-		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode,b.first_category,
+		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode b_encode,b.first_category,
 		b.second_category,b.third_category,b.center_id,tag.id as tag_bind_id,tag.tag_id
 		from goods_item i 
 		left join goods g on g.goods_id = i.goods_id
@@ -222,17 +242,25 @@
 		<if test="id !=null and id !=''">
 			and i.id = #{id} 
 		</if>
+		<if test="goodsEntity!=null">
+			<if test="goodsEntity.type!=null">
+				and g.type = #{goodsEntity.type}
+			</if>
+		</if>
+		order by i.id desc
 	</select>
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
-		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
+		select i.*,g.supplier_id,g.supplier_name,g.goods_name,g.id g_id,g.origin,g.specs_template_id,
 		c.item_id as center_item_id,c.status as center_status,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
-		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
+		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,tag.id as tag_bind_id,tag.tag_id 
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
 		left join goods_stock s on s.item_id = i.item_id 
-		left join goods_item_${centerId} c on c.item_id = i.item_id where i.status = 2
+		left join goods_item_${centerId} c on c.item_id = i.item_id 
+		left join goods_tag_bind tag on i.item_id = tag.item_id
+		where i.status = 2
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
@@ -260,17 +288,32 @@
 		<if test="entity.id !=null and entity.id !=''">
 			and id = #{entity.id} 
 		</if>
-		<if test="entity.tagBindEntity!=null and entity.tagBindEntity!=''">
-			and i.item_id in (${entity.tagBindEntity.itemId})
+		<if test="entity.tagBindEntity !=null and entity.tagBindEntity !=''">
+			and tag.tag_id = #{entity.tagBindEntity.tagId}
+		</if>
+		<if test="entity.goodsEntity!=null">
+			<if test="entity.goodsEntity.type!=null">
+				and g.type = #{entity.goodsEntity.type}
+			</if>
 		</if>
 	</select>
 	
 	
 	<insert id="insert" parameterType="Object">
 		insert into goods_item 
-		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt)
+		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion,encode,shelf_life,carton)
 		value
-		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt})
+		(#{goodsId},#{itemId},#{itemCode},#{sku},#{weight},#{exciseTax},#{status},#{discount},#{info},now(),now(),#{opt},#{conversion},#{encode,jdbcType=VARCHAR},#{shelfLife,jdbcType=VARCHAR},#{carTon,jdbcType=VARCHAR})
+	</insert>
+	
+	<insert id="insertBatch" parameterType="Object">
+		insert into goods_item 
+		(goods_id,item_id,item_code,sku,weight,excise_tax,status,discount,info,create_time,update_time,opt,conversion,encode,shelf_life,carton)
+		value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.goodsId},#{item.itemId},#{item.itemCode},#{item.sku},#{item.weight},#{item.exciseTax},#{item.status},#{item.discount},#{item.info},
+			now(),now(),#{item.opt},#{item.conversion},#{item.encode,jdbcType=VARCHAR},#{item.shelfLife,jdbcType=VARCHAR},#{item.carTon,jdbcType=VARCHAR})
+		</foreach>
 	</insert>
 	
 	<insert id="insertPrice" parameterType="Object">
@@ -294,6 +337,15 @@
 		#{proxyPrice},#{fxPrice},#{retailPrice},now(),now(),#{opt})
 	</insert>
 	
+	<insert id="insertPriceBatch" parameterType="Object">
+		insert into goods_price 
+		(item_id,min,max,proxy_price,fxprice,retail_price,create_time,update_time,opt)
+		value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.itemId},#{item.min},#{item.max},#{item.proxyPrice},#{item.fxPrice},#{item.retailPrice},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
 	<update id="update" parameterType="Object">
 		update goods_item set update_time=now()
 		<if test="itemCode!=null and itemCode!=''">
@@ -306,6 +358,21 @@
 			,weight = #{weight} 
 		</if>
 		 ,excise_tax = #{exciseTax}
+		<if test="conversion !=null and conversion !=''">
+			,conversion = #{conversion} 
+		</if>
+		<if test="encode !=null and encode !=''">
+			,encode = #{encode} 
+		</if>
+		<if test="info !=null and info !=''">
+			,info = #{info} 
+		</if>
+		<if test="shelfLife !=null and shelfLife !=''">
+			,shelf_life = #{shelfLife} 
+		</if>
+		<if test="carTon !=null and carTon !=''">
+			,carton = #{carTon} 
+		</if>
 		 where item_id  = #{itemId}
 	</update>
 	
@@ -470,5 +537,74 @@
 			and g.id = #{entity.id} 
 		</if>
 	</select>
+	
+	<update id="updateGoodsItemBeUseForBatch" parameterType="Object">
+		update goods_item set status = 1, update_time=now() where status = 0 and item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
+	
+	<insert id="insertStockForBatch" parameterType="Object">
+		insert ignore into goods_stock 
+		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time)
+		value
+		<foreach collection="list" item="item" open="" close=""
+			separator=",">
+			(#{item},0,0,0,0,0,now(),now())
+		</foreach>
+	</insert>
+	
+	<update id="updateGoodsItemBeFxForBatch" parameterType="Object">
+		update goods_item set status = 2, update_time=now() where status = 1 and item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
+	
+	<delete id="deleteAllFiles" parameterType="Object">
+		delete from goods_file where goods_id = #{goodsId}
+	</delete>
+	
+	<delete id="deleteListFiles" parameterType="Object">
+		delete from goods_file where id in 
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.id}
+		</foreach>
+	</delete>
+	
+	<update id="updateSubGoodsItem">
+		update goods_item,goods_item_2 set goods_item_2.update_time=now(),
+		goods_item_2.goods_id=goods_item.goods_id,goods_item_2.item_id=goods_item.item_id,
+		goods_item_2.item_code=goods_item.item_code,goods_item_2.encode=goods_item.encode
+		where goods_item_2.item_id=goods_item.item_id and goods_item.item_id  = #{itemId}
+	</update>
+	
+	<update id="updateGoodsStockByItemId" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			UPDATE goods_stock
+	        SET
+		        qpqty = qpqty + #{item.fxQty},
+		        fxqty = fxqty + #{item.fxQty}
+	        WHERE
+	        	item_id=#{item.itemId}
+		</foreach>
+	</update>
+	
+	<select id="queryItemCodeAndConversion" parameterType="Object" resultType="java.lang.String">
+		select CONCAT_WS(',',item_code, conversion) from goods_item
+	</select>
+	
+	<insert id="insertStockBatch" parameterType="Object">
+		insert ignore into goods_stock 
+		(item_id,qpQty,fxQty,defQty,lockedQty,frozenQty,create_time,update_time,opt)
+		value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.itemId},#{item.qpQty},#{item.fxQty},0,0,0,now(),now(),#{item.opt})
+		</foreach>
+	</insert>
 	
 </mapper>

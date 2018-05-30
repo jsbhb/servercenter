@@ -19,6 +19,7 @@ import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 
 /**  
  * ClassName: OrderMapper <br/>  
@@ -127,14 +128,41 @@ public interface OrderMapper {
 	
 	void updateOrderRebate(String orderId);
 
+	/**
+	 * @fun 获取天天仓订单，过时，统一所有订单支付单报关后发仓库
+	 * @return
+	 */
+	@Deprecated
 	List<OrderInfo> listOrderForSendToTTWarehouse();
-	
+	/**
+	 * @fun 获取其他仓仓订单，过时，统一所有订单支付单报关后发仓库
+	 * @return
+	 */
+	@Deprecated
 	List<OrderInfo> listOrderForSendToOtherWarehouse();
+	/**
+	 * @fun 获取跨境推送订单
+	 * @return
+	 */
+	List<OrderInfo> listOrderForSendToWarehouse();
+	/**
+	 * @fun 获取一般贸易推送订单
+	 * @return
+	 */
+	List<OrderInfo> listOrderForSendToWarehouseGeneralTrade();
 
 	void updateOrderRefunds(String orderId);
 
 	List<OrderInfo> listCapitalPoolNotEnough();
 	
 	List<ThirdOrderInfo> getThirdInfo(String orderId);
+
+	List<Integer> listOrderStatus(String orderId);
+
+	Integer getGradeId(String orderId);
+	
+	void updateThirdOrderInfoById(ExpressMaintenanceBO model);
+	
+	void saveThirdOrderInfo(ExpressMaintenanceBO model);
 	
 }

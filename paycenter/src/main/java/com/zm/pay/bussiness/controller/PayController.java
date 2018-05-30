@@ -102,5 +102,12 @@ public class PayController {
 
 		return payService.payCustom(model);
 	}
+	
+	@RequestMapping(value = "pay/testHttps", method = RequestMethod.POST)
+	@ApiIgnore
+	public String testHttps() throws Exception {
+
+		return payService.testHttps();
+	}
 
 }

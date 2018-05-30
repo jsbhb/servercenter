@@ -36,11 +36,9 @@ public class RebateServiceImpl implements RebateService {
 	@Resource
 	RebateMapper rebateMapper;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void updateRebateTask() {
 
-		List<RebateDetail> detailList = new ArrayList<RebateDetail>();
 		List<Rebate> rebateList = new ArrayList<Rebate>();
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Set<String> keys = template.keys(Constants.GRADE_ORDER_REBATE + "*");
@@ -62,34 +60,31 @@ public class RebateServiceImpl implements RebateService {
 				}
 			}
 		}
-		if(rebateList.size() > 0){
+		if (rebateList.size() > 0) {
 			rebateMapper.insertRebate(rebateList);
 		}
-		List<String> rebateDetailList = template.opsForList().range(Constants.REBATE_DETAIL, 0, -1);
-		if (rebateDetailList != null) {
-			Map<String, String> temp = null;
+	}
+
+	@Override
+	public void saveRebateDetail(Map<String, String> map) {
+		if (map != null && map.size() > 0) {
+			List<RebateDetail> detailList = new ArrayList<RebateDetail>();
 			RebateDetail rebateDetail = null;
-			for (String str : rebateDetailList) {
-				try {
-					temp = JSONUtil.parse(str, Map.class);
-					for (Map.Entry<String, String> entry : temp.entrySet()) {
-						if("orderId".equals(entry.getKey())){
-							continue;
-						}
-						rebateDetail = new RebateDetail();
-						rebateDetail.setGradeId(Integer.valueOf(entry.getKey()));
-						rebateDetail.setRebateMoney(Double.valueOf(entry.getValue()));
-						rebateDetail.setOrderId(temp.get("orderId"));
-						detailList.add(rebateDetail);
-					}
-				} catch (Exception e) {
-					LogUtil.writeErrorLog("【从redis中获取数据转换成明细出错】", e);
+			for (Map.Entry<String, String> entry : map.entrySet()) {
+				if ("orderId".equals(entry.getKey())) {
+					continue;
+				}
+				if (entry.getValue() != null && Double.valueOf(entry.getValue()) > 0) {
+					rebateDetail = new RebateDetail();
+					rebateDetail.setGradeId(Integer.valueOf(entry.getKey()));
+					rebateDetail.setRebateMoney(Double.valueOf(entry.getValue()));
+					rebateDetail.setOrderId(map.get("orderId"));
+					detailList.add(rebateDetail);
 				}
 			}
-		}
-		if (detailList.size() > 0) {
-			rebateMapper.insertRebateDetail(detailList);
-			template.opsForList().trim(Constants.REBATE_DETAIL, detailList.size(), -1);// 删除以保存的记录
+			if (detailList.size() > 0) {
+				rebateMapper.insertRebateDetail(detailList);
+			}
 		}
 
 	}
@@ -102,7 +97,9 @@ public class RebateServiceImpl implements RebateService {
 		if (result == null) {
 			return new ResultModel(true, null);
 		}
-		return new ResultModel(true, JSONUtil.parse(JSONUtil.toJson(result), Rebate.class));
+		Rebate rebate = JSONUtil.parse(JSONUtil.toJson(result), Rebate.class);
+		rebate.setGradeId(gradeId);
+		return new ResultModel(true, rebate);
 	}
 
 	@Override
@@ -116,4 +113,23 @@ public class RebateServiceImpl implements RebateService {
 		PageHelper.startPage(search.getCurrentPage(), search.getNumPerPage(), true);
 		return rebateMapper.listRebate(search);
 	}
+
+	@Override
+	public void updateRebateDetail(String orderId, Integer status) {
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("orderId", orderId);
+		param.put("status", status);
+		rebateMapper.updateRebateDetail(param);
+	}
+
+	@Override
+	public void redisTool(String key, Map<String, String> map) {
+		template.opsForHash().putAll(key, map);
+	}
+
+	@Override
+	public void redisToolList(String key, String value) {
+		template.opsForSet().add(key, value);
+	}
+
 }

@@ -79,6 +79,8 @@ public class Grade extends Pagination{
 	private String picPath4;
 	
 	private Integer copyMall;
+
+	private String gradeTypeName;
 	
 	public Grade(){
 		super();
@@ -346,6 +348,14 @@ public class Grade extends Pagination{
 
 	public void setRedirectUrl(String redirectUrl) {
 		this.redirectUrl = redirectUrl;
+	}
+
+	public String getGradeTypeName() {
+		return gradeTypeName;
+	}
+
+	public void setGradeTypeName(String gradeTypeName) {
+		this.gradeTypeName = gradeTypeName;
 	}
 	
 }

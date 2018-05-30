@@ -7,6 +7,8 @@
  */
 package com.zm.goods.bussiness.dao;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsBaseEntity;
 
@@ -68,5 +70,7 @@ public interface GoodsBaseMapper {
 	 * @since JDK 1.7
 	 */
 	void update(GoodsBaseEntity entity);
+
+	void insertBatch(List<GoodsBaseEntity> baseList);
 
 }

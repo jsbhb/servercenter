@@ -173,4 +173,22 @@ public interface GoodsItemService {
 	 */
 	Page<GoodsEntity> queryCenterByPageDownload(GoodsItemEntity entity, int centerId);
 
+	/**  
+	 * beUse:设置商品明细不可用. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void batchBeUse(GoodsItemEntity entity);
+
+	/**  
+	 * beUse:设置商品明细不可用. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void batchBeFx(GoodsItemEntity entity);
+
 }

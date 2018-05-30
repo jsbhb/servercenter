@@ -9,8 +9,15 @@ import java.util.List;
 public class GradeTypeDTO {
 
 	private Integer id;
+	private Integer parentId;
 	private String name;
 	private List<GradeTypeDTO> childern;
+	public Integer getParentId() {
+		return parentId;
+	}
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
+	}
 	public Integer getId() {
 		return id;
 	}

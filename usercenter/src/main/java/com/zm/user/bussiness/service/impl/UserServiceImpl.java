@@ -347,6 +347,7 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		result.put("userId", userId);
+		result.put("gradeId", grade.getId());
 
 		grade.setPersonInChargeId(userId);
 
@@ -359,7 +360,7 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		//添加注册信息存储
-//		userMapper.saveGradeData(grade);
+		userMapper.saveGradeData(grade);
 		//通知订单中心新增grade
 		GradeBO gradeBO = new GradeBO();
 		gradeBO.setId(grade.getId());

@@ -21,21 +21,27 @@ public class OpenInterfaceUtil {
 		user.setUserDetail(detail);
 		return user;
 	}
-	
-	public static ResultModel paramValidate(ButtJointOrder orderInfo){
-		if(!orderInfo.validate() || !orderInfo.getOrderDetail().validate()){
+
+	public static ResultModel paramValidate(ButtJointOrder orderInfo) {
+		if (!orderInfo.validate() || !orderInfo.getOrderDetail().validate()) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
-		if(orderInfo.getOrderDetail() == null){
+		if (!orderInfo.getCenterId().equals(orderInfo.getShopId()) || !"5".equals(orderInfo.getCreateType())
+				|| !"0".equals(orderInfo.getExpressType()) || !"0".equals(orderInfo.getOrderDetail().getDisAmount())) {
+			return new ResultModel(false, ErrorCodeEnum.PARAM_ERROR.getErrorCode(),
+					ErrorCodeEnum.PARAM_ERROR.getErrorMsg());
+		}
+
+		if (orderInfo.getOrderDetail() == null) {
 			return new ResultModel(false, ErrorCodeEnum.ORDER_MISS_DETAIL.getErrorCode(),
 					ErrorCodeEnum.ORDER_MISS_DETAIL.getErrorMsg());
 		}
-		if(orderInfo.getOrderGoodsList() == null){
+		if (orderInfo.getOrderGoodsList() == null) {
 			return new ResultModel(false, ErrorCodeEnum.ORDER_MISS_GOODS.getErrorCode(),
 					ErrorCodeEnum.ORDER_MISS_GOODS.getErrorMsg());
 		}
-		if(orderInfo.getOrderDetail().getPayment() > 2000){
+		if (orderInfo.getOrderDetail().getPayment() > 2000) {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 		}
@@ -43,21 +49,21 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.BUYER_PHONE_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.BUYER_PHONE_VALIDATE_ERROR.getErrorMsg());
 		}
-		if(!RegularUtil.isIdentify(orderInfo.getNumId())){
+		if (!RegularUtil.isIdentify(orderInfo.getNumId())) {
 			return new ResultModel(false, ErrorCodeEnum.IDENTIFY_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.IDENTIFY_VALIDATE_ERROR.getErrorMsg());
 		}
-		if(!RegularUtil.isPhone(orderInfo.getOrderDetail().getReceivePhone())){
+		if (!RegularUtil.isPhone(orderInfo.getOrderDetail().getReceivePhone())) {
 			return new ResultModel(false, ErrorCodeEnum.RECEIVE_PHONE_ERROR.getErrorCode(),
 					ErrorCodeEnum.RECEIVE_PHONE_ERROR.getErrorMsg());
 		}
-		for(OrderGoods goods : orderInfo.getOrderGoodsList()){
-			if(!goods.validate()){
+		for (OrderGoods goods : orderInfo.getOrderGoodsList()) {
+			if (!goods.validate()) {
 				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 			}
 		}
-		
+
 		return null;
 	}
 }

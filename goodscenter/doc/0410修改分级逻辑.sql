@@ -15,3 +15,6 @@ CREATE TABLE `goods_rebate` (
   UNIQUE INDEX `item_id_UNIQUE` (`item_id`,`grade_type` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品返佣表';
+
+
+alter table goods_rebate modify proportion decimal(12,6);

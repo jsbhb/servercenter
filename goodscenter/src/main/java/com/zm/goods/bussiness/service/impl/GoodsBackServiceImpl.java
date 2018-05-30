@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,15 +28,21 @@ import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoEntity;
+import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
@@ -173,8 +180,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	public GoodsRebateEntity queryById(GoodsRebateEntity entity) {
-		return goodsBackMapper.selectGoodsRebateById(entity);
+	public List<GoodsRebateEntity> queryById(String itemId) {
+		return goodsBackMapper.selectGoodsRebateById(itemId);
 	}
 
 	@Override
@@ -287,26 +294,177 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public void updateGoodsInfo(GoodsInfoEntity entity) {
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		goodsItemMapper.update(entity.getGoods().getGoodsItem());
+		// 主表修改后同步到分表中去，目前只同步mallId为2的分表 START
+		goodsItemMapper.updateSubGoodsItem(entity.getGoods().getGoodsItem().getItemId());
+		// 主表修改后同步到分表中去，目前只同步mallId为2的分表 END
 		goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
+			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
+			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
+
+			// 过滤相同文件列表
+			for (GoodsFile ngf : entity.getGoods().getFiles()) {
+				for (GoodsFile gf : oldFiles) {
+					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+						existFiles.add(gf);
+						oldFiles.remove(gf);
+						break;
+					}
+				}
+			}
+			// 挑出新增文件列表
+			for (GoodsFile gf : existFiles) {
+				for (GoodsFile ngf : entity.getGoods().getFiles()) {
+					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+						entity.getGoods().getFiles().remove(ngf);
+						break;
+					}
+				}
+			}
+
+			if (entity.getGoods().getFiles().size() > 0) {
+				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+			}
+			if (oldFiles.size() > 0) {
+				goodsItemMapper.deleteListFiles(oldFiles);
+			}
+		} else {
+			// 商品编辑时，如果没有传图片信息，则删除表中记录
+			goodsItemMapper.deleteAllFiles(entity.getGoods());
 		}
 		// 判断商品标签
-		 ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getGoodsItem());
-		 if (entity.getGoods().getGoodsTagBind() != null) {
-			 //增删改
-			 ERPGoodsTagBindEntity newTag = entity.getGoods().getGoodsTagBind();
-			 if (oldTag == null && newTag.getTagId() != 0) {
-				 goodsBackMapper.insertTagBind(newTag);
-			 } else if (oldTag != null && newTag.getTagId() == 0) {
-				 goodsBackMapper.deleteTagBind(oldTag);
-			 } else if (oldTag != null && newTag.getTagId() != 0) {
-				 goodsBackMapper.updateTagBind(newTag);
-			 }
-		 } else {
-			 if (oldTag != null) {
-				 goodsBackMapper.deleteTagBind(oldTag);
-			 }
-		 }
+		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getGoodsItem());
+		if (entity.getGoods().getGoodsTagBind() != null) {
+			// 增删改
+			ERPGoodsTagBindEntity newTag = entity.getGoods().getGoodsTagBind();
+			if (oldTag == null && newTag.getTagId() != 0) {
+				goodsBackMapper.insertTagBind(newTag);
+			} else if (oldTag != null && newTag.getTagId() == 0) {
+				goodsBackMapper.deleteTagBind(oldTag);
+			} else if (oldTag != null && newTag.getTagId() != 0) {
+				goodsBackMapper.updateTagBind(newTag);
+			}
+		} else {
+			if (oldTag != null) {
+				goodsBackMapper.deleteTagBind(oldTag);
+			}
+		}
+	}
+
+	@Override
+	public ResultModel getGoodsRebate(String itemId) {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		return new ResultModel(true, hashOperations.entries(Constants.GOODS_REBATE + itemId));
+	}
+
+	@Override
+	public List<GoodsInfoListForDownload> queryGoodsListForDownload(GoodsListDownloadParam param) {
+		return goodsBackMapper.selectGoodsListForDownload(param);
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public void maintainStockByItemId(List<GoodsStockEntity> stocks) {
+		goodsItemMapper.updateGoodsStockByItemId(stocks);
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public String maintainFiles(List<GoodsFielsMaintainBO> list) {
+		StringBuilder sb = new StringBuilder();
+		if (list != null && list.size() > 0) {
+			GoodsEntity entity = null;
+			GoodsFile goodsFile = null;
+			List<GoodsFile> fileList = null;
+			List<String> goodsIdList = null;
+			for (GoodsFielsMaintainBO model : list) {
+				goodsIdList = goodsBackMapper.listGoodsIdsByItemCode(model.getItemCode());
+				if (goodsIdList != null && goodsIdList.size() > 0) {
+					for (String goodsId : goodsIdList) {
+						entity = new GoodsEntity();
+						entity.setGoodsId(goodsId);
+						entity.setDetailPath(model.getGoodsDetailPath());
+						goodsBackMapper.updateDetailPath(entity);
+						if (model.getPicPathList() != null && model.getPicPathList().size() > 0) {
+							fileList = new ArrayList<GoodsFile>();
+							for (String str : model.getPicPathList()) {
+								goodsFile = new GoodsFile();
+								goodsFile.setGoodsId(goodsId);
+								goodsFile.setPath(str);
+								goodsFile.setOpt("batch");
+								fileList.add(goodsFile);
+							}
+							goodsItemMapper.insertFiles(fileList);
+						}
+					}
+				} else {
+					sb.append(model.getItemCode()+",");
+				}
+			}
+			if(sb.length() > 0){
+				sb.append("没有找到以上商家编码商品,请核对后重新上传以上商品");
+			}
+		}
+		return sb.toString();
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public ResultModel importGoods(List<GoodsInfoEntity> list) {
+		StringBuilder sb = new StringBuilder();
+		List<GoodsBaseEntity> baseList = new ArrayList<GoodsBaseEntity>();
+		List<GoodsEntity> goodsList = new ArrayList<GoodsEntity>();
+		List<GoodsItemEntity> itemList = new ArrayList<GoodsItemEntity>();
+		List<GoodsPrice> priceList = new ArrayList<GoodsPrice>();
+		List<GoodsStockEntity> stockList = new ArrayList<GoodsStockEntity>();
+		List<GoodsRebateEntity> rebateList = new ArrayList<GoodsRebateEntity>();
+		if (list != null && list.size() > 0) {
+			GoodsItemEntity goodsItem = null;
+			SetOperations<String, Object> setOperations = template.opsForSet();
+			for (GoodsInfoEntity entity : list) {
+				goodsItem = entity.getGoods().getGoodsItem();
+				boolean contain = setOperations.isMember(Constants.GOODS_CACHE, goodsItem.getItemCode()+","+goodsItem.getConversion());
+				if (contain) {
+					sb.append("商家编码：");
+					sb.append(goodsItem.getItemCode());
+					sb.append(",");
+					sb.append("换算比例：");
+					sb.append(goodsItem.getConversion());
+					sb.append(";");
+					LogUtil.writeLog("商家编码：" + goodsItem.getItemCode() + ",换算比例：" + goodsItem.getConversion() + "已经存在");
+					continue;
+				} else {
+					baseList.add(entity.getGoodsBase());
+					goodsList.add(entity.getGoods());
+					itemList.add(goodsItem);
+					priceList.add(goodsItem.getGoodsPrice());
+					stockList.add(goodsItem.getStock());
+					rebateList.addAll(entity.getGoodsRebateList());
+				}
+			}
+			if(baseList.size() > 0){
+				goodsBaseMapper.insertBatch(baseList);
+			}
+			if(goodsList.size() > 0){
+				goodsBackMapper.insertBatch(goodsList);
+			}
+			if(itemList.size() > 0){
+				goodsItemMapper.insertBatch(itemList);
+			}
+			if(priceList.size() > 0){
+				goodsItemMapper.insertPriceBatch(priceList);
+			}
+			if(stockList.size() > 0){
+				goodsItemMapper.insertStockBatch(stockList);
+			}
+			if(rebateList.size() > 0){
+				insertGoodsRebate(rebateList);
+			}
+			for(GoodsItemEntity entity : itemList){
+				setOperations.add(Constants.GOODS_CACHE, entity.getItemCode()+","+entity.getConversion());
+			}
+		}
+		return new ResultModel(true, sb.toString());
 	}
 }

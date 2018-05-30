@@ -63,6 +63,7 @@
 		<if test="id > 0">
 			and id = #{id} 
 		</if>
+		order by id desc
 	</select>
 	
 	<insert id="insert" parameterType="Object">
@@ -71,12 +72,22 @@
 		,#{thirdCatalogId},#{centerId},now(),now(),#{opt})
 	</insert>
 	
+	<insert id="insertBatch" parameterType="Object">
+		insert into base value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.id},#{item.brandId},#{item.goodsName},#{item.brand},#{item.incrementTax},#{item.tariff},#{item.unit},#{item.hscode},
+			#{item.encode},#{item.firstCatalogId},#{item.secondCatalogId},#{item.thirdCatalogId},#{item.centerId},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
 	<update id="update" parameterType="Object">
 		update base set
 		goods_name=#{goodsName},
 		brand=#{brand},
 		increment_tax=#{incrementTax},
 		tariff=#{tariff},
+		unit=#{unit},
+		hscode=#{hscode},
 		center_id=#{centerId},
 		update_time=now(),opt=#{opt}  where id=#{id}
 	</update>

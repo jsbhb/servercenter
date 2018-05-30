@@ -4,8 +4,6 @@ public class Constants {
 
 	public static final Double FIRST_VERSION = 1.0;
 
-	public static final Integer OWN_SUPPLIER = 1;// 自营仓ID
-
 	// *********************各支付类型******************************/
 	public static final String WX_PAY = "1";
 
@@ -40,12 +38,6 @@ public class Constants {
 
 	public static final Integer FULL_DISCOUNT = 2;// 满打折
 
-	// *******************区域中心ID**********************
-
-	public static final Integer O2O_CENTERID = 1;
-
-	public static final Integer BIG_TRADE_CENTERID = 2;
-
 	// *******************快递方式******************
 	public static final Integer EXPRESS = 0;
 
@@ -71,7 +63,7 @@ public class Constants {
 	// *********************订货平台ID*********************
 
 	public static final Integer PREDETERMINE_PLAT_TYPE = -1;
-	
+
 	// *********************中国供销海外购ID*********************
 
 	public static final Integer CNCOOPBUY = 2;
@@ -89,6 +81,35 @@ public class Constants {
 
 	// *********************等级返佣***************************
 	public static final String GRADE_ORDER_REBATE = "grade:orderrebate:";
+
 	// *********************返佣详情***************************
 	public static final String REBATE_DETAIL = "rebatedetail:";
+
+	// **********************订单周统计前缀***********************
+	public static final String ORDER_STATISTICS_WEEK = "orderstatistics:week:";
+
+	// **********************订单月统计前缀***********************
+	public static final String ORDER_STATISTICS_MONTH = "orderstatistics:month:";
+
+	// **********************销售额周统计前缀***********************
+	public static final String SALES_STATISTICS_WEEK = "salesstatistics:week:";
+
+	// **********************销售额月统计前缀***********************
+	public static final String SALES_STATISTICS_MONTH = "salesstatistics:month:";
+
+	// **********************订单当天统计前缀***********************
+	public static final String ORDER_STATISTICS_DAY = "orderstatistics:day:";
+
+	// **********************销售额当天统计前缀***********************
+	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";
+	
+	
+	//*********************包邮包税redis前缀***************************
+	public static final String POST_TAX = "post_tax:";
+	
+	//*********************包邮包税***************************
+	public static final String FREE_POST = "1";
+	public static final String ARRIVE_POST = "2";
+	public static final String FREE_TAX = "1";
+
 }

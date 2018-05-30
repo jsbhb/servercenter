@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.bussiness.component.OpenInterfaceUtil;
+import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderOpenInterfaceMapper;
 import com.zm.order.bussiness.service.OrderOpenInterfaceService;
@@ -41,6 +42,9 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	
 	@Resource
 	OrderOpenInterfaceMapper orderOpenInterfaceMapper;
+	
+	@Resource
+	ShareProfitComponent shareProfitComponent;
 
 	@Override
 	public ResultModel addOrder(String order) {
@@ -54,8 +58,6 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
 
 		}
-		
-		
 
 		Integer status = orderMapper.getOrderStatusByOrderId(orderInfo.getOrderId());
 		if (status != null) {
@@ -91,11 +93,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			return resultModel;
 		}
 		orderInfo.setUserId(Integer.valueOf(resultModel.getObj().toString()));
-		if (Constants.OWN_SUPPLIER.equals(orderInfo.getSupplierId())) {
-			orderInfo.setStatus(Constants.ORDER_PAY_CUSTOMS);
-		} else {
-			orderInfo.setStatus(Constants.ORDER_PAY);
-		}
+		orderInfo.setStatus(Constants.ORDER_PAY);
 		orderMapper.saveOrder(orderInfo);
 		orderInfo.getOrderDetail().setOrderId(orderInfo.getOrderId());
 
@@ -106,6 +104,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		}
 		orderMapper.saveOrderGoods(orderInfo.getOrderGoodsList());
 
+		shareProfitComponent.calShareProfitStayToAccount(orderInfo.getOrderId());//计算资金池和返佣
 		return new ResultModel(true, null);
 	}
 
@@ -135,6 +134,27 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			orderStatus.setAbnormalMsg(null);
 		}
 		return new ResultModel(true, orderStatus);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ResultModel payCustom(String data) {
+		Map<String,String> param = null;
+		try {
+			param = JSONUtil.parse(data, Map.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
+					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+		}
+		String orderId = param.get("orderId");
+		if(orderId == null){
+			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+		}
+		
+		orderOpenInterfaceMapper.updateOrderPayCustom(orderId);
+		return new ResultModel(true, null);
 	}
 
 }

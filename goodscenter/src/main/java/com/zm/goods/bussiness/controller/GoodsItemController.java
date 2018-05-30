@@ -1,7 +1,5 @@
 package com.zm.goods.bussiness.controller;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -16,7 +15,6 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -43,27 +41,12 @@ public class GoodsItemController {
 
 	@RequestMapping(value = "{version}/goods/item/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsItemEntity entity) {
+			@RequestBody GoodsItemEntity entity, @RequestParam(value = "type",required = false) String type) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String gradeLevel = request.getParameter("gradeLevel");
 			
-//			if (entity.getTagBindEntity() != null) {
-//				ERPGoodsTagBindEntity param = entity.getTagBindEntity();
-//				//增加根据标签查询的条件
-//				String itemIds = "";
-//				List<ERPGoodsTagBindEntity> erpGoodsTagBindList = goodsBackService.queryGoodsTagBindListInfo(param);
-//				for(ERPGoodsTagBindEntity ent:erpGoodsTagBindList) {
-//					itemIds = itemIds + "'" + ent.getItemId() + "',";
-//				}
-//				if (erpGoodsTagBindList.size() > 0) {
-//					itemIds = itemIds.substring(0,itemIds.length()-1);
-//				}
-//				param.setItemId(itemIds);
-//				entity.setTagBindEntity(param);
-//			}
-			
-			if ("1".equals(gradeLevel)) {
+			if ("1".equals(gradeLevel) || "1".equals(type)) {
 				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
 				return new ResultModel(true, page, new Pagination(page));
 			} else {
@@ -115,7 +98,12 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsItemService.beUse(entity);
+				String[] arr = entity.getItemId().split(",");
+				if (arr.length > 1) {
+					goodsItemService.batchBeUse(entity);
+				} else {
+					goodsItemService.beUse(entity);
+				}
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
@@ -130,7 +118,12 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsItemService.beFx(entity);
+				String[] arr = entity.getItemId().split(",");
+				if (arr.length > 1) {
+					goodsItemService.batchBeFx(entity);
+				} else {
+					goodsItemService.beFx(entity);
+				}
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());

@@ -12,8 +12,8 @@
 		<result column="tag_fun" property="tagFun" jdbcType="INTEGER" />
 		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
-		<result column="center_id" property="centerId" jdbcType="INTEGER" />
-		<result column="shop_id" property="shopId" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
@@ -98,7 +98,7 @@
 		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
-		(select ob.id,ob.order_id,ob.status,ob.tag_fun,ob.express_type,ob.supplier_id,ob.create_time,ob.center_id,ob.shop_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
+		(select ob.id,ob.order_id,ob.status,ob.tag_fun,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id
 		from order_base ob where
 		1 = 1 and tag_fun = #{tagFun} and status in (1,2,12)
 		<if test="status != null">
@@ -108,10 +108,10 @@
 			and ob.user_id = #{userId}
 		</if>
 		<if test="centerId != null and centerId != ''">
-			and ob.center_id = #{centerId}
+			and ob.mall_id = #{centerId}
 		</if>
 		<if test="shopId != null and shopId != ''">
-			and ob.shop_id = #{shopId}
+			and ob.grade_id = #{shopId}
 		</if>
 		<if test="orderId != null and orderId != ''">
 			and ob.order_id = #{orderId}

@@ -2,6 +2,7 @@ package com.zm.order.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.order.bussiness.component.CapitalPoolThreadPool;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
+import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.ActivityFeignClient;
@@ -35,6 +38,7 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.feignclient.model.SendOrderResult;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
@@ -95,6 +99,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Resource
 	CapitalPoolThreadPool capitalPoolThreadPool;
+
+	@Resource
+	CacheAbstractService cacheAbstractService;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -164,49 +171,65 @@ public class OrderServiceImpl implements OrderService {
 		priceAndWeightMap = (Map<String, Object>) result.getObj();
 		amount = (Double) priceAndWeightMap.get("totalAmount");
 
-		// 计算邮费(自提不算邮费)
+		// 邮费和税费初始值
 		Double postFee = 0.0;
-		Integer weight = (Integer) priceAndWeightMap.get("weight");
-		if (Constants.EXPRESS.equals(info.getExpressType())) {
-			String province = info.getOrderDetail().getReceiveProvince();
-			PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId());
-			postFee = getPostFee(post);
-		}
-
-		// 计算税费
 		Double taxFee = 0.0;
 		Double totalExciseTax = 0.0;
 		Double totalIncremTax = 0.0;
 		Double unDiscountAmount = 0.0;
-		if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
-			Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
+		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
-			for (Map.Entry<String, Double> entry : map.entrySet()) {
-				unDiscountAmount += entry.getValue();
+		// 获取包邮包税
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> tempMap = hashOperations.entries(Constants.POST_TAX + info.getSupplierId());
+		boolean freePost = false;
+		boolean freeTax = false;
+		if (tempMap != null) {
+			freePost = Constants.FREE_POST.equals(tempMap.get("post"))
+					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
+			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
+		}
+		if (!freePost) {
+			// 计算邮费(自提不算邮费)
+			if (Constants.EXPRESS.equals(info.getExpressType())) {
+				String province = info.getOrderDetail().getReceiveProvince();
+				PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId());
+				postFee = getPostFee(post);
 			}
-			for (Map.Entry<String, Double> entry : map.entrySet()) {
-				Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
-				Double fee = entry.getValue();
-				Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
-				if (tax.getExciseTax() != null) {
-					if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
-						result.setErrorMsg("消费税或增值税设置有误");
-						result.setSuccess(false);
-						return result;
-					}
-					Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
-							CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
-					Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
-					totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
-					Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
-							tax.getIncrementTax());
-					totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
-				} else {
-					totalIncremTax += CalculationUtils.mul(
-							CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()), 0.7);
+		}
+		if (!freeTax) {
+			// 计算税费
+			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
+
+				for (Map.Entry<String, Double> entry : map.entrySet()) {
+					unDiscountAmount += entry.getValue();
 				}
+				for (Map.Entry<String, Double> entry : map.entrySet()) {
+					Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
+					Double fee = entry.getValue();
+					Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
+					if (tax.getExciseTax() != null) {
+						if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
+							result.setErrorMsg("消费税或增值税设置有误");
+							result.setSuccess(false);
+							return result;
+						}
+						Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
+								CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
+						Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
+						totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
+						Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
+								tax.getIncrementTax());
+						totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
+					} else {
+						totalIncremTax += CalculationUtils.mul(
+								CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
+								0.7);
+					}
+				}
+				taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 			}
-			taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 		}
 
 		Double disAmount = 0.0;
@@ -283,6 +306,12 @@ public class OrderServiceImpl implements OrderService {
 			goods.setOrderId(orderId);
 		}
 		orderMapper.saveOrderGoods(info.getOrderGoodsList());
+
+		// 增加缓存订单数量
+		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+		// 增加月订单数
+		String time = DateUtils.getTimeString("yyyyMM");
+		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
 		result.setSuccess(true);
 		result.setErrorMsg(orderId);
@@ -366,7 +395,7 @@ public class OrderServiceImpl implements OrderService {
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
-			
+
 			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
 
@@ -420,12 +449,24 @@ public class OrderServiceImpl implements OrderService {
 				}
 			}
 			GoodsFile file = null;
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
 			for (ShoppingCart model : list) {
 				for (Map<String, Object> map : fileList) {
 					file = JSONUtil.parse(JSONUtil.toJson(map), GoodsFile.class);
 					if (file.getGoodsId().equals(model.getGoodsSpecs().getGoodsId())) {
 						model.setPicPath(file.getPath());
 						break;
+					}
+				}
+				Map<String, String> map = hashOperations.entries(Constants.POST_TAX + model.getSupplierId());
+				if (map != null) {
+					String post = map.get("post");
+					String tax = map.get("tax");
+					try {
+						model.setFreePost(Integer.valueOf(post == null ? "0" : post));
+						model.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
+					} catch (Exception e) {
+						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
 					}
 				}
 			}
@@ -537,6 +578,9 @@ public class OrderServiceImpl implements OrderService {
 		}
 		int count = orderMapper.updateOrderClose(orderId);
 		if (count > 0) {
+			// 增加取消数量缓存
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "cancel");
+
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("status", Constants.ORDER_CLOSE);
 			param.put("orderId", orderId);
@@ -561,7 +605,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void timeTaskcloseOrder() {
-		String time = DateUtils.getTime(Calendar.MINUTE, -90);
+		String time = DateUtils.getTime(Calendar.MINUTE, -90, "yyyy-MM-dd HH:mm:ss");
 		List<String> orderIdList = orderMapper.listTimeOutOrderIds(time);
 		for (String orderId : orderIdList) {
 			closeOrder(DEFAULT_USER_ID, orderId);
@@ -642,8 +686,10 @@ public class OrderServiceImpl implements OrderService {
 		List<OrderGoods> goodsList = null;
 		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
 		OrderGoods temp = null;
-		list.addAll(orderMapper.listOrderForSendToTTWarehouse());
-		list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		// list.addAll(orderMapper.listOrderForSendToTTWarehouse());
+		// list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
+		list.addAll(orderMapper.listOrderForSendToWarehouse());
+		list.addAll(orderMapper.listOrderForSendToWarehouseGeneralTrade());
 		if (list.size() > 0) {
 			for (OrderInfo info : list) {// 找出所有的itemId
 				for (OrderGoods goods : info.getOrderGoodsList()) {
@@ -725,8 +771,24 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list) {
 		orderMapper.updateThirdOrderInfo(list);
-		int count = orderMapper.updateOrderStatusByThirdStatus(list.get(0));
+		List<Integer> statusList = orderMapper.listOrderStatus(list.get(0).getOrderId());
+		ThirdOrderInfo orderInfo = list.get(0);
+		if (statusList != null && statusList.size() > 1) {
+			Collections.sort(statusList);
+			// 有一个没发货订单状态就是单证放行
+			if (Constants.ORDER_DELIVER.equals(statusList.get(statusList.size() - 1))
+					&& !statusList.get(0).equals(Constants.ORDER_DELIVER)) {
+				orderInfo.setOrderStatus(Constants.ORDER_DZFX);
+			}
+		}
+		int count = orderMapper.updateOrderStatusByThirdStatus(orderInfo);
 		if (count > 0) {
+			// 发货新增发货数量缓存
+			if (Constants.ORDER_DELIVER.equals(orderInfo.getOrderStatus())) {
+				// 增加发货数量缓存
+				Integer gradeId = orderMapper.getGradeId(orderInfo.getOrderId());
+				cacheAbstractService.addOrderCountCache(gradeId, Constants.ORDER_STATISTICS_DAY, "deliver");
+			}
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("status", list.get(0).getOrderStatus());
 			param.put("orderId", list.get(0).getOrderId());
@@ -752,7 +814,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void confirmByTimeTask() {
-		String time = DateUtils.getTime(Calendar.DATE, -7);
+		String time = DateUtils.getTime(Calendar.DATE, -7, "yyyy-MM-dd HH:mm:ss");
 		List<Order4Confirm> list = orderMapper.listUnConfirmOrder(time);
 		Map<String, Object> param = null;
 		for (Order4Confirm model : list) {
@@ -793,6 +855,10 @@ public class OrderServiceImpl implements OrderService {
 		detail.setReturnPayNo(payNo);
 		orderMapper.updateRefundPayNo(detail);
 		if (count > 0) {
+
+			// 增加取消数量缓存
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "cancel");
+
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("status", Constants.ORDER_CANCEL);
 			param.put("orderId", orderId);

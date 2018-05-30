@@ -75,4 +75,10 @@ public interface SupplierService {
 	 * @since JDK 1.7  
 	 */
 	List<SupplierEntity> queryAll();
+
+	/**
+	 * @fun 获取对接供应商的ID
+	 * @return
+	 */
+	ResultModel getButtJointSupplier();
 }

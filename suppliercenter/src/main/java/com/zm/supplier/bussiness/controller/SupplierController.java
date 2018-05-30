@@ -146,4 +146,12 @@ public class SupplierController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/supplier/butt-joint", method = RequestMethod.GET)
+	public ResultModel getButtJointSupplier(@PathVariable("version") Double version){
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return supplierService.getButtJointSupplier();
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }
