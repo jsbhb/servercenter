@@ -67,6 +67,8 @@ public class OrderInfo extends Pagination{
 	private Integer pushUserId;
 	
 	private Integer tagFun;
+	
+	private Integer manual;//是否手工单，0：自动；1手动
 
 	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
 
@@ -76,6 +78,14 @@ public class OrderInfo extends Pagination{
 			return false;
 		}
 		return true;
+	}
+
+	public Integer getManual() {
+		return manual;
+	}
+
+	public void setManual(Integer manual) {
+		this.manual = manual;
 	}
 
 	public Integer getTagFun() {

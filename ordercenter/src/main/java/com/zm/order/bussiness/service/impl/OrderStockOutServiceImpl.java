@@ -7,26 +7,36 @@
  */
 package com.zm.order.bussiness.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderStockOutMapper;
+import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderStockOutService;
+import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
+import com.zm.order.pojo.bo.GoodsItemBO;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
 
 /**
@@ -39,6 +49,7 @@ import com.zm.order.pojo.bo.OrderMaintenanceBO;
  * @since JDK 1.7
  */
 @Service
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Resource
@@ -49,6 +60,12 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Resource
 	UserFeignClient userFeignClient;
+
+	@Resource
+	GoodsFeignClient goodsFeignClient;
+	
+	@Resource
+	CacheAbstractService cacheAbstractService;
 
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
@@ -86,7 +103,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	}
 
 	@Override
-	public List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId, String supplierId) {
+	public List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId,
+			String supplierId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("startTime", startTime);
 		param.put("endTime", endTime);
@@ -104,7 +122,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			List<ExpressMaintenanceBO> tempList = null;
 			for (OrderMaintenanceBO model : list) {
 				thirdOrderInfo = new ThirdOrderInfo();
-				thirdOrderInfo.setOrderStatus(model.getStatus() == null ? 6 : model.getStatus());
+				thirdOrderInfo.setOrderStatus(model.getStatus() == null ? Constants.ORDER_DELIVER : model.getStatus());
 				thirdOrderInfo.setOrderId(model.getOrderId());
 				orderMapper.updateOrderStatusByThirdStatus(thirdOrderInfo);
 				tempList = model.getExpressList();
@@ -121,6 +139,62 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				}
 			}
 		}
+	}
+
+	@Override
+	public ResultModel importOrder(List<OrderInfo> list) {
+		if (list != null && list.size() > 0) {
+			Set<GoodsItemBO> itemSet = new HashSet<GoodsItemBO>();
+			GoodsItemBO item = null;
+			List<OrderGoods> goodsList = new ArrayList<OrderGoods>();
+			List<OrderDetail> detailList = new ArrayList<OrderDetail>();
+			for (OrderInfo info : list) {
+				if (!info.check()) {
+					return new ResultModel(false, info.getOrderId() + "订单基本信息不全");
+				}
+				if(!info.getOrderDetail().validate()){
+					return new ResultModel(false, info.getOrderId() + "订单详情信息不全");
+				}
+				for (OrderGoods goods : info.getOrderGoodsList()) {
+					if(!goods.validate()){
+						return new ResultModel(false, info.getOrderId() + "订单商品信息不全");
+					}
+					item = new GoodsItemBO();
+					item.setItemCode(goods.getItemCode());
+					item.setItemId(goods.getItemId());
+					item.setRetailPrice(goods.getItemPrice());
+					item.setSku(goods.getSku());
+					itemSet.add(item);
+				}
+				goodsList.addAll(info.getOrderGoodsList());
+				detailList.add(info.getOrderDetail());
+			}
+			ResultModel result = goodsFeignClient.manualOrderGoodsCheck(Constants.FIRST_VERSION, itemSet);
+			if (!result.isSuccess()) {
+				return result;
+			}
+			orderBackMapper.insertOrderBaseBatch(list);
+			orderBackMapper.insertOrderGoodsBatch(goodsList);
+			orderBackMapper.insertOrderDetailBatch(detailList);
+			//统计
+//			for(OrderInfo info : list){
+//				// 增加缓存订单数量
+//				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+//				// 增加月订单数
+//				String time = DateUtils.getTimeString("yyyyMM");
+//				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
+//				
+//				// 增加当天销售额
+//				cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
+//						info.getOrderDetail().getPayment());
+//				// 增加月销售额
+//				cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
+//						info.getOrderDetail().getPayment());
+//			}
+			//end
+			return new ResultModel(true, "操作成功");
+		}
+		return new ResultModel(false, "没有订单信息");
 	}
 
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.bo.GoodsItemBO;
 
 @FeignClient("goodscenter")
 public interface GoodsFeignClient {
@@ -47,8 +48,13 @@ public interface GoodsFeignClient {
 			@RequestParam("orderFlag") Integer orderFlag);
 
 	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
-	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set);
-	
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version,
+			@RequestBody Set<String> set);
+
 	@RequestMapping(value = "{version}/goods/tag/presell", method = RequestMethod.POST)
 	public List<String> listPreSellItemIds(@PathVariable("version") Double version);
+
+	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
+	public com.zm.order.common.ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
+			@RequestBody Set<GoodsItemBO> set);
 }

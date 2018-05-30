@@ -153,6 +153,11 @@ public class UserServiceImpl implements UserService {
 			info.getUserDetail().setUserId(info.getId());
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
+		
+		if(info.getAddress() != null){
+			info.getAddress().setUserId(info.getId());
+			saveAddress(info.getAddress());
+		}
 
 		return info.getId();
 	}

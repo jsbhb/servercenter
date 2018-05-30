@@ -607,4 +607,12 @@
 		</foreach>
 	</insert>
 	
+	<select id="listGoodsItemByItemIds" parameterType="Object" resultMap="entity">
+		select i.id,i.item_id,i.item_code,i.sku,p.retail_price from goods_item i left join goods_price p on 
+		i.item_id = p.item_id where i.item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
 </mapper>

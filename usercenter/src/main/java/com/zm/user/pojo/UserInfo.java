@@ -64,9 +64,19 @@ public class UserInfo {
 	private UserDetail userDetail;
 
 	private Integer vipLevel;
+	
+	private Address address;
 
 	public boolean check() {
 		return (account != null || phone != null || email != null) && centerId != null;
+	}
+	
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 	
 	public Integer getGuideId() {

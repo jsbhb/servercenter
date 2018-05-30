@@ -16,6 +16,7 @@ import com.zm.order.bussiness.service.OrderStockOutService;
 import com.zm.order.common.Pagination;
 import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
@@ -131,11 +132,33 @@ public class OrderStockOutController {
 	}
 
 	@RequestMapping(value = "{version}/order/stockOut/maintenance/express", method = RequestMethod.POST)
-	public ResultModel maintenanceExpress(@PathVariable("version") Double version, @RequestBody List<OrderMaintenanceBO> list) {
-		
+	public ResultModel maintenanceExpress(@PathVariable("version") Double version,
+			@RequestBody List<OrderMaintenanceBO> list) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			orderStockOutService.maintenanceExpress(list);
-			return new ResultModel(true,"success"); 
+			return new ResultModel(true, "success");
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
+	@RequestMapping(value = "{version}/order/import", method = RequestMethod.POST)
+	public ResultModel importOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return orderStockOutService.importOrder(list);
+			} catch (Exception e) {
+				LogUtil.writeErrorLog("批量导入出错", e);
+				if (e.getMessage().contains("Duplicate entry")) {
+					return new ResultModel(false,
+							"订单号或支付单重复" + e.getMessage().substring(
+									e.getMessage().indexOf("Duplicate entry") + "Duplicate entry".length(),
+									e.getMessage().indexOf("for key")));
+				}
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());

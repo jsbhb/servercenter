@@ -65,10 +65,10 @@ public class OrderDetail {
 	private String remark;
 
 	public boolean validate() {
-		return (payType != null && payment != null && payTime != null && postFee != null && taxFee != null
-				&& tariffTax != null && incrementTax != null && exciseTax != null && payNo != null && disAmount != null
+		return (payType != null && payment != null && postFee != null && taxFee != null
+				&& tariffTax != null && incrementTax != null && exciseTax != null && disAmount != null
 				&& receiveName != null && receivePhone != null && receiveProvince != null && receiveCity != null
-				&& receiveArea != null && receiveAddress != null && receiveZipCode != null);
+				&& receiveArea != null && receiveAddress != null);
 	}
 
 	public Double getDisAmount() {

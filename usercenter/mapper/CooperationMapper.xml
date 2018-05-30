@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.user.bussiness.dao.CooperationMapper">
+	<resultMap type="com.zm.user.pojo.po.ShopKeeperPO" id="shopKeeper">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="shop_name" property="shopName" jdbcType="VARCHAR" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="area" property="area" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="shop_path" property="shopPath" jdbcType="VARCHAR" />
+		<result column="pic_path" property="picPath" jdbcType="VARCHAR" />
+		<result column="keeper_name" property="keeperName" jdbcType="VARCHAR" />
+		<result column="occupation" property="occupation" jdbcType="VARCHAR" />
+		<result column="sales" property="sales" jdbcType="DECIMAL" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="level" property="level" jdbcType="INTEGER" />
+		<result column="attribute" property="attribute" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.user.pojo.po.PartnerPO" id="partner">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="partner_name" property="partnerName" jdbcType="VARCHAR" />
+		<result column="province" property="province" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="area" property="area" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="aboutus_path" property="aboutusPath" jdbcType="VARCHAR" />
+		<result column="pic_path" property="picPath" jdbcType="VARCHAR" />
+		<result column="person_in_charge" property="personInCharge" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="attribute" property="attribute" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<select id="listShopKeeper" resultMap="shopKeeper">
+		select * from shopkeeper
+	</select>
+	<select id="getShopkeeperById" parameterType="Object" resultMap="shopKeeper">
+		select * from shopkeeper where id = #{id}
+	</select>
+	
+	<select id="listPartner" resultMap="partner">
+		select * from partner
+	</select>
+	<select id="getPartnerById" parameterType="Object" resultMap="partner">
+		select * from partner where id = #{id}
+	</select>
+	
+	<insert id="saveShopKeeper" parameterType="Object">
+		insert into shopkeeper(shop_name,province,city,area,address,shop_path,pic_path,keeper_name,occupation,sales,
+		phone,level,attribute,create_time,opt) 
+		values
+		(#{shopName},#{province},#{city},#{area},#{address},#{shopPath},#{picPath},#{keeperName},#{occupation},#{sales},
+		#{phone},#{level},#{attribute},now(),#{opt})
+	</insert>
+	
+	<insert id="savePartner" parameterType="Object">
+		insert into partner(partner_name,province,city,area,address,aboutus_path,pic_path,person_in_charge,
+		phone,attribute,create_time,opt) 
+		values
+		(#{partnerName},#{province},#{city},#{area},#{address},#{aboutusPath},#{picPath},#{personInCharge},
+		#{phone},#{attribute},now(),#{opt})
+	</insert>
+	
+	<update id="updatePartner" parameterType="Object">
+		update partner 
+		<set>
+			<if test="partnerName != null and partnerName != ''">
+				partner_name = #{partnerName},
+			</if>
+			<if test="province != null and province != ''">
+				province = #{province},
+			</if>
+			<if test="city != null and city != ''">
+				city = #{city},
+			</if>
+			<if test="area != null and area != ''">
+				area = #{area},
+			</if>
+			<if test="address != null and address != ''">
+				address = #{address},
+			</if>
+			<if test="aboutusPath != null and aboutusPath != ''">
+				aboutus_path = #{aboutusPath},
+			</if>
+			<if test="picPath != null and picPath != ''">
+				pic_path = #{picPath},
+			</if>
+			<if test="personInCharge != null and personInCharge != ''">
+				person_in_charge = #{personInCharge},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+			<if test="attribute != null and attribute != ''">
+				attribute = #{attribute},
+			</if>
+			<if test="opt != null and opt != ''">
+				opt = #{opt},
+			</if>
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateShopKeeper" parameterType="Object">
+		update shopkeeper 
+		<set>
+			<if test="shopName != null and shopName != ''">
+				shop_name = #{shopName},
+			</if>
+			<if test="province != null and province != ''">
+				province = #{province},
+			</if>
+			<if test="city != null and city != ''">
+				city = #{city},
+			</if>
+			<if test="area != null and area != ''">
+				area = #{area},
+			</if>
+			<if test="address != null and address != ''">
+				address = #{address},
+			</if>
+			<if test="shopPath != null and shopPath != ''">
+				shop_path = #{shopPath},
+			</if>
+			<if test="picPath != null and picPath != ''">
+				pic_path = #{picPath},
+			</if>
+			<if test="keeperName != null and keeperName != ''">
+				keeper_name = #{keeperName},
+			</if>
+			<if test="occupation != null and occupation != ''">
+				occupation = #{occupation},
+			</if>
+			<if test="sales != null and sales != ''">
+				sales = #{sales},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+			<if test="level != null and level != ''">
+				level = #{level},
+			</if>
+			<if test="attribute != null and attribute != ''">
+				attribute = #{attribute},
+			</if>
+			<if test="opt != null and opt != ''">
+				opt = #{opt},
+			</if>
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="deleteShopkeeperById" parameterType="Object">
+		delete from shopkeeper where id = #{id}
+	</delete>
+	
+	<delete id="deletePartnerById" parameterType="Object">
+		delete from partner where id = #{id}
+	</delete>
+	
+	<select id="selectShopKeeperForPage" parameterType="Object" resultMap="shopKeeper">
+		select * from shopkeeper where 1=1 
+		<if test="shopName != null and shopName != ''">
+			and shop_name = #{shopName}
+		</if>
+		<if test="province != null and province != ''">
+			and province = #{province}
+		</if>
+		<if test="city != null and city != ''">
+			and city = #{city}
+		</if>
+		<if test="area != null and area != ''">
+			and area = #{area}
+		</if>
+		<if test="address != null and address != ''">
+			and address = #{address}
+		</if>
+		<if test="keeperName != null and keeperName != ''">
+			and keeper_name = #{keeperName}
+		</if>
+		<if test="occupation != null and occupation != ''">
+			and occupation = #{occupation}
+		</if>
+		<if test="sales != null and sales != ''">
+			and sales = #{sales}
+		</if>
+		<if test="phone != null and phone != ''">
+			and phone = #{phone}
+		</if>
+		<if test="level != null and level != ''">
+			and level = #{level}
+		</if>
+	</select>
+	
+	<select id="selectPartnerForPage" parameterType="Object" resultMap="partner">
+		select * from partner where 1=1 
+		<if test="partnerName != null and partnerName != ''">
+			and partner_name = #{partnerName}
+		</if>
+		<if test="province != null and province != ''">
+			and province = #{province}
+		</if>
+		<if test="city != null and city != ''">
+			and city = #{city}
+		</if>
+		<if test="area != null and area != ''">
+			and area = #{area}
+		</if>
+		<if test="address != null and address != ''">
+			and address = #{address}
+		</if>
+		<if test="personInCharge != null and personInCharge != ''">
+			and person_in_charge = #{personInCharge}
+		</if>
+		<if test="phone != null and phone != ''">
+			and phone = #{phone}
+		</if>
+	</select>
+
+</mapper>

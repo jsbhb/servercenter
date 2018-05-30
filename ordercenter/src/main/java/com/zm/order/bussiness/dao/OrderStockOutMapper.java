@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.pagehelper.Page;
+import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
@@ -72,5 +73,11 @@ public interface OrderStockOutMapper {
 	 * @since JDK 1.7  
 	 */
 	List<OrderInfoListForDownload> selectOrdreListForDownload(Map<String,Object> param);
+
+	void insertOrderBaseBatch(List<OrderInfo> list);
+
+	void insertOrderGoodsBatch(List<OrderGoods> goodsList);
+
+	void insertOrderDetailBatch(List<OrderDetail> detailList);
 
 }

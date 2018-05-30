@@ -10,6 +10,7 @@ package com.zm.order.bussiness.service;
 import java.util.List;
 
 import com.github.pagehelper.Page;
+import com.zm.order.common.ResultModel;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
@@ -81,5 +82,12 @@ public interface OrderStockOutService {
 	 * @param list
 	 */
 	void maintenanceExpress(List<OrderMaintenanceBO> list);
+
+	/**
+	 * @fun 商品导入
+	 * @param list
+	 * @return
+	 */
+	ResultModel importOrder(List<OrderInfo> list);
 
 }
