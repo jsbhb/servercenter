@@ -139,4 +139,9 @@ public class SupplierServiceImpl implements SupplierService {
 		return new ResultModel(true, list);
 	}
 
+	@Override
+	public void updateSupplier(SupplierEntity entity) {
+		supplierMapper.insert(entity);
+	}
+
 }

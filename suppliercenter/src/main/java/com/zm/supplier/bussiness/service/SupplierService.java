@@ -81,4 +81,13 @@ public interface SupplierService {
 	 * @return
 	 */
 	ResultModel getButtJointSupplier();
+
+	/**  
+	 * saveSupplier:更新供应商表. <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateSupplier(SupplierEntity entity);
 }

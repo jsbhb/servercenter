@@ -80,4 +80,12 @@
 		select * from supplier_interface where supplier_id = #{supplierId}
 	</select>
 	
+	<insert id="update" parameterType="Object">
+		update supplier_base set supplier_code = #{suppplierCode},
+		country = #{country},province=#{province},city=#{city},
+		area = #{area},address=#{address},operator=#{operator},
+		phone = #{phone},fax=#{fax},email=#{email},qq=#{qq},update_time = now()
+		where id = #{id}
+	</insert>
+	
 </mapper>

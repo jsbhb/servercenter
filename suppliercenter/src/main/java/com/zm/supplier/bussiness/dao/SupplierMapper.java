@@ -54,4 +54,13 @@ public interface SupplierMapper {
 	 * @since JDK 1.7  
 	 */
 	List<SupplierEntity> selectAll();
+
+	/**
+	 * update:更新供应商信息. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
+	 */
+	void update(SupplierEntity entity);
 }

@@ -154,4 +154,20 @@ public class SupplierController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/supplier/update", method = RequestMethod.POST)
+	public ResultModel update(@PathVariable("version") Double version, @RequestBody SupplierEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			try {
+				supplierService.updateSupplier(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }
