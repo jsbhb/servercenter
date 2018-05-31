@@ -124,7 +124,7 @@
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
 		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,
-		ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id,ob.order_source
+		ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id,ob.order_source,ob.order_flag
 		from order_base ob where
 		1 = 1
 		<if test="entity.status != null">
