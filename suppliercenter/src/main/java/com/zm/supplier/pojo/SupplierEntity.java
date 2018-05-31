@@ -38,6 +38,7 @@ public class SupplierEntity extends Pagination {
 	private String updateTime;
 	private String opt;
 	private boolean isDelete;
+	private String supplierCode;
 
 	public SupplierEntity() {
 		super();
@@ -193,6 +194,14 @@ public class SupplierEntity extends Pagination {
 
 	public void setDelete(boolean isDelete) {
 		this.isDelete = isDelete;
+	}
+
+	public String getSupplierCode() {
+		return supplierCode;
+	}
+
+	public void setSupplierCode(String supplierCode) {
+		this.supplierCode = supplierCode;
 	}
 
 }

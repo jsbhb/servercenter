@@ -36,6 +36,7 @@
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
 		<result column="is_delete" property="isDelete"/>
+		<result column="supplier_code" property="supplierCode"/>
 	</resultMap>
 
 	<select id="listExpressBySupplierId" parameterType="Object"
@@ -72,7 +73,7 @@
 		(#{id},0,#{supplierName},0,
 		#{country},#{province},#{city},#{area},#{address},
 		#{operator},#{phone},#{mobile},#{fax},#{email},#{qq},
-		now(),now(),#{opt},0,#{mode})
+		now(),now(),#{opt},0,#{mode},#{suppplierCode})
 	</insert>
 	
 	<select id="getSupplierInterface" parameterType="Object" resultMap="supplierinf">
