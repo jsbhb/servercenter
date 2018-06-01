@@ -1,5 +1,6 @@
 alter table goods add column is_free_tax tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否包税0：否，1是';
 alter table goods add index goods_id(goods_id);
+CREATE UNIQUE INDEX uk_goodsId ON goods(goods_id);
 alter table goods drop index idx_is_popular;
 alter table goods drop index idx_is_new;
 alter table goods drop index idx_is_hot;

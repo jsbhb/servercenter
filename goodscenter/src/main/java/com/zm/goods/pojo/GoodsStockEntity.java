@@ -19,7 +19,7 @@ package com.zm.goods.pojo;
 public class GoodsStockEntity {
 
 	private int id;
-	private int itemId;
+	private String itemId;
 	private int qpQty;// 良品数量
 	private int fxQty;// 分销数量
 	private int defQty;// 次品数量
@@ -37,11 +37,11 @@ public class GoodsStockEntity {
 		this.id = id;
 	}
 
-	public int getItemId() {
+	public String getItemId() {
 		return itemId;
 	}
 
-	public void setItemId(int itemId) {
+	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
 
