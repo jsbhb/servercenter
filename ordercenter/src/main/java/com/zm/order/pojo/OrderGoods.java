@@ -43,7 +43,7 @@ public class OrderGoods extends Pagination {
 	private String goodsId;
 	
 	public boolean validate() {
-		return (itemId != null && sku != null && itemCode != null && itemQuantity != null && itemPrice != null
+		return (sku != null && itemCode != null && itemQuantity != null && itemPrice != null
 				&& actualPrice != null);
 	}
 

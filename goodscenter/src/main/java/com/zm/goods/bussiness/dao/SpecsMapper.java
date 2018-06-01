@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.SpecsEntity;
 import com.zm.goods.pojo.SpecsTemplateEntity;
 import com.zm.goods.pojo.SpecsValueEntity;
+import com.zm.goods.pojo.bo.GoodsSpecsBO;
 
 /**
  * ClassName: SpecsMapper <br/>
@@ -89,5 +90,13 @@ public interface SpecsMapper {
 	 * @since JDK 1.7
 	 */
 	List<SpecsTemplateEntity> selectAll();
+	
+	List<SpecsEntity> selectAllSpece();
+	
+	List<SpecsValueEntity> selectAllSpeceValue();
+
+	void addSpece(GoodsSpecsBO entity);
+
+	void addSpecsValue(GoodsSpecsBO entity);
 
 }

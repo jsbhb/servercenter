@@ -13,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.SpecsEntity;
 import com.zm.goods.pojo.SpecsTemplateEntity;
 import com.zm.goods.pojo.SpecsValueEntity;
+import com.zm.goods.pojo.bo.GoodsSpecsBO;
 
 /**
  * ClassName: SpecsService <br/>
@@ -80,5 +81,13 @@ public interface SpecsService {
 	 * @since JDK 1.7  
 	 */
 	void saveValue(SpecsValueEntity value);
+
+	List<SpecsEntity> selectAllSpece();
+
+	List<SpecsValueEntity> selectAllSpeceValue();
+
+	int addSpecs(GoodsSpecsBO entity);
+
+	int addSpecsValue(GoodsSpecsBO entity);
 
 }
