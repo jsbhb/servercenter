@@ -9,6 +9,7 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
@@ -16,6 +17,7 @@ import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.bo.GoodsItemBO;
 
 /**
  * ClassName: BrandMapper <br/>
@@ -242,5 +244,5 @@ public interface GoodsItemMapper {
 
 	void insertPriceBatch(List<GoodsPrice> priceList);
 
-	List<GoodsItemEntity> listGoodsItemByItemIds(List<String> itemIds);
+	List<GoodsItemBO> listGoodsItemByItemIds(Map<String,Object> param);
 }

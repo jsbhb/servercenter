@@ -6,6 +6,13 @@ public class GoodsItemBO {
 	private String itemCode;
 	private String sku;
 	private Double retailPrice;
+	private Integer supplierId;
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
 	public String getItemId() {
 		return itemId;
 	}
@@ -34,7 +41,8 @@ public class GoodsItemBO {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+		result = prime * result + ((itemCode == null) ? 0 : itemCode.hashCode());
+		result = prime * result + ((supplierId == null) ? 0 : supplierId.hashCode());
 		return result;
 	}
 	@Override
@@ -46,10 +54,15 @@ public class GoodsItemBO {
 		if (getClass() != obj.getClass())
 			return false;
 		GoodsItemBO other = (GoodsItemBO) obj;
-		if (itemId == null) {
-			if (other.itemId != null)
+		if (itemCode == null) {
+			if (other.itemCode != null)
 				return false;
-		} else if (!itemId.equals(other.itemId))
+		} else if (!itemCode.equals(other.itemCode))
+			return false;
+		if (supplierId == null) {
+			if (other.supplierId != null)
+				return false;
+		} else if (!supplierId.equals(other.supplierId))
 			return false;
 		return true;
 	}

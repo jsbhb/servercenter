@@ -23,6 +23,7 @@ import com.zm.goods.bussiness.service.SpecsService;
 import com.zm.goods.pojo.SpecsEntity;
 import com.zm.goods.pojo.SpecsTemplateEntity;
 import com.zm.goods.pojo.SpecsValueEntity;
+import com.zm.goods.pojo.bo.GoodsSpecsBO;
 
 /**
  * ClassName: BrandService <br/>
@@ -92,6 +93,28 @@ public class SpecsServiceImpl implements SpecsService {
 		List<SpecsValueEntity> list = new ArrayList<SpecsValueEntity>();
 		list.add(value);
 		specsMapper.insertSpcesValue(list);
+	}
+
+	@Override
+	public List<SpecsEntity> selectAllSpece() {
+		return specsMapper.selectAllSpece();
+	}
+
+	@Override
+	public List<SpecsValueEntity> selectAllSpeceValue() {
+		return specsMapper.selectAllSpeceValue();
+	}
+
+	@Override
+	public int addSpecs(GoodsSpecsBO entity) {
+		specsMapper.addSpece(entity);
+		return entity.getSpecsNameId();
+	}
+
+	@Override
+	public int addSpecsValue(GoodsSpecsBO entity) {
+		specsMapper.addSpecsValue(entity);
+		return entity.getSpecsValueId();
 	}
 
 }

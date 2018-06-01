@@ -39,7 +39,7 @@
 	
 	<resultMap type="com.zm.goods.pojo.SpecsValueEntity" id="specsValue">
 		<id column="id" property="id"/>
-		<id column="specs_id" property="spcesId"/>
+		<id column="specs_id" property="specsId"/>
 		<result column="value" property="value"/>
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
@@ -78,8 +78,17 @@
 		</foreach>
 	</insert>
 	
+	<insert id="addSpces" useGeneratedKeys="true" keyProperty="specsNameId" parameterType="Object" >
+		insert into goods_specs(template_id,name,create_time) values (0,#{name},now())
+	</insert>
+	
 	<insert id="insertSpce" useGeneratedKeys="true" keyProperty="id" parameterType="Object" >
 		insert into goods_specs  values (#{id},#{templateId},#{name},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="addSpecsValue" useGeneratedKeys="true" keyProperty="specsValueId" parameterType="Object">
+		insert into goods_specs_value(specs_id,value,create_time) values
+		(#{specsNameId},#{specsValue},now())
 	</insert>
 	
 	<insert id="insertSpcesValue" parameterType="Object">
@@ -88,5 +97,13 @@
 			(#{item.id},#{item.specsId},#{item.value},now(),now(),#{item.opt})
 		</foreach>
 	</insert>
+	
+	<select id="selectAllSpece" resultMap="specs">
+		select * from goods_specs
+	</select>
+	
+	<select id="selectAllSpeceValue" resultMap="specsValue">
+		select * from goods_specs_value 
+	</select>
 	
 </mapper>

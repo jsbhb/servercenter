@@ -19,6 +19,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.SpecsEntity;
 import com.zm.goods.pojo.SpecsTemplateEntity;
 import com.zm.goods.pojo.SpecsValueEntity;
+import com.zm.goods.pojo.bo.GoodsSpecsBO;
 
 /**
  * ClassName: SpecsController <br/>
@@ -128,5 +129,59 @@ public class SpecsController {
 		} catch (Exception e) {
 			return new ResultModel(false, e.getMessage());
 		}
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/selectAllSpece", method = RequestMethod.GET)
+	public ResultModel selectAllSpece(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				return new ResultModel(true, specsService.selectAllSpece());
+			}
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/selectAllSpeceValue", method = RequestMethod.GET)
+	public ResultModel selectAllSpeceValue(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				return new ResultModel(true, specsService.selectAllSpeceValue());
+			}
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/save/new", method = RequestMethod.POST)
+	public ResultModel addSpecs(@PathVariable("version") Double version, @RequestBody GoodsSpecsBO entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, specsService.addSpecs(entity));
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/value/save", method = RequestMethod.POST)
+	public ResultModel addSpecsValue(@PathVariable("version") Double version, @RequestBody GoodsSpecsBO entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, specsService.addSpecsValue(entity));
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
 	}
 }
