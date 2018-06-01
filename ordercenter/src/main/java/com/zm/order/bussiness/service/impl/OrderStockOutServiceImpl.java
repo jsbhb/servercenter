@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -39,6 +38,7 @@ import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
+import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 
 /**
@@ -195,24 +195,20 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			orderBackMapper.insertOrderGoodsBatch(goodsList);
 			orderBackMapper.insertOrderDetailBatch(detailList);
 			// 统计
-			// for(OrderInfo info : list){
-			// // 增加缓存订单数量
-			// cacheAbstractService.addOrderCountCache(info.getShopId(),
-			// Constants.ORDER_STATISTICS_DAY, "produce");
-			// // 增加月订单数
-			// String time = DateUtils.getTimeString("yyyyMM");
-			// cacheAbstractService.addOrderCountCache(info.getShopId(),
-			// Constants.ORDER_STATISTICS_MONTH, time);
-			//
-			// // 增加当天销售额
-			// cacheAbstractService.addSalesCache(info.getShopId(),
-			// Constants.SALES_STATISTICS_DAY, "sales",
-			// info.getOrderDetail().getPayment());
-			// // 增加月销售额
-			// cacheAbstractService.addSalesCache(info.getShopId(),
-			// Constants.SALES_STATISTICS_MONTH, time,
-			// info.getOrderDetail().getPayment());
-			// }
+			for (OrderInfo info : list) {
+				// 增加缓存订单数量
+				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+				// 增加月订单数
+				String time = DateUtils.getTimeString("yyyyMM");
+				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
+
+				// 增加当天销售额
+				cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
+						info.getOrderDetail().getPayment());
+				// 增加月销售额
+				cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
+						info.getOrderDetail().getPayment());
+			}
 			// end
 			return new ResultModel(true, "操作成功");
 		}
