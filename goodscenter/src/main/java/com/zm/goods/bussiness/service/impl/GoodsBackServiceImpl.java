@@ -431,7 +431,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 						sb.append(",");
 						sb.append("换算比例：");
 						sb.append(goodsItem.getConversion());
-						sb.append(";");
+						sb.append(";已经存在");
 						LogUtil.writeLog(
 								"商家编码：" + goodsItem.getItemCode() + ",换算比例：" + goodsItem.getConversion() + "已经存在");
 						
