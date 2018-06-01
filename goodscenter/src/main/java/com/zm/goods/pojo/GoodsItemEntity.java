@@ -7,6 +7,8 @@
  */
 package com.zm.goods.pojo;
 
+import java.util.List;
+
 import com.zm.goods.common.Pagination;
 
 /**
@@ -47,6 +49,15 @@ public class GoodsItemEntity extends Pagination {
 	private int conversion;
 	private String shelfLife;
 	private String carTon;
+	private List<GoodsRebateEntity> goodsRebateList;
+
+	public List<GoodsRebateEntity> getGoodsRebateList() {
+		return goodsRebateList;
+	}
+
+	public void setGoodsRebateList(List<GoodsRebateEntity> goodsRebateList) {
+		this.goodsRebateList = goodsRebateList;
+	}
 
 	public int getId() {
 		return id;

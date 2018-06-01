@@ -44,6 +44,7 @@ public class GoodsEntity extends Pagination {
 	private String opt;// 操作人
 	private int templateId;
 	private GoodsItemEntity goodsItem;
+	private List<GoodsItemEntity> items;
 	private int thirdId;
 	private GoodsPrice goodsPrice;
 	private List<GoodsFile> files;
@@ -51,6 +52,14 @@ public class GoodsEntity extends Pagination {
 
 	public int getId() {
 		return id;
+	}
+
+	public List<GoodsItemEntity> getItems() {
+		return items;
+	}
+
+	public void setItems(List<GoodsItemEntity> items) {
+		this.items = items;
 	}
 
 	public void setId(int id) {

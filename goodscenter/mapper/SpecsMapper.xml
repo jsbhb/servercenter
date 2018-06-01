@@ -78,8 +78,8 @@
 		</foreach>
 	</insert>
 	
-	<insert id="addSpces" useGeneratedKeys="true" keyProperty="specsNameId" parameterType="Object" >
-		insert into goods_specs(template_id,name,create_time) values (0,#{name},now())
+	<insert id="addSpece" useGeneratedKeys="true" keyProperty="specsNameId" parameterType="Object" >
+		insert into goods_specs(template_id,name,create_time) values (0,#{specsName},now())
 	</insert>
 	
 	<insert id="insertSpce" useGeneratedKeys="true" keyProperty="id" parameterType="Object" >

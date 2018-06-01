@@ -399,10 +399,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 						}
 					}
 				} else {
-					sb.append(model.getItemCode()+",");
+					sb.append(model.getItemCode() + ",");
 				}
 			}
-			if(sb.length() > 0){
+			if (sb.length() > 0) {
 				sb.append("没有找到以上商家编码商品,请核对后重新上传以上商品");
 			}
 		}
@@ -420,49 +420,53 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		List<GoodsStockEntity> stockList = new ArrayList<GoodsStockEntity>();
 		List<GoodsRebateEntity> rebateList = new ArrayList<GoodsRebateEntity>();
 		if (list != null && list.size() > 0) {
-			GoodsItemEntity goodsItem = null;
 			SetOperations<String, Object> setOperations = template.opsForSet();
 			for (GoodsInfoEntity entity : list) {
-				goodsItem = entity.getGoods().getGoodsItem();
-				boolean contain = setOperations.isMember(Constants.GOODS_CACHE, goodsItem.getItemCode()+","+goodsItem.getConversion());
-				if (contain) {
-					sb.append("商家编码：");
-					sb.append(goodsItem.getItemCode());
-					sb.append(",");
-					sb.append("换算比例：");
-					sb.append(goodsItem.getConversion());
-					sb.append(";");
-					LogUtil.writeLog("商家编码：" + goodsItem.getItemCode() + ",换算比例：" + goodsItem.getConversion() + "已经存在");
-					continue;
-				} else {
-					baseList.add(entity.getGoodsBase());
-					goodsList.add(entity.getGoods());
-					itemList.add(goodsItem);
-					priceList.add(goodsItem.getGoodsPrice());
-					stockList.add(goodsItem.getStock());
-					rebateList.addAll(entity.getGoodsRebateList());
+				for (GoodsItemEntity goodsItem : entity.getGoods().getItems()) {
+					boolean contain = setOperations.isMember(Constants.GOODS_CACHE,
+							goodsItem.getItemCode() + "," + goodsItem.getConversion());
+					if (contain) {
+						sb.append("商家编码：");
+						sb.append(goodsItem.getItemCode());
+						sb.append(",");
+						sb.append("换算比例：");
+						sb.append(goodsItem.getConversion());
+						sb.append(";");
+						LogUtil.writeLog(
+								"商家编码：" + goodsItem.getItemCode() + ",换算比例：" + goodsItem.getConversion() + "已经存在");
+						
+						return new ResultModel(false, sb.toString());
+						
+					} else {
+						itemList.add(goodsItem);
+						priceList.add(goodsItem.getGoodsPrice());
+						stockList.add(goodsItem.getStock());
+						rebateList.addAll(goodsItem.getGoodsRebateList());
+					}
 				}
+				baseList.add(entity.getGoodsBase());
+				goodsList.add(entity.getGoods());
 			}
-			if(baseList.size() > 0){
+			if (baseList.size() > 0) {
 				goodsBaseMapper.insertBatch(baseList);
 			}
-			if(goodsList.size() > 0){
+			if (goodsList.size() > 0) {
 				goodsBackMapper.insertBatch(goodsList);
 			}
-			if(itemList.size() > 0){
+			if (itemList.size() > 0) {
 				goodsItemMapper.insertBatch(itemList);
 			}
-			if(priceList.size() > 0){
+			if (priceList.size() > 0) {
 				goodsItemMapper.insertPriceBatch(priceList);
 			}
-			if(stockList.size() > 0){
+			if (stockList.size() > 0) {
 				goodsItemMapper.insertStockBatch(stockList);
 			}
-			if(rebateList.size() > 0){
+			if (rebateList.size() > 0) {
 				insertGoodsRebate(rebateList);
 			}
-			for(GoodsItemEntity entity : itemList){
-				setOperations.add(Constants.GOODS_CACHE, entity.getItemCode()+","+entity.getConversion());
+			for (GoodsItemEntity entity : itemList) {
+				setOperations.add(Constants.GOODS_CACHE, entity.getItemCode() + "," + entity.getConversion());
 			}
 		}
 		return new ResultModel(true, sb.toString());
