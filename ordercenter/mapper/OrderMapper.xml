@@ -133,7 +133,7 @@
 		o.id,o.order_id,od.pay_no,od.payment,o.mall_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
-		where o.status = 12 and o.order_flag = 0 and o.create_type != 5
+		where o.status = 12 and o.order_flag = 0 and is_manual = 0 and o.create_type != 5
 	</select>
 
 
