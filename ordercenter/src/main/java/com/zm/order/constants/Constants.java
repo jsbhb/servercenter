@@ -111,5 +111,10 @@ public class Constants {
 	public static final String FREE_POST = "1";
 	public static final String ARRIVE_POST = "2";
 	public static final String FREE_TAX = "1";
+	
+	
+	//*******************订单来源**********************
+	public static final Integer ORDER_SOURCE_YOUZAN = 3;
+	public static final Integer ORDER_SOURCE_EXHIBITION = 5;
 
 }

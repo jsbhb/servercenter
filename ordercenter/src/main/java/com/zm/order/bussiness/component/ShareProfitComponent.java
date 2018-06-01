@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.zm.order.bussiness.component.model.ShareProfitModel;
@@ -86,6 +87,7 @@ public class ShareProfitComponent {
 	 * @fun 计算待到账的金额并扣减资金池
 	 * @param orderId
 	 */
+	@Async("myAsync")
 	public void calShareProfitStayToAccount(String orderId) {
 
 		try {

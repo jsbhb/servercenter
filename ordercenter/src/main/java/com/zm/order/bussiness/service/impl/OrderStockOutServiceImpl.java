@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderStockOutMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
@@ -39,7 +40,6 @@ import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
 import com.zm.order.utils.DateUtils;
-import com.zm.order.utils.JSONUtil;
 
 /**
  * ClassName: OrderBackServiceImpl <br/>
@@ -68,6 +68,9 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Resource
 	CacheAbstractService cacheAbstractService;
+
+	@Resource
+	ShareProfitComponent shareProfitComponent;
 
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
@@ -143,7 +146,6 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel importOrder(List<OrderInfo> list) {
 		if (list != null && list.size() > 0) {
@@ -155,11 +157,11 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				if (!info.check()) {
 					return new ResultModel(false, info.getOrderId() + "订单基本信息不全");
 				}
-				if (!info.getOrderDetail().validate()) {
+				if(!info.getOrderDetail().validate()){
 					return new ResultModel(false, info.getOrderId() + "订单详情信息不全");
 				}
 				for (OrderGoods goods : info.getOrderGoodsList()) {
-					if (!goods.validate()) {
+					if(!goods.validate()){
 						return new ResultModel(false, info.getOrderId() + "订单商品信息不全");
 					}
 					item = new GoodsItemBO();
@@ -167,7 +169,6 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					item.setItemId(goods.getItemId());
 					item.setRetailPrice(goods.getItemPrice());
 					item.setSku(goods.getSku());
-					item.setSupplierId(info.getSupplierId());
 					itemSet.add(item);
 				}
 				goodsList.addAll(info.getOrderGoodsList());
@@ -177,20 +178,6 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			if (!result.isSuccess()) {
 				return result;
 			}
-			
-			GoodsItemBO itemBO = null;
-			Map<String, GoodsItemBO> itemMap = new HashMap<String, GoodsItemBO>();
-			List<Map<String, Object>> listTemp = (List<Map<String, Object>>) result.getObj();
-			for (Map<String, Object> map : listTemp) {
-				itemBO = JSONUtil.parse(JSONUtil.toJson(map), GoodsItemBO.class);
-				itemMap.put(itemBO.getItemCode().trim(), itemBO);
-			}
-			
-			for (OrderGoods goods : goodsList) {
-				itemBO = itemMap.get(goods.getItemCode().trim());
-				goods.setItemId(itemBO.getItemId());
-			}
-
 			orderBackMapper.insertOrderBaseBatch(list);
 			orderBackMapper.insertOrderGoodsBatch(goodsList);
 			orderBackMapper.insertOrderDetailBatch(detailList);
@@ -202,12 +189,19 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				String time = DateUtils.getTimeString("yyyyMM");
 				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
-				// 增加当天销售额
-				cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
-						info.getOrderDetail().getPayment());
-				// 增加月销售额
-				cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
-						info.getOrderDetail().getPayment());
+				//如果是有赞或展厅的不进行返佣计算
+				if (Constants.ORDER_SOURCE_EXHIBITION.equals(info.getOrderSource())
+						|| Constants.ORDER_SOURCE_YOUZAN.equals(info.getOrderSource())) {
+
+					// 增加当天销售额
+					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
+							info.getOrderDetail().getPayment());
+					// 增加月销售额
+					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
+							info.getOrderDetail().getPayment());
+				} else {//其他来源的计算返佣，统计在计算时一起加上
+					shareProfitComponent.calShareProfitStayToAccount(info.getOrderId());
+				}
 			}
 			// end
 			return new ResultModel(true, "操作成功");

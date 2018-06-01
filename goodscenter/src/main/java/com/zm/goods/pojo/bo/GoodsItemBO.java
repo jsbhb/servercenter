@@ -48,8 +48,7 @@ public class GoodsItemBO {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((itemCode == null) ? 0 : itemCode.hashCode());
-		result = prime * result + ((supplierId == null) ? 0 : supplierId.hashCode());
+		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
 		return result;
 	}
 	@Override
@@ -61,17 +60,11 @@ public class GoodsItemBO {
 		if (getClass() != obj.getClass())
 			return false;
 		GoodsItemBO other = (GoodsItemBO) obj;
-		if (itemCode == null) {
-			if (other.itemCode != null)
+		if (itemId == null) {
+			if (other.itemId != null)
 				return false;
-		} else if (!itemCode.equals(other.itemCode))
-			return false;
-		if (supplierId == null) {
-			if (other.supplierId != null)
-				return false;
-		} else if (!supplierId.equals(other.supplierId))
+		} else if (!itemId.equals(other.itemId))
 			return false;
 		return true;
 	}
-	
 }
