@@ -145,7 +145,7 @@ public class ButtJointMessageUtils {
 		sb.append("</pay>\n");
 		sb.append("<logistics>");
 		sb.append("<logisticsCode>");
-		sb.append("ZTO"); // 快递公司代码
+		sb.append("YUNDA"); // 快递公司代码
 							// SF=顺丰速EMS=邮政速递POSTAM=邮政小包ZTO=中通速递STO=申通快递YTO=圆通速递JD=京东快递BEST=百世物流YUNDA=韵达速递TTKDEX=天天快递
 		sb.append("</logisticsCode>\n");
 		sb.append("<consignee>");
