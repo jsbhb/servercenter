@@ -104,7 +104,7 @@ public class ButtJointMessageUtils {
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			sb.append("<detail>\n");
 			sb.append("<productId>");
-			sb.append(goods.getSku()); // 货号'3105166008N0000002'
+			sb.append(goods.getItemCode()); // 货号'3105166008N0000002'
 			sb.append("</productId>\n");
 			sb.append("<qty>");
 			sb.append(goods.getItemQuantity()); // 数量
@@ -223,7 +223,7 @@ public class ButtJointMessageUtils {
 			for (OrderGoods goods : info.getOrderGoodsList()) {
 				outOrderGoods = new OutOrderGoods();
 				outOrderGoods.setGoods_name(URLEncoder.encode(goods.getItemName(), "utf-8"));
-				outOrderGoods.setOnly_sku(goods.getSku());
+				outOrderGoods.setOnly_sku(goods.getItemCode());
 				outOrderGoods.setQuantity(goods.getItemQuantity());
 				list.add(outOrderGoods);
 			}
@@ -240,7 +240,7 @@ public class ButtJointMessageUtils {
 		StringBuilder sb = new StringBuilder();
 		if (list != null && list.size() > 0) {
 			for (OrderBussinessModel model : list) {
-				sb.append(model.getSku() + ",");
+				sb.append(model.getItemCode() + ",");
 			}
 		}
 		return sb.toString().substring(0, sb.length() - 1);
@@ -415,7 +415,7 @@ public class ButtJointMessageUtils {
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			sb.append("<Detail>\n");
 			sb.append("<ProductId>");
-			sb.append(goods.getSku()); // 货号'3105166008N0000002'
+			sb.append(goods.getItemCode()); // 货号'3105166008N0000002'
 			sb.append("</ProductId>\n");
 			sb.append("<GoodsName>" + goods.getItemName() + "</GoodsName>\n");
 			sb.append("<Qty>");
