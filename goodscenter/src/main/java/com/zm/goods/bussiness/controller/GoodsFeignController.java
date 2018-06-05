@@ -1,6 +1,6 @@
 package com.zm.goods.bussiness.controller;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -29,9 +29,9 @@ public class GoodsFeignController {
 
 	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
 	public ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
-			@RequestBody Set<GoodsItemBO> set) {
+			@RequestBody List<GoodsItemBO> list) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsFeignService.manualOrderGoodsCheck(set);
+			return goodsFeignService.manualOrderGoodsCheck(list);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());

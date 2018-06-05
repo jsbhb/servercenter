@@ -42,9 +42,19 @@ public class OrderGoods extends Pagination {
 
 	private String goodsId;
 	
+	private Integer conversion;
+	
 	public boolean validate() {
 		return (sku != null && itemCode != null && itemQuantity != null && itemPrice != null
 				&& actualPrice != null);
+	}
+
+	public Integer getConversion() {
+		return conversion;
+	}
+
+	public void setConversion(Integer conversion) {
+		this.conversion = conversion;
 	}
 
 	public String getItemImg() {

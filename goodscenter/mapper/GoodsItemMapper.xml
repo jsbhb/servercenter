@@ -6,8 +6,10 @@
 	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="entity">
 		<id column="id" property="id"/>
 		<result column="goods_id" property="goodsId"/>
+		<result column="type" property="type"/>
 		<result column="item_id" property="itemId" />
 		<result column="item_code" property="itemCode"/>
+		<result column="conversion" property="conversion"/>
 		<result column="sku" property="sku"/>
 		<result column="encode" property="encode"/>
 		<result column="weight" property="weight"/>
@@ -25,6 +27,7 @@
 		<result column="center_status" property="centerStatus"/>
 		<result column="shelf_life" property="shelfLife"/>
 		<result column="carton" property="carTon"/>
+		<result column="retailPrice" property="retailPrice"/>
 		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
 			<result column="min" property="min"/>
 			<result column="max" property="max"/>
@@ -607,9 +610,19 @@
 		</foreach>
 	</insert>
 	
+	
+	
+	<select id="listGoodsItemByParam" parameterType="Object" resultMap="entity">
+		select i.id,i.item_id,i.item_code,i.sku,g.supplier_id,p.retail_price as retailPrice,i.conversion,g.goods_name,g.type from goods_item i left join goods_price p on 
+		i.item_id = p.item_id left join goods g on i.goods_id=g.goods_id where (i.sku,i.conversion) in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			(#{item.sku},#{item.conversion})
+		</foreach>
+	</select>
+	
 	<select id="listGoodsItemByItemIds" parameterType="Object" resultMap="entity">
-		select i.id,i.item_id,i.item_code,i.sku,p.retail_price from goods_item i left join goods_price p on 
-		i.item_id = p.item_id where i.item_id in 
+		select i.id,i.item_id,i.item_code,g.supplier_id,i.sku,p.retail_price as retailPrice,i.conversion,g.goods_name,g.type from goods_item i left join goods_price p on 
+		i.item_id = p.item_id left join goods g on i.goods_id=g.goods_id where i.item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>

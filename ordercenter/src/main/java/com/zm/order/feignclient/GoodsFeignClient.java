@@ -56,5 +56,5 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
 	public com.zm.order.common.ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
-			@RequestBody Set<GoodsItemBO> set);
+			@RequestBody List<GoodsItemBO> set);
 }

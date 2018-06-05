@@ -24,7 +24,7 @@ public class SysInit {
 	@PostConstruct
 	public void init(){
 		
-		initGoodsCache();
+//		initGoodsCache();
 	}
 	
 	private void initGoodsCache(){

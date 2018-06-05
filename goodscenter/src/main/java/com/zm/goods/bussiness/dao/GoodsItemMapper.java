@@ -243,4 +243,6 @@ public interface GoodsItemMapper {
 	void insertPriceBatch(List<GoodsPrice> priceList);
 
 	List<GoodsItemEntity> listGoodsItemByItemIds(List<String> itemIds);
+
+	List<GoodsItemEntity> listGoodsItemByParam(List<GoodsItemEntity> itemList);
 }

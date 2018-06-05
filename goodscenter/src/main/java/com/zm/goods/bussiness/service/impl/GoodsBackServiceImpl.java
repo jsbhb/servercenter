@@ -16,7 +16,6 @@ import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,6 @@ import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
@@ -197,12 +195,25 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	private void setRedis(List<GoodsRebateEntity> entityList) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<String, String> result = new HashMap<String, String>();
-		for (GoodsRebateEntity entity : entityList) {
-			result.put(entity.getGradeType() + "", entity.getProportion() + "");
+		Map<String, String> result = null;
+		Map<String, List<GoodsRebateEntity>> map = new HashMap<String, List<GoodsRebateEntity>>();
+		List<GoodsRebateEntity> tempList = null;
+		for (GoodsRebateEntity model : entityList) {
+			if (map.get(model.getItemId()) == null) {
+				tempList = new ArrayList<GoodsRebateEntity>();
+				tempList.add(model);
+				map.put(model.getItemId(), tempList);
+			} else {
+				map.get(model.getItemId()).add(model);
+			}
 		}
-
-		hashOperations.putAll(Constants.GOODS_REBATE + entityList.get(0).getItemId(), result);
+		for (Map.Entry<String, List<GoodsRebateEntity>> entry : map.entrySet()) {
+			result = new HashMap<String, String>();
+			for (GoodsRebateEntity entity : entry.getValue()) {
+				result.put(entity.getGradeType() + "", entity.getProportion() + "");
+			}
+			hashOperations.putAll(Constants.GOODS_REBATE + entry.getKey(), result);
+		}
 	}
 
 	@Override
@@ -420,32 +431,23 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		List<GoodsStockEntity> stockList = new ArrayList<GoodsStockEntity>();
 		List<GoodsRebateEntity> rebateList = new ArrayList<GoodsRebateEntity>();
 		if (list != null && list.size() > 0) {
-			SetOperations<String, Object> setOperations = template.opsForSet();
 			for (GoodsInfoEntity entity : list) {
 				for (GoodsItemEntity goodsItem : entity.getGoods().getItems()) {
-					boolean contain = setOperations.isMember(Constants.GOODS_CACHE,
-							goodsItem.getItemCode() + "," + goodsItem.getConversion());
-					if (contain) {
-						sb.append("商家编码：");
-						sb.append(goodsItem.getItemCode());
-						sb.append(",");
-						sb.append("换算比例：");
-						sb.append(goodsItem.getConversion());
-						sb.append(";已经存在");
-						LogUtil.writeLog(
-								"商家编码：" + goodsItem.getItemCode() + ",换算比例：" + goodsItem.getConversion() + "已经存在");
-						
-						return new ResultModel(false, sb.toString());
-						
-					} else {
-						itemList.add(goodsItem);
-						priceList.add(goodsItem.getGoodsPrice());
-						stockList.add(goodsItem.getStock());
-						rebateList.addAll(goodsItem.getGoodsRebateList());
-					}
+					itemList.add(goodsItem);
+					priceList.add(goodsItem.getGoodsPrice());
+					stockList.add(goodsItem.getStock());
+					rebateList.addAll(goodsItem.getGoodsRebateList());
 				}
 				baseList.add(entity.getGoodsBase());
 				goodsList.add(entity.getGoods());
+			}
+			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(itemList);
+			if(tempList != null && tempList.size() > 0){
+				sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
+				for(GoodsItemEntity goodsItem : itemList){
+					sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
+				}
+				return new ResultModel(false, sb.toString()); 
 			}
 			if (baseList.size() > 0) {
 				goodsBaseMapper.insertBatch(baseList);
@@ -465,10 +467,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			if (rebateList.size() > 0) {
 				insertGoodsRebate(rebateList);
 			}
-			for (GoodsItemEntity entity : itemList) {
-				setOperations.add(Constants.GOODS_CACHE, entity.getItemCode() + "," + entity.getConversion());
-			}
 		}
-		return new ResultModel(true, sb.toString());
+		return new ResultModel(true, "操作成功");
 	}
 }

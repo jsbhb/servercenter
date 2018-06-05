@@ -9,10 +9,8 @@ package com.zm.order.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -39,7 +37,9 @@ import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
+import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.DateUtils;
+import com.zm.order.utils.JSONUtil;
 
 /**
  * ClassName: OrderBackServiceImpl <br/>
@@ -149,35 +149,32 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	@Override
 	public ResultModel importOrder(List<OrderInfo> list) {
 		if (list != null && list.size() > 0) {
-			Set<GoodsItemBO> itemSet = new HashSet<GoodsItemBO>();
+			List<GoodsItemBO> itemList = new ArrayList<GoodsItemBO>();
 			GoodsItemBO item = null;
 			List<OrderGoods> goodsList = new ArrayList<OrderGoods>();
 			List<OrderDetail> detailList = new ArrayList<OrderDetail>();
 			for (OrderInfo info : list) {
-				if (!info.check()) {
-					return new ResultModel(false, info.getOrderId() + "订单基本信息不全");
-				}
-				if(!info.getOrderDetail().validate()){
-					return new ResultModel(false, info.getOrderId() + "订单详情信息不全");
-				}
 				for (OrderGoods goods : info.getOrderGoodsList()) {
-					if(!goods.validate()){
-						return new ResultModel(false, info.getOrderId() + "订单商品信息不全");
-					}
 					item = new GoodsItemBO();
 					item.setItemCode(goods.getItemCode());
 					item.setItemId(goods.getItemId());
 					item.setRetailPrice(goods.getItemPrice());
 					item.setSku(goods.getSku());
-					itemSet.add(item);
+					item.setConversion(goods.getConversion());
+					itemList.add(item);
 				}
 				goodsList.addAll(info.getOrderGoodsList());
 				detailList.add(info.getOrderDetail());
 			}
-			ResultModel result = goodsFeignClient.manualOrderGoodsCheck(Constants.FIRST_VERSION, itemSet);
+			ResultModel result = goodsFeignClient.manualOrderGoodsCheck(Constants.FIRST_VERSION, itemList);
 			if (!result.isSuccess()) {
 				return result;
 			}
+			result = consummateOrderGoods(list, result);
+			if (!result.isSuccess()) {
+				return result;
+			}
+
 			orderBackMapper.insertOrderBaseBatch(list);
 			orderBackMapper.insertOrderGoodsBatch(goodsList);
 			orderBackMapper.insertOrderDetailBatch(detailList);
@@ -189,7 +186,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				String time = DateUtils.getTimeString("yyyyMM");
 				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
-				//如果是有赞或展厅的不进行返佣计算
+				// 如果是有赞或展厅的不进行返佣计算
 				if (Constants.ORDER_SOURCE_EXHIBITION.equals(info.getOrderSource())
 						|| Constants.ORDER_SOURCE_YOUZAN.equals(info.getOrderSource())) {
 
@@ -199,7 +196,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					// 增加月销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
 							info.getOrderDetail().getPayment());
-				} else {//其他来源的计算返佣，统计在计算时一起加上
+				} else {// 其他来源的计算返佣，统计在计算时一起加上
 					shareProfitComponent.calShareProfitStayToAccount(info.getOrderId());
 				}
 			}
@@ -207,6 +204,58 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			return new ResultModel(true, "操作成功");
 		}
 		return new ResultModel(false, "没有订单信息");
+	}
+
+	@SuppressWarnings("unchecked")
+	private ResultModel consummateOrderGoods(List<OrderInfo> list, ResultModel result) {
+		List<Map<String, Object>> tempList = (List<Map<String, Object>>) result.getObj();
+		List<GoodsItemBO> itemList = new ArrayList<GoodsItemBO>();
+		GoodsItemBO itemBO = null;
+		for (Map<String, Object> map : tempList) {
+			itemBO = JSONUtil.parse(JSONUtil.toJson(map), GoodsItemBO.class);
+			itemList.add(itemBO);
+		}
+		Map<String, GoodsItemBO> tempMap = new HashMap<String, GoodsItemBO>();
+		for (GoodsItemBO model : itemList) {
+			tempMap.put(model.getItemId(), model);
+			tempMap.put(model.getSku() + "," + model.getConversion(), model);
+		}
+		int orderFlag = 0;
+		int supplierId = 0;
+		double amount = 0;
+		for (OrderInfo info : list) {
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				if (goods.getItemId() != null && !"".equals(goods.getItemId())) {
+					itemBO = tempMap.get(goods.getItemId());
+					if (itemBO == null) {
+						return new ResultModel(false, "商品编号：" + goods.getItemId() + ",不存在");
+					}
+					goods.setSku(itemBO.getSku());
+					goods.setItemCode(itemBO.getItemCode());
+				} else {
+					itemBO = tempMap.get(goods.getSku() + "," + goods.getConversion());
+					if (itemBO == null) {
+						return new ResultModel(false,
+								"自有编号：" + goods.getSku() + ",换算比例：" + goods.getConversion() + ",不存在");
+					}
+					goods.setItemId(itemBO.getItemId());
+					goods.setItemCode(itemBO.getItemCode());
+				}
+				goods.setItemName(itemBO.getGoodsName());
+				if (goods.getItemPrice() == null || "".equals(goods.getItemPrice())) {
+					goods.setItemPrice(itemBO.getRetailPrice());
+					goods.setActualPrice(itemBO.getRetailPrice());
+				}
+				amount = CalculationUtils.add(amount,
+						CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity()));
+				orderFlag = itemBO.getType();
+				supplierId = itemBO.getSupplierId();
+			}
+			info.setOrderFlag(orderFlag);
+			info.setSupplierId(supplierId);
+			info.getOrderDetail().setPayment(CalculationUtils.round(2, amount));
+		}
+		return new ResultModel(true, null);
 	}
 
 }

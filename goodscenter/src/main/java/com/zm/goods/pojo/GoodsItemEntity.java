@@ -23,6 +23,7 @@ import com.zm.goods.common.Pagination;
 public class GoodsItemEntity extends Pagination {
 	private int id;//
 	private String goodsId;// 商品ID
+	private Integer type;
 	private String itemId;// itemID
 	private String itemCode;// 商家自有编码
 	private String sku;// sku信息
@@ -37,6 +38,7 @@ public class GoodsItemEntity extends Pagination {
 	private String updateTime;// 更新时间
 	private String opt;// 操作人
 	private GoodsPrice goodsPrice;
+	private Double retailPrice;
 	private String goodsName;
 	private String supplierId;
 	private String supplierName;
@@ -50,6 +52,22 @@ public class GoodsItemEntity extends Pagination {
 	private String shelfLife;
 	private String carTon;
 	private List<GoodsRebateEntity> goodsRebateList;
+
+	public Double getRetailPrice() {
+		return retailPrice;
+	}
+
+	public void setRetailPrice(Double retailPrice) {
+		this.retailPrice = retailPrice;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
 
 	public List<GoodsRebateEntity> getGoodsRebateList() {
 		return goodsRebateList;
