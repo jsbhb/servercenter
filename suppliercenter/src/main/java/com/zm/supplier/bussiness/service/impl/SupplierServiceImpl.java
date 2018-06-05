@@ -141,7 +141,7 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Override
 	public void updateSupplier(SupplierEntity entity) {
-		supplierMapper.insert(entity);
+		supplierMapper.update(entity);
 	}
 
 }

@@ -73,7 +73,7 @@
 		(#{id},0,#{supplierName},0,
 		#{country},#{province},#{city},#{area},#{address},
 		#{operator},#{phone},#{mobile},#{fax},#{email},#{qq},
-		now(),now(),#{opt},0,#{mode},#{suppplierCode})
+		now(),now(),#{opt},0,#{mode},#{supplierCode})
 	</insert>
 	
 	<select id="getSupplierInterface" parameterType="Object" resultMap="supplierinf">
@@ -81,10 +81,44 @@
 	</select>
 	
 	<insert id="update" parameterType="Object">
-		update supplier_base set supplier_code = #{suppplierCode},
-		country = #{country},province=#{province},city=#{city},
-		area = #{area},address=#{address},operator=#{operator},
-		phone = #{phone},fax=#{fax},email=#{email},qq=#{qq},update_time = now()
+		update supplier_base set 
+		update_time = now()
+		<if test="supplierName!=null and supplierName!=''">
+			,supplier_name = #{supplierName}
+		</if>
+		<if test="supplierCode!=null and supplierCode!=''">
+			,supplier_code = #{supplierCode}
+		</if>
+		<if test="country!=null and country!=''">
+			,country = #{country}
+		</if>
+		<if test="province!=null and province!=''">
+			,province = #{province}
+		</if>
+		<if test="city!=null and city!=''">
+			,city = #{city}
+		</if>
+		<if test="area!=null and area!=''">
+			,area = #{area}
+		</if>
+		<if test="address!=null and address!=''">
+			,address = #{address}
+		</if>
+		<if test="operator!=null and operator!=''">
+			,operator = #{operator}
+		</if>
+		<if test="phone!=null and phone!=''">
+			,phone = #{phone}
+		</if>
+		<if test="fax!=null and fax!=''">
+			,fax = #{fax}
+		</if>
+		<if test="email!=null and email!=''">
+			,email = #{email}
+		</if>
+		<if test="qq!=null and qq!=''">
+			,qq = #{qq}
+		</if>
 		where id = #{id}
 	</insert>
 	
