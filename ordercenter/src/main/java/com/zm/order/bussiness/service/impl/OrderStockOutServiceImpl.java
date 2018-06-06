@@ -188,7 +188,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 				// 如果是有赞或展厅的不进行返佣计算
 				if (Constants.ORDER_SOURCE_EXHIBITION.equals(info.getOrderSource())
-						|| Constants.ORDER_SOURCE_YOUZAN.equals(info.getOrderSource())) {
+						|| Constants.ORDER_SOURCE_YOUZAN.equals(info.getOrderSource())
+						|| Constants.ORDER_SOURCE_BIG_CUSTOMER.equals(info.getOrderSource())) {
 
 					// 增加当天销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
