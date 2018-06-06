@@ -6,6 +6,13 @@ public class GradeBO {
 	private Integer parentId;
 	private Integer gradeType;
 	private String name;
+	private String company;
+	public String getCompany() {
+		return company;
+	}
+	public void setCompany(String company) {
+		this.company = company;
+	}
 	public String getName() {
 		return name;
 	}
