@@ -22,7 +22,6 @@ import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsConvert;
-import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;

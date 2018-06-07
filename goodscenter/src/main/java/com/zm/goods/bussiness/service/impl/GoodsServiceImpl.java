@@ -272,6 +272,11 @@ public class GoodsServiceImpl implements GoodsService {
 		for (OrderBussinessModel model : list) {
 			param.put("itemId", model.getItemId());
 			specs = goodsMapper.getGoodsSpecsForOrder(param);
+			if (specs == null) {
+				result.setSuccess(false);
+				result.setErrorMsg("商品编号:" + model.getItemId() + "已经下架");
+				return result;
+			}
 			weight += specs.getWeight() * model.getQuantity();
 			Double amount = GoodsServiceUtil.judgeQuantityRange(vip, result, specs, model);
 			if (!result.isSuccess()) {

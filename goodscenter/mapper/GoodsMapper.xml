@@ -356,7 +356,7 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.item_id = #{itemId}
+		gs.item_id = bgp.item_id where gs.item_id = #{itemId} and gs.status = 1
 	</select>
 	
 	<select id="getGoodsSpecsForButtJoinOrder" parameterType="Object" resultMap="goodsSpecs">
