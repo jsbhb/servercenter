@@ -263,7 +263,7 @@
 		base
 		gb on g.base_id = gb.id left join 
 		goods_category_brand gcb on gb.brand_id =
-		gcb.brand_id  where gi.status = 1  
+		gcb.brand_id  where gi.status = 1  and g.is_del = 0 
 		<if test="type != null and type != ''">
 			and g.type = #{type,jdbcType = INTEGER}
 		</if>
@@ -314,7 +314,7 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.status = 1 and gs.goods_id in
+		gs.item_id = bgp.item_id where gs.status = 1 and gi.is_del = 0 and gs.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -340,7 +340,7 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.status = 1 and gs.item_id = #{itemId}
+		gs.item_id = bgp.item_id where gs.status = 1 and gi.is_del = 0 and gs.item_id = #{itemId}
 	</select>
 	
 	<select id="getGoodsSpecsForOrder" parameterType="Object" resultMap="goodsSpecs">
@@ -356,7 +356,7 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.item_id = #{itemId} and gs.status = 1
+		gs.item_id = bgp.item_id where gs.item_id = #{itemId} and gs.status = 1 and gi.is_del = 0 and g.is_del = 0
 	</select>
 	
 	<select id="getGoodsSpecsForButtJoinOrder" parameterType="Object" resultMap="goodsSpecs">
@@ -366,7 +366,7 @@
 		from goods_item gi 
 		left join goods g on gi.goods_id = g.goods_id left join base b on g.base_id=b.id left join 
 		goods_price bgp on 
-		gi.item_id = bgp.item_id where gi.item_id = #{itemId} and gi.status = 2
+		gi.item_id = bgp.item_id where gi.item_id = #{itemId} and gi.status = 2 and gi.is_del = 0 and g.is_del = 0
 	</select>
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
@@ -387,7 +387,7 @@
 			goods_price bgp
 		</if>
 		on 
-		gs.item_id = bgp.item_id where gs.item_id in
+		gs.item_id = bgp.item_id where gi.is_del = 0 and g.is_del = 0 and gs.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
@@ -725,7 +725,7 @@
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods${centerId} gi left join goods g on gi.goods_id=g.goods_id left join 
 		base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
-		where gi.index_status = 0 
+		where gi.index_status = 0 and g.is_del = 0 
 		<if test="list != null and list.size > 0">
 			and gi.goods_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -743,7 +743,7 @@
 			goods_price bgp
 		</if>
 		on
-		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId}
+		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId} and gi.is_del = 0
 	</select>
 	
 	<update id="updateGoodsUpShelves" parameterType="Object">
@@ -796,7 +796,7 @@
 		<if test="centerId != '_2B'">
 			goods_price bgp
 		</if>
-		on gs.item_id = bgp.item_id where gs.status = 1 and gi.goods_id in
+		on gs.item_id = bgp.item_id where gs.status = 1 and g.is_del = 0 and i.is_del = 0 and gi.goods_id in
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
 			#{id}
@@ -866,7 +866,7 @@
 		<if test="centerId != '_2B'">
 			goods_price bgp
 		</if>
-		on gs.item_id = bgp.item_id where gs.status = 1
+		on gs.item_id = bgp.item_id where gs.status = 1 and g.is_del = 0 and i.is_del = 0
 		<if test="type == 0">
 			and gi.is_new = 1
 		</if>
