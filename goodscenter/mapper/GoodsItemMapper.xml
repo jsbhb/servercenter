@@ -530,7 +530,7 @@
 	<select id="selectCenterForPageDownload" parameterType="Object" resultMap="goods">
 		select g.*
 		from goods_${centerId} g 
-		left join goods gd on g.goods_id = gd.goods_id and gd.is_del = 0
+		inner join goods gd on g.goods_id = gd.goods_id and gd.is_del = 0
 		where 1=1
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
