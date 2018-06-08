@@ -145,7 +145,7 @@
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
-		left join goods_stock s on s.item_id = i.item_id where i.id=#{id}
+		left join goods_stock s on s.item_id = i.item_id where i.id=#{id} and i.is_del = 0 and g.is_del = 0
 	</select>
 	
 <!-- 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity"> -->
@@ -196,7 +196,7 @@
 		left join goods_stock s on s.item_id = i.item_id 
 		left join base b on g.base_id = b.id
 		left join goods_tag_bind tag on i.item_id = tag.item_id
-		where 1=1 
+		where 1=1 and i.is_del = 0 and g.is_del = 0
 		<if test="baseEntity!=null">
 			<if test="baseEntity.brandId!=null and baseEntity.brandId!=''">
 				and b.brand_id = #{baseEntity.brandId}
@@ -263,7 +263,7 @@
 		left join goods_stock s on s.item_id = i.item_id 
 		left join goods_item_${centerId} c on c.item_id = i.item_id 
 		left join goods_tag_bind tag on i.item_id = tag.item_id
-		where i.status = 2
+		where i.status = 2 and i.is_del = 0 and g.is_del = 0
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
@@ -440,7 +440,7 @@
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
 		left join goods_stock s on s.item_id = i.item_id 
-		left join goods_item_${centerId} c on c.item_id = i.item_id where i.status = 2
+		left join goods_item_${centerId} c on c.item_id = i.item_id where i.status = 2 and i.is_del = 0 and g.is_del = 0
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
@@ -515,7 +515,7 @@
 	
 	<select id="selectForPageDownload" parameterType="Object" resultMap="goods">
 		select g.*
-		from goods g where 1=1 
+		from goods g where 1=1 and g.is_del = 0
 		<if test="goodsName!=null and goodsName!=''">
 			and g.goods_name like concat('%',#{goodsName},'%') 
 		</if>
@@ -627,5 +627,52 @@
 			#{item}
 		</foreach>
 	</select>
+	
+	<update id="updateBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update goods_item
+			<set>
+				<if test="item.itemCode != null and item.itemCode != ''">item_code = #{item.itemCode}, </if>
+				<if test="item.sku != null and item.sku != ''">sku = #{item.sku}, </if>
+				<if test="item.weight != null and item.weight != ''">weight = #{item.weight}, </if>
+				<if test="item.exciseTax != null and item.exciseTax != ''">excise_tax = #{item.exciseTax}, </if>
+				<if test="item.status != null and item.status != ''">status = #{item.status}, </if>
+				<if test="item.info != null and item.info != ''">info = #{item.info}, </if>
+				<if test="item.conversion != null and item.conversion != ''">conversion = #{item.conversion}, </if>
+				<if test="item.encode != null and item.encode != ''">encode = #{item.encode}, </if>
+				<if test="item.shelfLife != null and item.shelfLife != ''">shelf_life = #{item.shelfLife}, </if>
+				<if test="item.carTon != null and item.carTon != ''">carton = #{item.carTon}, </if>
+				update_time = now(),opt = #{item.opt}
+            </set>
+            where item_id = #{item.itemId}
+		</foreach>
+	</update>
+	
+	<update id="updatePriceBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update goods_price
+			<set>
+				<if test="item.proxyPrice != null and item.proxyPrice != ''">proxy_price = #{item.proxyPrice}, </if>
+				<if test="item.fxPrice != null and item.fxPrice != ''">fxprice = #{item.fxPrice}, </if>
+				<if test="item.retailPrice != null and item.retailPrice != ''">retail_price = #{item.retailPrice}, </if>
+				<if test="item.min != null and item.min != ''">min = #{item.min}, </if>
+				<if test="item.max != null and item.max != ''">max = #{item.max}, </if>
+				update_time = now(),opt = #{item.opt}
+            </set>
+            where item_id = #{item.itemId}
+		</foreach>
+	</update>
+	
+	<update id="updateSubGoodsItemBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update goods_item,goods_item_2 
+			<set>
+				goods_item_2.goods_id=goods_item.goods_id,goods_item_2.item_id=goods_item.item_id,
+				goods_item_2.item_code=goods_item.item_code,goods_item_2.encode=goods_item.encode,
+				goods_item_2.update_time=now()
+            </set>
+            where goods_item_2.item_id=goods_item.item_id and goods_item.item_id = #{item}
+		</foreach>
+	</update>
 	
 </mapper>
