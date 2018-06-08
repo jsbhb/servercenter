@@ -216,15 +216,15 @@
 	
 	
 	<select id="select" parameterType="Object" resultMap="goodsWithItems">
-		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} 
+		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} and i.is_del = 0 and g.is_del = 0 
 	</select>
 	
 	<select id="selectById" parameterType="Object" resultMap="entity">
-		select * from goods where id = #{id} 
+		select * from goods where id = #{id} and is_del = 0
 	</select>
 	
 	<select id="selectForPage" parameterType="Object" resultMap="entity">
-		select * from goods where 1=1 
+		select * from goods where 1=1 and is_del = 0
 		<if test="goodsName!=null and goodsName!=''">
 			and goods_name like concat('%',#{goodsName},'%') 
 		</if>
@@ -272,7 +272,7 @@
 	</delete>
 	
 	<select id="selectRecordForDel" parameterType="Object" resultMap="entity">
-		SELECT a.* FROM goods a where a.id = #{id} and exists 
+		SELECT a.* FROM goods a where a.id = #{id} and a.is_del = 0 and exists 
 		(select goods_id from goods_item where status in('1','2')  and goods_id = a.goods_id);
 	</select>
 
@@ -282,15 +282,15 @@
 	</select>
 	
 	<select id="selectRecordForUpd" parameterType="Object" resultMap="entity">
-		SELECT a.* FROM goods a where a.id = #{id} and exists 
-		(select goods_id from goods_item where status = '2' and goods_id = a.goods_id);
+		SELECT a.* FROM goods a where a.id = #{id} and a.is_del = 0 and exists 
+		(select goods_id from goods_item where status = '2' and is_del = 0 and goods_id = a.goods_id);
 	</select>
 	
 	<select id="selectAllGoodsForRebate" parameterType="Object" resultMap="goodsRebate">
 		select g.id,g.goods_id,g.goods_name,g.supplier_id,g.supplier_name,g.description,
 		g.status,i.first,i.second,i.third,i.remark,i.update_time,i.opt 
 		from goods g left join goods_rebate i on i.goods_id = g.goods_id 
-		where 1=1
+		where 1=1 and g.is_del = 0
 		<if test="goodsName!=null and goodsName!=''">
 			and g.goods_name like concat('%',#{goodsName},'%') 
 		</if>
@@ -373,7 +373,7 @@
 	</select>
 	
 	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
-		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} 
+		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} and i.is_del = 0 and g.is_del = 0
 	</select>
 	
 	<select id="selectTagFuncListInfo" parameterType="Object" resultMap="tagFunc">
@@ -388,11 +388,11 @@
 	</select>
 	
 	<select id="selectGoodsItemByItemId" parameterType="Object" resultMap="goodsItemEntity">
-		select * from goods_item where item_id = #{itemId}
+		select * from goods_item where item_id = #{itemId} and is_del = 0
 	</select>
 	
 	<select id="selectGoodsEntityByItemId" parameterType="Object" resultMap="entity">
-		select * from goods where goods_id = #{goodsId}
+		select * from goods where goods_id = #{goodsId} and is_del = 0
 	</select>
 	
 	<update id="updateGoodsEntity" parameterType="Object">
@@ -419,7 +419,7 @@
 		left join zm_goods.goods_price gp on gi.item_id = gp.item_id
 		left join zm_goods.goods_rebate gr on gi.item_id = gr.item_id
 		left join zm_user.grade_type gt on gr.grade_type = gt.id
-		where 1=1 
+		where 1=1 and gi.is_del = 0 and g.is_del = 0
 		<if test="gradeType==null or gradeType == -1">
 			and gr.proportion > 0
 		</if>
@@ -450,6 +450,6 @@
 	</select>
 	
 	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">
-		select goods_id from goods_item where item_code = #{itemCode}
+		select goods_id from goods_item where item_code = #{itemCode} and is_del = 0
 	</select>
 </mapper>
