@@ -19,6 +19,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.SupplierPostFeeBO;
 
 /**
  * ClassName: OrderService <br/>
@@ -222,7 +223,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Double getPostFee(PostFeeDTO postFee);
+	List<SupplierPostFeeBO> getPostFee(List<PostFeeDTO> postFee);
 
 	/**
 	 * createTable:创建邮费数据表. <br/>

@@ -4,11 +4,41 @@ public class ExpressFee {
 
 	private Integer id;
 	
+	private Integer templateId;
+	
 	private Double fee;
 	
 	private Integer weight;
 	
 	private Double heavyFee;
+	
+	private Integer supplierId;
+	
+	private String includeProvince;
+
+	public Integer getTemplateId() {
+		return templateId;
+	}
+
+	public void setTemplateId(Integer templateId) {
+		this.templateId = templateId;
+	}
+
+	public String getIncludeProvince() {
+		return includeProvince;
+	}
+
+	public void setIncludeProvince(String includeProvince) {
+		this.includeProvince = includeProvince;
+	}
+
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
 
 	public Integer getId() {
 		return id;

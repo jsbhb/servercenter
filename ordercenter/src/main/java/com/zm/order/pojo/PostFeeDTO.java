@@ -11,17 +11,28 @@ public class PostFeeDTO {
 	
 	private String expressKey;
 	
-	private Integer weight;
+	private int weight;
 	
 	private Integer centerId;
 	
+	private Integer supplierId;
+	
 	public PostFeeDTO(){}
 	
-	public PostFeeDTO(Double price,String province, Integer weight, Integer centerId){
+	public PostFeeDTO(Double price,String province, Integer weight, Integer centerId, Integer supplierId){
 		this.price = price;
 		this.province = province;
 		this.weight = weight;
 		this.centerId = centerId;
+		this.supplierId = supplierId;
+	}
+
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
 	}
 
 	public Integer getCenterId() {

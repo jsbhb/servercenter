@@ -498,13 +498,11 @@ public class OrderController {
 	@ApiOperation(value = "获取运费接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
-	public ResultModel getPostFee(@PathVariable("version") Double version, @RequestBody PostFeeDTO postFee) {
+	public ResultModel getPostFee(@PathVariable("version") Double version, @RequestBody List<PostFeeDTO> postFee) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			Double fee = orderService.getPostFee(postFee);
-
-			return new ResultModel(true, fee);
+			return new ResultModel(true, orderService.getPostFee(postFee));
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),

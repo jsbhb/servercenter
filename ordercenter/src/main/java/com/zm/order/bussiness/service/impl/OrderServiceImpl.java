@@ -54,6 +54,7 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.Tax;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.SupplierPostFeeBO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
@@ -193,8 +194,10 @@ public class OrderServiceImpl implements OrderService {
 			// 计算邮费(自提不算邮费)
 			if (Constants.EXPRESS.equals(info.getExpressType())) {
 				String province = info.getOrderDetail().getReceiveProvince();
-				PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId());
-				postFee = getPostFee(post);
+				PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId(), info.getSupplierId());
+				List<PostFeeDTO> postFeeList = new ArrayList<PostFeeDTO>();
+				postFeeList.add(post);
+				postFee = getPostFee(postFeeList).get(0).getPostFee();
 			}
 		}
 		if (!freeTax) {
@@ -630,29 +633,85 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Double getPostFee(PostFeeDTO postFee) {
-		String id = judgeCenterId(postFee.getCenterId());
-		Double conditionFee = orderMapper.getFreePostFee(id);
+	public List<SupplierPostFeeBO> getPostFee(List<PostFeeDTO> postFee) {
+		List<SupplierPostFeeBO> result = new ArrayList<SupplierPostFeeBO>();
+		List<SupplierPostFeeBO> tempList = orderMapper.getFreePostFee();// 满多少包邮
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("id", id);
-		if (conditionFee != null && postFee.getPrice() >= conditionFee) {
-			return 0.0;
-		} else {
-			param.put("province", postFee.getProvince());
-			ExpressFee expressFee = orderMapper.getExpressFee(param);
-			if (expressFee != null) {
-				if (postFee.getWeight() > expressFee.getWeight()) {
-					Double weight = Math.ceil(CalculationUtils
-							.div(CalculationUtils.sub(postFee.getWeight(), expressFee.getWeight()), 1000.0));
-					return CalculationUtils.add(expressFee.getFee(),
-							CalculationUtils.mul(expressFee.getHeavyFee(), weight));
-				} else {
-					return expressFee.getFee();
+		// 满多少包邮
+		if (tempList != null && tempList.size() > 0) {
+			Iterator<PostFeeDTO> it = postFee.iterator();
+			while (it.hasNext()) {
+				PostFeeDTO dto = it.next();
+				for (SupplierPostFeeBO temp : tempList) {
+					if (temp.getSupplierId().equals(dto.getSupplierId())) {
+						if (dto.getPrice() >= temp.getPostFee()) {
+							result.add(new SupplierPostFeeBO(dto.getSupplierId(), 0.0));
+							it.remove();
+						}
+					}
 				}
-			} else {
-				return orderMapper.getDefaultFee(postFee.getExpressKey());
+			}
+			// 扣除包邮后的邮费
+			if (postFee.size() > 0) {
+				calPostFee(postFee, result, param, it);
+			}
+		} else {
+			Iterator<PostFeeDTO> it = postFee.iterator();
+			calPostFee(postFee, result, param, it);
+		}
+		return result;
+	}
+
+	private void calPostFee(List<PostFeeDTO> postFee, List<SupplierPostFeeBO> result, Map<String, Object> param,
+			Iterator<PostFeeDTO> it) {
+		List<Integer> supplierIds = new ArrayList<Integer>();
+		for (PostFeeDTO dto : postFee) {
+			supplierIds.add(dto.getSupplierId());
+		}
+		param.put("list", supplierIds);
+		List<ExpressFee> expressFeeList = orderMapper.getExpressFee(param);
+		if (expressFeeList != null && expressFeeList.size() > 0) {
+			while (it.hasNext()) {
+				PostFeeDTO dto = it.next();
+				for (ExpressFee expressFee : expressFeeList) {
+					if (expressFee.getSupplierId().equals(dto.getSupplierId())) {
+						if (expressFee.getIncludeProvince() == null || "".equals(expressFee.getIncludeProvince())) {
+							calPostFee(result, it, dto, expressFee);
+							break;
+						} else {
+							if(expressFee.getIncludeProvince().contains(dto.getProvince())){
+								calPostFee(result, it, dto, expressFee);
+								break;
+							}
+						}
+					}
+				}
+			}
+			if (postFee.size() > 0) {
+				double fee = orderMapper.getDefaultFee("");
+				for (PostFeeDTO dto : postFee) {
+					result.add(new SupplierPostFeeBO(dto.getSupplierId(), fee));
+				}
+			}
+		} else {
+			double fee = orderMapper.getDefaultFee("");
+			for (PostFeeDTO dto : postFee) {
+				result.add(new SupplierPostFeeBO(dto.getSupplierId(), fee));
 			}
 		}
+	}
+
+	private void calPostFee(List<SupplierPostFeeBO> result, Iterator<PostFeeDTO> it, PostFeeDTO dto,
+			ExpressFee expressFee) {
+		if (dto.getWeight() > expressFee.getWeight()) {
+			Double weight = Math.ceil(CalculationUtils
+					.div(CalculationUtils.sub(dto.getWeight(), expressFee.getWeight()), 1000.0));
+			result.add(new SupplierPostFeeBO(dto.getSupplierId(), CalculationUtils.add(
+					expressFee.getFee(), CalculationUtils.mul(expressFee.getHeavyFee(), weight))));
+		} else {
+			result.add(new SupplierPostFeeBO(dto.getSupplierId(), expressFee.getFee()));
+		}
+		it.remove();
 	}
 
 	@Override
@@ -660,13 +719,6 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.createExpressFee(centerId);
 		orderMapper.createFreeExpressFee(centerId);
 		orderMapper.createProfitProportion(centerId);
-	}
-
-	private String judgeCenterId(Integer id) {
-		if (Constants.PREDETERMINE_PLAT_TYPE == id) {
-			return "_2B";
-		}
-		return "_" + id;
 	}
 
 	@Override

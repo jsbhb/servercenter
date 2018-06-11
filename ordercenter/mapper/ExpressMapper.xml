@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.order.bussiness.dao.ExpressMapper">
+
+	<resultMap type="com.zm.order.pojo.bo.ExpressTemplateBO" id="template">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="template_name" property="templateName" jdbcType="VARCHAR" />
+		<result column="free_post_fee" property="freePost" jdbcType="INTEGER" />
+		<result column="free_tax_fee" property="freeTax" jdbcType="INTEGER" />
+		<result column="enable" property="enable" jdbcType="INTEGER" />
+		<collection property="expressList" ofType="com.zm.order.pojo.ExpressFee">
+			<id column="ef_id" property="id" jdbcType="INTEGER" />
+			<id column="fee" property="fee" />
+			<id column="weight" property="weight" />
+			<id column="heavy_fee" property="heavyFee" />
+			<id column="include_province" property="includeProvince" />
+		</collection>
+	</resultMap>
+	
+	<insert id="saveExpressTemplate" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
+		 insert into express_template (supplier_id,template_name,free_post_fee,free_tax_fee,enable,create_time,opt)
+		 values(#{supplierId},#{templateName},#{freePost},#{freeTax},#{enable},now()) 
+	</insert>
+	
+	<insert id="saveExpressBatch" parameterType="Object">
+		insert into express_fee (template_id,fee,weight,heavy_fee,include_province,create_time)
+		<foreach collection="list" item="item" separator=",">
+			(#{item.templateId},#{item.fee},#{item.weight},#{item.heavyFee},#{item.includeProvince},now)
+		</foreach>
+	</insert>
+	
+	<select id="getExpressTemplateById" parameterType="Object" resultMap="template">
+		select et.id,et.supplier_id,et.template_name,et.free_post_fee,et.free_tax_fee,
+		ef.id as ef_id,ef.fee,ef.weight,ef.heavy_fee,ef.include_province 
+		from express_template et left join express_fee ef on et.id = ef.template_id where et.id = #{id}
+	</select>
+	
+	<select id="selectExpressForPage" resultMap="template" parameterType="Object">
+		select * from express_template where 1=1 
+		<if test="templateName != null and templateName != ''">
+			and template_name like concat('%',#{templateName},'%') 
+		</if>
+		<if test="supplierId != null and supplierId != ''">
+			and supplier_id = #{supplierId}
+		</if>
+		<!-- mybatis 会把0识别为null -->
+		<if test="enable != null and enable != '' or enable == 0">
+			and enable = #{enable}
+		</if>
+		order by create_time desc
+	</select>
+	
+	<update id="updateDisableBySupplierId" parameterType="Object">
+		update express_template set enable = 0 where supplier_id = #{supplierId}
+	</update>
+	
+	<update id="updateEnable" parameterType="Object">
+		update express_template set enable = 1 where id = #{id}
+	</update>
+	
+	<update id="update" parameterType="Object">
+		update express_template 
+		<set>
+			<if test="templateName != null and templateName != ''">
+				template_name = #{templateName},
+			</if>
+			<if test="freePost != null and freePost != ''">
+				free_post_fee = #{freePost},
+			</if>
+			<if test="freeTax != null and freeTax != ''">
+				free_tax_fee = #{freeTax},
+			</if>
+			<if test="enable != null and enable != '' or enable == 0">
+				enable = #{enable},
+			</if>
+			update_time = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateExpressBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";" >
+			update express_fee 
+			<set>
+				<if test="fee != null and fee != ''">
+					fee = #{item.fee},
+				</if>
+				<if test="weight != null and weight != ''">
+					weight = #{item.weight},
+				</if>
+				<if test="heavyFee != null and heavyFee != ''">
+					heavy_fee = #{item.heavyFee},
+				</if>
+				<if test="includeProvince != null and includeProvince != ''" >
+					include_province = #{includeProvince},
+				</if>
+				update_time = now()
+			</set>
+			where id = #{id}
+		</foreach>
+	</update>
+
+</mapper>

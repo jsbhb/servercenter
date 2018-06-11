@@ -20,6 +20,7 @@ import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
+import com.zm.order.pojo.bo.SupplierPostFeeBO;
 
 /**  
  * ClassName: OrderMapper <br/>  
@@ -84,9 +85,9 @@ public interface OrderMapper {
 	
 	ProfitProportion getProfitProportion(@Param("centerId") Integer centerId);
 	
-	Double getFreePostFee(@Param("id") String id);
+	List<SupplierPostFeeBO> getFreePostFee();
 	
-	ExpressFee getExpressFee(Map<String,Object> param);
+	List<ExpressFee> getExpressFee(Map<String,Object> param);
 	
 	Double getDefaultFee(@Param("carrierKey") String carrierKey);
 	

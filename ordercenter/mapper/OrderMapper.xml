@@ -102,7 +102,9 @@
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="fee" property="fee" jdbcType="DECIMAL" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="heavy_fee" property="heavyFee" jdbcType="DECIMAL" />
+		<result column="include_province" property="includeProvince" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<resultMap type="com.zm.order.pojo.OrderIdAndSupplierId" id="orderIdAndSupplierId">
@@ -133,7 +135,7 @@
 		o.id,o.order_id,od.pay_no,od.payment,o.mall_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
-		where o.status = 12 and o.order_flag = 0 and is_manual = 0 and o.create_type != 5
+		where o.status = 12 and o.order_flag = 0 and is_manual = 0 and supplier_id != 5 and o.create_type != 5
 	</select>
 
 
@@ -486,8 +488,9 @@
 		EXISTS express_fee_${centerId} (
 		id INT UNSIGNED NOT NULL
 		AUTO_INCREMENT,
-		express_key VARCHAR(45) NOT NULL,
-		name VARCHAR(45) NOT
+		template_id INT UNSIGNED NOT NULL,
+		express_key VARCHAR(45) NULL,
+		name VARCHAR(45)
 		NULL COMMENT '名称',
 		fee decimal(10,2) NOT NULL COMMENT '默认费用',
 		weight int
@@ -510,6 +513,7 @@
 		NOT EXISTS free_express_fee_${centerId} (
 		id INT UNSIGNED NOT NULL
 		AUTO_INCREMENT,
+		supplier_id INT UNSIGNED NOT NULL,
 		condition_fee decimal(10,2) NOT NULL COMMENT '包邮条件费用',
 		attr VARCHAR(100) NULL COMMENT '备用',
 		attr1 VARCHAR(100) NULL COMMENT
@@ -552,13 +556,16 @@
 		select * from profit_proportion_${centerId}
 	</select>
 
-	<select id="getFreePostFee" parameterType="Object" resultType="java.lang.Double">
-		select condition_fee from free_express_fee${id}
+	<select id="getFreePostFee" parameterType="Object" resultType="com.zm.order.pojo.bo.SupplierPostFeeBO">
+		select supplier_id as supplierId,condition_fee as postFee from free_express_fee
 	</select>
 
 	<select id="getExpressFee" parameterType="Object" resultMap="expressFee">
-		select * from express_fee${id} where include_province like
-		concat('%',#{province,jdbcType=VARCHAR},'%')
+		select * from express_template et left join express_fee ef on et.id = ef.template_id where 
+		et.enable = 1 and et.supplier_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
 	</select>
 
 	<select id="getDefaultFee" parameterType="Object" resultType="java.lang.Double">
