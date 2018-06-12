@@ -270,8 +270,22 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			goodsBaseMapper.insert(entity.getGoodsBase());
 		}
 		goodsBackMapper.insert(entity.getGoods());
-		goodsItemMapper.insert(entity.getGoods().getGoodsItem());
-		goodsItemMapper.insertPrice(entity.getGoods().getGoodsItem().getGoodsPrice());
+		
+		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
+		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
+		for(GoodsItemEntity gitem: entity.getGoods().getItems()) {
+			insItemList.add(gitem);
+			insPriceList.add(gitem.getGoodsPrice());
+		}
+		if (insItemList.size() > 0) {
+			goodsItemMapper.insertBatch(insItemList);
+		}
+		if (insPriceList.size() > 0) {
+			goodsItemMapper.insertPriceBatch(insPriceList);
+		}
+		
+//		goodsItemMapper.insert(entity.getGoods().getGoodsItem());
+//		goodsItemMapper.insertPrice(entity.getGoods().getGoodsItem().getGoodsPrice());
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
 		}
@@ -292,9 +306,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectById(goodsEntity.getBaseId());
 		// 组装商品信息
 		goodsItemEntity.setGoodsPrice(goodsPrice);
+		List<GoodsItemEntity> items = new ArrayList<GoodsItemEntity>();
+		items.add(goodsItemEntity);
 		goodsEntity.setFiles(goodsFiles);
 		goodsEntity.setGoodsTagBind(erpGoodsTagBind);
-		goodsEntity.setGoodsItem(goodsItemEntity);
+//		goodsEntity.setGoodsItem(goodsItemEntity);
+		goodsEntity.setItems(items);
 		goodsInfo.setGoods(goodsEntity);
 		goodsInfo.setGoodsBase(goodsBaseEntity);
 		return goodsInfo;
@@ -304,11 +321,43 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void updateGoodsInfo(GoodsInfoEntity entity) {
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
-		goodsItemMapper.update(entity.getGoods().getGoodsItem());
-		// 主表修改后同步到分表中去，目前只同步mallId为2的分表 START
-		goodsItemMapper.updateSubGoodsItem(entity.getGoods().getGoodsItem().getItemId());
-		// 主表修改后同步到分表中去，目前只同步mallId为2的分表 END
-		goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
+
+		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
+		List<GoodsItemEntity> updItemList = new ArrayList<GoodsItemEntity>();
+		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
+		List<GoodsPrice> updPriceList = new ArrayList<GoodsPrice>();
+		List<String> updItemIdS = new ArrayList<String>();
+		for(GoodsItemEntity gitem: entity.getGoods().getItems()) {
+			if ("true".equals(gitem.getIsCreate())) {
+				insItemList.add(gitem);
+				insPriceList.add(gitem.getGoodsPrice());
+			} else {
+				updItemList.add(gitem);
+				updItemIdS.add(gitem.getItemId());
+				updPriceList.add(gitem.getGoodsPrice());
+			}
+		}
+		if (insItemList.size() > 0) {
+			goodsItemMapper.insertBatch(insItemList);
+		}
+		if (updItemList.size() > 0) {
+			goodsItemMapper.updateBatch(updItemList);
+		}
+		if (insPriceList.size() > 0) {
+			goodsItemMapper.insertPriceBatch(insPriceList);
+		}
+		if (updPriceList.size() > 0) {
+			goodsItemMapper.updatePriceBatch(updPriceList);
+		}
+		if (updItemIdS.size() > 0) {
+			goodsItemMapper.updateSubGoodsItemBatch(updItemIdS);
+		}
+//		goodsItemMapper.update(entity.getGoods().getGoodsItem());
+//		// 主表修改后同步到分表中去，目前只同步mallId为2的分表 START
+//		goodsItemMapper.updateSubGoodsItem(entity.getGoods().getGoodsItem().getItemId());
+//		// 主表修改后同步到分表中去，目前只同步mallId为2的分表 END
+//		goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
+		
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
 			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());

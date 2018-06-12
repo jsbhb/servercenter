@@ -52,6 +52,7 @@ public class GoodsItemEntity extends Pagination {
 	private String shelfLife;
 	private String carTon;
 	private List<GoodsRebateEntity> goodsRebateList;
+	private String isCreate;
 
 	public Double getRetailPrice() {
 		return retailPrice;
@@ -299,6 +300,14 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setCarTon(String carTon) {
 		this.carTon = carTon;
+	}
+
+	public String getIsCreate() {
+		return isCreate;
+	}
+
+	public void setIsCreate(String isCreate) {
+		this.isCreate = isCreate;
 	}
 	
 }

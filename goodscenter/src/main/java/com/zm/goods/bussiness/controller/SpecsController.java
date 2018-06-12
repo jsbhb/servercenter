@@ -184,4 +184,17 @@ public class SpecsController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/goods/specs/selectAllSpeceInfo", method = RequestMethod.GET)
+	public ResultModel selectAllSpeceInfo(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				return new ResultModel(true, specsService.selectAllSpeceInfo());
+			}
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 }

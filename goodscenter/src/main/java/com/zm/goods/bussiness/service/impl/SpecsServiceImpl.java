@@ -117,4 +117,9 @@ public class SpecsServiceImpl implements SpecsService {
 		return entity.getSpecsValueId();
 	}
 
+	@Override
+	public List<SpecsEntity> selectAllSpeceInfo() {
+		return specsMapper.selectAllSpeceInfo();
+	}
+
 }

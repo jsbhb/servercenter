@@ -45,6 +45,18 @@
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
 	</resultMap>
+	
+	
+	<resultMap type="com.zm.goods.pojo.SpecsEntity" id="specsInfo">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<collection property="values"
+			ofType="com.zm.goods.pojo.SpecsValueEntity">
+			<id column="valueId" property="id" jdbcType="INTEGER"/>
+			<result column="specsId" property="specsId" jdbcType="INTEGER"/>
+			<result column="value" property="value" jdbcType="VARCHAR"/>
+		</collection>
+	</resultMap>
 
 	
 	<select id="selectById" parameterType="Object" resultMap="temp">
@@ -104,6 +116,13 @@
 	
 	<select id="selectAllSpeceValue" resultMap="specsValue">
 		select * from goods_specs_value 
+	</select>
+	
+	<select id="selectAllSpeceInfo" resultMap="specsInfo">
+		select a.id,a.name,b.id valueId,b.value,b.specs_id specsId
+		from goods_specs a
+		left join goods_specs_value b on a.id = b.specs_id
+		order by a.id
 	</select>
 	
 </mapper>

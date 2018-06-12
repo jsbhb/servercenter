@@ -245,4 +245,10 @@ public interface GoodsItemMapper {
 	List<GoodsItemEntity> listGoodsItemByItemIds(List<String> itemIds);
 
 	List<GoodsItemEntity> listGoodsItemByParam(List<GoodsItemEntity> itemList);
+
+	void updateBatch(List<GoodsItemEntity> itemList);
+
+	void updatePriceBatch(List<GoodsPrice> priceList);
+	
+	void updateSubGoodsItemBatch(List<String> itemIds);
 }
