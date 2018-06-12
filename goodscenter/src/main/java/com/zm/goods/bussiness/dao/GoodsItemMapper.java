@@ -251,4 +251,6 @@ public interface GoodsItemMapper {
 	void updatePriceBatch(List<GoodsPrice> priceList);
 	
 	void updateSubGoodsItemBatch(List<String> itemIds);
+
+	List<GoodsItemEntity> listGoodsItemForCheck(GoodsItemEntity entity);
 }

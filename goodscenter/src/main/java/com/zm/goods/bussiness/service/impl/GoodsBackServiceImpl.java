@@ -350,15 +350,24 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				updPriceList.add(gitem.getGoodsPrice());
 			}
 		}
-
-		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(updItemList);
-		if(tempList != null && tempList.size() > 0){
-			sb.append("以下海关编码和换算比例的组合已经存在，请核对----");
-			for(GoodsItemEntity goodsItem : updItemList){
-				sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
+		
+		for(GoodsItemEntity gie:updItemList) {
+			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemForCheck(gie);
+			if(tempList != null && tempList.size() > 0){
+				sb.append("以下海关编码和换算比例的组合已经存在，请核对----");
+				sb.append(gie.getSku()+","+gie.getConversion()+";");
+				return new ResultModel(false, sb.toString()); 
 			}
-			return new ResultModel(false, sb.toString()); 
 		}
+
+//		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(updItemList);
+//		if(tempList != null && tempList.size() > 0){
+//			sb.append("以下海关编码和换算比例的组合已经存在，请核对----");
+//			for(GoodsItemEntity goodsItem : updItemList){
+//				sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
+//			}
+//			return new ResultModel(false, sb.toString()); 
+//		}
 		
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		
