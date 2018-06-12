@@ -280,8 +280,19 @@
 		<if test="goodsId != null and goodsId != ''">
 			and gi.goods_id = #{goodsId, jdbcType = VARCHAR}
 		</if>
-		<if test="goodsId == null or goodsId == ''">
-			limit #{pagination.startRow} , #{pagination.numPerPage}
+		<if test="goodsIds != null and goodsIds.size > 0">
+			and gi.goods_id in
+			<foreach collection="goodsIds" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+			order by gi.is_popular desc
+			<if test="sortList != null and sortList != ''">
+			,
+				<foreach item="sort" index="index" collection="sortList" open=""
+					separator="," close="">
+					${sort.sortField} ${sort.sortRule} 
+				</foreach>
+			</if>
 		</if>
 	</select>
 
