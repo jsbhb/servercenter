@@ -73,7 +73,7 @@ public class PinYin4JUtil {
 	public static Map<String,List<Object>> packDataByFirstCode(List list,Class<?> clazz, String needConvert){
 		Map<String,List<Object>> result = new HashMap<String, List<Object>>();
 		if(list == null || list.size() == 0){
-			throw new RuntimeException("list 不能为空");
+			return null;
 		}
 		boolean isString = true;
 		if(!clazz.getName().equals("java.lang.String")){
