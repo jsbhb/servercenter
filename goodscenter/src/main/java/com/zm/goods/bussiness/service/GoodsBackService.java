@@ -219,7 +219,7 @@ public interface GoodsBackService {
 	 *            sync: 同步商品新增 normal：自营商品新增
 	 * @since JDK 1.7
 	 */
-	void saveGoodsInfo(GoodsInfoEntity entity);
+	ResultModel saveGoodsInfo(GoodsInfoEntity entity);
 
 	/**
 	 * queryById:根据编号查询商品. <br/>
@@ -240,7 +240,7 @@ public interface GoodsBackService {
 	 *            sync: 同步商品新增 normal：自营商品新增
 	 * @since JDK 1.7
 	 */
-	void updateGoodsInfo(GoodsInfoEntity entity);
+	ResultModel updateGoodsInfo(GoodsInfoEntity entity);
 
 	ResultModel getGoodsRebate(String itemId);
 

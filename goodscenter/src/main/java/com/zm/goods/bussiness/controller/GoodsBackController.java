@@ -337,8 +337,7 @@ public class GoodsBackController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsBackService.saveGoodsInfo(entity);
-				return new ResultModel(true, "");
+				return goodsBackService.saveGoodsInfo(entity);
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}
@@ -365,8 +364,7 @@ public class GoodsBackController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsBackService.updateGoodsInfo(entity);
-				return new ResultModel(true, "");
+				return goodsBackService.updateGoodsInfo(entity);
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}

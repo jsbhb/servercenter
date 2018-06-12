@@ -265,11 +265,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public void saveGoodsInfo(GoodsInfoEntity entity) {
-		if (entity.getGoodsBase().getId() != 0) {
-			goodsBaseMapper.insert(entity.getGoodsBase());
-		}
-		goodsBackMapper.insert(entity.getGoods());
+	public ResultModel saveGoodsInfo(GoodsInfoEntity entity) {
+		StringBuilder sb = new StringBuilder();
 		
 		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
 		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
@@ -277,6 +274,21 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			insItemList.add(gitem);
 			insPriceList.add(gitem.getGoodsPrice());
 		}
+		
+		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(insItemList);
+		if(tempList != null && tempList.size() > 0){
+			sb.append("以下海关货号和换算比例的组合已经存在，请核对----");
+			for(GoodsItemEntity goodsItem : insItemList){
+				sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
+			}
+			return new ResultModel(false, sb.toString()); 
+		}
+		
+		if (entity.getGoodsBase().getId() != 0) {
+			goodsBaseMapper.insert(entity.getGoodsBase());
+		}
+		goodsBackMapper.insert(entity.getGoods());
+		
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
@@ -292,6 +304,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		if (entity.getGoods().getGoodsTagBind() != null) {
 			goodsBackMapper.insertTagBind(entity.getGoods().getGoodsTagBind());
 		}
+		return new ResultModel(true, "");
 	}
 
 	@Override
@@ -319,8 +332,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public void updateGoodsInfo(GoodsInfoEntity entity) {
-		goodsBackMapper.updateGoodsEntity(entity.getGoods());
+	public ResultModel updateGoodsInfo(GoodsInfoEntity entity) {
+		StringBuilder sb = new StringBuilder();
 
 		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
 		List<GoodsItemEntity> updItemList = new ArrayList<GoodsItemEntity>();
@@ -337,6 +350,18 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				updPriceList.add(gitem.getGoodsPrice());
 			}
 		}
+
+		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(updItemList);
+		if(tempList != null && tempList.size() > 0){
+			sb.append("以下海关编码和换算比例的组合已经存在，请核对----");
+			for(GoodsItemEntity goodsItem : updItemList){
+				sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
+			}
+			return new ResultModel(false, sb.toString()); 
+		}
+		
+		goodsBackMapper.updateGoodsEntity(entity.getGoods());
+		
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
@@ -410,6 +435,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				goodsBackMapper.deleteTagBind(oldTag);
 			}
 		}
+		return new ResultModel(true, ""); 
 	}
 
 	@Override
