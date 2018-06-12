@@ -369,7 +369,7 @@
 	</delete>
 	
 	<select id="selectGoodsTagBindByGoodsId" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where item_id = #{itemId}
+		select * from goods_tag_bind where item_id = #{goodsId}
 	</select>
 	
 	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
