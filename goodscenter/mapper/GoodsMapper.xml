@@ -68,6 +68,7 @@
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="discount" property="discount" jdbcType="NUMERIC" />
 		<result column="info" property="info" jdbcType="VARCHAR" />
+		<result column="carton" property="carton" jdbcType="VARCHAR" />
 		<result column="qpqty" property="stock" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -296,7 +297,7 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select
-		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gi.conversion,
+		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gi.conversion,gi.carton,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
 		gs.status as specsStatus,gi.excise_tax,gi.weight,
@@ -322,7 +323,7 @@
 	</select>
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gi.info,gs.item_id,gs.goods_id,
+		select gs.id,gi.info,gs.item_id,gs.goods_id,gi.carton,
 		gs.item_code,gi.sku,gs.is_promotion,gi.excise_tax,gi.weight,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
@@ -344,7 +345,7 @@
 	</select>
 	
 	<select id="getGoodsSpecsForOrder" parameterType="Object" resultMap="goodsSpecs">
-		select gs.id,gs.is_promotion,gi.weight,gs.item_id,gs.goods_id,
+		select gs.id,gs.is_promotion,gi.weight,gs.item_id,gs.goods_id,gi.carton,
 		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
 		bgp.delivery_place,b.first_category,b.second_category,b.third_category
 		from goods_item${centerId} gs left join goods_item gi on gs.item_id = gi.item_id
@@ -361,7 +362,7 @@
 	
 	<select id="getGoodsSpecsForButtJoinOrder" parameterType="Object" resultMap="goodsSpecs">
 		select gi.id,gi.weight,gi.item_id,gi.goods_id,bgp.retail_price as price,
-		bgp.id as price_id,bgp.min,bgp.max,
+		bgp.id as price_id,bgp.min,bgp.max,gi.carton,
 		bgp.delivery_place,b.first_category,b.second_category,b.third_category
 		from goods_item gi 
 		left join goods g on gi.goods_id = g.goods_id left join base b on g.base_id=b.id left join 
@@ -371,7 +372,7 @@
 	
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
-		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,gi.conversion,
+		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,gi.conversion,gi.carton,
 		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gs.opt,bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount, gi.excise_tax,gi.weight,

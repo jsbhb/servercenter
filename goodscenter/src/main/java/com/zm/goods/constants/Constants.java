@@ -26,6 +26,8 @@ public class Constants {
 	
 	public static final String BRAND = "brand";
 	
+	public static final String BRAND_PY = "brandpy";
+	
 	public static final String ORIGIN = "origin";
 	
 	public static final String PROPORTION = "proportion";

@@ -78,6 +78,16 @@ public class GoodsSpecs implements Serializable {
 	private List<GoodsTagEntity> tagList;
 	
 	private Integer conversion;//商品转换比例
+	
+	private String carton;
+
+	public String getCarton() {
+		return carton;
+	}
+
+	public void setCarton(String carton) {
+		this.carton = carton;
+	}
 
 	public Integer getConversion() {
 		return conversion;

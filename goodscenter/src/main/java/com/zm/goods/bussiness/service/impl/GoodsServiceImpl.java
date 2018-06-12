@@ -51,6 +51,7 @@ import com.zm.goods.pojo.vo.TimeLimitActiveData;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.JSONUtil;
+import com.zm.goods.utils.PinYin4JUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
@@ -591,6 +592,9 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		resultMap.put(PAGINATION, pagination.webListConverter());
+		List<String> list = new ArrayList<>((Set<String>)luceneMap.get(Constants.BRAND));
+		Map<String,List<Object>> brandMap = PinYin4JUtil.packDataByFirstCode(list, String.class, null);
+		resultMap.put(Constants.BRAND_PY, brandMap);
 		resultMap.put(Constants.BRAND, luceneMap.get(Constants.BRAND));
 		resultMap.put(Constants.ORIGIN, luceneMap.get(Constants.ORIGIN));
 
