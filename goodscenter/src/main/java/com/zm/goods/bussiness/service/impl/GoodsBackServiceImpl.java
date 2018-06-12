@@ -394,7 +394,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			goodsItemMapper.deleteAllFiles(entity.getGoods());
 		}
 		// 判断商品标签
-		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getGoodsItem());
+		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getItems().get(0));
 		if (entity.getGoods().getGoodsTagBind() != null) {
 			// 增删改
 			ERPGoodsTagBindEntity newTag = entity.getGoods().getGoodsTagBind();
