@@ -1,6 +1,8 @@
 package com.zm.order.bussiness.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -68,7 +70,21 @@ public class ExpressServiceImpl implements ExpressService {
 		}
 		expressMapper.update(expressTemplate);
 		if (expressTemplate.getExpressList() != null && expressTemplate.getExpressList().size() > 0) {
-			expressMapper.updateExpressBatch(expressTemplate.getExpressList());
+			List<ExpressFee> updateList = new ArrayList<ExpressFee>();
+			List<ExpressFee> saveList = new ArrayList<ExpressFee>();
+			for(ExpressFee express : expressTemplate.getExpressList()){
+				if(express.getId() != null){
+					updateList.add(express);
+				} else {
+					saveList.add(express);
+				}
+			}
+			if(updateList.size() > 0){
+				expressMapper.updateExpressBatch(updateList);
+			}
+			if(saveList.size() > 0){
+				expressMapper.saveExpressBatch(saveList);
+			}
 		}
 		if (expressTemplate.getEnable() == ENABLE) {
 			setPostTaxRedis(expressTemplate);

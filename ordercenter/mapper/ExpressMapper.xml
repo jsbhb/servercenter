@@ -20,13 +20,14 @@
 	
 	<insert id="saveExpressTemplate" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
 		 insert into express_template (supplier_id,template_name,free_post_fee,free_tax_fee,enable,create_time,opt)
-		 values(#{supplierId},#{templateName},#{freePost},#{freeTax},#{enable},now()) 
+		 values(#{supplierId},#{templateName},#{freePost},#{freeTax},#{enable},now(),#{opt}) 
 	</insert>
 	
 	<insert id="saveExpressBatch" parameterType="Object">
-		insert into express_fee (template_id,fee,weight,heavy_fee,include_province,create_time)
+		insert into express_fee (template_id,fee,weight,heavy_fee,include_province,create_time) 
+		values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.templateId},#{item.fee},#{item.weight},#{item.heavyFee},#{item.includeProvince},now)
+			(#{item.templateId},#{item.fee},#{item.weight},#{item.heavyFee},#{item.includeProvince},now())
 		</foreach>
 	</insert>
 	

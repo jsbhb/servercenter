@@ -13,9 +13,16 @@ public class ExpressTemplateBO extends Pagination{
 	private Integer freePost;
 	private Integer freeTax;
 	private Integer enable;
+	private String opt;
 	private List<ExpressFee> expressList;
 	public List<ExpressFee> getExpressList() {
 		return expressList;
+	}
+	public String getOpt() {
+		return opt;
+	}
+	public void setOpt(String opt) {
+		this.opt = opt;
 	}
 	public void setExpressList(List<ExpressFee> expressList) {
 		this.expressList = expressList;
