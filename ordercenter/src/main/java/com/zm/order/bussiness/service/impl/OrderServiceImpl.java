@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -679,7 +680,7 @@ public class OrderServiceImpl implements OrderService {
 							calPostFee(result, it, dto, expressFee);
 							break;
 						} else {
-							if(expressFee.getIncludeProvince().contains(dto.getProvince())){
+							if (expressFee.getIncludeProvince().contains(dto.getProvince())) {
 								calPostFee(result, it, dto, expressFee);
 								break;
 							}
@@ -704,10 +705,10 @@ public class OrderServiceImpl implements OrderService {
 	private void calPostFee(List<SupplierPostFeeBO> result, Iterator<PostFeeDTO> it, PostFeeDTO dto,
 			ExpressFee expressFee) {
 		if (dto.getWeight() > expressFee.getWeight()) {
-			Double weight = Math.ceil(CalculationUtils
-					.div(CalculationUtils.sub(dto.getWeight(), expressFee.getWeight()), 1000.0));
-			result.add(new SupplierPostFeeBO(dto.getSupplierId(), CalculationUtils.add(
-					expressFee.getFee(), CalculationUtils.mul(expressFee.getHeavyFee(), weight))));
+			Double weight = Math
+					.ceil(CalculationUtils.div(CalculationUtils.sub(dto.getWeight(), expressFee.getWeight()), 1000.0));
+			result.add(new SupplierPostFeeBO(dto.getSupplierId(),
+					CalculationUtils.add(expressFee.getFee(), CalculationUtils.mul(expressFee.getHeavyFee(), weight))));
 		} else {
 			result.add(new SupplierPostFeeBO(dto.getSupplierId(), expressFee.getFee()));
 		}
@@ -740,7 +741,24 @@ public class OrderServiceImpl implements OrderService {
 		OrderGoods temp = null;
 		// list.addAll(orderMapper.listOrderForSendToTTWarehouse());
 		// list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
-		list.addAll(orderMapper.listOrderForSendToWarehouse());
+		List<OrderInfo> tempList = orderMapper.listOrderForSendToWarehouse();
+		// 间隔12小时内的相同收货人和收货地址的订单先不推送
+		if (tempList != null && tempList.size() > 0) {
+			Iterator<OrderInfo> it = tempList.iterator();
+			OrderInfo info = null;
+			while (it.hasNext()) {
+				info = it.next();
+				String str = info.getSupplierId() + "," + info.getOrderDetail().getReceiveAddress() + ","
+						+ info.getOrderDetail().getReceiveName();
+				if (template.hasKey(str)) {
+					it.remove();
+				} else {
+					template.opsForValue().set(str, str, 12L, TimeUnit.HOURS);
+				}
+			}
+		}
+		// end
+		list.addAll(tempList);
 		list.addAll(orderMapper.listOrderForSendToWarehouseGeneralTrade());
 		if (list.size() > 0) {
 			for (OrderInfo info : list) {// 找出所有的itemId

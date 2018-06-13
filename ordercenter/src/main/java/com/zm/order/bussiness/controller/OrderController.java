@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.model.SendOrderResult;
@@ -31,6 +32,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.utils.JSONUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -498,11 +500,29 @@ public class OrderController {
 	@ApiOperation(value = "获取运费接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
-	public ResultModel getPostFee(@PathVariable("version") Double version, @RequestBody List<PostFeeDTO> postFee) {
+	public ResultModel getPostFee(@PathVariable("version") Double version, HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
+			String data = req.getParameter("data");
+			List<PostFeeDTO> postFee = null;
+			try {
+				postFee = JSONUtil.parse(data, new TypeReference<List<PostFeeDTO>>() {
+				});
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
+						ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
+
+			}
+			for (PostFeeDTO dto : postFee) {
+				if (!dto.valid()) {
+					return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+							ErrorCodeEnum.MISSING_PARAM.getErrorCode());
+				}
+			}
 
 			return new ResultModel(true, orderService.getPostFee(postFee));
+
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -619,7 +639,7 @@ public class OrderController {
 
 			return orderService.repayingPushJudge(pushUserId, shopId);
 		}
-		
+
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}

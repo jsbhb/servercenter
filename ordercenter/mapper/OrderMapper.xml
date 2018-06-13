@@ -20,6 +20,7 @@
 		<result column="coupon_ids" property="couponIds" jdbcType="VARCHAR" />
 		<result column="express_type" property="expressType" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
@@ -152,7 +153,7 @@
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
 		from (select
 		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.create_type,
-		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag
+		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag,ob.remark
 		from order_base ob where
 		is_del = 0
 		<if test="info.status != null">
