@@ -17,6 +17,10 @@ public class PostFeeDTO {
 	
 	private Integer supplierId;
 	
+	public boolean valid(){
+		return price != null && province != null && supplierId != null && centerId != null;
+	}
+	
 	public PostFeeDTO(){}
 	
 	public PostFeeDTO(Double price,String province, Integer weight, Integer centerId, Integer supplierId){
@@ -73,6 +77,12 @@ public class PostFeeDTO {
 
 	public void setWeight(Integer weight) {
 		this.weight = weight;
+	}
+
+	@Override
+	public String toString() {
+		return "PostFeeDTO [price=" + price + ", province=" + province + ", expressKey=" + expressKey + ", weight="
+				+ weight + ", centerId=" + centerId + ", supplierId=" + supplierId + "]";
 	}
 	
 }
