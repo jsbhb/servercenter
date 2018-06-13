@@ -142,6 +142,12 @@
 		<if test="entity.orderId != null and entity.orderId != ''">
 			and ob.order_id = #{entity.orderId}
 		</if>
+		<if test="orderIds != null and orderIds.size > 0 ">
+			and ob.order_id in 
+			<foreach collection="orderIds" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
 		<if test="entity.supplierId != null and entity.supplierId != ''">
 			and ob.supplier_id = #{entity.supplierId}
 		</if>
@@ -151,7 +157,8 @@
 		<if test="entity.endTime != null and entity.endTime != ''">
 			and ob.create_time &lt;= #{entity.endTime}
 		</if>
-		order by ob.create_time desc limit #{entity.startRow},#{entity.numPerPage}) o 
+<!-- 		order by ob.create_time desc limit #{entity.startRow},#{entity.numPerPage} -->
+		) o 
 		left join order_detail od on o.order_id = od.order_id 
 		<if test="entity.orderGoodsList != null and entity.orderGoodsList.size() > 0">
 			<foreach collection="entity.orderGoodsList" item="item" index="index">
@@ -163,12 +170,27 @@
 				<if test="item.itemId != null and item.itemId != ''">
 					and item_id = #{item.itemId}
 				</if>
+				<if test="item.itemName != null and item.itemName != ''">
+					and item_name like concat('%',#{item.itemName},'%') 
+				</if>
 				) 
 				og on o.order_id = og.order_id 
 			</foreach>
 		</if>
-		left join third_order_info oe
-		on oe.order_id = o.order_id order by o.create_time desc
+		left join third_order_info oe on oe.order_id = o.order_id 
+		<if test="entity.orderExpressList != null and entity.orderExpressList.size() > 0">
+			where 1=1 and oe.express_id in 
+			<foreach collection="entity.orderExpressList" item="item" index="index" open="(" separator="," close=")">
+				#{item.expressId}
+			</foreach>
+		</if>
+		<if test="page != null and page != ''">
+			group by o.order_id
+		</if>
+		order by o.create_time desc
+		<if test="pageNeed != null and pageNeed != ''">
+			limit #{entity.startRow},#{entity.numPerPage}
+		</if>
 	</select>
 	
 	<select id="queryCountOrderInfo" parameterType="Object"

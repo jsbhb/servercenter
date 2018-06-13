@@ -81,8 +81,22 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, entity.getShopId());
 			param.put("list", childrenIds);
 		}
-		Integer count = orderBackMapper.queryCountOrderInfo(param);
+//		Integer count = orderBackMapper.queryCountOrderInfo(param);
+//		List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
+		param.put("page", "true");
+		List<OrderInfo> pageOrderList = orderBackMapper.selectForPage(param);
+		param.put("pageNeed", "true");
+		List<OrderInfo> pageNeedOrderList = orderBackMapper.selectForPage(param);
+		Integer count = pageOrderList.size();
+		List<String> orderIds = new ArrayList<String>();
+		for (OrderInfo oi:pageNeedOrderList) {
+			orderIds.add(oi.getOrderId());
+		}
+		param.remove("page");
+		param.remove("pageNeed");
+		param.put("orderIds", orderIds);
 		List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
+		
 		entity.setTotalRows(count);
 		entity.webListConverter();// 计算总页数
 		Page<OrderInfo> page = new Page<OrderInfo>(entity.getCurrentPage(), entity.getNumPerPage(), count);
