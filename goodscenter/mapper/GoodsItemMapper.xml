@@ -684,7 +684,7 @@
 		left join goods_price p on i.item_id = p.item_id 
 		left join goods g on i.goods_id=g.goods_id 
 		where i.sku = #{sku} and i.conversion = #{conversion}
-		andi.item_id != #{itemId}
+		and i.item_id <![CDATA[ <> ]]> #{itemId}
 	</select>
 	
 </mapper>
