@@ -63,7 +63,7 @@ public class PinYin4JUtil {
 	}
 	
 	/**
-	 * @fun 按首字母分装成map，如果不是String的list，needConvert为对象中需要首字母的字段
+	 * @fun 按首字母大写分装成map，如果不是String的list，needConvert为对象中需要首字母的字段
 	 * @param list
 	 * @param clazz
 	 * @param needConvert
@@ -82,23 +82,24 @@ public class PinYin4JUtil {
 		List<Object> temp = null;
 		for(Object obj : list){
 			if(isString){
-				if(result.get(cn2PYInitial(obj.toString())) == null){
+				if(result.get(cn2PYInitial(obj.toString()).toUpperCase()) == null){
 					temp = new ArrayList<Object>();
 					temp.add(obj);
-					result.put(cn2PYInitial(obj.toString()), temp);
+					result.put(cn2PYInitial(obj.toString()).toUpperCase(), temp);
 				} else {
-					result.get(cn2PYInitial(obj.toString())).add(obj);
+					result.get(cn2PYInitial(obj.toString()).toUpperCase()).add(obj);
 				}
 			} else {
 				try {
 					Method method = clazz.getMethod("get"+needConvert.substring(0,1).toUpperCase()+needConvert.substring(1));
 					try {
-						String str = method.invoke(obj).toString();
+						String str = method.invoke(obj).toString().toUpperCase();
 						if(result.get(cn2PYInitial(str)) == null){
 							temp = new ArrayList<Object>();
 							temp.add(obj);
+							result.put(cn2PYInitial(str).toUpperCase(), temp);
 						} else {
-							result.get(cn2PYInitial(str)).add(obj);
+							result.get(cn2PYInitial(str).toUpperCase()).add(obj);
 						}
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
