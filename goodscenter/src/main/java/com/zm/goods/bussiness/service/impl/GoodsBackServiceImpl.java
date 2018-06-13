@@ -277,7 +277,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		
 		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(insItemList);
 		if(tempList != null && tempList.size() > 0){
-			sb.append("以下海关货号和换算比例的组合已经存在，请核对----");
+			sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
 			for(GoodsItemEntity goodsItem : insItemList){
 				sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
 			}
