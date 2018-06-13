@@ -48,6 +48,7 @@ import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.pojo.vo.TimeLimitActiveData;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
+import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.PinYin4JUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
@@ -504,10 +505,10 @@ public class GoodsServiceImpl implements GoodsService {
 				searchParm.put("sortList", sortList.getSortList());
 			}
 			String centerId = GoodsServiceUtil.judgeCenterId(searchModel.getCenterId());
-			searchParm.put("goodsIds", goodsIdList);
+//			searchParm.put("goodsIds", goodsIdList);
 			searchParm.put("centerId", centerId);
-//			goodsList = goodsMapper.queryGoodsItem(searchParm);
-			goodsList = (List<GoodsItem>) listGoods(searchParm, searchModel.getCenterId(), null, false);
+			goodsList = goodsMapper.queryGoodsItem(searchParm);
+//			goodsList = (List<GoodsItem>) listGoods(searchParm, searchModel.getCenterId(), null, false);
 			if (highlighterModel != null && highlighterModel.size() > 0) {
 				for (GoodsItem model : goodsList) {
 					if (highlighterModel.get(model.getGoodsId()).getGoodsName() != null
@@ -519,64 +520,64 @@ public class GoodsServiceImpl implements GoodsService {
 
 			}
 
-//			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
-//			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
-//			List<GoodsSpecs> temList = null;
-//			for (GoodsSpecs specs : specsList) {
-//				if (temp.get(specs.getGoodsId()) == null) {
-//					temList = new ArrayList<GoodsSpecs>();
-//					temList.add(specs);
-//					temp.put(specs.getGoodsId(), temList);
-//				} else {
-//					temp.get(specs.getGoodsId()).add(specs);
-//				}
-//			}
-//			Set<String> specsSet = null;
-//			Map<String, Double> result = null;
-//			for (GoodsItem model : goodsList) {
-//				temList = temp.get(model.getGoodsId());
-//				model.setGoodsSpecsList(temList);
-//				result = GoodsServiceUtil.getMinPrice(temList);
-//				for (GoodsSpecs specs : temList) {
-//					if (model.getSpecsInfo() == null) {
-//						specsSet = new HashSet<>();
-//					} else {
-//						specsSet = model.getSpecsInfo();
-//					}
-//					String specsInfo = specs.getInfo();
-//					if (specsInfo != null && !"".equals(specsInfo.trim())) {
-//						try {
-//							Map<String, String> specsMap = JSONUtil.parse(specsInfo, Map.class);
-//							for (Map.Entry<String, String> entry : specsMap.entrySet()) {
-//								specsSet.add(entry.getValue());
-//							}
-//						} catch (Exception e) {
-//							logger.error("规格格式错误：itemId=" + specs.getItemId() + "***********specsInfo=" + specsInfo);
-//						}
-//					}
-//				}
-//				model.setSpecsInfo(specsSet);
-//				model.setPrice(result.get("price"));
-//				model.setRealPrice(result.get("realPrice"));
-//			}
-//
-//			searchParm.put("type", PICTURE_TYPE);
-//
-//			List<GoodsFile> fileList = goodsMapper.listGoodsFile(searchParm);
-//			Map<String, List<GoodsFile>> Filetemp = new HashMap<String, List<GoodsFile>>();
-//			List<GoodsFile> tempList = null;
-//			for (GoodsFile file : fileList) {
-//				if (Filetemp.get(file.getGoodsId()) != null) {
-//					continue;
-//				}
-//				tempList = new ArrayList<GoodsFile>();
-//				tempList.add(file);
-//				Filetemp.put(file.getGoodsId(), tempList);
-//			}
-//
-//			for (GoodsItem model : goodsList) {
-//				model.setGoodsFileList(Filetemp.get(model.getGoodsId()));
-//			}
+			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
+			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
+			List<GoodsSpecs> temList = null;
+			for (GoodsSpecs specs : specsList) {
+				if (temp.get(specs.getGoodsId()) == null) {
+					temList = new ArrayList<GoodsSpecs>();
+					temList.add(specs);
+					temp.put(specs.getGoodsId(), temList);
+				} else {
+					temp.get(specs.getGoodsId()).add(specs);
+				}
+			}
+			Set<String> specsSet = null;
+			Map<String, Double> result = null;
+			for (GoodsItem model : goodsList) {
+				temList = temp.get(model.getGoodsId());
+				model.setGoodsSpecsList(temList);
+				result = GoodsServiceUtil.getMinPrice(temList);
+				for (GoodsSpecs specs : temList) {
+					if (model.getSpecsInfo() == null) {
+						specsSet = new HashSet<>();
+					} else {
+						specsSet = model.getSpecsInfo();
+					}
+					String specsInfo = specs.getInfo();
+					if (specsInfo != null && !"".equals(specsInfo.trim())) {
+						try {
+							Map<String, String> specsMap = JSONUtil.parse(specsInfo, Map.class);
+							for (Map.Entry<String, String> entry : specsMap.entrySet()) {
+								specsSet.add(entry.getValue());
+							}
+						} catch (Exception e) {
+							LogUtil.writeErrorLog("规格格式错误：itemId=" + specs.getItemId() + "***********specsInfo=" + specsInfo);
+						}
+					}
+				}
+				model.setSpecsInfo(specsSet);
+				model.setPrice(result.get("price"));
+				model.setRealPrice(result.get("realPrice"));
+			}
+
+			searchParm.put("type", PICTURE_TYPE);
+
+			List<GoodsFile> fileList = goodsMapper.listGoodsFile(searchParm);
+			Map<String, List<GoodsFile>> Filetemp = new HashMap<String, List<GoodsFile>>();
+			List<GoodsFile> tempList = null;
+			for (GoodsFile file : fileList) {
+				if (Filetemp.get(file.getGoodsId()) != null) {
+					continue;
+				}
+				tempList = new ArrayList<GoodsFile>();
+				tempList.add(file);
+				Filetemp.put(file.getGoodsId(), tempList);
+			}
+
+			for (GoodsItem model : goodsList) {
+				model.setGoodsFileList(Filetemp.get(model.getGoodsId()));
+			}
 
 			resultMap.put(GOODS_LIST, goodsList);
 		}
