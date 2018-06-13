@@ -509,16 +509,16 @@ public class GoodsServiceImpl implements GoodsService {
 			searchParm.put("centerId", centerId);
 			goodsList = goodsMapper.queryGoodsItem(searchParm);
 //			goodsList = (List<GoodsItem>) listGoods(searchParm, searchModel.getCenterId(), null, false);
-			if (highlighterModel != null && highlighterModel.size() > 0) {
-				for (GoodsItem model : goodsList) {
-					if (highlighterModel.get(model.getGoodsId()).getGoodsName() != null
-							&& !"".equals(highlighterModel.get(model.getGoodsId()).getGoodsName())) {
-
-						model.setCustomGoodsName(highlighterModel.get(model.getGoodsId()).getGoodsName());
-					}
-				}
-
-			}
+//			if (highlighterModel != null && highlighterModel.size() > 0) {
+//				for (GoodsItem model : goodsList) {
+//					if (highlighterModel.get(model.getGoodsId()).getGoodsName() != null
+//							&& !"".equals(highlighterModel.get(model.getGoodsId()).getGoodsName())) {
+//
+//						model.setCustomGoodsName(highlighterModel.get(model.getGoodsId()).getGoodsName());
+//					}
+//				}
+//
+//			}
 
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
 			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
