@@ -26,6 +26,7 @@ import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -229,5 +230,31 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
+	}
+
+	@Override
+	public Page<GoodsExtensionEntity> queryGoodsExtensionByPageDownload(GoodsItemEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return goodsItemMapper.selectGoodsExtensionForPageDownload(entity);
+	}
+
+	@Override
+	public Page<GoodsExtensionEntity> queryGoodsExtensionCenterByPageDownload(GoodsItemEntity entity, int centerId) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("entity", entity);
+		params.put("centerId", centerId);
+		return goodsItemMapper.selectGoodsExtensionCenterForPageDownload(params);
+	}
+
+	@Override
+	public GoodsExtensionEntity queryGoodsExtensionInfo(GoodsExtensionEntity entity) {
+		return goodsItemMapper.selectGoodsExtensionInfo(entity);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void updateGoodsExtension(GoodsExtensionEntity entity) {
+		goodsItemMapper.updateOrInsertGoodsExtension(entity);
 	}
 }
