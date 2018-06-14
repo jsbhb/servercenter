@@ -120,6 +120,14 @@ public class OrderServiceImpl implements OrderService {
 			result.setSuccess(false);
 			return result;
 		}
+		//TODO 天天仓规则
+		if(info.getSupplierId() == 1){
+			if(info.getOrderGoodsList().size() > 10){
+				result.setSuccess(false);
+				result.setErrorMsg("保税TT仓的商品订单数量不能超过10个");
+				return result;
+			}
+		}
 
 		String openId = null;
 		if (Constants.WX_PAY.equals(payType)) {
