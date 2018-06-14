@@ -107,7 +107,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Override
 	public OrderInfo queryByOrderId(String orderId) {
-		return orderMapper.getOrderByOrderId(orderId);
+		return orderBackMapper.getOrderByOrderId(orderId);
 	}
 
 	@Override

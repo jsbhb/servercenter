@@ -79,5 +79,7 @@ public interface OrderStockOutMapper {
 	void insertOrderGoodsBatch(List<OrderGoods> goodsList);
 
 	void insertOrderDetailBatch(List<OrderDetail> detailList);
+	
+	OrderInfo getOrderByOrderId(String orderId);
 
 }
