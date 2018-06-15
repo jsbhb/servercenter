@@ -655,7 +655,7 @@
 				<if test="item.weight != null and item.weight != ''">weight = #{item.weight}, </if>
 				<if test="item.exciseTax != null and item.exciseTax != ''">excise_tax = #{item.exciseTax}, </if>
 				<if test="item.status != null and item.status != ''">status = #{item.status}, </if>
-				<if test="item.info != null and item.info != ''">info = #{item.info}, </if>
+				info = #{item.info},
 				<if test="item.conversion != null and item.conversion != ''">conversion = #{item.conversion}, </if>
 				<if test="item.encode != null and item.encode != ''">encode = #{item.encode}, </if>
 				<if test="item.shelfLife != null and item.shelfLife != ''">shelf_life = #{item.shelfLife}, </if>
