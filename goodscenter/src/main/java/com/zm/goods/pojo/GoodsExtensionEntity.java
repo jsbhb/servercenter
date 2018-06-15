@@ -26,12 +26,14 @@ public class GoodsExtensionEntity extends Pagination {
 	private String brand;// 商品品牌
 	private String specs;// 商品规格
 	private String origin;// 原产国
-	private String useAge;// 适用年龄
+	private String custom;// 自定义字段
+	private String shelfLife;// 保质期
 	private String reason;// 推荐理由
 	private String remark;// 备注
 	private String createTime;// 创建时间
 	private String updateTime;// 更新时间
 	private String opt;// 操作人
+	
 	
 	public int getId() {
 		return id;
@@ -75,11 +77,17 @@ public class GoodsExtensionEntity extends Pagination {
 	public void setOrigin(String origin) {
 		this.origin = origin;
 	}
-	public String getUseAge() {
-		return useAge;
+	public String getCustom() {
+		return custom;
 	}
-	public void setUseAge(String useAge) {
-		this.useAge = useAge;
+	public void setCustom(String custom) {
+		this.custom = custom;
+	}
+	public String getShelfLife() {
+		return shelfLife;
+	}
+	public void setShelfLife(String shelfLife) {
+		this.shelfLife = shelfLife;
 	}
 	public String getReason() {
 		return reason;
@@ -111,5 +119,4 @@ public class GoodsExtensionEntity extends Pagination {
 	public void setOpt(String opt) {
 		this.opt = opt;
 	}
-	
 }

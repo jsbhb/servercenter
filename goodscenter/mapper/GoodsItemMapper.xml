@@ -147,7 +147,8 @@
 		<result column="brand" property="brand"/>
 		<result column="specs" property="specs"/>
 		<result column="origin" property="origin"/>
-		<result column="use_age" property="useAge"/>
+		<result column="custom" property="custom"/>
+		<result column="shelf_life" property="shelfLife"/>
 		<result column="reason" property="reason"/>
 		<result column="remark" property="remark"/>
 		<result column="create_time" property="createTime"/>
@@ -655,7 +656,7 @@
 				<if test="item.weight != null and item.weight != ''">weight = #{item.weight}, </if>
 				<if test="item.exciseTax != null and item.exciseTax != ''">excise_tax = #{item.exciseTax}, </if>
 				<if test="item.status != null and item.status != ''">status = #{item.status}, </if>
-				<if test="item.info != null and item.info != ''">info = #{item.info}, </if>
+				info = #{item.info},
 				<if test="item.conversion != null and item.conversion != ''">conversion = #{item.conversion}, </if>
 				<if test="item.encode != null and item.encode != ''">encode = #{item.encode}, </if>
 				<if test="item.shelfLife != null and item.shelfLife != ''">shelf_life = #{item.shelfLife}, </if>
@@ -705,7 +706,7 @@
 	
 	<select id="selectGoodsExtensionForPageDownload" parameterType="Object" resultMap="goodsExtension">
 		select gel.id,g.goods_id,gel.goods_path,gel.goods_name,
-		gel.brand,gel.specs,gel.origin,gel.use_age,gel.reason,gel.remark
+		gel.brand,gel.specs,gel.origin,gel.custom,gel.shelf_life,gel.reason,gel.remark
 		from goods g 
 		left join goods_extension_label gel on g.goods_id = gel.goods_id
 		where 1=1 and g.is_del = 0
@@ -719,7 +720,7 @@
 	
 	<select id="selectGoodsExtensionCenterForPageDownload" parameterType="Object" resultMap="goodsExtension">
 		select gel.id,g.goods_id,gel.goods_path,gel.goods_name,
-		gel.brand,gel.specs,gel.origin,gel.use_age,gel.reason,gel.remark
+		gel.brand,gel.specs,gel.origin,gel.custom,gel.shelf_life,gel.reason,gel.remark
 		from goods_${centerId} g 
 		inner join goods gd on g.goods_id = gd.goods_id and gd.is_del = 0
 		left join goods_extension_label gel on g.goods_id = gel.goods_id
@@ -746,10 +747,10 @@
 	
 	<insert id="updateOrInsertGoodsExtension" parameterType="object">
 		INSERT INTO goods_extension_label 
-		(goods_id,goods_path,goods_name,brand,specs,origin,use_age,reason,remark,create_time,update_time,opt) 
-		VALUES (#{goodsId},#{goodsPath},#{goodsName},#{brand},#{specs},#{origin},#{useAge},#{reason},#{remark},now(),now(),#{opt})
+		(goods_id,goods_path,goods_name,brand,specs,origin,custom,shelf_life,reason,remark,create_time,update_time,opt) 
+		VALUES (#{goodsId},#{goodsPath},#{goodsName},#{brand},#{specs},#{origin},#{custom},#{shelfLife},#{reason},#{remark},now(),now(),#{opt})
 		ON DUPLICATE KEY UPDATE goods_path = #{goodsPath},goods_name = #{goodsName},brand = #{brand},
-		specs = #{specs},origin = #{origin},use_age = #{useAge},reason = #{reason},
+		specs = #{specs},origin = #{origin},custom = #{custom},shelf_life = #{shelfLife},reason = #{reason},
 		remark = #{remark},update_time = now(),opt = #{opt}
 	</insert>
 	
