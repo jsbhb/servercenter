@@ -253,6 +253,11 @@ public class CacheServiceImpl extends CacheAbstractService {
 	}
 
 	private void mergeList(List<Double> list, List<String> tempList) {
+		if (tempList.size() == 0) {
+			for (int i = 0; i < LAST_WEEK; i++) {
+				tempList.add("0");
+			}
+		}
 		if (list.size() == 0) {
 			for (String str : tempList) {
 				list.add(Double.valueOf(str));
@@ -357,13 +362,15 @@ public class CacheServiceImpl extends CacheAbstractService {
 				increment(Constants.SALES_STATISTICS_MONTH + info.getShopId(), time,
 						info.getOrderDetail().getPayment());
 			}
-//			if (info.getShopId() != Constants.CNCOOPBUY) {
-//				increment(Constants.ORDER_STATISTICS_MONTH + Constants.CNCOOPBUY, time, 1);
-//				if (!Constants.ORDER_CLOSE.equals(info.getStatus())) {
-//					increment(Constants.SALES_STATISTICS_MONTH + Constants.CNCOOPBUY, time,
-//							info.getOrderDetail().getPayment());
-//				}
-//			}
+			// if (info.getShopId() != Constants.CNCOOPBUY) {
+			// increment(Constants.ORDER_STATISTICS_MONTH + Constants.CNCOOPBUY,
+			// time, 1);
+			// if (!Constants.ORDER_CLOSE.equals(info.getStatus())) {
+			// increment(Constants.SALES_STATISTICS_MONTH + Constants.CNCOOPBUY,
+			// time,
+			// info.getOrderDetail().getPayment());
+			// }
+			// }
 		}
 	}
 

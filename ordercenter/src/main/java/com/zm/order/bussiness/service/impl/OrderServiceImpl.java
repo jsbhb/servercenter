@@ -122,7 +122,11 @@ public class OrderServiceImpl implements OrderService {
 		}
 		//TODO 天天仓规则
 		if(info.getSupplierId() == 1){
-			if(info.getOrderGoodsList().size() > 10){
+			int totalQuantity = 0;
+			for(OrderGoods goods : info.getOrderGoodsList()){
+				totalQuantity +=goods.getItemQuantity();
+			}
+			if(totalQuantity > 10){
 				result.setSuccess(false);
 				result.setErrorMsg("保税TT仓的商品订单数量不能超过10个");
 				return result;
