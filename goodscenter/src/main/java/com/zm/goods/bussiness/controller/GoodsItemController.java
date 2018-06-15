@@ -16,6 +16,7 @@ import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.ResultModel;
@@ -266,6 +267,57 @@ public class GoodsItemController {
 				return new ResultModel(true, page, new Pagination(page));
 			}
 
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryGoodsExtensionForPageDownload", method = RequestMethod.POST)
+	public ResultModel queryGoodsExtensionForPageDownload(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String gradeLevel = request.getParameter("gradeLevel");
+
+			if ("1".equals(gradeLevel)) {
+				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionByPageDownload(entity);
+				return new ResultModel(true, page, new Pagination(page));
+			} else {
+				String centerId = request.getParameter("centerId");
+				if (centerId == null || "".equals(centerId)) {
+					new ResultModel(false, "没有获取区域中心编号");
+				}
+				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionCenterByPageDownload(entity, Integer.parseInt(centerId));
+				return new ResultModel(true, page, new Pagination(page));
+			}
+
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryGoodsExtensionInfo", method = RequestMethod.POST)
+	public ResultModel queryGoodsExtensionInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsExtensionEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			GoodsExtensionEntity result = goodsItemService.queryGoodsExtensionInfo(entity);
+			return new ResultModel(true, result);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/item/updateGoodsExtensionInfo", method = RequestMethod.POST)
+	public ResultModel updateGoodsExtensionInfo(@PathVariable("version") Double version, @RequestBody GoodsExtensionEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				goodsItemService.updateGoodsExtension(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
 
 		return new ResultModel(false, "版本错误");

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
@@ -253,4 +254,12 @@ public interface GoodsItemMapper {
 	void updateSubGoodsItemBatch(List<String> itemIds);
 
 	List<GoodsItemEntity> listGoodsItemForCheck(GoodsItemEntity entity);
+	
+	Page<GoodsExtensionEntity> selectGoodsExtensionForPageDownload(GoodsItemEntity entity);
+
+	Page<GoodsExtensionEntity> selectGoodsExtensionCenterForPageDownload(Map<String,Object> params);
+	
+	GoodsExtensionEntity selectGoodsExtensionInfo(GoodsExtensionEntity entity);
+	
+	void updateOrInsertGoodsExtension(GoodsExtensionEntity entity);
 }

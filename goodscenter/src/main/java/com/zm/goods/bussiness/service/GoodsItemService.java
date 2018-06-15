@@ -9,6 +9,7 @@ package com.zm.goods.bussiness.service;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
+import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 
@@ -190,5 +191,13 @@ public interface GoodsItemService {
 	 * @since JDK 1.7  
 	 */
 	void batchBeFx(GoodsItemEntity entity);
+
+	Page<GoodsExtensionEntity> queryGoodsExtensionByPageDownload(GoodsItemEntity entity);
+
+	Page<GoodsExtensionEntity> queryGoodsExtensionCenterByPageDownload(GoodsItemEntity entity, int centerId);
+
+	GoodsExtensionEntity queryGoodsExtensionInfo(GoodsExtensionEntity entity);
+
+	void updateGoodsExtension(GoodsExtensionEntity entity);
 
 }
