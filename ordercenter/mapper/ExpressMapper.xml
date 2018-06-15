@@ -84,21 +84,21 @@
 		<foreach collection="list" item="item" separator=";" >
 			update express_fee 
 			<set>
-				<if test="fee != null and fee != ''">
+				<if test="item.fee != null and item.fee != ''">
 					fee = #{item.fee},
 				</if>
-				<if test="weight != null and weight != ''">
+				<if test="item.weight != null and item.weight != ''">
 					weight = #{item.weight},
 				</if>
-				<if test="heavyFee != null and heavyFee != ''">
+				<if test="item.heavyFee != null and item.heavyFee != ''">
 					heavy_fee = #{item.heavyFee},
 				</if>
-				<if test="includeProvince != null and includeProvince != ''" >
-					include_province = #{includeProvince},
+				<if test="item.includeProvince != null and item.includeProvince != ''" >
+					include_province = #{item.includeProvince},
 				</if>
 				update_time = now()
 			</set>
-			where id = #{id}
+			where id = #{item.id}
 		</foreach>
 	</update>
 
