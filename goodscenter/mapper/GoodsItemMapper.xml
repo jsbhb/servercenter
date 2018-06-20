@@ -532,7 +532,9 @@
 	
 	<select id="selectForPageDownload" parameterType="Object" resultMap="goods">
 		select g.*
-		from goods g where 1=1 and g.is_del = 0
+		from goods_extension_label gel
+		inner join goods g on g.goods_id = gel.goods_id
+		where 1=1 and g.is_del = 0
 		<if test="goodsName!=null and goodsName!=''">
 			and g.goods_name like concat('%',#{goodsName},'%') 
 		</if>
@@ -546,7 +548,8 @@
 	
 	<select id="selectCenterForPageDownload" parameterType="Object" resultMap="goods">
 		select g.*
-		from goods_${centerId} g 
+		from goods_extension_label gel
+		inner join goods_${centerId} g on g.goods_id = gel.goods_id
 		inner join goods gd on g.goods_id = gd.goods_id and gd.is_del = 0
 		where 1=1
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
