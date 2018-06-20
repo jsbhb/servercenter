@@ -14,4 +14,6 @@ public interface ExpressService {
 	void updateExpressTemplate(ExpressTemplateBO template);
 
 	ExpressTemplateBO getExpressTemplate(Integer id);
+
+	void delExpressFee(Integer id);
 }

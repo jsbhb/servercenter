@@ -754,7 +754,7 @@ public class OrderServiceImpl implements OrderService {
 		// list.addAll(orderMapper.listOrderForSendToTTWarehouse());
 		// list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		List<OrderInfo> tempList = orderMapper.listOrderForSendToWarehouse();
-		// 间隔12小时内的相同收货人和收货地址的订单先不推送
+		// 间隔3小时内的相同收货人和收货地址的订单先不推送
 		if (tempList != null && tempList.size() > 0) {
 			Iterator<OrderInfo> it = tempList.iterator();
 			OrderInfo info = null;
@@ -765,7 +765,7 @@ public class OrderServiceImpl implements OrderService {
 				if (template.hasKey(str)) {
 					it.remove();
 				} else {
-					template.opsForValue().set(str, str, 12L, TimeUnit.HOURS);
+					template.opsForValue().set(str, str, 3L, TimeUnit.HOURS);
 				}
 			}
 		}

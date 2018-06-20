@@ -101,5 +101,9 @@
 			where id = #{item.id}
 		</foreach>
 	</update>
+	
+	<delete id="delExpressFee" parameterType="Object">
+		delete from express_fee where id = #{id}
+	</delete>
 
 </mapper>

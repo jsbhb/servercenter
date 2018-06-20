@@ -23,4 +23,6 @@ public interface ExpressMapper {
 	void update(ExpressTemplateBO expressTemplate);
 
 	void updateExpressBatch(List<ExpressFee> expressList);
+
+	void delExpressFee(Integer id);
 }

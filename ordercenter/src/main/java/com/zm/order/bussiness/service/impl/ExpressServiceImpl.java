@@ -103,4 +103,10 @@ public class ExpressServiceImpl implements ExpressService {
 		return expressMapper.getExpressTemplateById(id);
 	}
 
+	@Override
+	public void delExpressFee(Integer id) {
+		expressMapper.delExpressFee(id);
+		
+	}
+
 }
