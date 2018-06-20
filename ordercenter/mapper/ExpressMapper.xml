@@ -66,10 +66,10 @@
 			<if test="templateName != null and templateName != ''">
 				template_name = #{templateName},
 			</if>
-			<if test="freePost != null and freePost != ''">
+			<if test="freePost != null and freePost != '' or freePost == 0">
 				free_post_fee = #{freePost},
 			</if>
-			<if test="freeTax != null and freeTax != ''">
+			<if test="freeTax != null and freeTax != '' or freeTax == 0">
 				free_tax_fee = #{freeTax},
 			</if>
 			<if test="enable != null and enable != '' or enable == 0">
