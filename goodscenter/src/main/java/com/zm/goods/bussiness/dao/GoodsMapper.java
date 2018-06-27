@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -20,6 +21,9 @@ import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
+import com.zm.goods.pojo.bo.CategoryBO;
+import com.zm.goods.pojo.bo.ItemCountBO;
+import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
@@ -124,7 +128,7 @@ public interface GoodsMapper {
 	
 	void updateGoodsItemDownShelves(Map<String, Object> param);
 	
-	int countUpShelvesStatus(Map<String, Object> param);
+	List<ItemCountBO> countUpShelvesStatus(Map<String, Object> param);
 	
 	void insertCenterGoods(Map<String, Object> param);
 	
@@ -148,12 +152,30 @@ public interface GoodsMapper {
 	
 	List<String> listThirdCategory(List<String> goodsIdList);
 
-	int countItem(Map<String, Object> param);
+	List<ItemCountBO> countItem(Map<String, Object> param);
 
 	void updateGoodsItemUnDistribution(List<String> list);
 	
 	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
 
 	List<GoodsConvert> listSkuAndConversionByItemId(List<String> list);
+
+	List<String> listItemIdsByGoodsId(String goodsId);
+
+	List<ItemStockBO> listStockByItemIds(List<String> itemIds);
 	
+	List<CategoryBO> listCategoryByGoodsIds(List<String> goodsIds);
+
+	void updateFirstCategory(Map<String,Object> param);
+
+	void updateSecondCategory(Map<String,Object> param);
+
+	void updateThirdCategory(Map<String,Object> param);
+
+	void updateFirstCategoryHide(List<String> firstList);
+
+	List<String> listHideFirstCategory(Map<String,Object> param);
+	List<String> listHideSecondCategory(Map<String,Object> param);
+	List<String> listHideThirdCategory(Map<String,Object> param);
+
 }

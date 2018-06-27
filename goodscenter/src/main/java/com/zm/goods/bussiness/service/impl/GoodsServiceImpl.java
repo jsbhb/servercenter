@@ -41,6 +41,8 @@ import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
+import com.zm.goods.pojo.bo.CategoryBO;
+import com.zm.goods.pojo.bo.ItemCountBO;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
@@ -449,6 +451,10 @@ public class GoodsServiceImpl implements GoodsService {
 	private void renderLuceneModel(Map<String, Object> param, List<GoodsSearch> searchList, Integer id) {
 		GoodsSearch searchModel;
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
+		List<String> goodsIds = new ArrayList<String>();
+		Map<String, GoodsSearch> temp = new HashMap<String, GoodsSearch>();
+		Map<String, List<GoodsSpecs>> tempSpecs = new HashMap<String, List<GoodsSpecs>>();
+		List<GoodsSpecs> tempList = null;
 		if (itemList != null && itemList.size() > 0) {
 			Map<String, Double> result = null;
 			for (GoodsItem item : itemList) {
@@ -463,18 +469,32 @@ public class GoodsServiceImpl implements GoodsService {
 				searchModel.setGoodsName(item.getCustomGoodsName());
 				searchModel.setPopular(item.getPopular());
 				searchModel.setType(item.getType());
-				param.put("goodsId", item.getGoodsId());
-				List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
-				if (specsList != null && specsList.size() > 0) {
-					result = GoodsServiceUtil.getMinPrice(specsList);
-					searchModel.setPrice(result.get("realPrice"));
-				}
+				goodsIds.add(item.getGoodsId());
+				temp.put(item.getGoodsId(), searchModel);
 				searchList.add(searchModel);
 			}
-			AbstractLucene lucene = LuceneFactory.get(id);
-			lucene.writerIndex(searchList);
-			goodsMapper.updateGoodsUpShelves(param);
+			param.put("goodsIds", goodsIds);
+			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
+			for (GoodsSpecs specs : specsList) {
+				if (tempSpecs.get(specs.getGoodsId()) == null) {
+					tempList = new ArrayList<GoodsSpecs>();
+					tempList.add(specs);
+					tempSpecs.put(specs.getGoodsId(), tempList);
+				} else {
+					tempSpecs.get(specs.getGoodsId()).add(specs);
+				}
+			}
+			for (Map.Entry<String, GoodsSearch> entry : temp.entrySet()) {
+				tempList = tempSpecs.get(entry.getKey());
+				if (tempList != null && tempList.size() > 0) {
+					result = GoodsServiceUtil.getMinPrice(tempList);
+					entry.getValue().setPrice(result.get("realPrice"));
+				}
+			}
 		}
+		AbstractLucene lucene = LuceneFactory.get(id);
+		lucene.writerIndex(searchList);
+		goodsMapper.updateGoodsUpShelves(param);
 	}
 
 	private final String GOODS_LIST = "goodsList";
@@ -493,7 +513,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		Integer total = (Integer) luceneMap.get(Constants.TOTAL);
 		List<String> goodsIdList = (List<String>) luceneMap.get(Constants.ID_LIST);
-		pagination.setTotalRows((long) total);
+		pagination.setTotalRows(total == null ? 0 : (long)total);
 		if (goodsIdList != null && goodsIdList.size() > 0) {
 			List<GoodsItem> goodsList = new ArrayList<GoodsItem>();
 			// 设置高亮
@@ -505,20 +525,24 @@ public class GoodsServiceImpl implements GoodsService {
 				searchParm.put("sortList", sortList.getSortList());
 			}
 			String centerId = GoodsServiceUtil.judgeCenterId(searchModel.getCenterId());
-//			searchParm.put("goodsIds", goodsIdList);
+			// searchParm.put("goodsIds", goodsIdList);
 			searchParm.put("centerId", centerId);
 			goodsList = goodsMapper.queryGoodsItem(searchParm);
-//			goodsList = (List<GoodsItem>) listGoods(searchParm, searchModel.getCenterId(), null, false);
-//			if (highlighterModel != null && highlighterModel.size() > 0) {
-//				for (GoodsItem model : goodsList) {
-//					if (highlighterModel.get(model.getGoodsId()).getGoodsName() != null
-//							&& !"".equals(highlighterModel.get(model.getGoodsId()).getGoodsName())) {
-//
-//						model.setCustomGoodsName(highlighterModel.get(model.getGoodsId()).getGoodsName());
-//					}
-//				}
-//
-//			}
+			// goodsList = (List<GoodsItem>) listGoods(searchParm,
+			// searchModel.getCenterId(), null, false);
+			// if (highlighterModel != null && highlighterModel.size() > 0) {
+			// for (GoodsItem model : goodsList) {
+			// if (highlighterModel.get(model.getGoodsId()).getGoodsName() !=
+			// null
+			// &&
+			// !"".equals(highlighterModel.get(model.getGoodsId()).getGoodsName()))
+			// {
+			//
+			// model.setCustomGoodsName(highlighterModel.get(model.getGoodsId()).getGoodsName());
+			// }
+			// }
+			//
+			// }
 
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
 			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
@@ -552,7 +576,8 @@ public class GoodsServiceImpl implements GoodsService {
 								specsSet.add(entry.getValue());
 							}
 						} catch (Exception e) {
-							LogUtil.writeErrorLog("规格格式错误：itemId=" + specs.getItemId() + "***********specsInfo=" + specsInfo);
+							LogUtil.writeErrorLog(
+									"规格格式错误：itemId=" + specs.getItemId() + "***********specsInfo=" + specsInfo);
 						}
 					}
 				}
@@ -583,9 +608,12 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		resultMap.put(PAGINATION, pagination.webListConverter());
-		List<String> list = new ArrayList<>((Set<String>)luceneMap.get(Constants.BRAND));
-		Map<String,List<Object>> brandMap = PinYin4JUtil.packDataByFirstCode(list, String.class, null);
-		resultMap.put(Constants.BRAND_PY, brandMap);
+		Object obj = luceneMap.get(Constants.BRAND);
+		if(obj != null){
+			List<String> list = new ArrayList<>((Set<String>) obj);
+			Map<String, List<Object>> brandMap = PinYin4JUtil.packDataByFirstCode(list, String.class, null);
+			resultMap.put(Constants.BRAND_PY, brandMap);
+		}
 		resultMap.put(Constants.BRAND, luceneMap.get(Constants.BRAND));
 		resultMap.put(Constants.ORIGIN, luceneMap.get(Constants.ORIGIN));
 
@@ -711,28 +739,111 @@ public class GoodsServiceImpl implements GoodsService {
 		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 		List<String> itemIdS = new ArrayList<String>();
 		if (itemIdList != null && itemIdList.size() > 0) {
+			param.put("list", itemIdList);
+			List<ItemCountBO> temp = goodsMapper.countItem(param);
 			// 判断之前有没有同步到商城端，将没有同步的先同步
-			for (String itemId : itemIdList) {
-				param.put("itemId", itemId);
-				int tem = goodsMapper.countItem(param);
-				if (tem == 0) {
-					itemIdS.add(itemId);
+			if (temp == null || temp.size() == 0) {// 说明所有itemId都没有
+				for (String str : itemIdList) {
+					itemIdS.add(str);
+				}
+			} else {
+				List<String> tempStrList = new ArrayList<String>();
+				for (ItemCountBO model : temp) {
+					tempStrList.add(model.getItemId().trim());
+				}
+				for (String str : itemIdList) {
+					if (!tempStrList.contains(str.trim())) {
+						itemIdS.add(str);
+					}
 				}
 			}
 			if (itemIdS.size() > 0) {
 				syncgoods(itemIdS, centerId);
 			}
-			param.put("list", itemIdList);
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
 			param.remove("list");
 			if (goodsIdList != null && goodsIdList.size() > 0) {
 				param.put("list", goodsIdList);
+				// 判断有没有分类没上架的，进行上架
+				//TODO 系统自动上架
+//				List<CategoryBO> categoryList = goodsMapper.listCategoryByGoodsIds(goodsIdList);
+//				categoryStatusModify(categoryList, SHOW, centerIdstr);
 			}
 		}
+
 		renderLuceneModel(param, searchList, centerId);
 		param.put("list", itemIdList);
 		goodsMapper.updateGoodsItemUpShelves(param);
 		return new ResultModel(true, "");
+	}
+
+	private static final Integer SHOW = 1;
+	private static final Integer HIDE = 0;
+
+	private void categoryStatusModify(List<CategoryBO> categoryList, Integer status, String centerIdstr) {
+		if (categoryList != null && categoryList.size() > 0) {
+			Set<String> firstSet = new HashSet<>();
+			Set<String> secondSet = new HashSet<>();
+			Set<String> thirdSet = new HashSet<>();
+			for (CategoryBO model : categoryList) {
+				firstSet.add(model.getFirstId());
+				secondSet.add(model.getSecondId());
+				thirdSet.add(model.getThirdId());
+			}
+			Map<String, Object> param = new HashMap<String, Object>();
+			if (SHOW == status) {
+				param.put("status", SHOW);
+				param.put("cstatus", HIDE);
+				param.put("list", firstSet);
+				goodsMapper.updateFirstCategory(param);
+				param.put("list", secondSet);
+				goodsMapper.updateSecondCategory(param);
+				param.put("list", thirdSet);
+				goodsMapper.updateThirdCategory(param);
+			}
+			if (HIDE == status) {
+				param.put("status", HIDE);
+				param.put("cstatus", SHOW);
+				param.put("centerId", centerIdstr);
+				param.put("set", firstSet);
+				List<String> firstIdList = goodsMapper.listHideFirstCategory(param);
+				if(firstIdList == null || firstIdList.size() == 0){
+					param.put("list", firstSet);
+					goodsMapper.updateFirstCategory(param);
+				} else {
+					if(firstIdList.size() < firstSet.size()){
+						firstSet.removeAll(firstIdList);
+						param.put("list", firstSet);
+						goodsMapper.updateFirstCategory(param);
+					}
+				}
+				param.put("set", secondSet);
+				List<String> secondIdList = goodsMapper.listHideSecondCategory(param);
+				if(secondIdList == null || secondIdList.size() == 0){
+					param.put("list", secondSet);
+					goodsMapper.updateSecondCategory(param);
+				} else {
+					if(secondIdList.size() < secondSet.size()){
+						secondSet.removeAll(secondIdList);
+						param.put("list", secondSet);
+						goodsMapper.updateSecondCategory(param);
+					}
+				}
+				param.put("set", thirdSet);
+				List<String> thirdIdList = goodsMapper.listHideThirdCategory(param);
+				if(thirdIdList == null || thirdIdList.size() == 0){
+					param.put("list", thirdSet);
+					goodsMapper.updateThirdCategory(param);
+				} else {
+					if(thirdIdList.size() < thirdSet.size()){
+						thirdSet.removeAll(thirdIdList);
+						param.put("list", thirdSet);
+						goodsMapper.updateThirdCategory(param);
+					}
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -751,15 +862,29 @@ public class GoodsServiceImpl implements GoodsService {
 		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);// 去重
 		goodsMapper.updateGoodsItemDownShelves(param);// 商品更新为下架状态
 		List<String> downShelvesGoodsIdList = new ArrayList<String>();
-		for (String goodsId : goodsIdSet) {
-			param.put("goodsId", goodsId);
-			int count = goodsMapper.countUpShelvesStatus(param);
-			if (count == 0) {// 如果所有item已经下架，goods也下架，并删除索引
-				downShelvesGoodsIdList.add(goodsId);
+		param.put("set", goodsIdSet);
+		List<ItemCountBO> temp = goodsMapper.countUpShelvesStatus(param);
+		if (temp == null || temp.size() == 0) {// 如果所有item已经下架，goods也下架，并删除索引
+			for (String str : goodsIdSet) {
+				downShelvesGoodsIdList.add(str);
+			}
+		} else {// 如果所有item已经下架，goods也下架，并删除索引
+			List<String> tempStrList = new ArrayList<String>();
+			for (ItemCountBO model : temp) {
+				tempStrList.add(model.getItemId().trim());
+			}
+			for (String str : goodsIdSet) {
+				if (!tempStrList.contains(str.trim())) {
+					downShelvesGoodsIdList.add(str);
+				}
 			}
 		}
 		if (downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0) {
 			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
+			// 需要下架的分类
+			//TODO 系统下架分类
+//			List<CategoryBO> categoryList = goodsMapper.listCategoryByGoodsIds(goodsIdList);
+//			categoryStatusModify(categoryList, HIDE, centerIdstr);
 		}
 		return new ResultModel(true, "");
 	}
@@ -780,20 +905,20 @@ public class GoodsServiceImpl implements GoodsService {
 			String centerId = GoodsServiceUtil.judgeCenterId(id);
 			param.put("list", itemIdList);
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
-			List<String> secondIdList = goodsMapper.listSecondCategory(goodsIdList);
-			List<String> thirdIdList = goodsMapper.listThirdCategory(goodsIdList);
+//			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
+//			List<String> secondIdList = goodsMapper.listSecondCategory(goodsIdList);
+//			List<String> thirdIdList = goodsMapper.listThirdCategory(goodsIdList);
 			param.put("centerId", centerId);
 			param.put("goodsIdlist", goodsIdList);
-			param.put("firstIdlist", firstIdList);
-			param.put("secondIdlist", secondIdList);
-			param.put("thirdIdlist", thirdIdList);
+//			param.put("firstIdlist", firstIdList);
+//			param.put("secondIdlist", secondIdList);
+//			param.put("thirdIdlist", thirdIdList);
 			param.put("itemList", itemIdList);
-			goodsMapper.insertCenterFirstCategory(param);
-			goodsMapper.insertCenterSecondCategory(param);
-			goodsMapper.insertCenterThirdCategory(param);
+			// goodsMapper.insertCenterFirstCategory(param);
+			// goodsMapper.insertCenterSecondCategory(param);
+			// goodsMapper.insertCenterThirdCategory(param);
 			goodsMapper.insertCenterGoods(param);
-			goodsMapper.insertCenterGoodsFile(param);
+			// goodsMapper.insertCenterGoodsFile(param);
 			goodsMapper.insertCenterGoodsItem(param);
 			if (Constants.PREDETERMINE_PLAT_TYPE.equals(id)) {
 				goodsMapper.insert2BGoodsPrice(param);

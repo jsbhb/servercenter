@@ -7,18 +7,24 @@
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="first_id" property="firstId" jdbcType="VARCHAR"/>
 		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="sort" property="sort" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
 		<collection property="seconds"
 			ofType="com.zm.goods.pojo.SecondCatalogEntity">
 			<id column="secondId" property="id" jdbcType="INTEGER"/>
 			<result column="second_id" property="secondId" jdbcType="VARCHAR"/>
 			<result column="first_id" property="firstId" jdbcType="VARCHAR"/>
 			<result column="secondName" property="name" jdbcType="VARCHAR"/>
+			<result column="ssort" property="sort" jdbcType="INTEGER"/>
+			<result column="sstatus" property="status" jdbcType="INTEGER"/>
 			<collection property="thirds"
 				ofType="com.zm.goods.pojo.ThirdCatalogEntity">
 				<id column="thirdId" property="id" jdbcType="INTEGER"/>
 				<result column="second_id" property="secondId" jdbcType="VARCHAR"/>
 				<result column="third_id" property="thirdId" jdbcType="VARCHAR"/>
 				<result column="thirdName" property="name" jdbcType="VARCHAR"/>
+				<result column="tsort" property="sort" jdbcType="INTEGER"/>
+				<result column="tstatus" property="status" jdbcType="INTEGER"/>
 			</collection>
 		</collection>
 	</resultMap>
@@ -59,35 +65,59 @@
 
 	<select id="selectAll" resultMap="entity">
 		select
-		f.id,f.first_id,f.name,s.id as secondId,s.second_id,s.name as secondName,
-		t.id as thirdId,t.third_id,t.name as thirdName 
+		f.id,f.first_id,f.name,f.sort,f.status,s.id as secondId,s.second_id,s.name as secondName,
+		s.sort as ssort,s.status as sstatus,t.id as thirdId,t.third_id,t.name as thirdName,t.sort as tsort,t.status as tstatus  
 		from goods_first_category f
 		left join goods_second_category s on f.first_id = s.first_id
 		left join goods_third_category t on t.second_id = s.second_id;
 	</select>
 	
 	<insert id="insertFristCatalog" parameterType="Object">
-		insert into goods_first_category value (#{id},#{firstId},#{name},now(),now(),#{opt});
+		insert into goods_first_category(id,first_id,name,create_time,update_time,opt) 
+		value (#{id},#{firstId},#{name},now(),now(),#{opt});
 	</insert>
 
 	<insert id="insertSecondCatalog" parameterType="Object">
-		insert into goods_second_category value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt});
+		insert into goods_second_category(id,first_id,second_id,name,create_time,update_time,opt) 
+		value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt});
 	</insert>
 	
 	<insert id="insertThirdCatalog" parameterType="Object">
-		insert into goods_third_category value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt});
+		insert into goods_third_category(id,second_id,third_id,name,create_time,update_time,opt) 
+		value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt});
 	</insert>
 	
 	<insert id="updateFirstCatalog" parameterType="Object">
-		update  goods_first_category set name = #{name},update_time = now() where first_id = #{firstId}
+		update  goods_first_category set name = #{name},
+		<if test="status != null and status != '' or status == 0">
+			status = #{status},
+		</if>
+		<if test="sort != null and sort != '' or status == 0">
+			sort = #{sort},
+		</if>
+		update_time = now() where first_id = #{firstId}
 	</insert>
 
 	<insert id="updateSecondCatalog" parameterType="Object">
-		update  goods_second_category set name = #{name},update_time = now() where second_id = #{secondId}
+		update  goods_second_category set name = #{name},
+		<if test="status != null and status != '' or status == 0">
+			status = #{status},
+		</if>
+		<if test="sort != null and sort != '' or status == 0">
+			sort = #{sort},
+		</if>
+		update_time = now() where second_id = #{secondId}
 	</insert>
 	
 	<insert id="updateThirdCatalog" parameterType="Object">
-		update  goods_third_category set name = #{name},update_time = now() where third_id = #{thirdId}
+		update  goods_third_category set name = #{name},
+		<if test="status != null and status != '' or status == 0">
+			status = #{status},
+		</if>
+		<if test="sort != null and sort != '' or status == 0">
+			sort = #{sort},
+		</if>
+		update_time = now() where third_id = #{thirdId}
 	</insert>
 	
 		

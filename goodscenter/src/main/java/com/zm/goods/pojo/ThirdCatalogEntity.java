@@ -25,9 +25,27 @@ public class ThirdCatalogEntity {
 	private String createTime;
 	private String updateTime;
 	private String opt;
+	private Integer sort;
+	private Integer status;
 	
 	public ThirdCatalogEntity() {
 
+	}
+
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	public int getId() {

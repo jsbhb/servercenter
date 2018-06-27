@@ -243,8 +243,9 @@
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
 		select gfc.id,gfc.first_id,gfc.name as industryName,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
 		gtc.id as entryId,gtc.name as entryName,gtc.third_id  
-		from goods_first_category${centerId} gfc left join goods_second_category${centerId} gsc on gfc.first_id = gsc.first_id 
-		left join goods_third_category${centerId} gtc on gsc.second_id = gtc.second_id order by gfc.id
+		from goods_first_category gfc left join goods_second_category gsc on gfc.first_id = gsc.first_id 
+		left join goods_third_category gtc on gsc.second_id = gtc.second_id 
+		where gfc.status = 1 and gsc.status =1 and gtc.status =1 order by gfc.sort ,gsc.sort ,gtc.sort
 	</select>
 
 	<select id="getActivity" parameterType="Object" resultMap="activity">
@@ -308,7 +309,7 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select
-		gs.id,gs.item_id,gs.goods_id,gi.info,gs.item_code,gi.sku,gs.is_promotion,gi.conversion,gi.carton,
+		gs.id,gs.item_id,gs.goods_id,gi.info,gi.item_code,gi.sku,gs.is_promotion,gi.conversion,gi.carton,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gs.discount,
 		gs.status as specsStatus,gi.excise_tax,gi.weight,
@@ -335,7 +336,7 @@
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select gs.id,gi.info,gs.item_id,gs.goods_id,gi.carton,
-		gs.item_code,gi.sku,gs.is_promotion,gi.excise_tax,gi.weight,
+		gi.item_code,gi.sku,gs.is_promotion,gi.excise_tax,gi.weight,
 		bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount,
 		stock.fxqty as qpqty,
@@ -384,7 +385,7 @@
 	<select id="listGoodsSpecsByItemId" parameterType="Object"
 		resultMap="goodsSpecs">
 		select gs.id,gi.info,gs.item_id,gs.goods_id , gs.status as specsStatus,gi.conversion,gi.carton,
-		gs.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
+		gi.item_code,gi.sku,gs.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gs.opt,bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gs.discount, gi.excise_tax,gi.weight,
 		bgp.delivery_place,gb.increment_tax
@@ -747,7 +748,7 @@
 	</select> 
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
-		select gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount from goods_item${centerId} gs left join
+		select gs.id,gi.goods_id,gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount from goods_item${centerId} gs left join
 		<if test="centerId == '_2B'">
 			goods_price${centerId} bgp
 		</if>
@@ -755,7 +756,10 @@
 			goods_price bgp
 		</if>
 		on
-		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gs.goods_id = #{goodsId} and gi.is_del = 0
+		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gi.is_del = 0 and gs.goods_id in
+		<foreach collection="goodsIds" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
 	</select>
 	
 	<update id="updateGoodsUpShelves" parameterType="Object">
@@ -949,8 +953,13 @@
 		</foreach>
 	</select>
 	
-	<select id="countUpShelvesStatus" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from goods_item${centerId} where goods_id = #{goodsId} and status = 1
+	<select id="countUpShelvesStatus" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemCountBO">
+		select count(*) as count,goods_id as itemId from goods_item${centerId} where status = 1 and goods_id in
+		<foreach collection="set" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+		group by goods_id
 	</select>
 	
 	<!-- 同步商品 -->
@@ -1049,8 +1058,13 @@
 		</foreach>
 	</select>
 	
-	<select id="countItem" parameterType="Object" resultType = "java.lang.Integer">
-		select count(*) from goods_item${centerId} where item_id = #{itemId}
+	<select id="countItem" parameterType="Object" resultType = "com.zm.goods.pojo.bo.ItemCountBO">
+		select count(*) as count,item_id as itemId from goods_item${centerId} where item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
+		group by item_id
 	</select>
 	
 	<update id="updateGoodsItemUnDistribution" parameterType="Object">
@@ -1074,5 +1088,69 @@
 			#{item}
 		</foreach>
 	</select>
-
+	
+	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
+		select item_id from goods_item where goods_id = #{goodsId}
+	</select>
+	
+	<select id="listStockByItemIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemStockBO">
+		select item_id as itemId,fxqty as stock from goods_stock where item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<select id="listCategoryByGoodsIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.CategoryBO">
+		select b.id,b.first_category as firstId,b.second_category as secondId,b.third_category as thirdId from 
+		goods g left join base b on g.base_id = b.id where g.goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<update id="updateFirstCategory" parameterType="Object">
+		update goods_first_category set status = #{status} where status = #{cstatus} and first_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="updateSecondCategory" parameterType="Object">
+		update goods_second_category set status = #{status} where status = #{cstatus} and second_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<update id="updateThirdCategory" parameterType="Object">
+		update goods_third_category set status = #{status} where status = #{cstatus} and third_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</update>
+	
+	<select id="listHideFirstCategory" parameterType="Object" resultType="java.lang.String">
+		select distinct b.first_category from goods${centerId} g left join goods gs on g.goods_id = gs.goods_id left join base b
+		on gs.base_id = b.id where g.status = 1 and b.first_category in 
+		<foreach collection="set" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<select id="listHideSecondCategory" parameterType="Object" resultType="java.lang.String">
+		select distinct b.second_category from goods${centerId} g left join goods gs on g.goods_id = gs.goods_id left join base b
+		on gs.base_id = b.id where g.status = 1 and b.second_category in 
+		<foreach collection="set" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<select id="listHideThirdCategory" parameterType="Object" resultType="java.lang.String">
+		select distinct b.third_category from goods${centerId} g left join goods gs on g.goods_id = gs.goods_id left join base b
+		on gs.base_id = b.id where g.status = 1 and b.third_category in 
+		<foreach collection="set" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
 </mapper>

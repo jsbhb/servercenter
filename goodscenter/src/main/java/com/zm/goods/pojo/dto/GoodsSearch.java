@@ -171,6 +171,11 @@ public class GoodsSearch {
 	public void setBrand(String brand) {
 		this.brand = brand;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "GoodsSearch [goodsId=" + goodsId + ", price=" + price + ", priceMin=" + priceMin + ", priceMax="
+				+ priceMax + ", type=" + type + "]";
+	}
 	
 }
