@@ -332,23 +332,27 @@ public class UserServiceImpl implements UserService {
 
 	private final Integer COPY_MALL = 1;
 	private final Integer AREA_CENTER = 2;
-	private final Integer CENTER = 2;
 
 	@Override
 	public Map<String, Object> saveGrade(Grade grade) {
-		//前端创建文件夹
-		//TODO 是否需要加个字段，如果失败可以手动触发
-		if (AREA_CENTER.equals(grade.getGradeType())) {
-			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(CENTER, grade.getRedirectUrl(),
-					grade.getMobileUrl());
-			ResultModel result = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-					PublishType.TEST_REGION_CREATE);
-			if (!result.isSuccess()) {
-				throw new RuntimeException(result.getErrorMsg());
-			}
-		}
+
 		Map<String, Object> result = new HashMap<String, Object>();
 		userMapper.saveGrade(grade);
+		// 前端创建文件夹
+		// TODO 是否需要加个字段，如果失败可以手动触发
+		if (AREA_CENTER.equals(grade.getGradeType())) {
+			if(grade.getRedirectUrl() == null){
+				throw new RuntimeException("分级为区域中心的请填写域名地址,域名请联系技术部");
+			}
+			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
+					grade.getMobileUrl());
+			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
+					PublishType.TEST_REGION_CREATE);
+			if (!temp.isSuccess()) {
+				throw new RuntimeException(temp.getErrorMsg());
+			}
+		}
+
 		UserInfo user = new UserInfo();
 
 		Integer mallId = userComponent.getMallId(grade.getId());
@@ -388,6 +392,7 @@ public class UserServiceImpl implements UserService {
 		gradeBO.setId(grade.getId());
 		gradeBO.setParentId(grade.getParentId());
 		gradeBO.setGradeType(grade.getGradeType());
+
 		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
 		return result;
 	}

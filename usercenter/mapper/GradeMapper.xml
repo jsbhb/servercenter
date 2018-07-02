@@ -175,7 +175,7 @@
 	</select>
 	
 	<select id="listParentGradeById" parameterType="Object" resultMap="grade">
-		SELECT T2.id, T2.parent_id FROM (SELECT  @r AS _id, 
+		SELECT T2.id, T2.parent_id,T2.grade_type FROM (SELECT  @r AS _id, 
 		(SELECT @r := parent_id FROM grade WHERE id = _id) AS parent_id 
         FROM (SELECT @r := #{id}) vars,grade h 
 		WHERE @r != 0) T1 JOIN grade T2 ON T1._id = T2.id

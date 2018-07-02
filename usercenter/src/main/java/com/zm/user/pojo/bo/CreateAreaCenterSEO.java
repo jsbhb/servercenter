@@ -2,13 +2,13 @@ package com.zm.user.pojo.bo;
 
 public class CreateAreaCenterSEO {
 
-	private Integer centerId;
+	private Integer gradeId;
 	private String region;
 	private String domainName;
 	private String mDomainName;
 
-	public CreateAreaCenterSEO(Integer centerId, String domainName, String mDomainName) {
-		this.centerId = centerId;
+	public CreateAreaCenterSEO(Integer gradeId, String domainName, String mDomainName) {
+		this.gradeId = gradeId;
 		if (domainName.startsWith("http")) {
 			this.region = domainName.substring(domainName.indexOf("//") + 2, domainName.indexOf("."));
 		} else {
@@ -18,13 +18,15 @@ public class CreateAreaCenterSEO {
 		this.mDomainName = mDomainName;
 	}
 
-	public Integer getCenterId() {
-		return centerId;
+	public Integer getGradeId() {
+		return gradeId;
 	}
 
-	public void setCenterId(Integer centerId) {
-		this.centerId = centerId;
+
+	public void setGradeId(Integer gradeId) {
+		this.gradeId = gradeId;
 	}
+
 
 	public String getRegion() {
 		return region;

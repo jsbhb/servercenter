@@ -25,12 +25,15 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 	
 	@Override
 	public GradeConfig getGradeConfig(Integer mallId, Integer shopId, Integer userId) {
+		GradeConfig config = null;
 		if(shopId != null){
 			Integer tmallId = userComponent.getMallId(shopId);
 			if(!mallId.equals(tmallId)){
 				return null;
 			}
-			return gradeFrontMapper.getGradeConfig(shopId);
+			config = gradeFrontMapper.getGradeConfig(shopId);
+			config.setUrl(userComponent.getUrl(shopId));
+			return config;
 		}
 		if(userId != null){
 			UserInfo user = userMapper.getUserInfo(userId);
@@ -40,7 +43,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 			if(user.getShopId() == null){
 				return null;
 			}
-			return gradeFrontMapper.getGradeConfig(user.getShopId());
+			config = gradeFrontMapper.getGradeConfig(user.getShopId());
+			config.setUrl(userComponent.getUrl(user.getShopId()));
+			return config;
 		}
 		return null;
 	}
