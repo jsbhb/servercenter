@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.goods.bussiness.service.GoodsOpenInterfaceService;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.pojo.ErrorCodeEnum;
+import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.pojo.ResultModel;
 
 @RestController

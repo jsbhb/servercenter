@@ -21,11 +21,11 @@ import com.zm.goods.bussiness.component.PriceComponent;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.Activity;
-import com.zm.goods.pojo.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
@@ -83,7 +83,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	PriceComponent priceComponent;
-
+	
 	@Override
 	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
 		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
@@ -738,6 +738,7 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("centerId", centerIdstr);
 		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 		List<String> itemIdS = new ArrayList<String>();
+		List<String> goodsIdList = null;
 		if (itemIdList != null && itemIdList.size() > 0) {
 			param.put("list", itemIdList);
 			List<ItemCountBO> temp = goodsMapper.countItem(param);
@@ -760,7 +761,7 @@ public class GoodsServiceImpl implements GoodsService {
 			if (itemIdS.size() > 0) {
 				syncgoods(itemIdS, centerId);
 			}
-			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
+			goodsIdList = goodsMapper.getGoodsIdByItemId(param);
 			param.remove("list");
 			if (goodsIdList != null && goodsIdList.size() > 0) {
 				param.put("list", goodsIdList);

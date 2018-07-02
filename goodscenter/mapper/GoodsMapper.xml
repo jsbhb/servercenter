@@ -30,6 +30,7 @@
 		<result column="brand" property="brand" jdbcType="VARCHAR" />
 		<result column="origin" property="origin" jdbcType="VARCHAR" />
 		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
+		<result column="access_path" property="accessPath" jdbcType="VARCHAR" />
 		<result column="increment_tax" property="incrementTax"
 			jdbcType="NUMERIC" />
 		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
@@ -305,6 +306,7 @@
 			separator=",">
 			#{item,jdbcType = VARCHAR}
 		</foreach>
+		order by id asc
 	</select>
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
@@ -798,7 +800,7 @@
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
 		select gi.id,gi.goods_id ,g.goods_name as customGoodsName,max(bgp.retail_price) as price,
-		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,
+		g.supplier_id,i.weight,gi.create_time,g.type,g.supplier_name,g.access_path,
 		gb.brand_id,gcb.brand,g.origin,i.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
 		from goods${centerId} 
 		gi left join goods g on gi.goods_id=g.goods_id left join base gb on g.base_id=gb.id left join 
@@ -1087,17 +1089,6 @@
 			separator=",">
 			#{item}
 		</foreach>
-	</select>
-	
-	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
-		select item_id from goods_item where goods_id = #{goodsId}
-	</select>
-	
-	<select id="listStockByItemIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemStockBO">
-		select item_id as itemId,fxqty as stock from goods_stock where item_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
 	</select>
 	
 	<select id="listCategoryByGoodsIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.CategoryBO">

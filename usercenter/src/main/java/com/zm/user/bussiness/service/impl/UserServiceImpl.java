@@ -16,6 +16,7 @@ import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
+import com.zm.user.enummodel.PublishType;
 import com.zm.user.feignclient.ActivityFeignClient;
 import com.zm.user.feignclient.GoodsFeignClient;
 import com.zm.user.feignclient.OrderFeignClient;
@@ -31,15 +32,18 @@ import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.pojo.WeiXinPayConfig;
+import com.zm.user.pojo.bo.CreateAreaCenterSEO;
 import com.zm.user.pojo.bo.GradeBO;
+import com.zm.user.seo.publish.PublishComponent;
 import com.zm.user.utils.CommonUtils;
 import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
+import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class UserServiceImpl implements UserService {
 
 	private static final Integer DEFAULT = 1;
@@ -65,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	UserComponent userComponent;
-	
+
 	@Resource
 	RedisTemplate<String, String> redisTemplate;
 
@@ -147,14 +151,14 @@ public class UserServiceImpl implements UserService {
 
 		if (info.getUserDetail() != null) {
 			String nickName = info.getUserDetail().getNickName();
-			if(nickName != null && !"".equals(nickName)){
+			if (nickName != null && !"".equals(nickName)) {
 				info.getUserDetail().setNickName(EmojiFilter.emojiChange(info.getUserDetail().getNickName()));
 			}
 			info.getUserDetail().setUserId(info.getId());
 			userMapper.saveUserDetail(info.getUserDetail());
 		}
-		
-		if(info.getAddress() != null){
+
+		if (info.getAddress() != null) {
 			info.getAddress().setUserId(info.getId());
 			saveAddress(info.getAddress());
 		}
@@ -327,9 +331,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private final Integer COPY_MALL = 1;
+	private final Integer AREA_CENTER = 2;
+	private final Integer CENTER = 2;
 
 	@Override
 	public Map<String, Object> saveGrade(Grade grade) {
+		//前端创建文件夹
+		//TODO 是否需要加个字段，如果失败可以手动触发
+		if (AREA_CENTER.equals(grade.getGradeType())) {
+			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(CENTER, grade.getRedirectUrl(),
+					grade.getMobileUrl());
+			ResultModel result = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
+					PublishType.TEST_REGION_CREATE);
+			if (!result.isSuccess()) {
+				throw new RuntimeException(result.getErrorMsg());
+			}
+		}
 		Map<String, Object> result = new HashMap<String, Object>();
 		userMapper.saveGrade(grade);
 		UserInfo user = new UserInfo();
@@ -350,7 +367,7 @@ public class UserServiceImpl implements UserService {
 			userMapper.saveUserDetail(detail);
 			userId = user.getId();
 		}
-		
+
 		result.put("userId", userId);
 		result.put("gradeId", grade.getId());
 
@@ -363,10 +380,10 @@ public class UserServiceImpl implements UserService {
 			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
 		}
-		
-		//添加注册信息存储
+
+		// 添加注册信息存储
 		userMapper.saveGradeData(grade);
-		//通知订单中心新增grade
+		// 通知订单中心新增grade
 		GradeBO gradeBO = new GradeBO();
 		gradeBO.setId(grade.getId());
 		gradeBO.setParentId(grade.getParentId());

@@ -66,6 +66,16 @@ public class GoodsItem extends GoodsBase {
 	private Integer freePost;
 	
 	private Integer freeTax;
+	
+	private String accessPath;
+
+	public String getAccessPath() {
+		return accessPath;
+	}
+
+	public void setAccessPath(String accessPath) {
+		this.accessPath = accessPath;
+	}
 
 	public Integer getFreePost() {
 		return freePost;

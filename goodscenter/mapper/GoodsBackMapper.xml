@@ -278,7 +278,7 @@
 
 	<select id="selectGoodsFileByGoodsId" parameterType="Object" resultMap="goodsFile">
 		select * from goods_file where type = '0'
-		and goods_id = #{goodsId}
+		and goods_id = #{goodsId} order by id asc
 	</select>
 	
 	<select id="selectRecordForUpd" parameterType="Object" resultMap="entity">

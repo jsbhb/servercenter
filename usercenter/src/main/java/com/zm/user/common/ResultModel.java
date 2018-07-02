@@ -79,4 +79,10 @@ public class ResultModel {
 		this.pagination = pagination;
 	}
 
+	@Override
+	public String toString() {
+		return "ResultModel [errorCode=" + errorCode + ", errorMsg=" + errorMsg + ", success=" + success + ", obj="
+				+ obj + ", pagination=" + pagination + "]";
+	}
+
 }

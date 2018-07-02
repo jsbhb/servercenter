@@ -12,4 +12,7 @@ public interface UserFeignClient {
 
 	@RequestMapping(value = "{version}/user/center", method = RequestMethod.GET)
 	public ResultModel getCenterId(@PathVariable("version") Double version);
+	
+	@RequestMapping(value = "{version}/grade-url/{centerId}", method = RequestMethod.GET)
+	public String getClientUrl(@PathVariable("centerId")Integer centerId, @PathVariable("version")Double version);
 }

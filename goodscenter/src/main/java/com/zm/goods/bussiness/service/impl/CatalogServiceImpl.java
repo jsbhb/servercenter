@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.bussiness.dao.CatalogMapper;
 import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.CatalogService;
-import com.zm.goods.pojo.CategoryTypeEnum;
+import com.zm.goods.enummodel.CategoryTypeEnum;
 import com.zm.goods.pojo.FirstCatalogEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.SecondCatalogEntity;

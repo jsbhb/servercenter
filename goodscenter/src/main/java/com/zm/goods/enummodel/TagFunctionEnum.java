@@ -1,4 +1,4 @@
-package com.zm.goods.pojo;
+package com.zm.goods.enummodel;
 
 public enum TagFunctionEnum {
 	CUT_ORDER(1,"卡单");

@@ -44,9 +44,19 @@ public class OrderGoods extends Pagination {
 	
 	private Integer conversion;
 	
+	private String accessPath;
+	
 	public boolean validate() {
 		return (sku != null && itemCode != null && itemQuantity != null && itemPrice != null
 				&& actualPrice != null);
+	}
+
+	public String getAccessPath() {
+		return accessPath;
+	}
+
+	public void setAccessPath(String accessPath) {
+		this.accessPath = accessPath;
 	}
 
 	public Integer getConversion() {

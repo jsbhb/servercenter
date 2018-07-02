@@ -2,7 +2,6 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -23,7 +22,6 @@ import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.bo.CategoryBO;
 import com.zm.goods.pojo.bo.ItemCountBO;
-import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
@@ -160,10 +158,6 @@ public interface GoodsMapper {
 
 	List<GoodsConvert> listSkuAndConversionByItemId(List<String> list);
 
-	List<String> listItemIdsByGoodsId(String goodsId);
-
-	List<ItemStockBO> listStockByItemIds(List<String> itemIds);
-	
 	List<CategoryBO> listCategoryByGoodsIds(List<String> goodsIds);
 
 	void updateFirstCategory(Map<String,Object> param);

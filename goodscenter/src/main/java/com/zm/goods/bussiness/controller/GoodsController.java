@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.pojo.ErrorCodeEnum;
+import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -32,6 +32,7 @@ import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.TimeLimitActive;
+import com.zm.goods.seo.service.SEOService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -55,9 +56,12 @@ public class GoodsController {
 
 	@Resource
 	GoodsService goodsService;
-	
+
 	@Resource
 	GoodsService goodsTagDecorator;
+
+	@Resource
+	SEOService seoService;
 
 	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
@@ -67,7 +71,8 @@ public class GoodsController {
 			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-//			Map<String, Object> resultMap = goodsService.queryGoods(searchModel, sortList, pagination);
+			// Map<String, Object> resultMap =
+			// goodsService.queryGoods(searchModel, sortList, pagination);
 			Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination);
 			return new ResultModel(true, resultMap);
 		}
@@ -112,7 +117,8 @@ public class GoodsController {
 			pagination.init();
 			param.put("pagination", pagination);
 
-//			result.setObj(goodsService.listGoods(param, centerId, userId, proportion));
+			// result.setObj(goodsService.listGoods(param, centerId, userId,
+			// proportion));
 			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion));
 			result.setSuccess(true);
 		}
@@ -191,7 +197,8 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-//			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
+			// Map<String, Object> resultMap = goodsService.listGoodsSpecs(list,
+			// centerId, source);
 			Map<String, Object> resultMap = goodsTagDecorator.listGoodsSpecs(list, centerId, source);
 
 			result.setSuccess(true);
@@ -539,7 +546,11 @@ public class GoodsController {
 			if (itemIdList == null || itemIdList.size() == 0) {
 				return new ResultModel(false, "没有选择商品明细");
 			}
-			return goodsService.upShelves(itemIdList, centerId);
+			ResultModel result = goodsService.upShelves(itemIdList, centerId);
+			if (result.isSuccess()) {// 上架成功发布商品
+				result = seoService.publish(itemIdList, centerId);
+			}
+			return result;
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -558,7 +569,11 @@ public class GoodsController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			String[] arr = itemId.split(",");
 			List<String> itemIdList = Arrays.asList(arr);
-			return goodsService.downShelves(itemIdList, centerId);
+			ResultModel result = goodsService.downShelves(itemIdList, centerId);
+			if(result.isSuccess()){//下架删除商品
+				result = seoService.delPublish(itemIdList);
+			}
+			return result;
 		}
 
 		return new ResultModel(false, "版本错误");
@@ -632,17 +647,18 @@ public class GoodsController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
 	@ApiIgnore
-	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version, @RequestBody Set<String> set){
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version,
+			@RequestBody Set<String> set) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			if (set == null || set.size() == 0) {
 				return null;
 			}
 			return goodsService.listSkuAndConversionByItemId(set);
 		}
-		
+
 		return null;
 	}
 

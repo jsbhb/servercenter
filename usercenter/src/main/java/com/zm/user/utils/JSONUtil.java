@@ -1,6 +1,7 @@
 package com.zm.user.utils;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -20,6 +21,7 @@ public class JSONUtil {
     	 objectMapper = new ObjectMapper();
          objectMapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
          objectMapper.configure(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true);
+         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
     }
 
 

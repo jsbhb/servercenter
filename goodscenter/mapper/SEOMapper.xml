@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.SEOMapper">
+
+
+	<resultMap type="com.zm.goods.pojo.GoodsItem" id="goodsItem">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+		<result column="customGoodsName" property="customGoodsName"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="is_popular" property="popular" jdbcType="INTEGER" />
+		<result column="is_hot" property="hot" jdbcType="INTEGER" />
+		<result column="is_new" property="fresh" jdbcType="INTEGER" />
+		<result column="is_good" property="good" jdbcType="INTEGER" />
+		<result column="is_choice" property="choice" jdbcType="INTEGER" />
+		<result column="detail_path" property="detailPath" jdbcType="VARCHAR" />
+		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
+		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
+		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
+		<result column="index_status" property="indexStatus" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="brand_id" property="brandId" jdbcType="VARCHAR" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+		<result column="brand" property="brand" jdbcType="VARCHAR" />
+		<result column="origin" property="origin" jdbcType="VARCHAR" />
+		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
+		<result column="increment_tax" property="incrementTax"
+			jdbcType="NUMERIC" />
+		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
+		<result column="encode" property="encode" jdbcType="VARCHAR" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<collection property="goodsFileList" ofType="com.zm.goods.pojo.GoodsFile">
+			<id column="file_id" property="id" jdbcType="INTEGER" />
+			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+			<result column="path" property="path" jdbcType="VARCHAR" />
+		</collection>
+		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
+			<id column="specs_id" property="id" jdbcType="INTEGER" />
+			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="conversion" property="conversion" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
+		<result column="info" property="info" jdbcType="VARCHAR" />
+		<result column="carton" property="carton" jdbcType="VARCHAR" />
+		<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
+			<id column="price_id" property="id" jdbcType="INTEGER" />
+			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="min" property="min" jdbcType="INTEGER" />
+			<result column="max" property="max" jdbcType="INTEGER" />
+			<result column="retail_price" property="price" jdbcType="NUMERIC" />
+		</collection>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.po.PagePO" id="page">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="path" property="path" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="file" property="file" jdbcType="VARCHAR" />
+		<result column="client" property="client" jdbcType="VARCHAR" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="page" property="page" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<collection property="module" ofType="com.zm.goods.pojo.po.ComponentPagePO">
+			<id column="cpid" property="id" jdbcType="INTEGER" />
+			<result column="key" property="key" jdbcType="VARCHAR" />
+			<result column="area" property="area" jdbcType="VARCHAR" />
+			<result column="sort" property="sort" jdbcType="INTEGER" />
+			<collection property="list" ofType="com.zm.goods.pojo.po.ComponentDataPO">
+				<id column="cdid" property="id" jdbcType="INTEGER" />
+				<result column="origin" property="origin" jdbcType="VARCHAR" />
+				<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+				<result column="picPath" property="picPath" jdbcType="VARCHAR" />
+				<result column="csort" property="sort" jdbcType="INTEGER" />
+				<result column="title" property="title" jdbcType="VARCHAR" />
+				<result column="specs" property="specs" jdbcType="VARCHAR" />
+				<result column="href" property="href" jdbcType="VARCHAR" />
+				<result column="enname" property="enname" jdbcType="VARCHAR" />
+				<result column="price" property="price"  />
+				<result column="tag_path" property="tagPath" jdbcType="VARCHAR" />
+				<result column="cdescription" property="description" jdbcType="VARCHAR" />
+				<result column="hot" property="hot" jdbcType="INTEGER" />
+				<result column="popular" property="popular" jdbcType="INTEGER" />
+				<result column="free_post" property="freePost" jdbcType="INTEGER" />
+				<result column="free_tax" property="freeTax" jdbcType="INTEGER" />
+				<result column="promotion" property="promotion" jdbcType="INTEGER" />
+				<result column="ctype" property="type" jdbcType="INTEGER" />
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<select id="getGoods" parameterType="Object" resultMap="goodsItem">
+		select g.id,g.goods_id ,g.goods_name as customGoodsName, g.description,g.detail_path,gf.id as file_id,gf.path,
+		gi.excise_tax,gi.info,gi.conversion,gi.item_id,gi.item_code,gi.sku,gi.weight,gi.carton,gp.min,gp.max,gp.retail_price,
+		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
+		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode
+		from goods g left join base gb on g.base_id = gb.id left join goods_category_brand gcb 
+		on gb.brand_id = gcb.brand_id left join goods_file gf on g.goods_id = gf.goods_id left join 
+		goods_item gi on g.goods_id = gi.goods_id left join goods_item${centerId} git on gi.item_id = git.item_id 
+		left join goods_price gp on gp.item_id = gi.item_id 
+		where g.goods_id = #{goodsId} and git.status = 1 and g.is_del = 0 
+	</select>
+	
+	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
+		select item_id from goods_item where goods_id = #{goodsId}
+	</select>
+	
+	<select id="listStockByItemIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemStockBO">
+		select gi.item_id as itemId,gs.fxqty as stock from goods_stock gs left join goods_item${centerId} gi
+		on gs.item_id = gi.item_id where gi.status = 1 and gi.item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<select id="queryGoodsCategoryPath" parameterType="Object" resultType="java.lang.String">
+		select concat_ws('/',gfc.access_path,gsc.access_path,gtc.access_path) as path from goods_first_category gfc left join
+		goods_second_category gsc on gfc.first_id = gsc.first_id left join goods_third_category gtc 
+		on gsc.second_id = gtc.second_id where gtc.third_id = #{thirdId} 
+	</select>
+	
+	<update id="updateGoodsAccessPath" parameterType="Object">
+		update goods set access_path = #{accessPath} where goods_id = #{goodsId}
+	</update>
+	
+	<select id="getGoodsSEO" parameterType="Object" resultType="com.zm.goods.seo.model.SEOModel">
+		select keywords, title, description from goods_seo where goods_id = #{goodsId}
+	</select>
+	
+	<select id="getGoodsAccessPath" parameterType="Object" resultType="java.lang.String">
+		select access_path from goods where goods_id = #{goodsId}
+	</select>
+	
+	<select id="getPageById" parameterType="Object" resultMap="page">
+		select p.id,p.name,p.type,p.status,p.client,p.grade_id,p.path,p.page,p.file,p.description,
+		cp.id as cpid,cp.key,cp.sort,cd.tag_path,cd.enname,c.area,
+		cd.id as cdid,cd.picPath,cd.origin,cd.goods_id,cd.sort as csort,cd.title,cd.specs,cd.href,cd.price,
+		cd.description as cdescription,cd.hot,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
+		left join component_page cp on p.id = cp.page_id left join component_data cd on cp.id = cd.cp_id left join 
+		component c on cp.key = c.key where p.id = #{id} order by cp.sort,cd.type,cd.sort
+	</select>
+	
+	<select id="getGoodsDetailPageByPublish" parameterType="Object" resultMap="page">
+		select p.id,p.name,p.type,p.status,p.client,p.grade_id,p.path,p.page,p.file,p.description,
+		cp.id as cpid,cp.key,cp.sort,cd.tag_path,cd.enname,c.area,
+		cd.id as cdid,cd.picPath,cd.origin,cd.goods_id,cd.sort as csort,cd.title,cd.specs,cd.href,cd.price,
+		cd.description as cdescription,cd.hot,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
+		left join component_page cp on p.id = cp.page_id left join component_data cd on cp.id = cd.cp_id left join 
+		component c on cp.key = c.key where p.status = 2 and type = 3 order by cp.sort,cd.type,cd.sort
+	</select>
+	
+	<select id="getPageSEO" parameterType="Object" resultType="com.zm.goods.seo.model.SEOModel">
+		select keywords, title, description from page_seo where page_id = #{pageId}
+	</select>
+	
+	<update id="updatePagePublishToSave" parameterType="Object">
+		update page set status = 1 where grade_id = #{gradeId} and type = #{type} and status = 2 and client = #{client}
+	</update>
+	
+	<update id="updatePageSaveToPublish" parameterType="Object">
+		update page set status = 2 where id = #{id}
+	</update>
+	
+	<select id="getGoodsIdByItemId" parameterType="Object" resultType="java.lang.String">
+		select goods_id from goods_item where item_id = #{itemId}
+	</select>
+	
+</mapper>

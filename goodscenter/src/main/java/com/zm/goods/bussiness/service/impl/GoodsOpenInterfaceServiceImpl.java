@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.zm.goods.bussiness.dao.GoodsOpenInterfaceMapper;
 import com.zm.goods.bussiness.service.GoodsOpenInterfaceService;
-import com.zm.goods.pojo.ErrorCodeEnum;
+import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.pojo.GoodsDetail;
 import com.zm.goods.pojo.GoodsStock;
 import com.zm.goods.pojo.ResultModel;

@@ -1,5 +1,7 @@
 package com.zm.user.pojo;
 
+import com.zm.user.enummodel.NotifyTypeEnum;
+
 public class NotifyMsg {
 
 	private String phone;

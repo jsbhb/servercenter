@@ -1,4 +1,4 @@
-package com.zm.user.pojo;
+package com.zm.user.enummodel;
 
 public enum ErrorCodeEnum {
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.user.bussiness.service.GradeFrontService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
-import com.zm.user.pojo.ErrorCodeEnum;
+import com.zm.user.enummodel.ErrorCodeEnum;
 
 @RestController
 public class GradeFrontController {

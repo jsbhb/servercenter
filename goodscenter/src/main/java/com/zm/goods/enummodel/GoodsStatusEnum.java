@@ -5,7 +5,7 @@
  * Date:Dec 21, 201710:13:19 AM  
  *  
  */
-package com.zm.goods.pojo;
+package com.zm.goods.enummodel;
 
 /**  
  * ClassName: GoodsStatusEnum <br/>  
