@@ -1,5 +1,6 @@
 package com.zm.goods.seo.model;
 
+import com.zm.goods.pojo.po.ComponentDataPO;
 import com.zm.goods.pojo.po.ComponentPagePO;
 
 public class SEODataModel {
@@ -7,17 +8,25 @@ public class SEODataModel {
 	private String code;
 	private Integer sort;
 	private String area;
-	private Object data;
+	private Object cont;
+	private Object own;
 
 	public SEODataModel(Object item, ComponentPagePO tem) {
 		this.code = tem.getKey();
 		this.sort = tem.getSort();
 		this.area = tem.getArea();
 		if (item != null) {
-			data = item;
+			cont = item;
 		} else if(tem.getList() != null && tem.getList().size() > 0){
 			tem.handleData();
-			data = tem.getList();
+			for(ComponentDataPO temModel : tem.getList()){
+				if(0 == temModel.getType()){
+					own = temModel;
+					tem.getList().remove(temModel);
+					break;
+				}
+			}
+			cont = tem.getList();
 		}
 	}
 
@@ -45,12 +54,20 @@ public class SEODataModel {
 		this.area = area;
 	}
 
-	public Object getData() {
-		return data;
+	public Object getCont() {
+		return cont;
 	}
 
-	public void setData(Object data) {
-		this.data = data;
+	public void setCont(Object cont) {
+		this.cont = cont;
+	}
+
+	public Object getOwn() {
+		return own;
+	}
+
+	public void setOwn(Object own) {
+		this.own = own;
 	}
 
 }

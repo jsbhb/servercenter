@@ -83,7 +83,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	PriceComponent priceComponent;
-	
+
 	@Override
 	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
 		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
@@ -513,7 +513,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		Integer total = (Integer) luceneMap.get(Constants.TOTAL);
 		List<String> goodsIdList = (List<String>) luceneMap.get(Constants.ID_LIST);
-		pagination.setTotalRows(total == null ? 0 : (long)total);
+		pagination.setTotalRows(total == null ? 0 : (long) total);
 		if (goodsIdList != null && goodsIdList.size() > 0) {
 			List<GoodsItem> goodsList = new ArrayList<GoodsItem>();
 			// 设置高亮
@@ -602,6 +602,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 			for (GoodsItem model : goodsList) {
 				model.setGoodsFileList(Filetemp.get(model.getGoodsId()));
+				model.setHref("/" + model.getAccessPath() + "/" + model.getGoodsId() + ".html");
 			}
 
 			resultMap.put(GOODS_LIST, goodsList);
@@ -609,7 +610,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 		resultMap.put(PAGINATION, pagination.webListConverter());
 		Object obj = luceneMap.get(Constants.BRAND);
-		if(obj != null){
+		if (obj != null) {
 			List<String> list = new ArrayList<>((Set<String>) obj);
 			Map<String, List<Object>> brandMap = PinYin4JUtil.packDataByFirstCode(list, String.class, null);
 			resultMap.put(Constants.BRAND_PY, brandMap);
@@ -766,9 +767,10 @@ public class GoodsServiceImpl implements GoodsService {
 			if (goodsIdList != null && goodsIdList.size() > 0) {
 				param.put("list", goodsIdList);
 				// 判断有没有分类没上架的，进行上架
-				//TODO 系统自动上架
-//				List<CategoryBO> categoryList = goodsMapper.listCategoryByGoodsIds(goodsIdList);
-//				categoryStatusModify(categoryList, SHOW, centerIdstr);
+				// TODO 系统自动上架
+				// List<CategoryBO> categoryList =
+				// goodsMapper.listCategoryByGoodsIds(goodsIdList);
+				// categoryStatusModify(categoryList, SHOW, centerIdstr);
 			}
 		}
 
@@ -808,11 +810,11 @@ public class GoodsServiceImpl implements GoodsService {
 				param.put("centerId", centerIdstr);
 				param.put("set", firstSet);
 				List<String> firstIdList = goodsMapper.listHideFirstCategory(param);
-				if(firstIdList == null || firstIdList.size() == 0){
+				if (firstIdList == null || firstIdList.size() == 0) {
 					param.put("list", firstSet);
 					goodsMapper.updateFirstCategory(param);
 				} else {
-					if(firstIdList.size() < firstSet.size()){
+					if (firstIdList.size() < firstSet.size()) {
 						firstSet.removeAll(firstIdList);
 						param.put("list", firstSet);
 						goodsMapper.updateFirstCategory(param);
@@ -820,11 +822,11 @@ public class GoodsServiceImpl implements GoodsService {
 				}
 				param.put("set", secondSet);
 				List<String> secondIdList = goodsMapper.listHideSecondCategory(param);
-				if(secondIdList == null || secondIdList.size() == 0){
+				if (secondIdList == null || secondIdList.size() == 0) {
 					param.put("list", secondSet);
 					goodsMapper.updateSecondCategory(param);
 				} else {
-					if(secondIdList.size() < secondSet.size()){
+					if (secondIdList.size() < secondSet.size()) {
 						secondSet.removeAll(secondIdList);
 						param.put("list", secondSet);
 						goodsMapper.updateSecondCategory(param);
@@ -832,11 +834,11 @@ public class GoodsServiceImpl implements GoodsService {
 				}
 				param.put("set", thirdSet);
 				List<String> thirdIdList = goodsMapper.listHideThirdCategory(param);
-				if(thirdIdList == null || thirdIdList.size() == 0){
+				if (thirdIdList == null || thirdIdList.size() == 0) {
 					param.put("list", thirdSet);
 					goodsMapper.updateThirdCategory(param);
 				} else {
-					if(thirdIdList.size() < thirdSet.size()){
+					if (thirdIdList.size() < thirdSet.size()) {
 						thirdSet.removeAll(thirdIdList);
 						param.put("list", thirdSet);
 						goodsMapper.updateThirdCategory(param);
@@ -883,9 +885,10 @@ public class GoodsServiceImpl implements GoodsService {
 		if (downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0) {
 			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
 			// 需要下架的分类
-			//TODO 系统下架分类
-//			List<CategoryBO> categoryList = goodsMapper.listCategoryByGoodsIds(goodsIdList);
-//			categoryStatusModify(categoryList, HIDE, centerIdstr);
+			// TODO 系统下架分类
+			// List<CategoryBO> categoryList =
+			// goodsMapper.listCategoryByGoodsIds(goodsIdList);
+			// categoryStatusModify(categoryList, HIDE, centerIdstr);
 		}
 		return new ResultModel(true, "");
 	}
@@ -906,14 +909,17 @@ public class GoodsServiceImpl implements GoodsService {
 			String centerId = GoodsServiceUtil.judgeCenterId(id);
 			param.put("list", itemIdList);
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-//			List<String> firstIdList = goodsMapper.listFirstCategory(goodsIdList);
-//			List<String> secondIdList = goodsMapper.listSecondCategory(goodsIdList);
-//			List<String> thirdIdList = goodsMapper.listThirdCategory(goodsIdList);
+			// List<String> firstIdList =
+			// goodsMapper.listFirstCategory(goodsIdList);
+			// List<String> secondIdList =
+			// goodsMapper.listSecondCategory(goodsIdList);
+			// List<String> thirdIdList =
+			// goodsMapper.listThirdCategory(goodsIdList);
 			param.put("centerId", centerId);
 			param.put("goodsIdlist", goodsIdList);
-//			param.put("firstIdlist", firstIdList);
-//			param.put("secondIdlist", secondIdList);
-//			param.put("thirdIdlist", thirdIdList);
+			// param.put("firstIdlist", firstIdList);
+			// param.put("secondIdlist", secondIdList);
+			// param.put("thirdIdlist", thirdIdList);
 			param.put("itemList", itemIdList);
 			// goodsMapper.insertCenterFirstCategory(param);
 			// goodsMapper.insertCenterSecondCategory(param);

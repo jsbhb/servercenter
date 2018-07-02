@@ -21,23 +21,33 @@ public class ShoppingCart {
 	private String goodsName;
 
 	private Integer supplierId;
-	
+
 	private String supplierName;
 
 	@JsonIgnore
 	private String createTime;
 	@JsonIgnore
 	private String updateTime;
-	
+
 	private Integer type;
 
 	private GoodsSpecs goodsSpecs;
 
 	private String picPath;
-	
+
 	private Integer freePost;
-	
+
 	private Integer freeTax;
+
+	private String href;
+
+	public String getHref() {
+		return href;
+	}
+
+	public void setHref(String href) {
+		this.href = href;
+	}
 
 	public Integer getFreePost() {
 		return freePost;
@@ -166,10 +176,8 @@ public class ShoppingCart {
 
 	@Override
 	public String toString() {
-		return "ShoppingCart [id=" + id + ", userId=" + userId + ", itemId=" + itemId + ", quantity=" + quantity
-				+ ", gradeId=" + gradeId + ", goodsName=" + goodsName + ", supplierId=" + supplierId + ", supplierName="
-				+ supplierName + ", createTime=" + createTime + ", updateTime=" + updateTime + ", type=" + type
-				+ ", goodsSpecs=" + goodsSpecs + ", picPath=" + picPath + "]";
+		return "ShoppingCart [id=" + id + ", itemId=" + itemId + ", quantity=" + quantity + ", gradeId=" + gradeId
+				+ ", goodsSpecs=" + goodsSpecs + "]";
 	}
 
 }

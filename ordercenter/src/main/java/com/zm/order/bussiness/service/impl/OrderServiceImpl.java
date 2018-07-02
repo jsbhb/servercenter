@@ -120,13 +120,13 @@ public class OrderServiceImpl implements OrderService {
 			result.setSuccess(false);
 			return result;
 		}
-		//TODO 天天仓规则
-		if(info.getSupplierId() == 1){
+		// TODO 天天仓规则
+		if (info.getSupplierId() == 1) {
 			int totalQuantity = 0;
-			for(OrderGoods goods : info.getOrderGoodsList()){
-				totalQuantity +=goods.getItemQuantity();
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				totalQuantity += goods.getItemQuantity();
 			}
-			if(totalQuantity > 10){
+			if (totalQuantity > 10) {
 				result.setSuccess(false);
 				result.setErrorMsg("保税TT仓的商品订单数量不能超过10个");
 				return result;
@@ -364,6 +364,14 @@ public class OrderServiceImpl implements OrderService {
 		pagination.setTotalRows(count.longValue());
 		pagination.webListConverter();
 		List<OrderInfo> list = orderMapper.listOrderByParam(param);
+		if (list != null && list.size() > 0) {
+			for (OrderInfo order : list) {
+				for (OrderGoods goods : order.getOrderGoodsList()) {
+					Object obj = template.opsForValue().get("href:" + goods.getGoodsId());
+					goods.setHref(obj == null ? "" : obj.toString());
+				}
+			}
+		}
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("pagination", pagination);
 		resultMap.put("orderList", list);
@@ -458,9 +466,13 @@ public class OrderServiceImpl implements OrderService {
 			for (ShoppingCart model : list) {
 				for (Map<String, Object> map : specsList) {
 					specs = JSONUtil.parse(JSONUtil.toJson(map), GoodsSpecs.class);
-					if (specs.getItemId().equals(model.getItemId())) {
-						model.setGoodsSpecs(specs);
-						break;
+					try {
+						if (specs.getItemId().equals(model.getItemId())) {
+							model.setGoodsSpecs(specs);
+							break;
+						}
+					} catch (NullPointerException e) {
+						LogUtil.writeErrorLog("【数据不完整】" + specs.toString() + "," + model.toString());
 					}
 				}
 			}
@@ -469,9 +481,13 @@ public class OrderServiceImpl implements OrderService {
 			for (ShoppingCart model : list) {
 				for (Map<String, Object> map : fileList) {
 					file = JSONUtil.parse(JSONUtil.toJson(map), GoodsFile.class);
-					if (file.getGoodsId().equals(model.getGoodsSpecs().getGoodsId())) {
-						model.setPicPath(file.getPath());
-						break;
+					try {
+						if (file.getGoodsId().equals(model.getGoodsSpecs().getGoodsId())) {
+							model.setPicPath(file.getPath());
+							break;
+						}
+					} catch (NullPointerException e) {
+						LogUtil.writeErrorLog("【数据不完整】" + file.toString() + "," + model.toString());
 					}
 				}
 				Map<String, String> map = hashOperations.entries(Constants.POST_TAX + model.getSupplierId());
@@ -484,6 +500,12 @@ public class OrderServiceImpl implements OrderService {
 					} catch (Exception e) {
 						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
 					}
+				}
+				try {
+					Object obj = template.opsForValue().get("href:" + model.getGoodsSpecs().getGoodsId());
+					model.setHref(obj == null ? "" : obj.toString());
+				} catch (NullPointerException e) {
+					LogUtil.writeErrorLog("【没有规格信息】" + model.toString());
 				}
 			}
 

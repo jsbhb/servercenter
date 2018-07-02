@@ -322,11 +322,7 @@ public class GoodsSpecs implements Serializable {
 
 	@Override
 	public String toString() {
-		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + ", itemCode=" + itemCode
-				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
-				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
-				+ ", vipMinPrice=" + vipMinPrice + ", vipMaxPrice=" + vipMaxPrice + ", stock=" + stock + ", priceList="
-				+ priceList + "]";
+		return "GoodsSpecs [id=" + id + ", goodsId=" + goodsId + ", itemId=" + itemId + "]";
 	}
 
 }

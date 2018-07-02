@@ -82,6 +82,7 @@ public class SEOServiceImpl implements SEOService {
 					continue;
 				}
 				String path = seoMapper.queryGoodsCategoryPath(goodsItem.getThirdCategory());
+				template.opsForValue().set("href:" + goodsId, "/" + path + "/" + goodsId + ".html");
 				param.put("accessPath", path);
 				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
@@ -205,11 +206,11 @@ public class SEOServiceImpl implements SEOService {
 	@Override
 	public ResultModel getGoodsAccessPath(String goodsId, String itemId) {
 		ResultModel result = new ResultModel();
-		if(goodsId != null && !"".equals(goodsId)){
+		if (goodsId != null && !"".equals(goodsId)) {
 			String path = seoMapper.getGoodsAccessPath(goodsId);
 			result.setSuccess(true);
 			result.setObj(path);
-		} else if(itemId != null && !"".equals(itemId)){
+		} else if (itemId != null && !"".equals(itemId)) {
 			goodsId = seoMapper.getGoodsIdByItemId(itemId);
 			String path = seoMapper.getGoodsAccessPath(goodsId);
 			result.setSuccess(true);

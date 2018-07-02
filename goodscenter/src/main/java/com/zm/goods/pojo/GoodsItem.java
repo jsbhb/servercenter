@@ -68,6 +68,16 @@ public class GoodsItem extends GoodsBase {
 	private Integer freeTax;
 	
 	private String accessPath;
+	
+	private String href;
+
+	public String getHref() {
+		return href;
+	}
+
+	public void setHref(String href) {
+		this.href = href;
+	}
 
 	public String getAccessPath() {
 		return accessPath;

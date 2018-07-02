@@ -157,7 +157,7 @@
 		cd.id as cdid,cd.picPath,cd.origin,cd.goods_id,cd.sort as csort,cd.title,cd.specs,cd.href,cd.price,
 		cd.description as cdescription,cd.hot,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
 		left join component_page cp on p.id = cp.page_id left join component_data cd on cp.id = cd.cp_id left join 
-		component c on cp.key = c.key where p.status = 2 and type = 3 order by cp.sort,cd.type,cd.sort
+		component c on cp.key = c.key where p.status = 2 and p.type = 3 order by cp.sort,cd.type,cd.sort
 	</select>
 	
 	<select id="getPageSEO" parameterType="Object" resultType="com.zm.goods.seo.model.SEOModel">
