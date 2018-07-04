@@ -124,7 +124,6 @@ alter table goods_third_category add column access_path varchar(200) null commen
 alter table goods_first_category add column theme_name varchar(200) null comment '主题页名称';
 alter table goods_second_category add column theme_name varchar(200) null comment '主题页名称';
 alter table goods_third_category add column theme_name varchar(200) null comment '主题页名称';
-alter table goods_third_category add column is_popular tinyint unsigned default 0 comment '0：否；1是';
 CREATE UNIQUE INDEX uk_theme_name ON goods_first_category(theme_name);
 CREATE UNIQUE INDEX uk_theme_name ON goods_second_category(theme_name);
 CREATE UNIQUE INDEX uk_theme_name ON goods_third_category(theme_name);
