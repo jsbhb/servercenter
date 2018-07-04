@@ -6,10 +6,10 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 public class HttpConfiguration {
 
-	@Bean
+//	@Bean
 	public EmbeddedServletContainerFactory servletContainer(){
 		TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory();
 	    tomcat.addAdditionalTomcatConnectors(createHttpConnector());

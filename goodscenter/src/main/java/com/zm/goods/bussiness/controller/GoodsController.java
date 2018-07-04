@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -222,7 +223,7 @@ public class GoodsController {
 						userId);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.writeErrorLog("【获取商品价格信息出错】", e);
 			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			result.setSuccess(false);
 			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());

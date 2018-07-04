@@ -90,7 +90,11 @@ public interface GoodsMapper {
 	
 	List<GoodsItem> listGoodsForLucene(Map<String, Object> param);
 	
+	List<GoodsItem> listGoodsForLuceneUpdateTag(Map<String, Object> param);
+	
 	List<GoodsSpecs> listSpecsForLucene(Map<String,Object> param);
+	
+	List<GoodsSpecs> listItemTagForLuceneUpdate(Map<String,Object> param);
 	
 	void updateGoodsUpShelves(Map<String,Object> param);
 	
@@ -171,5 +175,7 @@ public interface GoodsMapper {
 	List<String> listHideFirstCategory(Map<String,Object> param);
 	List<String> listHideSecondCategory(Map<String,Object> param);
 	List<String> listHideThirdCategory(Map<String,Object> param);
+
+	List<GoodsSpecs> listItemUpshelvTagForLuceneUpdate(Map<String, Object> param);
 
 }

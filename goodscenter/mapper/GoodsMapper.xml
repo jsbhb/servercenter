@@ -36,6 +36,13 @@
 		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
 		<result column="encode" property="encode" jdbcType="VARCHAR" />
 		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
+			<id column="specs_id" property="id" jdbcType="INTEGER" />
+			<collection property="tagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
+				<id column="tag_id" property="id" jdbcType="INTEGER" />
+				<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+			</collection>
+		</collection>
 	</resultMap>
 
 	<resultMap type="com.zm.goods.pojo.GoodsFile" id="goodsFile">
@@ -754,6 +761,36 @@
 			</foreach>
 		</if>
 	</select> 
+	
+	<select id="listGoodsForLuceneUpdateTag" resultMap="goodsItem" parameterType="Object">
+		select g.id,g.goods_id,gi.id as specs_id, gt.id as tag_id,gt.tag_name from goods${centerId} g left join 
+		goods_item${centerId} gi on g.goods_id = gi.goods_id left join goods gs on g.goods_id=gs.goods_id 
+		left join goods_tag_bind gtb on gi.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
+		where gs.is_del = 0 and gi.status = 1 and g.index_status = 1 and g.goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
+	</select>
+	
+	<select id="listItemTagForLuceneUpdate" resultMap="goodsSpecs" parameterType="Object">
+		select gi.id,gi.item_id,gi.goods_id,gt.id as tag_id,gt.tag_name from goods_item${centerId} gi left join 
+		goods${centerId} g on gi.goods_id = g.goods_id left join goods gs on g.goods_id=gs.goods_id left join 
+		goods_tag_bind gtb on gi.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
+		where g.index_status = 1 and gs.is_del = 0 and gi.item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
+	</select>
+	
+	<select id="listItemUpshelvTagForLuceneUpdate " resultMap="goodsSpecs" parameterType="Object">
+		select gi.id,gi.item_id,gi.goods_id,gt.id as tag_id,gt.tag_name from goods_item${centerId} gi left join 
+		goods${centerId} g on gi.goods_id = g.goods_id left join goods gs on g.goods_id=gs.goods_id left join 
+		goods_tag_bind gtb on gi.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
+		where gi.status = 1 and gi.goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
+	</select>
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
 		select gs.id,gi.goods_id,gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount,gt.id as tag_id,gt.tag_name 
