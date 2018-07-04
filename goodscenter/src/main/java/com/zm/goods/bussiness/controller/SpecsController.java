@@ -197,4 +197,36 @@ public class SpecsController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+	
+	@RequestMapping(value = "{version}/goods/specs/updateSpecs", method = RequestMethod.POST)
+	public ResultModel updateSpecs(@PathVariable("version") Double version, @RequestBody SpecsEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				specsService.updateSpecs(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/specs/updateValue", method = RequestMethod.POST)
+	public ResultModel updateValue(@PathVariable("version") Double version, @RequestBody SpecsValueEntity value) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				specsService.updateValue(value);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

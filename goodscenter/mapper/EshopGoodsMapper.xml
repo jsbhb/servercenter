@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.EshopGoodsMapper">
+
+	<resultMap type="com.zm.goods.pojo.EshopGoodsEntity" id="eshopGoods">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+		<result column="origin" property="origin" jdbcType="VARCHAR" />
+		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
+		<result column="brand" property="brand" jdbcType="VARCHAR" />
+		<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="encode" property="encode" jdbcType="VARCHAR" />
+		<result column="proxy_price" property="proxyPrice" jdbcType="NUMERIC" />
+		<result column="retail_price" property="retailPrice" jdbcType="NUMERIC" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap type="com.zm.goods.pojo.EshopGoodsEntity" id="eshopGoodsBase">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+		<result column="origin" property="origin" jdbcType="VARCHAR" />
+		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
+		<result column="brand" property="brand" jdbcType="VARCHAR" />
+		<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="encode" property="encode" jdbcType="VARCHAR" />
+		<result column="proxy_price" property="proxyPrice" jdbcType="NUMERIC" />
+		<result column="retail_price" property="retailPrice" jdbcType="NUMERIC" />
+		<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
+		<collection property="goodsStockList" ofType="com.zm.goods.pojo.EshopGoodsStockEntity">
+			<id column="stock_id" property="id" jdbcType="INTEGER" />
+			<result column="loc" property="loc" jdbcType="VARCHAR" />
+			<result column="is_default" property="isDefault" jdbcType="INTEGER" />
+			<result column="quantity" property="quantity" jdbcType="INTEGER" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.EshopGoodsInventoryEntity" id="eshopGoodsInventory">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="mall_id" property="mallId" jdbcType="INTEGER" />
+		<result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="loc" property="loc" jdbcType="VARCHAR" />
+		<result column="sys_qty" property="sysQty" jdbcType="INTEGER" />
+		<result column="check_qty" property="checkQty" jdbcType="INTEGER" />
+		<result column="diff_qty" property="diffQty" jdbcType="INTEGER" />
+		<result column="operation_type" property="operationType" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<insert id="createPurchaseInfo" parameterType="Object">
+		INSERT IGNORE INTO
+		eshop_goods_purchase
+		VALUES
+		(#{orderId},#{status},#{mallId},#{gradeId},
+		#{receiveName},#{receivePhone},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertGoodsOperationRecordForPurchase" parameterType="Object">
+		INSERT IGNORE INTO
+		eshop_goods_operation_record
+		(mall_id,grade_id,operation_type,purchase_id,item_id,item_quantity,loc,create_time,update_time,opt)
+		VALUES
+		<foreach collection="orderGoodsList" item="item" separator=",">
+			(#{item.mallId},#{item.gradeId},'101',#{orderId},
+			#{item.itemId},#{item.itemQuantity},'defaultLoc',now(),now(),#{opt})
+		</foreach>
+	</insert>
+	
+	<select id="getGoodsItemInfoByItemIds" parameterType="Object" resultMap="eshopGoods">
+		select gi.goods_id,gi.item_id,gi.encode,gp.proxy_price,gp.retail_price
+		from goods_item gi
+		left join goods_price gp on gi.item_id = gp.item_id
+		where gi.item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<select id="getGoodsInfoByItemIds" parameterType="Object" resultMap="eshopGoods">
+		select g.goods_id,g.goods_name,g.origin,gfc.name as first_category,gb.brand,
+		gf.path as item_img
+		from goods g
+		left join base gb on g.base_id = gb.id
+		left join goods_first_category gfc on gb.first_category = gfc.first_id
+		left join 
+		(select min(id) id,goods_id,path from goods_file group by goods_id) gf on g.goods_id = gf.goods_id
+		where g.goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
+	<update id="syncGoodsInfoForPurchase" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			insert into eshop_goods
+			values (#{item.mallId},#{item.gradeId},#{item.goodsName},
+			#{item.origin},#{item.firstCategory},#{item.brand},#{item.status},
+			#{item.itemImg},#{item.itemId},#{item.encode},#{item.proxyPrice},
+			#{item.retailPrice},#{item.remark},now(),now(),#{item.opt})
+			ON DUPLICATE KEY UPDATE 
+			proxy_price = #{item.proxyPrice}, update_time=now(), opt=#{item.opt}
+		</foreach>
+	</update>
+	
+	<update id="syncGoodsStockForPurchase" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";">
+			insert into eshop_goods_stock
+			values (#{mallId},#{gradeId},#{item.itemId},
+			'defaultLoc','1',#{item.itemQuantity}
+			,now(),now(),#{opt})
+			ON DUPLICATE KEY UPDATE 
+			quantity = quantity + #{item.itemQuantity}, update_time=now(), opt=#{opt}
+		</foreach>
+	</update>
+	
+	<update id="updateGoodsInfoForEshop" parameterType="Object">
+		update eshop_goods set update_time=now(), opt=#{opt}
+		<if test="goodsName != null">
+			, goods_name = #{goodsName}
+		</if>
+		<if test="origin != null">
+			, origin = #{origin}
+		</if>
+		<if test="firstCategory != null">
+			, first_category = #{firstCategory}
+		</if>
+		<if test="brand != null">
+			, brand = #{brand}
+		</if>
+		<if test="encode != null">
+			, encode = #{encode}
+		</if>
+		<if test="proxyPrice != null">
+			, proxy_price = #{proxyPrice}
+		</if>
+		<if test="retailPrice != null">
+			, retail_price = #{retailPrice}
+		</if>
+		where mall_id = #{mallId} and grade_id = #{gradeId} and item_id = #{item.itemId}
+	</update>
+	
+	<select id="selectGoodsInfoForEshop" parameterType="Object" resultMap="eshopGoodsBase">
+		select g.*,sum(gs.quantity) as item_quantity,
+		gs.id stock_id,gs.loc,gs.is_default,gs.quantity
+		from eshop_goods g
+		left join eshop_goods_stock gs on g.item_id = gs.item_id
+		where g.mall_id = #{mallId} and g.grade_id = #{gradeId} and gs.quantity > 0
+		<if test="goodsName != null and goodsName !=''">
+			and g.goods_name like CONCAT('%',#{goodsName},'%') 
+		</if>
+		<if test="origin != null and origin !=''">
+			and g.origin = #{origin}
+		</if>
+		<if test="firstCategory != null and firstCategory !=''">
+			and g.first_category = #{firstCategory}
+		</if>
+		<if test="brand != null and brand !=''">
+			and g.brand = #{brand}
+		</if>
+		<if test="status != null and status !=''">
+			and g.status = #{status}
+		</if>
+		<if test="itemId != null and itemId !=''">
+			and g.item_id = #{itemId}
+		</if>
+		<if test="encode != null and encode !=''">
+			and g.encode = #{encode}
+		</if>
+		<if test="loc != null and loc !=''">
+			and gs.loc = #{loc}
+		</if>
+		<if test="itemIdList != null and itemIdList.size() > 0">
+			and g.item_id in 
+			<foreach collection="itemIdList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		group by g.item_id
+		order by g.item_id,gs.is_default desc
+	</select>
+	
+	<insert id="insertGoodsOperationRecordForInventory" parameterType="Object">
+		INSERT IGNORE INTO
+		eshop_goods_operation_record
+		(mall_id,grade_id,operation_type,item_id,loc,sys_qty,check_qty,diff_qty,create_time,update_time,opt)
+		VALUES 
+		(#{mallId},#{gradeId},#{operationType},#{itemId},#{loc},#{sysQty},#{checkQty},#{diffQty},now(),now(),#{opt})
+	</insert>
+	
+	<update id="syncGoodsStockForInventory" parameterType="Object">
+		update eshop_goods_stock
+		set update_time=now(), opt=#{opt}
+		<if test="operationType != null and operationType != '' or operationType == 301">
+			, quantity = quantity + #{diffQty}
+		</if>
+		<if test="operationType != null and operationType != '' or operationType == 302">
+			, quantity = quantity - #{diffQty}
+		</if>
+		where mall_id = #{mallId} and grade_id = #{gradeId} and item_id = #{itemId}
+	</update>
+	
+	<select id="selectGoodsInventoryInfoForEshop" parameterType="Object" resultMap="eshopGoodsInventory">
+		select egor.* 
+		from eshop_goods_operation_record egor
+		left join eshop_goods eg on egor.mall_id = eg.mall_id 
+		and egor.grade_id = eg.grade_id and egor.item_id = eg.item_id
+		where egor.mall_id = #{mallId} and egor.grade_id = #{gradeId}
+		<if test="goodsName != null and goodsName !=''">
+			and eg.goods_name like CONCAT('%',#{goodsName},'%') 
+		</if>
+		<if test="origin != null and origin !=''">
+			and eg.origin = #{origin}
+		</if>
+		<if test="firstCategory != null and firstCategory !=''">
+			and eg.first_category = #{firstCategory}
+		</if>
+		<if test="brand != null and brand !=''">
+			and eg.brand = #{brand}
+		</if>
+		<if test="itemId != null and itemId !=''">
+			and eg.item_id = #{itemId}
+		</if>
+		<if test="encode != null and encode !=''">
+			and eg.encode = #{encode}
+		</if>
+		<if test="loc != null and loc !=''">
+			and egor.loc = #{loc}
+		</if>
+		<if test="operationType != null and operationType !=''">
+			and egor.operation_type = #{operationType}
+		</if>
+		order by g.item_id
+	</select>
+	
+	<update id="syncGoodsStockForSellOrder" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";" >
+			update eshop_goods_stock
+			<set>
+				update_time=now(), opt=#{item.opt},
+				quantity = quantity - #{item.quantity},
+			</set>
+			where mall_id = #{item.mallId} and grade_id = #{item.gradeId} 
+			and item_id = #{item.itemId} and loc = #{item.loc}
+		</foreach>
+	</update>
+	
+	<insert id="insertGoodsOperationRecordForSellOrder" parameterType="Object">
+		INSERT IGNORE INTO
+		eshop_goods_operation_record
+		(mall_id,grade_id,operation_type,order_id,item_id,item_quantity,loc,create_time,update_time,opt)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.mallId},#{item.gradeId},'201',#{orderId},
+			#{item.itemId},#{item.quantity},#{item.loc},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
+</mapper>

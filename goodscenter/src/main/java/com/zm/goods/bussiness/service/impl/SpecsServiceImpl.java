@@ -82,10 +82,10 @@ public class SpecsServiceImpl implements SpecsService {
 	public void saveSpecs(SpecsEntity entity) {
 		specsMapper.insertSpce(entity);
 
-		for (SpecsValueEntity value : entity.getValues()) {
-			value.setSpecsId(entity.getId());
-		}
-		specsMapper.insertSpcesValue(entity.getValues());
+//		for (SpecsValueEntity value : entity.getValues()) {
+//			value.setSpecsId(entity.getId());
+//		}
+//		specsMapper.insertSpcesValue(entity.getValues());
 	}
 
 	@Override
@@ -120,6 +120,16 @@ public class SpecsServiceImpl implements SpecsService {
 	@Override
 	public List<SpecsEntity> selectAllSpeceInfo() {
 		return specsMapper.selectAllSpeceInfo();
+	}
+
+	@Override
+	public void updateSpecs(SpecsEntity entity) {
+		specsMapper.updateSpce(entity);
+	}
+
+	@Override
+	public void updateValue(SpecsValueEntity value) {
+		specsMapper.updateSpcesValue(value);
 	}
 
 }

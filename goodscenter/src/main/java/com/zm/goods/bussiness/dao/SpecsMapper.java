@@ -100,5 +100,9 @@ public interface SpecsMapper {
 	void addSpecsValue(GoodsSpecsBO entity);
 	
 	List<SpecsEntity> selectAllSpeceInfo();
+	
+	void updateSpce(SpecsEntity entity);
+
+	void updateSpcesValue(SpecsValueEntity entity);
 
 }

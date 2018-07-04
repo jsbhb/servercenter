@@ -125,4 +125,16 @@
 		order by a.id
 	</select>
 	
+	<update id="updateSpce" parameterType="Object" >
+		update goods_specs 
+		set name = #{name},opt = #{opt}, update_time = now()
+		where id = #{id}
+	</update>
+	
+	<update id="updateSpcesValue" parameterType="Object">
+		update goods_specs_value 
+		set value = #{value},opt = #{opt}, update_time = now()
+		where id = #{id} and specs_id = #{specsId}
+	</update>
+	
 </mapper>

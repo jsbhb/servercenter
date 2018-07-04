@@ -59,7 +59,7 @@ CREATE TABLE `zm_goods`.`eshop_goods` (
   `first_category` varchar(100) NULL COMMENT '一级分类',
   `brand` VARCHAR(100) NULL COMMENT '品牌名称',
   `status` TINYINT UNSIGNED NULL DEFAULT 0 COMMENT '0：在售;1：停售;',
-  `item_img` VARCHAR(100) NULL COMMENT '商品图片',
+  `item_img` VARCHAR(200) NULL COMMENT '商品图片',
   `item_id` INT(11) DEFAULT NULL COMMENT 'item_id',
   `encode` INT(11) DEFAULT NULL COMMENT 'encode',
   `proxy_price` decimal(10,2) NULL DEFAULT 0.0 COMMENT '成本价格',
@@ -97,12 +97,13 @@ CREATE TABLE `zm_goods`.`eshop_goods_stock` (
   INDEX `idx_mall_id` (`mall_id`),
   INDEX `idx_grade_id` (`grade_id`),
   INDEX `idx_item_id` (`item_id`),
-  INDEX `idx_loc` (`loc`)
+  INDEX `idx_loc` (`loc`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `mall_id_grade_id_item_id_UNIQUE` (`mall_id`,`grade_id`,`item_id`)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品库位库存表';
 
+/*
 drop table if exists  `eshop_goods_inventory`;
 
 CREATE TABLE `zm_goods`.`eshop_goods_inventory` (
@@ -122,10 +123,11 @@ CREATE TABLE `zm_goods`.`eshop_goods_inventory` (
   INDEX `idx_mall_id` (`mall_id`),
   INDEX `idx_grade_id` (`grade_id`),
   INDEX `idx_item_id` (`item_id`),
-  INDEX `idx_loc` (`loc`)
+  INDEX `idx_loc` (`loc`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品盘点记录表';
+*/
 
 drop table if exists  `eshop_goods_operation_record`;
 
@@ -135,8 +137,9 @@ CREATE TABLE `zm_goods`.`eshop_goods_operation_record` (
   `grade_id` INT(11) DEFAULT NULL COMMENT 'gradeID',
   `operation_type` tinyint(4) unsigned NOT NULL COMMENT '操作大类: 进:100;销:200;存:300;',
   `purchase_id` VARCHAR(50) NULL COMMENT '采购单编号',
+  `order_id` VARCHAR(50) NULL COMMENT '销售单编号',
   `item_id` VARCHAR(50) NOT NULL COMMENT 'itemID',
-  `item_quantity` INT UNSIGNED NULL COMMENT '销售数量',
+  `item_quantity` INT UNSIGNED NULL COMMENT '数量',
   `loc` VARCHAR(50) NULL COMMENT 'location',
   `sys_qty` int  NULL COMMENT '系统数量',
   `check_qty` int  NULL COMMENT '盘点数量',
@@ -149,7 +152,7 @@ CREATE TABLE `zm_goods`.`eshop_goods_operation_record` (
   INDEX `idx_grade_id` (`grade_id`),
   INDEX `idx_purchase_id` (`purchase_id`),
   INDEX `idx_item_id` (`item_id`),
-  INDEX `idx_loc` (`loc`)
+  INDEX `idx_loc` (`loc`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品操作记录表';

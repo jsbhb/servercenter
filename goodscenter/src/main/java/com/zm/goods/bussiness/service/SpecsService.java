@@ -91,5 +91,9 @@ public interface SpecsService {
 	int addSpecsValue(GoodsSpecsBO entity);
 
 	List<SpecsEntity> selectAllSpeceInfo();
+	
+	void updateSpecs(SpecsEntity entity);
+
+	void updateValue(SpecsValueEntity value);
 
 }

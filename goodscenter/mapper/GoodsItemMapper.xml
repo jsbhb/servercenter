@@ -316,6 +316,7 @@
 				and g.type = #{entity.goodsEntity.type}
 			</if>
 		</if>
+		order by i.id desc
 	</select>
 	
 	

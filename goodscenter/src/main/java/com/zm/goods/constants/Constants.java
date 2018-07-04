@@ -49,4 +49,9 @@ public class Constants {
 	//*********************商品缓存***********************************
 	public static final String GOODS_CACHE = "goodscache:";
 	
+	//*******************eshopgoodsoperationtype**********************
+	public static final Integer OPERATION_TYPE_PURCHASE_INSTOCK = 101;
+	public static final Integer OPERATION_TYPE_INVENTORY_PROFIT = 301;
+	public static final Integer OPERATION_TYPE_INVENTORY_LOSSES = 302;
+	
 }
