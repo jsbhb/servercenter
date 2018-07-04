@@ -715,11 +715,12 @@
 		left join goods_extension_label gel on g.goods_id = gel.goods_id
 		where 1=1 and g.is_del = 0
 		<if test="goodsName!=null and goodsName!=''">
-			and gel.goods_name like concat('%',#{goodsName},'%') 
+			and (gel.goods_name like concat('%',#{goodsName},'%') or g.goods_name like concat('%',#{goodsName},'%'))
 		</if>
 		<if test="goodsId!=null and goodsId !=''">
 			and g.goods_id = #{goodsId} 
 		</if>
+		order by g.goods_id desc
 	</select>
 	
 	<select id="selectGoodsExtensionCenterForPageDownload" parameterType="Object" resultMap="goodsExtension">
@@ -730,11 +731,12 @@
 		left join goods_extension_label gel on g.goods_id = gel.goods_id
 		where 1=1
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
-			and gel.goods_name like concat('%',#{entity.goodsName},'%') 
+			and (gel.goods_name like concat('%',#{entity.goodsName},'%') or g.goods_name like concat('%',#{entity.goodsName},'%'))
 		</if>
 		<if test="entity.goodsId!=null and entity.goodsId !=''">
 			and g.goods_id = #{entity.goodsId} 
 		</if>
+		order by g.goods_id desc
 	</select>
 	
 	<select id="selectGoodsExtensionInfo" parameterType="Object" resultMap="goodsExtension">
