@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.order.bussiness.dao.EshopOrderMapper">
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoDTO" id="eShopOrderBase">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="payment" property="payment" jdbcType="DECIMAL" />
+		<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+		<result column="receive_phone" property="receivePhone" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoDTO" id="eShopOrderDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="payment" property="payment" jdbcType="DECIMAL" />
+		<result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+		<result column="receive_phone" property="receivePhone" jdbcType="VARCHAR" />
+		<collection ofType="com.zm.order.pojo.OrderGoodsDTO" property="orderGoodsList">
+			<id column="goods_id" property="id" jdbcType="INTEGER" />
+			<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
+			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
+			<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoDTO" id="eShopSellOrderBase">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
+		<result column="tdq" property="tdq" jdbcType="INTEGER" />
+		<result column="pay_type" property="payType" jdbcType="INTEGER" />
+		<result column="payment" property="payment" jdbcType="DECIMAL" />
+		<result column="actual_payment" property="actualPayment" jdbcType="DECIMAL" />
+		<result column="gross_profit" property="grossProfit" jdbcType="DECIMAL" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoDTO" id="eShopSellOrderDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="mall_id" property="centerId" jdbcType="INTEGER" />
+		<result column="grade_id" property="shopId" jdbcType="INTEGER" />
+		<result column="tdq" property="tdq" jdbcType="INTEGER" />
+		<result column="pay_type" property="payType" jdbcType="INTEGER" />
+		<result column="payment" property="payment" jdbcType="DECIMAL" />
+		<result column="actual_payment" property="actualPayment" jdbcType="DECIMAL" />
+		<result column="gross_profit" property="grossProfit" jdbcType="DECIMAL" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<collection ofType="com.zm.order.pojo.OrderGoodsDTO" property="orderGoodsList">
+			<id column="goods_id" property="id" jdbcType="INTEGER" />
+			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+			<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+			<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+			<result column="encode" property="encode" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
+			<result column="proxy_price" property="itemPrice" jdbcType="DECIMAL" />
+			<result column="retail_price" property="actualPrice" jdbcType="DECIMAL" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderGoodsDTO" id="eShopSellOrderGoodsCount">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+		<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+		<result column="encode" property="encode" jdbcType="VARCHAR" />
+		<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="userOrderListByParam" parameterType="Object" resultMap="eShopOrderBase">
+		select ob.order_id,ob.status,ob.create_time,od.payment,od.receive_name,od.receive_phone
+		from zm_order.order_base ob
+		left join zm_order.order_detail od on ob.order_id = od.order_id
+		where ob.is_del = '0'
+		<if test="info.mallId != null and info.mallId != ''">
+			and ob.mall_id = #{info.mallId}
+		</if>
+		<if test="info.gradeId != null and info.gradeId != ''">
+			and ob.grade_id = #{info.gradeId}
+		</if>
+		<if test="info.orderId != null and info.orderId != ''">
+			and ob.order_id = #{info.orderId}
+		</if>
+		<if test="info.status != null and info.status != ''">
+			and ob.status = #{info.status}
+		</if>
+		<if test="info.receiveName != null and info.receiveName != ''">
+			and od.receive_name = #{info.receiveName}
+		</if>
+		<if test="info.receivePhone != null and info.receivePhone != ''">
+			and od.receive_phone = #{info.receivePhone}
+		</if>
+		<if test="info.isEshopIn != null and info.isEshopIn != ''">
+			and ob.is_eshop_in = #{info.isEshopIn}
+		</if>
+		order by ob.order_id desc
+	</select>
+	
+	<select id="userOrderDetailByParam" parameterType="Object" resultMap="eShopOrderDetail">
+		select ob.order_id,ob.status,ob.create_time,od.payment,od.receive_name,od.receive_phone,
+		og.id as goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price
+		from zm_order.order_base ob
+		left join zm_order.order_detail od on ob.order_id = od.order_id
+		left join zm_order.order_goods og on ob.order_id = og.order_id
+		where ob.is_del = '0'
+		<if test="info.mallId != null and info.mallId != ''">
+			and ob.mall_id = #{info.mallId}
+		</if>
+		<if test="info.gradeId != null and info.gradeId != ''">
+			and ob.grade_id = #{info.gradeId}
+		</if>
+		<if test="info.orderId != null and info.orderId != ''">
+			and ob.order_id = #{info.orderId}
+		</if>
+		order by goods_id asc
+	</select>
+	
+	<update id="updateOrderBaseEshopIn" parameterType="Object">
+		update order_base 
+		set is_eshop_in = #{isEshopIn}
+		where mall_id = #{mallId} 
+		and grade_id = #{gradeId} 
+		and order_id = #{orderId}
+	</update>
+	
+	<insert id="insertSellOrder" parameterType="Object">
+		INSERT IGNORE INTO
+		eshop_sell_order
+		(order_id,status,mall_id,grade_id,tdq,pay_type,payment,create_time,update_time,opt)
+		VALUES
+		(#{orderId},#{status},#{mallId},#{gradeId},#{tdq},#{payType},#{payment},now(),now(),#{item.opt})
+	</insert>
+	
+	<insert id="insertSellOrderDetail" parameterType="Object">
+		INSERT IGNORE INTO
+		eshop_sell_order_detail
+		(order_id,item_id,item_name,item_img,encode,item_quantity,proxy_price,retail_price,create_time,update_time,opt)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.orderId},#{item.itemId},#{item.itemName},#{item.itemImg},#{item.encode},
+			#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
+	<update id="updateSellOrder" parameterType="Object">
+		update eshop_sell_order 
+		set update_time = now(),status = #{status},pay_type = #{payType},
+		actual_payment = #{actualPayment},gross_profit = #{grossProfit},opt=#{opt}
+		where mall_id = #{mallId} 
+		and grade_id = #{gradeId} 
+		and order_id = #{orderId}
+	</update>
+	
+	<select id="sellOrderListByParam" parameterType="Object" resultMap="eShopSellOrderBase">
+		select *
+		from zm_order.eshop_sell_order
+		where mall_id = #{info.mallId} 
+		and grade_id = #{info.gradeId} 
+		<if test="info.orderId != null and info.orderId != ''">
+			and order_id = #{info.orderId}
+		</if>
+		<if test="info.status != null and info.status != ''">
+			and status = #{info.status}
+		</if>
+		order by ob.order_id desc
+	</select>
+	
+	<select id="sellOrderDetailByParam" parameterType="Object" resultMap="eShopSellOrderDetail">
+		select eso.id,eso.order_id,eso.status,eso.mall_id,
+		eso.grade_id,eso.tdq,eso.pay_type,eso.payment,
+		eso.actual_payment,eso.gross_profit,eso.create_time,eso.opt,
+		esod.id as goods_id,esod.item_id,esod.item_name,esod.item_img,
+		esod.encode,esod.item_quantity,esod.proxy_price,esod.retail_price
+		from zm_order.eshop_sell_order eso
+		left join zm_order.eshop_sell_order_detail esod on eso.order_id = esod.order_id
+		where eso.mall_id = #{info.mallId} 
+		and eso.grade_id = #{info.gradeId} 
+		<if test="info.orderId != null and info.orderId != ''">
+			and ob.order_id = #{info.orderId}
+		</if>
+		order by goods_id asc
+	</select>
+	
+	<select id="selectSellOrderCountInfo" parameterType="Object" resultMap="eShopSellOrderBase">
+		SELECT count(order_id) tdq,sum(payment) payment,
+		sum(actual_payment) actual_payment,sum(gross_profit) gross_profit
+		FROM zm_order.eshop_sell_order 
+		where mall_id = #{info.mallId} 
+		and grade_id = #{info.gradeId} 
+		<if test="info.searchDateType != null and info.searchDateType == '1'">
+			and DATE_FORMAT(create_time, '%Y-%m-%d') = #{startTime}
+		</if>
+		<if test="info.searchDateType != null and info.searchDateType != '1'">
+			and create_time between #{startTime} and #{endTime}
+		</if>
+	</select>
+	
+	<select id="selectSellOrderGoodsCountInfo" parameterType="Object" resultMap="eShopSellOrderGoodsCount">
+		SELECT esod.id,esod.item_id,esod.item_name,esod.item_img,
+		esod.encode,sum(esod.item_quantity) item_quantity
+		FROM zm_order.eshop_sell_order eso
+		LEFT JOIN zm_order.eshop_sell_order_detail esod on eso.order_id = esod.order_id
+		where eso.mall_id = #{info.mallId} 
+		and eso.grade_id = #{info.gradeId} 
+		<if test="info.searchDateType != null and info.searchDateType == '1'">
+			and DATE_FORMAT(eso.create_time, '%Y-%m-%d') = #{startTime}
+		</if>
+		<if test="info.searchDateType != null and info.searchDateType != '1'">
+			and eso.create_time between #{startTime} and #{endTime}
+		</if>
+		group by esod.item_id
+		order by item_quantity desc
+	</select>
+</mapper>

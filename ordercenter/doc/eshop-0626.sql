@@ -1,6 +1,6 @@
 use zm_order;
 
-alter table order_base add column is_eshop_in tinyint unsigned default 0 comment '是否eshop入库，0否;1是';
+alter table order_base add column is_eshop_in tinyint unsigned default 0 comment '是否eshop入库，0未操作/撤销;1进货;2入库';
 
 drop table if exists  `eshop_sell_order`;
 
@@ -34,6 +34,8 @@ CREATE TABLE `zm_order`.`eshop_sell_order_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `order_id` VARCHAR(50) NOT NULL COMMENT '订单编号',
   `item_id` VARCHAR(100) NOT NULL,
+  `item_name` VARCHAR(100) NOT NULL COMMENT '商品名称',
+  `item_img` VARCHAR(200) NULL COMMENT '商品图片',
   `encode` VARCHAR(100) NULL,
   `item_quantity` INT UNSIGNED NOT NULL,
   `proxy_price` decimal(10,2) NULL DEFAULT 0.0 COMMENT '成本价格',

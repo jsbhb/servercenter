@@ -78,6 +78,21 @@ public class CommonUtils {
         }  
   
         return obj;  
-    }    
+    }   
+	
+	public static String getEshopSellOrderId(String orderFlag){
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMATE);
+		DecimalFormat df2=(DecimalFormat) DecimalFormat.getInstance();
+		df2.applyPattern(DECIMAL_FORMAT);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("Sell");
+		sb.append(orderFlag);
+		sb.append(sdf.format(now));
+		sb.append(df2.format(poll()));
+		
+		return sb.toString();
+	} 
     
 }
