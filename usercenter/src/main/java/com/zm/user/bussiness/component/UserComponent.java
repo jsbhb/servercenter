@@ -33,17 +33,17 @@ public class UserComponent {
 		return null;
 	}
 	
-	public String getUrl(Integer gradeId){
+	public Grade getUrl(Integer gradeId){
 		if(gradeId != null){
 			List<Grade> list = gradeMapper.listParentGradeById(gradeId);
 			if(list != null && list.size() > 0){
 				for(Grade grade : list){
 					if(grade.getGradeType() == 2){
-						return gradeFrontMapper.getClientUrlById(grade.getId());
+						return gradeFrontMapper.getGradeUrl(grade.getId());
 					}
 				}
 			}
 		}
-		return gradeFrontMapper.getClientUrlById(2);
+		return gradeFrontMapper.getGradeUrl(2);
 	}
 }

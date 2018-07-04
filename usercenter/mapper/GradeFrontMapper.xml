@@ -9,6 +9,12 @@
 		<result column="head_img" property="headImg" jdbcType="VARCHAR" />
 	</resultMap>
 	
+	<resultMap type="com.zm.user.pojo.Grade" id="grade">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
+		<result column="mobile_url" property="mobileUrl" jdbcType="VARCHAR" />
+	</resultMap>
+	
 	
 	<select id="getGradeConfig" parameterType="Object" resultMap="gradeConfig">
 		select id,grade_id,aboutus,head_img,name from grade_config where grade_id = #{gradeId}
@@ -20,6 +26,10 @@
 
 	<select id="getMobileUrl" parameterType="Object" resultType="java.lang.String">
 		select mobile_url from grade where id = #{id}
+	</select>
+	
+	<select id="getGradeUrl" parameterType="Object" resultMap="grade">
+		select id,redirect_url,mobile_url from grade where id = #{id}
 	</select>
 
 </mapper>

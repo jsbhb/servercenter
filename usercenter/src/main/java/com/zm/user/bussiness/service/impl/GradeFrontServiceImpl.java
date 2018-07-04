@@ -8,6 +8,7 @@ import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeFrontMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.GradeFrontService;
+import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.GradeConfig;
 import com.zm.user.pojo.UserInfo;
 
@@ -35,7 +36,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 			if(config == null){
 				config = new GradeConfig();
 			}
-			config.setUrl(userComponent.getUrl(shopId));
+			Grade grade = userComponent.getUrl(shopId);
+			config.setUrl(grade.getRedirectUrl());
+			config.setMobileUrl(grade.getMobileUrl());
 			return config;
 		}
 		if(userId != null){
@@ -50,7 +53,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 			if(config == null){
 				config = new GradeConfig();
 			}
-			config.setUrl(userComponent.getUrl(user.getShopId()));
+			Grade grade = userComponent.getUrl(shopId);
+			config.setUrl(grade.getRedirectUrl());
+			config.setMobileUrl(grade.getMobileUrl());
 			return config;
 		}
 		return null;
