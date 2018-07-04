@@ -30,6 +30,7 @@ import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
+import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PopularizeDict;
@@ -293,15 +294,6 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		map.put("tax", taxMap);
 
-		if (supplierId != null) {
-			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
-		}
-
-		result = processWarehouse.processWarehouse(orderFlag, list);
-		if (!result.isSuccess()) {
-			return result;
-		}
-
 		map.put("weight", weight);
 		map.put("totalAmount", totalAmount);
 		result.setSuccess(true);
@@ -448,13 +440,29 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void renderLuceneModel(Map<String, Object> param, List<GoodsSearch> searchList, Integer id) {
-		GoodsSearch searchModel;
+		if (param.get("list") == null) {
+			throw new RuntimeException("没有获取到商品编号对应的GOODS_ID");
+		}
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
 		List<String> goodsIds = new ArrayList<String>();
+		//封装新建lucene索引的数据searchList
+		createNewLucenIndex(param, searchList, itemList, goodsIds);
+		//更新lucene索引的tag
+		List<String> totalGoodsId = (List<String>) param.get("list");
+		AbstractLucene lucene = LuceneFactory.get(id);
+		lucene.writerIndex(searchList);
+		goodsMapper.updateGoodsUpShelves(param);
+	}
+
+	private void createNewLucenIndex(Map<String, Object> param, List<GoodsSearch> searchList, List<GoodsItem> itemList,
+			List<String> goodsIds) {
+		GoodsSearch searchModel;
+		List<GoodsSpecs> tempList;
 		Map<String, GoodsSearch> temp = new HashMap<String, GoodsSearch>();
 		Map<String, List<GoodsSpecs>> tempSpecs = new HashMap<String, List<GoodsSpecs>>();
-		List<GoodsSpecs> tempList = null;
+		StringBuilder sb = new StringBuilder();
 		if (itemList != null && itemList.size() > 0) {
 			Map<String, Double> result = null;
 			for (GoodsItem item : itemList) {
@@ -488,13 +496,20 @@ public class GoodsServiceImpl implements GoodsService {
 				tempList = tempSpecs.get(entry.getKey());
 				if (tempList != null && tempList.size() > 0) {
 					result = GoodsServiceUtil.getMinPrice(tempList);
+					sb.delete(0, sb.length());
+					for (GoodsSpecs specs : tempList) {
+						if (specs.getTagList() != null && specs.getTagList().size() > 0) {
+							for (GoodsTagEntity entity : specs.getTagList()) {
+								sb.append(entity.getTagName());
+								sb.append(",");
+							}
+						}
+					}
 					entry.getValue().setPrice(result.get("realPrice"));
+					entry.getValue().setTag(sb.substring(0, sb.length() - 1));
 				}
 			}
 		}
-		AbstractLucene lucene = LuceneFactory.get(id);
-		lucene.writerIndex(searchList);
-		goodsMapper.updateGoodsUpShelves(param);
 	}
 
 	private final String GOODS_LIST = "goodsList";
@@ -1005,7 +1020,7 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 
-		if (supplierId != null && Constants.O2O_ORDER.equals(orderFlag)) {
+		if (supplierId != null) {
 			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 		}
 
@@ -1029,6 +1044,14 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
+
+		supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
+
+		return processWarehouse.processWarehouse(orderFlag, list);
 	}
 
 }

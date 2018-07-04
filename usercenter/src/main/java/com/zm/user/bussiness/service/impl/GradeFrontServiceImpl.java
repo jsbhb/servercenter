@@ -32,6 +32,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 				return null;
 			}
 			config = gradeFrontMapper.getGradeConfig(shopId);
+			if(config == null){
+				config = new GradeConfig();
+			}
 			config.setUrl(userComponent.getUrl(shopId));
 			return config;
 		}
@@ -44,6 +47,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 				return null;
 			}
 			config = gradeFrontMapper.getGradeConfig(user.getShopId());
+			if(config == null){
+				config = new GradeConfig();
+			}
 			config.setUrl(userComponent.getUrl(user.getShopId()));
 			return config;
 		}

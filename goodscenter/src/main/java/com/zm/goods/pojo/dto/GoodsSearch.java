@@ -1,41 +1,67 @@
 package com.zm.goods.pojo.dto;
 
+import com.zm.goods.annotation.SearchCondition;
+
 public class GoodsSearch {
-	
+
 	private String goodsId;
 
 	private Integer centerId;
 	
+	@SearchCondition(value = SearchCondition.FILTER)
 	private String specs;
-	
+
+	@SearchCondition(value = SearchCondition.SEARCH)
 	private String goodsName;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
 	private String brand;
-	
+
+	@SearchCondition(value = SearchCondition.SEARCH)
 	private String upShelves;
+
 	
 	private Double price;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
 	private String createTime;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
 	private String origin;
-	
+
 	private Integer status;
-	
+
 	private Integer popular;
-	
+
+	@SearchCondition(value = SearchCondition.SEARCH)
 	private String thirdCategory;
-	
+
+	@SearchCondition(value = SearchCondition.SEARCH)
 	private String secondCategory;
-	
+
+	@SearchCondition(value = SearchCondition.SEARCH)
 	private String firstCategory;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
 	private String priceMin;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
 	private String priceMax;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
 	private Integer type;
-	
+
+	@SearchCondition(value = SearchCondition.FILTER)
+	private String tag;
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
 	public Integer getType() {
 		return type;
 	}
@@ -177,5 +203,5 @@ public class GoodsSearch {
 		return "GoodsSearch [goodsId=" + goodsId + ", price=" + price + ", priceMin=" + priceMin + ", priceMax="
 				+ priceMax + ", type=" + type + "]";
 	}
-	
+
 }

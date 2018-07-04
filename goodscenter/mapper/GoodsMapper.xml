@@ -89,6 +89,10 @@
 				jdbcType="VARCHAR" />
 			<result column="sub_opt" property="opt" jdbcType="VARCHAR" />
 		</collection>
+		<collection property="tagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
+			<id column="tag_id" property="id" jdbcType="INTEGER" />
+			<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+		</collection>
 	</resultMap>
 
 	<resultMap type="com.zm.goods.pojo.PriceContrast" id="priceConstrast">
@@ -194,6 +198,7 @@
 		<id column="id" property="firstId" jdbcType="INTEGER" />
 		<result column="first_id" property="id" jdbcType="VARCHAR" />
 		<result column="industryName" property="industryName" jdbcType="VARCHAR" />
+		<result column="tag_path" property="tagPath" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.goods.pojo.vo.GoodsCategoryModel" property="dictList">
 			<id column="dictid" property="secondId" jdbcType="INTEGER" />
 			<result column="second_id" property="id" jdbcType="VARCHAR" />
@@ -202,6 +207,7 @@
 				<id column="entryId" property="thirdId" jdbcType="INTEGER" />
 				<result column="third_id" property="id" jdbcType="VARCHAR" />
 				<result column="entryName" property="entryName" jdbcType="VARCHAR" />
+				<result column="is_popular" property="popular" jdbcType="INTEGER" />
 			</collection>
 		</collection>
 	</resultMap>
@@ -242,8 +248,8 @@
 	</select>
 	
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
-		select gfc.id,gfc.first_id,gfc.name as industryName,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
-		gtc.id as entryId,gtc.name as entryName,gtc.third_id  
+		select gfc.id,gfc.first_id,gfc.name as industryName,gfc.tag_path,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
+		gtc.id as entryId,gtc.name as entryName,gtc.third_id,gtc.is_popular   
 		from goods_first_category gfc left join goods_second_category gsc on gfc.first_id = gsc.first_id 
 		left join goods_third_category gtc on gsc.second_id = gtc.second_id 
 		where gfc.status = 1 and gsc.status =1 and gtc.status =1 order by gfc.sort ,gsc.sort ,gtc.sort
@@ -750,7 +756,8 @@
 	</select> 
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
-		select gs.id,gi.goods_id,gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount from goods_item${centerId} gs left join
+		select gs.id,gi.goods_id,gi.info,bgp.id as price_id, bgp.retail_price as price, gs.discount,gt.id as tag_id,gt.tag_name 
+		from goods_item${centerId} gs left join
 		<if test="centerId == '_2B'">
 			goods_price${centerId} bgp
 		</if>
@@ -758,7 +765,9 @@
 			goods_price bgp
 		</if>
 		on
-		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id where gi.is_del = 0 and gs.goods_id in
+		gs.item_id = bgp.item_id left join goods_item gi on gs.item_id = gi.item_id left join 
+		goods_tag_bind gtb on gs.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
+		where gi.is_del = 0 and gs.goods_id in
 		<foreach collection="goodsIds" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>

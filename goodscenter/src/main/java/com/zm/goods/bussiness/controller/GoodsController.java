@@ -197,9 +197,9 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			// Map<String, Object> resultMap = goodsService.listGoodsSpecs(list,
-			// centerId, source);
-			Map<String, Object> resultMap = goodsTagDecorator.listGoodsSpecs(list, centerId, source);
+			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
+			// Map<String, Object> resultMap =
+			// goodsTagDecorator.listGoodsSpecs(list, centerId, source);
 
 			result.setSuccess(true);
 			result.setObj(resultMap);
@@ -570,7 +570,7 @@ public class GoodsController {
 			String[] arr = itemId.split(",");
 			List<String> itemIdList = Arrays.asList(arr);
 			ResultModel result = goodsService.downShelves(itemIdList, centerId);
-			if(result.isSuccess()){//下架删除商品
+			if (result.isSuccess()) {// 下架删除商品
 				result = seoService.delPublish(itemIdList);
 			}
 			return result;
@@ -657,6 +657,17 @@ public class GoodsController {
 				return null;
 			}
 			return goodsService.listSkuAndConversionByItemId(set);
+		}
+
+		return null;
+	}
+
+	@RequestMapping(value = "{version}/goods/cal-stock", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel calStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
+			Integer supplierId, Integer orderFlag) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.calStock(list,supplierId,orderFlag);
 		}
 
 		return null;

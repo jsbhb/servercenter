@@ -185,7 +185,7 @@ public abstract class AbstractLucene {
 	 * @param param
 	 * @since JDK 1.7
 	 */
-	public abstract void updateIndex(Map<String, String> param);
+	public abstract <T> void updateIndex(List<T> objList);
 
 	/**
 	 * 

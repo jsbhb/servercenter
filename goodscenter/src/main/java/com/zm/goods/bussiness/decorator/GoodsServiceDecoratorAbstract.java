@@ -9,7 +9,6 @@ import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
-import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PriceContrast;
@@ -178,6 +177,11 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	
 	@Override
 	public Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set){
+		return null;
+	}
+	
+	@Override
+	public ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag){
 		return null;
 	}
 

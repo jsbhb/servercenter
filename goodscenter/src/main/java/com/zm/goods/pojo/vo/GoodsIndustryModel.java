@@ -15,7 +15,17 @@ public class GoodsIndustryModel {
 	
 	private String industryName;
 	
+	private String tagPath;
+	
 	private List<GoodsCategoryModel> dictList;
+
+	public String getTagPath() {
+		return tagPath;
+	}
+
+	public void setTagPath(String tagPath) {
+		this.tagPath = tagPath;
+	}
 
 	public Integer getFirstId() {
 		return firstId;

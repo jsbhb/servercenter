@@ -28,7 +28,7 @@ import com.zm.order.pojo.UserInfo;
 import com.zm.order.utils.JSONUtil;
 
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService {
 
 	@Resource
@@ -39,16 +39,16 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 
 	@Resource
 	OrderMapper orderMapper;
-	
+
 	@Resource
 	OrderOpenInterfaceMapper orderOpenInterfaceMapper;
-	
+
 	@Resource
 	ShareProfitComponent shareProfitComponent;
 
 	@Override
 	public ResultModel addOrder(String order) {
-		
+
 		ButtJointOrder orderInfo = null;
 		try {
 			orderInfo = JSONUtil.parse(order, ButtJointOrder.class);
@@ -81,14 +81,15 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			model.setSku(goods.getSku());
 			list.add(model);
 		}
-		// 判断库存和购买数量
-		resultModel = goodsFeignClient.delButtjoinOrderStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
-				orderInfo.getOrderFlag());
+
+		UserInfo user = OpenInterfaceUtil.packUser(orderInfo);
+		resultModel = userFeignClient.registerUser(Constants.FIRST_VERSION, user, "erp");
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
-		UserInfo user = OpenInterfaceUtil.packUser(orderInfo);
-		resultModel = userFeignClient.registerUser(Constants.FIRST_VERSION, user, "erp");
+		// 判断库存和购买数量
+		resultModel = goodsFeignClient.delButtjoinOrderStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
+				orderInfo.getOrderFlag());
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
@@ -104,15 +105,15 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		}
 		orderMapper.saveOrderGoods(orderInfo.getOrderGoodsList());
 
-		shareProfitComponent.calShareProfitStayToAccount(orderInfo.getOrderId());//计算资金池和返佣
+		shareProfitComponent.calShareProfitStayToAccount(orderInfo.getOrderId());// 计算资金池和返佣
 		return new ResultModel(true, null);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel getOrderStatus(String json) {
-		
-		Map<String,String> param = null;
+
+		Map<String, String> param = null;
 		try {
 			param = JSONUtil.parse(json, Map.class);
 		} catch (Exception e) {
@@ -121,16 +122,16 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
 		}
 		String orderId = param.get("orderId");
-		if(orderId == null){
+		if (orderId == null) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
 		OrderStatus orderStatus = orderOpenInterfaceMapper.getOrderStatus(orderId);
-		if(orderStatus == null){
+		if (orderStatus == null) {
 			return new ResultModel(false, ErrorCodeEnum.NO_DATA_ERROR.getErrorCode(),
 					ErrorCodeEnum.NO_DATA_ERROR.getErrorMsg());
 		}
-		if(!Constants.ORDER_EXCEPTION.equals(orderStatus.getStatus())){
+		if (!Constants.ORDER_EXCEPTION.equals(orderStatus.getStatus())) {
 			orderStatus.setAbnormalMsg(null);
 		}
 		return new ResultModel(true, orderStatus);
@@ -139,7 +140,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel payCustom(String data) {
-		Map<String,String> param = null;
+		Map<String, String> param = null;
 		try {
 			param = JSONUtil.parse(data, Map.class);
 		} catch (Exception e) {
@@ -148,11 +149,11 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
 		}
 		String orderId = param.get("orderId");
-		if(orderId == null){
+		if (orderId == null) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
-		
+
 		orderOpenInterfaceMapper.updateOrderPayCustom(orderId);
 		return new ResultModel(true, null);
 	}

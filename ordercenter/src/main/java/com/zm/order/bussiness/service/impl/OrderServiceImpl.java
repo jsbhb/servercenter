@@ -132,6 +132,12 @@ public class OrderServiceImpl implements OrderService {
 				return result;
 			}
 		}
+		
+		if(info.getOrderFlag().equals(Constants.GENERAL_TRADE)  && info.getOrderDetail().getPayment() < 800){
+			result.setSuccess(false);
+			result.setErrorMsg("一般贸易订单起订额需要大于800元");
+			return result;
+		}
 
 		String openId = null;
 		if (Constants.WX_PAY.equals(payType)) {
@@ -301,7 +307,12 @@ public class OrderServiceImpl implements OrderService {
 				info.setPushUserId(null);
 			}
 		}
-
+		
+		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(), info.getOrderFlag());
+		if (!temp.isSuccess()) {
+			return temp;
+		}
+		
 		info.setOrderId(orderId);
 		info.setWeight(weight);
 		info.getOrderDetail().setOrderId(orderId);

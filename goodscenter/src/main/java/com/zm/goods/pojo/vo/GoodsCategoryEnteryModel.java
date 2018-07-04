@@ -13,6 +13,16 @@ public class GoodsCategoryEnteryModel {
 	
 	private String entryName;
 	
+	private Integer popular;
+	
+	public Integer getPopular() {
+		return popular;
+	}
+
+	public void setPopular(Integer popular) {
+		this.popular = popular;
+	}
+
 	public Integer getThirdId() {
 		return thirdId;
 	}

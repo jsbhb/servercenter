@@ -42,6 +42,7 @@ import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.util.BytesRef;
 
+import com.zm.goods.annotation.SearchCondition;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.base.SortModel;
 import com.zm.goods.pojo.base.SortModelList;
@@ -94,6 +95,7 @@ public class GoodsLucene extends AbstractLucene {
 			doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
 			doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
 					Store.NO));
+			doc.add(new StringField("tag", model.getTag() == null ? "" : model.getTag(), Store.NO));
 			try {
 				time = DateUtil.stringToLong(model.getCreateTime(), dateFormat);
 			} catch (ParseException e) {
@@ -114,31 +116,62 @@ public class GoodsLucene extends AbstractLucene {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public void updateIndex(Map<String, String> param) {
-		Document doc = new Document();
+	public <T> void updateIndex(List<T> objList) {
+		Document doc = null;
+		Object o = null;
+		if (objList == null || objList.size() == 0) {
+			return;
+		}
+		String goodsId = null;
+		for (Object obj : objList) {
+			doc = new Document();
+			Class clazz = obj.getClass();
+			Field[] fields = clazz.getDeclaredFields();
+			for (Field field : fields) {
+				PropertyDescriptor pd = null;
+				try {
+					pd = new PropertyDescriptor(field.getName(), clazz);
+				} catch (IntrospectionException e) {
+					e.printStackTrace();
+				}
+				SearchCondition searchCondition = field.getAnnotation(SearchCondition.class);
+				if (searchCondition == null) {
+					continue;
+				}
+				Method getMethod = pd.getReadMethod();// 获得get方法
+				try {
+					o = getMethod.invoke(obj);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
 
-		for (Map.Entry<String, String> entry : param.entrySet()) {
-			if ("goodsName".equals(entry.getKey())) {
-				TextField commodityName = new TextField("goodsName", entry.getValue() == null ? "" : entry.getValue(),
-						Store.YES);
-				doc.add(commodityName);
-			} else if ("specs".equals(entry.getKey()) || "brand".equals(entry.getKey())
-					|| "origin".equals(entry.getKey())) {
-				doc.add(new StringField(entry.getKey(), entry.getValue() == null ? "" : entry.getValue() + "",
-						Store.YES));
-			} else {
-				doc.add(new StringField(entry.getKey(), entry.getValue() == null ? "" : entry.getValue() + "",
-						Store.NO));
+				if (o != null) {
+					if ("goodsName".equals(field.getName())) {
+						TextField commodityName = new TextField(field.getName(), o.toString(), Store.YES);
+						doc.add(commodityName);
+					} else if ("specs".equals(field.getName()) || "brand".equals(field.getName())
+							|| "origin".equals(field.getName())) {
+						doc.add(new StringField(field.getName(), o.toString(), Store.YES));
+					} else if ("goodsId".equals(field.getName())) {
+						goodsId = o.toString();
+					} else {
+						doc.add(new StringField(field.getName(), o.toString(), Store.NO));
+					}
+				}
+			}
+			try {
+				indexWriter.updateDocument(new Term("goodsId", goodsId), doc);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		try {
-			indexWriter.updateDocument(new Term("goodsId", param.get("goodsId")), doc);
 			indexWriter.commit();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
@@ -201,6 +234,10 @@ public class GoodsLucene extends AbstractLucene {
 			} catch (IntrospectionException e) {
 				e.printStackTrace();
 			}
+			SearchCondition searchCondition = field.getAnnotation(SearchCondition.class);
+			if (searchCondition == null) {
+				continue;
+			}
 			Method getMethod = pd.getReadMethod();// 获得get方法
 			try {
 				o = getMethod.invoke(commodityInfo);
@@ -208,11 +245,9 @@ public class GoodsLucene extends AbstractLucene {
 				e.printStackTrace();
 			}
 			if (o != null) {
-				if ("brand".equals(field.getName()) || "origin".equals(field.getName())
-						|| "priceMin".equals(field.getName()) || "priceMax".equals(field.getName())
-						|| "type".equals(field.getName())) {
+				if (SearchCondition.FILTER == searchCondition.value()) {
 					accuratePara.put(field.getName(), o + "");
-				} else if (!"centerId".equals(field.getName())) {
+				} else if (SearchCondition.SEARCH == searchCondition.value()) {
 					keyWordsList.add(o + "");
 					filedsList.add(field.getName());
 				}

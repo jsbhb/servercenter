@@ -57,4 +57,8 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
 	public com.zm.order.common.ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
 			@RequestBody List<GoodsItemBO> set);
+	
+	@RequestMapping(value = "{version}/goods/cal-stock", method = RequestMethod.POST)
+	public ResultModel calStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
+			@RequestParam("supplierId")Integer supplierId, @RequestParam("orderFlag")Integer orderFlag);
 }
