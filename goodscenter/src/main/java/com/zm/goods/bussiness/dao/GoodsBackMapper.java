@@ -308,4 +308,6 @@ public interface GoodsBackMapper {
 	List<String> listGoodsIdsByItemCode(String itemCode);
 
 	void insertBatch(List<GoodsEntity> goodsList);
+
+	void insertTagBindList(List<ERPGoodsTagBindEntity> entityList);
 }

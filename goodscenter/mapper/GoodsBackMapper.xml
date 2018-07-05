@@ -452,4 +452,11 @@
 	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">
 		select goods_id from goods_item where item_code = #{itemCode} and is_del = 0
 	</select>
+	
+	<insert id="insertTagBindList" parameterType="Object">
+		insert into goods_tag_bind (item_id,tag_id,create_time,update_time,opt) value
+		<foreach collection="list" item="item" separator=",">
+			(#{item.itemId},#{item.tagId},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
 </mapper>

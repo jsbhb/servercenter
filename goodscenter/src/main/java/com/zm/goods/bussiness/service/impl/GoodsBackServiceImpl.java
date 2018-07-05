@@ -301,8 +301,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
 		}
-		if (entity.getGoods().getGoodsTagBind() != null) {
-			goodsBackMapper.insertTagBind(entity.getGoods().getGoodsTagBind());
+		if (entity.getGoods().getGoodsTagBindList() != null) {
+			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
 		}
 		return new ResultModel(true, "");
 	}
