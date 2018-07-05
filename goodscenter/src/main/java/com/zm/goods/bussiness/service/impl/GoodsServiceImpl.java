@@ -449,7 +449,7 @@ public class GoodsServiceImpl implements GoodsService {
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
 		List<String> goodsIds = new ArrayList<String>();
 		// 封装新建lucene索引的数据searchList
-		createNewLucenIndex(param, searchList, itemList, goodsIds);
+		createNewLucenIndex(param, searchList, itemList, goodsIds,itemIdList);
 		// 更新lucene索引的tag
 		List<String> totalGoodsId = (List<String>) param.get("list");
 		AbstractLucene lucene = LuceneFactory.get(id);
@@ -473,11 +473,24 @@ public class GoodsServiceImpl implements GoodsService {
 			GoodsSearch search = null;
 			StringBuilder sb = new StringBuilder();
 			List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
+			Map<String, Double> result = null;
 			for(GoodsItem item : itemList){
-				sb.delete(0, sb.length());
+				sb.delete(0, sb.length()); 
 				search = new GoodsSearch();
 				search.setGoodsId(item.getGoodsId());
+				search.setBrand(item.getBrand());
+				search.setStatus(item.getStatus());
+				search.setOrigin(item.getOrigin());
+				search.setFirstCategory(item.getFirstCategory());
+				search.setThirdCategory(item.getThirdCategory());
+				search.setSecondCategory(item.getSecondCategory());
+				search.setGoodsName(item.getCustomGoodsName());
+				search.setPopular(item.getPopular());
+				search.setType(item.getType());
+				search.setCreateTime(item.getCreateTime());
 				if(item.getGoodsSpecsList() != null){
+					result = GoodsServiceUtil.getMinPrice(item.getGoodsSpecsList());
+					search.setPrice(result.get("realPrice"));
 					for(GoodsSpecs specs : item.getGoodsSpecsList()){
 						if(specs.getTagList() != null){
 							for(GoodsTagEntity entity : specs.getTagList()){
@@ -582,7 +595,7 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	private void createNewLucenIndex(Map<String, Object> param, List<GoodsSearch> searchList, List<GoodsItem> itemList,
-			List<String> goodsIds) {
+			List<String> goodsIds, List<String> itemIds) {
 		GoodsSearch searchModel;
 		List<GoodsSpecs> tempList;
 		Map<String, GoodsSearch> temp = new HashMap<String, GoodsSearch>();
@@ -602,11 +615,13 @@ public class GoodsServiceImpl implements GoodsService {
 				searchModel.setGoodsName(item.getCustomGoodsName());
 				searchModel.setPopular(item.getPopular());
 				searchModel.setType(item.getType());
+				searchModel.setCreateTime(item.getCreateTime());
 				goodsIds.add(item.getGoodsId());
 				temp.put(item.getGoodsId(), searchModel);
 				searchList.add(searchModel);
 			}
 			param.put("goodsIds", goodsIds);
+			param.put("itemIds", itemIds);
 			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 			for (GoodsSpecs specs : specsList) {
 				if (tempSpecs.get(specs.getGoodsId()) == null) {

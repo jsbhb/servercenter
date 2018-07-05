@@ -68,40 +68,10 @@ public class GoodsLucene extends AbstractLucene {
 	@Override
 	public <T> void writerIndex(List<T> objList) {
 		Document doc;
-		long time = 0;
 		DecimalFormat df2 = (DecimalFormat) DecimalFormat.getInstance();
 		df2.applyPattern(decimalFormat);
 		for (Object obj : objList) {
-
-			GoodsSearch model = (GoodsSearch) obj;
-
-			doc = new Document();
-			doc.add(new StringField("goodsId", model.getGoodsId(), Store.YES));
-
-			// 商品名称设置权重
-			TextField commodityName = new TextField("goodsName",
-					model.getGoodsName() == null ? "" : model.getGoodsName(), Store.YES);
-			doc.add(commodityName);
-
-			doc.add(new TextField("specs", model.getSpecs() == null ? "" : model.getSpecs(), Store.YES));
-
-			doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
-			doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
-			doc.add(new StringField("type", model.getType() == null ? "0" : model.getType() + "", Store.NO));
-			doc.add(new StringField("upShelves", "1", Store.NO));
-			doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
-			doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
-			doc.add(new StringField("thirdCategory", model.getThirdCategory().trim(), Store.NO));
-			doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
-			doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
-					Store.NO));
-			doc.add(new StringField("tag", model.getTag() == null ? "" : model.getTag(), Store.NO));
-			try {
-				time = DateUtil.stringToLong(model.getCreateTime(), dateFormat);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			doc.add(new LongField("createTime", time, Store.NO));
+			doc = packDocument(df2, obj);
 			try {
 				indexWriter.addDocument(doc);
 			} catch (IOException e) {
@@ -116,51 +86,54 @@ public class GoodsLucene extends AbstractLucene {
 
 	}
 
-	@SuppressWarnings("rawtypes")
+	private Document packDocument(DecimalFormat df2, Object obj) {
+		Document doc;
+		long time = 0;
+		GoodsSearch model = (GoodsSearch) obj;
+
+		doc = new Document();
+		doc.add(new StringField("goodsId", model.getGoodsId(), Store.YES));
+
+		// 商品名称设置权重
+		TextField commodityName = new TextField("goodsName",
+				model.getGoodsName() == null ? "" : model.getGoodsName(), Store.YES);
+		doc.add(commodityName);
+
+		doc.add(new TextField("specs", model.getSpecs() == null ? "" : model.getSpecs(), Store.YES));
+
+		doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
+		doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
+		doc.add(new StringField("type", model.getType() == null ? "0" : model.getType() + "", Store.NO));
+		doc.add(new StringField("upShelves", "1", Store.NO));
+		doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
+		doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
+		doc.add(new StringField("thirdCategory", model.getThirdCategory().trim(), Store.NO));
+		doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
+		doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
+				Store.NO));
+		doc.add(new StringField("tag", model.getTag() == null ? "" : model.getTag(), Store.NO));
+		try {
+			time = DateUtil.stringToLong(model.getCreateTime(), dateFormat);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		doc.add(new LongField("createTime", time, Store.NO));
+		return doc;
+	}
+
 	@Override
 	public <T> void updateIndex(List<T> objList) {
 		Document doc = null;
-		Object o = null;
+		
 		if (objList == null || objList.size() == 0) {
 			return;
 		}
-		String goodsId = null;
+		DecimalFormat df2 = (DecimalFormat) DecimalFormat.getInstance();
+		df2.applyPattern(decimalFormat);
 		for (Object obj : objList) {
-			doc = new Document();
-			Class clazz = obj.getClass();
-			Field[] fields = clazz.getDeclaredFields();
-			for (Field field : fields) {
-				PropertyDescriptor pd = null;
-				try {
-					pd = new PropertyDescriptor(field.getName(), clazz);
-				} catch (IntrospectionException e) {
-					e.printStackTrace();
-				}
-				SearchCondition searchCondition = field.getAnnotation(SearchCondition.class);
-				if (searchCondition == null) {
-					continue;
-				}
-				Method getMethod = pd.getReadMethod();// 获得get方法
-				try {
-					o = getMethod.invoke(obj);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					e.printStackTrace();
-				}
-
-				if (o != null) {
-					if ("goodsName".equals(field.getName())) {
-						TextField commodityName = new TextField(field.getName(), o.toString(), Store.YES);
-						doc.add(commodityName);
-					} else if ("specs".equals(field.getName()) || "brand".equals(field.getName())
-							|| "origin".equals(field.getName())) {
-						doc.add(new StringField(field.getName(), o.toString(), Store.YES));
-					} else if ("goodsId".equals(field.getName())) {
-						goodsId = o.toString();
-					} else {
-						doc.add(new StringField(field.getName(), o.toString(), Store.NO));
-					}
-				}
-			}
+			GoodsSearch model = (GoodsSearch) obj;
+			String goodsId = model.getGoodsId();
+			doc = packDocument(df2, obj);
 			try {
 				indexWriter.updateDocument(new Term("goodsId", goodsId), doc);
 			} catch (IOException e) {

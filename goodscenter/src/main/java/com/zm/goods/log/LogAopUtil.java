@@ -62,7 +62,13 @@ public class LogAopUtil {
 		}
 
 		if("".equals(sb.toString())){
-			sb.append(e.toString());
+			if("".equals(sb.toString())){
+				if(e.toString().length() > 2000){
+					sb.append(e.toString().substring(0, 1990));
+				} else {
+					sb.append(e.toString());
+				}
+			}
 		}
 		ExceptionLog exceptionLog = new ExceptionLog(ServerLogEnum.GOODS_CENTER.getServerId(),
 				ServerLogEnum.GOODS_CENTER.getServerName(), methodName, sb.toString());

@@ -38,6 +38,11 @@
 		<result column="unit" property="unit" jdbcType="VARCHAR" />
 		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
 			<id column="specs_id" property="id" jdbcType="INTEGER" />
+			<result column="info" property="info" jdbcType="VARCHAR" />
+			<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
+				<id column="price_id" property="id" jdbcType="INTEGER" />
+				<result column="price" property="price" jdbcType="NUMERIC" />
+			</collection>
 			<collection property="tagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
 				<id column="tag_id" property="id" jdbcType="INTEGER" />
 				<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
@@ -763,9 +768,23 @@
 	</select> 
 	
 	<select id="listGoodsForLuceneUpdateTag" resultMap="goodsItem" parameterType="Object">
-		select g.id,g.goods_id,gi.id as specs_id, gt.id as tag_id,gt.tag_name from goods${centerId} g left join 
+		select g.id,g.goods_id,gi.id as specs_id, gt.id as tag_id,gt.tag_name,gs.create_time, 
+		gs.goods_name as customGoodsName ,g.is_popular, gs.type,gitem.info,bgp.id as price_id, 
+		bgp.retail_price as price, gi.discount,
+		gcb.brand ,gs.origin, gb.third_category,gb.second_category,gb.first_category from goods${centerId} g left join 
 		goods_item${centerId} gi on g.goods_id = gi.goods_id left join goods gs on g.goods_id=gs.goods_id 
+		left join goods_item gitem on gi.item_id = gitem.item_id
 		left join goods_tag_bind gtb on gi.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
+		left join base gb on gs.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
+		left join
+		<if test="centerId == '_2B'">
+			goods_price${centerId} bgp
+		</if>
+		<if test="centerId != '_2B'">
+			goods_price bgp
+		</if>
+		on
+		gi.item_id = bgp.item_id 
 		where gs.is_del = 0 and gi.status = 1 and g.index_status = 1 and g.goods_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
@@ -806,6 +825,10 @@
 		goods_tag_bind gtb on gs.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
 		where gi.is_del = 0 and gs.goods_id in
 		<foreach collection="goodsIds" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
+		and gs.item_id in 
+		<foreach collection="itemIds" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
 	</select>
