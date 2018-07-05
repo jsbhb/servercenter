@@ -251,6 +251,9 @@
 		<if test="itemCode!=null and itemCode!=''">
 			and i.item_code = #{itemCode}
 		</if>
+		<if test="encode!=null and encode!=''">
+			and i.encode = #{encode}
+		</if>
 		<if test="goodsName!=null and goodsName!=''">
 			and g.goods_name like concat('%',#{goodsName},'%')
 		</if>
@@ -301,6 +304,9 @@
 		</if>
 		<if test="entity.goodsId!=null and entity.goodsId !=''">
 			and i.goods_id = #{entity.goodsId} 
+		</if>
+		<if test="entity.encode!=null and entity.encode!=''">
+			and i.encode = #{entity.encode}
 		</if>
 		<if test="entity.sku !=null and entity.sku !=''">
 			and sku = #{entity.sku} 
