@@ -399,7 +399,7 @@
 		update goods set goods_name = #{goodsName},
 		supplier_id = #{supplierId}, supplier_name = #{supplierName},
 		origin = #{origin}, type = #{type}, update_time = now(),
-		specs_template_id = #{templateId} 
+		specs_template_id = #{templateId}, detail_path = #{detailPath} 
 		where goods_id = #{goodsId}
 	</update>
 	
