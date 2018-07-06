@@ -170,6 +170,7 @@
 		<result column="goods_id" property="goodsId"/>
 		<result column="item_id" property="itemId" />
 		<result column="sku" property="sku"/>
+		<result column="info" property="info"/>
 		<result column="goods_name" property="goodsName"/>
 		<result column="brand" property="brand"/>
 		<result column="origin" property="origin"/>
@@ -404,21 +405,17 @@
 	</update>
 	
 	<select id="selectGoodsListForDownload" parameterType="Object" resultMap="goodsInfoListForDownload">
-		select g.goods_id,gi.item_id,gi.sku,g.goods_name,b.brand,g.origin,
+		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
 		gi.status goods_status,gi2.status item_status,g.supplier_name,gs.fxqty,
-		gfc.name first_name,gsc.name second_name,gtc.name third_name,
-		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gt.name grade_type_name,gr.proportion
+		b.first_category first_name,b.second_category second_name,b.third_category third_name,
+		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion
 		from zm_goods.goods_item gi
 		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
 		left join zm_goods.goods g on g.goods_id = gi.goods_id
 		left join zm_goods.base b on g.base_id = b.id
-		left join zm_goods.goods_first_category gfc on b.first_category = gfc.first_id
-		left join zm_goods.goods_second_category gsc on b.first_category = gsc.first_id and b.second_category = gsc.second_id
-		left join zm_goods.goods_third_category gtc on b.second_category = gtc.second_id and b.third_category = gtc.third_id
 		left join zm_goods.goods_stock gs on gi.item_id = gs.item_id
 		left join zm_goods.goods_price gp on gi.item_id = gp.item_id
 		left join zm_goods.goods_rebate gr on gi.item_id = gr.item_id
-		left join zm_user.grade_type gt on gr.grade_type = gt.id
 		where 1=1 and gi.is_del = 0 and g.is_del = 0
 		<if test="gradeType==null or gradeType == -1">
 			and gr.proportion > 0
