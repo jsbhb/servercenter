@@ -177,7 +177,7 @@ public interface UserService {
 	 * @param grade
 	 * @since JDK 1.7
 	 */
-	Map<String,Object> saveGrade(Grade grade);
+	ResultModel saveGrade(Grade grade);
 
 	/**
 	 * getCenterId:获取所有区域中心ID. <br/>

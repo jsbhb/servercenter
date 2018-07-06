@@ -334,22 +334,23 @@ public class UserServiceImpl implements UserService {
 	private final Integer AREA_CENTER = 2;
 
 	@Override
-	public Map<String, Object> saveGrade(Grade grade) {
+	public ResultModel saveGrade(Grade grade) {
 
+		
 		Map<String, Object> result = new HashMap<String, Object>();
 		userMapper.saveGrade(grade);
 		// 前端创建文件夹
 		// TODO 是否需要加个字段，如果失败可以手动触发
 		if (AREA_CENTER.equals(grade.getGradeType())) {
 			if(grade.getRedirectUrl() == null){
-				throw new RuntimeException("分级为区域中心的请填写域名地址,域名请联系技术部");
+				return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
 			}
 			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
 					grade.getMobileUrl());
 			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
 					PublishType.TEST_REGION_CREATE);
 			if (!temp.isSuccess()) {
-				throw new RuntimeException(temp.getErrorMsg());
+				return new ResultModel (false, "", temp.getErrorMsg());
 			}
 		}
 
@@ -394,7 +395,7 @@ public class UserServiceImpl implements UserService {
 		gradeBO.setGradeType(grade.getGradeType());
 
 		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
-		return result;
+		return new ResultModel(true, result);
 	}
 
 	@Override

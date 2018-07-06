@@ -494,9 +494,8 @@ public class UserController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			Map<String, Object> result = userService.saveGrade(grade);
+			return userService.saveGrade(grade);
 
-			return new ResultModel(true, result);
 		}
 
 		return new ResultModel(false, "版本错误");

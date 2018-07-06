@@ -50,10 +50,11 @@
 	
 	
 	<select id="selectRebateDetailById" parameterType="Object" resultMap="rebateDetail">
-		select * from rebate_detail where 1=1
+		select * from rebate_detail where 1=1 
 		<if test="gradeId != null and gradeId != ''">
 			and grade_id = #{gradeId}
 		</if>
+		and status != 11 
 		order by create_time desc
 	</select>
 	
