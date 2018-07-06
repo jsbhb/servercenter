@@ -34,8 +34,8 @@ public class SEOController {
 	 * @return
 	 */
 	@RequestMapping(value = "auth/{version}/goods/stock/{centerId}/{goodsId}", method = RequestMethod.GET)
-	public ResultModel getGoodsStock(@PathVariable("version") Double version,
-			@PathVariable("goodsId") String goodsId, @PathVariable("centerId") Integer centerId) {
+	public ResultModel getGoodsStock(@PathVariable("version") Double version, @PathVariable("goodsId") String goodsId,
+			@PathVariable("centerId") Integer centerId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return new ResultModel(true, seoService.getGoodsStock(goodsId, centerId));
@@ -83,10 +83,10 @@ public class SEOController {
 	 */
 	@RequestMapping(value = "{version}/goods/publish/{centerId}", method = RequestMethod.POST)
 	public ResultModel goodsPublish(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> itemIdList) {
+			@RequestBody List<String> goodsIdList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return seoService.publish(itemIdList, centerId);
+			return seoService.publishByGoodsId(goodsIdList, centerId, true);
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -98,11 +98,12 @@ public class SEOController {
 	 * @param version
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/goods/publish/del", method = RequestMethod.POST)
-	public ResultModel goodsPublishDel(@PathVariable("version") Double version, @RequestBody List<String> itemIdList) {
+	@RequestMapping(value = "{version}/goods/publish/del/{centerId}", method = RequestMethod.POST)
+	public ResultModel goodsPublishDel(@PathVariable("version") Double version, @RequestBody List<String> goodsIdList,
+			@PathVariable("centerId") Integer centerId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return seoService.delPublish(itemIdList);
+			return seoService.delPublishByGoodsId(goodsIdList, centerId);
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),

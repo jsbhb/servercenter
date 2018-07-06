@@ -127,3 +127,5 @@ alter table goods_third_category add column theme_name varchar(200) null comment
 CREATE UNIQUE INDEX uk_theme_name ON goods_first_category(theme_name);
 CREATE UNIQUE INDEX uk_theme_name ON goods_second_category(theme_name);
 CREATE UNIQUE INDEX uk_theme_name ON goods_third_category(theme_name);
+
+alter table goods_2 add column is_publish tinyint default 0 comment '0:未发布，1已发布';

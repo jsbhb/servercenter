@@ -150,7 +150,7 @@
 		oestatus,od.pay_time,od.pay_no,
 		od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type,
 		og.id as
-		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info
+		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info,og.goods_id as goodsId 
 		from (select
 		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.create_type,
 		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag,ob.remark

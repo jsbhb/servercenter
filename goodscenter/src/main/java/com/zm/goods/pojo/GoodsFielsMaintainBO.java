@@ -1,12 +1,12 @@
 package com.zm.goods.pojo;
 
-import java.util.Set;
+import java.util.List;
 
 public class GoodsFielsMaintainBO {
 
 	private String itemCode;
 	private String goodsDetailPath;
-	private Set<String> picPathList;
+	private List<String> picPathList;
 	
 	public String getItemCode() {
 		return itemCode;
@@ -20,10 +20,10 @@ public class GoodsFielsMaintainBO {
 	public void setGoodsDetailPath(String goodsDetailPath) {
 		this.goodsDetailPath = goodsDetailPath;
 	}
-	public Set<String> getPicPathList() {
+	public List<String> getPicPathList() {
 		return picPathList;
 	}
-	public void setPicPathList(Set<String> picPathList) {
+	public void setPicPathList(List<String> picPathList) {
 		this.picPathList = picPathList;
 	}
 	

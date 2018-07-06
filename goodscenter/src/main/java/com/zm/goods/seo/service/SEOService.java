@@ -9,13 +9,17 @@ public interface SEOService {
 
 	List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId);
 
-	ResultModel publish(List<String> itemIdList, Integer centerId);
+	ResultModel publish(List<String> itemIdList, Integer centerId, boolean isNewPublish);
 
 	ResultModel navPublish();
 
-	ResultModel delPublish(List<String> itemIdList);
+	ResultModel delPublish(List<String> itemIdList, Integer centerId);
 
 	ResultModel indexPublish(Integer id);
 
 	ResultModel getGoodsAccessPath(String goodsId, String itemId);
+
+	ResultModel publishByGoodsId(List<String> goodsIdList, Integer centerId, boolean isNewPublish);
+
+	ResultModel delPublishByGoodsId(List<String> goodsIdList, Integer centerId);
 }

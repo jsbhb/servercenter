@@ -24,6 +24,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
+import com.zm.goods.seo.model.GoodsTempModel;
 import com.zm.goods.seo.model.SEOBase;
 import com.zm.goods.seo.model.SEODetail;
 import com.zm.goods.seo.model.SEOGoodsDel;
@@ -61,57 +62,29 @@ public class SEOServiceImpl implements SEOService {
 	}
 
 	@Override
-	public ResultModel publish(List<String> itemIdList, Integer centerId) {
+	public ResultModel publish(List<String> itemIdList, Integer centerId, boolean isNewPublish) {
 		String centerIdStr = GoodsServiceUtil.judgeCenterId(centerId);
-		List<PagePO> pageList = seoMapper.getGoodsDetailPageByPublish();
-		if (pageList == null || pageList.size() != 2) {
-			return new ResultModel(false, "请确认手机和pc商详模板是否都存在");
-		}
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", itemIdList);
 		param.put("centerId", centerIdStr);
 		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-		StringBuilder sb = new StringBuilder();
-		ResultModel result = new ResultModel(true, "");
-		SEODetail seoGoodsDetail;
-		if (goodsIdList != null && goodsIdList.size() > 0) {
-			for (String goodsId : goodsIdList) {
-				param.put("goodsId", goodsId);
-				GoodsItem goodsItem = getGoods(param);
-				if (goodsItem == null) {
-					continue;
-				}
-				String path = seoMapper.queryGoodsCategoryPath(goodsItem.getThirdCategory());
-				template.opsForValue().set("href:" + goodsId, "/" + path + "/" + goodsId + ".html");
-				param.put("accessPath", path);
-				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
-				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
-						pageList);
-				publishAndHandle(sb, result, seoGoodsDetail, PublishType.TEST_PAGE_CREATE);
-				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.MPMALL,
-						pageList);
-				publishAndHandle(sb, result, seoGoodsDetail, PublishType.TEST_PAGE_CREATE);
-				seoMapper.updateGoodsAccessPath(param);
-			}
-			if (sb.length() > 0) {
-				sb.append("发布失败");
-				result.setErrorMsg(sb.toString());
-			}
+		if(goodsIdList == null || goodsIdList.size() == 0){
+			return new ResultModel(false, "没有对应的商品GOODSID");
 		}
-		return result;
+		return publishByGoodsId(goodsIdList, centerId, isNewPublish);
 	}
 
-	private void publishAndHandle(StringBuilder sb, ResultModel result, SEOBase base, PublishType publishType) {
+	private boolean publishAndHandle(StringBuilder sb, ResultModel result, SEOBase base, PublishType publishType) {
 		ResultModel temp = PublishComponent.publish(JSONUtil.toJson(base), publishType);
-		if (!temp.isSuccess() && SystemEnum.PCMALL.getName().equals(base.getSystem())) {
+		if(!temp.isSuccess()){
 			result.setSuccess(false);
-			sb.append("PC端:" + temp.getErrorMsg() + ",");
+			if(base instanceof SEODetail){
+				SEODetail tem = (SEODetail) base;
+				sb.append(tem.getFile() + ":");
+			}
+			sb.append(temp.getErrorMsg());
 		}
-
-		if (!temp.isSuccess() && SystemEnum.MPMALL.getName().equals(base.getSystem())) {
-			result.setSuccess(false);
-			sb.append("H5端:" + temp.getErrorMsg() + ",");
-		}
+		return temp.isSuccess();
 	}
 
 	private GoodsItem getGoods(Map<String, Object> param) {
@@ -151,27 +124,15 @@ public class SEOServiceImpl implements SEOService {
 	}
 
 	@Override
-	public ResultModel delPublish(List<String> itemIdList) {
+	public ResultModel delPublish(List<String> itemIdList, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", itemIdList);
-		ResultModel result = new ResultModel(true, "");
+		param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
 		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-		StringBuilder sb = new StringBuilder();
-		if (goodsIdList != null && goodsIdList.size() > 0) {
-			SEOGoodsDel seoGoodsDel = null;
-			for (String goodsId : goodsIdList) {
-				String path = seoMapper.getGoodsAccessPath(goodsId);
-				seoGoodsDel = new SEOGoodsDel(path, SystemEnum.PCMALL, goodsId + ".html");
-				publishAndHandle(sb, result, seoGoodsDel, PublishType.TEST_PAGE_DELETE);
-				seoGoodsDel = new SEOGoodsDel(path, SystemEnum.MPMALL, goodsId + ".html");
-				publishAndHandle(sb, result, seoGoodsDel, PublishType.TEST_PAGE_DELETE);
-			}
+		if(goodsIdList == null || goodsIdList.size() == 0){
+			return new ResultModel(false, "没有对应的商品GOODSID");
 		}
-		if (sb.length() > 0) {
-			sb.append("发布失败");
-			result.setErrorMsg(sb.toString());
-		}
-		return result;
+		return delPublishByGoodsId(goodsIdList, centerId);
 	}
 
 	@Override
@@ -181,17 +142,20 @@ public class SEOServiceImpl implements SEOService {
 		List<PagePO> pageList = new ArrayList<PagePO>();
 		ResultModel result = new ResultModel(true, "");
 		StringBuilder sb = new StringBuilder();
-		String url = userFeignClient.getClientUrl(page.getGradeId(), Constants.FIRST_VERSION);
-		String region;
-		if (url.startsWith("http")) {
-			region = url.substring(url.indexOf("//") + 2, url.indexOf("."));
-		} else {
-			region = url.substring(0, url.indexOf("."));
-		}
 		pageList.add(page);
 		SEODetail seoDetail = new SEODetail(null, seoModel, null, null, SystemEnum.getSystem(page.getClient()),
 				pageList);
-		seoDetail.setRegion(region);
+		if(page.getGradeId() != 2){//主站不需要
+			String url = userFeignClient.getClientUrl(page.getGradeId(), Constants.FIRST_VERSION);
+			String region;
+			if (url.startsWith("http")) {
+				region = url.substring(url.indexOf("//") + 2, url.indexOf("."));
+			} else {
+				region = url.substring(0, url.indexOf("."));
+			}
+			seoDetail.setRegion(region);
+		}
+		
 		publishAndHandle(sb, result, seoDetail, PublishType.TEST_PAGE_CREATE);
 		if (sb.length() > 0) {
 			sb.append("发布失败");
@@ -218,6 +182,105 @@ public class SEOServiceImpl implements SEOService {
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("没有商品编号");
+		}
+		return result;
+	}
+
+	@Override
+	public ResultModel publishByGoodsId(List<String> goodsIdList, Integer centerId, boolean isNewPublish) {
+		List<PagePO> pageList = seoMapper.getGoodsDetailPageByPublish();
+		if (pageList == null || pageList.size() != 2) {
+			return new ResultModel(false, "请确认手机和pc商详模板是否都存在");
+		}
+		StringBuilder sb = new StringBuilder();
+		ResultModel result = new ResultModel(true, "");
+		SEODetail seoGoodsDetail;
+		boolean success;
+		if (goodsIdList != null && goodsIdList.size() > 0) {
+			Map<String,Object> param = new HashMap<String,Object>();
+			param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
+			for (String goodsId : goodsIdList) {
+				param.put("goodsId", goodsId);
+				GoodsItem goodsItem = getGoods(param);
+				if (goodsItem == null) {
+					continue;
+				}
+				if(!isNewPublish){//如果不是新发布，是重新发布的，先把发布标志置为未发布
+					seoMapper.updateGoodsRePublishByGoodsId(param);
+				}
+				String path = seoMapper.queryGoodsCategoryPath(goodsItem.getThirdCategory());
+				template.opsForValue().set("href:" + goodsId, "/" + path + "/" + goodsId + ".html");
+				param.put("accessPath", path);
+				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
+				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
+						pageList);
+				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.TEST_PAGE_CREATE);
+				if(!success){
+					continue;
+				}
+				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.MPMALL,
+						pageList);
+				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.TEST_PAGE_CREATE);
+				if(!success){
+					continue;
+				}
+				seoMapper.updateGoodsAccessPath(param);
+				seoMapper.updateGoodsPublishByGoodsId(param);
+			}
+			if (sb.length() > 0) {
+				sb.append("发布失败");
+				result.setErrorMsg(sb.toString());
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public ResultModel delPublishByGoodsId(List<String> goodsIdList, Integer centerId) {
+		ResultModel result = new ResultModel(true, "");
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("list", goodsIdList);
+		param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
+		List<GoodsTempModel> tempList = seoMapper.getDownShelvesGoodsIdByGoodsId(param);
+		if(tempList != null && tempList.size() > 0){//说明有商品所有规格都下架，需要删除已经发布的商详
+			List<String> needDelgoodsIdList = new ArrayList<String>();
+			List<String> needRePublishgoodsIdList = new ArrayList<String>();
+			for(GoodsTempModel model : tempList){
+				if(model.getStatus() == 0){
+					needDelgoodsIdList.add(model.getGoodsId());//需要删除的
+				} else {
+					needRePublishgoodsIdList.add(model.getGoodsId());//需要重新发布的
+				}
+			}
+			StringBuilder sb = new StringBuilder();
+			boolean success;
+			if (needDelgoodsIdList != null && needDelgoodsIdList.size() > 0) {
+				SEOGoodsDel seoGoodsDel = null;
+				for (String goodsId : needDelgoodsIdList) {
+					String path = seoMapper.getGoodsAccessPath(goodsId);
+					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.PCMALL, goodsId + ".html");
+					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.TEST_PAGE_DELETE);
+					if(!success){
+						continue;
+					}
+					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.MPMALL, goodsId + ".html");
+					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.TEST_PAGE_DELETE);
+					if(!success){
+						continue;
+					}
+					param.put("goodsId", goodsId);
+					seoMapper.updateGoodsDelPublishByGoodsId(param);
+				}
+			}
+			if (sb.length() > 0) {
+				sb.append("删除失败");
+				result.setErrorMsg(sb.toString());
+			}
+			if(needRePublishgoodsIdList.size() > 0){//需要重新发布的goods
+				ResultModel temp = publishByGoodsId(needRePublishgoodsIdList, centerId, false);
+				result.setSuccess(temp.isSuccess());
+				result.setErrorMsg(result.getErrorMsg() + temp.getErrorMsg());
+			}
 		}
 		return result;
 	}

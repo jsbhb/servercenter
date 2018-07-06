@@ -33,7 +33,6 @@ import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.TimeLimitActive;
-import com.zm.goods.seo.service.SEOService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -60,9 +59,6 @@ public class GoodsController {
 
 	@Resource
 	GoodsService goodsTagDecorator;
-
-	@Resource
-	SEOService seoService;
 
 	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
@@ -548,9 +544,6 @@ public class GoodsController {
 				return new ResultModel(false, "没有选择商品明细");
 			}
 			ResultModel result = goodsService.upShelves(itemIdList, centerId);
-			if (result.isSuccess()) {// 上架成功发布商品
-				result = seoService.publish(itemIdList, centerId);
-			}
 			return result;
 		}
 
@@ -571,9 +564,6 @@ public class GoodsController {
 			String[] arr = itemId.split(",");
 			List<String> itemIdList = Arrays.asList(arr);
 			ResultModel result = goodsService.downShelves(itemIdList, centerId);
-			if (result.isSuccess()) {// 下架删除商品
-				result = seoService.delPublish(itemIdList);
-			}
 			return result;
 		}
 

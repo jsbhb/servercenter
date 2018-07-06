@@ -6,6 +6,7 @@ import java.util.Map;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.PagePO;
+import com.zm.goods.seo.model.GoodsTempModel;
 import com.zm.goods.seo.model.SEOModel;
 
 public interface SEOMapper {
@@ -35,5 +36,13 @@ public interface SEOMapper {
 	void updatePageSaveToPublish(Integer id);
 	
 	String getGoodsIdByItemId(String itemId);
+
+	void updateGoodsPublishByGoodsId(Map<String,Object> param);
+
+	void updateGoodsDelPublishByGoodsId(Map<String, Object> param);
+	
+	void updateGoodsRePublishByGoodsId(Map<String, Object> param);
+	
+	List<GoodsTempModel> getDownShelvesGoodsIdByGoodsId(Map<String, Object> param);
 
 }

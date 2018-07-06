@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.bussiness.component.ActivityComponent;
 import com.zm.goods.bussiness.component.GoodsServiceUtil;
 import com.zm.goods.bussiness.component.PriceComponent;
+import com.zm.goods.bussiness.component.PublishThreadPool;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
@@ -84,6 +85,9 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	PriceComponent priceComponent;
+	
+	@Resource
+	PublishThreadPool publishThreadPool;
 
 	@Override
 	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
@@ -939,6 +943,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if(updateTagList != null && updateTagList.size() > 0){//更新标签
 			updateLuceneIndex(updateTagList, centerId);
 		}
+		publishThreadPool.publish(itemIdList, centerId);//发布商品
 		return new ResultModel(true, "");
 	}
 
@@ -1060,6 +1065,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if(updateTagGoodsIdList.size() > 0){
 			updateLuceneIndex(updateTagGoodsIdList, centerId);
 		}
+		publishThreadPool.delPublish(itemIdList, centerId);//删除商品和重新发布商品
 		return new ResultModel(true, "");
 	}
 
