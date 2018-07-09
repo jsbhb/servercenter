@@ -43,21 +43,21 @@
 		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
 			<id column="specs_id" property="id" jdbcType="INTEGER" />
 			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
-		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
-		<result column="conversion" property="conversion" jdbcType="INTEGER" />
-		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
-		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
-		<result column="sku" property="sku" jdbcType="VARCHAR" />
-		<result column="weight" property="weight" jdbcType="INTEGER" />
-		<result column="info" property="info" jdbcType="VARCHAR" />
-		<result column="carton" property="carton" jdbcType="VARCHAR" />
-		<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
-			<id column="price_id" property="id" jdbcType="INTEGER" />
+			<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+			<result column="conversion" property="conversion" jdbcType="INTEGER" />
 			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
-			<result column="min" property="min" jdbcType="INTEGER" />
-			<result column="max" property="max" jdbcType="INTEGER" />
-			<result column="retail_price" property="price" jdbcType="NUMERIC" />
-		</collection>
+			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+			<result column="sku" property="sku" jdbcType="VARCHAR" />
+			<result column="weight" property="weight" jdbcType="INTEGER" />
+			<result column="info" property="info" jdbcType="VARCHAR" />
+			<result column="carton" property="carton" jdbcType="VARCHAR" />
+			<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
+				<id column="price_id" property="id" jdbcType="INTEGER" />
+				<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+				<result column="min" property="min" jdbcType="INTEGER" />
+				<result column="max" property="max" jdbcType="INTEGER" />
+				<result column="retail_price" property="price" jdbcType="NUMERIC" />
+			</collection>
 		</collection>
 	</resultMap>
 	

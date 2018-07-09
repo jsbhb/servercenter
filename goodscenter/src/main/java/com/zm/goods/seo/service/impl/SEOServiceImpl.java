@@ -20,6 +20,7 @@ import com.zm.goods.enummodel.SystemEnum;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.PagePO;
@@ -91,6 +92,11 @@ public class SEOServiceImpl implements SEOService {
 		GoodsItem goodsItem = seoMapper.getGoods(param);
 		if (goodsItem == null) {
 			return null;
+		}
+		if(goodsItem.getGoodsSpecsList() != null){
+			for(GoodsSpecs specs : goodsItem.getGoodsSpecsList()){
+				specs.infoFilter();
+			}
 		}
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> map = hashOperations.entries(Constants.POST_TAX + goodsItem.getSupplierId());
