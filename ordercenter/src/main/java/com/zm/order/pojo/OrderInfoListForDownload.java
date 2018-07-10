@@ -39,6 +39,8 @@ public class OrderInfoListForDownload {
 	private Double actualPrice;
 	private String itemCode;
 	private String receivePhone;
+	private String itemInfo;
+	private String conversion;
 	
 	public String getOrderId() {
 		return orderId;
@@ -249,6 +251,18 @@ public class OrderInfoListForDownload {
 	}
 	public void setReceivePhone(String receivePhone) {
 		this.receivePhone = receivePhone;
+	}
+	public String getItemInfo() {
+		return itemInfo;
+	}
+	public void setItemInfo(String itemInfo) {
+		this.itemInfo = itemInfo;
+	}
+	public String getConversion() {
+		return conversion;
+	}
+	public void setConversion(String conversion) {
+		this.conversion = conversion;
 	}
 
 }
