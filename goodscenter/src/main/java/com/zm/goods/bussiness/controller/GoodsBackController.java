@@ -448,4 +448,19 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+
+	@RequestMapping(value = "{version}/goods/goods/saveItemInfo", method = RequestMethod.POST)
+	public ResultModel saveItemInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsInfoEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return goodsBackService.saveItemInfo(entity);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

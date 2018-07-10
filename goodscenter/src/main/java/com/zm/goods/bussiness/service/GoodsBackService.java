@@ -268,5 +268,7 @@ public interface GoodsBackService {
 	 * @return
 	 */
 	ResultModel tagBatchBind(List<GoodsTagBindEntity> list);
+	
+	ResultModel saveItemInfo(GoodsInfoEntity entity);
 
 }

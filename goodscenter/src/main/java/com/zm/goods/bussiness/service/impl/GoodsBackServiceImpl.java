@@ -567,4 +567,75 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		}
 		return new ResultModel(true, null);
 	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
+	public ResultModel saveItemInfo(GoodsInfoEntity entity) {
+		StringBuilder sb = new StringBuilder();
+
+		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
+		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
+		for(GoodsItemEntity gitem: entity.getGoods().getItems()) {
+			insItemList.add(gitem);
+			insPriceList.add(gitem.getGoodsPrice());
+		}
+		
+		for(GoodsItemEntity gie:insItemList) {
+			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemForCheck(gie);
+			if(tempList != null && tempList.size() > 0){
+				sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
+				sb.append(gie.getSku()+","+gie.getConversion()+";");
+				return new ResultModel(false, sb.toString()); 
+			}
+		}
+		
+		goodsBackMapper.updateGoodsEntity(entity.getGoods());
+		
+		if (insItemList.size() > 0) {
+			goodsItemMapper.insertBatch(insItemList);
+		}
+		if (insPriceList.size() > 0) {
+			goodsItemMapper.insertPriceBatch(insPriceList);
+		}
+		
+		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
+			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
+			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
+			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
+
+			// 过滤相同文件列表
+			for (GoodsFile ngf : entity.getGoods().getFiles()) {
+				for (GoodsFile gf : oldFiles) {
+					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+						existFiles.add(gf);
+						oldFiles.remove(gf);
+						break;
+					}
+				}
+			}
+			// 挑出新增文件列表
+			for (GoodsFile gf : existFiles) {
+				for (GoodsFile ngf : entity.getGoods().getFiles()) {
+					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+						entity.getGoods().getFiles().remove(ngf);
+						break;
+					}
+				}
+			}
+
+			if (entity.getGoods().getFiles().size() > 0) {
+				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+			}
+			if (oldFiles.size() > 0) {
+				goodsItemMapper.deleteListFiles(oldFiles);
+			}
+		} else {
+			// 商品编辑时，如果没有传图片信息，则删除表中记录
+			goodsItemMapper.deleteAllFiles(entity.getGoods());
+		}
+		if (entity.getGoods().getGoodsTagBindList() != null) {
+			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
+		}
+		return new ResultModel(true, ""); 
+	}
 }
