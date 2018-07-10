@@ -25,6 +25,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
+import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
@@ -40,6 +41,7 @@ import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -64,6 +66,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Resource
 	GoodsBaseMapper goodsBaseMapper;
+	
+	@Resource
+	GoodsTagMapper goodsTagMapper;
 
 	@Resource
 	RedisTemplate<String, Object> template;
@@ -553,5 +558,13 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			}
 		}
 		return new ResultModel(true, "操作成功");
+	}
+
+	@Override
+	public ResultModel tagBatchBind(List<GoodsTagBindEntity> list) {
+		if(list != null && list.size() > 0){
+			goodsTagMapper.batchInsert(list);
+		}
+		return new ResultModel(true, null);
 	}
 }

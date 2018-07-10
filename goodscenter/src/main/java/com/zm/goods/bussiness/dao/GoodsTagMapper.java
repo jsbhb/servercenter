@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 
+import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
 
 public interface GoodsTagMapper {
@@ -13,4 +14,6 @@ public interface GoodsTagMapper {
 	 * @return
 	 */
 	List<String> listCutOrderItemIds();
+
+	void batchInsert(List<GoodsTagBindEntity> list);
 }

@@ -19,7 +19,7 @@ package com.zm.goods.pojo;
 public class GoodsTagBindEntity {
 
 	private int id;
-	private String goodsId;// 商品ID
+	private String itemId;// 商品ID
 	private int tagId;//标签ID
 	private String createTime;// 注册时间
 	private String updateTime;// 更新时间
@@ -30,11 +30,11 @@ public class GoodsTagBindEntity {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getGoodsId() {
-		return goodsId;
+	public String getItemId() {
+		return itemId;
 	}
-	public void setGoodsId(String goodsId) {
-		this.goodsId = goodsId;
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
 	}
 	public int getTagId() {
 		return tagId;

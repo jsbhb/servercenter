@@ -25,6 +25,7 @@ import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -436,6 +437,14 @@ public class GoodsBackController {
 	public ResultModel importGoods(@PathVariable("version") Double version, @RequestBody List<GoodsInfoEntity> list) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsBackService.importGoods(list);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+	
+	@RequestMapping(value = "{version}/goods/tag/batch-bind", method = RequestMethod.POST)
+	public ResultModel tagBatchBind(@PathVariable("version") Double version, @RequestBody List<GoodsTagBindEntity> list) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsBackService.tagBatchBind(list);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}

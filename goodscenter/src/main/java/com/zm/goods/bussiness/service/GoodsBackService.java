@@ -19,6 +19,7 @@ import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -260,5 +261,12 @@ public interface GoodsBackService {
 	 * @return
 	 */
 	ResultModel importGoods(List<GoodsInfoEntity> list);
+
+	/**
+	 * @fun 批量绑定标签
+	 * @param list
+	 * @return
+	 */
+	ResultModel tagBatchBind(List<GoodsTagBindEntity> list);
 
 }

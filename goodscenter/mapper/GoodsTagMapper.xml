@@ -35,4 +35,11 @@
 		select gtb.item_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gt.tag_fun_id = 1
 	</select>
 	
+	<insert id="batchInsert" parameterType="Object">
+		insert into goods_tag_bind(item_id,tag_id,create_time,opt) value 
+		<foreach collection="list" item="item" separator="," open="" close="">
+			(#{item.itemId},#{item.tagId},now(),#{item.opt})
+		</foreach>
+	</insert>
+	
 </mapper>
