@@ -122,7 +122,7 @@ CREATE TABLE `zm_order`.`order_goods` (
   `item_id` VARCHAR(100) NOT NULL,
   `sku` VARCHAR(50) NULL,
   `item_name` VARCHAR(100) NULL,
-  `item_img` VARCHAR(100) NULL,
+  `item_img` VARCHAR(300) NULL,
   `item_info` VARCHAR(200) NULL,
   `item_code` VARCHAR(100) NULL,
   `item_quantity` INT UNSIGNED NOT NULL,

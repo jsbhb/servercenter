@@ -63,12 +63,11 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 		List<String> itemIdList = new ArrayList<String>();
 		if (goodsList != null && goodsList.size() > 0) {
 			for (GoodsItem item : goodsList) {
-				itemIdList.add(item.getGoodsId());
-//				if (item.getGoodsSpecsList() != null) {
-//					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
-//						itemIdList.add(specs.getItemId());
-//					}
-//				}
+				if (item.getGoodsSpecsList() != null) {
+					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
+						itemIdList.add(specs.getItemId());
+					}
+				}
 			}
 			List<GoodsTagEntity> list = goodsTagMapper.listGoodsTagByGoodsId(itemIdList);
 			List<GoodsTagEntity> temp = null;

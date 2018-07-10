@@ -111,7 +111,7 @@ public class GoodsLucene extends AbstractLucene {
 		doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
 		doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
 				Store.NO));
-		doc.add(new StringField("tag", model.getTag() == null ? "" : model.getTag(), Store.NO));
+		doc.add(new TextField("tag", model.getTag() == null ? "" : model.getTag(), Store.NO));
 		try {
 			time = DateUtil.stringToLong(model.getCreateTime(), dateFormat);
 		} catch (ParseException e) {

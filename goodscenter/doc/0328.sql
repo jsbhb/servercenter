@@ -34,6 +34,7 @@ create table `zm_goods`.`goods_tag_bind`(
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `item_tag` (`item_id`,`tag_id` ASC),
   INDEX `idx_tagId` (`tag_id`),
   INDEX `idx_goodsId` (`item_id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '商品标签绑定表';
