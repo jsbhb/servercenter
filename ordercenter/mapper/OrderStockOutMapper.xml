@@ -83,6 +83,7 @@
 		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
 		<result column="proxy_price" property="proxyPrice" jdbcType="DECIMAL" />
 		<result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
+		<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
 		<result column="item_quantity" property="itemQuantity" jdbcType="INTEGER" />
 		<result column="first_id" property="firstId" jdbcType="VARCHAR" />
 		<result column="first_name" property="firstName" jdbcType="VARCHAR" />
@@ -107,6 +108,7 @@
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 		<result column="receive_phone" property="receivePhone" jdbcType="VARCHAR" />
+		<result column="conversion" property="conversion" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
 			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
@@ -231,9 +233,9 @@
 	
 	<select id="selectOrdreListForDownload" resultMap="orderInfoListForDownload" parameterType="Object">
 		select ob.order_id,ob.status,ob.grade_id,ug.grade_name,ob.supplier_id,sb.supplier_name,
-		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_quantity,gfc.first_id,
+		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_info,og.item_quantity,gfc.first_id,
 		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
-		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,
+		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,i.conversion,
 		od.receive_city,od.receive_area,od.receive_address,od.create_time,od.receive_phone,
 		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id,ob.order_source,
 		u.idnum,u.name order_name,og.item_quantity*i.conversion packing,og.actual_price,og.item_code
