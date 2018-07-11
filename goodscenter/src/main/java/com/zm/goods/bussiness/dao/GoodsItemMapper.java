@@ -266,6 +266,8 @@ public interface GoodsItemMapper {
 	void updateOrInsertGoodsExtension(GoodsExtensionEntity entity);
 
 	List<GoodsPriceRatioEntity> selectGoodsPriceRatioListInfo(GoodsItemEntity entity);
+
+	Page<GoodsRatioPlatformEntity> selectGoodsRatioPlatformForPage(GoodsRatioPlatformEntity entity);
 	
 	void insertGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 	

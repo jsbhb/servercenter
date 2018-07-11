@@ -339,6 +339,18 @@ public class GoodsItemController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	@RequestMapping(value = "{version}/goods/item/queryGoodsRatioPlatformForPage", method = RequestMethod.POST)
+	public ResultModel queryGoodsRatioPlatformForPage(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsRatioPlatformEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<GoodsRatioPlatformEntity> page = goodsItemService.queryGoodsRatioPlanformPage(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 	@RequestMapping(value = "{version}/goods/item/createGoodsRatioPlatformInfo", method = RequestMethod.POST)
 	public ResultModel createGoodsRatioPlatformInfo(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsRatioPlatformEntity entity) {

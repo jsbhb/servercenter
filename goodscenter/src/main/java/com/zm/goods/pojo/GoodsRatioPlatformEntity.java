@@ -1,6 +1,8 @@
 package com.zm.goods.pojo;
 
-public class GoodsRatioPlatformEntity {
+import com.zm.goods.common.Pagination;
+
+public class GoodsRatioPlatformEntity extends Pagination {
 	private Integer id;
 	private String ratioPlatformName;// 比价平台名称
 	private Integer isUse;// 是否使用，0：是;1：否

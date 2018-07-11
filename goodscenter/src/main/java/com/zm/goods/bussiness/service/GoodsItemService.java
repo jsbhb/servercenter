@@ -206,6 +206,8 @@ public interface GoodsItemService {
 	
 	List<GoodsPriceRatioEntity> queryGoodsPriceRatioListInfo(GoodsItemEntity entity);
 
+	Page<GoodsRatioPlatformEntity> queryGoodsRatioPlanformPage(GoodsRatioPlatformEntity entity);
+
 	void createGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 
 	void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);

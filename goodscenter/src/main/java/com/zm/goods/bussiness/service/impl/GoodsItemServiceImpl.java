@@ -266,6 +266,12 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
+	public Page<GoodsRatioPlatformEntity> queryGoodsRatioPlanformPage(GoodsRatioPlatformEntity entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return goodsItemMapper.selectGoodsRatioPlatformForPage(entity);
+	}
+
+	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void createGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity) {
 		goodsItemMapper.insertGoodsRatioPlatformInfo(entity);

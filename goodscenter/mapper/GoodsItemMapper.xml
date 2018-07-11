@@ -171,6 +171,15 @@
 		<result column="opt" property="opt"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsRatioPlatformEntity" id="goodsRatioPlatformBase">
+		<id column="id" property="id"/>
+		<result column="ratio_platform_name" property="ratioPlatformName" />
+		<result column="is_use" property="isUse"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
 	<select id="selectById" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
@@ -781,11 +790,20 @@
 		remark = #{remark},update_time = now(),opt = #{opt}
 	</insert>
 	
+	<select id="selectGoodsRatioPlatformForPage" parameterType="Object" resultMap="goodsRatioPlatformBase">
+		select grp.*
+		from goods_ratio_platform grp
+		where 1=1 and grp.is_use = '0'
+		<if test="ratioPlatformName!=null and ratioPlatformName!=''">
+			and gpr.ratio_platform_name = #{ratioPlatformName}
+		</if>
+	</select>
+	
 	<select id="selectGoodsPriceRatioListInfo" parameterType="Object" resultMap="goodsPriceRatioBase">
 		select gpr.*,grp.ratio_platform_name
 		from goods_ratio_platform grp
 		inner join goods_price_ratio gpr on gpr.ratio_platform_id = grp.id
-		where 1=1  and grp.is_use = '0'
+		where 1=1 and grp.is_use = '0'
 		<if test="itemId!=null and itemId!=''">
 			and gpr.item_id = #{itemId} 
 		</if>
