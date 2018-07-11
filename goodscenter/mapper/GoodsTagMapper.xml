@@ -36,7 +36,7 @@
 	</select>
 	
 	<insert id="batchInsert" parameterType="Object">
-		insert into goods_tag_bind(item_id,tag_id,create_time,opt) value 
+		insert ignore into goods_tag_bind(item_id,tag_id,create_time,opt) value 
 		<foreach collection="list" item="item" separator="," open="" close="">
 			(#{item.itemId},#{item.tagId},now(),#{item.opt})
 		</foreach>
