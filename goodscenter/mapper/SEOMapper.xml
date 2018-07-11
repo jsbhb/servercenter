@@ -186,7 +186,7 @@
 	
 	<select id="getDownShelvesGoodsIdByGoodsId" parameterType="Object" resultType="com.zm.goods.seo.model.GoodsTempModel">
 		select goods_id as goodsId, status from goods${centerId} 
-		where index_status = 0 and status = 0 and goods_id in 
+		where 1=1 and goods_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
