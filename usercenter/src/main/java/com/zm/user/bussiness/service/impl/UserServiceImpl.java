@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.user.bussiness.component.UserComponent;
+import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
@@ -69,6 +70,9 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	UserComponent userComponent;
+	
+	@Resource
+	GradeMapper<Grade> gradeMapper;
 
 	@Resource
 	RedisTemplate<String, String> redisTemplate;
@@ -331,7 +335,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private final Integer COPY_MALL = 1;
-	private final Integer AREA_CENTER = 2;
 
 	@Override
 	public ResultModel saveGrade(Grade grade) {
@@ -340,17 +343,16 @@ public class UserServiceImpl implements UserService {
 		Map<String, Object> result = new HashMap<String, Object>();
 		userMapper.saveGrade(grade);
 		// 前端创建文件夹
-		// TODO 是否需要加个字段，如果失败可以手动触发
-		if (AREA_CENTER.equals(grade.getGradeType())) {
+		if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
 			if(grade.getRedirectUrl() == null){
 				return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
 			}
 			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
 					grade.getMobileUrl());
 			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-					PublishType.TEST_REGION_CREATE);
-			if (!temp.isSuccess()) {
-				return new ResultModel (false, "", temp.getErrorMsg());
+					PublishType.REGION_CREATE);
+			if (temp.isSuccess()) {
+				gradeMapper.updateGradeInit(grade.getId());
 			}
 		}
 

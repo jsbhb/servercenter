@@ -18,16 +18,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.service.GradeService;
 import com.zm.user.common.ResultModel;
+import com.zm.user.constants.Constants;
 import com.zm.user.enummodel.BackManagerErrorEnum;
+import com.zm.user.enummodel.PublishType;
 import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
+import com.zm.user.pojo.bo.CreateAreaCenterSEO;
 import com.zm.user.pojo.dto.GradeTypeDTO;
 import com.zm.user.pojo.po.GradeTypePO;
+import com.zm.user.seo.publish.PublishComponent;
+import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.TreePackUtil;
 
 /**
@@ -45,6 +51,9 @@ public class GradeServiceImpl implements GradeService {
 
 	@Resource
 	GradeMapper<Grade> gradeMapper;
+	
+	@Resource
+	UserComponent userComponent;
 
 	@Override
 	public Page<Grade> queryForPagination(Grade grade) {
@@ -80,8 +89,16 @@ public class GradeServiceImpl implements GradeService {
 
 	@Override
 	public ResultModel fuzzySearch(FuzzySearchGrade entity) {
-
-		return new ResultModel(true, gradeMapper.fuzzyListGrade(entity));
+		List<FuzzySearchGrade> list = gradeMapper.fuzzyListGrade(entity);
+		if(list != null && list.size() > 0){
+			Grade grade = null;
+			for(FuzzySearchGrade temp : list){
+				grade = userComponent.getUrl(temp.getId());
+				temp.setUrl(grade.getRedirectUrl());
+				temp.setMobileUrl(grade.getMobileUrl());
+			}
+		}
+		return new ResultModel(true, list);
 	}
 
 	@Override
@@ -152,6 +169,28 @@ public class GradeServiceImpl implements GradeService {
 		dto.setName(gradeTypePO.getName());
 		dto.setParentId(gradeTypePO.getParentId());
 		return new ResultModel(true, dto);
+	}
+
+	
+	
+	@Override
+	public ResultModel initAreaCenter(Integer id) {
+		Grade grade = gradeMapper.getGradeForInitAreaCenterById(id);
+		if(!Constants.AREA_CENTER.equals(grade.getGradeType())){
+			return new ResultModel(false, "", "区域中心才能初始化域名");
+		}
+		if(grade.getRedirectUrl() == null || grade.getMobileUrl() == null){
+			return new ResultModel (false, "", "请填写域名");
+		}
+		CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
+				grade.getMobileUrl());
+		ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
+				PublishType.REGION_CREATE);
+		if (!temp.isSuccess()) {
+			return new ResultModel (false, "", temp.getErrorMsg());
+		}
+		gradeMapper.updateGradeInit(id);
+		return new ResultModel (true, null);
 	}
 
 }

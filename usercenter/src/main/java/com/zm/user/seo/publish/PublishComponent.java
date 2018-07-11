@@ -19,7 +19,7 @@ public class PublishComponent {
 		CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(2, "test.cncoopbuy.com",
 				"mtest.cncoopbuy.com");
 		ResultModel result = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-				PublishType.TEST_REGION_CREATE);
+				PublishType.REGION_CREATE);
 		System.out.println(result);
 	}
 }

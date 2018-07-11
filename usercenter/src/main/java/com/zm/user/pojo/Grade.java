@@ -82,9 +82,21 @@ public class Grade extends Pagination{
 
 	private String gradeTypeName;
 	
+	private Integer init;
+	
 	public Grade(){
 		super();
 	}
+
+	public Integer getInit() {
+		return init;
+	}
+
+
+	public void setInit(Integer init) {
+		this.init = init;
+	}
+
 
 	public Integer getCopyMall() {
 		return copyMall;

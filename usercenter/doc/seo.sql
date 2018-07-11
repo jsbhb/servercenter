@@ -1,0 +1,1 @@
+alter table grade add column init tinyint unsigned default 0 comment '0未初始化，1已初始化';

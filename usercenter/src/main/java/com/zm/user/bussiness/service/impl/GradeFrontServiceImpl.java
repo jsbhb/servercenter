@@ -8,7 +8,6 @@ import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeFrontMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.GradeFrontService;
-import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.GradeConfig;
 import com.zm.user.pojo.UserInfo;
 
@@ -26,20 +25,12 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 	
 	@Override
 	public GradeConfig getGradeConfig(Integer mallId, Integer shopId, Integer userId) {
-		GradeConfig config = null;
 		if(shopId != null){
 			Integer tmallId = userComponent.getMallId(shopId);
 			if(!mallId.equals(tmallId)){
 				return null;
 			}
-			config = gradeFrontMapper.getGradeConfig(shopId);
-			if(config == null){
-				config = new GradeConfig();
-			}
-			Grade grade = userComponent.getUrl(shopId);
-			config.setUrl(grade.getRedirectUrl());
-			config.setMobileUrl(grade.getMobileUrl());
-			return config;
+			return gradeFrontMapper.getGradeConfig(shopId);
 		}
 		if(userId != null){
 			UserInfo user = userMapper.getUserInfo(userId);
@@ -49,14 +40,7 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 			if(user.getShopId() == null){
 				return null;
 			}
-			config = gradeFrontMapper.getGradeConfig(user.getShopId());
-			if(config == null){
-				config = new GradeConfig();
-			}
-			Grade grade = userComponent.getUrl(shopId);
-			config.setUrl(grade.getRedirectUrl());
-			config.setMobileUrl(grade.getMobileUrl());
-			return config;
+			return gradeFrontMapper.getGradeConfig(user.getShopId());
 		}
 		return null;
 	}

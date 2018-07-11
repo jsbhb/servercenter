@@ -11,7 +11,21 @@ public class FuzzySearchGrade {
 	private String name;
 	private Integer level;
 	private Integer centerId;
+	private String url;
+	private String mobileUrl;
 	
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getMobileUrl() {
+		return mobileUrl;
+	}
+	public void setMobileUrl(String mobileUrl) {
+		this.mobileUrl = mobileUrl;
+	}
 	public Integer getCenterId() {
 		return centerId;
 	}

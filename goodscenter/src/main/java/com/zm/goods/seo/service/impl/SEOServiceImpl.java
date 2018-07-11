@@ -119,9 +119,9 @@ public class SEOServiceImpl implements SEOService {
 		StringBuilder sb = new StringBuilder();
 		List<GoodsIndustryModel> list = goodsMapper.queryGoodsCategory(null);
 		SEONavigation seoNav = new SEONavigation("nav-1", SystemEnum.PCMALL, list);
-		publishAndHandle(sb, result, seoNav, PublishType.TEST_MODULE_CREATE);
+		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
 		seoNav = new SEONavigation("nav-1", SystemEnum.MPMALL, list);
-		publishAndHandle(sb, result, seoNav, PublishType.TEST_MODULE_CREATE);
+		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
 		if (sb.length() > 0) {
 			sb.append("发布失败");
 			result.setErrorMsg(sb.toString());
@@ -162,7 +162,7 @@ public class SEOServiceImpl implements SEOService {
 			seoDetail.setRegion(region);
 		}
 		
-		publishAndHandle(sb, result, seoDetail, PublishType.TEST_PAGE_CREATE);
+		publishAndHandle(sb, result, seoDetail, PublishType.PAGE_CREATE);
 		if (sb.length() > 0) {
 			sb.append("发布失败");
 			result.setErrorMsg(sb.toString());
@@ -220,13 +220,13 @@ public class SEOServiceImpl implements SEOService {
 				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
 						pageList);
-				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.TEST_PAGE_CREATE);
+				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				if(!success){
 					continue;
 				}
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.MPMALL,
 						pageList);
-				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.TEST_PAGE_CREATE);
+				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				if(!success){
 					continue;
 				}
@@ -265,12 +265,12 @@ public class SEOServiceImpl implements SEOService {
 				for (String goodsId : needDelgoodsIdList) {
 					String path = seoMapper.getGoodsAccessPath(goodsId);
 					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.PCMALL, goodsId + ".html");
-					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.TEST_PAGE_DELETE);
+					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.PAGE_DELETE);
 					if(!success){
 						continue;
 					}
 					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.MPMALL, goodsId + ".html");
-					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.TEST_PAGE_DELETE);
+					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.PAGE_DELETE);
 					if(!success){
 						continue;
 					}

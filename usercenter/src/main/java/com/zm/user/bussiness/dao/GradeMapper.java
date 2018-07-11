@@ -141,5 +141,9 @@ public interface GradeMapper<T> {
 	List<GradeTypePO> listGradeTypeByIds(List<Integer> list);
 
 	List<GradeTypePO> listGradeTypeChildrenById(Integer id);
+	
+	Grade getGradeForInitAreaCenterById(Integer id);
+	
+	void updateGradeInit(Integer id);
 
 }

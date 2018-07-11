@@ -12,26 +12,6 @@ public class GradeConfig {
 	
 	private String name;
 	
-	private String url;
-	
-	private String mobileUrl;
-
-	public String getMobileUrl() {
-		return mobileUrl;
-	}
-
-	public void setMobileUrl(String mobileUrl) {
-		this.mobileUrl = mobileUrl;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
 	public Integer getId() {
 		return id;
 	}

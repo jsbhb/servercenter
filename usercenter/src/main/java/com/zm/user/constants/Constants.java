@@ -48,4 +48,7 @@ public class Constants {
 	
 	public static final Integer AUDIT_PASS = 2;
 	public static final Integer AUDIT_UN_PASS = 1;
+	
+	//*********************分级类型**************************
+	public static final Integer AREA_CENTER = 2;//区域中心
 }

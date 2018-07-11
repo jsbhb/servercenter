@@ -9,6 +9,7 @@
 		<result column="grade_type" property="gradeType" jdbcType="INTEGER" />
 		<result column="grade_level" property="gradeLevel" jdbcType="INTEGER" />
 		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
+		<result column="init" property="init" jdbcType="INTEGER" />
 		<result column="person_in_charge" property="personInCharge"
 			jdbcType="VARCHAR" />
 		<result column="phone" property="phone" jdbcType="VARCHAR" />
@@ -232,5 +233,13 @@
 	
 	<select id="listGradeTypeChildrenById" parameterType="Object" resultMap="gradeTypePO">
 		select * from grade_type where parent_id = #{id}
+	</select>
+	
+	<select id="getGradeForInitAreaCenterById" parameterType="Object" resultMap="grade">
+		select id,redirect_url,mobile_url,grade_type from grade where id = #{id}
+	</select>
+	
+	<select id="updateGradeInit" parameterType="Object">
+		update grade set init = 1 where id = #{id}
 	</select>
 </mapper>
