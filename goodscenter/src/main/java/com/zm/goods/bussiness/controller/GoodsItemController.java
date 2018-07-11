@@ -1,5 +1,7 @@
 package com.zm.goods.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +21,8 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.GoodsPriceRatioEntity;
+import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.ResultModel;
 
 /**
@@ -318,6 +322,66 @@ public class GoodsItemController {
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/queryGoodsPriceRatioListInfo", method = RequestMethod.POST)
+	public ResultModel queryGoodsPriceRatioListInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsItemEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			List<GoodsPriceRatioEntity> goodsPriceRatios = goodsItemService.queryGoodsPriceRatioListInfo(entity);
+			return new ResultModel(true, goodsPriceRatios);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/createGoodsRatioPlatformInfo", method = RequestMethod.POST)
+	public ResultModel createGoodsRatioPlatformInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsRatioPlatformEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			goodsItemService.createGoodsRatioPlatformInfo(entity);
+			return new ResultModel(true, "");
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/updateGoodsRatioPlatformInfo", method = RequestMethod.POST)
+	public ResultModel updateGoodsRatioPlatformInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsRatioPlatformEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			goodsItemService.updateGoodsRatioPlatformInfo(entity);
+			return new ResultModel(true, "");
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/createGoodsPriceRatioInfo", method = RequestMethod.POST)
+	public ResultModel createGoodsPriceRatioInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody List<GoodsPriceRatioEntity> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			goodsItemService.createGoodsPriceRatioInfo(list);
+			return new ResultModel(true, "");
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/item/updateGoodsPriceRatioInfo", method = RequestMethod.POST)
+	public ResultModel updateGoodsPriceRatioInfo(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody List<GoodsPriceRatioEntity> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			goodsItemService.updateGoodsPriceRatioInfo(list);
+			return new ResultModel(true, "");
 		}
 
 		return new ResultModel(false, "版本错误");

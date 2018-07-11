@@ -31,6 +31,8 @@ import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.GoodsPriceRatioEntity;
+import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 
 /**
  * ClassName: GoodsBackServiceImpl <br/>
@@ -256,5 +258,34 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void updateGoodsExtension(GoodsExtensionEntity entity) {
 		goodsItemMapper.updateOrInsertGoodsExtension(entity);
+	}
+
+	@Override
+	public List<GoodsPriceRatioEntity> queryGoodsPriceRatioListInfo(GoodsItemEntity entity) {
+		return goodsItemMapper.selectGoodsPriceRatioListInfo(entity);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void createGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity) {
+		goodsItemMapper.insertGoodsRatioPlatformInfo(entity);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity) {
+		goodsItemMapper.updateGoodsRatioPlatformInfo(entity);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void createGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list) {
+		goodsItemMapper.insertGoodsPriceRatioInfo(list);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void updateGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list) {
+		goodsItemMapper.updateGoodsPriceRatioInfo(list);
 	}
 }

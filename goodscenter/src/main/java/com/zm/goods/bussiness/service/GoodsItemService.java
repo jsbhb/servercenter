@@ -7,11 +7,15 @@
  */
 package com.zm.goods.bussiness.service;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.GoodsPriceRatioEntity;
+import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 
 /**
  * ClassName: GoodsItemService <br/>
@@ -199,5 +203,15 @@ public interface GoodsItemService {
 	GoodsExtensionEntity queryGoodsExtensionInfo(GoodsExtensionEntity entity);
 
 	void updateGoodsExtension(GoodsExtensionEntity entity);
+	
+	List<GoodsPriceRatioEntity> queryGoodsPriceRatioListInfo(GoodsItemEntity entity);
+
+	void createGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
+
+	void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
+
+	void createGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
+
+	void updateGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
 
 }

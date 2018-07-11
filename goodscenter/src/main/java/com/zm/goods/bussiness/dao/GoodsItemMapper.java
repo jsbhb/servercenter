@@ -16,6 +16,8 @@ import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.GoodsPriceRatioEntity;
+import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
 
 /**
@@ -262,4 +264,14 @@ public interface GoodsItemMapper {
 	GoodsExtensionEntity selectGoodsExtensionInfo(GoodsExtensionEntity entity);
 	
 	void updateOrInsertGoodsExtension(GoodsExtensionEntity entity);
+
+	List<GoodsPriceRatioEntity> selectGoodsPriceRatioListInfo(GoodsItemEntity entity);
+	
+	void insertGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
+	
+	void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
+	
+	void insertGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
+	
+	void updateGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
 }
