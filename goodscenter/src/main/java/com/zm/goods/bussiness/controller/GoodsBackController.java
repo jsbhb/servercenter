@@ -17,6 +17,7 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFielsMaintainBO;
@@ -426,6 +427,7 @@ public class GoodsBackController {
 			try {
 				return new ResultModel(true, goodsBackService.maintainFiles(list));
 			} catch (Exception e) {
+				LogUtil.writeErrorLog("批量导入商品图片出错", e);
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
 						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
@@ -468,7 +470,7 @@ public class GoodsBackController {
 	@RequestMapping(value = "{version}/goods/publish/exception/{centerId}/{type}", method = RequestMethod.POST)
 	public ResultModel listPublishExceptionGoods(@PathVariable("version") Double version,
 			@PathVariable("centerId") Integer centerId, @RequestBody GoodsEntity entity,
-			@PathVariable("version") Integer type) {
+			@PathVariable("type") Integer type) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {

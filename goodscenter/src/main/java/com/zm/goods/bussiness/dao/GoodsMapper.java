@@ -178,4 +178,6 @@ public interface GoodsMapper {
 
 	List<GoodsSpecs> listItemUpshelvTagForLuceneUpdate(Map<String, Object> param);
 
+	int countGoodsBySupplierIdAndItemId(Map<String, Object> param);
+
 }

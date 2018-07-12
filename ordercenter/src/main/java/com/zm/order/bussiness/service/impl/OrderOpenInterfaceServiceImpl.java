@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +16,9 @@ import com.zm.order.bussiness.component.OpenInterfaceUtil;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderOpenInterfaceMapper;
+import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderOpenInterfaceService;
+import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
@@ -23,8 +27,12 @@ import com.zm.order.pojo.ButtJointOrder;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderStatus;
+import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.Tax;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.utils.CalculationUtils;
+import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 
 @Service
@@ -46,8 +54,18 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	@Resource
 	ShareProfitComponent shareProfitComponent;
 
+	@Resource
+	RedisTemplate<String, Object> template;
+
+	@Resource
+	OrderService orderService;
+	
+	@Resource
+	CacheAbstractService cacheAbstractService;
+
+	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel addOrder(String order) {
+	public ResultModel addOrder(String order) throws Exception {
 
 		ButtJointOrder orderInfo = null;
 		try {
@@ -87,14 +105,96 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
+		orderInfo.setUserId(Integer.valueOf(resultModel.getObj().toString()));
 		// 判断库存和购买数量
-		resultModel = goodsFeignClient.delButtjoinOrderStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
-				orderInfo.getOrderFlag());
+		resultModel = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
+				false, 2, orderInfo.getOrderFlag(), orderInfo.getCouponIds(), orderInfo.getUserId());
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
-		orderInfo.setUserId(Integer.valueOf(resultModel.getObj().toString()));
+		Map<String, Object> priceAndWeightMap = null;
+		Double amount = 0.0;
+		priceAndWeightMap = (Map<String, Object>) resultModel.getObj();
+		amount = (Double) priceAndWeightMap.get("totalAmount");
+
+		// 邮费和税费初始值
+		Double postFee = 0.0;
+		Double taxFee = 0.0;
+		Double totalExciseTax = 0.0;
+		Double totalIncremTax = 0.0;
+		Double unDiscountAmount = 0.0;
+		Integer weight = (Integer) priceAndWeightMap.get("weight");
+
+		// 获取包邮包税
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> tempMap = hashOperations.entries(Constants.POST_TAX + orderInfo.getSupplierId());
+		boolean freePost = false;
+		boolean freeTax = false;
+		if (tempMap != null) {
+			freePost = Constants.FREE_POST.equals(tempMap.get("post"))
+					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
+			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
+		}
+		if (!freePost) {
+			// 计算邮费(自提不算邮费)
+			String province = orderInfo.getOrderDetail().getReceiveProvince();
+			PostFeeDTO post = new PostFeeDTO(amount, province, weight, 2, orderInfo.getSupplierId());
+			List<PostFeeDTO> postFeeList = new ArrayList<PostFeeDTO>();
+			postFeeList.add(post);
+			postFee = orderService.getPostFee(postFeeList).get(0).getPostFee();
+		}
+		if (!freeTax) {
+			// 计算税费
+			if (Constants.O2O_ORDER_TYPE.equals(orderInfo.getOrderFlag())) {
+				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
+
+				for (Map.Entry<String, Double> entry : map.entrySet()) {
+					unDiscountAmount += entry.getValue();
+				}
+				for (Map.Entry<String, Double> entry : map.entrySet()) {
+					Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
+					Double fee = entry.getValue();
+					Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
+					if (tax.getExciseTax() != null) {
+						if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
+							return new ResultModel(false, ErrorCodeEnum.TAX_SET_ERROR.getErrorCode(),
+									ErrorCodeEnum.TAX_SET_ERROR.getErrorMsg());
+						}
+						Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
+								CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
+						Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
+						totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
+						Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
+								tax.getIncrementTax());
+						totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
+					} else {
+						totalIncremTax += CalculationUtils.mul(
+								CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
+								0.7);
+					}
+				}
+				taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
+			}
+		}
+
+		amount = CalculationUtils.add(amount, taxFee, postFee);
+		amount = CalculationUtils.round(2, amount);
+		int totalAmount = (int) CalculationUtils.mul(amount, 100);
+		int localAmount = (int) (orderInfo.getOrderDetail().getPayment() * 100);
+		if (totalAmount - localAmount > 5 || totalAmount - localAmount < -5) {// 价格区间定义在正负5分
+			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
+					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
+		}
+
 		orderInfo.setStatus(Constants.ORDER_PAY);
+
+		resultModel = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
+				orderInfo.getOrderFlag());
+		if (!resultModel.isSuccess()) {
+			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
+					resultModel.getErrorMsg() + ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
+		}
+
 		orderMapper.saveOrder(orderInfo);
 		orderInfo.getOrderDetail().setOrderId(orderInfo.getOrderId());
 
@@ -104,6 +204,12 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			goods.setOrderId(orderInfo.getOrderId());
 		}
 		orderMapper.saveOrderGoods(orderInfo.getOrderGoodsList());
+
+		// 增加缓存订单数量
+		cacheAbstractService.addOrderCountCache(orderInfo.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+		// 增加月订单数
+		String time = DateUtils.getTimeString("yyyyMM");
+		cacheAbstractService.addOrderCountCache(orderInfo.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
 		shareProfitComponent.calShareProfitStayToAccount(orderInfo.getOrderId());// 计算资金池和返佣
 		return new ResultModel(true, null);

@@ -6,6 +6,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.UserDetail;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.RegularUtil;
 
 public class OpenInterfaceUtil {
@@ -37,6 +38,13 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.ORDER_MISS_DETAIL.getErrorCode(),
 					ErrorCodeEnum.ORDER_MISS_DETAIL.getErrorMsg());
 		}
+		Double taxFee = CalculationUtils.add(orderInfo.getOrderDetail().getExciseTax(),
+				orderInfo.getOrderDetail().getIncrementTax(), orderInfo.getOrderDetail().getTariffTax());
+		if (CalculationUtils.sub(taxFee, orderInfo.getOrderDetail().getTaxFee()) > 3
+				|| CalculationUtils.sub(taxFee, orderInfo.getOrderDetail().getTaxFee()) < -3) {
+			return new ResultModel(false, ErrorCodeEnum.TAX_ERROR.getErrorCode(),
+					ErrorCodeEnum.TAX_ERROR.getErrorMsg());
+		}
 		if (orderInfo.getOrderGoodsList() == null) {
 			return new ResultModel(false, ErrorCodeEnum.ORDER_MISS_GOODS.getErrorCode(),
 					ErrorCodeEnum.ORDER_MISS_GOODS.getErrorMsg());
@@ -57,11 +65,20 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.RECEIVE_PHONE_ERROR.getErrorCode(),
 					ErrorCodeEnum.RECEIVE_PHONE_ERROR.getErrorMsg());
 		}
+		Double amount = 0.0;
 		for (OrderGoods goods : orderInfo.getOrderGoodsList()) {
 			if (!goods.validate()) {
 				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 			}
+			amount = CalculationUtils.add(amount, CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity()));
+		}
+		amount = CalculationUtils.add(amount, orderInfo.getOrderDetail().getTaxFee(),
+				orderInfo.getOrderDetail().getPostFee());
+		if (CalculationUtils.sub(orderInfo.getOrderDetail().getPayment(), amount) > 3
+				|| CalculationUtils.sub(orderInfo.getOrderDetail().getPayment(), amount) < -3) {
+			return new ResultModel(false, ErrorCodeEnum.PAYMENT_ERROR.getErrorCode(),
+					ErrorCodeEnum.PAYMENT_ERROR.getErrorMsg());
 		}
 
 		return null;
