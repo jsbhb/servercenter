@@ -310,4 +310,8 @@ public interface GoodsBackMapper {
 	void insertBatch(List<GoodsEntity> goodsList);
 
 	void insertTagBindList(List<ERPGoodsTagBindEntity> entityList);
+
+	Page<GoodsEntity> listPublishError(Map<String, Object> param);
+
+	Page<GoodsEntity> listUnPublishError(Map<String, Object> param);
 }

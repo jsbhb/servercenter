@@ -440,9 +440,10 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/tag/batch-bind", method = RequestMethod.POST)
-	public ResultModel tagBatchBind(@PathVariable("version") Double version, @RequestBody List<GoodsTagBindEntity> list) {
+	public ResultModel tagBatchBind(@PathVariable("version") Double version,
+			@RequestBody List<GoodsTagBindEntity> list) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsBackService.tagBatchBind(list);
 		}
@@ -456,6 +457,23 @@ public class GoodsBackController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
 				return goodsBackService.saveItemInfo(entity);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/publish/exception/{centerId}/{type}", method = RequestMethod.POST)
+	public ResultModel listPublishExceptionGoods(@PathVariable("version") Double version,
+			@PathVariable("centerId") Integer centerId, @RequestBody GoodsEntity entity,
+			@PathVariable("version") Integer type) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				Page<GoodsEntity> page = goodsBackService.listPublishExceptionGoods(type, entity, centerId);
+				return new ResultModel(true, page, new Pagination(page));
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}

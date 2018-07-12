@@ -14,11 +14,16 @@
 		<result column="goods_name" property="goodsName"/>
 		<result column="description" property="description"/>
 		<result column="status" property="status"/>
+		<result column="type" property="type"/>
 		<result column="detail_path" property="detailPath"/>
 		<result column="index_status" property="indexStatus"/>
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
+		<collection property="files" ofType="com.zm.goods.pojo.GoodsFile">
+			<id column="file_id" property="id"/>
+			<result column="path" property="path" jdbcType="VARCHAR" />
+		</collection>
 	</resultMap>
 	
 
@@ -456,4 +461,22 @@
 			(#{item.itemId},#{item.tagId},now(),now(),#{item.opt})
 		</foreach>
 	</insert>
+	
+	<select id="listPublishError" parameterType="Object" resultMap="entity">
+		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods${centerId} gi left join goods g 
+		on g.goods_id = gi.goods_id left join goods_file gf on g.goods_id = gf.goods_id 
+		where gi.status = 1 and is_publish = 0 
+		<if test="entity.goodsName != null and entity.goodsName != ''">
+			and goods_name like concat('%',#{entity.goodsName},'%') 
+		</if>
+	</select>
+	
+	<select id="listUnPublishError" parameterType="Object" resultMap="entity">
+		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods${centerId} gi left join goods g 
+		on g.goods_id = gi.goods_id left join goods_file gf on g.goods_id = gf.goods_id 
+		where gi.status = 0 and is_publish = 1 
+		<if test="entity.goodsName != null and entity.goodsName != ''">
+			and goods_name like concat('%',#{entity.goodsName},'%') 
+		</if>
+	</select>
 </mapper>
