@@ -799,14 +799,26 @@
 		</if>
 	</select>
 	
-	<select id="selectGoodsPriceRatioListInfo" parameterType="Object" resultMap="goodsPriceRatioBase">
-		select gpr.*,grp.ratio_platform_name
+	<select id="selectGoodsRatioPlatformForEdit" parameterType="Object" resultMap="goodsRatioPlatformBase">
+		select grp.*
 		from goods_ratio_platform grp
-		inner join goods_price_ratio gpr on gpr.ratio_platform_id = grp.id
-		where 1=1 and grp.is_use = '0'
-		<if test="itemId!=null and itemId!=''">
-			and gpr.item_id = #{itemId} 
-		</if>
+		where 1=1 and grp.is_use = '0' and grp.id = #{id}
+	</select>
+	
+	<select id="selectGoodsPriceRatioListInfo" parameterType="Object" resultMap="goodsPriceRatioBase">
+		select base.* from (
+		select gpr.id,gpr.item_id,gpr.ratio_price,
+		gpr.evaluate_qty,gpr.sales_volume,gpr.status,
+		gpr.grab_address,grp.id ratio_platform_id,grp.ratio_platform_name 
+		from goods_ratio_platform grp
+		left join 
+		(select * from goods_price_ratio 
+		 where 1=1 
+		 <if test="itemId!=null and itemId!=''">
+			and item_id = #{itemId} 
+		 </if>
+		) gpr on grp.id = gpr.ratio_platform_id
+		where 1=1 and grp.is_use = '0') base
 	</select>
 	
 	<insert id="insertGoodsRatioPlatformInfo" parameterType="object">
@@ -822,28 +834,18 @@
         where id = #{id}
 	</update>
 	
-	<insert id="insertGoodsPriceRatioInfo" parameterType="Object">
-		insert ignore into goods_price_ratio 
-		(item_id,ratio_platform_id,ratio_price,evaluate_qty,sales_volume,status,grab_address,create_time,update_time,opt)
-		value
+	<insert id="syncGoodsPriceRatioInfo" parameterType="object">
+		INSERT INTO goods_price_ratio 
+		(item_id,ratio_platform_id,ratio_price,evaluate_qty,sales_volume,
+		status,grab_address,create_time,update_time,opt)
+		VALUES
 		<foreach collection="list" item="item" separator=",">
 			(#{item.itemId},#{item.ratioPlatformId},#{item.ratioPrice},#{item.evaluateQty},
 			#{item.salesVolume},#{item.status},#{item.grabAddress},now(),now(),#{item.opt})
 		</foreach>
+		ON DUPLICATE KEY UPDATE 
+		ratio_price = VALUES(ratio_price), evaluate_qty = VALUES(evaluate_qty),
+		sales_volume = VALUES(sales_volume), status = VALUES(status), 
+		grab_address = VALUES(grab_address),	update_time=now(), opt=VALUES(opt)
 	</insert>
-	
-	<update id="updateGoodsPriceRatioInfo" parameterType="Object">
-		<foreach collection="list" item="item" separator=";">
-			update goods_price_ratio
-			<set>
-				ratio_price = #{item.ratioPrice},
-				evaluate_qty = #{item.evaluateQty},
-				sales_volume = #{item.salesVolume},
-				status = #{item.status},
-				grab_address = #{item.grabAddress},
-				update_time = now(),opt = #{item.opt}
-            </set>
-            where item_id = #{item.itemId} and ratio_platform_id = #{item.ratioPlatformId}
-		</foreach>
-	</update>
 </mapper>

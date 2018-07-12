@@ -208,12 +208,12 @@ public interface GoodsItemService {
 
 	Page<GoodsRatioPlatformEntity> queryGoodsRatioPlanformPage(GoodsRatioPlatformEntity entity);
 
+	GoodsRatioPlatformEntity queryGoodsRatioPlanformInfo(GoodsRatioPlatformEntity entity);
+
 	void createGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 
 	void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 
-	void createGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
-
-	void updateGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
+	void syncGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
 
 }

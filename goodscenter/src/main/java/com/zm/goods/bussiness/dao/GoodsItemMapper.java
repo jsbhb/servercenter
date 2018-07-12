@@ -268,12 +268,12 @@ public interface GoodsItemMapper {
 	List<GoodsPriceRatioEntity> selectGoodsPriceRatioListInfo(GoodsItemEntity entity);
 
 	Page<GoodsRatioPlatformEntity> selectGoodsRatioPlatformForPage(GoodsRatioPlatformEntity entity);
+
+	GoodsRatioPlatformEntity selectGoodsRatioPlatformForEdit(GoodsRatioPlatformEntity entity);
 	
 	void insertGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 	
 	void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 	
-	void insertGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
-	
-	void updateGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
+	void syncGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
 }

@@ -351,6 +351,18 @@ public class GoodsItemController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	@RequestMapping(value = "{version}/goods/item/queryGoodsRatioPlatformForEdit", method = RequestMethod.POST)
+	public ResultModel queryGoodsRatioPlatformForEdit(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsRatioPlatformEntity entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			GoodsRatioPlatformEntity ratioPlatformInfo = goodsItemService.queryGoodsRatioPlanformInfo(entity);
+			return new ResultModel(true, ratioPlatformInfo);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 	@RequestMapping(value = "{version}/goods/item/createGoodsRatioPlatformInfo", method = RequestMethod.POST)
 	public ResultModel createGoodsRatioPlatformInfo(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsRatioPlatformEntity entity) {
@@ -375,24 +387,12 @@ public class GoodsItemController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/goods/item/createGoodsPriceRatioInfo", method = RequestMethod.POST)
-	public ResultModel createGoodsPriceRatioInfo(HttpServletRequest request, @PathVariable("version") Double version,
+	@RequestMapping(value = "{version}/goods/item/syncGoodsPriceRatioInfo", method = RequestMethod.POST)
+	public ResultModel syncGoodsPriceRatioInfo(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody List<GoodsPriceRatioEntity> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			goodsItemService.createGoodsPriceRatioInfo(list);
-			return new ResultModel(true, "");
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-
-	@RequestMapping(value = "{version}/goods/item/updateGoodsPriceRatioInfo", method = RequestMethod.POST)
-	public ResultModel updateGoodsPriceRatioInfo(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody List<GoodsPriceRatioEntity> list) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			goodsItemService.updateGoodsPriceRatioInfo(list);
+			goodsItemService.syncGoodsPriceRatioInfo(list);
 			return new ResultModel(true, "");
 		}
 

@@ -272,6 +272,11 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
+	public GoodsRatioPlatformEntity queryGoodsRatioPlanformInfo(GoodsRatioPlatformEntity entity) {
+		return goodsItemMapper.selectGoodsRatioPlatformForEdit(entity);
+	}
+
+	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void createGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity) {
 		goodsItemMapper.insertGoodsRatioPlatformInfo(entity);
@@ -285,13 +290,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
-	public void createGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list) {
-		goodsItemMapper.insertGoodsPriceRatioInfo(list);
-	}
-
-	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
-	public void updateGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list) {
-		goodsItemMapper.updateGoodsPriceRatioInfo(list);
+	public void syncGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list) {
+		goodsItemMapper.syncGoodsPriceRatioInfo(list);
 	}
 }
