@@ -103,15 +103,18 @@ public class LogAopUtil {
 			}
 			sb.append(paraName + ":" + value + ",");
 		}
+		Integer centerId = -1;
+		try {
+			centerId = Integer.valueOf(appKey.split("_")[1]);
+		} catch (Exception e) {
+			logger.error("appKey参数有误=" + appKey, e);
+		}
 		
 		try {
-			Integer centerId = Integer.valueOf(appKey);
 			String parameter = sb.substring(0, sb.length() - 1);
 			OpenInfLog log = new OpenInfLog(centerId, ServerLogEnum.ORDER_CENTER.getServerId(),
 					ServerLogEnum.ORDER_CENTER.getServerName(), methodName, ip, parameter);
 			logFeignClient.saveOpenInfoLog(Constants.FIRST_VERSION, log);
-		} catch (NumberFormatException e) {
-			logger.error("区域中心ID转换错误============,appKey参数有误=" + appKey, e);
 		} catch (Exception e) {
 			logger.error("日志记录ERROR====", e);
 		}

@@ -27,16 +27,12 @@ public class OrderOpenInterfaceController {
 			String appKey = req.getParameter("appKey");
 			if (order == null || appKey == null || "".equals(order) || "".equals(appKey)) {
 				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
-						ErrorCodeEnum.MISSING_PARAM.getErrorCode());
+						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 			}
 			try {
 				return orderOpenInterfaceService.addOrder(order);
 			} catch (Exception e) {
 				e.printStackTrace();
-				if (e.getMessage().contains("Duplicate entry")) {
-					return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
-							ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
-				}
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
 						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
