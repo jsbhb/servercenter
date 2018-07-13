@@ -106,4 +106,15 @@ public class DateUtils {
         return Math.abs(year + month);  
     }  
 	
+	public static boolean judgeDateFormat(String str,String format){
+		SimpleDateFormat formatter = new SimpleDateFormat(format);
+		try{  
+        	formatter.setLenient(false);
+            formatter.parse(str);  
+            return true;
+        }catch(Exception e){
+        	return false;
+        }
+	}
+	
 }

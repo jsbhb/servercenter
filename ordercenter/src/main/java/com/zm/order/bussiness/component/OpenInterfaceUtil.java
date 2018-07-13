@@ -7,6 +7,7 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.UserDetail;
 import com.zm.order.pojo.UserInfo;
 import com.zm.order.utils.CalculationUtils;
+import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.RegularUtil;
 
 public class OpenInterfaceUtil {
@@ -22,14 +23,19 @@ public class OpenInterfaceUtil {
 		user.setUserDetail(detail);
 		return user;
 	}
+	
 
 	public static ResultModel paramValidate(ButtJointOrder orderInfo) {
 		if (!orderInfo.validate() || !orderInfo.getOrderDetail().validate()) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
-		if (!orderInfo.getCenterId().equals(orderInfo.getShopId()) || !"5".equals(orderInfo.getCreateType())
-				|| !"0".equals(orderInfo.getExpressType()) || !"0".equals(orderInfo.getOrderDetail().getDisAmount())) {
+		if(!DateUtils.judgeDateFormat(orderInfo.getOrderDetail().getPayTime(), "yyyy-MM-dd HH:mm:ss")){
+			return new ResultModel(false, ErrorCodeEnum.TIME_FORMATE_ERROR.getErrorCode(),
+					ErrorCodeEnum.TIME_FORMATE_ERROR.getErrorMsg());
+		}
+		if (2 != (orderInfo.getCenterId()) || 5 != orderInfo.getCreateType()
+				|| 0 != orderInfo.getExpressType() || 0 != orderInfo.getOrderDetail().getDisAmount()) {
 			return new ResultModel(false, ErrorCodeEnum.PARAM_ERROR.getErrorCode(),
 					ErrorCodeEnum.PARAM_ERROR.getErrorMsg());
 		}

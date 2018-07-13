@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.OrderOpenInterfaceService;
 import com.zm.order.constants.Constants;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.ResultModel;
 
@@ -32,7 +33,11 @@ public class OrderOpenInterfaceController {
 			try {
 				return orderOpenInterfaceService.addOrder(order);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.writeErrorLog("【对接订单出错】",e);
+				if (e.getMessage().contains("Duplicate entry")) {
+					return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
+							ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
+				}
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
 						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
@@ -55,7 +60,7 @@ public class OrderOpenInterfaceController {
 			try {
 				return orderOpenInterfaceService.getOrderStatus(data);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.writeErrorLog("【对接获取订单状态出错】",e);
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
 						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
@@ -79,7 +84,7 @@ public class OrderOpenInterfaceController {
 			try {
 				return orderOpenInterfaceService.payCustom(data);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.writeErrorLog("【对接订单支付单报关出错】",e);
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
 						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
