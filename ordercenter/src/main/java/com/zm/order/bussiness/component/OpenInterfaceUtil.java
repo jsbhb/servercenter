@@ -41,6 +41,13 @@ public class OpenInterfaceUtil {
 			add(2);// 支付宝
 		}
 	};
+	@SuppressWarnings("serial")
+	private static final List<Integer> orderSource = new ArrayList<Integer>() {
+		{
+			add(0);// PC
+			add(1);// 手机
+		}
+	};
 
 	public static ResultModel paramValidate(ButtJointOrder orderInfo) {
 		if (!orderInfo.validate() || !orderInfo.getOrderDetail().validate()) {
@@ -53,7 +60,8 @@ public class OpenInterfaceUtil {
 		}
 		if (2 != orderInfo.getCenterId() || 5 != orderInfo.getCreateType() || 0 != orderInfo.getExpressType()
 				|| 0 != orderInfo.getOrderDetail().getDisAmount() || !orderType.contains(orderInfo.getOrderFlag())
-				|| !payType.contains(orderInfo.getOrderDetail().getPayType())) {
+				|| !payType.contains(orderInfo.getOrderDetail().getPayType())
+				|| !orderSource.contains(orderInfo.getOrderSource())) {
 			return new ResultModel(false, ErrorCodeEnum.PARAM_ERROR.getErrorCode(),
 					ErrorCodeEnum.PARAM_ERROR.getErrorMsg());
 		}
