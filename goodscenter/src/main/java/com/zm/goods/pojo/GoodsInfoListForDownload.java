@@ -1,5 +1,6 @@
 package com.zm.goods.pojo;
 
+import java.util.List;
 
 public class GoodsInfoListForDownload {
 
@@ -23,6 +24,8 @@ public class GoodsInfoListForDownload {
 	private Integer gradeType;
 	private String gradeTypeName;
 	private Double proportion;
+	private List<GoodsTagEntity> goodsTagList;
+	private List<GoodsPriceRatioEntity> goodsPriceRatioList;
 	
 	public String getGoodsId() {
 		return goodsId;
@@ -144,5 +147,17 @@ public class GoodsInfoListForDownload {
 	}
 	public void setInfo(String info) {
 		this.info = info;
+	}
+	public List<GoodsTagEntity> getGoodsTagList() {
+		return goodsTagList;
+	}
+	public void setGoodsTagList(List<GoodsTagEntity> goodsTagList) {
+		this.goodsTagList = goodsTagList;
+	}
+	public List<GoodsPriceRatioEntity> getGoodsPriceRatioList() {
+		return goodsPriceRatioList;
+	}
+	public void setGoodsPriceRatioList(List<GoodsPriceRatioEntity> goodsPriceRatioList) {
+		this.goodsPriceRatioList = goodsPriceRatioList;
 	}
 }

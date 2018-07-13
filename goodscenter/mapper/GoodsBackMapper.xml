@@ -192,6 +192,17 @@
 		<result column="grade_type" property="gradeType"/>
 		<result column="grade_type_name" property="gradeTypeName"/>
 		<result column="proportion" property="proportion"/>
+		<collection property="goodsTagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
+			<id column="gtbid" property="id"/>
+			<result column="tag_name" property="tagName"/>
+		</collection>
+		<collection property="goodsPriceRatioList" ofType="com.zm.goods.pojo.GoodsPriceRatioEntity">
+			<id column="gprid" property="id"/>
+			<result column="ratio_platform_name" property="ratioPlatformName"/>
+			<result column="ratio_price" property="ratioPrice"/>
+			<result column="evaluate_qty" property="evaluateQty"/>
+			<result column="sales_volume" property="salesVolume"/>
+		</collection>
 	</resultMap>
 	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
@@ -413,7 +424,9 @@
 		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
 		gi.status goods_status,gi2.status item_status,g.supplier_name,gs.fxqty,
 		b.first_category first_name,b.second_category second_name,b.third_category third_name,
-		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion
+		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion,
+		gtb.id gtbid,gt.tag_name,gpr.id gprid,grp.ratio_platform_name,gpr.ratio_price,
+		gpr.evaluate_qty,gpr.sales_volume
 		from zm_goods.goods_item gi
 		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
 		left join zm_goods.goods g on g.goods_id = gi.goods_id
@@ -421,9 +434,13 @@
 		left join zm_goods.goods_stock gs on gi.item_id = gs.item_id
 		left join zm_goods.goods_price gp on gi.item_id = gp.item_id
 		left join zm_goods.goods_rebate gr on gi.item_id = gr.item_id
+		left join zm_goods.goods_tag_bind gtb on gi.item_id = gtb.item_id
+		left join zm_goods.goods_tag gt on gtb.tag_id = gt.id
+		left join zm_goods.goods_price_ratio gpr on gi.item_id = gpr.item_id
+		left join zm_goods.goods_ratio_platform grp on gpr.ratio_platform_id = grp.id
 		where 1=1 and gi.is_del = 0 and g.is_del = 0
-		<if test="gradeType==null or gradeType == -1">
-			and gr.proportion > 0
+		<if test="proportionFlg!=null and proportionFlg != -1">
+			and gr.proportion &gt; 0
 		</if>
 		<if test="gradeType!=null and gradeType != -1">
 			and gr.grade_type = #{gradeType}
@@ -434,6 +451,18 @@
 		<if test="itemIdList != null and itemIdList.size() > 0">
 			and gi.item_id in 
 			<foreach collection="itemIdList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="rebateStart!=null and rebateStart != -1">
+			and gr.proportion &gt;= #{rebateStart}
+		</if>
+		<if test="rebateEnd!=null and rebateEnd != -1">
+			and gr.proportion &lt;= #{rebateEnd}
+		</if>
+		<if test="tagIdList != null and tagIdList.size() > 0">
+			and gtb.tag_id in 
+			<foreach collection="tagIdList" item="item" open="(" separator="," close=")">
                 #{item}
 			</foreach>
 		</if>
