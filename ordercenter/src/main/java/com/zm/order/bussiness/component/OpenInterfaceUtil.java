@@ -1,5 +1,8 @@
 package com.zm.order.bussiness.component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.zm.order.pojo.ButtJointOrder;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderGoods;
@@ -23,19 +26,34 @@ public class OpenInterfaceUtil {
 		user.setUserDetail(detail);
 		return user;
 	}
-	
+
+	@SuppressWarnings("serial")
+	private static final List<Integer> orderType = new ArrayList<Integer>() {
+		{
+			add(0);// 跨境
+			add(2);// 一般贸易
+		}
+	};
+	@SuppressWarnings("serial")
+	private static final List<Integer> payType = new ArrayList<Integer>() {
+		{
+			add(1);// 微信
+			add(2);// 支付宝
+		}
+	};
 
 	public static ResultModel paramValidate(ButtJointOrder orderInfo) {
 		if (!orderInfo.validate() || !orderInfo.getOrderDetail().validate()) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
-		if(!DateUtils.judgeDateFormat(orderInfo.getOrderDetail().getPayTime(), "yyyy-MM-dd HH:mm:ss")){
+		if (!DateUtils.judgeDateFormat(orderInfo.getOrderDetail().getPayTime(), "yyyy-MM-dd HH:mm:ss")) {
 			return new ResultModel(false, ErrorCodeEnum.TIME_FORMATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.TIME_FORMATE_ERROR.getErrorMsg());
 		}
-		if (2 != (orderInfo.getCenterId()) || 5 != orderInfo.getCreateType()
-				|| 0 != orderInfo.getExpressType() || 0 != orderInfo.getOrderDetail().getDisAmount()) {
+		if (2 != orderInfo.getCenterId() || 5 != orderInfo.getCreateType() || 0 != orderInfo.getExpressType()
+				|| 0 != orderInfo.getOrderDetail().getDisAmount() || !orderType.contains(orderInfo.getOrderFlag())
+				|| !payType.contains(orderInfo.getOrderDetail().getPayType())) {
 			return new ResultModel(false, ErrorCodeEnum.PARAM_ERROR.getErrorCode(),
 					ErrorCodeEnum.PARAM_ERROR.getErrorMsg());
 		}
@@ -55,7 +73,11 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.ORDER_MISS_GOODS.getErrorCode(),
 					ErrorCodeEnum.ORDER_MISS_GOODS.getErrorMsg());
 		}
-		if (orderInfo.getOrderDetail().getPayment() > 2000) {
+		if (orderInfo.getOrderFlag() == 0 && orderInfo.getOrderDetail().getPayment() > 2000) {
+			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
+					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
+		}
+		if (orderInfo.getOrderFlag() == 2 && orderInfo.getOrderDetail().getPayment() < 800) {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 		}

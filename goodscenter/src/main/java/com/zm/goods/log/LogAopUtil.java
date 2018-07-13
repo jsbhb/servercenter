@@ -106,8 +106,14 @@ public class LogAopUtil {
 			sb.append(paraName + ":" + value + ",");
 		}
 		
+		Integer centerId = -1;
 		try {
-			Integer centerId = Integer.valueOf(appKey);
+			centerId = Integer.valueOf(appKey.split("_")[1]);
+		} catch (Exception e) {
+			logger.error("appKey参数有误=" + appKey, e);
+		}
+		
+		try {
 			String parameter = sb.substring(0, sb.length() - 1);
 			OpenInfLog log = new OpenInfLog(centerId, ServerLogEnum.GOODS_CENTER.getServerId(),
 					ServerLogEnum.GOODS_CENTER.getServerName(), methodName, ip, parameter);

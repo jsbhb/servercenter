@@ -70,7 +70,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 	@Override
 	public ResultModel getGoodsDetail(String data) {
 		
-		Map<String,String> param = null;
+		Map<String,Object> param = null;
 		try {
 			param = JSONUtil.parse(data, Map.class);
 		} catch (Exception e) {
@@ -79,7 +79,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
 		}
 		
-		String itemId = param.get("itemId");
+		String itemId = param.get("itemId") == null ? null : param.get("itemId").toString();
 		if (itemId != null) {
 			String[] itemIdArr = itemId.split(",");
 			List<GoodsDetail> list = goodsOpenInterfaceMapper.listGoodsDetail(itemIdArr);
@@ -105,8 +105,8 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			}
 			return new ResultModel(true, list);
 		}
-		String pageStr = param.get("page");
-		String pageSizeStr = param.get("pageSize");
+		String pageStr = param.get("page") == null ? null : param.get("page").toString();
+		String pageSizeStr = param.get("pageSize") == null ? null : param.get("pageSize").toString();
 		if (pageStr == null || pageSizeStr == null) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
