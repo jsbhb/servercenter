@@ -137,6 +137,10 @@
 			<result column="specs_template_id" property="templateId" jdbcType="INTEGER" />
 			<result column="origin" property="origin" jdbcType="VARCHAR" />
 		</association>
+		<collection property="tagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
+			<id column="tag_id" property="id" jdbcType="INTEGER" />
+			<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
+		</collection>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsExtensionEntity" id="goodsExtension">
@@ -230,13 +234,14 @@
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,b.id as base_id,b.brand_id,
 		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode b_encode,b.first_category,
-		b.second_category,b.third_category,b.center_id,tag.id as tag_bind_id,tag.tag_id
+		b.second_category,b.third_category,b.center_id,tag.id as tag_bind_id,tag.tag_id,gtag.tag_name
 		from goods_item i 
 		left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
 		left join goods_stock s on s.item_id = i.item_id 
 		left join base b on g.base_id = b.id
-		left join goods_tag_bind tag on i.item_id = tag.item_id
+		left join goods_tag_bind tag on i.item_id = tag.item_id 
+		left join goods_tag gtag on tag.tag_id = gtag.id 
 		where 1=1 and i.is_del = 0 and g.is_del = 0
 		<if test="baseEntity!=null">
 			<if test="baseEntity.brandId!=null and baseEntity.brandId!=''">

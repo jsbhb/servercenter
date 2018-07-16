@@ -48,11 +48,20 @@ public class GoodsItemEntity extends Pagination {
 	private GoodsEntity goodsEntity;
 	private GoodsBaseEntity baseEntity;
 	private ERPGoodsTagBindEntity tagBindEntity;
+	private List<GoodsTagEntity> tagList;
 	private int conversion;
 	private String shelfLife;
 	private String carTon;
 	private List<GoodsRebateEntity> goodsRebateList;
 	private String isCreate;
+
+	public List<GoodsTagEntity> getTagList() {
+		return tagList;
+	}
+
+	public void setTagList(List<GoodsTagEntity> tagList) {
+		this.tagList = tagList;
+	}
 
 	public Double getRetailPrice() {
 		return retailPrice;
