@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.zm.goods.seo.model.SEOModel;
 
 @JsonInclude(Include.NON_NULL)
 public class PagePO {
@@ -19,6 +20,7 @@ public class PagePO {
 	private String page;
 	private String description;
 	private List<ComponentPagePO> module;
+	private SEOModel sEOModel;
 	public Integer getId() {
 		return id;
 	}
@@ -85,5 +87,13 @@ public class PagePO {
 	public void setFile(String file) {
 		this.file = file;
 	}
+	public SEOModel getsEOModel() {
+		return sEOModel;
+	}
+	public void setsEOModel(SEOModel sEOModel) {
+		this.sEOModel = sEOModel;
+	}
+	
+	
 	
 }
