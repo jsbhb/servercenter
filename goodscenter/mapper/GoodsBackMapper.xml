@@ -192,6 +192,10 @@
 		<result column="grade_type" property="gradeType"/>
 		<result column="grade_type_name" property="gradeTypeName"/>
 		<result column="proportion" property="proportion"/>
+		<result column="encode" property="encode"/>
+		<result column="carton" property="carton"/>
+		<result column="shelf_life" property="shelfLife"/>
+		<result column="goods_type" property="goodsType"/>
 		<collection property="goodsTagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
 			<id column="gtbid" property="id"/>
 			<result column="tag_name" property="tagName"/>
@@ -426,7 +430,7 @@
 		b.first_category first_name,b.second_category second_name,b.third_category third_name,
 		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion,
 		gtb.id gtbid,gt.tag_name,gpr.id gprid,grp.ratio_platform_name,gpr.ratio_price,
-		gpr.evaluate_qty,gpr.sales_volume
+		gpr.evaluate_qty,gpr.sales_volume,gi.encode,gi.carton,gi.shelf_life,g.type goods_type 
 		from zm_goods.goods_item gi
 		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
 		left join zm_goods.goods g on g.goods_id = gi.goods_id
@@ -463,6 +467,27 @@
 		<if test="tagIdList != null and tagIdList.size() > 0">
 			and gtb.tag_id in 
 			<foreach collection="tagIdList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="itemStatus!=null and itemStatus != 0">
+			and gi2.status = #{itemStatus}
+		</if>
+		<if test="firstCatalogList != null and firstCatalogList.size() > 0">
+			and b.first_category in 
+			<foreach collection="firstCatalogList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="secondCatalogList != null and secondCatalogList.size() > 0">
+			and b.second_category in 
+			<foreach collection="secondCatalogList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="thirdCatalogList != null and thirdCatalogList.size() > 0">
+			and b.third_category in 
+			<foreach collection="thirdCatalogList" item="item" open="(" separator="," close=")">
                 #{item}
 			</foreach>
 		</if>

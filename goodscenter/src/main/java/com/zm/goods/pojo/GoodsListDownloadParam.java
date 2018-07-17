@@ -11,6 +11,10 @@ public class GoodsListDownloadParam {
 	private List<String> tagIdList;
 	private Double rebateStart;
 	private Double rebateEnd;
+	private List<String> firstCatalogList;
+	private List<String> secondCatalogList;
+	private List<String> thirdCatalogList;
+	private Integer itemStatus;
 	
 	
 	public Integer getGradeType() {
@@ -54,5 +58,29 @@ public class GoodsListDownloadParam {
 	}
 	public void setRebateEnd(Double rebateEnd) {
 		this.rebateEnd = rebateEnd;
+	}
+	public List<String> getFirstCatalogList() {
+		return firstCatalogList;
+	}
+	public void setFirstCatalogList(List<String> firstCatalogList) {
+		this.firstCatalogList = firstCatalogList;
+	}
+	public List<String> getSecondCatalogList() {
+		return secondCatalogList;
+	}
+	public void setSecondCatalogList(List<String> secondCatalogList) {
+		this.secondCatalogList = secondCatalogList;
+	}
+	public List<String> getThirdCatalogList() {
+		return thirdCatalogList;
+	}
+	public void setThirdCatalogList(List<String> thirdCatalogList) {
+		this.thirdCatalogList = thirdCatalogList;
+	}
+	public Integer getItemStatus() {
+		return itemStatus;
+	}
+	public void setItemStatus(Integer itemStatus) {
+		this.itemStatus = itemStatus;
 	}
 }
