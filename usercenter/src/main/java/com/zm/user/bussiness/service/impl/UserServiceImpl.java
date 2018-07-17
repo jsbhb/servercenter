@@ -338,15 +338,15 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResultModel saveGrade(Grade grade) {
-
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		userMapper.saveGrade(grade);
+		if(!grade.check()){
+			return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
+		}
+		userMapper.saveGrade(grade);//保存完后需要主键ID
 		// 前端创建文件夹
 		if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
-			if(grade.getRedirectUrl() == null){
-				return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
-			}
+			
 			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
 					grade.getMobileUrl());
 			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
@@ -354,7 +354,7 @@ public class UserServiceImpl implements UserService {
 			if (temp.isSuccess()) {
 				gradeMapper.updateGradeInit(grade.getId());
 			}
-		}
+		} 
 
 		UserInfo user = new UserInfo();
 
