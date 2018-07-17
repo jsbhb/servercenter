@@ -321,14 +321,15 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		GoodsPrice goodsPrice = goodsItemMapper.selectItemPrice(itemId);
 		GoodsEntity goodsEntity = goodsBackMapper.selectGoodsEntityByItemId(goodsItemEntity.getGoodsId());
 		List<GoodsFile> goodsFiles = goodsBackMapper.selectGoodsFileByGoodsId(goodsEntity);
-		ERPGoodsTagBindEntity erpGoodsTagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(goodsItemEntity);
+		List<ERPGoodsTagBindEntity> erpGoodsTagBindList = goodsBackMapper.selectGoodsTagBindListByGoodsId(goodsItemEntity);
 		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectById(goodsEntity.getBaseId());
 		// 组装商品信息
 		goodsItemEntity.setGoodsPrice(goodsPrice);
 		List<GoodsItemEntity> items = new ArrayList<GoodsItemEntity>();
 		items.add(goodsItemEntity);
 		goodsEntity.setFiles(goodsFiles);
-		goodsEntity.setGoodsTagBind(erpGoodsTagBind);
+//		goodsEntity.setGoodsTagBind(erpGoodsTagBind);
+		goodsEntity.setGoodsTagBindList(erpGoodsTagBindList);
 		// goodsEntity.setGoodsItem(goodsItemEntity);
 		goodsEntity.setItems(items);
 		goodsInfo.setGoods(goodsEntity);
@@ -435,20 +436,39 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			goodsItemMapper.deleteAllFiles(entity.getGoods());
 		}
 		// 判断商品标签
-		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoods().getItems().get(0));
-		if (entity.getGoods().getGoodsTagBind() != null) {
+		List<ERPGoodsTagBindEntity> oldTagList = goodsBackMapper.selectGoodsTagBindListByGoodsId(entity.getGoods().getItems().get(0));
+		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
 			// 增删改
-			ERPGoodsTagBindEntity newTag = entity.getGoods().getGoodsTagBind();
-			if (oldTag == null && newTag.getTagId() != 0) {
-				goodsBackMapper.insertTagBind(newTag);
-			} else if (oldTag != null && newTag.getTagId() == 0) {
-				goodsBackMapper.deleteTagBind(oldTag);
-			} else if (oldTag != null && newTag.getTagId() != 0) {
-				goodsBackMapper.updateTagBind(newTag);
+			List<ERPGoodsTagBindEntity> newTagList = entity.getGoods().getGoodsTagBindList();
+			List<ERPGoodsTagBindEntity> existTagList = new ArrayList<ERPGoodsTagBindEntity>();
+			for(ERPGoodsTagBindEntity netbe:newTagList) {
+				for(ERPGoodsTagBindEntity oetbe:oldTagList) {
+					if (oetbe.getItemId().equals(netbe.getItemId()) && oetbe.getTagId() == netbe.getTagId()) {
+						existTagList.add(oetbe);
+						oldTagList.remove(oetbe);
+						break;
+					}
+				}
+			}
+			
+			for(ERPGoodsTagBindEntity eetbe:existTagList) {
+				for(ERPGoodsTagBindEntity netbe:newTagList) {
+					if (eetbe.getItemId().equals(netbe.getItemId()) && eetbe.getTagId() == netbe.getTagId()) {
+						newTagList.remove(netbe);
+						break;
+					}
+				}
+			}
+			
+			if (newTagList != null) {
+				goodsBackMapper.insertTagBindList(newTagList);
+			}
+			if (oldTagList != null) {
+				goodsBackMapper.deleteTagBindList(oldTagList);
 			}
 		} else {
-			if (oldTag != null) {
-				goodsBackMapper.deleteTagBind(oldTag);
+			if (oldTagList != null) {
+				goodsBackMapper.deleteTagBindList(oldTagList);
 			}
 		}
 		return new ResultModel(true, "");

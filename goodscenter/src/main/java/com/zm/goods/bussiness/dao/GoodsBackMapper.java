@@ -314,4 +314,8 @@ public interface GoodsBackMapper {
 	Page<GoodsEntity> listPublishError(Map<String, Object> param);
 
 	Page<GoodsEntity> listUnPublishError(Map<String, Object> param);
+
+	List<ERPGoodsTagBindEntity> selectGoodsTagBindListByGoodsId(GoodsItemEntity entity);
+
+	void deleteTagBindList(List<ERPGoodsTagBindEntity> list);
 }

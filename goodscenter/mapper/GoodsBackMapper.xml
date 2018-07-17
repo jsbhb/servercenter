@@ -533,4 +533,16 @@
 			and goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
 	</select>
+	
+	<select id="selectGoodsTagBindListByGoodsId" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where item_id = #{goodsId}
+	</select>
+	
+	<delete id="deleteTagBindList" parameterType="Object">
+		delete from goods_tag_bind where id in 
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.id}
+		</foreach>
+	</delete>
 </mapper>
