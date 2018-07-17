@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.zm.order.bussiness.component.ShareProfitComponent;
+import com.zm.order.bussiness.component.ThreadPoolComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderStockOutMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
@@ -70,7 +70,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	CacheAbstractService cacheAbstractService;
 
 	@Resource
-	ShareProfitComponent shareProfitComponent;
+	ThreadPoolComponent threadPoolComponent;
 
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
@@ -212,7 +212,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
 							info.getOrderDetail().getPayment());
 				} else {// 其他来源的计算返佣，统计在计算时一起加上
-					shareProfitComponent.calShareProfitStayToAccount(info.getOrderId());
+					threadPoolComponent.calShareProfitStayToAccount(info.getOrderId());
 				}
 			}
 			// end

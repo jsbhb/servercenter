@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zm.order.bussiness.component.CapitalPoolThreadPool;
 import com.zm.order.bussiness.component.ShareProfitComponent;
+import com.zm.order.bussiness.component.ThreadPoolComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderService;
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
 	ActivityFeignClient activityFeignClient;
 
 	@Resource
-	CapitalPoolThreadPool capitalPoolThreadPool;
+	ThreadPoolComponent threadPoolComponent;
 
 	@Resource
 	CacheAbstractService cacheAbstractService;
@@ -1006,16 +1006,16 @@ public class OrderServiceImpl implements OrderService {
 			Map<Integer, List<OrderInfo>> tempMap = new HashMap<Integer, List<OrderInfo>>();
 			List<OrderInfo> orderTmpList = null;
 			for (OrderInfo info : infoList) {
-				if (tempMap.get(info.getCenterId()) == null) {
+				if (tempMap.get(info.getShopId()) == null) {
 					orderTmpList = new ArrayList<OrderInfo>();
 					orderTmpList.add(info);
-					tempMap.put(info.getCenterId(), orderTmpList);
+					tempMap.put(info.getShopId(), orderTmpList);
 				} else {
-					tempMap.get(info.getCenterId()).add(info);
+					tempMap.get(info.getShopId()).add(info);
 				}
 			}
 			for (Map.Entry<Integer, List<OrderInfo>> entry : tempMap.entrySet()) {
-				capitalPoolThreadPool.capitalPoolRecount(entry.getValue());
+				threadPoolComponent.capitalPoolRecount(entry.getValue());
 			}
 		}
 		return false;

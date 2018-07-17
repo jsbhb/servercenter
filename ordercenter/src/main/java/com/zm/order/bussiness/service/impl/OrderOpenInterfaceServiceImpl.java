@@ -186,7 +186,11 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		orderInfo.setStatus(Constants.ORDER_PAY);
+		if(orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)){//一般贸易订单状态已付款
+			orderInfo.setStatus(Constants.ORDER_PAY);
+		} else if(orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)){//跨境订单状态为支付单报关
+			orderInfo.setStatus(Constants.ORDER_PAY_CUSTOMS);
+		}
 
 		resultModel = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
 				orderInfo.getOrderFlag());
@@ -246,7 +250,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel payCustom(String data) {
-		Map<String, String> param = null;
+		Map<String, Object> param = null;
 		try {
 			param = JSONUtil.parse(data, Map.class);
 		} catch (Exception e) {
@@ -254,13 +258,16 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
 		}
-		String orderId = param.get("orderId");
+		String orderId = param.get("orderId") == null ? null : param.get("orderId").toString();
 		if (orderId == null) {
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
-
-		orderOpenInterfaceMapper.updateOrderPayCustom(orderId);
+		List<String> orderIds = new ArrayList<String>();
+		orderIds.add(orderId);
+		param.put("list", orderIds);
+		param.put("status",2);
+		orderOpenInterfaceMapper.updateOrderStatus(param);
 		return new ResultModel(true, null);
 	}
 

@@ -12,11 +12,11 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.zm.order.bussiness.component.model.ShareProfitModel;
 import com.zm.order.bussiness.dao.OrderMapper;
+import com.zm.order.bussiness.dao.OrderOpenInterfaceMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
@@ -55,6 +55,9 @@ public class ShareProfitComponent {
 
 	@Resource
 	CacheAbstractService cacheAbstractService;
+	
+	@Resource
+	OrderOpenInterfaceMapper orderOpenInterfaceMapper;
 
 	private static final Integer REBATE_DETAIL_FINISH = 1;
 	private static final Integer REBATE_DETAIL_CANCEL = 2;
@@ -87,7 +90,6 @@ public class ShareProfitComponent {
 	 * @fun 计算待到账的金额并扣减资金池
 	 * @param orderId
 	 */
-	@Async("myAsync")
 	public void calShareProfitStayToAccount(String orderId) {
 
 		try {
@@ -399,22 +401,23 @@ public class ShareProfitComponent {
 		Double balance = null;
 		while (it.hasNext()) {
 			orderInfo = it.next();
-			if (!Constants.PREDETERMINE_PLAT_TYPE.equals(orderInfo.getCenterId())
-					&& !Constants.CNCOOPBUY.equals(orderInfo.getCenterId())) {
+			if ((Constants.PREDETERMINE_PLAT_TYPE != orderInfo.getCenterId()
+					&& Constants.CNCOOPBUY != orderInfo.getCenterId())
+					|| Constants.OPEN_INTERFACE_TYPE == orderInfo.getCreateType()) {
 				balance = null;
 				try {
-					balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
+					balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "money",
 							CalculationUtils.sub(0, orderInfo.getOrderDetail().getPayment()));// 扣除资金池
 					if (balance < 0) {// 如果扣除后小于0，则不发送订单给仓库，并把扣除的资金加回去
 						orderIdListForCapitalNotEnough.add(orderInfo.getOrderId());
 						it.remove();
-						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "money",
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "money",
 								orderInfo.getOrderDetail().getPayment());
 					} else {// 如果余额足够，把资金放到冻结资金处
 						orderIdListForCapitalEnough.add(orderInfo.getOrderId());
-						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "frozenMoney",
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "frozenMoney",
 								orderInfo.getOrderDetail().getPayment());// 冻结资金增加
-						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getCenterId(), "useMoney",
+						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "useMoney",
 								orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
 						Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
 						listOperations.leftPush(Constants.CAPITAL_DETAIL, JSONUtil.toJson(capitalPoolDetailMap));
@@ -438,7 +441,18 @@ public class ShareProfitComponent {
 		}
 		try {// 资金够的更新出错需要回滚
 			if (orderIdListForCapitalEnough.size() > 0) {
-				orderMapper.updateOrderCapitalEnough(orderIdListForCapitalEnough);
+				if(Constants.OPEN_INTERFACE_TYPE != orderInfo.getCreateType()){
+					orderMapper.updateOrderCapitalEnough(orderIdListForCapitalEnough);
+				} else {//对接订单单独处理
+					Map<String,Object> param = new HashMap<String, Object>();
+					param.put("list", orderIdListForCapitalEnough);
+					if(orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)){//一般贸易订单状态为12
+						param.put("status", Constants.CAPITAL_POOL_ENOUGH);
+					} else if(orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)){//跨境订单状态为支付单报关
+						param.put("status", Constants.ORDER_PAY_CUSTOMS);
+					}
+					orderOpenInterfaceMapper.updateOrderStatus(param);
+				}
 			}
 		} catch (Exception e) {
 			LogUtil.writeErrorLog("【更新订单状态为资金池扣减出错】订单号：" + orderIdListForCapitalEnough.toString(), e);

@@ -23,7 +23,7 @@ public enum ErrorCodeEnum {
 	RETAIL_PRICE_ERROR("10018","零售价有误"),
 	PAYMENT_ERROR("10019","“商品总额+税费+运费”与“支付金额”不匹配"),
 	TAX_ERROR("10020","“关税+增值税+消费税”与“总税费”不匹配"),
-	SUPPLIER_GOODS_ERROR("10021","订单商品中的商品供应商不属于同一个供应商"),
+	SUPPLIER_GOODS_ERROR("10021","订单商品中的商品不属于同一个仓库"),
 	PAYMENT_VALIDATE_ERROR("10022","支付金额后台校验不通过，确认税费等费用是否计算正确"),
 	TAX_SET_ERROR("10023","后台税率设置有问题"),
 	TIME_FORMATE_ERROR("10024","时间格式错误，请使用yyyy-MM-dd HH:mm:ss");

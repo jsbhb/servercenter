@@ -117,5 +117,8 @@ public class Constants {
 	public static final Integer ORDER_SOURCE_YOUZAN = 3;
 	public static final Integer ORDER_SOURCE_EXHIBITION = 5;
 	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;
+	
+	//*******************订单来源**********************
+	public static final Integer OPEN_INTERFACE_TYPE = 5;
 
 }

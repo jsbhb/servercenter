@@ -3,6 +3,7 @@ package com.zm.order.bussiness.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zm.order.constants.Constants;
 import com.zm.order.pojo.ButtJointOrder;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderGoods;
@@ -58,8 +59,9 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.TIME_FORMATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.TIME_FORMATE_ERROR.getErrorMsg());
 		}
-		if (2 != orderInfo.getCenterId() || 5 != orderInfo.getCreateType() || 0 != orderInfo.getExpressType()
-				|| 0 != orderInfo.getOrderDetail().getDisAmount() || !orderType.contains(orderInfo.getOrderFlag())
+		if (Constants.CNCOOPBUY != orderInfo.getCenterId() || Constants.OPEN_INTERFACE_TYPE != orderInfo.getCreateType()
+				|| Constants.EXPRESS != orderInfo.getExpressType() || 0 != orderInfo.getOrderDetail().getDisAmount()
+				|| !orderType.contains(orderInfo.getOrderFlag())
 				|| !payType.contains(orderInfo.getOrderDetail().getPayType())
 				|| !orderSource.contains(orderInfo.getOrderSource())) {
 			return new ResultModel(false, ErrorCodeEnum.PARAM_ERROR.getErrorCode(),

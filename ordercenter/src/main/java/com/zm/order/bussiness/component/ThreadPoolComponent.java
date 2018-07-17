@@ -7,17 +7,18 @@ import javax.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.pojo.OrderInfo;
 
 @Component
-public class CapitalPoolThreadPool {
+public class ThreadPoolComponent {
 
 	@Resource
-	OrderMapper orderMapper;
-	
-	@Resource
 	ShareProfitComponent shareProfitComponent;
+	
+	@Async("myAsync")
+	public void calShareProfitStayToAccount(String orderId){
+		shareProfitComponent.calShareProfitStayToAccount(orderId);
+	}
 	
 	@Async("myAsync")
 	public void capitalPoolRecount(List<OrderInfo> list){
