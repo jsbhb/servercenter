@@ -299,7 +299,8 @@
 				and g.type = #{goodsEntity.type}
 			</if>
 		</if>
-		order by i.id desc
+<!-- 		order by i.id desc -->
+		order by i.update_time desc,i.create_time desc
 	</select>
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
@@ -351,7 +352,8 @@
 				and g.type = #{entity.goodsEntity.type}
 			</if>
 		</if>
-		order by i.id desc
+<!-- 		order by i.id desc -->
+		order by i.update_time desc,i.create_time desc
 	</select>
 	
 	
