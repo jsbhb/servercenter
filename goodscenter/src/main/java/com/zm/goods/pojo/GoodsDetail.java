@@ -1,8 +1,12 @@
 package com.zm.goods.pojo;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.zm.goods.utils.JSONUtil;
 
 @JsonInclude(Include.NON_NULL)
 public class GoodsDetail {
@@ -23,6 +27,19 @@ public class GoodsDetail {
 	private String brand;
 	private Integer min;
 	private Integer max;
+	
+	public void infoFilter() {
+		if (info != null && !"".equals(info.trim())) {
+			List<TempSpecs> temList = JSONUtil.parse(info, new TypeReference<List<TempSpecs>>() {
+			});
+			StringBuilder sb = new StringBuilder("{");
+			for (TempSpecs temp : temList) {
+				sb.append("\"" + temp.skV + "\":\"" + temp.svV + "\",");
+			}
+			info = sb.substring(0, sb.length() - 1);
+			info = info + "}";
+		}
+	}
 	
 	public String getGoodsId() {
 		return goodsId;
@@ -115,4 +132,25 @@ public class GoodsDetail {
 		this.max = max;
 	}
 	
+	private static class TempSpecs {
+		private String svV;
+
+		private String skV;
+
+		@SuppressWarnings("unused")
+		public void setSvV(String svV) {
+			this.svV = svV;
+		}
+
+		@SuppressWarnings("unused")
+		public void setSkV(String skV) {
+			this.skV = skV;
+		}
+
+		@Override
+		public String toString() {
+			return "TempSpecs [svV=" + svV + ", skV=" + skV + "]";
+		}
+
+	}
 }

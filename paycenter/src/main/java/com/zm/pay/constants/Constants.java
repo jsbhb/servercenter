@@ -10,7 +10,7 @@ public class Constants {
 
 //	public static final String WX_NOTIFY_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/wxPayReturn";//正式
 
-	public static final String WX_NOTIFY_URL = "http://106.15.156.118//paycenter/auth/payMng/wxPayReturn";//测试
+	public static final String WX_NOTIFY_URL = "http://testapi.cncoopbuy.com/paycenter/auth/payMng/wxPayReturn";//测试
 
 	public static final String JSAPI = "JSAPI";
 
@@ -64,8 +64,8 @@ public class Constants {
 	// ********************支付宝支付参数*****************************
 //	public static final String ALI_NOTIFY_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/payNotify";//正式
 //	public static final String ALI_RETURN_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/payReturn";//正式
-	public static final String ALI_NOTIFY_URL = "http://106.15.156.118/paycenter/auth/payMng/payNotify";//测试
-	public static final String ALI_RETURN_URL = "http://106.15.156.118/paycenter/auth/payMng/payReturn";//测试
+	public static final String ALI_NOTIFY_URL = "http://testapi.cncoopbuy.com/paycenter/auth/payMng/payNotify";//测试
+	public static final String ALI_RETURN_URL = "http://testapi.cncoopbuy.com/paycenter/auth/payMng/payReturn";//测试
 	public static final String SCAN_CODE = "scanCode";// 扫码支付
 	public static final String SCAN_CODE_SERVICE = "create_direct_pay_by_user";// 扫码支付接口名
 
@@ -79,7 +79,7 @@ public class Constants {
 	public static final boolean IF_VALIDATE_CNNAME = false;
 
 	// 后台服务对应的写法参照 BackRcvResponse.java
-	public static String BACK_URL = "http://106.15.156.118/paycenter/auth/payMng/unionNotify";//测试
+	public static String BACK_URL = "http://testapi.cncoopbuy.com/paycenter/auth/payMng/unionNotify";//测试
 	public static String FRONT_URL = "http://testapi.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//测试
 //	public static String FRONT_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//正式
 //	public static String BACK_URL = "http://api.cncoopbuy.com/paycenter/auth/payMng/unionNotify";//正式

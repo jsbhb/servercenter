@@ -21,6 +21,8 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 
 	@Resource
 	GoodsOpenInterfaceMapper goodsOpenInterfaceMapper;
+	
+	private final int MAX_SIZE = 100;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -40,6 +42,10 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
 		String[] itemIdArr = itemId.split(",");
+		if(itemIdArr.length > MAX_SIZE){
+			return new ResultModel(false, ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorCode(),
+					ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorMsg());
+		}
 
 		List<GoodsStock> list = goodsOpenInterfaceMapper.listGoodsStock(itemIdArr);
 		if (list == null || list.size() == 0) {
@@ -65,7 +71,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		
 		return new ResultModel(true, list);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel getGoodsDetail(String data) {
@@ -82,6 +88,10 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		String itemId = param.get("itemId") == null ? null : param.get("itemId").toString();
 		if (itemId != null) {
 			String[] itemIdArr = itemId.split(",");
+			if(itemIdArr.length > MAX_SIZE){
+				return new ResultModel(false, ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorCode(),
+						ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorMsg());
+			}
 			List<GoodsDetail> list = goodsOpenInterfaceMapper.listGoodsDetail(itemIdArr);
 			if (list == null || list.size() == 0) {
 				return new ResultModel(false, ErrorCodeEnum.NO_DATA_ERROR.getErrorCode(),
@@ -103,6 +113,8 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
 						"itemId:" + s + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 			}
+			//规格信息格式化
+			infoFormat(list);
 			return new ResultModel(true, list);
 		}
 		String pageStr = param.get("page") == null ? null : param.get("page").toString();
@@ -121,7 +133,10 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.NUMBER_FORMAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.NUMBER_FORMAT_ERROR.getErrorMsg());
 		}
-		
+		if(pageSize > MAX_SIZE){
+			return new ResultModel(false, ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorCode(),
+					ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorMsg());
+		}
 		int startRow = page > 0 ? (page-1) * pageSize : 0;
 		Map<String,Object> queryParam = new HashMap<String,Object>();
 		queryParam.put("startRow", startRow);
@@ -132,8 +147,16 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.NO_DATA_ERROR.getErrorCode(),
 					ErrorCodeEnum.NO_DATA_ERROR.getErrorMsg());
 		}
+		//规格信息格式化
+		infoFormat(list);
 		
 		return new ResultModel(true, list);
+	}
+	
+	private void infoFormat(List<GoodsDetail> list){
+		for(GoodsDetail detail : list){
+			detail.infoFilter();
+		}
 	}
 
 }

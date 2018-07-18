@@ -63,7 +63,7 @@ public interface OrderMapper {
 	
 	int updateOrderCancel(String orderId);
 	
-	Integer getOrderStatusByOrderId(String orderId);
+	List<String> isExist(OrderInfo order);
 	
 	OrderInfo getOrderByOrderId(String orderId);
 	

@@ -28,8 +28,9 @@
 	</resultMap>
 
 	<select id="listGoodsStock" parameterType="Object" resultMap="stock">
-		select g.id,g.item_id,g.fxqty from goods_stock g left join goods_item i on g.item_id = i.item_id 
-		where i.status = 2 and g.item_id in
+		select g.id,g.item_id,g.fxqty from goods_item_2 gi left join goods_stock g on g.item_id = gi.item_id 
+		left join  goods_item i on gi.item_id = i.item_id
+		where gi.status = 1 and i.status = 2 and g.item_id in
 		<foreach collection="array" open="(" close=")" separator="," item="item">
 			#{item}
 		</foreach>
@@ -38,16 +39,19 @@
 	<select id="listGoodsDetail" parameterType="Object" resultMap="detail">
 		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,g.type,g.supplier_id,g.origin,
 		b.brand,p.min,p.max from goods_item i left join goods g on i.goods_id = g.goods_id left join 
-		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id where i.status = 2 and i.item_id in 
+		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id left join goods_item_2 gi 
+		on i.item_id = gi.item_id where gi.status = 1 and i.status = 2 and i.item_id in 
 		<foreach collection="array" open="(" close=")" separator="," item="item">
 			#{item}
 		</foreach>
+		order by i.create_time
 	</select>
 	
 	<select id="listGoodsDetailByPage" parameterType="Object" resultMap="detail">
 		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,g.type,g.supplier_id,g.origin,
 		b.brand,p.min,p.max from goods_item i left join goods g on i.goods_id = g.goods_id left join 
-		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id where i.status = 2 
+		base b on g.base_id = b.id left join goods_price p on i.item_id = p.item_id left join goods_item_2 gi 
+		on i.item_id = gi.item_id where gi.status = 1 and i.status = 2 order by i.create_time
 		limit #{startRow},#{pageSize}
 	</select>
 	

@@ -77,8 +77,8 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 
 		}
 
-		Integer status = orderMapper.getOrderStatusByOrderId(orderInfo.getOrderId());
-		if (status != null) {
+		List<String> orderIds = orderMapper.isExist(orderInfo);
+		if (orderIds.size() > 0) {
 			return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
 		}

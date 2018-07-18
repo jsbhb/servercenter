@@ -22,7 +22,7 @@
 	</select>
 	
 	<update id="updateOrderStatus" parameterType="Object">
-		update order_base set status = #{status} where create_type = 5 and order_flag = 0 and order_id in
+		update order_base set status = #{status},update_time = now() where create_type = 5 and order_id in
 		<foreach collection="list" item="item" index="index" open="("
 			close=")" separator=",">
 			#{item}
