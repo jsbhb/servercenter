@@ -67,11 +67,7 @@ public class SEOServiceImpl implements SEOService {
 
 	@Override
 	public ResultModel publish(List<String> itemIdList, Integer centerId, boolean isNewPublish) {
-		String centerIdStr = GoodsServiceUtil.judgeCenterId(centerId);
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("list", itemIdList);
-		param.put("centerId", centerIdStr);
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
+		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有对应的商品GOODSID");
 		}
@@ -120,7 +116,7 @@ public class SEOServiceImpl implements SEOService {
 	public ResultModel navPublish() {
 		ResultModel result = new ResultModel(true, "");
 		StringBuilder sb = new StringBuilder();
-		List<GoodsIndustryModel> list = goodsMapper.queryGoodsCategory(null);
+		List<GoodsIndustryModel> list = goodsMapper.queryGoodsCategory();
 		SEONavigation seoNav = new SEONavigation("nav-1", SystemEnum.PCMALL, list);
 		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
 		seoNav = new SEONavigation("nav-1", SystemEnum.MPMALL, list);
@@ -134,10 +130,7 @@ public class SEOServiceImpl implements SEOService {
 
 	@Override
 	public ResultModel delPublish(List<String> itemIdList, Integer centerId) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("list", itemIdList);
-		param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
+		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有对应的商品GOODSID");
 		}

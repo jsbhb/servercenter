@@ -54,6 +54,7 @@ public class GoodsItemEntity extends Pagination {
 	private String carTon;
 	private List<GoodsRebateEntity> goodsRebateList;
 	private String isCreate;
+	private Integer isFx;
 
 	public List<GoodsTagEntity> getTagList() {
 		return tagList;
@@ -317,6 +318,14 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setIsCreate(String isCreate) {
 		this.isCreate = isCreate;
+	}
+
+	public Integer getIsFx() {
+		return isFx;
+	}
+
+	public void setIsFx(Integer isFx) {
+		this.isFx = isFx;
 	}
 	
 }

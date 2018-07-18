@@ -306,26 +306,22 @@
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,g.id g_id,g.origin,g.specs_template_id,g.type,
-		c.item_id as center_item_id,c.status as center_status,
+		i.item_id as center_item_id,i.status as center_status,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,tag.id as tag_bind_id,tag.tag_id 
 		from goods_item i left join goods g on g.goods_id = i.goods_id
 		left join goods_price p on p.item_id = i.item_id 
 		left join goods_stock s on s.item_id = i.item_id 
-		left join goods_item_${centerId} c on c.item_id = i.item_id 
 		left join goods_tag_bind tag on i.item_id = tag.item_id
-		where i.status = 2 and i.is_del = 0 and g.is_del = 0
+		where i.is_del = 0 and g.is_del = 0
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
 		<if test="entity.itemCode!=null and entity.itemCode!=''">
 			and i.item_code = #{entity.itemCode}
 		</if>
-		<if test="entity.status == 0 and entity.status != ''">
-			and (c.status = 0 or c.status is null)
-		</if>
-		<if test="entity.status == 1">
-			and c.status = 1
+		<if test="(entity.status != null and entity.status != '') or entity.status == 0">
+			and i.status = #{entity.status}
 		</if>
 		<if test="entity.supplierId!=null and entity.supplierId!=''">
 			and g.supplier_id = #{entity.supplierId}
@@ -485,46 +481,6 @@
 		where id = #{id}
 	</update>
 	
-	<select id="selectPurchaseCenterForPage" parameterType="Object" resultMap="entity">
-		select i.id,i.goods_id,i.item_id,i.item_code,i.sku,
-		i.weight,i.excise_tax,i.is_promotion,i.status,i.discount,
-		i.info,i.create_time,i.update_time,i.opt,
-		g.supplier_id,g.supplier_name,g.goods_name,
-		c.item_id as center_item_id,c.status as center_status,
-		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,
-		p.retail_price,s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty 
-		from goods_item i left join goods g on g.goods_id = i.goods_id
-		left join goods_price p on p.item_id = i.item_id 
-		left join goods_stock s on s.item_id = i.item_id 
-		left join goods_item_${centerId} c on c.item_id = i.item_id where i.status = 2 and i.is_del = 0 and g.is_del = 0
-		<if test="entity.goodsName!=null and entity.goodsName!=''">
-			and g.goods_name like concat('%',#{entity.goodsName},'%') 
-		</if>
-		<if test="entity.itemCode!=null and entity.itemCode!=''">
-			and i.item_code = #{entity.itemCode}
-		</if>
-		<if test="entity.status == 0 and entity.status != ''">
-			and (c.status = 0 or c.status is null)
-		</if>
-		<if test="entity.status == 1">
-			and c.status = 1
-		</if>
-		<if test="entity.supplierId!=null and entity.supplierId!=''">
-			and g.supplier_id = #{entity.supplierId}
-		</if>
-		<if test="entity.itemId!=null and entity.itemId!=''">
-			and i.item_id = #{entity.itemId} 
-		</if>
-		<if test="entity.goodsId!=null and entity.goodsId !=''">
-			and i.goods_id = #{entity.goodsId} 
-		</if>
-		<if test="entity.sku !=null and entity.sku !=''">
-			and sku = #{entity.sku} 
-		</if>
-		<if test="entity.id !=null and entity.id !=''">
-			and id = #{entity.id} 
-		</if>
-	</select>
 	
 	<select id="selectPurchaseCenterItem" parameterType="Object" resultMap="entity">
 		select g.id,g.goods_id,g.goods_name,g.status,
@@ -586,11 +542,8 @@
 	</select>
 	
 	<select id="selectCenterForPageDownload" parameterType="Object" resultMap="goods">
-		select g.*
-		from goods_extension_label gel
-		inner join goods_${centerId} g on g.goods_id = gel.goods_id
-		inner join goods gd on g.goods_id = gd.goods_id and gd.is_del = 0
-		where 1=1
+		select g.* from goods_extension_label gel inner join goods g on g.goods_id = gel.goods_id
+		where g.is_del = 0
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and g.goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
@@ -764,10 +717,8 @@
 	<select id="selectGoodsExtensionCenterForPageDownload" parameterType="Object" resultMap="goodsExtension">
 		select gel.id,g.goods_id,gel.goods_path,ifnull(gel.goods_name,g.goods_name) as goods_name,
 		gel.brand,gel.specs,gel.origin,gel.custom,gel.shelf_life,gel.reason,gel.remark
-		from goods_${centerId} g 
-		inner join goods gd on g.goods_id = gd.goods_id and gd.is_del = 0
-		left join goods_extension_label gel on g.goods_id = gel.goods_id
-		where 1=1
+		from goods g left join goods_extension_label gel on g.goods_id = gel.goods_id
+		where g.is_del = 0
 		<if test="entity.goodsName!=null and entity.goodsName!=''">
 			and (gel.goods_name like concat('%',#{entity.goodsName},'%') or g.goods_name like concat('%',#{entity.goodsName},'%'))
 		</if>

@@ -50,6 +50,7 @@ public class GoodsEntity extends Pagination {
 	private List<GoodsFile> files;
 	private ERPGoodsTagBindEntity goodsTagBind;
 	private List<ERPGoodsTagBindEntity> goodsTagBindList;
+	private Integer isPublish;
 
 	public int getId() {
 		return id;
@@ -283,4 +284,13 @@ public class GoodsEntity extends Pagination {
 		this.goodsTagBindList = goodsTagBindList;
 	}
 
+	public Integer getIsPublish() {
+		return isPublish;
+	}
+
+	public void setIsPublish(Integer isPublish) {
+		this.isPublish = isPublish;
+	}
+
+	
 }

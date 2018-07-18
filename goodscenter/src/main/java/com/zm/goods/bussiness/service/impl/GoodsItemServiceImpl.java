@@ -167,19 +167,6 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	public Page<GoodsItemEntity> queryPurchaseCenterByPage(GoodsItemEntity entity, int centerId) {
-		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("entity", entity);
-		if (centerId == -1) {
-			params.put("centerId", "2B");
-		} else {
-			params.put("centerId", centerId);
-		}
-		return goodsItemMapper.selectPurchaseCenterForPage(params);
-	}
-
-	@Override
 	public Page<GoodsItemEntity> queryPurchaseCenterItem(GoodsItemEntity entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		Map<String,Object> params = new HashMap<String,Object>();

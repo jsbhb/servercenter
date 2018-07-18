@@ -22,6 +22,7 @@ import com.zm.goods.bussiness.component.PublishThreadPool;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.convertor.LucenceModelConvertor;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
@@ -35,7 +36,6 @@ import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PopularizeDict;
-import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.Tax;
@@ -48,8 +48,6 @@ import com.zm.goods.pojo.bo.ItemCountBO;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
-import com.zm.goods.pojo.vo.TimeLimitActive;
-import com.zm.goods.pojo.vo.TimeLimitActiveData;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.JSONUtil;
@@ -91,15 +89,10 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
-		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
-		param.put("centerId", centerIdstr);
 		if (param.get("itemId") != null) {
 			List<String> itemIdList = new ArrayList<String>();
-			Map<String, Object> tempMap = new HashMap<String, Object>();
 			itemIdList.add((String) param.get("itemId"));
-			tempMap.put("centerId", centerIdstr);
-			tempMap.put("list", itemIdList);
-			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(tempMap);
+			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 			param.put("goodsId", goodsIdList.get(0));
 		}
 
@@ -117,7 +110,6 @@ public class GoodsServiceImpl implements GoodsService {
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		parameter.put("list", idList);
 		parameter.put("type", PICTURE_TYPE);
-		parameter.put("centerId", centerIdstr);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
 		GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, true);
@@ -169,12 +161,6 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public List<PriceContrast> listPriceContrast(Map<String, Object> param) {
-
-		return goodsMapper.listPriceContrast(param);
-	}
-
-	@Override
 	public List<GoodsFile> listGoodsCookFile(String goodsId) {
 
 		List<String> idList = new ArrayList<String>();
@@ -188,12 +174,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public Map<String, Object> tradeGoodsDetail(String itemId, Integer centerId) {
-		Map<String, Object> param = new HashMap<String, Object>();
-
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
-		param.put("centerId", id);
-		param.put("itemId", itemId);
-		GoodsSpecs specs = goodsMapper.getGoodsSpecs(param);
+		GoodsSpecs specs = goodsMapper.getGoodsSpecs(itemId);
 		if (specs == null) {
 			return null;
 		}
@@ -219,8 +200,6 @@ public class GoodsServiceImpl implements GoodsService {
 	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", list);
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
-		param.put("centerId", id);
 		param.put("source", source);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsByItemId(param);
 		if (specsList == null || specsList.size() == 0) {
@@ -238,7 +217,6 @@ public class GoodsServiceImpl implements GoodsService {
 
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		parameter.put("list", idList);
-		parameter.put("centerId", id);
 		parameter.put("type", PICTURE_TYPE);
 
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
@@ -266,8 +244,6 @@ public class GoodsServiceImpl implements GoodsService {
 			return new ResultModel(false, ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorCode(),
 					ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorMsg());
 		}
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
-		param.put("centerId", id);
 		param.put("orderFlag", orderFlag);
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
@@ -326,23 +302,6 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("page", page);
 		param.put("pageType", pageType);
 		return goodsMapper.listLayout(param);
-	}
-
-	@Override
-	public void createTable(Integer centerId) {
-		goodsMapper.createGoodsItem(centerId);
-		goodsMapper.createGoods(centerId);
-		goodsMapper.createGoodsFile(centerId);
-		goodsMapper.createFirstCategory(centerId);
-		goodsMapper.createSecondCategory(centerId);
-		goodsMapper.createThirdCategory(centerId);
-		goodsMapper.createGoodsPrice(centerId);
-		goodsMapper.createLayout(centerId);
-		goodsMapper.createPopularizeDict(centerId);
-		goodsMapper.createPopularizeData(centerId);
-		goodsMapper.createActivity(centerId);
-		goodsMapper.createActivityData(centerId);
-		goodsMapper.createPriceContrast(centerId);
 	}
 
 	@Override
@@ -453,24 +412,23 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<String> renderLuceneModel(Map<String, Object> param, List<GoodsSearch> searchList, Integer id,
+	private List<String> renderLuceneModel(Map<String, Object> param, Integer id,
 			List<String> itemIdList) {
 		if (param.get("list") == null) {
 			throw new RuntimeException("没有获取到商品编号对应的GOODS_ID");
 		}
+		
+		//封装新建lucene索引的数据searchList
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
 		List<String> goodsIds = new ArrayList<String>();
-		// 封装新建lucene索引的数据searchList
+		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 		createNewLucenIndex(param, searchList, itemList, goodsIds, itemIdList);
+		
+		
 		// 更新lucene索引的tag
 		List<String> totalGoodsId = (List<String>) param.get("list");
 		AbstractLucene lucene = LuceneFactory.get(id);
 		lucene.writerIndex(searchList);
-		// List<GoodsSearch> updateindexList = updateLuceneIndex(totalGoodsId,
-		// goodsIds, itemIdList, id);
-		// if(updateindexList != null && updateindexList.size() > 0){
-		// lucene.updateIndex(updateindexList);
-		// }
 		goodsMapper.updateGoodsUpShelves(param);
 		totalGoodsId.removeAll(goodsIds);
 		return totalGoodsId;
@@ -478,10 +436,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	// 更新上架中goods的tag lucene索引
 	private void updateLuceneIndex(List<String> updateTagList, Integer centerId) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
-		param.put("list", updateTagList);
-		List<GoodsItem> itemList = goodsMapper.listGoodsForLuceneUpdateTag(param);
+		List<GoodsItem> itemList = goodsMapper.listGoodsForLuceneUpdateTag(updateTagList);
 		if (itemList != null && itemList.size() > 0) {
 			GoodsSearch search = null;
 			StringBuilder sb = new StringBuilder();
@@ -524,118 +479,27 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 	}
 
-	// 封装需要更新lucene索引标签的商品
-	@SuppressWarnings("unused")
-	private List<GoodsSearch> updateLuceneIndex(List<String> totalGoodsId, List<String> goodsIds,
-			List<String> itemIdList, Integer centerId) {
-		totalGoodsId.removeAll(goodsIds);// 排除新上架的goods，剩下的需要更新标签
-		if (totalGoodsId.size() > 0) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
-			param.put("list", itemIdList);
-			// 根据点击上架的itemid，获取该items的goods已经上架的item
-			List<GoodsSpecs> specsList = goodsMapper.listItemTagForLuceneUpdate(param);
-			if (specsList != null && specsList.size() > 0) {
-				// 根据goodsId 封装标签字符串，最后需要和已经上架的标签字符串合并
-				Map<String, StringBuilder> temp = new HashMap<String, StringBuilder>();
-				// 存放需要更新tag的goodsId，根据goodsId获取原有已经上架的tag
-				Set<String> idSet = new HashSet<String>();
-				// 获取新增lucene索引的tag
-				getNewTagForLuceneIndex(specsList, temp, idSet);
-				// 获取原来已上架的tag
-				getUpshelvTag(param, temp, idSet);
-				if (temp.size() > 0) {
-					GoodsSearch search = null;
-					List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
-					for (Map.Entry<String, StringBuilder> entry : temp.entrySet()) {
-						search = new GoodsSearch();
-						search.setGoodsId(entry.getKey());
-						search.setTag(entry.getValue().substring(0, entry.getValue().length() - 1));
-						searchList.add(search);
-					}
-					return searchList;
-				}
-			}
-		}
-		return null;
-	}
-
-	private void getUpshelvTag(Map<String, Object> param, Map<String, StringBuilder> temp, Set<String> idSet) {
-		StringBuilder sb;
-		if (idSet.size() > 0) {
-			param.put("list", idSet);
-			List<GoodsSpecs> upshelvSpecsList = goodsMapper.listItemUpshelvTagForLuceneUpdate(param);
-			if (upshelvSpecsList != null && upshelvSpecsList.size() > 0) {
-				for (GoodsSpecs specs : upshelvSpecsList) {
-					if (specs.getTagList() != null && specs.getTagList().size() > 0) {
-						if (temp.get(specs.getGoodsId()) == null) {
-							sb = new StringBuilder();
-							for (GoodsTagEntity tag : specs.getTagList()) {
-								sb.append(tag.getTagName() + ",");
-							}
-							temp.put(specs.getGoodsId(), sb);
-						} else {
-							for (GoodsTagEntity tag : specs.getTagList()) {
-								temp.get(specs.getGoodsId()).append(tag.getTagName() + ",");
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void getNewTagForLuceneIndex(List<GoodsSpecs> specsList, Map<String, StringBuilder> temp,
-			Set<String> idSet) {
-		StringBuilder sb = null;
-		// 封装新增加的tag
-		for (GoodsSpecs specs : specsList) {
-			if (specs.getTagList() != null && specs.getTagList().size() > 0) {
-				idSet.add(specs.getGoodsId());
-				if (temp.get(specs.getGoodsId()) == null) {
-					sb = new StringBuilder();
-					for (GoodsTagEntity tag : specs.getTagList()) {
-						sb.append(tag.getTagName() + ",");
-					}
-					temp.put(specs.getGoodsId(), sb);
-				} else {
-					for (GoodsTagEntity tag : specs.getTagList()) {
-						temp.get(specs.getGoodsId()).append(tag.getTagName() + ",");
-					}
-				}
-			}
-		}
-	}
 
 	private void createNewLucenIndex(Map<String, Object> param, List<GoodsSearch> searchList, List<GoodsItem> itemList,
 			List<String> goodsIds, List<String> itemIds) {
-		GoodsSearch searchModel;
-		List<GoodsSpecs> tempList;
-		Map<String, GoodsSearch> temp = new HashMap<String, GoodsSearch>();
-		Map<String, List<GoodsSpecs>> tempSpecs = new HashMap<String, List<GoodsSpecs>>();
-		StringBuilder sb = new StringBuilder();
+		
 		if (itemList != null && itemList.size() > 0) {
+			GoodsSearch searchModel;
+			Map<String, GoodsSearch> temp = new HashMap<String, GoodsSearch>();
 			Map<String, Double> result = null;
 			for (GoodsItem item : itemList) {
 				searchModel = new GoodsSearch();
-				searchModel.setGoodsId(item.getGoodsId());
-				searchModel.setBrand(item.getBrand());
-				searchModel.setStatus(item.getStatus());
-				searchModel.setOrigin(item.getOrigin());
-				searchModel.setFirstCategory(item.getFirstCategory());
-				searchModel.setThirdCategory(item.getThirdCategory());
-				searchModel.setSecondCategory(item.getSecondCategory());
-				searchModel.setGoodsName(item.getCustomGoodsName());
-				searchModel.setPopular(item.getPopular());
-				searchModel.setType(item.getType());
-				searchModel.setCreateTime(item.getCreateTime());
+				LucenceModelConvertor.convertToGoodsSearch(item, searchModel );
 				goodsIds.add(item.getGoodsId());
 				temp.put(item.getGoodsId(), searchModel);
 				searchList.add(searchModel);
 			}
 			param.put("goodsIds", goodsIds);
 			param.put("itemIds", itemIds);
+			
 			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
+			Map<String, List<GoodsSpecs>> tempSpecs = new HashMap<String, List<GoodsSpecs>>();
+			List<GoodsSpecs> tempList;
 			for (GoodsSpecs specs : specsList) {
 				if (tempSpecs.get(specs.getGoodsId()) == null) {
 					tempList = new ArrayList<GoodsSpecs>();
@@ -645,6 +509,8 @@ public class GoodsServiceImpl implements GoodsService {
 					tempSpecs.get(specs.getGoodsId()).add(specs);
 				}
 			}
+			
+			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<String, GoodsSearch> entry : temp.entrySet()) {
 				tempList = tempSpecs.get(entry.getKey());
 				if (tempList != null && tempList.size() > 0) {
@@ -696,9 +562,6 @@ public class GoodsServiceImpl implements GoodsService {
 			if (sortList != null && sortList.getSortList() != null && sortList.getSortList().size() > 0) {
 				searchParm.put("sortList", sortList.getSortList());
 			}
-			String centerId = GoodsServiceUtil.judgeCenterId(searchModel.getCenterId());
-			// searchParm.put("goodsIds", goodsIdList);
-			searchParm.put("centerId", centerId);
 			goodsList = goodsMapper.queryGoodsItem(searchParm);
 			// goodsList = (List<GoodsItem>) listGoods(searchParm,
 			// searchModel.getCenterId(), null, false);
@@ -795,9 +658,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<GoodsIndustryModel> loadIndexNavigation(Integer centerId) {
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
-
-		return goodsMapper.queryGoodsCategory(id);
+		return goodsMapper.queryGoodsCategory();
 	}
 
 	@Override
@@ -806,54 +667,6 @@ public class GoodsServiceImpl implements GoodsService {
 		param.put("list", list);
 		param.put("orderFlag", orderFlag);
 		goodsMapper.updateStockBack(param);
-	}
-
-	@Override
-	public List<TimeLimitActive> getTimelimitGoods(Integer centerId) {
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
-		List<TimeLimitActive> list = goodsMapper.listLimitTimeData(id);
-		Map<String, Object> searchParm = new HashMap<String, Object>();
-		if (list == null || list.size() == 0) {
-			return null;
-		}
-		for (TimeLimitActive active : list) {
-			if (active.getDataList() != null && active.getDataList().size() > 0) {
-				List<String> idList = new ArrayList<String>();
-				for (TimeLimitActiveData data : active.getDataList()) {
-					idList.add(data.getGoodsId());
-				}
-				searchParm.put("list", idList);
-				searchParm.put("centerId", id);
-				List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
-				Map<String, GoodsSpecs> temp = new HashMap<String, GoodsSpecs>();
-				for (GoodsSpecs specs : specsList) {
-					specs.infoFilter();
-					temp.put(specs.getGoodsId(), specs);
-				}
-				for (TimeLimitActiveData data : active.getDataList()) {
-					GoodsSpecs specs = temp.get(data.getGoodsId());
-					if (specs != null) {
-						if (specs.getPriceList() != null && specs.getPriceList().size() > 0) {
-							Double discount = specs.getDiscount() == null ? 10.0 : specs.getDiscount();
-							discount = CalculationUtils.div(discount, 10.0);
-							data.setPrice(specs.getPriceList().get(0).getPrice());
-							data.setRealPrice(CalculationUtils.mul(specs.getPriceList().get(0).getPrice(), discount));
-						}
-					}
-				}
-			}
-		}
-		return list;
-	}
-
-	@Override
-	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
-
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", id);
-		param.put("type", type);
-		return goodsMapper.listSpecialGoods(param);
 	}
 
 	@Override
@@ -907,53 +720,23 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public ResultModel upShelves(List<String> itemIdList, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
-		param.put("centerId", centerIdstr);
-		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
-		List<String> itemIdS = new ArrayList<String>();
-		List<String> goodsIdList = null;
+		
+		
 		if (itemIdList != null && itemIdList.size() > 0) {
-			param.put("list", itemIdList);
-			List<ItemCountBO> temp = goodsMapper.countItem(param);
-			// 判断之前有没有同步到商城端，将没有同步的先同步
-			if (temp == null || temp.size() == 0) {// 说明所有itemId都没有
-				for (String str : itemIdList) {
-					itemIdS.add(str);
-				}
-			} else {
-				List<String> tempStrList = new ArrayList<String>();
-				for (ItemCountBO model : temp) {
-					tempStrList.add(model.getItemId().trim());
-				}
-				for (String str : itemIdList) {
-					if (!tempStrList.contains(str.trim())) {
-						itemIdS.add(str);
-					}
-				}
+			param.put("list", goodsMapper.getGoodsIdByItemId(itemIdList));
+			List<String> updateTagList = renderLuceneModel(param, centerId, itemIdList);
+			
+			//结果处理
+			if (updateTagList != null && updateTagList.size() > 0) {// 更新标签
+				updateLuceneIndex(updateTagList, centerId);
 			}
-			if (itemIdS.size() > 0) {
-				syncgoods(itemIdS, centerId);
-			}
-			goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-			param.remove("list");
-			if (goodsIdList != null && goodsIdList.size() > 0) {
-				param.put("list", goodsIdList);
-				// 判断有没有分类没上架的，进行上架
-				// TODO 系统自动上架
-				// List<CategoryBO> categoryList =
-				// goodsMapper.listCategoryByGoodsIds(goodsIdList);
-				// categoryStatusModify(categoryList, SHOW, centerIdstr);
-			}
+			goodsMapper.updateGoodsItemUpShelves(itemIdList);
+			publishThreadPool.publish(itemIdList, centerId);// 发布商品
+			
+			return new ResultModel(true, "");
+		}else{
+			return new ResultModel(false, "没有提供上架商品信息");
 		}
-
-		List<String> updateTagList = renderLuceneModel(param, searchList, centerId, itemIdList);
-		param.put("list", itemIdList);
-		goodsMapper.updateGoodsItemUpShelves(param);
-		if (updateTagList != null && updateTagList.size() > 0) {// 更新标签
-			updateLuceneIndex(updateTagList, centerId);
-		}
-		publishThreadPool.publish(itemIdList, centerId);// 发布商品
-		return new ResultModel(true, "");
 	}
 
 	private static final Integer SHOW = 1;
@@ -1033,10 +816,7 @@ public class GoodsServiceImpl implements GoodsService {
 			return new ResultModel(false, "请传入itemId");
 		}
 		Map<String, Object> param = new HashMap<String, Object>();
-		String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
-		param.put("centerId", centerIdstr);
-		param.put("list", itemIdList);
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
+		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有该商品");
 		}
@@ -1079,47 +859,11 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	private void deleteLuceneAndDownShelves(List<String> goodsIdList, Integer id) {
-		String centerId = GoodsServiceUtil.judgeCenterId(id);
 		AbstractLucene lucene = LuceneFactory.get(id);
 		lucene.deleteIndex(goodsIdList);
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
-		param.put("list", goodsIdList);
-		goodsMapper.updateGoodsDownShelves(param);
+		goodsMapper.updateGoodsDownShelves(goodsIdList);
 	}
 
-	public ResultModel syncgoods(List<String> itemIdList, Integer id) {
-		if (itemIdList != null && itemIdList.size() > 0) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			String centerId = GoodsServiceUtil.judgeCenterId(id);
-			param.put("list", itemIdList);
-			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(param);
-			// List<String> firstIdList =
-			// goodsMapper.listFirstCategory(goodsIdList);
-			// List<String> secondIdList =
-			// goodsMapper.listSecondCategory(goodsIdList);
-			// List<String> thirdIdList =
-			// goodsMapper.listThirdCategory(goodsIdList);
-			param.put("centerId", centerId);
-			param.put("goodsIdlist", goodsIdList);
-			// param.put("firstIdlist", firstIdList);
-			// param.put("secondIdlist", secondIdList);
-			// param.put("thirdIdlist", thirdIdList);
-			param.put("itemList", itemIdList);
-			// goodsMapper.insertCenterFirstCategory(param);
-			// goodsMapper.insertCenterSecondCategory(param);
-			// goodsMapper.insertCenterThirdCategory(param);
-			goodsMapper.insertCenterGoods(param);
-			// goodsMapper.insertCenterGoodsFile(param);
-			goodsMapper.insertCenterGoodsItem(param);
-			if (Constants.PREDETERMINE_PLAT_TYPE.equals(id)) {
-				goodsMapper.insert2BGoodsPrice(param);
-			} else {
-				goodsMapper.insertCenterGoodsPrice(param);
-			}
-		}
-		return new ResultModel(true, "");
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override

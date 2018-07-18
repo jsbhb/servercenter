@@ -25,14 +25,12 @@ import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
-import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
-import com.zm.goods.pojo.vo.TimeLimitActive;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -123,37 +121,6 @@ public class GoodsController {
 		return result;
 	}
 
-	@RequestMapping(value = "auth/{version}/goods/priceconstrast/{itemId}", method = RequestMethod.GET)
-	@ApiOperation(value = "商品价格比价接口", response = ResultModel.class)
-	@ApiImplicitParams({
-			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "path", name = "itemId", dataType = "String", required = true, value = "商品唯一编码itemId"),
-			@ApiImplicitParam(paramType = "query", name = "startTime", dataType = "String", required = false, value = "开始时间"),
-			@ApiImplicitParam(paramType = "query", name = "endTime", dataType = "String", required = false, value = "结束时间"),
-			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
-	public ResultModel listPriceConstrast(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("itemId") String itemId) {
-
-		ResultModel result = new ResultModel();
-
-		String startTime = req.getParameter("startTime");
-		String endTime = req.getParameter("endTime");
-		Integer centerId = Integer.valueOf(req.getParameter("centerId"));
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("itemId", itemId);
-			param.put("centerId", "_" + centerId);
-			param.put("startTime", startTime);
-			param.put("endTime", endTime);
-			List<PriceContrast> list = goodsService.listPriceContrast(param);
-
-			result.setSuccess(true);
-			result.setObj(list);
-		}
-
-		return result;
-	}
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{centerId}/{itemId}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取单个商品规格接口", response = ResultModel.class)
@@ -310,20 +277,6 @@ public class GoodsController {
 
 	}
 
-	@RequestMapping(value = "{version}/goods/table/{centerId}", method = RequestMethod.POST)
-	@ApiIgnore
-	public ResultModel createTable(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId) {
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			goodsService.createTable(centerId);
-			return new ResultModel(true, null);
-		}
-
-		return new ResultModel(false, "版本错误");
-
-	}
-
 	@RequestMapping(value = "{version}/goods/active/start/{centerId}/{activeId}", method = RequestMethod.POST)
 	@ApiIgnore
 	public ResultModel startActive(@PathVariable("version") Double version, @PathVariable("activeId") Integer activeId,
@@ -429,50 +382,6 @@ public class GoodsController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	/**
-	 * @fun 获取限时抢购商品
-	 */
-	@RequestMapping(value = "auth/{version}/goods/timelimit/{centerId}", method = RequestMethod.GET)
-	@ApiOperation(value = "获取限时抢购数据接口", response = ResultModel.class)
-	@ApiImplicitParams({
-			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
-	public ResultModel getTimelimitGoods(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			List<TimeLimitActive> list = goodsService.getTimelimitGoods(centerId);
-			if (list == null) {
-				return new ResultModel(true, "目前没有正在进行或即将开始的限时抢购活动");
-			}
-
-			return new ResultModel(true, list);
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-
-	/**
-	 * @fun 获取有特殊属性的商品
-	 * 
-	 */
-	@RequestMapping(value = "auth/{version}/goods/specialgoods/{centerId}/{type}", method = RequestMethod.GET)
-	@ApiOperation(value = "获取特殊属性商品接口", response = ResultModel.class)
-	@ApiImplicitParams({
-			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "path", name = "type", dataType = "type", required = true, value = "页面类型：0：新品；1：特推，2渠道，3精选"),
-			@ApiImplicitParam(paramType = "path", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
-	public ResultModel getSpecialGoods(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId, @PathVariable("type") Integer type) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			return new ResultModel(true, goodsService.listSpecialGoods(centerId, type));
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
 
 	/**
 	 * @fun 根据同步到的库存更新库存信息
@@ -589,23 +498,6 @@ public class GoodsController {
 	}
 
 	/**
-	 * @fun 商品同步
-	 * @param version
-	 * @param list
-	 * @return
-	 */
-	@RequestMapping(value = "{version}/goods/syncgoods/{centerId}", method = RequestMethod.POST)
-	public ResultModel syncgoods(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> itemIdList) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.syncgoods(itemIdList, centerId);
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-
-	/**
 	 * @fun 同步库存
 	 * @return
 	 */
@@ -614,26 +506,6 @@ public class GoodsController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsService.syncStock(itemIdList);
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-
-	/**
-	 * @fun 订货平台商品同步
-	 * @param version
-	 * @param list
-	 * @return
-	 */
-	@RequestMapping(value = "{version}/goods/itemSync/{centerId}", method = RequestMethod.POST)
-	public ResultModel itemSync(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> itemIdList) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			if (itemIdList == null || itemIdList.size() == 0) {
-				return new ResultModel(false, "没有选择要同步的商品");
-			}
-			return goodsService.syncgoods(itemIdList, centerId);
 		}
 
 		return new ResultModel(false, "版本错误");

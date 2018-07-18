@@ -173,22 +173,6 @@ public class GoodsItemController {
 		}
 	}
 	
-	@RequestMapping(value = "{version}/goods/item/queryPurchaseItemForPage", method = RequestMethod.POST)
-	public ResultModel queryPurchaseItemForPage(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsItemEntity entity) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			String centerId = request.getParameter("centerId");
-			if (centerId == null || "".equals(centerId)) {
-				new ResultModel(false, "没有获取订货平台编号");
-			}
-			Page<GoodsItemEntity> page = goodsItemService.queryPurchaseCenterByPage(entity, Integer.parseInt(centerId));
-			return new ResultModel(true, page, new Pagination(page));
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-	
 	@RequestMapping(value = "{version}/goods/item/queryPurchaseItem", method = RequestMethod.POST)
 	public ResultModel queryPurchaseItem(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsItemEntity entity) {

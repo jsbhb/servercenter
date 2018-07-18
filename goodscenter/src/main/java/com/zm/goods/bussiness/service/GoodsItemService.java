@@ -113,17 +113,6 @@ public interface GoodsItemService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	Page<GoodsItemEntity> queryPurchaseCenterByPage(GoodsItemEntity entity, int centerId);
-
-	/**  
-	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
-	 *  
-	 * @author hebin
-	 * @param entity
-	 * @param parseInt
-	 * @return  
-	 * @since JDK 1.7  
-	 */
 	Page<GoodsItemEntity> queryPurchaseCenterItem(GoodsItemEntity entity);
 
 	/**  

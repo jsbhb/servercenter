@@ -53,7 +53,7 @@ public class GoodsSearch {
 
 	@SearchCondition(value = SearchCondition.FILTER)
 	private String tag;
-
+	
 	public String getTag() {
 		return tag;
 	}

@@ -160,17 +160,6 @@ public interface GoodsItemMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	Page<GoodsItemEntity> selectPurchaseCenterForPage(Map<String,Object> params);
-
-	/**  
-	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
-	 *  
-	 * @author hebin  
-	 * @param entity
-	 * @param centerId
-	 * @return  
-	 * @since JDK 1.7  
-	 */
 	Page<GoodsItemEntity> selectPurchaseCenterItem(Map<String,Object> params);
 
 	/**  

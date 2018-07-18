@@ -660,18 +660,17 @@
 	</insert>
 	
 	<select id="listPublishError" parameterType="Object" resultMap="entity">
-		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods${centerId} gi left join goods g 
-		on g.goods_id = gi.goods_id left join goods_file gf on g.goods_id = gf.goods_id 
-		where gi.status = 1 and is_publish = 0 
+		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods g left join goods_file gf on g.goods_id = gf.goods_id 
+		where g.status = 1 and is_publish = 0 
 		<if test="entity.goodsName != null and entity.goodsName != ''">
 			and goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>
 	</select>
 	
 	<select id="listUnPublishError" parameterType="Object" resultMap="entity">
-		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods${centerId} gi left join goods g 
-		on g.goods_id = gi.goods_id left join goods_file gf on g.goods_id = gf.goods_id 
-		where gi.status = 0 and is_publish = 1 
+		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods g 
+		left join goods_file gf on g.goods_id = gf.goods_id 
+		where g.status = 0 and is_publish = 1 
 		<if test="entity.goodsName != null and entity.goodsName != ''">
 			and goods_name like concat('%',#{entity.goodsName},'%') 
 		</if>

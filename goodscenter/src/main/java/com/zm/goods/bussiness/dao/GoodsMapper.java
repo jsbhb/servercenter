@@ -15,7 +15,6 @@ import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.PopularizeDict;
-import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
@@ -23,7 +22,6 @@ import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.bo.CategoryBO;
 import com.zm.goods.pojo.bo.ItemCountBO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
-import com.zm.goods.pojo.vo.TimeLimitActive;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 public interface GoodsMapper {
@@ -34,9 +32,7 @@ public interface GoodsMapper {
 	
 	List<GoodsSpecs> listGoodsSpecs(Map<String,Object> param);
 	
-	List<PriceContrast> listPriceContrast(Map<String,Object> param);
-	
-	GoodsSpecs getGoodsSpecs(Map<String,Object> param);
+	GoodsSpecs getGoodsSpecs(String itemId);
 	
 	GoodsSpecs getGoodsSpecsForOrder(Map<String,Object> param);
 	
@@ -90,19 +86,19 @@ public interface GoodsMapper {
 	
 	List<GoodsItem> listGoodsForLucene(Map<String, Object> param);
 	
-	List<GoodsItem> listGoodsForLuceneUpdateTag(Map<String, Object> param);
+	List<GoodsItem> listGoodsForLuceneUpdateTag(List<String> updateTagList);
 	
 	List<GoodsSpecs> listSpecsForLucene(Map<String,Object> param);
 	
-	List<GoodsSpecs> listItemTagForLuceneUpdate(Map<String,Object> param);
+	List<GoodsSpecs> listItemTagForLuceneUpdate(List<String> itemIdList);
 	
 	void updateGoodsUpShelves(Map<String,Object> param);
 	
-	void updateGoodsItemUpShelves(Map<String,Object> param);
+	void updateGoodsItemUpShelves(List<String> itemIdList);
 
 	List<GoodsItem> queryGoodsItem(Map<String, Object> searchParm);
 	
-	List<GoodsIndustryModel> queryGoodsCategory(@Param("centerId")String centerId);
+	List<GoodsIndustryModel> queryGoodsCategory();
 	
 	Tax getTax(Map<String,Object> param);
 	
@@ -112,11 +108,7 @@ public interface GoodsMapper {
 	
 	void updateStockBack(Map<String,Object> param);
 	
-	List<TimeLimitActive> listLimitTimeData(@Param("centerId")String centerId);
-	
-	List<GoodsItem> listSpecialGoods(Map<String,Object> param);
-
-	List<String> getGoodsIdByItemId(Map<String,Object> param);
+	List<String> getGoodsIdByItemId(List<String> itemIdList);
 
 	void updateThirdWarehouseStock(List<WarehouseStock> list);
 
@@ -126,35 +118,17 @@ public interface GoodsMapper {
 
 	List<OrderBussinessModel> checkStock();
 
-	void updateGoodsDownShelves(Map<String, Object> param);
+	void updateGoodsDownShelves(List<String> goodsIdList);
 	
 	void updateGoodsItemDownShelves(Map<String, Object> param);
 	
 	List<ItemCountBO> countUpShelvesStatus(Map<String, Object> param);
-	
-	void insertCenterGoods(Map<String, Object> param);
-	
-	void insertCenterGoodsFile(Map<String, Object> param);
-	
-	void insertCenterFirstCategory(Map<String, Object> param);
-	
-	void insertCenterSecondCategory(Map<String, Object> param);
-	
-	void insertCenterThirdCategory(Map<String, Object> param);
-	
-	void insertCenterGoodsItem(Map<String, Object> param);
-	
-	void insertCenterGoodsPrice(Map<String, Object> param);
-	
-	void insert2BGoodsPrice(Map<String, Object> param);
 	
 	List<String> listFirstCategory(List<String> goodsIdList);
 	
 	List<String> listSecondCategory(List<String> goodsIdList);
 	
 	List<String> listThirdCategory(List<String> goodsIdList);
-
-	List<ItemCountBO> countItem(Map<String, Object> param);
 
 	void updateGoodsItemUnDistribution(List<String> list);
 	

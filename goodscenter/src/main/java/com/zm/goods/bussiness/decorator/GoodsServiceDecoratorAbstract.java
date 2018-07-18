@@ -8,10 +8,8 @@ import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
-import com.zm.goods.pojo.PriceContrast;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
@@ -20,7 +18,6 @@ import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
-import com.zm.goods.pojo.vo.TimeLimitActive;
 
 /**
  * @fun 装饰器抽象类，把不需要装饰的方法在抽象类里默认实现
@@ -39,11 +36,6 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	@Override
 	public abstract Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
 	
-	@Override
-	public List<PriceContrast> listPriceContrast(Map<String, Object> param) {
-		return null;
-	}
-
 	@Override
 	public List<GoodsFile> listGoodsCookFile(String goodsId) {
 		return null;
@@ -68,11 +60,6 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	@Override
 	public List<Layout> getModular(String page, Integer centerId, Integer pageType) {
 		return null;
-	}
-
-	@Override
-	public void createTable(Integer centerId) {
-		
 	}
 
 	@Override
@@ -108,16 +95,6 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	@Override
 	public void stockBack(List<OrderBussinessModel> list, Integer orderFlag) {
 		
-	}
-
-	@Override
-	public List<TimeLimitActive> getTimelimitGoods(Integer centerId) {
-		return null;
-	}
-
-	@Override
-	public List<GoodsItem> listSpecialGoods(Integer centerId, Integer type) {
-		return null;
 	}
 
 	@Override
@@ -162,11 +139,6 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 
 	@Override
 	public ResultModel syncStock(List<String> itemIdList) {
-		return null;
-	}
-
-	@Override
-	public ResultModel syncgoods(List<String> itemIdList, Integer centerId) {
 		return null;
 	}
 
