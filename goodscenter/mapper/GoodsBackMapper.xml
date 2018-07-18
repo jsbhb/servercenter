@@ -209,6 +209,52 @@
 		</collection>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsInfoListForDownload" id="goodsInfoListForDownloadPartOne">
+		<result column="goods_id" property="goodsId"/>
+		<result column="item_id" property="itemId" />
+		<result column="sku" property="sku"/>
+		<result column="info" property="info"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="brand" property="brand"/>
+		<result column="origin" property="origin"/>
+		<result column="goods_status" property="goodsStatus"/>
+		<result column="item_status" property="itemStatus"/>
+		<result column="supplier_name" property="supplierName"/>
+		<result column="first_name" property="firstName"/>
+		<result column="second_name" property="secondName"/>
+		<result column="third_name" property="thirdName"/>
+		<result column="encode" property="encode"/>
+		<result column="carton" property="carton"/>
+		<result column="shelf_life" property="shelfLife"/>
+		<result column="goods_type" property="goodsType"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsInfoListForDownload" id="goodsInfoListForDownloadPartTwo">
+		<result column="item_id" property="itemId" />
+		<result column="fxqty" property="fxQty"/>
+		<result column="proxy_price" property="proxyPrice"/>
+		<result column="fxprice" property="fxPrice"/>
+		<result column="retail_price" property="retailPrice"/>
+		<result column="grade_type" property="gradeType"/>
+		<result column="grade_type_name" property="gradeTypeName"/>
+		<result column="proportion" property="proportion"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsInfoListForDownload" id="goodsInfoListForDownloadPartThree">
+		<result column="item_id" property="itemId" />
+		<collection property="goodsTagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
+			<id column="gtbid" property="id"/>
+			<result column="tag_name" property="tagName"/>
+		</collection>
+		<collection property="goodsPriceRatioList" ofType="com.zm.goods.pojo.GoodsPriceRatioEntity">
+			<id column="gprid" property="id"/>
+			<result column="ratio_platform_name" property="ratioPlatformName"/>
+			<result column="ratio_price" property="ratioPrice"/>
+			<result column="evaluate_qty" property="evaluateQty"/>
+			<result column="sales_volume" property="salesVolume"/>
+		</collection>
+	</resultMap>
+	
 	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
 		select * from third_goods where 1=1 
 		<if test="id != null and id > 0">
@@ -488,6 +534,103 @@
 		<if test="thirdCatalogList != null and thirdCatalogList.size() > 0">
 			and b.third_category in 
 			<foreach collection="thirdCatalogList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		order by gi.item_id
+	</select>
+	
+	<select id="selectGoodsListForDownloadPartOne" parameterType="Object" resultMap="goodsInfoListForDownloadPartOne">
+		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
+		gi.status goods_status,gi2.status item_status,g.supplier_name,
+		b.first_category first_name,b.second_category second_name,b.third_category third_name,
+		gi.encode,gi.carton,gi.shelf_life,g.type goods_type 
+		from zm_goods.goods_item gi
+		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
+		left join zm_goods.goods g on g.goods_id = gi.goods_id
+		left join zm_goods.base b on g.base_id = b.id
+		where 1=1 and gi.is_del = 0 and g.is_del = 0
+		<if test="supplierId!=null and supplierId != -1">
+			and g.supplier_id = #{supplierId}
+		</if>
+		<if test="itemIdList != null and itemIdList.size() > 0">
+			and gi.item_id in 
+			<foreach collection="itemIdList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="itemStatus!=null and itemStatus != 0">
+			and gi2.status = #{itemStatus}
+		</if>
+		<if test="firstCatalogList != null and firstCatalogList.size() > 0">
+			and b.first_category in 
+			<foreach collection="firstCatalogList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="secondCatalogList != null and secondCatalogList.size() > 0">
+			and b.second_category in 
+			<foreach collection="secondCatalogList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="thirdCatalogList != null and thirdCatalogList.size() > 0">
+			and b.third_category in 
+			<foreach collection="thirdCatalogList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		order by gi.item_id
+	</select>
+	
+	<select id="selectGoodsListForDownloadPartTwo" parameterType="Object" resultMap="goodsInfoListForDownloadPartTwo">
+		select gi.item_id,gs.fxqty,
+		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion
+		from zm_goods.goods_item gi
+		left join zm_goods.goods_stock gs on gi.item_id = gs.item_id
+		left join zm_goods.goods_price gp on gi.item_id = gp.item_id
+		left join zm_goods.goods_rebate gr on gi.item_id = gr.item_id
+		where 1=1 and gi.is_del = 0
+		<if test="proportionFlg!=null and proportionFlg != -1">
+			and gr.proportion &gt; 0
+		</if>
+		<if test="gradeType!=null and gradeType != -1">
+			and gr.grade_type = #{gradeType}
+		</if>
+		<if test="itemIdList != null and itemIdList.size() > 0">
+			and gi.item_id in 
+			<foreach collection="itemIdList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="rebateStart!=null and rebateStart != -1">
+			and gr.proportion &gt;= #{rebateStart}
+		</if>
+		<if test="rebateEnd!=null and rebateEnd != -1">
+			and gr.proportion &lt;= #{rebateEnd}
+		</if>
+		order by gi.item_id,gr.grade_type
+	</select>
+	
+	<select id="selectGoodsListForDownloadPartThree" parameterType="Object" resultMap="goodsInfoListForDownloadPartThree">
+		select gi.item_id,
+		gtb.id gtbid,gt.tag_name,gpr.id gprid,grp.ratio_platform_name,gpr.ratio_price,
+		gpr.evaluate_qty,gpr.sales_volume
+		from zm_goods.goods_item gi
+		left join zm_goods.goods_tag_bind gtb on gi.item_id = gtb.item_id
+		left join zm_goods.goods_tag gt on gtb.tag_id = gt.id
+		left join zm_goods.goods_price_ratio gpr on gi.item_id = gpr.item_id
+		left join zm_goods.goods_ratio_platform grp on gpr.ratio_platform_id = grp.id
+		where 1=1 and gi.is_del = 0
+		<if test="itemIdList != null and itemIdList.size() > 0">
+			and gi.item_id in 
+			<foreach collection="itemIdList" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="tagIdList != null and tagIdList.size() > 0">
+			and gtb.tag_id in 
+			<foreach collection="tagIdList" item="item" open="(" separator="," close=")">
                 #{item}
 			</foreach>
 		</if>

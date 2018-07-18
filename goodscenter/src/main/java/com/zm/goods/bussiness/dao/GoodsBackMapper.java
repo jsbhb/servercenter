@@ -318,4 +318,10 @@ public interface GoodsBackMapper {
 	List<ERPGoodsTagBindEntity> selectGoodsTagBindListByItemId(GoodsItemEntity entity);
 
 	void deleteTagBindList(List<ERPGoodsTagBindEntity> list);
+
+	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartOne(GoodsListDownloadParam param);
+
+	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartTwo(GoodsListDownloadParam param);
+
+	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartThree(GoodsListDownloadParam param);
 }

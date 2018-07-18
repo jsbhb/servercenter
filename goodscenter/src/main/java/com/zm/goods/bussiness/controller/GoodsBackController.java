@@ -391,7 +391,9 @@ public class GoodsBackController {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
+				LogUtil.writeLog("【导出数据开始】" + System.currentTimeMillis() / 1000);
 				List<GoodsInfoListForDownload> result = goodsBackService.queryGoodsListForDownload(param);
+				LogUtil.writeLog("【导出数据结束】" + System.currentTimeMillis() / 1000);
 				return new ResultModel(true, result);
 			}
 

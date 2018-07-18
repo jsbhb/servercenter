@@ -29,6 +29,7 @@ import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
@@ -482,7 +483,46 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	public List<GoodsInfoListForDownload> queryGoodsListForDownload(GoodsListDownloadParam param) {
-		return goodsBackMapper.selectGoodsListForDownload(param);
+		if (param.getGradeType() != null && param.getGradeType() != -1) {
+			return goodsBackMapper.selectGoodsListForDownload(param);
+		} else {
+			List<GoodsInfoListForDownload> partOne = goodsBackMapper.selectGoodsListForDownloadPartOne(param);
+			List<GoodsInfoListForDownload> partTwo = goodsBackMapper.selectGoodsListForDownloadPartTwo(param);
+			List<GoodsInfoListForDownload> partThree = goodsBackMapper.selectGoodsListForDownloadPartThree(param);
+			LogUtil.writeLog("【数据拼接开始】" + System.currentTimeMillis() / 1000);
+			for(GoodsInfoListForDownload partTwoEntity: partTwo) {
+				for(GoodsInfoListForDownload partOneEntity: partOne) {
+					if (partTwoEntity.getItemId().equals(partOneEntity.getItemId())) {
+						partTwoEntity.setGoodsId(partOneEntity.getGoodsId());
+						partTwoEntity.setSku(partOneEntity.getSku());
+						partTwoEntity.setInfo(partOneEntity.getInfo());
+						partTwoEntity.setGoodsName(partOneEntity.getGoodsName());
+						partTwoEntity.setBrand(partOneEntity.getBrand());
+						partTwoEntity.setOrigin(partOneEntity.getOrigin());
+						partTwoEntity.setGoodsStatus(partOneEntity.getGoodsStatus());
+						partTwoEntity.setItemStatus(partOneEntity.getItemStatus());
+						partTwoEntity.setSupplierName(partOneEntity.getSupplierName());
+						partTwoEntity.setFirstName(partOneEntity.getFirstName());
+						partTwoEntity.setSecondName(partOneEntity.getSecondName());
+						partTwoEntity.setThirdName(partOneEntity.getThirdName());
+						partTwoEntity.setEncode(partOneEntity.getEncode());
+						partTwoEntity.setCarton(partOneEntity.getCarton());
+						partTwoEntity.setShelfLife(partOneEntity.getShelfLife());
+						partTwoEntity.setGoodsType(partOneEntity.getGoodsType());
+						break;
+					}
+				}
+				for(GoodsInfoListForDownload partThreeEntity: partThree) {
+					if (partTwoEntity.getItemId().equals(partThreeEntity.getItemId())) {
+						partTwoEntity.setGoodsTagList(partThreeEntity.getGoodsTagList());
+						partTwoEntity.setGoodsPriceRatioList(partThreeEntity.getGoodsPriceRatioList());
+						break;
+					}
+				}
+			}
+			LogUtil.writeLog("【数据拼接结束】" + System.currentTimeMillis() / 1000);
+			return partTwo;
+		}
 	}
 
 	@Override
