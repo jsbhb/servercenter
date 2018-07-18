@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
+import com.zm.goods.pojo.po.PagePO;
 
 public interface SEOService {
 
@@ -16,6 +17,17 @@ public interface SEOService {
 	ResultModel delPublish(List<String> itemIdList, Integer centerId);
 
 	ResultModel indexPublish(Integer id);
+
+	/**
+	 * 
+	 * retrievePage:检索页面数据. <br/>
+	 * 
+	 * @author hebin
+	 * @param id
+	 * @return
+	 * @since JDK 1.7
+	 */
+	PagePO retrievePage(Integer id) throws Exception;
 
 	ResultModel getGoodsAccessPath(String goodsId, String itemId);
 

@@ -49,7 +49,7 @@ public class SEOServiceImpl implements SEOService {
 
 	@Resource
 	UserFeignClient userFeignClient;
-	
+
 	private static Integer CNCOOPBUY_ID = 2;
 	private static String HTTP_STR = "http";
 
@@ -149,8 +149,8 @@ public class SEOServiceImpl implements SEOService {
 
 		// 检索数据
 		PagePO pagePo = retrievePageData(id);
-		
-		//数据转化为接口结构
+
+		// 数据转化为接口结构
 		SEODetail seoDetail = convertToSEODetail(pagePo);
 
 		// 发布并操作返回结构
@@ -167,13 +167,13 @@ public class SEOServiceImpl implements SEOService {
 		return result;
 	}
 
-	/**  
-	 * convertToSEODetail:数据转化为接口结构. <br/>  
-	 *  
-	 * @author hebin  
+	/**
+	 * convertToSEODetail:数据转化为接口结构. <br/>
+	 * 
+	 * @author hebin
 	 * @param pagePo
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	private SEODetail convertToSEODetail(PagePO pagePo) {
 		List<PagePO> pageList = new ArrayList<PagePO>();
@@ -208,6 +208,18 @@ public class SEOServiceImpl implements SEOService {
 	}
 
 	@Override
+	public PagePO retrievePage(Integer id) throws Exception {
+		PagePO page = seoMapper.getPageById(id);
+
+		if (page == null) {
+			throw new Exception("no page info!");
+		}
+
+		page.setsEOModel(seoMapper.getPageSEO(id));
+		return page;
+	}
+
+	@Override
 	public ResultModel getGoodsAccessPath(String goodsId, String itemId) {
 		ResultModel result = new ResultModel();
 		if (goodsId != null && !"".equals(goodsId)) {
@@ -228,14 +240,14 @@ public class SEOServiceImpl implements SEOService {
 
 	@Override
 	public ResultModel publishByGoodsId(List<String> goodsIdList, Integer centerId, boolean isNewPublish) {
-		
-		//检索手机端及商场的页面组建数据
+
+		// 检索手机端及商场的页面组建数据
 		List<PagePO> pageList = seoMapper.getGoodsDetailPageByPublish();
 		if (pageList == null || pageList.size() != 2) {
 			return new ResultModel(false, "请确认手机和pc商详模板是否都存在");
 		}
-		
-		//数据转化
+
+		// 数据转化
 		StringBuilder sb = new StringBuilder();
 		ResultModel result = new ResultModel(true, "");
 		SEODetail seoGoodsDetail;
