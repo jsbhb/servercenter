@@ -82,7 +82,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Override
 	public GoodsItemEntity queryById(int id) {
 		GoodsItemEntity entity = goodsItemMapper.selectById(id);
-		ERPGoodsTagBindEntity tagBind = goodsBackMapper.selectGoodsTagBindByGoodsId(entity);
+		ERPGoodsTagBindEntity tagBind = goodsBackMapper.selectGoodsTagBindByItemId(entity);
 		entity.setTagBindEntity(tagBind);
 		return entity;
 	}
@@ -155,7 +155,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		goodsItemMapper.updatePrice(entity.getGoodsPrice());
 		//判断商品标签
 		//增删改
-		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByGoodsId(entity);
+		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByItemId(entity);
 		ERPGoodsTagBindEntity newTag = entity.getTagBindEntity();
 		if (oldTag == null && newTag.getTagId() != 0) {
 			goodsBackMapper.insertTagBind(newTag);

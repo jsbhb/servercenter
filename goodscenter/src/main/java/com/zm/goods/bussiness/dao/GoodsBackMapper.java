@@ -224,7 +224,7 @@ public interface GoodsBackMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ERPGoodsTagBindEntity selectGoodsTagBindByGoodsId(GoodsItemEntity entity);
+	ERPGoodsTagBindEntity selectGoodsTagBindByItemId(GoodsItemEntity entity);
 
 	/**
 	 * insert:插入商品. <br/>
@@ -315,7 +315,7 @@ public interface GoodsBackMapper {
 
 	Page<GoodsEntity> listUnPublishError(Map<String, Object> param);
 
-	List<ERPGoodsTagBindEntity> selectGoodsTagBindListByGoodsId(GoodsItemEntity entity);
+	List<ERPGoodsTagBindEntity> selectGoodsTagBindListByItemId(GoodsItemEntity entity);
 
 	void deleteTagBindList(List<ERPGoodsTagBindEntity> list);
 }

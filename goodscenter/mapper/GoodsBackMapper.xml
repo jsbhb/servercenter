@@ -389,8 +389,8 @@
 		delete from goods_tag_bind where item_id = #{itemId}
 	</delete>
 	
-	<select id="selectGoodsTagBindByGoodsId" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where item_id = #{goodsId}
+	<select id="selectGoodsTagBindByItemId" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where item_id = #{itemId}
 	</select>
 	
 	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
@@ -534,8 +534,8 @@
 		</if>
 	</select>
 	
-	<select id="selectGoodsTagBindListByGoodsId" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where item_id = #{goodsId}
+	<select id="selectGoodsTagBindListByItemId" parameterType="Object" resultMap="goodsTagBind">
+		select * from goods_tag_bind where item_id = #{itemId}
 	</select>
 	
 	<delete id="deleteTagBindList" parameterType="Object">
