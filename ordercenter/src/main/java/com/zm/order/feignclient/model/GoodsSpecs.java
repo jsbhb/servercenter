@@ -22,7 +22,7 @@ public class GoodsSpecs implements Serializable {
 	@JsonIgnore
 	private Integer id;
 
-	private Integer goodsId;
+	private String goodsId;
 
 	private String itemId;
 
@@ -224,11 +224,11 @@ public class GoodsSpecs implements Serializable {
 		this.id = id;
 	}
 
-	public Integer getGoodsId() {
+	public String getGoodsId() {
 		return goodsId;
 	}
 
-	public void setGoodsId(Integer goodsId) {
+	public void setGoodsId(String goodsId) {
 		this.goodsId = goodsId;
 	}
 
