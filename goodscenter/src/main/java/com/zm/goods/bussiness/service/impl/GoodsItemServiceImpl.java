@@ -99,22 +99,14 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 
 	@Override
 	public void notBeFx(GoodsItemEntity entity) {
-		entity.setStatus(GoodsStatusEnum.USEFUL.getIndex()+"");
-		goodsItemMapper.updateStatus(entity);
+		entity.setStatus(GoodsStatusEnum.NOTFX.getIndex()+"");
+		goodsItemMapper.updateIsFXStatus(entity);
 	}
 
 	@Override
 	public void beFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.FX.getIndex()+"");
-		goodsItemMapper.updateStatus(entity);
-	}
-
-	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
-	public void beUse(GoodsItemEntity entity) {
-		entity.setStatus(GoodsStatusEnum.USEFUL.getIndex()+"");
-		goodsItemMapper.updateStatus(entity);
-		goodsItemMapper.insertStock(entity);
+		goodsItemMapper.updateIsFXStatus(entity);
 	}
 
 	@Override
@@ -219,6 +211,14 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public void batchNotBeFx(GoodsItemEntity entity) {
+		String[] arr = entity.getItemId().split(",");
+		List<String> itemIdList = Arrays.asList(arr);
+		goodsItemMapper.updateGoodsItemNotBeFxForBatch(itemIdList);
 	}
 
 	@Override

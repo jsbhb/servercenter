@@ -76,15 +76,6 @@ public interface GoodsItemService {
 	void beFx(GoodsItemEntity entity);
 
 	/**  
-	 * beUse:设置商品明细不可用. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param entity  
-	 * @since JDK 1.7  
-	 */
-	void beUse(GoodsItemEntity entity);
-
-	/**  
 	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
 	 *  
 	 * @author hebin
@@ -184,6 +175,8 @@ public interface GoodsItemService {
 	 * @since JDK 1.7  
 	 */
 	void batchBeFx(GoodsItemEntity entity);
+
+	void batchNotBeFx(GoodsItemEntity entity);
 
 	Page<GoodsExtensionEntity> queryGoodsExtensionByPageDownload(GoodsItemEntity entity);
 

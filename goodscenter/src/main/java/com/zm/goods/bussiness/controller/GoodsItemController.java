@@ -98,26 +98,6 @@ public class GoodsItemController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/goods/item/beUse", method = RequestMethod.POST)
-	public ResultModel beUse(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			try {
-				String[] arr = entity.getItemId().split(",");
-				if (arr.length > 1) {
-					goodsItemService.batchBeUse(entity);
-				} else {
-					goodsItemService.beUse(entity);
-				}
-				return new ResultModel(true, "");
-			} catch (Exception e) {
-				return new ResultModel(false, e.getMessage());
-			}
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-
 	@RequestMapping(value = "{version}/goods/item/beFx", method = RequestMethod.POST)
 	public ResultModel beFx(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
 
@@ -143,7 +123,12 @@ public class GoodsItemController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsItemService.notBeFx(entity);
+				String[] arr = entity.getItemId().split(",");
+				if (arr.length > 1) {
+					goodsItemService.batchNotBeFx(entity);
+				} else {
+					goodsItemService.notBeFx(entity);
+				}
 				return new ResultModel(true, "");
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());

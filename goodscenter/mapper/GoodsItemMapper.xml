@@ -538,7 +538,7 @@
 	</insert>
 	
 	<update id="updateGoodsItemBeFxForBatch" parameterType="Object">
-		update goods_item set status = 2, update_time=now() where status = 1 and item_id in
+		update goods_item set is_fx = 1, update_time=now() where status = 1 and item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}
@@ -771,4 +771,16 @@
 		sales_volume = VALUES(sales_volume), status = VALUES(status), 
 		grab_address = VALUES(grab_address),	update_time=now(), opt=VALUES(opt)
 	</insert>
+	
+	<update id="updateIsFXStatus" parameterType="Object">
+		update goods_item set is_fx= #{status},update_time=now() where item_id  = #{itemId}
+	</update>
+	
+	<update id="updateGoodsItemNotBeFxForBatch" parameterType="Object">
+		update goods_item set is_fx = 0, update_time=now() where status = 1 and item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
 </mapper>
