@@ -27,7 +27,7 @@ public interface GoodsFeignClient {
 			@RequestParam("orderFlag") Integer orderFlag,
 			@RequestParam(value = "couponIds", required = false) String couponIds,
 			@RequestParam(value = "userId", required = false) Integer userId,
-			@RequestParam(value = "isFx") boolean isFx);
+			@RequestParam("isFx") boolean isFx);
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,

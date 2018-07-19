@@ -277,7 +277,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		
 		for (OrderBussinessModel model : list) {
-			specs = tempSpecsMap.get(model.getItemCode());
+			specs = tempSpecsMap.get(model.getItemId());
 			if (specs == null) {
 				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
 						"itemId=" + model.getItemId() + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());

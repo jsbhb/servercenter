@@ -114,7 +114,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
-		ResultModel result = new ResultModel();
+		ResultModel result = new ResultModel(true,null);
 		String openId = req.getParameter("openId");
 
 		// 判断参数有效性
@@ -143,7 +143,7 @@ public class OrderServiceImpl implements OrderService {
 		StringBuilder detail = new StringBuilder();
 		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(info, detail);
 		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
-				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId(),false);
+				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId(), false);
 		if (!result.isSuccess()) {
 			return result;
 		}
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
 
 		// 邮费和税费初始值
 		Double postFee = 0.0;
-		TaxFeeBO taxFee = null;// 税费对象
+		TaxFeeBO taxFee = new TaxFeeBO();// 税费对象
 		Double unDiscountAmount = 0.0;// 商品原总价
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
@@ -189,7 +189,7 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 
-		//计算优惠金额
+		// 计算优惠金额
 		Double disAmount = 0.0;
 		if (unDiscountAmount > 0) {
 			disAmount = CalculationUtils.sub(unDiscountAmount, amount);
@@ -205,9 +205,9 @@ public class OrderServiceImpl implements OrderService {
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		//调用支付信息
+		// 调用支付信息
 		orderComponentUtil.getPayInfo(payType, type, req, result, openId, orderId, centerId, detail, totalAmount);
-		if(!result.isSuccess()){
+		if (!result.isSuccess()) {
 			return result;
 		}
 
@@ -230,9 +230,9 @@ public class OrderServiceImpl implements OrderService {
 			return temp;
 		}
 
-		//完善订单信息
-		orderComponentUtil.renderOrderInfo(info, postFee, weight, unDiscountAmount, taxFee, disAmount);
-		//保存订单
+		// 完善订单信息
+		orderComponentUtil.renderOrderInfo(info, postFee, weight, amount, taxFee, disAmount);
+		// 保存订单
 		orderComponentUtil.saveOrder(info);
 
 		// 增加缓存订单数量

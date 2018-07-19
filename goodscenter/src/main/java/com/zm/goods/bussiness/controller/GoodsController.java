@@ -176,8 +176,7 @@ public class GoodsController {
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
 			Integer centerId, Integer orderFlag, @RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId,
-			@RequestParam(value = "isFx") boolean isFx) {
+			@RequestParam(value = "userId", required = false) Integer userId, boolean isFx) {
 
 		ResultModel result = new ResultModel();
 		try {
