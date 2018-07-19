@@ -20,6 +20,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -103,6 +104,7 @@ public class GoodsLucene extends AbstractLucene {
 
 		doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
 		doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
+		doc.add(new IntField("ratio", model.getRatio() == null ? 0 : model.getRatio(), Store.NO));
 		doc.add(new StringField("type", model.getType() == null ? "0" : model.getType() + "", Store.NO));
 		doc.add(new StringField("upShelves", "1", Store.NO));
 		doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
@@ -234,8 +236,6 @@ public class GoodsLucene extends AbstractLucene {
 		List<SortField> sortFieldList = new ArrayList<SortField>();
 		if (sortList != null && sortList.getSortList() != null && sortList.getSortList().size() > 0) {
 			List<SortModel> list = sortList.getSortList();
-			SortField s1 = new SortField("popular", Type.STRING, true);
-			sortFieldList.add(s1);
 			SortField sortField = null;
 			for (SortModel model : list) {
 				if ("createTime".equals(model.getSortField())) {
@@ -247,6 +247,9 @@ public class GoodsLucene extends AbstractLucene {
 				}
 				sortFieldList.add(sortField);
 			}
+		} else {
+			SortField sortField = new SortField("ratio", Type.INT, true);
+			sortFieldList.add(sortField);
 		}
 		sortFieldList.add(SortField.FIELD_SCORE);
 		Sort sort = new Sort(sortFieldList.toArray(new SortField[sortFieldList.size()]));

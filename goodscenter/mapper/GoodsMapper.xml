@@ -22,6 +22,7 @@
 		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
 		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
 		<result column="index_status" property="indexStatus" jdbcType="INTEGER" />
+		<result column="goods_tag_ratio" property="goodsTagRatio" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
@@ -442,7 +443,7 @@
 	<!-- Lucene -->
 	<select id="listGoodsForLucene" resultMap="goodsItem" parameterType="Object">
 		select g.id, g.goods_id, g.create_time, g.goods_name as customGoodsName ,g.is_popular, g.type,
-		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
+		g.goods_tag_ratio,gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category
 		from goods g
 		left join base gb on g.base_id=gb.id 
 		left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 

@@ -17,6 +17,7 @@ public class LucenceModelConvertor {
 		searchModel.setPopular(item.getPopular());
 		searchModel.setType(item.getType());
 		searchModel.setCreateTime(item.getCreateTime());
+		searchModel.setRatio(item.getGoodsTagRatio());
 	}
 
 }

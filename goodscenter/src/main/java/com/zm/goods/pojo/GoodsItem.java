@@ -70,6 +70,16 @@ public class GoodsItem extends GoodsBase {
 	private String accessPath;
 	
 	private String href;
+	
+	private Integer goodsTagRatio;
+
+	public Integer getGoodsTagRatio() {
+		return goodsTagRatio;
+	}
+
+	public void setGoodsTagRatio(Integer goodsTagRatio) {
+		this.goodsTagRatio = goodsTagRatio;
+	}
 
 	public String getHref() {
 		return href;
