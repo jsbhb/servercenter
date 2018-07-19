@@ -28,6 +28,8 @@ public class ERPGoodsTagEntity extends Pagination {
 	private String createTime;// 注册时间
 	private String updateTime;// 更新时间
 	private String opt;// 操作人
+	private Integer tagRatio;//标签权重
+	
 	public Integer getId() {
 		return id;
 	}
@@ -75,6 +77,12 @@ public class ERPGoodsTagEntity extends Pagination {
 	}
 	public void setTagFunId(Integer tagFunId) {
 		this.tagFunId = tagFunId;
+	}
+	public Integer getTagRatio() {
+		return tagRatio;
+	}
+	public void setTagRatio(Integer tagRatio) {
+		this.tagRatio = tagRatio;
 	}
 	
 }

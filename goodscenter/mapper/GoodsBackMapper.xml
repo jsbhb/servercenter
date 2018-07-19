@@ -103,6 +103,7 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="tag_ratio" property="tagRatio" jdbcType="INTEGER" />
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.ERPGoodsTagBindEntity" id="goodsTagBind">
@@ -310,8 +311,8 @@
 	</select>
 	
 	<insert id="insert" parameterType="Object">
-		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt) value
-		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,#{type},now(),now(),#{opt})
+		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt,goods_tag_ratio) value
+		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,#{type},now(),now(),#{opt},#{goodsTagRatio})
 	</insert>
 	
 	<insert id="insertBatch" parameterType="Object">
@@ -395,8 +396,8 @@
 	</select>
 	
 	<insert id="insertGoodsTag" parameterType="Object">
-		insert into goods_tag (tag_name,priority,description,create_time,update_time,opt) value
-		(#{tagName},#{priority},#{description},now(),now(),#{opt})
+		insert into goods_tag (tag_name,priority,description,create_time,update_time,opt,tag_ratio) value
+		(#{tagName},#{priority},#{description},now(),now(),#{opt},#{tagRatio})
 	</insert>
 	
 	<update id="updateGoodsTag" parameterType="Object">
