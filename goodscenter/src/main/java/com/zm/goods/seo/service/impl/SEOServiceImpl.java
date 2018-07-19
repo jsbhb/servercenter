@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.zm.goods.bussiness.component.GoodsServiceUtil;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.dao.SEOMapper;
 import com.zm.goods.constants.Constants;
@@ -57,10 +56,7 @@ public class SEOServiceImpl implements SEOService {
 	public List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId) {
 		List<String> itemIds = seoMapper.listItemIdsByGoodsId(goodsId);
 		if (itemIds != null && itemIds.size() > 0) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("list", itemIds);
-			param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
-			return seoMapper.listStockByItemIds(param);
+			return seoMapper.listStockByItemIds(itemIds);
 		}
 		return null;
 	}
@@ -87,8 +83,8 @@ public class SEOServiceImpl implements SEOService {
 		return temp.isSuccess();
 	}
 
-	private GoodsItem getGoods(Map<String, Object> param) {
-		GoodsItem goodsItem = seoMapper.getGoods(param);
+	private GoodsItem getGoods(String goodsId) {
+		GoodsItem goodsItem = seoMapper.getGoods(goodsId);
 		if (goodsItem == null) {
 			return null;
 		}
@@ -247,10 +243,8 @@ public class SEOServiceImpl implements SEOService {
 		boolean success;
 		if (goodsIdList != null && goodsIdList.size() > 0) {
 			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
 			for (String goodsId : goodsIdList) {
-				param.put("goodsId", goodsId);
-				GoodsItem goodsItem = getGoods(param);
+				GoodsItem goodsItem = getGoods(goodsId);
 				if (goodsItem == null) {
 					continue;
 				}
@@ -260,6 +254,7 @@ public class SEOServiceImpl implements SEOService {
 				String path = seoMapper.queryGoodsCategoryPath(goodsItem.getThirdCategory());
 				template.opsForValue().set("href:" + goodsId, "/" + path + "/" + goodsId + ".html");
 				param.put("accessPath", path);
+				param.put("goodsId", goodsId);
 				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
 						pageList);
@@ -274,7 +269,7 @@ public class SEOServiceImpl implements SEOService {
 					continue;
 				}
 				seoMapper.updateGoodsAccessPath(param);
-				seoMapper.updateGoodsPublishByGoodsId(param);
+				seoMapper.updateGoodsPublishByGoodsId(goodsId);
 			}
 			if (sb.length() > 0) {
 				sb.append("发布失败");
@@ -287,10 +282,7 @@ public class SEOServiceImpl implements SEOService {
 	@Override
 	public ResultModel delPublishByGoodsId(List<String> goodsIdList, Integer centerId) {
 		ResultModel result = new ResultModel(true, "");
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("list", goodsIdList);
-		param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
-		List<GoodsTempModel> tempList = seoMapper.getDownShelvesGoodsIdByGoodsId(param);
+		List<GoodsTempModel> tempList = seoMapper.getDownShelvesGoodsIdByGoodsId(goodsIdList);
 		if (tempList != null && tempList.size() > 0) {// 说明有商品所有规格都下架，需要删除已经发布的商详
 			List<String> needDelgoodsIdList = new ArrayList<String>();
 			List<String> needRePublishgoodsIdList = new ArrayList<String>();
@@ -317,8 +309,7 @@ public class SEOServiceImpl implements SEOService {
 					if (!success) {
 						continue;
 					}
-					param.put("goodsId", goodsId);
-					seoMapper.updateGoodsDelPublishByGoodsId(param);
+					seoMapper.updateGoodsDelPublishByGoodsId(goodsId);
 				}
 			}
 			if (sb.length() > 0) {

@@ -734,13 +734,13 @@ public class OrderServiceImpl implements OrderService {
 				}
 			}
 			if (postFee.size() > 0) {
-				double fee = orderMapper.getDefaultFee("");
+				double fee = orderMapper.getDefaultFee();
 				for (PostFeeDTO dto : postFee) {
 					result.add(new SupplierPostFeeBO(dto.getSupplierId(), fee));
 				}
 			}
 		} else {
-			double fee = orderMapper.getDefaultFee("");
+			double fee = orderMapper.getDefaultFee();
 			for (PostFeeDTO dto : postFee) {
 				result.add(new SupplierPostFeeBO(dto.getSupplierId(), fee));
 			}
@@ -758,13 +758,6 @@ public class OrderServiceImpl implements OrderService {
 			result.add(new SupplierPostFeeBO(dto.getSupplierId(), expressFee.getFee()));
 		}
 		it.remove();
-	}
-
-	@Override
-	public void createTable(Integer centerId) {
-		orderMapper.createExpressFee(centerId);
-		orderMapper.createFreeExpressFee(centerId);
-		orderMapper.createProfitProportion(centerId);
 	}
 
 	@Override

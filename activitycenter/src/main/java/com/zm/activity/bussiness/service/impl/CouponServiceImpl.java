@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +34,8 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public List<Coupon> listCoupon(Integer centerId, Integer userId, String activityId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
 		param.put("activityId", activityId);
-		List<Coupon> couponList = couponMapper.listCoupon(param);
+		List<Coupon> couponList = couponMapper.listCoupon(activityId);
 		if (userId == null) {
 			return couponList;
 		}
@@ -73,23 +71,13 @@ public class CouponServiceImpl implements CouponService {
 		if (couponIdList == null || couponIdList.size() == 0) {
 			return null;
 		}
-		param.put("list", couponIdList);
-		return couponMapper.listCouponByCouponIds(param);
-	}
-
-	@Override
-	public void createTable(Integer centerId) {
-		couponMapper.createCoupon(centerId);
-		couponMapper.createCouponGoods(centerId);
-		couponMapper.createRule(centerId);
+		return couponMapper.listCouponByCouponIds(couponIdList);
 	}
 
 	@Override
 	public ResultModel receiveCoupon(Integer centerId, Integer userId, String couponId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
-		param.put("couponId", couponId);
-		Integer total = couponMapper.getIssueNumByCouponId(param);
+		Integer total = couponMapper.getIssueNumByCouponId(couponId);
 		if (total == null) {
 			return new ResultModel(false, "没有该优惠券");
 		}
@@ -117,10 +105,7 @@ public class CouponServiceImpl implements CouponService {
 	@Override
 	public ResultModel giveOutCoupon(Integer centerId, List<String> list) {
 		try {
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("centerId", centerId);
-			param.put("list", list);
-			List<Coupon> couponList = couponMapper.listIssueNum(param);
+			List<Coupon> couponList = couponMapper.listIssueNum(list);
 			if (couponList != null) {
 				for (Coupon coupon : couponList) {
 					Integer num = coupon.getNum();
@@ -130,7 +115,7 @@ public class CouponServiceImpl implements CouponService {
 					}
 				}
 			}
-			couponMapper.updateCouponGiveOut(param);
+			couponMapper.updateCouponGiveOut(list);
 			return new ResultModel(true, "");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -143,14 +128,13 @@ public class CouponServiceImpl implements CouponService {
 	public ResultModel listCouponByGoodsId(Integer centerId, String goodsId, String firstId, String secondId,
 			String thirdId, Integer userId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
 		param.put("goodsId", goodsId);
 		param.put("firstId", firstId);
 		param.put("secondId", secondId);
 		param.put("thirdId", thirdId);
-		List<Coupon> couponList = couponMapper.listCouponSpecialByGoodsId(param);//range=4
+		List<Coupon> couponList = couponMapper.listCouponSpecialByGoodsId(goodsId);//range=4
 		couponList.addAll(couponMapper.listCouponByCategory(param));//range = 1,2,3
-		couponList.addAll(couponMapper.listCouponAllRange(param));//range = 0
+		couponList.addAll(couponMapper.listCouponAllRange());//range = 0
 		List<String> couponIdList = null;
 		if (userId != null) {
 			param.put("userId", userId);
@@ -180,25 +164,21 @@ public class CouponServiceImpl implements CouponService {
 
 	@Override
 	public ResultModel listCouponByNode(Integer node, Integer centerId) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
-		param.put("node", node);
 
-		return new ResultModel(true, couponMapper.listCouponByNode(param));
+		return new ResultModel(true, couponMapper.listCouponByNode(node));
 	}
 
 	@Override
 	public ResultModel listCouponByCouponIds(String couponIds, Integer centerId, Integer userId) {
 		String[] couponIdArr = couponIds.split(",");
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", centerId);
 		param.put("userId", userId);
 		param.put("list", Arrays.asList(couponIdArr));
 		Integer count = couponMapper.countUserCoupon(param);
 		if (count != couponIdArr.length) {
 			return new ResultModel(false, "优惠券使用非法");
 		}
-		return new ResultModel(true, couponMapper.listCouponByCouponIds(param));
+		return new ResultModel(true, couponMapper.listCouponByCouponIds(Arrays.asList(couponIdArr)));
 	}
 
 	@Override
@@ -214,9 +194,7 @@ public class CouponServiceImpl implements CouponService {
 
 	@Override
 	public void updateCouponStatus(List<Integer> centerIdList) {
-		for (Integer centerId : centerIdList) {
-			couponMapper.updateCouponStatus(centerId);
-		}
+			couponMapper.updateCouponStatus();
 	}
 
 }

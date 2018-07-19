@@ -65,24 +65,6 @@ public class CouponController {
 	}
 
 	/**
-	 * @fun 新建区域中心时新建表
-	 * @param version
-	 * @param centerId
-	 * @return
-	 */
-	@RequestMapping(value = "{version}/createTable/{centerId}", method = RequestMethod.POST)
-	public boolean createTable(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			couponService.createTable(centerId);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * @fun 领取优惠券
 	 * @param version
 	 * @param userId

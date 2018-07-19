@@ -388,43 +388,18 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
-	@Override
-	// 最早模式中所有区域中心同时上架，现在已经弃用
-	public void createGoodsLucene(Integer centerId) {
-		// Map<String, Object> param = new HashMap<String, Object>();
-		// List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
-		// if (centerId == null) {
-		// ResultModel resultModel =
-		// userFeignClient.getCenterId(Constants.FIRST_VERSION);
-		// if (resultModel.isSuccess()) {
-		// List<Integer> list = (List<Integer>) resultModel.getObj();
-		// for (Integer id : list) {
-		// String centerIdstr = GoodsServiceUtil.judgeCenterId(id);
-		// param.put("centerId", centerIdstr);
-		// // renderLuceneModel(param, searchList, id);
-		// }
-		// }
-		// } else {
-		// String centerIdstr = GoodsServiceUtil.judgeCenterId(centerId);
-		// param.put("centerId", centerIdstr);
-		// // renderLuceneModel(param, searchList, centerId);
-		// }
-	}
-
 	@SuppressWarnings("unchecked")
-	private List<String> renderLuceneModel(Map<String, Object> param, Integer id,
-			List<String> itemIdList) {
+	private List<String> renderLuceneModel(Map<String, Object> param, Integer id, List<String> itemIdList) {
 		if (param.get("list") == null) {
 			throw new RuntimeException("没有获取到商品编号对应的GOODS_ID");
 		}
-		
-		//封装新建lucene索引的数据searchList
+
+		// 封装新建lucene索引的数据searchList
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLucene(param);
 		List<String> goodsIds = new ArrayList<String>();
 		List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 		createNewLucenIndex(param, searchList, itemList, goodsIds, itemIdList);
-		
-		
+
 		// 更新lucene索引的tag
 		List<String> totalGoodsId = (List<String>) param.get("list");
 		AbstractLucene lucene = LuceneFactory.get(id);
@@ -445,17 +420,7 @@ public class GoodsServiceImpl implements GoodsService {
 			for (GoodsItem item : itemList) {
 				sb.delete(0, sb.length());
 				search = new GoodsSearch();
-				search.setGoodsId(item.getGoodsId());
-				search.setBrand(item.getBrand());
-				search.setStatus(item.getStatus());
-				search.setOrigin(item.getOrigin());
-				search.setFirstCategory(item.getFirstCategory());
-				search.setThirdCategory(item.getThirdCategory());
-				search.setSecondCategory(item.getSecondCategory());
-				search.setGoodsName(item.getCustomGoodsName());
-				search.setPopular(item.getPopular());
-				search.setType(item.getType());
-				search.setCreateTime(item.getCreateTime());
+				LucenceModelConvertor.convertToGoodsSearch(item, search);
 				if (item.getGoodsSpecsList() != null) {
 					result = GoodsServiceUtil.getMinPrice(item.getGoodsSpecsList());
 					search.setPrice(result.get("realPrice"));
@@ -479,24 +444,23 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 	}
 
-
 	private void createNewLucenIndex(Map<String, Object> param, List<GoodsSearch> searchList, List<GoodsItem> itemList,
 			List<String> goodsIds, List<String> itemIds) {
-		
+
 		if (itemList != null && itemList.size() > 0) {
 			GoodsSearch searchModel;
 			Map<String, GoodsSearch> temp = new HashMap<String, GoodsSearch>();
 			Map<String, Double> result = null;
 			for (GoodsItem item : itemList) {
 				searchModel = new GoodsSearch();
-				LucenceModelConvertor.convertToGoodsSearch(item, searchModel );
+				LucenceModelConvertor.convertToGoodsSearch(item, searchModel);
 				goodsIds.add(item.getGoodsId());
 				temp.put(item.getGoodsId(), searchModel);
 				searchList.add(searchModel);
 			}
 			param.put("goodsIds", goodsIds);
 			param.put("itemIds", itemIds);
-			
+
 			List<GoodsSpecs> specsList = goodsMapper.listSpecsForLucene(param);
 			Map<String, List<GoodsSpecs>> tempSpecs = new HashMap<String, List<GoodsSpecs>>();
 			List<GoodsSpecs> tempList;
@@ -509,7 +473,7 @@ public class GoodsServiceImpl implements GoodsService {
 					tempSpecs.get(specs.getGoodsId()).add(specs);
 				}
 			}
-			
+
 			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<String, GoodsSearch> entry : temp.entrySet()) {
 				tempList = tempSpecs.get(entry.getKey());
@@ -720,21 +684,20 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public ResultModel upShelves(List<String> itemIdList, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		
-		
+
 		if (itemIdList != null && itemIdList.size() > 0) {
 			param.put("list", goodsMapper.getGoodsIdByItemId(itemIdList));
 			List<String> updateTagList = renderLuceneModel(param, centerId, itemIdList);
-			
-			//结果处理
+
+			// 结果处理
 			if (updateTagList != null && updateTagList.size() > 0) {// 更新标签
 				updateLuceneIndex(updateTagList, centerId);
 			}
 			goodsMapper.updateGoodsItemUpShelves(itemIdList);
 			publishThreadPool.publish(itemIdList, centerId);// 发布商品
-			
+
 			return new ResultModel(true, "");
-		}else{
+		} else {
 			return new ResultModel(false, "没有提供上架商品信息");
 		}
 	}
@@ -815,17 +778,38 @@ public class GoodsServiceImpl implements GoodsService {
 		if (itemIdList == null || itemIdList.size() == 0) {
 			return new ResultModel(false, "请传入itemId");
 		}
-		Map<String, Object> param = new HashMap<String, Object>();
 		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有该商品");
 		}
 		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);// 去重
-		goodsMapper.updateGoodsItemDownShelves(param);// 商品更新为下架状态
+		goodsMapper.updateGoodsItemDownShelves(itemIdList);// 商品更新为下架状态,同时不可分销
+
+		// 获取所有规格下架的goodsId和部分规格下架的goodsId
 		List<String> downShelvesGoodsIdList = new ArrayList<String>();
 		List<String> updateTagGoodsIdList = new ArrayList<String>();
-		param.put("set", goodsIdSet);
-		List<ItemCountBO> temp = goodsMapper.countUpShelvesStatus(param);
+		getAllAndSectionSpecsDownShelves(goodsIdSet, downShelvesGoodsIdList, updateTagGoodsIdList);
+
+		// lucene下架商品，并更新整个goods为下架状态
+		if (downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0) {
+			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
+			// 该部分为系统根据分类下是否还有上架的商品自动进行分类的显示和隐藏
+			// List<CategoryBO> categoryList =
+			// goodsMapper.listCategoryByGoodsIds(goodsIdList);
+			// categoryStatusModify(categoryList, HIDE, centerIdstr);
+		}
+		// 更新lucene索引
+		if (updateTagGoodsIdList.size() > 0) {
+			updateLuceneIndex(updateTagGoodsIdList, centerId);
+		}
+		publishThreadPool.delPublish(itemIdList, centerId);// 删除商品和重新发布商品
+		return new ResultModel(true, "");
+	}
+
+	private void getAllAndSectionSpecsDownShelves(Set<String> goodsIdSet, List<String> downShelvesGoodsIdList,
+			List<String> updateTagGoodsIdList) {
+		List<String> goodsIdList = new ArrayList<String>(goodsIdSet);
+		List<ItemCountBO> temp = goodsMapper.countUpShelvesStatus(goodsIdList);
 		if (temp == null || temp.size() == 0) {// 如果所有item已经下架，goods也下架，并删除索引
 			for (String str : goodsIdSet) {
 				downShelvesGoodsIdList.add(str);
@@ -843,19 +827,6 @@ public class GoodsServiceImpl implements GoodsService {
 				}
 			}
 		}
-		if (downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0) {
-			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
-			// 需要下架的分类
-			// TODO 系统下架分类
-			// List<CategoryBO> categoryList =
-			// goodsMapper.listCategoryByGoodsIds(goodsIdList);
-			// categoryStatusModify(categoryList, HIDE, centerIdstr);
-		}
-		if (updateTagGoodsIdList.size() > 0) {
-			updateLuceneIndex(updateTagGoodsIdList, centerId);
-		}
-		publishThreadPool.delPublish(itemIdList, centerId);// 删除商品和重新发布商品
-		return new ResultModel(true, "");
 	}
 
 	private void deleteLuceneAndDownShelves(List<String> goodsIdList, Integer id) {
@@ -863,7 +834,6 @@ public class GoodsServiceImpl implements GoodsService {
 		lucene.deleteIndex(goodsIdList);
 		goodsMapper.updateGoodsDownShelves(goodsIdList);
 	}
-
 
 	@SuppressWarnings("unchecked")
 	@Override

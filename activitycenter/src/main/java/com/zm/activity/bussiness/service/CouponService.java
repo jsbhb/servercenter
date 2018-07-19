@@ -24,13 +24,6 @@ public interface CouponService {
 	List<Coupon> listCouponByUserId(Integer centerId, Integer userId, Integer status);
 
 	/**
-	 * @fun 新建区域中心时新建数据表
-	 * @param centerId
-	 * @return
-	 */
-	void createTable(Integer centerId);
-
-	/**
 	 * @fun 用户领取优惠券
 	 * @param centerId
 	 * @param userId

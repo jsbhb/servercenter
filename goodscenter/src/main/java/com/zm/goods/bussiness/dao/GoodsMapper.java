@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -120,9 +121,9 @@ public interface GoodsMapper {
 
 	void updateGoodsDownShelves(List<String> goodsIdList);
 	
-	void updateGoodsItemDownShelves(Map<String, Object> param);
+	void updateGoodsItemDownShelves(List<String> itemIdList);
 	
-	List<ItemCountBO> countUpShelvesStatus(Map<String, Object> param);
+	List<ItemCountBO> countUpShelvesStatus(List<String> goodsIdList);
 	
 	List<String> listFirstCategory(List<String> goodsIdList);
 	

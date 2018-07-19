@@ -105,11 +105,13 @@
 		gi.excise_tax,gi.info,gi.conversion,gi.item_id,gi.item_code,gi.sku,gi.weight,gi.carton,gp.min,gp.max,gp.retail_price,
 		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,
 		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode
-		from goods g left join base gb on g.base_id = gb.id left join goods_category_brand gcb 
-		on gb.brand_id = gcb.brand_id left join goods_file gf on g.goods_id = gf.goods_id left join 
-		goods_item gi on g.goods_id = gi.goods_id left join goods_item${centerId} git on gi.item_id = git.item_id 
+		from goods g 
+		left join base gb on g.base_id = gb.id 
+		left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
+		left join goods_file gf on g.goods_id = gf.goods_id 
+		left join goods_item gi on g.goods_id = gi.goods_id 
 		left join goods_price gp on gp.item_id = gi.item_id 
-		where g.goods_id = #{goodsId} and git.status = 1 and g.is_del = 0 
+		where g.goods_id = #{goodsId} and gi.status = 1 and g.is_del = 0 
 	</select>
 	
 	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
@@ -117,8 +119,10 @@
 	</select>
 	
 	<select id="listStockByItemIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemStockBO">
-		select gi.item_id as itemId,gs.fxqty as stock from goods_stock gs left join goods_item${centerId} gi
-		on gs.item_id = gi.item_id where gi.status = 1 and gi.item_id in 
+		select gi.item_id as itemId,gs.fxqty as stock 
+		from goods_stock gs 
+		left join goods_item gi on gs.item_id = gi.item_id 
+		where gi.status = 1 and gi.item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach> 
@@ -177,15 +181,15 @@
 	</select>
 	
 	<update id="updateGoodsPublishByGoodsId" parameterType="Object" >
-		update goods${centerId} set is_publish = 1 where goods_id = #{goodsId} and status = 1
+		update goods set is_publish = 1 where goods_id = #{goodsId} and status = 1
 	</update>
 	
 	<update id="updateGoodsDelPublishByGoodsId" parameterType="Object">
-		update goods${centerId} set is_publish = 0 where goods_id = #{goodsId} and status = 0
+		update goods set is_publish = 0 where goods_id = #{goodsId} and status = 0
 	</update>
 	
 	<select id="getDownShelvesGoodsIdByGoodsId" parameterType="Object" resultType="com.zm.goods.seo.model.GoodsTempModel">
-		select goods_id as goodsId, status from goods${centerId} 
+		select goods_id as goodsId, status from goods
 		where 1=1 and goods_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
@@ -193,7 +197,7 @@
 	</select>
 		
 	<update id="updateGoodsRePublishByGoodsId" parameterType="Object">
-		update goods${centerId} set is_publish = 0 where goods_id = #{goodsId}
+		update goods set is_publish = 0 where goods_id = #{goodsId}
 	</update>
 	
 </mapper>

@@ -14,9 +14,6 @@ import com.zm.user.pojo.bo.GradeBO;
 @FeignClient("ordercenter")
 public interface OrderFeignClient {
 
-	@RequestMapping(value = "{version}/order/table/{centerId}", method = RequestMethod.POST)
-	public ResultModel createTable(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId);
-
 	@RequestMapping(value = "{version}/order/repayingPushJudge/{shopId}/{pushUserId}", method = RequestMethod.GET)
 	public ResultModel repayingPushJudge(@PathVariable("version") Double version,
 			@PathVariable("shopId") Integer shopId, @PathVariable("pushUserId") Integer pushUserId);

@@ -315,23 +315,6 @@ public class GoodsController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/goods/createlucene", method = RequestMethod.GET)
-	@ApiOperation(value = "创建lucene接口", response = ResultModel.class)
-	@ApiImplicitParams({
-			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
-	public ResultModel createLucene(@PathVariable("version") Double version,
-			@RequestParam("centerId") Integer centerId) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			goodsService.createGoodsLucene(centerId);
-			return new ResultModel(true, null);
-		}
-
-		return new ResultModel(false, "版本错误");
-	}
-
 	@RequestMapping(value = "auth/{version}/goods/navigation", method = RequestMethod.GET)
 	@ApiOperation(value = "获取首页分类接口", response = ResultModel.class)
 	@ApiImplicitParams({

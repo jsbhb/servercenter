@@ -11,13 +11,13 @@ import com.zm.goods.seo.model.SEOModel;
 
 public interface SEOMapper {
 	
-	GoodsItem getGoods(Map<String, Object> param);
+	GoodsItem getGoods(String goodsId);
 
 	String queryGoodsCategoryPath(String thirdCategory);
 	
 	List<String> listItemIdsByGoodsId(String goodsId);
 
-	List<ItemStockBO> listStockByItemIds(Map<String,Object> param);
+	List<ItemStockBO> listStockByItemIds(List<String> itemIds);
 	
 	void updateGoodsAccessPath(Map<String,Object> param);
 	
@@ -37,12 +37,12 @@ public interface SEOMapper {
 	
 	String getGoodsIdByItemId(String itemId);
 
-	void updateGoodsPublishByGoodsId(Map<String,Object> param);
+	void updateGoodsPublishByGoodsId(String goodsId);
 
-	void updateGoodsDelPublishByGoodsId(Map<String, Object> param);
+	void updateGoodsDelPublishByGoodsId(String goodsId);
 	
 	void updateGoodsRePublishByGoodsId(Map<String, Object> param);
 	
-	List<GoodsTempModel> getDownShelvesGoodsIdByGoodsId(Map<String, Object> param);
+	List<GoodsTempModel> getDownShelvesGoodsIdByGoodsId(List<String> goodsIdList);
 
 }

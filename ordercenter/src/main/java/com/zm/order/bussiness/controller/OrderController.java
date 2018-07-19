@@ -530,23 +530,6 @@ public class OrderController {
 
 	}
 
-	@RequestMapping(value = "{version}/order/table/{centerId}", method = RequestMethod.POST)
-	@ApiIgnore
-	public ResultModel createTable(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-
-			orderService.createTable(centerId);
-
-			return new ResultModel(true, null);
-		}
-
-		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
-				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
-
-	}
-
 	@RequestMapping(value = "{version}/order/express", method = RequestMethod.GET)
 	@ApiIgnore
 	public ResultModel listExpress(@PathVariable("version") Double version) {

@@ -83,11 +83,6 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	}
 
 	@Override
-	public void createGoodsLucene(Integer centerId) {
-		
-	}
-
-	@Override
 	public List<GoodsIndustryModel> loadIndexNavigation(Integer centerId) {
 		return null;
 	}

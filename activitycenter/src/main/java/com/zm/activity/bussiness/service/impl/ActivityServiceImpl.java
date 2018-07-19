@@ -19,7 +19,7 @@ public class ActivityServiceImpl implements ActivityService{
 	@Override
 	public List<Activity> listActivity(Integer centerId) {
 		
-		return activityMapper.listActivity(centerId);
+		return activityMapper.listActivity();
 	}
 
 }

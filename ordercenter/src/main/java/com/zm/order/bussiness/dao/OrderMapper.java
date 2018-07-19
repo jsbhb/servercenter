@@ -77,19 +77,13 @@ public interface OrderMapper {
 	
 	int updatePayCustom(String orderId);
 	
-	void createFreeExpressFee(@Param("centerId") Integer centerId);
-	
-	void createExpressFee(@Param("centerId") Integer centerId);
-	
-	void createProfitProportion(@Param("centerId") Integer centerId);
-	
 	ProfitProportion getProfitProportion(@Param("centerId") Integer centerId);
 	
 	List<SupplierPostFeeBO> getFreePostFee();
 	
 	List<ExpressFee> getExpressFee(Map<String,Object> param);
 	
-	Double getDefaultFee(@Param("carrierKey") String carrierKey);
+	Double getDefaultFee();
 	
 	List<Express> listExpress();
 

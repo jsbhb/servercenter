@@ -12,6 +12,6 @@
 	</resultMap>
 	
 	<select id="listActivity" parameterType="Object" resultMap="activity">
-		select * from activity_${centerId}
+		select * from activity
 	</select>
 </mapper>

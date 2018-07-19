@@ -18,8 +18,6 @@ import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.enummodel.PublishType;
-import com.zm.user.feignclient.ActivityFeignClient;
-import com.zm.user.feignclient.GoodsFeignClient;
 import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
 import com.zm.user.feignclient.model.PayModel;
@@ -61,12 +59,6 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	PayFeignClient payFeignClient;
-
-	@Resource
-	GoodsFeignClient goodsFeignClient;
-
-	@Resource
-	ActivityFeignClient activityFeignClient;
 
 	@Resource
 	UserComponent userComponent;
@@ -334,8 +326,6 @@ public class UserServiceImpl implements UserService {
 		return false;
 	}
 
-	private final Integer COPY_MALL = 1;
-
 	@Override
 	public ResultModel saveGrade(Grade grade) {
 		
@@ -381,12 +371,6 @@ public class UserServiceImpl implements UserService {
 		grade.setPersonInChargeId(userId);
 
 		userMapper.updatePersonInChargeId(grade);
-
-		if (COPY_MALL.equals(grade.getCopyMall())) {
-			goodsFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-			orderFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-			activityFeignClient.createTable(Constants.FIRST_VERSION, grade.getId());
-		}
 
 		// 添加注册信息存储
 		userMapper.saveGradeData(grade);

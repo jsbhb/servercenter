@@ -226,16 +226,6 @@ public interface OrderService {
 	List<SupplierPostFeeBO> getPostFee(List<PostFeeDTO> postFee);
 
 	/**
-	 * createTable:创建邮费数据表. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	void createTable(Integer centerId);
-
-	/**
 	 * listExpress:获取快递公司. <br/>
 	 * 
 	 * @author wqy

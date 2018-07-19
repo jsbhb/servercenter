@@ -3,24 +3,16 @@ package com.zm.activity.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.zm.activity.pojo.Coupon;
 import com.zm.activity.pojo.Rule;
 
 public interface CouponMapper {
 
-	List<Coupon> listCoupon(Map<String, Object> param);
+	List<Coupon> listCoupon(String activityId);
 
-	List<Coupon> listCouponByCouponIds(Map<String, Object> param);
+	List<Coupon> listCouponByCouponIds(List<String> couponIdList);
 	
-	void createCoupon(@Param("centerId")Integer centerId);
-	
-	void createRule(@Param("centerId")Integer centerId);
-	
-	void createCouponGoods(@Param("centerId")Integer centerId);
-
-	Integer getIssueNumByCouponId(Map<String, Object> param);
+	Integer getIssueNumByCouponId(String couponId);
 	
 	List<String> listUserCouponByUserId(Map<String, Object> param);
 	
@@ -30,22 +22,22 @@ public interface CouponMapper {
 
 	int binding(Map<String, Object> param);
 
-	List<Coupon> listIssueNum(Map<String, Object> param);
+	List<Coupon> listIssueNum(List<String> list);
 
-	void updateCouponGiveOut(Map<String, Object> param);
+	void updateCouponGiveOut(List<String> list);
 
-	List<Coupon> listCouponSpecialByGoodsId(Map<String, Object> param);
+	List<Coupon> listCouponSpecialByGoodsId(String goodsId);
 	
 	List<Coupon> listCouponByCategory(Map<String, Object> param);
 	
-	List<Coupon> listCouponAllRange(Map<String, Object> param);
+	List<Coupon> listCouponAllRange();
 
-	List<Coupon> listCouponByNode(Map<String, Object> param);
+	List<Coupon> listCouponByNode(Integer node);
 
 	Integer countUserCoupon(Map<String, Object> param);
 
 	void updateUserCoupon(Map<String, Object> param);
 
-	void updateCouponStatus(@Param("centerId")Integer centerId);
+	void updateCouponStatus();
 
 }

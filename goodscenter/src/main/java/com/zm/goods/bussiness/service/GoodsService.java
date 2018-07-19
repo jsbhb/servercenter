@@ -131,16 +131,6 @@ public interface GoodsService {
 	Map<String, Object> getEndActive();
 	
 	/**
-	 * createGoodsLucene:创建商品lucene索引数据. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	void createGoodsLucene(Integer centerId);
-
-	/**
 	 * queryMember:商城搜索lucene. <br/>
 	 * 
 	 * @author wqy

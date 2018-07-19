@@ -268,11 +268,11 @@
 	</select>
 
 	<select id="getActivity" parameterType="Object" resultMap="activity">
-<!-- 		select * from activity${centerId} where type_status = #{typeStatus} and status = -->
-<!-- 		1 -->
-<!-- 		<if test="type != null"> -->
-<!-- 			and type = #{type} -->
-<!-- 		</if> -->
+		select * from activity${centerId} 
+		where type_status = #{typeStatus} and status = 1
+		<if test="type != null">
+			and type = #{type}
+		</if>
 	</select>
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
@@ -510,7 +510,7 @@
 	</update>
 	
 	<update id="updateGoodsItemUpShelves" parameterType="Object">
-		update goods_item set status = 1, update_time=now() where 1=1
+		update goods_item set status = 1,is_fx=1, update_time=now() where 1=1
 		<if test="list != null and list.size > 0">
 			and item_id in 
 			<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -527,7 +527,7 @@
 	</update>
 	
 	<update id="updateGoodsItemDownShelves" parameterType="Object">
-		update goods_item set status = 0, update_time=now() where item_id in 
+		update goods_item set status = 0,is_fx = 0, update_time=now() where item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 				#{item}
 		</foreach>
@@ -648,7 +648,7 @@
 	
 	<select id="countUpShelvesStatus" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemCountBO">
 		select count(*) as count,goods_id as itemId from goods_item where status = 1 and goods_id in
-		<foreach collection="set" item="item" open="(" close=")"
+		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}
 		</foreach>
