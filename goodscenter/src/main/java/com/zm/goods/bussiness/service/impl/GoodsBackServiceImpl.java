@@ -277,9 +277,11 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
 		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
+		List<String> insItemIdList = new ArrayList<String>();
 		for (GoodsItemEntity gitem : entity.getGoods().getItems()) {
 			insItemList.add(gitem);
 			insPriceList.add(gitem.getGoodsPrice());
+			insItemIdList.add(gitem.getItemId());
 		}
 
 		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(insItemList);
@@ -295,16 +297,15 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			goodsBaseMapper.insert(entity.getGoodsBase());
 		}
 		goodsBackMapper.insert(entity.getGoods());
-
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
 		if (insPriceList.size() > 0) {
 			goodsItemMapper.insertPriceBatch(insPriceList);
 		}
-
-		// goodsItemMapper.insert(entity.getGoods().getGoodsItem());
-		// goodsItemMapper.insertPrice(entity.getGoods().getGoodsItem().getGoodsPrice());
+		if (insItemIdList.size() > 0) {
+			goodsItemMapper.insertStockForBatch(insItemIdList);
+		}
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
 		}
@@ -347,14 +348,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		List<GoodsItemEntity> updItemList = new ArrayList<GoodsItemEntity>();
 		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
 		List<GoodsPrice> updPriceList = new ArrayList<GoodsPrice>();
-		List<String> updItemIdS = new ArrayList<String>();
 		for (GoodsItemEntity gitem : entity.getGoods().getItems()) {
 			if ("true".equals(gitem.getIsCreate())) {
 				insItemList.add(gitem);
 				insPriceList.add(gitem.getGoodsPrice());
 			} else {
 				updItemList.add(gitem);
-				updItemIdS.add(gitem.getItemId());
 				updPriceList.add(gitem.getGoodsPrice());
 			}
 		}
@@ -367,19 +366,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				return new ResultModel(false, sb.toString());
 			}
 		}
-
-		// List<GoodsItemEntity> tempList =
-		// goodsItemMapper.listGoodsItemByParam(updItemList);
-		// if(tempList != null && tempList.size() > 0){
-		// sb.append("以下海关编码和换算比例的组合已经存在，请核对----");
-		// for(GoodsItemEntity goodsItem : updItemList){
-		// sb.append(goodsItem.getSku()+","+goodsItem.getConversion()+";");
-		// }
-		// return new ResultModel(false, sb.toString());
-		// }
-
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
-
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
@@ -392,14 +379,6 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		if (updPriceList.size() > 0) {
 			goodsItemMapper.updatePriceBatch(updPriceList);
 		}
-		if (updItemIdS.size() > 0) {
-			goodsItemMapper.updateSubGoodsItemBatch(updItemIdS);
-		}
-		// goodsItemMapper.update(entity.getGoods().getGoodsItem());
-		// // 主表修改后同步到分表中去，目前只同步mallId为2的分表 START
-		// goodsItemMapper.updateSubGoodsItem(entity.getGoods().getGoodsItem().getItemId());
-		// // 主表修改后同步到分表中去，目前只同步mallId为2的分表 END
-		// goodsItemMapper.updatePrice(entity.getGoods().getGoodsItem().getGoodsPrice());
 
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
 			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
@@ -637,9 +616,11 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
 		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
+		List<String> insItemIdList = new ArrayList<String>();
 		for (GoodsItemEntity gitem : entity.getGoods().getItems()) {
 			insItemList.add(gitem);
 			insPriceList.add(gitem.getGoodsPrice());
+			insItemIdList.add(gitem.getItemId());
 		}
 
 		for (GoodsItemEntity gie : insItemList) {
@@ -652,12 +633,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		}
 
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
-
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
 		if (insPriceList.size() > 0) {
 			goodsItemMapper.insertPriceBatch(insPriceList);
+		}
+		if (insItemIdList.size() > 0) {
+			goodsItemMapper.insertStockForBatch(insItemIdList);
 		}
 
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
