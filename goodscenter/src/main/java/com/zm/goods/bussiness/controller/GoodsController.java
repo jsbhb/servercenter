@@ -121,7 +121,6 @@ public class GoodsController {
 		return result;
 	}
 
-
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs/{centerId}/{itemId}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取单个商品规格接口", response = ResultModel.class)
 	@ApiImplicitParams({
@@ -177,13 +176,14 @@ public class GoodsController {
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
 			Integer centerId, Integer orderFlag, @RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId) {
+			@RequestParam(value = "userId", required = false) Integer userId,
+			@RequestParam(value = "isFx") boolean isFx) {
 
 		ResultModel result = new ResultModel();
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
-				result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds,
-						userId);
+				result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds, userId,
+						isFx);
 			}
 		} catch (Exception e) {
 			LogUtil.writeErrorLog("【获取商品价格信息出错】", e);
@@ -365,7 +365,6 @@ public class GoodsController {
 		return new ResultModel(false, "版本错误");
 	}
 
-
 	/**
 	 * @fun 根据同步到的库存更新库存信息
 	 */
@@ -513,7 +512,7 @@ public class GoodsController {
 	public ResultModel calStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
 			Integer supplierId, Integer orderFlag) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsService.calStock(list,supplierId,orderFlag);
+			return goodsService.calStock(list, supplierId, orderFlag);
 		}
 
 		return null;

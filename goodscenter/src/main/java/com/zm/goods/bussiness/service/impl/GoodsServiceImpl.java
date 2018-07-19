@@ -229,30 +229,55 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
+	private final String FX = "fx";
+	private final String NOT_FX = "notfx";
+
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag, String couponIds, Integer userId) {
+			Integer centerId, Integer orderFlag, String couponIds, Integer userId, boolean isFx) {
 
+		//初始化参数
 		ResultModel result = new ResultModel(true, "");
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();
 		Map<String, Object> param = new HashMap<String, Object>();
+		Map<String, GoodsSpecs> tempSpecsMap = new HashMap<String, GoodsSpecs>();
+		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();
+		GoodsSpecs specs = null;
+		Double totalAmount = 0.0;
+		Integer weight = 0;
+		Map<String, GoodsSpecs> specsMap = new HashMap<String, GoodsSpecs>();
+		List<String> itemIds = new ArrayList<String>();
+		for (OrderBussinessModel model : list) {
+			itemIds.add(model.getItemId());
+		}
+		//判断所有商品是否都是同个仓库
 		param.put("supplierId", supplierId);
-		param.put("list", list);
+		param.put("list", itemIds);
 		int count = goodsMapper.countGoodsBySupplierIdAndItemId(param);
 		if (count != list.size()) {
 			return new ResultModel(false, ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorCode(),
 					ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorMsg());
 		}
-		param.put("orderFlag", orderFlag);
-		GoodsSpecs specs = null;
-		Double totalAmount = 0.0;
-		Integer weight = 0;
-		Map<String, GoodsSpecs> specsMap = new HashMap<String, GoodsSpecs>();
-
+		//获取所有item的规格
+		param.put("list", itemIds);
+		param.put("isFx", isFx ? FX : NOT_FX);
+		List<GoodsSpecs> specsList = goodsMapper.getGoodsSpecsForOrder(param);
+		if (specsList == null || specsList.size() == 0) {
+			return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
+					"所有商品" + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
+		}
+		for (GoodsSpecs tempspecs : specsList) {
+			tempSpecsMap.put(tempspecs.getItemId(), tempspecs);
+		}
+		//获取所有税率信息
+		List<Tax> taxList = goodsMapper.getTax(itemIds);
+		for (Tax tax : taxList) {
+			tempTaxMap.put(tax.getItemId(), tax);
+		}
+		
 		for (OrderBussinessModel model : list) {
-			param.put("itemId", model.getItemId());
-			specs = goodsMapper.getGoodsSpecsForOrder(param);
+			specs = tempSpecsMap.get(model.getItemCode());
 			if (specs == null) {
 				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
 						"itemId=" + model.getItemId() + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
@@ -264,7 +289,7 @@ public class GoodsServiceImpl implements GoodsService {
 						ErrorCodeEnum.OUT_OF_RANGE.getErrorMsg());
 			}
 			if (Constants.O2O_ORDER.equals(orderFlag)) {
-				Tax tax = goodsMapper.getTax(param);
+				Tax tax = tempTaxMap.get(model.getItemId());
 				if (taxMap.get(tax) == null) {
 					taxMap.put(tax, amount);
 				} else {

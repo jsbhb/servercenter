@@ -26,7 +26,8 @@ public interface GoodsFeignClient {
 			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
 			@RequestParam("orderFlag") Integer orderFlag,
 			@RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId);
+			@RequestParam(value = "userId", required = false) Integer userId,
+			@RequestParam(value = "isFx") boolean isFx);
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
@@ -58,17 +59,19 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
 	public com.zm.order.common.ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
 			@RequestBody List<GoodsItemBO> set);
-	
+
 	@RequestMapping(value = "{version}/goods/cal-stock", method = RequestMethod.POST)
 	public ResultModel calStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
-			@RequestParam("supplierId")Integer supplierId, @RequestParam("orderFlag")Integer orderFlag);
-	
+			@RequestParam("supplierId") Integer supplierId, @RequestParam("orderFlag") Integer orderFlag);
+
 	@RequestMapping(value = "{version}/goods/createPurchaseInfoForEshop", method = RequestMethod.POST)
 	public ResultModel createPurchaseInfo(@PathVariable("version") Double version, @RequestBody OrderInfoDTO info);
-	
+
 	@RequestMapping(value = "{version}}/goods/checkSellOrderGoodsStockForEshop", method = RequestMethod.POST)
-	public ResultModel checkSellOrderGoodsStockForEshop(@PathVariable("version") Double version, @RequestBody OrderInfoDTO info);
-	
+	public ResultModel checkSellOrderGoodsStockForEshop(@PathVariable("version") Double version,
+			@RequestBody OrderInfoDTO info);
+
 	@RequestMapping(value = "{version}}/goods/createSellOrderGoodsInfoForEshop", method = RequestMethod.POST)
-	public ResultModel createSellOrderGoodsInfoForEshop(@PathVariable("version") Double version, @RequestBody OrderInfoDTO info);
+	public ResultModel createSellOrderGoodsInfoForEshop(@PathVariable("version") Double version,
+			@RequestBody OrderInfoDTO info);
 }

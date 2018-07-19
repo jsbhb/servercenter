@@ -59,13 +59,15 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip, Integer centerId,
-			Integer orderFlag, String couponIds, Integer userId);
+			Integer orderFlag, String couponIds, Integer userId, boolean isFx);
 
 	/**
 	 * listGoodsSpecs:获取规格信息.
+	 * 
 	 * @param list
 	 * @param centerId
-	 * @param source feign：通过feign调用该函数，mall默认值，为商城端调用
+	 * @param source
+	 *            feign：通过feign调用该函数，mall默认值，为商城端调用
 	 * @return
 	 */
 	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
@@ -109,7 +111,7 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	void updateActiveStart(Integer centerId, Integer activeId);
-	
+
 	/**
 	 * updateActiveEnd:结束活动. <br/>
 	 * 
@@ -129,7 +131,7 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	Map<String, Object> getEndActive();
-	
+
 	/**
 	 * queryMember:商城搜索lucene. <br/>
 	 * 
@@ -159,7 +161,7 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	void stockBack(List<OrderBussinessModel> list, Integer orderFlag);
-	
+
 	/**
 	 * stockJudge:库存判断（支付时第三方仓库）. <br/>
 	 * 

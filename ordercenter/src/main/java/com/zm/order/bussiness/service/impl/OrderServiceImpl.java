@@ -21,8 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.order.bussiness.component.OrderComponentUtil;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.component.ThreadPoolComponent;
+import com.zm.order.bussiness.convertor.OrderConvertUtil;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderService;
@@ -36,11 +38,11 @@ import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.feignclient.model.GoodsFile;
 import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
-import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.feignclient.model.SendOrderResult;
 import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.CustomModel;
+import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.ExpressFee;
 import com.zm.order.pojo.Order4Confirm;
@@ -53,9 +55,9 @@ import com.zm.order.pojo.Pagination;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
-import com.zm.order.pojo.Tax;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
+import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
@@ -105,69 +107,24 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	CacheAbstractService cacheAbstractService;
 
+	@Resource
+	OrderComponentUtil orderComponentUtil;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
 		ResultModel result = new ResultModel();
-		if (info == null) {
-			result.setErrorMsg("订单不能为空");
-			result.setSuccess(false);
-			return result;
-		}
-		if (!info.check()) {
-			result.setErrorMsg("订单参数不全");
-			result.setSuccess(false);
-			return result;
-		}
-		// TODO 天天仓规则
-		if (info.getSupplierId() == 1) {
-			int totalQuantity = 0;
-			for (OrderGoods goods : info.getOrderGoodsList()) {
-				totalQuantity += goods.getItemQuantity();
-			}
-			if (totalQuantity > 10) {
-				result.setSuccess(false);
-				result.setErrorMsg("保税TT仓的商品订单数量不能超过10个");
-				return result;
-			}
-		}
-		
-		if(info.getOrderFlag().equals(Constants.GENERAL_TRADE)  && info.getOrderDetail().getPayment() < 800){
-			result.setSuccess(false);
-			result.setErrorMsg("一般贸易订单起订额需要大于800元");
-			return result;
-		}
+		String openId = req.getParameter("openId");
 
-		String openId = null;
-		if (Constants.WX_PAY.equals(payType)) {
-			openId = req.getParameter("openId");
-			if (Constants.JSAPI.equals(type)) {
-				if (openId == null || "".equals(openId)) {
-					result.setSuccess(false);
-					result.setErrorMsg("请使用微信授权登录");
-					return result;
-				}
-			}
+		// 判断参数有效性
+		orderComponentUtil.paramValidate(info, payType, type, result, openId);
+		if (!result.isSuccess()) {
+			return result;
 		}
 
 		String orderId = CommonUtils.getOrderId(info.getOrderFlag() + "");
-
-		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
-		OrderBussinessModel model = null;
-		StringBuilder detail = new StringBuilder();
-		int localAmount = (int) (info.getOrderDetail().getPayment() * 100);
-		for (OrderGoods goods : info.getOrderGoodsList()) {
-			model = new OrderBussinessModel();
-			model.setOrderId(orderId);
-			model.setItemCode(goods.getItemCode());
-			model.setDeliveryPlace(info.getOrderDetail().getDeliveryPlace());
-			model.setItemId(goods.getItemId());
-			model.setQuantity(goods.getItemQuantity());
-			model.setSku(goods.getSku());
-			list.add(model);
-			detail.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
-		}
+		info.setOrderId(orderId);
 
 		Map<String, Object> priceAndWeightMap = null;
 		Double amount = 0.0;
@@ -181,22 +138,22 @@ public class OrderServiceImpl implements OrderService {
 
 		// 获取该用户是否是VIP
 		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
-		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
-		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
-				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId());
 
+		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
+		StringBuilder detail = new StringBuilder();
+		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(info, detail);
+		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
+				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId(),false);
 		if (!result.isSuccess()) {
 			return result;
 		}
 		priceAndWeightMap = (Map<String, Object>) result.getObj();
-		amount = (Double) priceAndWeightMap.get("totalAmount");
+		amount = (Double) priceAndWeightMap.get("totalAmount");// 商品总价（扣掉了优惠券，折扣）
 
 		// 邮费和税费初始值
 		Double postFee = 0.0;
-		Double taxFee = 0.0;
-		Double totalExciseTax = 0.0;
-		Double totalIncremTax = 0.0;
-		Double unDiscountAmount = 0.0;
+		TaxFeeBO taxFee = null;// 税费对象
+		Double unDiscountAmount = 0.0;// 商品原总价
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
 		// 获取包邮包税
@@ -212,11 +169,7 @@ public class OrderServiceImpl implements OrderService {
 		if (!freePost) {
 			// 计算邮费(自提不算邮费)
 			if (Constants.EXPRESS.equals(info.getExpressType())) {
-				String province = info.getOrderDetail().getReceiveProvince();
-				PostFeeDTO post = new PostFeeDTO(amount, province, weight, info.getCenterId(), info.getSupplierId());
-				List<PostFeeDTO> postFeeList = new ArrayList<PostFeeDTO>();
-				postFeeList.add(post);
-				postFee = getPostFee(postFeeList).get(0).getPostFee();
+				postFee = orderComponentUtil.getPostFee(info, unDiscountAmount, weight);
 			}
 		}
 		if (!freeTax) {
@@ -224,74 +177,37 @@ public class OrderServiceImpl implements OrderService {
 			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
 
+				// 计算商品总价
 				for (Map.Entry<String, Double> entry : map.entrySet()) {
 					unDiscountAmount += entry.getValue();
 				}
-				for (Map.Entry<String, Double> entry : map.entrySet()) {
-					Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
-					Double fee = entry.getValue();
-					Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
-					if (tax.getExciseTax() != null) {
-						if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
-							result.setErrorMsg("消费税或增值税设置有误");
-							result.setSuccess(false);
-							return result;
-						}
-						Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
-								CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
-						Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
-						totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
-						Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
-								tax.getIncrementTax());
-						totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
-					} else {
-						totalIncremTax += CalculationUtils.mul(
-								CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
-								0.7);
-					}
+				// 获取税费
+				taxFee = orderComponentUtil.getTaxFee(map, unDiscountAmount, postFee, result);
+				if (!result.isSuccess()) {
+					return result;
 				}
-				taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 			}
 		}
 
+		//计算优惠金额
 		Double disAmount = 0.0;
 		if (unDiscountAmount > 0) {
 			disAmount = CalculationUtils.sub(unDiscountAmount, amount);
 		}
 
-		amount = CalculationUtils.add(amount, taxFee, postFee);
+		amount = CalculationUtils.add(amount, taxFee.getTaxFee(), postFee);
 		amount = CalculationUtils.round(2, amount);
 		int totalAmount = (int) CalculationUtils.mul(amount, 100);
 
-		if (totalAmount - localAmount > 5 || totalAmount - localAmount < -5) {// 价格区间定义在正负5分
-			result.setErrorMsg("价格前后台不一致,商品原总价：" + unDiscountAmount + ",现订单总价：" + amount + ",税费：" + taxFee + ",运费："
-					+ postFee + ",优惠金额：" + disAmount);
-			result.setSuccess(false);
-			return result;
+		// 判断价格是否一致
+		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info.getOrderDetail().getPayment())) {
+			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
+					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		PayModel payModel = new PayModel();
-		payModel.setBody("购物订单");
-		payModel.setOrderId(orderId);
-		payModel.setTotalAmount(totalAmount + "");
-		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
-		if (detailStr.length() > 100) {// 支付宝描述过长会报错
-			detailStr = detailStr.substring(0, 100) + "...";
-		}
-		payModel.setDetail(detailStr);
-
-		if (Constants.WX_PAY.equals(payType)) {
-			payModel.setOpenId(openId);
-			payModel.setIP(req.getRemoteAddr());
-			Map<String, String> paymap = payFeignClient.wxPay(centerId, type, payModel);
-			result.setObj(paymap);
-		} else if (Constants.ALI_PAY.equals(payType)) {
-			result.setObj(payFeignClient.aliPay(centerId, type, payModel));
-		} else if (Constants.UNION_PAY.equals(payType)) {
-			result.setObj(payFeignClient.unionpay(centerId, type, payModel));
-		} else {
-			result.setSuccess(false);
-			result.setErrorMsg("请指定正确的支付方式");
+		//调用支付信息
+		orderComponentUtil.getPayInfo(payType, type, req, result, openId, orderId, centerId, detail, totalAmount);
+		if(!result.isSuccess()){
 			return result;
 		}
 
@@ -307,32 +223,17 @@ public class OrderServiceImpl implements OrderService {
 				info.setPushUserId(null);
 			}
 		}
-		
-		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(), info.getOrderFlag());
+
+		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(),
+				info.getOrderFlag());
 		if (!temp.isSuccess()) {
 			return temp;
 		}
-		
-		info.setOrderId(orderId);
-		info.setWeight(weight);
-		info.getOrderDetail().setOrderId(orderId);
-		info.setStatus(0);
 
-		orderMapper.saveOrder(info);
-
-		info.getOrderDetail().setPostFee(postFee);
-		info.getOrderDetail().setPayment(amount);
-		info.getOrderDetail().setTaxFee(taxFee);
-		info.getOrderDetail().setIncrementTax(totalIncremTax);
-		info.getOrderDetail().setExciseTax(totalExciseTax);
-		info.getOrderDetail().setTariffTax(0.0);
-		info.getOrderDetail().setDisAmount(disAmount);
-		orderMapper.saveOrderDetail(info.getOrderDetail());
-
-		for (OrderGoods goods : info.getOrderGoodsList()) {
-			goods.setOrderId(orderId);
-		}
-		orderMapper.saveOrderGoods(info.getOrderGoodsList());
+		//完善订单信息
+		orderComponentUtil.renderOrderInfo(info, postFee, weight, unDiscountAmount, taxFee, disAmount);
+		//保存订单
+		orderComponentUtil.saveOrder(info);
 
 		// 增加缓存订单数量
 		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");

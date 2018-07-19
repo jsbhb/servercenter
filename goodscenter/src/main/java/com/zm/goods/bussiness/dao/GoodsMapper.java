@@ -2,7 +2,6 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -35,7 +34,7 @@ public interface GoodsMapper {
 	
 	GoodsSpecs getGoodsSpecs(String itemId);
 	
-	GoodsSpecs getGoodsSpecsForOrder(Map<String,Object> param);
+	List<GoodsSpecs> getGoodsSpecsForOrder(Map<String,Object> param);
 	
 	GoodsSpecs getGoodsSpecsForButtJoinOrder(String itemId);
 	
@@ -101,7 +100,7 @@ public interface GoodsMapper {
 	
 	List<GoodsIndustryModel> queryGoodsCategory();
 	
-	Tax getTax(Map<String,Object> param);
+	List<Tax> getTax(List<String> list);
 	
 	List<WarehouseModel> listWarehouse(Map<String,Object> param);
 	

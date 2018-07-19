@@ -13,25 +13,23 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.bussiness.component.OpenInterfaceUtil;
+import com.zm.order.bussiness.component.OrderComponentUtil;
 import com.zm.order.bussiness.component.ShareProfitComponent;
+import com.zm.order.bussiness.convertor.OrderConvertUtil;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderOpenInterfaceMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderOpenInterfaceService;
-import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.pojo.ButtJointOrder;
 import com.zm.order.pojo.ErrorCodeEnum;
-import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderStatus;
-import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
-import com.zm.order.pojo.Tax;
 import com.zm.order.pojo.UserInfo;
-import com.zm.order.utils.CalculationUtils;
+import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 
@@ -58,8 +56,8 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	RedisTemplate<String, Object> template;
 
 	@Resource
-	OrderService orderService;
-	
+	OrderComponentUtil orderComponentUtil;
+
 	@Resource
 	CacheAbstractService cacheAbstractService;
 
@@ -74,7 +72,6 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			e.printStackTrace();
 			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
-
 		}
 
 		List<String> orderIds = orderMapper.isExist(orderInfo);
@@ -88,41 +85,31 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		if (resultModel != null) {
 			return resultModel;
 		}
-		List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
-		OrderBussinessModel model = null;
-		for (OrderGoods goods : orderInfo.getOrderGoodsList()) {
-			model = new OrderBussinessModel();
-			model.setOrderId(orderInfo.getOrderId());
-			model.setItemCode(goods.getItemCode());
-			model.setItemId(goods.getItemId());
-			model.setQuantity(goods.getItemQuantity());
-			model.setSku(goods.getSku());
-			list.add(model);
-		}
 
+		// 注册用户，获取userId
 		UserInfo user = OpenInterfaceUtil.packUser(orderInfo);
 		resultModel = userFeignClient.registerUser(Constants.FIRST_VERSION, user, "erp");
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
 		orderInfo.setUserId(Integer.valueOf(resultModel.getObj().toString()));
-		// 判断库存和购买数量
+
+		// 判断费用
+		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(orderInfo, null);
 		resultModel = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
-				false, 2, orderInfo.getOrderFlag(), orderInfo.getCouponIds(), orderInfo.getUserId());
+				false, 2, orderInfo.getOrderFlag(), orderInfo.getCouponIds(), orderInfo.getUserId(), true);
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
 		Map<String, Object> priceAndWeightMap = null;
 		Double amount = 0.0;
 		priceAndWeightMap = (Map<String, Object>) resultModel.getObj();
-		amount = (Double) priceAndWeightMap.get("totalAmount");
+		amount = (Double) priceAndWeightMap.get("totalAmount");// 商品总价（扣掉了优惠券，折扣）
 
 		// 邮费和税费初始值
-		Double postFee = 0.0;
-		Double taxFee = 0.0;
-		Double totalExciseTax = 0.0;
-		Double totalIncremTax = 0.0;
-		Double unDiscountAmount = 0.0;
+		Double postFee = 0.0;// 邮费
+		Double unDiscountAmount = 0.0;// 商品原总价
+		TaxFeeBO taxFee = null;// 税费对象
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
 		// 获取包邮包税
@@ -137,61 +124,37 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		}
 		if (!freePost) {
 			// 计算邮费(自提不算邮费)
-			String province = orderInfo.getOrderDetail().getReceiveProvince();
-			PostFeeDTO post = new PostFeeDTO(amount, province, weight, 2, orderInfo.getSupplierId());
-			List<PostFeeDTO> postFeeList = new ArrayList<PostFeeDTO>();
-			postFeeList.add(post);
-			postFee = orderService.getPostFee(postFeeList).get(0).getPostFee();
+			postFee = orderComponentUtil.getPostFee(orderInfo, amount, weight);
 		}
 		if (!freeTax) {
-			// 计算税费
+			// 计算税费相关
 			if (Constants.O2O_ORDER_TYPE.equals(orderInfo.getOrderFlag())) {
 				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
-
+				// 计算商品总价
 				for (Map.Entry<String, Double> entry : map.entrySet()) {
 					unDiscountAmount += entry.getValue();
 				}
-				for (Map.Entry<String, Double> entry : map.entrySet()) {
-					Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
-					Double fee = entry.getValue();
-					Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
-					if (tax.getExciseTax() != null) {
-						if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
-							return new ResultModel(false, ErrorCodeEnum.TAX_SET_ERROR.getErrorCode(),
-									ErrorCodeEnum.TAX_SET_ERROR.getErrorMsg());
-						}
-						Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
-								CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
-						Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
-						totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
-						Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
-								tax.getIncrementTax());
-						totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
-					} else {
-						totalIncremTax += CalculationUtils.mul(
-								CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
-								0.7);
-					}
+				// 获取税费
+				taxFee = orderComponentUtil.getTaxFee(map, unDiscountAmount, postFee, resultModel);
+				if (!resultModel.isSuccess()) {
+					return resultModel;
 				}
-				taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 			}
 		}
 
-		amount = CalculationUtils.add(amount, taxFee, postFee);
-		amount = CalculationUtils.round(2, amount);
-		int totalAmount = (int) CalculationUtils.mul(amount, 100);
-		int localAmount = (int) (orderInfo.getOrderDetail().getPayment() * 100);
-		if (totalAmount - localAmount > 5 || totalAmount - localAmount < -5) {// 价格区间定义在正负5分
+		// 判断价格是否一致
+		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, orderInfo.getOrderDetail().getPayment())) {
 			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		if(orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)){//一般贸易订单状态已付款
+		if (orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)) {// 一般贸易订单状态已付款
 			orderInfo.setStatus(Constants.ORDER_PAY);
-		} else if(orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)){//跨境订单状态为支付单报关
+		} else if (orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)) {// 跨境订单状态为支付单报关
 			orderInfo.setStatus(Constants.ORDER_PAY_CUSTOMS);
 		}
 
+		// 判断库存
 		resultModel = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
 				orderInfo.getOrderFlag());
 		if (!resultModel.isSuccess()) {
@@ -199,15 +162,8 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 					resultModel.getErrorMsg() + ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
 		}
 
-		orderMapper.saveOrder(orderInfo);
-		orderInfo.getOrderDetail().setOrderId(orderInfo.getOrderId());
-
-		orderMapper.saveOrderDetail(orderInfo.getOrderDetail());
-
-		for (OrderGoods goods : orderInfo.getOrderGoodsList()) {
-			goods.setOrderId(orderInfo.getOrderId());
-		}
-		orderMapper.saveOrderGoods(orderInfo.getOrderGoodsList());
+		// 保存订单
+		orderComponentUtil.saveOrder(orderInfo);
 
 		// 增加缓存订单数量
 		cacheAbstractService.addOrderCountCache(orderInfo.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
@@ -266,7 +222,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		List<String> orderIds = new ArrayList<String>();
 		orderIds.add(orderId);
 		param.put("list", orderIds);
-		param.put("status",2);
+		param.put("status", 2);
 		orderOpenInterfaceMapper.updateOrderStatus(param);
 		return new ResultModel(true, null);
 	}

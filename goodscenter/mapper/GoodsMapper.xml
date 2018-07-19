@@ -241,6 +241,7 @@
 	
 	<resultMap type="com.zm.goods.pojo.Tax" id="tax">
 		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC" />
 		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
 	</resultMap>
@@ -254,9 +255,13 @@
 	</resultMap>
 	
 	<select id="getTax" parameterType="Object" resultMap="tax">
-		select gs.excise_tax,gb.increment_tax from goods_item gs left join goods g on 
+		select gs.id,gs.item_id,gs.excise_tax,gb.increment_tax from goods_item gs left join goods g on 
 		gs.goods_id = g.goods_id 
-		left join base gb on g.base_id = gb.id where gs.item_id = #{itemId}
+		left join base gb on g.base_id = gb.id where gs.item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item,jdbcType = VARCHAR}
+		</foreach>
 	</select>
 	
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
@@ -361,7 +366,13 @@
 		left join goods g on gi.goods_id = g.goods_id 
 		left join base b on g.base_id=b.id 
 		left join goods_price bgp on gi.item_id = bgp.item_id 
-		where gi.item_id = #{itemId} and gi.status = 1 and gi.is_del = 0 and g.is_del = 0
+		where gi.status = 1 and gi.is_del = 0 and g.is_del = 0 and gi.item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		<if test="isFx == 'fx'">
+			and gi.is_fx = 1
+		</if>
 	</select>
 	
 	<select id="getGoodsSpecsForButtJoinOrder" parameterType="Object" resultMap="goodsSpecs">
@@ -762,7 +773,7 @@
 		select count(*) from goods g left join goods_item gi on g.goods_id = gi.goods_id 
 		where g.supplier_id = #{supplierId} and item_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item.itemId}
+			#{item}
 		</foreach> 
 	</select>
 	

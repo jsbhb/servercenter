@@ -48,7 +48,7 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag, String couponIds, Integer userId) {
+			Integer centerId, Integer orderFlag, String couponIds, Integer userId, boolean isFx) {
 		return null;
 	}
 

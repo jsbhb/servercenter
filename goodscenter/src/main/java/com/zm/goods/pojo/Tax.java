@@ -3,10 +3,20 @@ package com.zm.goods.pojo;
 public class Tax {
 	
 	private Integer id;
+	
+	private String itemId;
 
 	private Double exciseTax;
 	
 	private Double incrementTax;
+
+	public String getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
 
 	public Integer getId() {
 		return id;
