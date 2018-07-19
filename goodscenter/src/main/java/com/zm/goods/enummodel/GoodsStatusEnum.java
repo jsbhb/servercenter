@@ -18,7 +18,7 @@ package com.zm.goods.enummodel;
  */
 public enum  GoodsStatusEnum {
 	
-	INIT("初始化",0),USEFUL("可用",1),FX("可分销",2);
+	NOTFX("不可分销",0),FX("可分销",1);
 	
 	private String name;
 	private int index;

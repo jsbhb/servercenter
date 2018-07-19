@@ -265,4 +265,8 @@ public interface GoodsItemMapper {
 	void updateGoodsRatioPlatformInfo(GoodsRatioPlatformEntity entity);
 	
 	void syncGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list);
+
+	void updateIsFXStatus(GoodsItemEntity entity);
+
+	void updateGoodsItemNotBeFxForBatch(List<String> list);
 }
