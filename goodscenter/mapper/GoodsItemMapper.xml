@@ -99,6 +99,7 @@
 		<result column="center_status" property="centerStatus"/>
 		<result column="shelf_life" property="shelfLife"/>
 		<result column="carton" property="carTon"/>
+		<result column="is_fx" property="isFx"/>
 		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
 			<result column="min" property="min"/>
 			<result column="max" property="max"/>
