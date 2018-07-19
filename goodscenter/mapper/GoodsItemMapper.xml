@@ -194,42 +194,6 @@
 		left join goods_stock s on s.item_id = i.item_id where i.id=#{id} and i.is_del = 0 and g.is_del = 0
 	</select>
 	
-<!-- 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity"> -->
-<!-- 		select i.*,g.supplier_id,g.supplier_name,g.goods_name, -->
-<!-- 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price, -->
-<!-- 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty  -->
-<!-- 		from goods_item i left join goods g on g.goods_id = i.goods_id -->
-<!-- 		left join goods_price p on p.item_id = i.item_id  -->
-<!-- 		left join goods_stock s on s.item_id = i.item_id where 1=1  -->
-<!-- 		<if test="goodsName!=null and goodsName!=''"> -->
-<!-- 			and g.goods_name like concat('%',#{goodsName},'%')  -->
-<!-- 		</if> -->
-<!-- 		<if test="itemCode!=null and itemCode!=''"> -->
-<!-- 			and i.item_code = #{entity.itemCode} -->
-<!-- 		</if> -->
-<!-- 		<if test="status !=null and status!=''"> -->
-<!-- 			and i.status = #{status} -->
-<!-- 		</if> -->
-<!-- 		<if test="supplierId!=null and supplierId!=''"> -->
-<!-- 			and g.supplier_id = #{supplierId} -->
-<!-- 		</if> -->
-<!-- 		<if test="itemId!=null and itemId!=''"> -->
-<!-- 			and i.item_id = #{itemId}  -->
-<!-- 		</if> -->
-<!-- 		<if test="goodsId!=null and goodsId !=''"> -->
-<!-- 			and i.goods_id = #{goodsId}  -->
-<!-- 		</if> -->
-<!-- 		<if test="sku !=null and sku !=''"> -->
-<!-- 			and i.sku = #{sku}  -->
-<!-- 		</if> -->
-<!-- 		<if test="id !=null and id !=''"> -->
-<!-- 			and i.id = #{id}  -->
-<!-- 		</if> -->
-<!-- 		<if test="tagBindEntity !=null and tagBindEntity !=''"> -->
-<!-- 			and i.item_id in (${tagBindEntity.itemId}) -->
-<!-- 		</if> -->
-<!-- 	</select> -->
-	
 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,g.id g_id,g.origin,g.specs_template_id,g.type,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
@@ -264,16 +228,15 @@
 		<if test="tagBindEntity !=null and tagBindEntity !=''">
 			and tag.tag_id = #{tagBindEntity.tagId}
 		</if>
-		<if test="status !=null and status==3">
-			and i.status = '2'
-			and ifnull(s.fxqty,0) > 0
+		<if test="status !=null and status==0">
+			and i.status = '0'
 		</if>
-		<if test="status !=null and status==4">
-			and i.status = '2'
-			and ifnull(s.fxqty,0) = 0
+		<if test="status !=null and status==1">
+			and i.status = '1'
 		</if>
-		<if test="status !=null and status==5">
-			and i.status in ('0','1')
+		<if test="status !=null and status==2">
+			and i.status = '1'
+			and ifnull(i.is_fx,0) = 1
 		</if>
 		<if test="itemId!=null and itemId!=''">
 			and i.item_id = #{itemId}
