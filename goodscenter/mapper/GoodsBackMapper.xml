@@ -472,13 +472,12 @@
 	
 	<select id="selectGoodsListForDownload" parameterType="Object" resultMap="goodsInfoListForDownload">
 		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
-		gi.status goods_status,gi2.status item_status,g.supplier_name,gs.fxqty,
+		gi.is_fx goods_status,gi.status item_status,g.supplier_name,gs.fxqty,
 		b.first_category first_name,b.second_category second_name,b.third_category third_name,
 		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion,
 		gtb.id gtbid,gt.tag_name,gpr.id gprid,grp.ratio_platform_name,gpr.ratio_price,
 		gpr.evaluate_qty,gpr.sales_volume,gi.encode,gi.carton,gi.shelf_life,g.type goods_type 
 		from zm_goods.goods_item gi
-		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
 		left join zm_goods.goods g on g.goods_id = gi.goods_id
 		left join zm_goods.base b on g.base_id = b.id
 		left join zm_goods.goods_stock gs on gi.item_id = gs.item_id
@@ -517,7 +516,7 @@
 			</foreach>
 		</if>
 		<if test="itemStatus!=null and itemStatus != 0">
-			and gi2.status = #{itemStatus}
+			and gi.status = #{itemStatus}
 		</if>
 		<if test="firstCatalogList != null and firstCatalogList.size() > 0">
 			and b.first_category in 
@@ -542,11 +541,10 @@
 	
 	<select id="selectGoodsListForDownloadPartOne" parameterType="Object" resultMap="goodsInfoListForDownloadPartOne">
 		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
-		gi.status goods_status,gi2.status item_status,g.supplier_name,
+		gi.is_fx goods_status,gi.status item_status,g.supplier_name,
 		b.first_category first_name,b.second_category second_name,b.third_category third_name,
 		gi.encode,gi.carton,gi.shelf_life,g.type goods_type 
 		from zm_goods.goods_item gi
-		left join zm_goods.goods_item_2 gi2 on gi.item_id = gi2.item_id
 		left join zm_goods.goods g on g.goods_id = gi.goods_id
 		left join zm_goods.base b on g.base_id = b.id
 		where 1=1 and gi.is_del = 0 and g.is_del = 0
@@ -560,7 +558,7 @@
 			</foreach>
 		</if>
 		<if test="itemStatus!=null and itemStatus != 0">
-			and gi2.status = #{itemStatus}
+			and gi.status = #{itemStatus}
 		</if>
 		<if test="firstCatalogList != null and firstCatalogList.size() > 0">
 			and b.first_category in 
