@@ -467,7 +467,8 @@
 		update goods set goods_name = #{goodsName},
 		supplier_id = #{supplierId}, supplier_name = #{supplierName},
 		origin = #{origin}, type = #{type}, update_time = now(),
-		specs_template_id = #{templateId}, detail_path = #{detailPath} 
+		specs_template_id = #{templateId}, detail_path = #{detailPath},
+		goods_tag_ratio = goods_tag_ratio + #{goodsTagRatio} 
 		where goods_id = #{goodsId}
 	</update>
 	
@@ -686,4 +687,15 @@
 			#{item.id}
 		</foreach>
 	</delete>
+	
+	<update id="updateGoodsTagRatioByList" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			UPDATE goods
+	        SET
+		        goods_tag_ratio = goods_tag_ratio + #{item.goodsTagRatio},
+		        update_time = now()
+	        WHERE
+	        	goods_id=#{item.goodsId}
+		</foreach>
+	</update>
 </mapper>

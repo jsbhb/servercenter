@@ -300,6 +300,4 @@ public class GoodsEntity extends Pagination {
 	public void setGoodsTagRatio(Integer goodsTagRatio) {
 		this.goodsTagRatio = goodsTagRatio;
 	}
-
-	
 }

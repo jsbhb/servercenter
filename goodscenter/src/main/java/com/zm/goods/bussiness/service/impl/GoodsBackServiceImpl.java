@@ -297,16 +297,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		Integer tmpGoodsTagRatio = 0;
 		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
 			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
-			
-			List<ERPGoodsTagEntity> allTagList= goodsBackMapper.selectTagListInfo();
-			for (ERPGoodsTagBindEntity gtbe : entity.getGoods().getGoodsTagBindList()) {
-				for (ERPGoodsTagEntity gte : allTagList) {
-					if (gtbe.getTagId() == gte.getId()) {
-						tmpGoodsTagRatio += gte.getTagRatio();
-						break;
-					}
-				}
-			}
+			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
 		}
 		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
 
@@ -380,7 +371,6 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				return new ResultModel(false, sb.toString());
 			}
 		}
-		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
@@ -429,6 +419,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			// 商品编辑时，如果没有传图片信息，则删除表中记录
 			goodsItemMapper.deleteAllFiles(entity.getGoods());
 		}
+		
+		//设定商品的标签权重
+		Integer tmpGoodsTagRatio = 0;
+		
 		// 判断商品标签
 		List<ERPGoodsTagBindEntity> oldTagList = goodsBackMapper.selectGoodsTagBindListByItemId(entity.getGoods().getItems().get(0));
 		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
@@ -456,15 +450,20 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			
 			if (newTagList.size() > 0) {
 				goodsBackMapper.insertTagBindList(newTagList);
+				tmpGoodsTagRatio = calcGoodsTagRatio(newTagList);
 			}
 			if (oldTagList.size() > 0) {
 				goodsBackMapper.deleteTagBindList(oldTagList);
+				tmpGoodsTagRatio = tmpGoodsTagRatio - calcGoodsTagRatio(oldTagList);
 			}
 		} else {
 			if (oldTagList.size() > 0) {
 				goodsBackMapper.deleteTagBindList(oldTagList);
+				tmpGoodsTagRatio = calcGoodsTagRatio(oldTagList);
 			}
 		}
+		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
+		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		return new ResultModel(true, "");
 	}
 
@@ -616,9 +615,53 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public ResultModel tagBatchBind(List<GoodsTagBindEntity> list) {
 		if (list != null && list.size() > 0) {
+			List<String> itemList = new ArrayList<String>();
+			for (GoodsTagBindEntity gtbe:list) {
+				itemList.add(gtbe.getItemId());
+			}
+			//去除重复绑定的标签
+			List<GoodsTagBindEntity> existTagList = goodsTagMapper.listGoodsTagBindByItemList(itemList);
+			for (GoodsTagBindEntity gte:existTagList) {
+				for (GoodsTagBindEntity gtbe:list) {
+					if (gte.getItemId().equals(gtbe.getItemId()) && gte.getTagId() == gtbe.getTagId()) {
+						list.remove(gtbe);
+						break;
+					}
+				}
+			}
+			if (list.size() <= 0) {
+				return new ResultModel(true, null);
+			} else {
+				for (GoodsTagBindEntity gtbe:list) {
+					itemList.add(gtbe.getItemId());
+				}
+			}
 			goodsTagMapper.batchInsert(list);
+			
+			//设定权重
+			List<GoodsEntity> goodsIdList = goodsTagMapper.listGoodsIdByItemList(itemList);
+			List<ERPGoodsTagBindEntity> tmpGoodsTagBindEntityList = null;
+			Map<String,List<ERPGoodsTagBindEntity>> tempMap = new HashMap<String,List<ERPGoodsTagBindEntity>>();
+			for(GoodsTagBindEntity gtbe:list) {
+				if(tempMap.get(gtbe.getItemId()) == null){
+					tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
+					tmpGoodsTagBindEntityList.add(convertToERPGoodsTagBindEntity(gtbe));
+					tempMap.put(gtbe.getItemId(), tmpGoodsTagBindEntityList);
+				} else {
+					tempMap.get(gtbe.getItemId()).add(convertToERPGoodsTagBindEntity(gtbe));
+				}
+			}
+			for(GoodsEntity ge:goodsIdList) {
+				tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
+				for(GoodsItemEntity gie:ge.getItems()) {
+					tmpGoodsTagBindEntityList.addAll(tempMap.get(gie.getItemId()));
+				}
+				ge.setGoodsTagRatio(calcGoodsTagRatio(tmpGoodsTagBindEntityList));
+			}
+			goodsBackMapper.updateGoodsTagRatioByList(goodsIdList);
 		}
 		return new ResultModel(true, null);
 	}
@@ -646,7 +689,6 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			}
 		}
 
-		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		if (insItemList.size() > 0) {
 			goodsItemMapper.insertBatch(insItemList);
 		}
@@ -692,9 +734,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			// 商品编辑时，如果没有传图片信息，则删除表中记录
 			goodsItemMapper.deleteAllFiles(entity.getGoods());
 		}
+		//设定商品的标签权重
+		Integer tmpGoodsTagRatio = 0;
 		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
 			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
+			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
 		}
+		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
+		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		return new ResultModel(true, "");
 	}
 
@@ -714,5 +761,29 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			return goodsBackMapper.listUnPublishError(param);
 		}
 		return null;
+	}
+	
+	private Integer calcGoodsTagRatio(List<ERPGoodsTagBindEntity> checkList) {
+		Integer tmpGoodsTagRatio = 0;
+		
+		List<ERPGoodsTagEntity> allTagList= goodsBackMapper.selectTagListInfo();
+		for (ERPGoodsTagBindEntity gtbe : checkList) {
+			for (ERPGoodsTagEntity gte : allTagList) {
+				if (gtbe.getTagId() == gte.getId()) {
+					tmpGoodsTagRatio += gte.getTagRatio();
+					break;
+				}
+			}
+		}
+		
+		return tmpGoodsTagRatio;
+	}
+	
+	private ERPGoodsTagBindEntity convertToERPGoodsTagBindEntity(GoodsTagBindEntity temp){
+		ERPGoodsTagBindEntity entity = new ERPGoodsTagBindEntity();
+		entity.setItemId(temp.getItemId());
+		entity.setTagId(temp.getTagId());
+		return entity;
+		
 	}
 }

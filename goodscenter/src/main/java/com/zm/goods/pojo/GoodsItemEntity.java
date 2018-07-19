@@ -327,5 +327,4 @@ public class GoodsItemEntity extends Pagination {
 	public void setIsFx(Integer isFx) {
 		this.isFx = isFx;
 	}
-	
 }

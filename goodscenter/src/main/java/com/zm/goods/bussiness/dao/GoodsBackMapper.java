@@ -324,4 +324,6 @@ public interface GoodsBackMapper {
 	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartTwo(GoodsListDownloadParam param);
 
 	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartThree(GoodsListDownloadParam param);
+
+	void updateGoodsTagRatioByList(List<GoodsEntity> goodsList);
 }

@@ -24,6 +24,13 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsItems">
+		<id column="goods_id" property="goodsId"/>
+		<collection property="items" ofType="com.zm.goods.pojo.GoodsItemEntity">
+			<id column="item_id" property="itemId"/>
+		</collection>
+	</resultMap>
+	
 	<select id="listGoodsTagByGoodsId" parameterType="Object" resultMap="tag">
 		select gt.*,gtb.item_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.item_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
@@ -41,5 +48,21 @@
 			(#{item.itemId},#{item.tagId},now(),#{item.opt})
 		</foreach>
 	</insert>
+	
+	<select id="listGoodsIdByItemList" resultMap="goodsItems">
+		select goods_id,item_id from goods_item where item_id in 
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+		</foreach>
+		order by goods_id
+	</select>
+	
+	<select id="listGoodsTagBindByItemList" resultMap="tagBind">
+		select * from goods_tag_bind
+		where item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
 	
 </mapper>
