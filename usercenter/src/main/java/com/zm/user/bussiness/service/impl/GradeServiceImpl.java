@@ -90,14 +90,14 @@ public class GradeServiceImpl implements GradeService {
 	@Override
 	public ResultModel fuzzySearch(FuzzySearchGrade entity) {
 		List<FuzzySearchGrade> list = gradeMapper.fuzzyListGrade(entity);
-		if(list != null && list.size() > 0){
-			Grade grade = null;
-			for(FuzzySearchGrade temp : list){
-				grade = userComponent.getUrl(temp.getId());
-				temp.setUrl(grade.getRedirectUrl());
-				temp.setMobileUrl(grade.getMobileUrl());
-			}
-		}
+//		if(list != null && list.size() > 0){
+//			Grade grade = null;
+//			for(FuzzySearchGrade temp : list){
+//				grade = userComponent.getUrl(temp.getId());
+//				temp.setUrl(grade.getRedirectUrl());
+//				temp.setMobileUrl(grade.getMobileUrl());
+//			}
+//		}
 		return new ResultModel(true, list);
 	}
 

@@ -17,7 +17,6 @@ import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
-import com.zm.user.enummodel.PublishType;
 import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.feignclient.PayFeignClient;
 import com.zm.user.feignclient.model.PayModel;
@@ -31,13 +30,10 @@ import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
 import com.zm.user.pojo.WeiXinPayConfig;
-import com.zm.user.pojo.bo.CreateAreaCenterSEO;
 import com.zm.user.pojo.bo.GradeBO;
-import com.zm.user.seo.publish.PublishComponent;
 import com.zm.user.utils.CommonUtils;
 import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
-import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
@@ -330,21 +326,21 @@ public class UserServiceImpl implements UserService {
 	public ResultModel saveGrade(Grade grade) {
 		
 		Map<String, Object> result = new HashMap<String, Object>();
-		if(!grade.check()){
-			return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
-		}
+//		if(!grade.check()){
+//			return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
+//		}
 		userMapper.saveGrade(grade);//保存完后需要主键ID
 		// 前端创建文件夹
-		if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
-			
-			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
-					grade.getMobileUrl());
-			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-					PublishType.REGION_CREATE);
-			if (temp.isSuccess()) {
-				gradeMapper.updateGradeInit(grade.getId());
-			}
-		} 
+//		if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
+//			
+//			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
+//					grade.getMobileUrl());
+//			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
+//					PublishType.REGION_CREATE);
+//			if (temp.isSuccess()) {
+//				gradeMapper.updateGradeInit(grade.getId());
+//			}
+//		} 
 
 		UserInfo user = new UserInfo();
 
