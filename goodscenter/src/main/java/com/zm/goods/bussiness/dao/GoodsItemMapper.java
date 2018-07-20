@@ -269,4 +269,6 @@ public interface GoodsItemMapper {
 	void updateIsFXStatus(GoodsItemEntity entity);
 
 	void updateGoodsItemNotBeFxForBatch(List<String> list);
+
+	void updateGoodsItemUpdateTimeByItemIdList(List<String> list);
 }

@@ -639,7 +639,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 					itemList.add(gtbe.getItemId());
 				}
 			}
+			//批量打标签后更新商品明细的更新时间
 			goodsTagMapper.batchInsert(list);
+			goodsItemMapper.updateGoodsItemUpdateTimeByItemIdList(itemList);
 			
 			//设定权重
 			List<GoodsEntity> goodsIdList = goodsTagMapper.listGoodsIdByItemList(itemList);
