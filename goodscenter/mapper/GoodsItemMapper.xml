@@ -780,4 +780,12 @@
 			#{item}
 		</foreach>
 	</update>
+	
+	<update id="updateGoodsItemUpdateTimeByItemIdList" parameterType="Object">
+		update goods_item set update_time=now() where item_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
 </mapper>

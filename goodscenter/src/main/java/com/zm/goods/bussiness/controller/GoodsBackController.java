@@ -18,6 +18,7 @@ import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.log.LogUtil;
+import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFielsMaintainBO;
@@ -308,8 +309,15 @@ public class GoodsBackController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsBackService.deleteGoodsTag(entity);
-				return new ResultModel(true, "");
+				ERPGoodsTagBindEntity checkEntity = new ERPGoodsTagBindEntity();
+				checkEntity.setTagId(entity.getId());
+				List<ERPGoodsTagBindEntity> existTagList = goodsBackService.queryGoodsTagBindListInfo(checkEntity);
+				if (existTagList == null) {
+					goodsBackService.deleteGoodsTag(entity);
+					return new ResultModel(true, "");
+				} else if (existTagList.size() > 0) {
+					return new ResultModel(false, "当前标签已绑定商品，请先解绑商品");
+				}
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}
