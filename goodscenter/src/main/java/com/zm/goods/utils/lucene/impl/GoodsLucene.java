@@ -45,12 +45,12 @@ import org.apache.lucene.util.BytesRef;
 
 import com.zm.goods.annotation.SearchCondition;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.base.SortModel;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.utils.DateUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
+import com.zm.goods.utils.lucene.SplitAnalyzer;
 
 /**
  * ClassName: CommodityLucene <br/>
@@ -66,6 +66,8 @@ public class GoodsLucene extends AbstractLucene {
 	private static String dateFormat = "yyyy-MM-dd HH:mm:ss";
 
 	private static String decimalFormat = "000000000";
+
+	private SplitAnalyzer analyzer = new SplitAnalyzer(",");//按逗号分词
 
 	@Override
 	public <T> void writerIndex(List<T> objList) {
@@ -92,14 +94,13 @@ public class GoodsLucene extends AbstractLucene {
 		Document doc;
 		long time = 0;
 		GoodsSearch model = (GoodsSearch) obj;
-		LogUtil.writeLog(model.getTag());
 
 		doc = new Document();
 		doc.add(new StringField("goodsId", model.getGoodsId(), Store.YES));
 
 		// 商品名称设置权重
-		TextField commodityName = new TextField("goodsName",
-				model.getGoodsName() == null ? "" : model.getGoodsName(), Store.YES);
+		TextField commodityName = new TextField("goodsName", model.getGoodsName() == null ? "" : model.getGoodsName(),
+				Store.YES);
 		doc.add(commodityName);
 
 		doc.add(new TextField("specs", model.getSpecs() == null ? "" : model.getSpecs(), Store.YES));
@@ -115,7 +116,12 @@ public class GoodsLucene extends AbstractLucene {
 		doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
 		doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
 				Store.NO));
-		doc.add(new TextField("tag", model.getTag() == null ? "" : model.getTag(), Store.NO));
+		try {
+			doc.add(new TextField("tag",
+					analyzer.tokenStream("tag", new StringReader(model.getTag() == null ? "" : model.getTag()))));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		try {
 			time = DateUtil.stringToLong(model.getCreateTime(), dateFormat);
 		} catch (ParseException e) {
@@ -128,7 +134,7 @@ public class GoodsLucene extends AbstractLucene {
 	@Override
 	public <T> void updateIndex(List<T> objList) {
 		Document doc = null;
-		
+
 		if (objList == null || objList.size() == 0) {
 			return;
 		}
@@ -350,6 +356,32 @@ public class GoodsLucene extends AbstractLucene {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static void main(String[] args) {
+
+		String str = "爆款";
+		TokenStream stream = null;
+		@SuppressWarnings("resource")
+		SplitAnalyzer an = new SplitAnalyzer(",");
+		try {
+			stream = an.tokenStream("tag", new StringReader(str));
+			CharTermAttribute attr = stream.addAttribute(CharTermAttribute.class);
+			stream.reset();
+			while (stream.incrementToken()) {
+				System.out.println(attr.toString());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }
