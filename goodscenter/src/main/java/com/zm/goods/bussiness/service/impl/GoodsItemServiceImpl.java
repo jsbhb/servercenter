@@ -23,6 +23,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
+import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.enummodel.GoodsStatusEnum;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
@@ -33,6 +34,7 @@ import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
+import com.zm.goods.pojo.GoodsTagEntity;
 
 /**
  * ClassName: GoodsBackServiceImpl <br/>
@@ -50,6 +52,9 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	
 	@Resource
 	GoodsItemMapper goodsItemMapper;
+	
+	@Resource
+	GoodsTagMapper goodsTagMapper;
 
 	@Override
 	public Page<GoodsItemEntity> queryByPage(GoodsItemEntity entity) {
@@ -58,9 +63,13 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		List<GoodsItemEntity> list = (List<GoodsItemEntity>) page;
 		if (list.size() > 0) {
 			List<String> ids = new ArrayList<String>();
+			List<String> itemIds = new ArrayList<String>();
 			for (GoodsItemEntity item : list) {
 				ids.add(item.getGoodsId());
+				itemIds.add(item.getItemId());
 			}
+			
+			List<GoodsItemEntity> itemTagList = goodsTagMapper.listGoodsTagByItemId(itemIds);
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("list", ids);
 			List<GoodsFile> files = goodsBackMapper.selectGoodsFileByParam(param);
@@ -70,6 +79,15 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 						List<GoodsFile> gfiles = new ArrayList<GoodsFile>();
 						gfiles.add(file);
 						item.getGoodsEntity().setFiles(gfiles);
+						break;
+					}
+				}
+				
+				//默认设置空的标签列表
+				item.setTagList(new ArrayList<GoodsTagEntity>());
+				for(GoodsItemEntity gie:itemTagList) {
+					if (item.getItemId().equals(gie.getItemId())) {
+						item.setTagList(gie.getTagList());
 						break;
 					}
 				}
