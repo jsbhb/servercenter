@@ -546,7 +546,7 @@
 	</update>
 	
 	<select id="queryGoodsItem" parameterType="Object" resultMap="goodsItem">
-		select g.id,g.goods_id ,g.goods_name as customGoodsName,max(bgp.retail_price) as price,
+		select g.id,g.goods_id ,g.goods_name as customGoodsName,min(bgp.retail_price) as price,
 		g.supplier_id,i.weight,g.create_time,g.type,g.supplier_name,g.access_path,
 		gb.brand_id,gcb.brand,g.origin,i.excise_tax,gb.increment_tax,gb.tariff,gb.hscode
 		from goods g

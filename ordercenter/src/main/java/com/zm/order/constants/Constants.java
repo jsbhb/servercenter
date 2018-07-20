@@ -120,5 +120,8 @@ public class Constants {
 	
 	//*******************订单来源**********************
 	public static final Integer OPEN_INTERFACE_TYPE = 5;
+	
+	//*******************一般贸易金额**********************
+	public static final Integer GENERAL_TRADE_FEE = 500;
 
 }

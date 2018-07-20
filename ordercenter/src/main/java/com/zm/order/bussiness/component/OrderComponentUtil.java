@@ -32,7 +32,7 @@ public class OrderComponentUtil {
 
 	@Resource
 	OrderMapper orderMapper;
-	
+
 	@Resource
 	PayFeignClient payFeignClient;
 
@@ -160,9 +160,10 @@ public class OrderComponentUtil {
 			}
 		}
 
-		if (info.getOrderFlag().equals(Constants.GENERAL_TRADE) && info.getOrderDetail().getPayment() < 800) {
+		if (info.getOrderFlag().equals(Constants.GENERAL_TRADE)
+				&& info.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
 			result.setSuccess(false);
-			result.setErrorMsg("一般贸易订单起订额需要大于800元");
+			result.setErrorMsg("一般贸易订单起订额需要大于" + Constants.GENERAL_TRADE_FEE + "元");
 			return;
 		}
 
@@ -199,7 +200,7 @@ public class OrderComponentUtil {
 		info.getOrderDetail().setTariffTax(0.0);
 		info.getOrderDetail().setDisAmount(disAmount);
 	}
-	
+
 	/**
 	 * @fun 调用第三方支付
 	 * @param payType

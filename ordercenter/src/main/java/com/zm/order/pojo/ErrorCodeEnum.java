@@ -1,5 +1,7 @@
 package com.zm.order.pojo;
 
+import com.zm.order.constants.Constants;
+
 public enum ErrorCodeEnum {
 
 	SERVER_ERROR("-1", "服务器异常"), TOKEN_VALIDATE_ERROR("10000", "token权限验证错误"),
@@ -14,7 +16,7 @@ public enum ErrorCodeEnum {
 	IDENTIFY_VALIDATE_ERROR("10009","身份证验证失败"),
 	BUYER_PHONE_VALIDATE_ERROR("10010","订购人手机验证失败"),
 	RECEIVE_PHONE_ERROR("10011","收货人手机验证失败"),
-	OUT_OF_PRICE("10012","跨境订单单笔总价不能超过2000,一般贸易订单单笔总价需大于800"),
+	OUT_OF_PRICE("10012","跨境订单单笔总价不能超过2000,一般贸易订单单笔总价需大于" + Constants.GENERAL_TRADE),
 	GOODS_DOWNSHELVES("10013","商品已下架"),
 	FORMAT_ERROR("10014","请使用JSON格式"),
 	VERSION_ERROR("10015","版本错误"),

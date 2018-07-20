@@ -87,7 +87,7 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 		}
-		if (orderInfo.getOrderFlag() == 2 && orderInfo.getOrderDetail().getPayment() < 800) {
+		if (orderInfo.getOrderFlag() == 2 && orderInfo.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 		}
