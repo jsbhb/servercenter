@@ -67,7 +67,7 @@ public class GoodsLucene extends AbstractLucene {
 
 	private static String decimalFormat = "000000000";
 
-	private SplitAnalyzer analyzer = new SplitAnalyzer(",");//按逗号分词
+	private SplitAnalyzer splitAnalyzer = new SplitAnalyzer(",");//按逗号分词
 
 	@Override
 	public <T> void writerIndex(List<T> objList) {
@@ -118,7 +118,7 @@ public class GoodsLucene extends AbstractLucene {
 				Store.NO));
 		try {
 			doc.add(new TextField("tag",
-					analyzer.tokenStream("tag", new StringReader(model.getTag() == null ? "" : model.getTag()))));
+					splitAnalyzer.tokenStream("tag", new StringReader(model.getTag() == null ? "" : model.getTag()))));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
