@@ -45,6 +45,7 @@ import org.apache.lucene.util.BytesRef;
 
 import com.zm.goods.annotation.SearchCondition;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.base.SortModel;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
@@ -91,6 +92,7 @@ public class GoodsLucene extends AbstractLucene {
 		Document doc;
 		long time = 0;
 		GoodsSearch model = (GoodsSearch) obj;
+		LogUtil.writeLog(model.getTag());
 
 		doc = new Document();
 		doc.add(new StringField("goodsId", model.getGoodsId(), Store.YES));
