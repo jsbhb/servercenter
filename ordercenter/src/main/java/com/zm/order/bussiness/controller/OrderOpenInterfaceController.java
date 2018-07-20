@@ -34,7 +34,7 @@ public class OrderOpenInterfaceController {
 				return orderOpenInterfaceService.addOrder(order);
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("【对接订单出错】",e);
-				if (e.getMessage().contains("Duplicate entry")) {
+				if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
 					return new ResultModel(false, ErrorCodeEnum.REPEAT_ERROR.getErrorCode(),
 							ErrorCodeEnum.REPEAT_ERROR.getErrorMsg());
 				}

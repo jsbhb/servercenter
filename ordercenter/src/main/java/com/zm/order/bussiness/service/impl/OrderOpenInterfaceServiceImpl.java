@@ -109,7 +109,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		// 邮费和税费初始值
 		Double postFee = 0.0;// 邮费
 		Double unDiscountAmount = 0.0;// 商品原总价
-		TaxFeeBO taxFee = null;// 税费对象
+		TaxFeeBO taxFee = new TaxFeeBO();// 税费对象
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
 		// 获取包邮包税
