@@ -33,6 +33,7 @@
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="first_id" property="firstId" jdbcType="VARCHAR"/>
 		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="access_path" property="accessPath" jdbcType="VARCHAR"/>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.SecondCatalogEntity" id="second">
@@ -40,6 +41,7 @@
 		<result column="second_id" property="secondId" jdbcType="VARCHAR"/>
 		<result column="first_id" property="firstId" jdbcType="VARCHAR"/>
 		<result column="secondName" property="name" jdbcType="VARCHAR"/>
+		<result column="access_path" property="accessPath" jdbcType="VARCHAR"/>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.ThirdCatalogEntity" id="third">
@@ -47,6 +49,7 @@
 		<result column="second_id" property="secondId" jdbcType="VARCHAR"/>
 		<result column="third_id" property="thirdId" jdbcType="VARCHAR"/>
 		<result column="thirdName" property="name" jdbcType="VARCHAR"/>
+		<result column="access_path" property="accessPath" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<select id="selectFirstAll" resultMap="first">

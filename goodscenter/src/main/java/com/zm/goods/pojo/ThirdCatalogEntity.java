@@ -27,6 +27,7 @@ public class ThirdCatalogEntity {
 	private String opt;
 	private Integer sort;
 	private Integer status;
+	private String accessPath;
 	
 	public ThirdCatalogEntity() {
 
@@ -102,6 +103,14 @@ public class ThirdCatalogEntity {
 
 	public void setOpt(String opt) {
 		this.opt = opt;
+	}
+
+	public String getAccessPath() {
+		return accessPath;
+	}
+
+	public void setAccessPath(String accessPath) {
+		this.accessPath = accessPath;
 	}
 
 }

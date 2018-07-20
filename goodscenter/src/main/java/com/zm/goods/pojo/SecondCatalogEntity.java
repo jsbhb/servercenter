@@ -30,6 +30,7 @@ public class SecondCatalogEntity {
 	private Integer sort;
 	private Integer status;
 	private List<ThirdCatalogEntity> thirds;
+	private String accessPath;
 
 	public SecondCatalogEntity() {
 
@@ -114,4 +115,13 @@ public class SecondCatalogEntity {
 	public void setThirds(List<ThirdCatalogEntity> thirds) {
 		this.thirds = thirds;
 	}
+
+	public String getAccessPath() {
+		return accessPath;
+	}
+
+	public void setAccessPath(String accessPath) {
+		this.accessPath = accessPath;
+	}
+	
 }

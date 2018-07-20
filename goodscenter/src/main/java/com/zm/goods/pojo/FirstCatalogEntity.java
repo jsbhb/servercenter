@@ -28,6 +28,7 @@ public class FirstCatalogEntity {
 	private Integer sort;
 	private Integer status;
 	private List<SecondCatalogEntity> seconds;
+	private String accessPath;
 
 	public FirstCatalogEntity() {
 
@@ -103,6 +104,14 @@ public class FirstCatalogEntity {
 
 	public void setSeconds(List<SecondCatalogEntity> seconds) {
 		this.seconds = seconds;
+	}
+
+	public String getAccessPath() {
+		return accessPath;
+	}
+
+	public void setAccessPath(String accessPath) {
+		this.accessPath = accessPath;
 	}
 
 }
