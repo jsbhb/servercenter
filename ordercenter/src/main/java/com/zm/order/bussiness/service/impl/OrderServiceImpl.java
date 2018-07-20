@@ -195,15 +195,15 @@ public class OrderServiceImpl implements OrderService {
 			disAmount = CalculationUtils.sub(unDiscountAmount, amount);
 		}
 
-		amount = CalculationUtils.add(amount, taxFee.getTaxFee(), postFee);
-		amount = CalculationUtils.round(2, amount);
-		int totalAmount = (int) CalculationUtils.mul(amount, 100);
-
 		// 判断价格是否一致
 		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info.getOrderDetail().getPayment())) {
 			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
+		
+		amount = CalculationUtils.add(amount, taxFee.getTaxFee(), postFee);
+		amount = CalculationUtils.round(2, amount);
+		int totalAmount = (int) CalculationUtils.mul(amount, 100);
 
 		// 调用支付信息
 		orderComponentUtil.getPayInfo(payType, type, req, result, openId, orderId, centerId, detail, totalAmount);
