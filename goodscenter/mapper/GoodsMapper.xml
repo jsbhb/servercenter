@@ -561,6 +561,7 @@
 		</foreach>
 		group by g.goods_id
 		<if test="sortList != null and sortList.size > 0">
+		order by 
 			<foreach item="sort" index="index" collection="sortList" open=""
 				separator="," close="">
 				${sort.sortField} ${sort.sortRule} 
