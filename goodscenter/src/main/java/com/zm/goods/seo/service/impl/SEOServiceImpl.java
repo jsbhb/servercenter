@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.zm.goods.bussiness.dao.GoodsMapper;
+import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.dao.SEOMapper;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.PublishType;
@@ -20,6 +21,7 @@ import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
+import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.PagePO;
@@ -48,7 +50,10 @@ public class SEOServiceImpl implements SEOService {
 
 	@Resource
 	UserFeignClient userFeignClient;
-
+	
+	@Resource
+	GoodsTagMapper goodsTagMapper;
+	
 	private static Integer CNCOOPBUY_ID = 2;
 	private static String HTTP_STR = "http";
 
@@ -93,6 +98,9 @@ public class SEOServiceImpl implements SEOService {
 				specs.infoFilter();
 			}
 		}
+		//加标签
+		addItemGoodsTag(goodsItem);
+		
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> map = hashOperations.entries(Constants.POST_TAX + goodsItem.getSupplierId());
 		if (map != null) {
@@ -323,6 +331,40 @@ public class SEOServiceImpl implements SEOService {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * @fun 加标签
+	 * @param goodsList
+	 */
+	private void addItemGoodsTag(GoodsItem goods) {
+		List<String> itemIdList = new ArrayList<String>();
+		if (goods != null) {
+			if (goods.getGoodsSpecsList() != null) {
+				for (GoodsSpecs specs : goods.getGoodsSpecsList()) {
+					itemIdList.add(specs.getItemId());
+				}
+			}
+			List<GoodsTagEntity> list = goodsTagMapper.listGoodsTagByGoodsId(itemIdList);
+			List<GoodsTagEntity> temp = null;
+			Map<String, List<GoodsTagEntity>> map = new HashMap<String, List<GoodsTagEntity>>();
+			if (list != null && list.size() > 0) {
+				for (GoodsTagEntity tag : list) {
+					if (map.get(tag.getItemId()) == null) {
+						temp = new ArrayList<GoodsTagEntity>();
+						temp.add(tag);
+						map.put(tag.getItemId(), temp);
+					} else {
+						map.get(tag.getItemId()).add(tag);
+					}
+				}
+			}
+			if (goods.getGoodsSpecsList() != null) {
+				for (GoodsSpecs specs : goods.getGoodsSpecsList()) {
+					specs.setTagList(map.get(specs.getItemId()));
+				}
+			}
+		}
 	}
 
 }
