@@ -204,7 +204,6 @@
 		left join base b on g.base_id = b.id
 		<if test="tagBindEntity !=null and tagBindEntity !=''">
 			left join goods_tag_bind tag on i.item_id = tag.item_id 
-			and tag.tag_id = #{tagBindEntity.tagId}
 		</if>
 		where 1=1 and i.is_del = 0 and g.is_del = 0
 		<if test="baseEntity!=null">
@@ -223,6 +222,9 @@
 		</if>
 		<if test="supplierId!=null and supplierId!=''">
 			and g.supplier_id = #{supplierId}
+		</if>
+		<if test="tagBindEntity !=null and tagBindEntity !=''">
+			and tag.tag_id = #{tagBindEntity.tagId}
 		</if>
 		<if test="status !=null and status==0">
 			and i.status = '0'
