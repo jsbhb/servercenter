@@ -111,7 +111,7 @@
 		left join goods_file gf on g.goods_id = gf.goods_id 
 		left join goods_item gi on g.goods_id = gi.goods_id 
 		left join goods_price gp on gp.item_id = gi.item_id 
-		where g.goods_id = #{goodsId} and gi.status = 1 and g.is_del = 0 
+		where g.goods_id = #{goodsId} and gi.status = 1 and g.is_del = 0 order by file_id
 	</select>
 	
 	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
