@@ -52,6 +52,7 @@ public class GoodsEntity extends Pagination {
 	private List<ERPGoodsTagBindEntity> goodsTagBindList;
 	private Integer isPublish;
 	private Integer goodsTagRatio;
+	private GoodsBaseEntity baseEntity;
 
 	public int getId() {
 		return id;
@@ -299,5 +300,13 @@ public class GoodsEntity extends Pagination {
 
 	public void setGoodsTagRatio(Integer goodsTagRatio) {
 		this.goodsTagRatio = goodsTagRatio;
+	}
+
+	public GoodsBaseEntity getBaseEntity() {
+		return baseEntity;
+	}
+
+	public void setBaseEntity(GoodsBaseEntity baseEntity) {
+		this.baseEntity = baseEntity;
 	}
 }
