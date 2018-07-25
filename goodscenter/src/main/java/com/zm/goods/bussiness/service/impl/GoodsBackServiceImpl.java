@@ -659,7 +659,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			for(GoodsEntity ge:goodsIdList) {
 				tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
 				for(GoodsItemEntity gie:ge.getItems()) {
-					tmpGoodsTagBindEntityList.addAll(tempMap.get(gie.getItemId()));
+					if(tempMap.get(gie.getItemId()) != null){
+						tmpGoodsTagBindEntityList.addAll(tempMap.get(gie.getItemId()));
+					}
 				}
 				ge.setGoodsTagRatio(calcGoodsTagRatio(tmpGoodsTagBindEntityList));
 			}
