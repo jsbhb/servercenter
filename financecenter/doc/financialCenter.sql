@@ -35,7 +35,7 @@ CREATE TABLE `zm_financial`.`capitalpool_detail` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `center_id` INT NULL COMMENT '区域中心ID',
   `pay_type` TINYINT UNSIGNED NULL COMMENT '支付类型0:收入,1:支出',
-  `business_type` TINYINT UNSIGNED NULL COMMENT '业务类型0:现金,1:返佣,2:赠送,3:抵用券,4：清算',
+  `business_type` TINYINT UNSIGNED NULL COMMENT '业务类型0:现金,1:信用额度,2:订单消费,3:清算',
   `money` DECIMAL(12,2) NULL COMMENT '金额',
   `pay_no` VARCHAR(30) NULL COMMENT '流水号',
   `order_id` VARCHAR(30) NULL COMMENT '订单号',

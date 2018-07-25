@@ -1,6 +1,8 @@
 package com.zm.finance.pojo.capitalpool;
 
-public class CapitalPoolDetail {
+import com.zm.finance.pojo.Pagination;
+
+public class CapitalPoolDetail extends Pagination{
 
 	private Integer id;
 	private Integer centerId;

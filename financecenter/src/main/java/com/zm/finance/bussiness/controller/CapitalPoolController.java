@@ -1,5 +1,7 @@
 package com.zm.finance.bussiness.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +17,8 @@ import com.zm.finance.constants.Constants;
 import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.Pagination;
 import com.zm.finance.pojo.ResultModel;
-import com.zm.finance.pojo.capitalpool.CapitalPool;
+import com.zm.finance.pojo.capitalpool.CapitalPoolDetail;
+import com.zm.finance.pojo.capitalpool.CapitalSearchParam;
 import com.zm.finance.pojo.refilling.Refilling;
 
 @RestController
@@ -54,10 +57,10 @@ public class CapitalPoolController {
 
 	@RequestMapping(value = "{version}/finance/listcalCapitalPool", method = RequestMethod.POST)
 	public ResultModel listcalCapitalPool(@PathVariable("version") Double version,
-			@RequestBody CapitalPool capitalPool) {
+			@RequestBody CapitalSearchParam searchParam) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return capitalPoolService.listcalCapitalPool(capitalPool);
+			return capitalPoolService.listcalCapitalPool(searchParam);
 		}
 		return new ResultModel(false, "版本错误");
 	}
@@ -97,6 +100,35 @@ public class CapitalPoolController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return capitalPoolService.liquidation(centerId, money);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/finance/capitalpool/capitalPoolOverview", method = RequestMethod.POST)
+	public ResultModel getCapitalPoolOverview(@PathVariable("version") Double version,
+			@RequestBody List<Integer> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return capitalPoolService.getCapitalPoolOverview(list);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/finance/capitalpool/detail", method = RequestMethod.POST)
+	public ResultModel listCapitalPoolDetail(@PathVariable("version") Double version,
+			@RequestBody CapitalPoolDetail detail) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return capitalPoolService.listCapitalPoolDetail(detail);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/finance/capitalpool", method = RequestMethod.POST)
+	public ResultModel addCapitalpool(@PathVariable("version") Double version, @RequestBody CapitalPoolDetail detail) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return capitalPoolService.addCapitalpool(detail);
 		}
 		return new ResultModel(false, "版本错误");
 	}

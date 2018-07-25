@@ -213,7 +213,7 @@
 	</update>
 
 	<select id="listGrade" resultMap="grade">
-		select * from grade
+		select g.*,gt.name as gradeTypeName from grade g left join grade_type gt on g.grade_type = gt.id
 	</select>
 	
 	<select id="listChildrenGrade" parameterType="Object" resultType="java.lang.String">

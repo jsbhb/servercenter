@@ -475,7 +475,7 @@ public class ShareProfitComponent {
 		Map<String, Object> capitalPoolDetailMap = new HashMap<String, Object>();
 		capitalPoolDetailMap.put("centerId", orderInfo.getShopId().toString());
 		capitalPoolDetailMap.put("payType", "1");// 类型是支出
-		capitalPoolDetailMap.put("businessType", "0");// 方式是现金
+		capitalPoolDetailMap.put("businessType", "2");// 方式是现金
 		capitalPoolDetailMap.put("money", orderInfo.getOrderDetail().getPayment().toString());
 		capitalPoolDetailMap.put("orderId", orderInfo.getOrderId());
 		capitalPoolDetailMap.put("remark", "订单产生，资金池扣减");

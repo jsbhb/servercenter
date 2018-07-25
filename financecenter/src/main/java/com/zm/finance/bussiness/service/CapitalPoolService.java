@@ -1,9 +1,12 @@
 package com.zm.finance.bussiness.service;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
 import com.zm.finance.pojo.AuditModel;
 import com.zm.finance.pojo.ResultModel;
-import com.zm.finance.pojo.capitalpool.CapitalPool;
+import com.zm.finance.pojo.capitalpool.CapitalPoolDetail;
+import com.zm.finance.pojo.capitalpool.CapitalSearchParam;
 import com.zm.finance.pojo.refilling.Refilling;
 
 public interface CapitalPoolService {
@@ -34,7 +37,7 @@ public interface CapitalPoolService {
 	 * @fun 获取区域中心资金池
 	 * @return
 	 */
-	ResultModel listcalCapitalPool(CapitalPool capitalPool);
+	ResultModel listcalCapitalPool(CapitalSearchParam searchParam);
 
 	/**
 	 * @fun 返佣进行资金池充值申请
@@ -72,4 +75,10 @@ public interface CapitalPoolService {
 	 * @return
 	 */
 	ResultModel liquidation(Integer centerId, Double money);
+
+	ResultModel getCapitalPoolOverview(List<Integer> list);
+
+	ResultModel listCapitalPoolDetail(CapitalPoolDetail detail);
+
+	ResultModel addCapitalpool(CapitalPoolDetail detail);
 }

@@ -31,4 +31,8 @@ public interface CapitalPoolMapper {
 	void insertCapitalPoolRecord(Integer centerId);
 	
 	Page<Refilling> selectDetailByEntity(Refilling refilling);
+	
+	Page<CapitalPoolDetail> listCapitalPoolDetail(CapitalPoolDetail detail);
+
+	void initCapitalPoolRecord(CapitalPoolDetail detail);
 }

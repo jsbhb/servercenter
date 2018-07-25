@@ -34,6 +34,19 @@
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
+		
+	<resultMap type="com.zm.finance.pojo.capitalpool.CapitalPoolDetail" id="capDetail">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER"/>
+		<result column="pay_type" property="payType" jdbcType="NUMERIC"/>
+		<result column="business_type" property="bussinessType" jdbcType="NUMERIC"/>
+		<result column="money" property="money" jdbcType="NUMERIC"/>
+		<result column="pay_no" property="payNo" jdbcType="VARCHAR"/>
+		<result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
 
 	<select id="listCenterCapitalPool" resultMap="capitalpool">
 		select * from capitalpool
@@ -41,10 +54,10 @@
 	
 	<insert id="insertCapitalPoolDetail" parameterType="Object">
 		insert into capitalpool_detail 
-		(center_id,pay_type,business_type,money,pay_no,order_id,remark,create_time)
+		(center_id,pay_type,business_type,money,pay_no,order_id,remark,create_time,opt)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.centerId},#{item.payType},#{item.bussinessType},#{item.money},#{item.payNo},#{item.orderId},#{item.remark},now())
+			(#{item.centerId},#{item.payType},#{item.bussinessType},#{item.money},#{item.payNo},#{item.orderId},#{item.remark},now(),#{item.opt})
 		</foreach>
 	</insert>
 	
@@ -120,6 +133,10 @@
 		insert into capitalpool (center_id,create_time,update_time,opt) VALUES (#{centerId},now(),now(),'8001')
 	</insert>
 	
+	<insert id="initCapitalPoolRecord" parameterType = "Object">
+		insert into capitalpool (center_id,money,count_money,create_time,opt) values(#{centerId},#{money},#{money},now(),#{opt})
+	</insert>
+	
 	<select id="selectDetailByEntity" resultMap="refilling" parameterType="Object">
 		select * from refilling_detail where 1=1
 		<if test="centerId != null and centerId != '0'">
@@ -132,5 +149,15 @@
 			and status = #{status}
 		</if>
 		order by create_time desc,status asc
+	</select>
+	
+	<select id="listCapitalPoolDetail" parameterType="Object" resultMap="capDetail">
+		select * from capitalpool_detail where center_id = #{centerId}
+		<if test="payType != null and payType != '' or payType == 0">
+			and pay_type = #{payType}
+		</if>
+		<if test="bussinessType != null and bussinessType != '' or bussinessType == 0">
+			and business_type = #{bussinessType}
+		</if>
 	</select>
 </mapper>

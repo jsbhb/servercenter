@@ -123,5 +123,11 @@ public class Constants {
 	
 	//*******************一般贸易金额**********************
 	public static final Integer GENERAL_TRADE_FEE = 500;
+	
+	//*******************金额允许偏离范围**********************
+	public static final Integer DEVIATION = 5;
+	
+	//*******************海关税率折扣**********************
+	public static final double TAX_DISCOUNT = 0.7;
 
 }

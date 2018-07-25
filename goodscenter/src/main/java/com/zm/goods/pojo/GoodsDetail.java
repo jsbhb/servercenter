@@ -27,6 +27,9 @@ public class GoodsDetail {
 	private String brand;
 	private Integer min;
 	private Integer max;
+	private String itemCode;
+	private String sku;
+	private Double exciseTax;
 	
 	public void infoFilter() {
 		if (info != null && !"".equals(info.trim())) {
@@ -41,6 +44,30 @@ public class GoodsDetail {
 		}
 	}
 	
+	public Double getExciseTax() {
+		return exciseTax;
+	}
+
+	public void setExciseTax(Double exciseTax) {
+		this.exciseTax = exciseTax;
+	}
+
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
 	public String getGoodsId() {
 		return goodsId;
 	}

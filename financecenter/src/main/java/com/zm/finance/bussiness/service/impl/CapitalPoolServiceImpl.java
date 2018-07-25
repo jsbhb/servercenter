@@ -20,15 +20,19 @@ import com.zm.finance.bussiness.dao.CapitalPoolMapper;
 import com.zm.finance.bussiness.service.CapitalPoolService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.pojo.AuditModel;
+import com.zm.finance.pojo.Pagination;
 import com.zm.finance.pojo.ResultModel;
+import com.zm.finance.pojo.capitalpool.CapitalOverviewModel;
 import com.zm.finance.pojo.capitalpool.CapitalPool;
 import com.zm.finance.pojo.capitalpool.CapitalPoolDetail;
+import com.zm.finance.pojo.capitalpool.CapitalSearchParam;
 import com.zm.finance.pojo.refilling.Refilling;
 import com.zm.finance.util.CalculationUtils;
+import com.zm.finance.util.CommonUtil;
 import com.zm.finance.util.JSONUtil;
 
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	@Resource
@@ -43,13 +47,13 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		if (keys == null) {
 			return;
 		}
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, String> result = null;
 		List<CapitalPool> poolList = new ArrayList<CapitalPool>();
 		List<CapitalPoolDetail> detailList = new ArrayList<CapitalPoolDetail>();
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		for (String key : keys) {
 			result = hashOperations.entries(key);
-			if (result != null) {
+			if (result != null && result.size() > 0) {
 				poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
 			}
 		}
@@ -65,8 +69,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			template.opsForList().trim(Constants.CAPITAL_DETAIL, poolDetailList.size(), -1);// 删除以保存的记录
 		}
 		if (poolList.size() > 0) {
-			capitalPoolMapper.updateCapitalPool(poolList);//更新数据库资金池
-			capitalPoolMapper.insertCapitalPool(poolList);//插入当前的资金池值，防止redis崩溃时数据被清空
+			capitalPoolMapper.updateCapitalPool(poolList);// 更新数据库资金池
+			capitalPoolMapper.insertCapitalPool(poolList);// 插入当前的资金池值，防止redis崩溃时数据被清空
 		}
 
 	}
@@ -113,29 +117,34 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		return new ResultModel(true);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ResultModel listcalCapitalPool(CapitalPool capitalPool) {
+	public ResultModel listcalCapitalPool(CapitalSearchParam searchParam) {
 		List<CapitalPool> poolList = new ArrayList<CapitalPool>();
 		Map<String, String> result = null;
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		if (capitalPool.getCenterId() == null) {
+		if (searchParam.getIds() == null) {
 			Set<String> keys = template.keys(Constants.CAPITAL_PERFIX + "*");
 			if (keys != null) {
 				for (String key : keys) {
 					result = hashOperations.entries(key);
-					if (result != null) {
+					if (result != null && result.size() > 0) {
 						poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
 					}
 				}
 			}
 		} else {
-			result = hashOperations.entries(Constants.CAPITAL_PERFIX + capitalPool.getCenterId());
-			if (result != null) {
-				poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+			String ids = searchParam.getIds();
+			String[] idArr = ids.split(",");
+			for (String id : idArr) {
+				result = hashOperations.entries(Constants.CAPITAL_PERFIX + id);
+				if (result != null && result.size() > 0) {
+					poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+				}
 			}
 		}
-
-		return new ResultModel(true, poolList);
+		Page<CapitalPool> page = (Page<CapitalPool>) CommonUtil.pagination(poolList, searchParam);
+		return new ResultModel(true, page, new Pagination(page));
 	}
 
 	@Override
@@ -208,10 +217,105 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + centerId, "money");
 		double balance = 0;
 		balance = CalculationUtils.sub(Double.valueOf(capitalMoney == null ? "0" : capitalMoney), money);
-		if(balance < 0){
+		if (balance < 0) {
 			return new ResultModel(false, "资金池不足");
 		}
 		capitalPoolCharge(null, liquidationMoney, centerId, Constants.LIQUIDATION, "资金池清算", Constants.EXPENDITURE);
 		return new ResultModel(true);
+	}
+
+	private final Double WARNING_AMOUNT = 3000.0;// 预警金额
+
+	@Override
+	public ResultModel getCapitalPoolOverview(List<Integer> list) {
+		if (list == null || list.size() == 0) {
+			return new ResultModel(false, "没有ID");
+		}
+		// redis获取资金池列表
+		Map<String, String> result = new HashMap<String, String>();
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		List<CapitalPool> poolList = new ArrayList<CapitalPool>();
+		for (Integer keySuffix : list) {
+			result = hashOperations.entries(Constants.CAPITAL_PERFIX + keySuffix);
+			if (result != null && result.size() > 0) {
+				poolList.add(JSONUtil.parse(JSONUtil.toJson(result), CapitalPool.class));
+			}
+		}
+		// 生成资金池概览
+		double init = 0.0;
+		List<Integer> warningIds = new ArrayList<Integer>();
+		for (CapitalPool pool : poolList) {
+			init = CalculationUtils.add(pool.getMoney(), init);
+			if (pool.getMoney() < WARNING_AMOUNT) {
+				warningIds.add(pool.getCenterId());
+			}
+		}
+		CapitalOverviewModel model = new CapitalOverviewModel();
+		model.setTotal(list.size());
+		model.setTotalFee(init);
+		model.setWarningId(warningIds);
+		return new ResultModel(true, model);
+	}
+
+	@Override
+	public ResultModel listCapitalPoolDetail(CapitalPoolDetail detail) {
+		PageHelper.startPage(detail.getCurrentPage(), detail.getNumPerPage(), true);
+		Page<CapitalPoolDetail> page = capitalPoolMapper.listCapitalPoolDetail(detail);
+		return new ResultModel(true, page, new Pagination(page));
+	}
+
+	@Override
+	public ResultModel addCapitalpool(CapitalPoolDetail detail) {
+		List<CapitalPoolDetail> detailList = new ArrayList<CapitalPoolDetail>();
+		detailList.add(detail);
+		String key = Constants.CAPITAL_PERFIX + detail.getCenterId();
+		if (Constants.INCOME.equals(detail.getPayType())) {
+			capitalPoolMapper.insertCapitalPoolDetail(detailList);
+			CapitalPool record = capitalPoolMapper.selectRecordByCenterId(detail.getCenterId());
+			if (record == null) {// 初始化数据库数据
+				capitalPoolMapper.initCapitalPoolRecord(detail);
+			}
+			if (!template.hasKey(key)) {
+				initCapital(detail);//初始化redis数据
+			} else {
+				template.opsForHash().increment(key, "money", detail.getMoney());// 增加余额
+				template.opsForHash().increment(key, "countMoney", detail.getMoney());// 增加累计金额
+			}
+		}
+		if (Constants.EXPENDITURE.equals(detail.getPayType())) {
+			Double liquidationMoney = CalculationUtils.sub(0, detail.getMoney());
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
+			double balance = hashOperations.increment(key, "money", liquidationMoney);// 扣除资金池
+			if (balance < 0) {
+				hashOperations.increment(key, "money", detail.getMoney());
+				return new ResultModel(false, "资金池不足以清算");
+			}
+			try {
+				capitalPoolMapper.insertCapitalPoolDetail(detailList);
+			} catch (Exception e) {
+				hashOperations.increment(key, "money", detail.getMoney());
+				return new ResultModel(false, "资金池清算出错");
+			}
+		}
+		return new ResultModel(true, "");
+	}
+
+	private void initCapital(CapitalPoolDetail detail) {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		String key = Constants.CAPITAL_PERFIX + detail.getCenterId();
+		Map<String, String> mapForRedis = new HashMap<String, String>();
+		mapForRedis.put("centerId", detail.getCenterId().toString());
+		mapForRedis.put("money", detail.getMoney() + "");
+		mapForRedis.put("frozenMoney", "0");
+		mapForRedis.put("preferential", "0");
+		mapForRedis.put("frozenPreferential", "0");
+		mapForRedis.put("useMoney", "0");
+		mapForRedis.put("usePreferential", "0");
+		mapForRedis.put("countMoney", detail.getMoney() + "");
+		mapForRedis.put("countPreferential", "0");
+		mapForRedis.put("status", "1");// 默认启用状态
+		mapForRedis.put("level", "0");// 等级0
+		mapForRedis.put("opt", "8001");// 默认admin账号
+		hashOperations.putAll(key, mapForRedis);
 	}
 }

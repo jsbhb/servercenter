@@ -15,7 +15,10 @@
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR"/>
 		<result column="weight" property="weight" jdbcType="INTEGER"/>
 		<result column="goods_name" property="itemName" jdbcType="VARCHAR"/>
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR"/>
+		<result column="sku" property="sku" jdbcType="VARCHAR"/>
 		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC"/>
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC"/>
 		<result column="tariff" property="tariff" jdbcType="NUMERIC"/>
 		<result column="info" property="info" jdbcType="VARCHAR"/>
 		<result column="retail_price" property="retailPrice" jdbcType="NUMERIC"/>
@@ -38,7 +41,7 @@
 	</select>
 	
 	<select id="listGoodsDetail" parameterType="Object" resultMap="detail">
-		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,
+		select i.item_id,i.weight,i.item_code,i.sku,g.goods_name,g.goods_id,i.excise_tax,b.increment_tax,b.tariff,i.info,p.retail_price,
 		g.type,g.supplier_id,g.origin,b.brand,p.min,p.max 
 		from goods_item i 
 		left join goods g on i.goods_id = g.goods_id 
@@ -52,7 +55,7 @@
 	</select>
 	
 	<select id="listGoodsDetailByPage" parameterType="Object" resultMap="detail">
-		select i.item_id,i.weight,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,
+		select i.item_id,i.weight,i.item_code,i.sku,i.excise_tax,g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,
 		g.type,g.supplier_id,g.origin,b.brand,p.min,p.max 
 		from goods_item i 
 		left join goods g on i.goods_id = g.goods_id 

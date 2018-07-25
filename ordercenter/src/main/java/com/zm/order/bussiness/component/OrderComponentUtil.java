@@ -81,13 +81,14 @@ public class OrderComponentUtil {
 				Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
 						CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
 				Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
-				totalExciseTax += CalculationUtils.mul(exciseTax, 0.7);
+				totalExciseTax += CalculationUtils.mul(exciseTax, Constants.TAX_DISCOUNT);
 				Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
 						tax.getIncrementTax());
-				totalIncremTax += CalculationUtils.mul(incremTax, 0.7);
+				totalIncremTax += CalculationUtils.mul(incremTax, Constants.TAX_DISCOUNT);
 			} else {
-				totalIncremTax += CalculationUtils
-						.mul(CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()), 0.7);
+				totalIncremTax += CalculationUtils.mul(
+						CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
+						Constants.TAX_DISCOUNT);
 			}
 		}
 		taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
@@ -122,7 +123,7 @@ public class OrderComponentUtil {
 		amount = CalculationUtils.round(2, amount);
 		int totalAmount = (int) CalculationUtils.mul(amount, 100);
 		int localAmount = (int) (payMent * 100);
-		if (totalAmount - localAmount > 5 || totalAmount - localAmount < -5) {// 价格区间定义在正负5分
+		if (totalAmount - localAmount > Constants.DEVIATION || totalAmount - localAmount < -Constants.DEVIATION) {// 价格区间定义在正负5分
 			return false;
 		}
 		return true;

@@ -7,7 +7,7 @@ public class GoodsSearch {
 	private String goodsId;
 
 	private Integer centerId;
-	
+
 	@SearchCondition(value = SearchCondition.FILTER)
 	private String specs;
 
@@ -20,7 +20,6 @@ public class GoodsSearch {
 	@SearchCondition(value = SearchCondition.SEARCH)
 	private String upShelves;
 
-	
 	private Double price;
 
 	@SearchCondition(value = SearchCondition.FILTER)
@@ -53,9 +52,9 @@ public class GoodsSearch {
 
 	@SearchCondition(value = SearchCondition.FILTER)
 	private String tag;
-	
+
 	private Integer ratio;
-	
+
 	public Integer getRatio() {
 		return ratio;
 	}
@@ -211,7 +210,7 @@ public class GoodsSearch {
 	@Override
 	public String toString() {
 		return "GoodsSearch [goodsId=" + goodsId + ", price=" + price + ", priceMin=" + priceMin + ", priceMax="
-				+ priceMax + ", type=" + type + "]";
+				+ priceMax + ", type=" + type + ", tag=" + tag + "]";
 	}
 
 }
