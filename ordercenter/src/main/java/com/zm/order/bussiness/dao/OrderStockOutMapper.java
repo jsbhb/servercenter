@@ -14,6 +14,7 @@ import com.github.pagehelper.Page;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.OrderInfoEntityForMJY;
 import com.zm.order.pojo.OrderInfoListForDownload;
 
 /**  
@@ -44,15 +45,11 @@ public interface OrderStockOutMapper {
 	 */
 	int queryCountOrderInfo(Map<String,Object> param);
 
-	/**  
-	 * selectByOrderId:根据订单编号检索订单. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param orderId
-	 * @return  
-	 * @since JDK 1.7  
-	 */
-	OrderInfo selectByOrderId(String orderId);
+	OrderInfoEntityForMJY selectStockOutByOrderIdForMJY(String orderId);
+
+	OrderInfoEntityForMJY selectStockInByOrderIdForMJY(String orderId);
+
+	void updateOrderBaseEshopIn(Map<String,Object> param);
 
 	/**  
 	 * selectOrderGoodsForPage:(这里用一句话描述这个方法的作用). <br/>  

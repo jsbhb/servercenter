@@ -317,4 +317,73 @@ public class HttpClientUtil {
 		}
 		return resultStr;
 	}
+
+	/**
+	 * @fun 微信https请求
+	 * @param url
+	 * @param jsonStr
+	 * @return
+	 */
+	public static String MJYPost(String url, String jsonStr) {
+		String resultStr = "";
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+
+		// 创建httppost
+		HttpPost httpPost = new HttpPost(url);
+
+		StringEntity stringEntity = new StringEntity(jsonStr, Charsets.UTF_8);
+		HttpEntity entity = null;
+		CloseableHttpResponse response = null;
+		try {
+			httpPost.setEntity(stringEntity);
+			httpPost.setConfig(requestConfig);
+			httpPost.addHeader("Accept", "*/*");
+			httpPost.addHeader("Accept-Language", "zh-cn");
+			httpPost.addHeader("Content-Type", "application/json");
+			logger.info("executing request uri：" + httpPost.getURI());
+			//URL中存在https
+			if (url.indexOf("https") != -1) {
+				response = httpsclient.execute(httpPost);
+			} else {
+				response = httpclient.execute(httpPost);
+			}
+
+			// 如果连接状态异常，则直接关闭
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logger.info("httpclient 访问异常 ");
+				httpPost.abort();
+				return null;
+			}
+			entity = response.getEntity();
+			if (entity != null) {
+				resultStr = EntityUtils.toString(entity, "UTF-8");
+				logger.info(" httpClient response string " + resultStr);
+			}
+
+		} catch (Exception e) {
+			httpPost.abort();
+			logger.error("http post error ",e);
+			return null;
+			// 关闭连接,释放资源
+		} finally {
+			try {
+				if (entity != null) {
+					EntityUtils.consume(entity);// 关闭
+				}
+				if (response != null) {
+					response.close();
+				}
+				if (httpPost != null) {
+					// 关闭连接,释放资源
+					httpPost.releaseConnection();
+				}
+
+			} catch (Exception e) {
+				logger.error("http post error " + e.getMessage());
+			}
+
+		}
+		return resultStr;
+	}
 }

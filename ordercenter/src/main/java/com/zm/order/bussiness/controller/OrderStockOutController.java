@@ -163,4 +163,40 @@ public class OrderStockOutController {
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+
+	@RequestMapping(value = "{version}/order/stockOut/sendStockInGoodsInfoToMJY", method = RequestMethod.POST)
+	public ResultModel sendStockInGoodsInfoToMJY(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				String orderId = request.getParameter("orderId");
+				if (orderId == null) {
+					return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+				}
+				return orderStockOutService.getStockInGoodsInfoByOrderId(orderId);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
+	@RequestMapping(value = "{version}/order/stockOut/sendStockOutGoodsInfoToMJY", method = RequestMethod.POST)
+	public ResultModel sendStockOutGoodsInfoToMJY(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				String orderId = request.getParameter("orderId");
+				if (orderId == null) {
+					return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+				}
+				return orderStockOutService.getStockOutGoodsInfoByOrderId(orderId);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
 }

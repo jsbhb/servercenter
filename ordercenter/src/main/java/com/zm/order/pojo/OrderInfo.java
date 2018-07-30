@@ -71,6 +71,8 @@ public class OrderInfo extends Pagination{
 	private Integer manual;//是否手工单，0：自动；1手动
 
 	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
+	
+	private Integer isEshopIn;//Eshop是否入库，0：未入库；1入库
 
 	public boolean check() {
 		if (orderDetail == null || orderGoodsList == null || orderFlag == null || createType == null || userId == null
@@ -318,6 +320,14 @@ public class OrderInfo extends Pagination{
 
 	public void setOrderExpressList(List<ThirdOrderInfo> orderExpressList) {
 		this.orderExpressList = orderExpressList;
+	}
+
+	public Integer getIsEshopIn() {
+		return isEshopIn;
+	}
+
+	public void setIsEshopIn(Integer isEshopIn) {
+		this.isEshopIn = isEshopIn;
 	}
 
 	@Override

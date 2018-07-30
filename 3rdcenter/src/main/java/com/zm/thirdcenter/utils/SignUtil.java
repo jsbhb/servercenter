@@ -1,7 +1,12 @@
 package com.zm.thirdcenter.utils;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class SignUtil {
 
@@ -70,5 +75,68 @@ public class SignUtil {
 
 		String s = new String(tempArr);
 		return s;
+	}
+	
+	public static String decrypt(String accessKey, String accessSecret, Map<String, Object> map) {
+		List<String> sortedKeyList = keySort(map);
+		StringBuilder builder = new StringBuilder();
+		for (String key : sortedKeyList) {
+			if (!key.equalsIgnoreCase("accesskey")) {
+				String value = String.valueOf(map.get(key));
+				if (key.equalsIgnoreCase("stockInVoucherSkus")) {
+					value = JSONUtil.toJson(map.get(key));
+				}
+				if (key.equalsIgnoreCase("stockOutVoucherSkus")) {
+					value = JSONUtil.toJson(map.get(key));
+				}
+				if (value != null && !"null".equals(value)){
+					builder.append(key);
+					builder.append(value);
+				}
+			}
+		}
+		builder.append(accessSecret);
+		builder.insert(0, accessKey);
+		return builder.toString();
+	}
+
+	public static String sha1(String decrypt) throws IOException {
+		try { 
+			// 指定 sha1算法
+			MessageDigest digest = MessageDigest.getInstance("SHA-1");
+			digest.update(decrypt.getBytes()); 
+			// 获取字节数组 
+			byte messageDigest[] = digest.digest(); // Create Hex String
+			StringBuffer hexString = new StringBuffer(); // 字节数组转换为 十六进制数 
+			for (int i = 0; i < messageDigest.length; i++) { 
+				String shaHex = Integer.toHexString(messageDigest[i] & 0xFF); 
+				if (shaHex.length() < 2) {
+					hexString.append(0); 
+				}
+				hexString.append(shaHex); 
+			}
+			System.out.println("原始字符串=====>"+decrypt);
+			System.out.println("生成token=====>"+(hexString.toString().toUpperCase()));
+			return hexString.toString().toUpperCase();
+		} catch (NoSuchAlgorithmException e) {
+			throw new IOException(e.getMessage());
+		}
+	}
+	
+
+
+	/**
+	 * @fun 排序
+	 * @param params
+	 * @return
+	 */
+	public static List<String> keySort(Map<String, ? extends Object> params) {
+		if (params == null) {
+			return null;
+		}
+		List<String> keyList = new ArrayList<String>(params.keySet());
+		Collections.sort(keyList);
+
+		return keyList;
 	}
 }

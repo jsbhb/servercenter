@@ -28,11 +28,15 @@ import com.zm.order.bussiness.service.OrderStockOutService;
 import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
+import com.zm.order.feignclient.ThirdPartFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.OrderInfoEntityForMJY;
 import com.zm.order.pojo.OrderInfoListForDownload;
+import com.zm.order.pojo.StockInVoucherSku;
+import com.zm.order.pojo.StockOutVoucherSku;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
@@ -71,6 +75,9 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
+
+	@Resource
+	ThirdPartFeignClient thirdPartFeignClient;
 
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
@@ -270,6 +277,60 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			info.setSupplierId(supplierId);
 			info.getOrderDetail().setPayment(CalculationUtils.round(2, amount));
 		}
+		return new ResultModel(true, null);
+	}
+
+	@Override
+	public ResultModel getStockInGoodsInfoByOrderId(String orderId) {
+		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockInByOrderIdForMJY(orderId);
+		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockInVoucherSkus().size()) {
+			Integer tmpQty = 0;
+			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
+				tmpQty = tmpQty + sivs.getExpectedQuantity();
+			}
+			goodsInfo.setExpectedSkuQuantity(tmpQty);
+			
+			ResultModel createResult = thirdPartFeignClient.addStoreSio(Constants.FIRST_VERSION, goodsInfo);
+			
+			if (!createResult.isSuccess()) {
+				return new ResultModel(false, createResult.getErrorMsg());
+			}
+			//返回成功后将orderBase的is_eshop_in状态修改
+			Map<String,Object> param = new HashMap<String,Object>();
+			param.put("orderId", orderId);
+			param.put("isEshopIn", 1);
+			orderBackMapper.updateOrderBaseEshopIn(param);
+		} else {
+			return new ResultModel(false, "订单内商品种类数量不正确");
+		}
+
+		return new ResultModel(true, null);
+	}
+
+	@Override
+	public ResultModel getStockOutGoodsInfoByOrderId(String orderId) {
+		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockOutByOrderIdForMJY(orderId);
+		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockOutVoucherSkus().size()) {
+			Integer tmpQty = 0;
+			for(StockOutVoucherSku sivs:goodsInfo.getStockOutVoucherSkus()) {
+				tmpQty = tmpQty + sivs.getExpectedQuantity();
+			}
+			goodsInfo.setExpectedSkuQuantity(tmpQty);
+			
+			ResultModel createResult = thirdPartFeignClient.addStoreSoo(Constants.FIRST_VERSION, goodsInfo);
+			
+			if (!createResult.isSuccess()) {
+				return new ResultModel(false, createResult.getErrorMsg());
+			}
+			//返回成功后将orderBase的is_eshop_in状态修改
+			Map<String,Object> param = new HashMap<String,Object>();
+			param.put("orderId", orderId);
+			param.put("isEshopIn", 0);
+			orderBackMapper.updateOrderBaseEshopIn(param);
+		} else {
+			return new ResultModel(false, "订单内商品种类数量不正确");
+		}
+
 		return new ResultModel(true, null);
 	}
 

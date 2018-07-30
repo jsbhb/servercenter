@@ -20,6 +20,7 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="order_source" property="orderSource" jdbcType="INTEGER" />
 		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="is_eshop_in" property="isEshopIn" jdbcType="INTEGER" />
 		<association property="orderDetail" javaType="com.zm.order.pojo.OrderDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
@@ -117,6 +118,35 @@
 			<result column="express_id" property="expressId" jdbcType="VARCHAR" />
 		</collection>
 	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoEntityForMJY" id="stockInOrderInfoForMJY">
+		<id column="order_id" property="code" jdbcType="VARCHAR" />
+		<result column="grade_id" property="storeCode" jdbcType="VARCHAR" />
+		<result column="order_id" property="relatedVoucherCode" jdbcType="VARCHAR" />
+		<result column="tdq" property="expectedSkuQuantity" jdbcType="INTEGER" />
+		<result column="memo" property="memo" jdbcType="VARCHAR" />
+		<collection ofType="com.zm.order.pojo.StockInVoucherSku"
+			property="stockInVoucherSkus">
+			<id column="item_id" property="skuCode" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="expectedQuantity" jdbcType="INTEGER" />
+			<result column="actual_price" property="price" jdbcType="VARCHAR" />
+			<result column="remark" property="memo" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderInfoEntityForMJY" id="stockOutOrderInfoForMJY">
+		<id column="order_id" property="code" jdbcType="VARCHAR" />
+		<result column="grade_id" property="storeCode" jdbcType="VARCHAR" />
+		<result column="order_id" property="relatedVoucherCode" jdbcType="VARCHAR" />
+		<result column="tdq" property="expectedSkuQuantity" jdbcType="INTEGER" />
+		<result column="memo" property="memo" jdbcType="VARCHAR" />
+		<collection ofType="com.zm.order.pojo.StockOutVoucherSku"
+			property="stockInVoucherSkus">
+			<id column="item_id" property="skuCode" jdbcType="VARCHAR" />
+			<result column="item_quantity" property="expectedQuantity" jdbcType="INTEGER" />
+			<result column="remark" property="memo" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
 
 
 	<select id="selectForPage" resultMap="orderBase" parameterType="Object">
@@ -127,7 +157,7 @@
 		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
 		from 
 		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,
-		ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id,ob.order_source,ob.order_flag,ob.remark
+		ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id,ob.order_source,ob.order_flag,ob.remark,ob.is_eshop_in
 		from order_base ob where
 		1 = 1
 		<if test="entity.status != null">
@@ -317,5 +347,27 @@
         left join third_order_info oe on oe.order_id = o.order_id 
         where o.order_id = #{orderId}
 	</select>
+	
+	<select id="selectStockInByOrderIdForMJY" parameterType="Object" resultMap="stockInOrderInfoForMJY">
+		select o.order_id,o.grade_id,o.tdq,ifnull(o.remark,'') memo,og.item_id,
+		og.item_quantity,og.actual_price,ifnull(og.remark,'') remark
+		from order_base o
+		left join order_goods og on o.order_id = og.order_id 
+        where o.order_id = #{orderId}
+	</select>
+	
+	<select id="selectStockOutByOrderIdForMJY" parameterType="Object" resultMap="stockOutOrderInfoForMJY">
+		select o.order_id,o.grade_id,o.tdq,ifnull(o.remark,'') memo,og.item_id,
+		og.item_quantity,ifnull(og.remark,'') remark
+		from order_base o
+		left join order_goods og on o.order_id = og.order_id 
+        where o.order_id = #{orderId}
+	</select>
+	
+	<update id="updateOrderBaseEshopIn" parameterType="Object">
+		update order_base 
+		set is_eshop_in = #{isEshopIn}
+		where order_id = #{orderId}
+	</update>
 
 </mapper>

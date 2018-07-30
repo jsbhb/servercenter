@@ -90,4 +90,8 @@ public interface OrderStockOutService {
 	 */
 	ResultModel importOrder(List<OrderInfo> list);
 
+	ResultModel getStockInGoodsInfoByOrderId(String orderId);
+
+	ResultModel getStockOutGoodsInfoByOrderId(String orderId);
+
 }

@@ -32,4 +32,20 @@ public class Constants {
 	
 	public static final String CARRIER = "carrier";//快递公司对应的编码
 
+	// *********************卖家云配置信息******************************/
+	// *********************卖家云test配置信息******************************/
+	public static final String MJY_ACCESS_URL = "http://47.97.8.253:9090";
+	public static final String MJY_ACCESS_KEY = "733DF1E42D934F70AC5ACF39D8CD41EA";
+	public static final String MJY_ACCESS_SECRET = "YzqWJFXtxDwuMdEU";
+	// *********************卖家云normal配置信息******************************/
+//	public static final String MJY_ACCESS_URL = "https://api.erp.maijiayun.cn";
+//	public static final String MJY_ACCESS_KEY = "F251342C2C1E467EA583BABB755BD59A";
+//	public static final String MJY_ACCESS_SECRET = "qOUIdLOGPabCjrll";
+
+	public static final String MJY_ACCESS_VERSION = "v1";
+
+	public static final String MJY_METHOD_STORE_SIO_ADD = "maijiayun.warehouse.store.sio.add";
+
+	public static final String MJY_METHOD_STORE_SOO_ADD = "maijiayun.warehouse.store.soo.add";
+
 }
