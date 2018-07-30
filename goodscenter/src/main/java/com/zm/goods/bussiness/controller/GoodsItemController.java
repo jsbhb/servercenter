@@ -226,19 +226,21 @@ public class GoodsItemController {
 			@RequestBody GoodsItemEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String gradeLevel = request.getParameter("gradeLevel");
-
-			if ("1".equals(gradeLevel)) {
-				Page<GoodsEntity> page = goodsItemService.queryByPageDownload(entity);
-				return new ResultModel(true, page, new Pagination(page));
-			} else {
-				String centerId = request.getParameter("centerId");
-				if (centerId == null || "".equals(centerId)) {
-					new ResultModel(false, "没有获取区域中心编号");
-				}
-				Page<GoodsEntity> page = goodsItemService.queryCenterByPageDownload(entity, Integer.parseInt(centerId));
-				return new ResultModel(true, page, new Pagination(page));
-			}
+			Page<GoodsEntity> page = goodsItemService.queryByPageDownload(entity);
+			return new ResultModel(true, page, new Pagination(page));
+//			String gradeLevel = request.getParameter("gradeLevel");
+//
+//			if ("1".equals(gradeLevel)) {
+//				Page<GoodsEntity> page = goodsItemService.queryByPageDownload(entity);
+//				return new ResultModel(true, page, new Pagination(page));
+//			} else {
+//				String centerId = request.getParameter("centerId");
+//				if (centerId == null || "".equals(centerId)) {
+//					new ResultModel(false, "没有获取区域中心编号");
+//				}
+//				Page<GoodsEntity> page = goodsItemService.queryCenterByPageDownload(entity, Integer.parseInt(centerId));
+//				return new ResultModel(true, page, new Pagination(page));
+//			}
 
 		}
 
@@ -250,19 +252,21 @@ public class GoodsItemController {
 			@RequestBody GoodsItemEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String gradeLevel = request.getParameter("gradeLevel");
-
-			if ("1".equals(gradeLevel)) {
-				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionByPageDownload(entity);
-				return new ResultModel(true, page, new Pagination(page));
-			} else {
-				String centerId = request.getParameter("centerId");
-				if (centerId == null || "".equals(centerId)) {
-					new ResultModel(false, "没有获取区域中心编号");
-				}
-				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionCenterByPageDownload(entity, Integer.parseInt(centerId));
-				return new ResultModel(true, page, new Pagination(page));
-			}
+			Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionByPageDownload(entity);
+			return new ResultModel(true, page, new Pagination(page));
+//			String gradeLevel = request.getParameter("gradeLevel");
+//
+//			if ("1".equals(gradeLevel)) {
+//				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionByPageDownload(entity);
+//				return new ResultModel(true, page, new Pagination(page));
+//			} else {
+//				String centerId = request.getParameter("centerId");
+//				if (centerId == null || "".equals(centerId)) {
+//					new ResultModel(false, "没有获取区域中心编号");
+//				}
+//				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionCenterByPageDownload(entity, Integer.parseInt(centerId));
+//				return new ResultModel(true, page, new Pagination(page));
+//			}
 
 		}
 

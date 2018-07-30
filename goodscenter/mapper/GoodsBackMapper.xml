@@ -517,7 +517,7 @@
                 #{item}
 			</foreach>
 		</if>
-		<if test="itemStatus!=null and itemStatus != 0">
+		<if test="itemStatus!=null and itemStatus != -1">
 			and gi.status = #{itemStatus}
 		</if>
 		<if test="firstCatalogList != null and firstCatalogList.size() > 0">
@@ -537,6 +537,9 @@
 			<foreach collection="thirdCatalogList" item="item" open="(" separator="," close=")">
                 #{item}
 			</foreach>
+		</if>
+		<if test="goodsType!=null and goodsType != -1">
+			and g.type = #{goodsType}
 		</if>
 		order by gi.item_id
 	</select>

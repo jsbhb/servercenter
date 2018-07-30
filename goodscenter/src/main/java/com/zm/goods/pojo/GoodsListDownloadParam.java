@@ -15,6 +15,7 @@ public class GoodsListDownloadParam {
 	private List<String> secondCatalogList;
 	private List<String> thirdCatalogList;
 	private Integer itemStatus;
+	private Integer goodsType;
 	
 	
 	public Integer getGradeType() {
@@ -82,5 +83,11 @@ public class GoodsListDownloadParam {
 	}
 	public void setItemStatus(Integer itemStatus) {
 		this.itemStatus = itemStatus;
+	}
+	public Integer getGoodsType() {
+		return goodsType;
+	}
+	public void setGoodsType(Integer goodsType) {
+		this.goodsType = goodsType;
 	}
 }

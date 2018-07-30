@@ -507,6 +507,9 @@
 		<if test="id !=null and id !=''">
 			and g.id = #{id} 
 		</if>
+		<if test="status!=null and status !=''">
+			and g.status = #{status} 
+		</if>
 	</select>
 	
 	<select id="selectCenterForPageDownload" parameterType="Object" resultMap="goods">
@@ -681,6 +684,9 @@
 		</if>
 		<if test="goodsId!=null and goodsId !=''">
 			and g.goods_id = #{goodsId} 
+		</if>
+		<if test="goodsEntity.type !=null and goodsEntity.type !=''">
+			and g.type = #{goodsEntity.type} 
 		</if>
 		order by g.goods_id desc
 	</select>
