@@ -323,8 +323,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				}
 				Integer tmpConversionQty = sivs.getExpectedQuantity() * tmpItem.getConversion();
 				sivs.setExpectedQuantity(tmpConversionQty);
-				sivs.setSkuCode(tmpItem.getItemId());
-				sivs.setPrice(tmpItem.getRetailPrice());
+				sivs.setSkuCode(tmpConverItem.getItemId());
+				sivs.setPrice(tmpConverItem.getRetailPrice());
 			}
 			
 			Integer tmpQty = 0;
@@ -406,7 +406,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				}
 				Integer tmpConversionQty = sovs.getExpectedQuantity() * tmpItem.getConversion();
 				sovs.setExpectedQuantity(tmpConversionQty);
-				sovs.setSkuCode(tmpItem.getItemId());
+				sovs.setSkuCode(tmpConverItem.getItemId());
 			}
 			
 			Integer tmpQty = 0;
