@@ -140,9 +140,12 @@ public class ThirdPartMaiJiaYunController {
 				JSONObject jobj = JSONObject.fromObject(httpResult);
 				THIRDLOG.info("转换JSON：" + "=====" + jobj);
 				if (jobj != null) {
-					result.setErrorMsg(jobj.getString("resolveMsg"));
 					result.setSuccess(jobj.getBoolean("isOk"));
-					result.setErrorCode(jobj.getString("errorCode"));
+					if (!jobj.getBoolean("isOk")) {
+						result.setErrorCode(jobj.getString("errorCode"));
+						result.setErrorMsg(jobj.getString("errorMsg"));
+//						result.setErrorMsg(jobj.getString("resolveMsg"));
+					}
 					return result;
 				} else {
 					result.setErrorMsg("接口调用返回值为空");
