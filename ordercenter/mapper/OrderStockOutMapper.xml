@@ -142,7 +142,7 @@
 		<result column="tdq" property="expectedSkuQuantity" jdbcType="INTEGER" />
 		<result column="memo" property="memo" jdbcType="VARCHAR" />
 		<collection ofType="com.zm.order.pojo.StockOutVoucherSku"
-			property="stockInVoucherSkus">
+			property="stockOutVoucherSkus">
 			<id column="item_id" property="skuCode" jdbcType="VARCHAR" />
 			<result column="item_quantity" property="expectedQuantity" jdbcType="INTEGER" />
 			<result column="remark" property="memo" jdbcType="VARCHAR" />

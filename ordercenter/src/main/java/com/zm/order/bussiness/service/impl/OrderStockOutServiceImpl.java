@@ -417,7 +417,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				if (!stockOutMap.containsKey(sovs.getSkuCode())) {
 					stockOutMap.put(sovs.getSkuCode(), sovs);
 				} else {
-					StockInVoucherSku tmpSku = (StockInVoucherSku)stockOutMap.get(sovs.getSkuCode());
+					StockOutVoucherSku tmpSku = (StockOutVoucherSku)stockOutMap.get(sovs.getSkuCode());
 					tmpSku.setExpectedQuantity(sovs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
 					stockOutMap.put(sovs.getSkuCode(), tmpSku);
 				}
