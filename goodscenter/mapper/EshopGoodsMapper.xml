@@ -48,6 +48,24 @@
 		<result column="operation_type" property="operationType" jdbcType="INTEGER" />
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="itemEntity">
+		<id column="id" property="id"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="item_id" property="itemId" />
+		<result column="item_code" property="itemCode"/>
+		<result column="sku" property="sku"/>
+		<result column="encode" property="encode"/>
+		<result column="weight" property="weight"/>
+		<result column="excise_tax" property="exciseTax"/>
+		<result column="status" property="status"/>
+		<result column="discount" property="discount"/>
+		<result column="info" property="info"/>
+		<result column="conversion" property="conversion"/>
+		<result column="shelf_life" property="shelfLife"/>
+		<result column="carton" property="carTon"/>
+		<result column="retail_price" property="retailPrice"/>
+	</resultMap>
+	
 	<insert id="createPurchaseInfo" parameterType="Object">
 		INSERT IGNORE INTO
 		eshop_goods_purchase
@@ -259,4 +277,18 @@
 		</foreach>
 	</insert>
 	
+	
+	<select id="selectGoodsItemInfoByGoodsIdForEshop" parameterType="Object" resultMap="itemEntity">
+		select gi.goods_id,gi.item_id,gi.item_code,
+		gi.conversion,gp.retail_price 
+		from goods_item gi
+		left join goods_price gp on gi.item_id = gp.item_id
+		where gi.is_del = '0'
+		and gi.goods_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+		order by gi.conversion,gi.item_code,gi.item_id
+	</select>
 </mapper>
