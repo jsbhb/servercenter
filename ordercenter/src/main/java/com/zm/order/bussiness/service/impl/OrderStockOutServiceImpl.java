@@ -30,6 +30,7 @@ import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.ThirdPartFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.pojo.GoodsItemEntity;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
@@ -284,10 +285,66 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public ResultModel getStockInGoodsInfoByOrderId(String orderId) {
 		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockInByOrderIdForMJY(orderId);
 		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockInVoucherSkus().size()) {
+			//将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
+			List<String> goodsIds = new ArrayList<String>();
+			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
+				if (!"".equals(sivs.getGoodsId().trim())) {
+					goodsIds.add(sivs.getGoodsId().trim());
+				} else {
+					return new ResultModel(false, "订单内商品对应的goodsId为空，请修改后重试");
+				}
+			}
+			List<GoodsItemEntity> items = goodsFeignClient.queryGoodsItemInfoByGoodsIdForEshop(Constants.FIRST_VERSION, goodsIds);
+			if (items == null || items.size() <=0) {
+				return new ResultModel(false, "订单内商品对应的转换信息为空，请修改后重试");
+			}
+			//将订单内的商品信息转换为单包装的商品信息
+			GoodsItemEntity tmpConverItem;
+			GoodsItemEntity tmpItem;
+			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
+				tmpConverItem = null;
+				tmpItem = null;
+				for(GoodsItemEntity gie:items) {
+					if (sivs.getGoodsId().equals(gie.getGoodsId())) {
+						if (tmpConverItem == null && gie.getConversion() == 1) {
+							tmpConverItem = gie;
+						}
+						if (sivs.getSkuCode().equals(gie.getItemId())) {
+							tmpItem = gie;
+							break;
+						}
+					}
+				}
+				if (tmpConverItem == null) {
+					return new ResultModel(false, "商品编号"+sivs.getSkuCode()+"对应的单包装信息为空，请修改后重试");
+				}
+				if (tmpItem == null) {
+					return new ResultModel(false, "商品编号"+sivs.getSkuCode()+"对应的转换信息为空，请联系技术");
+				}
+				Integer tmpConversionQty = sivs.getExpectedQuantity() * tmpItem.getConversion();
+				sivs.setExpectedQuantity(tmpConversionQty);
+				sivs.setSkuCode(tmpItem.getItemId());
+				sivs.setPrice(tmpItem.getRetailPrice());
+			}
+			
 			Integer tmpQty = 0;
+			Map<String,Object> stockInMap = new HashMap<String,Object>();
+			List<StockInVoucherSku> newStockInList = new ArrayList<StockInVoucherSku>();
 			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
 				tmpQty = tmpQty + sivs.getExpectedQuantity();
+				if (!stockInMap.containsKey(sivs.getSkuCode())) {
+					stockInMap.put(sivs.getSkuCode(), sivs);
+				} else {
+					StockInVoucherSku tmpSku = (StockInVoucherSku)stockInMap.get(sivs.getSkuCode());
+					tmpSku.setExpectedQuantity(sivs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
+					stockInMap.put(sivs.getSkuCode(), tmpSku);
+				}
 			}
+			for (Map.Entry<String, Object> entry:stockInMap.entrySet()) {
+				StockInVoucherSku tmpSku = (StockInVoucherSku)entry.getValue();
+				newStockInList.add(tmpSku);
+			}
+			goodsInfo.setStockInVoucherSkus(newStockInList);
 			goodsInfo.setExpectedSkuQuantity(tmpQty);
 			
 			ResultModel createResult = thirdPartFeignClient.addStoreSio(Constants.FIRST_VERSION, goodsInfo);
@@ -311,10 +368,65 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public ResultModel getStockOutGoodsInfoByOrderId(String orderId) {
 		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockOutByOrderIdForMJY(orderId);
 		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockOutVoucherSkus().size()) {
-			Integer tmpQty = 0;
-			for(StockOutVoucherSku sivs:goodsInfo.getStockOutVoucherSkus()) {
-				tmpQty = tmpQty + sivs.getExpectedQuantity();
+			//将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
+			List<String> goodsIds = new ArrayList<String>();
+			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
+				if (!"".equals(sovs.getGoodsId().trim())) {
+					goodsIds.add(sovs.getGoodsId().trim());
+				} else {
+					return new ResultModel(false, "订单内商品对应的goodsId为空，请修改后重试");
+				}
 			}
+			List<GoodsItemEntity> items = goodsFeignClient.queryGoodsItemInfoByGoodsIdForEshop(Constants.FIRST_VERSION, goodsIds);
+			if (items == null || items.size() <=0) {
+				return new ResultModel(false, "订单内商品对应的转换信息为空，请修改后重试");
+			}
+			//将订单内的商品信息转换为单包装的商品信息
+			GoodsItemEntity tmpConverItem;
+			GoodsItemEntity tmpItem;
+			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
+				tmpConverItem = null;
+				tmpItem = null;
+				for(GoodsItemEntity gie:items) {
+					if (sovs.getGoodsId().equals(gie.getGoodsId())) {
+						if (tmpConverItem == null && gie.getConversion() == 1) {
+							tmpConverItem = gie;
+						}
+						if (sovs.getSkuCode().equals(gie.getItemId())) {
+							tmpItem = gie;
+							break;
+						}
+					}
+				}
+				if (tmpConverItem == null) {
+					return new ResultModel(false, "商品编号"+sovs.getSkuCode()+"对应的单包装信息为空，请修改后重试");
+				}
+				if (tmpItem == null) {
+					return new ResultModel(false, "商品编号"+sovs.getSkuCode()+"对应的转换信息为空，请联系技术");
+				}
+				Integer tmpConversionQty = sovs.getExpectedQuantity() * tmpItem.getConversion();
+				sovs.setExpectedQuantity(tmpConversionQty);
+				sovs.setSkuCode(tmpItem.getItemId());
+			}
+			
+			Integer tmpQty = 0;
+			Map<String,Object> stockOutMap = new HashMap<String,Object>();
+			List<StockOutVoucherSku> newStockOutList = new ArrayList<StockOutVoucherSku>();
+			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
+				tmpQty = tmpQty + sovs.getExpectedQuantity();
+				if (!stockOutMap.containsKey(sovs.getSkuCode())) {
+					stockOutMap.put(sovs.getSkuCode(), sovs);
+				} else {
+					StockInVoucherSku tmpSku = (StockInVoucherSku)stockOutMap.get(sovs.getSkuCode());
+					tmpSku.setExpectedQuantity(sovs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
+					stockOutMap.put(sovs.getSkuCode(), tmpSku);
+				}
+			}
+			for (Map.Entry<String, Object> entry:stockOutMap.entrySet()) {
+				StockOutVoucherSku tmpSku = (StockOutVoucherSku)entry.getValue();
+				newStockOutList.add(tmpSku);
+			}
+			goodsInfo.setStockOutVoucherSkus(newStockOutList);
 			goodsInfo.setExpectedSkuQuantity(tmpQty);
 			
 			ResultModel createResult = thirdPartFeignClient.addStoreSoo(Constants.FIRST_VERSION, goodsInfo);
