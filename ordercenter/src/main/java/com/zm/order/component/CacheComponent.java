@@ -1,15 +1,18 @@
 package com.zm.order.component;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import com.zm.order.pojo.bo.GradeBO;
 
 public class CacheComponent {
 
-	private Set<GradeBO> gradeSet = new HashSet<GradeBO>();
-	private TreeSet<GradeBO> treeSet = new TreeSet<GradeBO>();
+	//比较器如果写在对象里面时，判断重复是根据比较器来，如果小于0则判断为重复
+	private ConcurrentSkipListSet<GradeBO> gradeSet = new ConcurrentSkipListSet<GradeBO>(new Comparator<GradeBO>() {
+		public int compare(GradeBO k1, GradeBO k2) {
+			return k1.getId() - k2.getId();
+		}
+	});
 
 //	private Map<String, IntradayOrderBO> statisticsOrderCacheMap = new ConcurrentHashMap<String, IntradayOrderBO>();
 //	private Map<String, Double> statisticsSalesCacheMap = new ConcurrentHashMap<String, Double>();
@@ -115,11 +118,9 @@ public class CacheComponent {
 			gradeSet.remove(grade);
 		}
 		gradeSet.add(grade);
-		treeSet.clear();
-		treeSet.addAll(gradeSet);
 	}
 
-	public Set<GradeBO> getSet() {
-		return treeSet;
+	public ConcurrentSkipListSet<GradeBO> getSet() {
+		return gradeSet;
 	}
 }

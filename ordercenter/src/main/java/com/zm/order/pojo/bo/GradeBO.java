@@ -2,7 +2,7 @@ package com.zm.order.pojo.bo;
 
 import java.util.List;
 
-public class GradeBO implements Comparable<GradeBO>{
+public class GradeBO{
 
 	private Integer id;
 	private Integer parentId;
@@ -31,13 +31,6 @@ public class GradeBO implements Comparable<GradeBO>{
 	}
 	public void setGradeType(Integer gradeType) {
 		this.gradeType = gradeType;
-	}
-	@Override
-	public int compareTo(GradeBO o) {
-		if(id > o.getId()){
-			return 1;
-		}
-		return 0;
 	}
 	@Override
 	public int hashCode() {
