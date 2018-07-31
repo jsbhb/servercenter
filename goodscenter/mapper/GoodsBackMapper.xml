@@ -641,7 +641,10 @@
 	</select>
 
 	<select id="selectGoodsFileByParam" parameterType="Object" resultMap="goodsFile">
-		SELECT min(id) id,goods_id,path 
+		select id,goods_id,path 
+		from zm_goods.goods_file
+		where id in ( 
+		SELECT min(id) id
 		FROM zm_goods.goods_file 
 		WHERE 1=1 AND goods_id in 
 		<foreach collection="list" item="item" open="(" close=")"
@@ -649,6 +652,7 @@
 			#{item,jdbcType = VARCHAR}
 		</foreach>
 		group by goods_id
+		)
 	</select>
 	
 	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">

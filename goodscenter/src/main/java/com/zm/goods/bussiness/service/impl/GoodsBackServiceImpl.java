@@ -384,41 +384,47 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			goodsItemMapper.updatePriceBatch(updPriceList);
 		}
 
+		//商品主图
+		//先将所有图片都删除，如果有图片信息，重新保存
+		goodsItemMapper.deleteAllFiles(entity.getGoods());
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
-			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
-			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
-
-			// 过滤相同文件列表
-			for (GoodsFile ngf : entity.getGoods().getFiles()) {
-				for (GoodsFile gf : oldFiles) {
-					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
-						existFiles.add(gf);
-						oldFiles.remove(gf);
-						break;
-					}
-				}
-			}
-			// 挑出新增文件列表
-			for (GoodsFile gf : existFiles) {
-				for (GoodsFile ngf : entity.getGoods().getFiles()) {
-					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
-						entity.getGoods().getFiles().remove(ngf);
-						break;
-					}
-				}
-			}
-
-			if (entity.getGoods().getFiles().size() > 0) {
-				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-			}
-			if (oldFiles.size() > 0) {
-				goodsItemMapper.deleteListFiles(oldFiles);
-			}
-		} else {
-			// 商品编辑时，如果没有传图片信息，则删除表中记录
-			goodsItemMapper.deleteAllFiles(entity.getGoods());
+			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
 		}
+//		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
+//			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
+//			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
+//			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
+//
+//			// 过滤相同文件列表
+//			for (GoodsFile ngf : entity.getGoods().getFiles()) {
+//				for (GoodsFile gf : oldFiles) {
+//					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+//						existFiles.add(gf);
+//						oldFiles.remove(gf);
+//						break;
+//					}
+//				}
+//			}
+//			// 挑出新增文件列表
+//			for (GoodsFile gf : existFiles) {
+//				for (GoodsFile ngf : entity.getGoods().getFiles()) {
+//					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+//						entity.getGoods().getFiles().remove(ngf);
+//						break;
+//					}
+//				}
+//			}
+//
+//			if (entity.getGoods().getFiles().size() > 0) {
+//				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+//			}
+//			if (oldFiles.size() > 0) {
+//				goodsItemMapper.deleteListFiles(oldFiles);
+//			}
+//		} else {
+//			// 商品编辑时，如果没有传图片信息，则删除表中记录
+//			goodsItemMapper.deleteAllFiles(entity.getGoods());
+//		}
 		
 		//设定商品的标签权重
 		Integer tmpGoodsTagRatio = 0;
@@ -703,41 +709,47 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			goodsItemMapper.insertStockForBatch(insItemIdList);
 		}
 
+		//商品主图
+		//先将所有图片都删除，如果有图片信息，重新保存
+		goodsItemMapper.deleteAllFiles(entity.getGoods());
 		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
-			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
-			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
-
-			// 过滤相同文件列表
-			for (GoodsFile ngf : entity.getGoods().getFiles()) {
-				for (GoodsFile gf : oldFiles) {
-					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
-						existFiles.add(gf);
-						oldFiles.remove(gf);
-						break;
-					}
-				}
-			}
-			// 挑出新增文件列表
-			for (GoodsFile gf : existFiles) {
-				for (GoodsFile ngf : entity.getGoods().getFiles()) {
-					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
-						entity.getGoods().getFiles().remove(ngf);
-						break;
-					}
-				}
-			}
-
-			if (entity.getGoods().getFiles().size() > 0) {
-				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-			}
-			if (oldFiles.size() > 0) {
-				goodsItemMapper.deleteListFiles(oldFiles);
-			}
-		} else {
-			// 商品编辑时，如果没有传图片信息，则删除表中记录
-			goodsItemMapper.deleteAllFiles(entity.getGoods());
+			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
 		}
+//		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
+//			// 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
+//			List<GoodsFile> oldFiles = goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
+//			List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
+//
+//			// 过滤相同文件列表
+//			for (GoodsFile ngf : entity.getGoods().getFiles()) {
+//				for (GoodsFile gf : oldFiles) {
+//					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+//						existFiles.add(gf);
+//						oldFiles.remove(gf);
+//						break;
+//					}
+//				}
+//			}
+//			// 挑出新增文件列表
+//			for (GoodsFile gf : existFiles) {
+//				for (GoodsFile ngf : entity.getGoods().getFiles()) {
+//					if (ngf.getGoodsId().equals(gf.getGoodsId()) && ngf.getPath().equals(gf.getPath())) {
+//						entity.getGoods().getFiles().remove(ngf);
+//						break;
+//					}
+//				}
+//			}
+//
+//			if (entity.getGoods().getFiles().size() > 0) {
+//				goodsItemMapper.insertFiles(entity.getGoods().getFiles());
+//			}
+//			if (oldFiles.size() > 0) {
+//				goodsItemMapper.deleteListFiles(oldFiles);
+//			}
+//		} else {
+//			// 商品编辑时，如果没有传图片信息，则删除表中记录
+//			goodsItemMapper.deleteAllFiles(entity.getGoods());
+//		}
 		//设定商品的标签权重
 		Integer tmpGoodsTagRatio = 0;
 		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
