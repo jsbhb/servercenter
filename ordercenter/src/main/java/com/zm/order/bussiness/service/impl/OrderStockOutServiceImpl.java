@@ -328,10 +328,23 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			}
 			
 			Integer tmpQty = 0;
+			Map<String,Object> stockInMap = new HashMap<String,Object>();
+			List<StockInVoucherSku> newStockInList = new ArrayList<StockInVoucherSku>();
 			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
 				tmpQty = tmpQty + sivs.getExpectedQuantity();
-				sivs.setGoodsId(null);
+				if (!stockInMap.containsKey(sivs.getSkuCode())) {
+					stockInMap.put(sivs.getSkuCode(), sivs);
+				} else {
+					StockInVoucherSku tmpSku = (StockInVoucherSku)stockInMap.get(sivs.getSkuCode());
+					tmpSku.setExpectedQuantity(sivs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
+					stockInMap.put(sivs.getSkuCode(), tmpSku);
+				}
 			}
+			for (Map.Entry<String, Object> entry:stockInMap.entrySet()) {
+				StockInVoucherSku tmpSku = (StockInVoucherSku)entry.getValue();
+				newStockInList.add(tmpSku);
+			}
+			goodsInfo.setStockInVoucherSkus(newStockInList);
 			goodsInfo.setExpectedSkuQuantity(tmpQty);
 			
 			ResultModel createResult = thirdPartFeignClient.addStoreSio(Constants.FIRST_VERSION, goodsInfo);
@@ -397,10 +410,23 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			}
 			
 			Integer tmpQty = 0;
+			Map<String,Object> stockOutMap = new HashMap<String,Object>();
+			List<StockOutVoucherSku> newStockOutList = new ArrayList<StockOutVoucherSku>();
 			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
 				tmpQty = tmpQty + sovs.getExpectedQuantity();
-				sovs.setGoodsId(null);
+				if (!stockOutMap.containsKey(sovs.getSkuCode())) {
+					stockOutMap.put(sovs.getSkuCode(), sovs);
+				} else {
+					StockInVoucherSku tmpSku = (StockInVoucherSku)stockOutMap.get(sovs.getSkuCode());
+					tmpSku.setExpectedQuantity(sovs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
+					stockOutMap.put(sovs.getSkuCode(), tmpSku);
+				}
 			}
+			for (Map.Entry<String, Object> entry:stockOutMap.entrySet()) {
+				StockOutVoucherSku tmpSku = (StockOutVoucherSku)entry.getValue();
+				newStockOutList.add(tmpSku);
+			}
+			goodsInfo.setStockOutVoucherSkus(newStockOutList);
 			goodsInfo.setExpectedSkuQuantity(tmpQty);
 			
 			ResultModel createResult = thirdPartFeignClient.addStoreSoo(Constants.FIRST_VERSION, goodsInfo);
