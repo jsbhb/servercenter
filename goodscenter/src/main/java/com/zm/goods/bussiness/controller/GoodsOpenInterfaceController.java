@@ -1,7 +1,14 @@
 package com.zm.goods.bussiness.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URLDecoder;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,5 +72,17 @@ public class GoodsOpenInterfaceController {
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+	
+	@RequestMapping(value = "test", method = RequestMethod.POST)
+	public void test(HttpServletRequest req, HttpServletResponse res) throws Exception{
+		InputStream in = req.getInputStream();
+		BufferedReader br = new BufferedReader(new InputStreamReader(in, "utf-8"));
+		String s;
+		StringBuilder sb = new StringBuilder();
+		while((s = br.readLine()) != null){
+			sb.append(s);
+		}
+		System.out.println(URLDecoder.decode(sb.toString(), "utf-8"));
 	}
 }

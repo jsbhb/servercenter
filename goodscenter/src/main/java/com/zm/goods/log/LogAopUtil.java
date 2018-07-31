@@ -81,7 +81,7 @@ public class LogAopUtil {
 	}
 
 	// 开放接口调用日志
-	@Pointcut("execution(* com.zm.goods.bussiness.service.impl.GoodsOpenInterfaceServiceImpl.*(..))")
+	@Pointcut("execution(* com.zm.goods.bussiness.service.impl.GoodsOpenInterfaceServiceImpl.get*(..))")
 	public void openInfPointCut() {
 	}
 
