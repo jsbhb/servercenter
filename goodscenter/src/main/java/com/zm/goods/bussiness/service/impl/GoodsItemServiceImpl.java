@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.goods.bussiness.component.ThreadPoolComponent;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
@@ -55,6 +56,9 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	
 	@Resource
 	GoodsTagMapper goodsTagMapper;
+	
+	@Resource
+	ThreadPoolComponent threadPoolComponent;
 
 	@Override
 	public Page<GoodsItemEntity> queryByPage(GoodsItemEntity entity) {
@@ -119,12 +123,18 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	public void notBeFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.NOTFX.getIndex()+"");
 		goodsItemMapper.updateIsFXStatus(entity);
+		List<String> itemIdList = new ArrayList<String>();
+		itemIdList.add(entity.getItemId());
+		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 
 	@Override
 	public void beFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.FX.getIndex()+"");
 		goodsItemMapper.updateIsFXStatus(entity);
+		List<String> itemIdList = new ArrayList<String>();
+		itemIdList.add(entity.getItemId());
+		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
 	@Override
@@ -229,6 +239,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
+		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
 	@Override
@@ -237,6 +248,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemNotBeFxForBatch(itemIdList);
+		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 
 	@Override

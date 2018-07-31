@@ -85,9 +85,20 @@ public class Grade extends Pagination{
 	
 	private Integer init;
 	
+	private Integer type;//客户类型 1：普通客户，2：对接客户
+	
+	private String appKey;
+	
+	private String appSecret;
+	
 	public boolean check(){
 		if(Constants.AREA_CENTER.equals(gradeType)){
-			if(redirectUrl == null || mobileUrl == null){
+//			if(redirectUrl == null || mobileUrl == null){
+//				return false;
+//			}
+		}
+		if(Constants.BUTT_JOINT_USER.equals(type)){
+			if(redirectUrl == null || appKey == null || appSecret == null){
 				return false;
 			}
 		}
@@ -96,6 +107,30 @@ public class Grade extends Pagination{
 	
 	public Grade(){
 		super();
+	}
+	
+	public String getAppKey() {
+		return appKey;
+	}
+
+	public void setAppKey(String appKey) {
+		this.appKey = appKey;
+	}
+
+	public String getAppSecret() {
+		return appSecret;
+	}
+
+	public void setAppSecret(String appSecret) {
+		this.appSecret = appSecret;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	public Integer getInit() {

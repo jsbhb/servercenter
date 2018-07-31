@@ -38,4 +38,12 @@ public class UserFeignController {
 		}
 		return null;
 	}
+	
+	@RequestMapping(value = "{version}/user/feign/grade/buttjoint", method = RequestMethod.GET)
+	public boolean initButtjoint(@PathVariable("version") Double version){
+		if(Constants.FIRST_VERSION.equals(version)){
+			return userFeignService.initButtjoint();
+		}
+		return false;
+	}
 }

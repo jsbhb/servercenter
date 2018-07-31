@@ -51,4 +51,9 @@ public class Constants {
 	
 	//*********************分级类型**************************
 	public static final Integer AREA_CENTER = 2;//区域中心
+	
+	//************************客户类型**************//
+	public static final Integer BUTT_JOINT_USER = 2;//对接用户
+	
+	public static final String BUTT_JOINT_USER_PREFIX = "buttjoint:";//对接用户
 }

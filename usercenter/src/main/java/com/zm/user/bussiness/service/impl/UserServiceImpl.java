@@ -32,8 +32,10 @@ import com.zm.user.pojo.VipPrice;
 import com.zm.user.pojo.WeiXinPayConfig;
 import com.zm.user.pojo.bo.GradeBO;
 import com.zm.user.utils.CommonUtils;
+import com.zm.user.utils.ConvertUtil;
 import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
+import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
@@ -58,12 +60,15 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	UserComponent userComponent;
-	
+
 	@Resource
 	GradeMapper<Grade> gradeMapper;
 
 	@Resource
-	RedisTemplate<String, String> redisTemplate;
+	RedisTemplate<String, String> redisTemplate;// 反序列化采用的是默认的，最初使用时微信信息都采用这种模式，所以遗留下来
+
+	@Resource
+	RedisTemplate<String, String> template;// 反序列化用的是stringSerializer，后期代码都采用该方法
 
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -324,23 +329,25 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResultModel saveGrade(Grade grade) {
-		
+
 		Map<String, Object> result = new HashMap<String, Object>();
-//		if(!grade.check()){
-//			return new ResultModel (false, "", "分级为区域中心的请填写域名地址,域名请联系技术部");
-//		}
-		userMapper.saveGrade(grade);//保存完后需要主键ID
+		if (!grade.check()) {
+			return new ResultModel(false, "", "对接用户请填写appKey、appSecret和对应网址");
+		}
+		userMapper.saveGrade(grade);// 保存完后需要主键ID
 		// 前端创建文件夹
-//		if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
-//			
-//			CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
-//					grade.getMobileUrl());
-//			ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-//					PublishType.REGION_CREATE);
-//			if (temp.isSuccess()) {
-//				gradeMapper.updateGradeInit(grade.getId());
-//			}
-//		} 
+		// if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
+		//
+		// CreateAreaCenterSEO createAreaCenterSEO = new
+		// CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
+		// grade.getMobileUrl());
+		// ResultModel temp =
+		// PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
+		// PublishType.REGION_CREATE);
+		// if (temp.isSuccess()) {
+		// gradeMapper.updateGradeInit(grade.getId());
+		// }
+		// }
 
 		UserInfo user = new UserInfo();
 
@@ -366,6 +373,9 @@ public class UserServiceImpl implements UserService {
 
 		grade.setPersonInChargeId(userId);
 
+		if (grade.getAppKey() != null && !"".equals(grade.getAppKey())) {
+			grade.setAppKey(grade.getAppKey() + "_" + grade.getId());
+		}
 		userMapper.updatePersonInChargeId(grade);
 
 		// 添加注册信息存储
@@ -377,6 +387,10 @@ public class UserServiceImpl implements UserService {
 		gradeBO.setGradeType(grade.getGradeType());
 
 		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
+		if (Constants.BUTT_JOINT_USER.equals(grade.getType())) {
+			template.opsForSet().add(Constants.BUTT_JOINT_USER_PREFIX,
+					JSONUtil.toJson(ConvertUtil.converToButtjoinUserBO(grade)));
+		}
 		return new ResultModel(true, result);
 	}
 

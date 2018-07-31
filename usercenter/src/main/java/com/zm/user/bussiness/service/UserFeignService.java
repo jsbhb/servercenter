@@ -9,4 +9,6 @@ public interface UserFeignService {
 	List<GradeBO> listGradeBO();
 
 	List<Integer> listChildrenGrade(Integer gradeId);
+
+	boolean initButtjoint();
 }

@@ -1,17 +1,15 @@
 package com.zm.order.component;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
-import com.zm.order.constants.Constants;
 import com.zm.order.pojo.bo.GradeBO;
-import com.zm.order.pojo.bo.IntradayOrderBO;
-import com.zm.order.utils.CalculationUtils;
 
 public class CacheComponent {
 
-	private ConcurrentSkipListSet<GradeBO> gradeSet = new ConcurrentSkipListSet<GradeBO>();
+	private Set<GradeBO> gradeSet = new HashSet<GradeBO>();
+	private TreeSet<GradeBO> treeSet = new TreeSet<GradeBO>();
 
 //	private Map<String, IntradayOrderBO> statisticsOrderCacheMap = new ConcurrentHashMap<String, IntradayOrderBO>();
 //	private Map<String, Double> statisticsSalesCacheMap = new ConcurrentHashMap<String, Double>();
@@ -113,10 +111,15 @@ public class CacheComponent {
 	// end
 
 	public void addGrade(GradeBO grade) {
+		if(gradeSet.contains(grade)){
+			gradeSet.remove(grade);
+		}
 		gradeSet.add(grade);
+		treeSet.clear();
+		treeSet.addAll(gradeSet);
 	}
 
-	public ConcurrentSkipListSet<GradeBO> getSet() {
-		return gradeSet;
+	public Set<GradeBO> getSet() {
+		return treeSet;
 	}
 }

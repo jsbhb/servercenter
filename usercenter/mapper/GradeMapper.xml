@@ -17,6 +17,9 @@
 		<result column="grade_person_in_charge" property="gradePersonInCharge"
 			jdbcType="INTEGER" />
 		<result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
+		<result column="appKey" property="appKey" jdbcType="VARCHAR" />
+		<result column="appSecret" property="appSecret" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
 		<result column="mobile_url" property="mobileUrl" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -60,7 +63,7 @@
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
 	</resultMap>
-
+	
 	<update id="update" parameterType="Object">
 		update grade set update_time = now()
 		<if test="gradeName!=null and gradeName!=''">
@@ -241,5 +244,9 @@
 	
 	<select id="updateGradeInit" parameterType="Object">
 		update grade set init = 1 where id = #{id}
+	</select>
+	
+	<select id="listButtjointGrade" parameterType="Object">
+		select appKey,appSecret,redirect_url from grade where type = 2
 	</select>
 </mapper>

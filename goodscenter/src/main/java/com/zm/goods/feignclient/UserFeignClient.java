@@ -15,4 +15,8 @@ public interface UserFeignClient {
 	
 	@RequestMapping(value = "{version}/grade-url/{centerId}", method = RequestMethod.GET)
 	public String getClientUrl(@PathVariable("centerId")Integer centerId, @PathVariable("version")Double version);
+	
+	@RequestMapping(value = "{version}/user/feign/grade/buttjoint", method = RequestMethod.GET)
+	public boolean initButtjoint(@PathVariable("version")Double version);
+	
 }

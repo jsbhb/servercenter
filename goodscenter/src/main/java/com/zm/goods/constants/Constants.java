@@ -54,4 +54,7 @@ public class Constants {
 	public static final Integer OPERATION_TYPE_INVENTORY_PROFIT = 301;
 	public static final Integer OPERATION_TYPE_INVENTORY_LOSSES = 302;
 	
+	//************************redis前缀********************************//
+	public static final String BUTT_JOINT_USER_PREFIX = "buttjoint:";//对接用户
+	
 }

@@ -9,9 +9,11 @@ package com.zm.user.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +27,18 @@ import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.enummodel.BackManagerErrorEnum;
 import com.zm.user.enummodel.PublishType;
+import com.zm.user.feignclient.OrderFeignClient;
 import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
+import com.zm.user.pojo.bo.ButtjointUserBO;
 import com.zm.user.pojo.bo.CreateAreaCenterSEO;
+import com.zm.user.pojo.bo.GradeBO;
 import com.zm.user.pojo.dto.GradeTypeDTO;
 import com.zm.user.pojo.po.GradeTypePO;
 import com.zm.user.seo.publish.PublishComponent;
+import com.zm.user.utils.ConvertUtil;
 import com.zm.user.utils.JSONUtil;
 import com.zm.user.utils.TreePackUtil;
 
@@ -51,9 +57,15 @@ public class GradeServiceImpl implements GradeService {
 
 	@Resource
 	GradeMapper<Grade> gradeMapper;
-	
+
 	@Resource
 	UserComponent userComponent;
+
+	@Resource
+	RedisTemplate<String, String> template;
+	
+	@Resource
+	OrderFeignClient orderFeignClient;
 
 	@Override
 	public Page<Grade> queryForPagination(Grade grade) {
@@ -68,8 +80,31 @@ public class GradeServiceImpl implements GradeService {
 
 	@Override
 	public void update(Grade entity) {
+		Grade grade = gradeMapper.selectById(entity.getId());
 		gradeMapper.update(entity);
 		gradeMapper.updateGradeData(entity);
+		if (Constants.BUTT_JOINT_USER.equals(entity.getType())
+				&& !grade.getRedirectUrl().equals(entity.getRedirectUrl())) {
+			Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
+			ButtjointUserBO bo = null;
+			for (String str : set) {
+				bo = JSONUtil.parse(str, ButtjointUserBO.class);
+				if (bo.getAppKey().equals(entity.getAppKey()) && bo.getAppSecret().equals(entity.getAppSecret())) {
+					template.opsForSet().remove(Constants.BUTT_JOINT_USER_PREFIX, JSONUtil.toJson(bo));// 删除原来的
+					template.opsForSet().add(Constants.BUTT_JOINT_USER_PREFIX,
+							JSONUtil.toJson(ConvertUtil.converToButtjoinUserBO(entity)));
+				}
+			}
+		}
+		if(!grade.getGradeType().equals(entity.getGradeType())){
+			// 通知订单中心新增grade
+			GradeBO gradeBO = new GradeBO();
+			gradeBO.setId(grade.getId());
+			gradeBO.setParentId(grade.getParentId());
+			gradeBO.setGradeType(entity.getGradeType());
+
+			orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
+		}
 	}
 
 	@Override
@@ -90,14 +125,14 @@ public class GradeServiceImpl implements GradeService {
 	@Override
 	public ResultModel fuzzySearch(FuzzySearchGrade entity) {
 		List<FuzzySearchGrade> list = gradeMapper.fuzzyListGrade(entity);
-//		if(list != null && list.size() > 0){
-//			Grade grade = null;
-//			for(FuzzySearchGrade temp : list){
-//				grade = userComponent.getUrl(temp.getId());
-//				temp.setUrl(grade.getRedirectUrl());
-//				temp.setMobileUrl(grade.getMobileUrl());
-//			}
-//		}
+		// if(list != null && list.size() > 0){
+		// Grade grade = null;
+		// for(FuzzySearchGrade temp : list){
+		// grade = userComponent.getUrl(temp.getId());
+		// temp.setUrl(grade.getRedirectUrl());
+		// temp.setMobileUrl(grade.getMobileUrl());
+		// }
+		// }
 		return new ResultModel(true, list);
 	}
 
@@ -125,7 +160,7 @@ public class GradeServiceImpl implements GradeService {
 
 		String parentIdStr = gradeMapper.listGradeTypeChildren(id);
 		List<Integer> list = new ArrayList<Integer>();
-		if(parentIdStr == null){
+		if (parentIdStr == null) {
 			return new ResultModel(true, null);
 		}
 		String[] parentIdArr = parentIdStr.split(",");
@@ -171,26 +206,23 @@ public class GradeServiceImpl implements GradeService {
 		return new ResultModel(true, dto);
 	}
 
-	
-	
 	@Override
 	public ResultModel initAreaCenter(Integer id) {
 		Grade grade = gradeMapper.getGradeForInitAreaCenterById(id);
-		if(!Constants.AREA_CENTER.equals(grade.getGradeType())){
+		if (!Constants.AREA_CENTER.equals(grade.getGradeType())) {
 			return new ResultModel(false, "", "区域中心才能初始化域名");
 		}
-		if(grade.getRedirectUrl() == null || grade.getMobileUrl() == null){
-			return new ResultModel (false, "", "请填写域名");
+		if (grade.getRedirectUrl() == null || grade.getMobileUrl() == null) {
+			return new ResultModel(false, "", "请填写域名");
 		}
 		CreateAreaCenterSEO createAreaCenterSEO = new CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
 				grade.getMobileUrl());
-		ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-				PublishType.REGION_CREATE);
+		ResultModel temp = PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO), PublishType.REGION_CREATE);
 		if (!temp.isSuccess()) {
-			return new ResultModel (false, "", temp.getErrorMsg());
+			return new ResultModel(false, "", temp.getErrorMsg());
 		}
 		gradeMapper.updateGradeInit(id);
-		return new ResultModel (true, null);
+		return new ResultModel(true, null);
 	}
 
 }

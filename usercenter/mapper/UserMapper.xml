@@ -367,9 +367,9 @@
 
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
-		create_time,opt,company,redirect_url,mobile_url)
+		create_time,opt,redirect_url,mobile_url,type,appKey,appSecret)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company},#{redirectUrl},#{mobileUrl})
+		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{redirectUrl},#{mobileUrl},#{type},#{appKey},#{appSecret})
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
@@ -377,7 +377,11 @@
 	</select>
 	
 	<update id="updatePersonInChargeId" parameterType="Object">
-		update grade set person_in_charge_id = #{personInChargeId} where id = #{id} 
+		update grade set person_in_charge_id = #{personInChargeId}
+		<if test="appKey != null and appKey != ''">
+		, appKey = #{appKey}
+		</if> 
+		where id = #{id} 
 	</update>
 	
 	<select id="getUserIdentityId" parameterType="Object" resultMap="userInfo">

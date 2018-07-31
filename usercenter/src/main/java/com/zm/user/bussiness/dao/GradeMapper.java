@@ -145,5 +145,7 @@ public interface GradeMapper<T> {
 	Grade getGradeForInitAreaCenterById(Integer id);
 	
 	void updateGradeInit(Integer id);
+	
+	List<Grade> listButtjointGrade();
 
 }

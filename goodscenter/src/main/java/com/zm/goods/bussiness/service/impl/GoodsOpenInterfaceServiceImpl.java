@@ -1,19 +1,30 @@
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.zm.goods.bussiness.dao.GoodsOpenInterfaceMapper;
 import com.zm.goods.bussiness.service.GoodsOpenInterfaceService;
+import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.feignclient.UserFeignClient;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsDetail;
 import com.zm.goods.pojo.GoodsStock;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.bo.ButtjointUserBO;
+import com.zm.goods.utils.HttpClientUtil;
 import com.zm.goods.utils.JSONUtil;
 
 @Service
@@ -21,6 +32,12 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 
 	@Resource
 	GoodsOpenInterfaceMapper goodsOpenInterfaceMapper;
+	
+	@Resource
+	UserFeignClient userFeignClient;
+	
+	@Resource
+	RedisTemplate<String, String> template;
 	
 	private final int MAX_SIZE = 100;
 
@@ -157,6 +174,90 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		for(GoodsDetail detail : list){
 			detail.infoFilter();
 		}
+	}
+
+	@Override
+	public void sendGoodsInfo(List<String> itemIdList) {
+		Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
+		List<GoodsDetail> list = goodsOpenInterfaceMapper.listGoodsDetail(itemIdList.toArray(new String[itemIdList.size()]));
+		if(set != null && set.size() > 0 && list != null && list.size() > 0){
+			String nonceStr = System.currentTimeMillis()+"";
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put(METHOD, GOODS_UP_SHELVES);
+			param.put(NONCESTR, nonceStr);
+			param.put(VERSION, 1.0);
+			param.put(DATA, JSONUtil.toJson(list));
+			ButtjointUserBO bo = null;
+			for(String str : set){
+				bo = JSONUtil.parse(str, ButtjointUserBO.class);
+				LogUtil.writeLog("下发上架信息："+bo.getAppKey());
+				if(bo.getUrl() == null || "".equals(bo.getUrl())){
+					continue;
+				}
+				param.put(APP_KEY, bo.getAppKey());
+				param.put(APP_SECRET, bo.getAppSecret());
+				param.put(SIGN, sign(param));
+				param.remove(APP_SECRET);
+				HttpClientUtil.post(bo.getUrl(), param);
+			}
+		} 
+	}
+
+	@Override
+	public void sendGoodsDownShelves(List<String> itemIdList) {
+		Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
+		if(set != null && set.size() > 0){
+			String nonceStr = System.currentTimeMillis()+"";
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put(METHOD, GOODS_DOWN_SHELVES);
+			param.put(NONCESTR, nonceStr);
+			param.put(VERSION, 1.0);
+			param.put(DATA, JSONUtil.toJson(itemIdList));
+			ButtjointUserBO bo = null;
+			for(String str : set){
+				bo = JSONUtil.parse(str, ButtjointUserBO.class);
+				LogUtil.writeLog("下发下架信息："+bo.getAppKey());
+				if(bo.getUrl() == null || "".equals(bo.getUrl())){
+					continue;
+				}
+				param.put(APP_KEY, bo.getAppKey());
+				param.put(APP_SECRET, bo.getAppSecret());
+				param.put(SIGN, sign(param));
+				param.remove(APP_SECRET);
+				HttpClientUtil.post(bo.getUrl(), param);
+			}
+		} 
+	}
+	private final String GOODS_UP_SHELVES = "upShelves";
+	private final String GOODS_DOWN_SHELVES = "downShelves";
+	private final String METHOD = "method";
+	private final String APP_SECRET = "appSecret";
+	private final String APP_KEY = "appKey";
+	private final String SIGN = "sign";
+	private final String DATA = "data";
+	private final String VERSION = "version";
+	private final String NONCESTR = "nonceStr";
+	
+	private String sign(Map<String, Object> param) {
+		String s = sort(param);
+		String str = s.substring(0, s.length() - 1);
+		return DigestUtils.md5Hex(str);
+	}
+
+	private String sort(Map<String, Object> params) {
+		if (params == null) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		List<String> keyList = new ArrayList<String>(params.keySet());
+		Collections.sort(keyList);
+		for (String s : keyList) {
+			if (!"sign".equalsIgnoreCase(s) && !"sign_type".equalsIgnoreCase(s)
+					&& !StringUtils.isEmpty(params.get(s))) {
+				sb.append(s + "=" + String.valueOf(params.get(s)) + "&");
+			}
+		}
+		return sb.toString();
 	}
 
 }

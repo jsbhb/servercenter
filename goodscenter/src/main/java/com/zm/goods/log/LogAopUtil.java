@@ -108,7 +108,9 @@ public class LogAopUtil {
 		
 		Integer centerId = -1;
 		try {
-			centerId = Integer.valueOf(appKey.split("_")[1]);
+			if(appKey != null && !"".equals(appKey)){
+				centerId = Integer.valueOf(appKey.split("_")[1]);
+			}
 		} catch (Exception e) {
 			logger.error("appKey参数有误=" + appKey, e);
 		}
