@@ -7,6 +7,8 @@ public class StockOutVoucherSku {
 	private String memo;
 	
 	private String skuCode;
+	
+	private String goodsId;
 
 	public String getSkuCode() {
 		return skuCode;
@@ -32,4 +34,11 @@ public class StockOutVoucherSku {
 		this.memo = memo;
 	}
 
+	public String getGoodsId() {
+		return goodsId;
+	}
+
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
+	}
 }

@@ -10,6 +10,8 @@ public class StockInVoucherSku {
 
 	private String memo;
 
+	private String goodsId;
+
 	public String getSkuCode() {
 		return skuCode;
 	}
@@ -40,5 +42,13 @@ public class StockInVoucherSku {
 
 	public void setMemo(String memo) {
 		this.memo = memo;
+	}
+
+	public String getGoodsId() {
+		return goodsId;
+	}
+
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
 	}
 }

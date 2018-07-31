@@ -131,6 +131,7 @@
 			<result column="item_quantity" property="expectedQuantity" jdbcType="INTEGER" />
 			<result column="actual_price" property="price" jdbcType="VARCHAR" />
 			<result column="remark" property="memo" jdbcType="VARCHAR" />
+			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		</collection>
 	</resultMap>
 	
@@ -145,6 +146,7 @@
 			<id column="item_id" property="skuCode" jdbcType="VARCHAR" />
 			<result column="item_quantity" property="expectedQuantity" jdbcType="INTEGER" />
 			<result column="remark" property="memo" jdbcType="VARCHAR" />
+			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		</collection>
 	</resultMap>
 
@@ -350,7 +352,7 @@
 	
 	<select id="selectStockInByOrderIdForMJY" parameterType="Object" resultMap="stockInOrderInfoForMJY">
 		select o.order_id,o.grade_id,o.tdq,ifnull(o.remark,'') memo,og.item_id,
-		og.item_quantity,og.actual_price,ifnull(og.remark,'') remark
+		og.item_quantity,og.actual_price,ifnull(og.remark,'') remark,ifnull(og.goods_id,'') goods_id
 		from order_base o
 		left join order_goods og on o.order_id = og.order_id 
         where o.order_id = #{orderId}
@@ -358,7 +360,7 @@
 	
 	<select id="selectStockOutByOrderIdForMJY" parameterType="Object" resultMap="stockOutOrderInfoForMJY">
 		select o.order_id,o.grade_id,o.tdq,ifnull(o.remark,'') memo,og.item_id,
-		og.item_quantity,ifnull(og.remark,'') remark
+		og.item_quantity,ifnull(og.remark,'') remark,ifnull(og.goods_id,'') goods_id
 		from order_base o
 		left join order_goods og on o.order_id = og.order_id 
         where o.order_id = #{orderId}

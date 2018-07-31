@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.feignclient.model.OrderBussinessModel;
+import com.zm.order.pojo.GoodsItemEntity;
 import com.zm.order.pojo.OrderInfoDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.bo.GoodsItemBO;
@@ -67,11 +68,15 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/createPurchaseInfoForEshop", method = RequestMethod.POST)
 	public ResultModel createPurchaseInfo(@PathVariable("version") Double version, @RequestBody OrderInfoDTO info);
 
-	@RequestMapping(value = "{version}}/goods/checkSellOrderGoodsStockForEshop", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/checkSellOrderGoodsStockForEshop", method = RequestMethod.POST)
 	public ResultModel checkSellOrderGoodsStockForEshop(@PathVariable("version") Double version,
 			@RequestBody OrderInfoDTO info);
 
-	@RequestMapping(value = "{version}}/goods/createSellOrderGoodsInfoForEshop", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/createSellOrderGoodsInfoForEshop", method = RequestMethod.POST)
 	public ResultModel createSellOrderGoodsInfoForEshop(@PathVariable("version") Double version,
 			@RequestBody OrderInfoDTO info);
+
+	@RequestMapping(value = "{version}/goods/queryGoodsItemInfoByGoodsIdForEshop", method = RequestMethod.POST)
+	public List<GoodsItemEntity> queryGoodsItemInfoByGoodsIdForEshop(@PathVariable("version") Double version,
+			@RequestBody List<String> goodsIds);
 }
