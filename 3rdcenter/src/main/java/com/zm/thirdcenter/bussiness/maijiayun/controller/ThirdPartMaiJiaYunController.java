@@ -78,7 +78,8 @@ public class ThirdPartMaiJiaYunController {
 				JSONObject jobj = JSONObject.fromObject(httpResult);
 				THIRDLOG.info("转换JSON：" + "=====" + jobj);
 				if (jobj != null) {
-					result.setErrorMsg(jobj.getString("resolveMsg"));
+//					result.setErrorMsg(jobj.getString("resolveMsg"));
+					result.setErrorMsg(jobj.getString("errorMsg"));
 					result.setSuccess(jobj.getBoolean("isOk"));
 					result.setErrorCode(jobj.getString("errorCode"));
 					return result;
