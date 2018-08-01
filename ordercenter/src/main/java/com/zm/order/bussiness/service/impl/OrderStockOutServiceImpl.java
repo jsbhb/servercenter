@@ -43,6 +43,7 @@ import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
 import com.zm.order.utils.CalculationUtils;
+import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 
@@ -285,6 +286,9 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public ResultModel getStockInGoodsInfoByOrderId(String orderId) {
 		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockInByOrderIdForMJY(orderId);
 		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockInVoucherSkus().size()) {
+			//获取业务流水号：MJYSTOCKIN+时间+4位随机数
+			goodsInfo.setCode(CommonUtils.getMJYStockInOrderId());
+			
 			//将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
 			List<String> goodsIds = new ArrayList<String>();
 			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
@@ -368,6 +372,9 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public ResultModel getStockOutGoodsInfoByOrderId(String orderId) {
 		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockOutByOrderIdForMJY(orderId);
 		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockOutVoucherSkus().size()) {
+			//获取业务流水号：MJYSTOCKOUT+时间+4位随机数
+			goodsInfo.setCode(CommonUtils.getMJYStockOutOrderId());
+			
 			//将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
 			List<String> goodsIds = new ArrayList<String>();
 			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
