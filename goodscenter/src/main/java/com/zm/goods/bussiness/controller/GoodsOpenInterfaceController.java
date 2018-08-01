@@ -84,6 +84,5 @@ public class GoodsOpenInterfaceController {
 			sb.append(s);
 		}
 		System.out.println(URLDecoder.decode(sb.toString(), "utf-8"));
-		System.out.println(req.getParameter("version"));
 	}
 }

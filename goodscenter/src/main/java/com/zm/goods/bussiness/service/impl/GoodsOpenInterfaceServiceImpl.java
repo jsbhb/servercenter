@@ -181,6 +181,8 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
 		List<GoodsDetail> list = goodsOpenInterfaceMapper.listGoodsDetail(itemIdList.toArray(new String[itemIdList.size()]));
 		if(set != null && set.size() > 0 && list != null && list.size() > 0){
+			//规格信息格式化
+			infoFormat(list);
 			String nonceStr = System.currentTimeMillis()+"";
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put(METHOD, GOODS_UP_SHELVES);
