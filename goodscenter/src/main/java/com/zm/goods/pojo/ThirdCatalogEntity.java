@@ -28,6 +28,7 @@ public class ThirdCatalogEntity {
 	private Integer sort;
 	private Integer status;
 	private String accessPath;
+	private Integer isPopular;
 	
 	public ThirdCatalogEntity() {
 
@@ -113,4 +114,11 @@ public class ThirdCatalogEntity {
 		this.accessPath = accessPath;
 	}
 
+	public Integer getIsPopular() {
+		return isPopular;
+	}
+
+	public void setIsPopular(Integer isPopular) {
+		this.isPopular = isPopular;
+	}
 }

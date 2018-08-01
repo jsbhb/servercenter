@@ -9,6 +9,8 @@
 		<result column="name" property="name" jdbcType="VARCHAR"/>
 		<result column="sort" property="sort" jdbcType="INTEGER"/>
 		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="tag_path" property="tagPath" jdbcType="VARCHAR"/>
+		<result column="access_path" property="accessPath" jdbcType="VARCHAR"/>
 		<collection property="seconds"
 			ofType="com.zm.goods.pojo.SecondCatalogEntity">
 			<id column="secondId" property="id" jdbcType="INTEGER"/>
@@ -17,6 +19,7 @@
 			<result column="secondName" property="name" jdbcType="VARCHAR"/>
 			<result column="ssort" property="sort" jdbcType="INTEGER"/>
 			<result column="sstatus" property="status" jdbcType="INTEGER"/>
+			<result column="saccess_path" property="accessPath" jdbcType="VARCHAR"/>
 			<collection property="thirds"
 				ofType="com.zm.goods.pojo.ThirdCatalogEntity">
 				<id column="thirdId" property="id" jdbcType="INTEGER"/>
@@ -25,6 +28,8 @@
 				<result column="thirdName" property="name" jdbcType="VARCHAR"/>
 				<result column="tsort" property="sort" jdbcType="INTEGER"/>
 				<result column="tstatus" property="status" jdbcType="INTEGER"/>
+				<result column="taccess_path" property="accessPath" jdbcType="VARCHAR"/>
+				<result column="is_popular" property="isPopular" jdbcType="INTEGER"/>
 			</collection>
 		</collection>
 	</resultMap>
@@ -68,11 +73,13 @@
 
 	<select id="selectAll" resultMap="entity">
 		select
-		f.id,f.first_id,f.name,f.sort,f.status,s.id as secondId,s.second_id,s.name as secondName,
-		s.sort as ssort,s.status as sstatus,t.id as thirdId,t.third_id,t.name as thirdName,t.sort as tsort,t.status as tstatus  
+		f.id,f.first_id,f.name,f.sort,f.status,f.tag_path,f.access_path,
+		s.id as secondId,s.second_id,s.name as secondName,s.sort as ssort,s.status as sstatus,s.access_path as saccess_path,
+		t.id as thirdId,t.third_id,t.name as thirdName,t.sort as tsort,t.status as tstatus,t.access_path as taccess_path,t.is_popular  
 		from goods_first_category f
 		left join goods_second_category s on f.first_id = s.first_id
-		left join goods_third_category t on t.second_id = s.second_id;
+		left join goods_third_category t on t.second_id = s.second_id
+		order by sort,first_id,ssort,second_id,tsort,is_popular,third_id
 	</select>
 	
 	<insert id="insertFristCatalog" parameterType="Object">

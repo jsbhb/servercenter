@@ -29,6 +29,7 @@ public class FirstCatalogEntity {
 	private Integer status;
 	private List<SecondCatalogEntity> seconds;
 	private String accessPath;
+	private String tagPath;
 
 	public FirstCatalogEntity() {
 
@@ -112,6 +113,14 @@ public class FirstCatalogEntity {
 
 	public void setAccessPath(String accessPath) {
 		this.accessPath = accessPath;
+	}
+
+	public String getTagPath() {
+		return tagPath;
+	}
+
+	public void setTagPath(String tagPath) {
+		this.tagPath = tagPath;
 	}
 
 }
