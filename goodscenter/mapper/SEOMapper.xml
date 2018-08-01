@@ -90,7 +90,7 @@
 				<result column="price" property="price"  />
 				<result column="tag_path" property="tagPath" jdbcType="VARCHAR" />
 				<result column="cdescription" property="description" jdbcType="VARCHAR" />
-				<result column="hot" property="hot" jdbcType="INTEGER" />
+				<result column="goods_type" property="goodsType" jdbcType="INTEGER" />
 				<result column="popular" property="popular" jdbcType="INTEGER" />
 				<result column="free_post" property="freePost" jdbcType="INTEGER" />
 				<result column="free_tax" property="freeTax" jdbcType="INTEGER" />
@@ -150,7 +150,7 @@
 		select p.id,p.name,p.type,p.status,p.client,p.grade_id,p.path,p.page,p.file,p.description,
 		cp.id as cpid,cp.key,cp.sort,cd.tag_path,cd.enname,c.area,
 		cd.id as cdid,cd.picPath,cd.origin,cd.goods_id,cd.sort as csort,cd.title,cd.specs,cd.href,cd.price,
-		cd.description as cdescription,cd.hot,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
+		cd.description as cdescription,cd.goods_type,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
 		left join component_page cp on p.id = cp.page_id left join component_data cd on cp.id = cd.cp_id left join 
 		component c on cp.key = c.key where p.id = #{id} order by cp.sort,cd.type,cd.sort
 	</select>
@@ -159,7 +159,7 @@
 		select p.id,p.name,p.type,p.status,p.client,p.grade_id,p.path,p.page,p.file,p.description,
 		cp.id as cpid,cp.key,cp.sort,cd.tag_path,cd.enname,c.area,
 		cd.id as cdid,cd.picPath,cd.origin,cd.goods_id,cd.sort as csort,cd.title,cd.specs,cd.href,cd.price,
-		cd.description as cdescription,cd.hot,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
+		cd.description as cdescription,cd.goods_type,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
 		left join component_page cp on p.id = cp.page_id left join component_data cd on cp.id = cd.cp_id left join 
 		component c on cp.key = c.key where p.status = 2 and p.type = 3 order by cp.sort,cd.type,cd.sort
 	</select>

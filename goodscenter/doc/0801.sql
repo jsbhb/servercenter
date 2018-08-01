@@ -1,0 +1,1 @@
+alter table component_data change hot goods_type tinyint;

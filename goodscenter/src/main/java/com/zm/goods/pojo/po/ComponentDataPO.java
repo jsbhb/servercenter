@@ -17,7 +17,7 @@ public class ComponentDataPO {
 	private String origin;
 	private Double price;
 	private String specs;
-	private Integer hot;
+	private Integer goodsType;
 	private Integer freePost;
 	private Integer freeTax;
 	private Integer promotion;
@@ -28,7 +28,6 @@ public class ComponentDataPO {
 	public void handleData(){
 		this.id = null;
 		this.sort = null;
-		this.hot = this.hot == 0 ? null : this.hot;
 		this.freePost = this.freePost == 0 ? null : this.freePost;
 		this.freeTax = this.freeTax == 0 ? null : this.freeTax;
 		this.promotion = this.promotion == 0 ? null : this.promotion;
@@ -131,12 +130,12 @@ public class ComponentDataPO {
 		this.specs = specs;
 	}
 
-	public Integer getHot() {
-		return hot;
+	public Integer getGoodsType() {
+		return goodsType;
 	}
 
-	public void setHot(Integer hot) {
-		this.hot = hot;
+	public void setGoodsType(Integer goodsType) {
+		this.goodsType = goodsType;
 	}
 
 	public Integer getFreePost() {
