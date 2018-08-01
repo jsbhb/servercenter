@@ -1,15 +1,11 @@
 package com.zm.goods.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
@@ -17,7 +13,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,21 +130,14 @@ public class HttpClientUtil {
 				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
 		// 创建httppost
 		HttpPost httpPost = new HttpPost(url);
-		// 创建参数队列
-		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		// 绑定到请求 Entry
-		for (Map.Entry<String, Object> entry : params.entrySet()) {
-			formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
-		}
 
-		UrlEncodedFormEntity uefEntity;
 		HttpEntity entity = null;
 		CloseableHttpResponse response = null;
 		try {
-			uefEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-			uefEntity.setContentType("text/plain;charset=utf-8");
-			logger.info("executing request params" + formParams.toString());
-			httpPost.setEntity(uefEntity);
+			StringEntity stringEntity = new StringEntity(JSONUtil.toJson(params), Charsets.UTF_8);
+			stringEntity.setContentType("application/json; charset=UTF-8");
+			logger.info("executing request params" + JSONUtil.toJson(params).toString());
+			httpPost.setEntity(stringEntity);
 			httpPost.setConfig(requestConfig);
 			logger.info("executing request uri：" + httpPost.getURI());
 			response = httpclient.execute(httpPost);
