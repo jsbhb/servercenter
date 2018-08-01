@@ -147,7 +147,7 @@ public class HttpClientUtil {
 		CloseableHttpResponse response = null;
 		try {
 			uefEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-			uefEntity.setContentType("application/json;charset=utf-8");
+			uefEntity.setContentType("text/plain;charset=utf-8");
 			logger.info("executing request params" + formParams.toString());
 			httpPost.setEntity(uefEntity);
 			httpPost.setConfig(requestConfig);
