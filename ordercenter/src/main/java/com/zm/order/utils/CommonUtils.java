@@ -94,5 +94,33 @@ public class CommonUtils {
 		
 		return sb.toString();
 	} 
+	
+	public static String getMJYStockInOrderId(){
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMATE);
+		DecimalFormat df2=(DecimalFormat) DecimalFormat.getInstance();
+		df2.applyPattern(DECIMAL_FORMAT);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("MJYSTOCKIN");
+		sb.append(sdf.format(now));
+		sb.append(df2.format(poll()));
+		
+		return sb.toString();
+	} 
+	
+	public static String getMJYStockOutOrderId(){
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMATE);
+		DecimalFormat df2=(DecimalFormat) DecimalFormat.getInstance();
+		df2.applyPattern(DECIMAL_FORMAT);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("MJYSTOCKOUT");
+		sb.append(sdf.format(now));
+		sb.append(df2.format(poll()));
+		
+		return sb.toString();
+	} 
     
 }
