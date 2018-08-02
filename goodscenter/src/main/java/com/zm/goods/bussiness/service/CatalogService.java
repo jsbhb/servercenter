@@ -143,5 +143,11 @@ public interface CatalogService {
 	 * @since JDK 1.7  
 	 */
 	List<ThirdCatalogEntity> queryThirdAll();
+	
+	void updateFirstByParam(FirstCatalogEntity entity);
+
+	void updateSecondByParam(SecondCatalogEntity entity);
+
+	void updateThirdByParam(ThirdCatalogEntity entity);
 
 }

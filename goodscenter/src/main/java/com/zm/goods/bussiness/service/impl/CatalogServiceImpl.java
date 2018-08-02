@@ -129,4 +129,19 @@ public class CatalogServiceImpl implements CatalogService {
 	public List<ThirdCatalogEntity> queryThirdAll() {
 		return catalogMapper.selectThirdAll();
 	}
+
+	@Override
+	public void updateFirstByParam(FirstCatalogEntity entity) {
+		catalogMapper.updateFirstCatalogByParam(entity);
+	}
+
+	@Override
+	public void updateSecondByParam(SecondCatalogEntity entity) {
+		catalogMapper.updateSecondCatalogByParam(entity);
+	}
+
+	@Override
+	public void updateThirdByParam(ThirdCatalogEntity entity) {
+		catalogMapper.updateThirdCatalogByParam(entity);
+	}
 }

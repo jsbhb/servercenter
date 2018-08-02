@@ -83,18 +83,18 @@
 	</select>
 	
 	<insert id="insertFristCatalog" parameterType="Object">
-		insert into goods_first_category(id,first_id,name,create_time,update_time,opt) 
-		value (#{id},#{firstId},#{name},now(),now(),#{opt});
+		insert into goods_first_category(id,first_id,name,create_time,update_time,opt,sort,status,tag_path,access_path) 
+		value (#{id},#{firstId},#{name},now(),now(),#{opt},#{sort},#{status},#{tagPath},#{accessPath});
 	</insert>
 
 	<insert id="insertSecondCatalog" parameterType="Object">
-		insert into goods_second_category(id,first_id,second_id,name,create_time,update_time,opt) 
-		value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt});
+		insert into goods_second_category(id,first_id,second_id,name,create_time,update_time,opt,sort,status,access_path) 
+		value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt},#{sort},#{status},#{accessPath});
 	</insert>
 	
 	<insert id="insertThirdCatalog" parameterType="Object">
-		insert into goods_third_category(id,second_id,third_id,name,create_time,update_time,opt) 
-		value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt});
+		insert into goods_third_category(id,second_id,third_id,name,create_time,update_time,opt,sort,status,access_path) 
+		value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt},#{sort},#{status},#{accessPath});
 	</insert>
 	
 	<insert id="updateFirstCatalog" parameterType="Object">
@@ -102,8 +102,17 @@
 		<if test="status != null and status != '' or status == 0">
 			status = #{status},
 		</if>
-		<if test="sort != null and sort != '' or status == 0">
+		<if test="sort != null and sort != '' or sort == 0">
 			sort = #{sort},
+		</if>
+		<if test="name != null and name != ''">
+			name = #{name},
+		</if>
+		<if test="accessPath != null and accessPath != ''">
+			access_path = #{accessPath},
+		</if>
+		<if test="tagPath != null and tagPath != ''">
+			tag_path = #{tagPath},
 		</if>
 		update_time = now() where first_id = #{firstId}
 	</insert>
@@ -113,8 +122,14 @@
 		<if test="status != null and status != '' or status == 0">
 			status = #{status},
 		</if>
-		<if test="sort != null and sort != '' or status == 0">
+		<if test="sort != null and sort != '' or sort == 0">
 			sort = #{sort},
+		</if>
+		<if test="name != null and name != ''">
+			name = #{name},
+		</if>
+		<if test="accessPath != null and accessPath != ''">
+			access_path = #{accessPath},
 		</if>
 		update_time = now() where second_id = #{secondId}
 	</insert>
@@ -124,8 +139,14 @@
 		<if test="status != null and status != '' or status == 0">
 			status = #{status},
 		</if>
-		<if test="sort != null and sort != '' or status == 0">
+		<if test="sort != null and sort != '' or sort == 0">
 			sort = #{sort},
+		</if>
+		<if test="name != null and name != ''">
+			name = #{name},
+		</if>
+		<if test="accessPath != null and accessPath != ''">
+			access_path = #{accessPath},
 		</if>
 		update_time = now() where third_id = #{thirdId}
 	</insert>
@@ -152,4 +173,58 @@
 	<select id="selectThirdAll" resultMap="third">
 		select * from goods_third_category
 	</select>
+	
+	<update id="updateFirstCatalogByParam" parameterType="Object">
+		update  goods_first_category set
+		<if test="sort == -1">
+			sort = sort - 1,
+		</if>
+		<if test="sort == 1">
+			sort = sort + 1,
+		</if>
+		<if test="status == 0 or status == 1">
+			status = #{status},
+		</if>
+		update_time = now() where first_id = #{firstId} 
+		<if test="sort == -1">
+			and sort > 0
+		</if>
+	</update>
+
+	<update id="updateSecondCatalogByParam" parameterType="Object">
+		update  goods_second_category set
+		<if test="sort == -1">
+			sort = sort - 1,
+		</if>
+		<if test="sort == 1">
+			sort = sort + 1,
+		</if>
+		<if test="status == 0 or status == 1">
+			status = #{status},
+		</if>
+		update_time = now() where second_id = #{secondId} 
+		<if test="sort == -1">
+			and sort > 0
+		</if>
+	</update>
+	
+	<update id="updateThirdCatalogByParam" parameterType="Object">
+		update  goods_third_category set
+		<if test="sort == -1">
+			sort = sort - 1,
+		</if>
+		<if test="sort == 1">
+			sort = sort + 1,
+		</if>
+		<if test="status == 0 or status == 1">
+			status = #{status},
+		</if>
+		<if test="isPopular == 0 or isPopular == 1">
+			is_popular = #{isPopular},
+		</if>
+		update_time = now() where third_id = #{thirdId} 
+		<if test="sort == -1">
+			and sort > 0
+		</if>
+	</update>
 </mapper>

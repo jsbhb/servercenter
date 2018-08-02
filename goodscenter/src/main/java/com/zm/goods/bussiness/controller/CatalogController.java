@@ -258,4 +258,55 @@ public class CatalogController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+
+	@RequestMapping(value = "{version}/goods/catalog/updateFirstByParam", method = RequestMethod.POST)
+	public ResultModel updateFirstByParam(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody FirstCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				catalogService.updateFirstByParam(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/updateSecondByParam", method = RequestMethod.POST)
+	public ResultModel updateSecondByParam(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody SecondCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				catalogService.updateSecondByParam(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/updateThirdByParam", method = RequestMethod.POST)
+	public ResultModel updateThirdByParam(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody ThirdCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				catalogService.updateThirdByParam(entity);
+				return new ResultModel(true, "");
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 }

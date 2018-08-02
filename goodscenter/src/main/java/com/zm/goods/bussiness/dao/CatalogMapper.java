@@ -163,5 +163,11 @@ public interface CatalogMapper {
 	 * @since JDK 1.7  
 	 */
 	List<ThirdCatalogEntity> selectThirdAll();
+	
+	void updateFirstCatalogByParam(FirstCatalogEntity entity);
+
+	void updateSecondCatalogByParam(SecondCatalogEntity entity);
+
+	void updateThirdCatalogByParam(ThirdCatalogEntity entity);
 
 }
