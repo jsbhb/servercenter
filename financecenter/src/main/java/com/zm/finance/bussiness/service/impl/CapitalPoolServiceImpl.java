@@ -276,8 +276,13 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				capitalPoolMapper.initCapitalPoolRecord(detail);
 			}
 			if (!template.hasKey(key)) {
-				initCapital(detail);//初始化redis数据
+				initCapital(detail);// 初始化redis数据
 			} else {
+				HashOperations<String, String, String> hashOperations = template.opsForHash();
+				Map<String, String> result = hashOperations.entries(key);
+				if (result.get("centerId") == null) {
+					hashOperations.put(key, "centerId", detail.getCenterId() + "");
+				}
 				template.opsForHash().increment(key, "money", detail.getMoney());// 增加余额
 				template.opsForHash().increment(key, "countMoney", detail.getMoney());// 增加累计金额
 			}
