@@ -272,5 +272,7 @@ public interface GoodsBackService {
 	ResultModel saveItemInfo(GoodsInfoEntity entity);
 
 	Page<GoodsEntity> listPublishExceptionGoods(Integer type, GoodsEntity entity, Integer centerId);
+	
+	GoodsEntity queryGoodsInfoByGoodsId(GoodsEntity entity);
 
 }

@@ -40,6 +40,7 @@ public class UserFeignServiceImpl implements UserFeignService {
 				gradeBO.setName(grade.getGradeName());
 				gradeBO.setCompany(grade.getCompany());
 				gradeBO.setGradeTypeName(grade.getGradeTypeName());
+				gradeBO.setType(grade.getType());
 				gradeList.add(gradeBO);
 			}
 		}

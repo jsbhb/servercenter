@@ -493,4 +493,24 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/goods/goods/queryGoodsInfoByGoodsId", method = RequestMethod.POST)
+	public ResultModel queryGoodsInfoByGoodsId(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody GoodsEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				if ("".equals(entity.getGoodsId())) {
+					return new ResultModel(false, "没有商品ID信息");
+				}
+
+				GoodsEntity result = goodsBackService.queryGoodsInfoByGoodsId(entity);
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 }

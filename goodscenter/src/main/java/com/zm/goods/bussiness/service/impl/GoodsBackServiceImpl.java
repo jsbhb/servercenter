@@ -802,4 +802,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		return entity;
 		
 	}
+
+	@Override
+	public GoodsEntity queryGoodsInfoByGoodsId(GoodsEntity entity) {
+		GoodsEntity retEntity = goodsBackMapper.selectGoodsInfoByGoodsId(entity);
+		return retEntity;
+	}
 }

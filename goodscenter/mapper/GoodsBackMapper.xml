@@ -705,4 +705,8 @@
 	        	goods_id=#{item.goodsId}
 		</foreach>
 	</update>
+	
+	<select id="selectGoodsInfoByGoodsId" parameterType="Object" resultMap="entity">
+		SELECT * FROM goods where goods_id = #{goodsId}
+	</select>
 </mapper>

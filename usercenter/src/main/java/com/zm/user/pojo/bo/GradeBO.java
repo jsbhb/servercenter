@@ -8,6 +8,7 @@ public class GradeBO {
 	private String name;
 	private String company;
 	private String gradeTypeName;
+	private Integer type;
 	public String getGradeTypeName() {
 		return gradeTypeName;
 	}
@@ -43,6 +44,12 @@ public class GradeBO {
 	}
 	public void setGradeType(Integer gradeType) {
 		this.gradeType = gradeType;
+	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
 	}
 	
 }
