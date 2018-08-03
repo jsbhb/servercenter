@@ -83,8 +83,9 @@ public class GradeServiceImpl implements GradeService {
 		Grade grade = gradeMapper.selectById(entity.getId());
 		gradeMapper.update(entity);
 		gradeMapper.updateGradeData(entity);
+		String url = grade.getRedirectUrl() == null ? "" : grade.getRedirectUrl();
 		if (Constants.BUTT_JOINT_USER.equals(entity.getType())
-				&& !grade.getRedirectUrl().equals(entity.getRedirectUrl())) {
+				&& !url.equals(entity.getRedirectUrl())) {
 			Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
 			ButtjointUserBO bo = null;
 			for (String str : set) {

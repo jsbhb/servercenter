@@ -65,7 +65,7 @@
 	</resultMap>
 	
 	<update id="update" parameterType="Object">
-		update grade set update_time = now()
+		update grade set update_time = now(), redirect_url = #{redirectUrl}
 		<if test="gradeName!=null and gradeName!=''">
 			,grade_name = #{gradeName}
 		</if>
@@ -80,9 +80,6 @@
 		</if>
 		<if test="company!=null and company!=''">
 			,company = #{company}
-		</if>
-		<if test="redirectUrl!=null and redirectUrl!=''">
-			,redirect_url = #{redirectUrl}
 		</if>
 		<if test="mobileUrl!=null and mobileUrl!=''">
 			,mobile_url = #{mobileUrl}

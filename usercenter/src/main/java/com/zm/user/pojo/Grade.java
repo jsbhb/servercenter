@@ -98,7 +98,7 @@ public class Grade extends Pagination{
 //			}
 		}
 		if(Constants.BUTT_JOINT_USER.equals(type)){
-			if(redirectUrl == null || appKey == null || appSecret == null){
+			if(appKey == null || appSecret == null){
 				return false;
 			}
 		}

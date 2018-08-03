@@ -9,7 +9,7 @@ public class ConvertUtil {
 		ButtjointUserBO bo = new ButtjointUserBO();
 		bo.setAppKey(grade.getAppKey());
 		bo.setAppSecret(grade.getAppSecret());
-		bo.setUrl(grade.getRedirectUrl());
+		bo.setUrl(grade.getRedirectUrl() == null ? "" : grade.getRedirectUrl());
 		return bo;
 	}
 
