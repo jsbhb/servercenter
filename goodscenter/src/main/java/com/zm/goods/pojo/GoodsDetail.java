@@ -30,6 +30,7 @@ public class GoodsDetail {
 	private String itemCode;
 	private String sku;
 	private Double exciseTax;
+	private String firstCategory;
 	
 	public void infoFilter() {
 		if (info != null && !"".equals(info.trim())) {
@@ -44,6 +45,14 @@ public class GoodsDetail {
 		}
 	}
 	
+	public String getFirstCategory() {
+		return firstCategory;
+	}
+
+	public void setFirstCategory(String firstCategory) {
+		this.firstCategory = firstCategory;
+	}
+
 	public Double getExciseTax() {
 		return exciseTax;
 	}

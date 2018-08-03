@@ -256,6 +256,8 @@ public class SEOServiceImpl implements SEOService {
 				if (goodsItem == null) {
 					continue;
 				}
+				
+				LogUtil.writeLog("SPECS-SIZE:"+goodsItem.getGoodsSpecsList().size());
 				if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
 					seoMapper.updateGoodsRePublishByGoodsId(param);
 				}
@@ -266,6 +268,7 @@ public class SEOServiceImpl implements SEOService {
 				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
 						pageList);
+				
 				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				if (!success) {
 					continue;
