@@ -55,6 +55,7 @@
 		<result column="third_id" property="thirdId" jdbcType="VARCHAR"/>
 		<result column="thirdName" property="name" jdbcType="VARCHAR"/>
 		<result column="access_path" property="accessPath" jdbcType="VARCHAR"/>
+		<result column="is_popular" property="isPopular" jdbcType="INTEGER"/>
 	</resultMap>
 
 	<select id="selectFirstAll" resultMap="first">
