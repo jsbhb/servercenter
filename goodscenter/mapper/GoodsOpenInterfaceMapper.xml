@@ -29,6 +29,7 @@
 		<result column="name" property="firstCategory" jdbcType="VARCHAR"/>
 		<result column="min" property="min" jdbcType="INTEGER"/>
 		<result column="max" property="max" jdbcType="INTEGER"/>
+		<result column="fxqty" property="quantity" jdbcType="INTEGER"/>
 	</resultMap>
 
 	<select id="listGoodsStock" parameterType="Object" resultMap="stock">
@@ -43,12 +44,13 @@
 	
 	<select id="listGoodsDetail" parameterType="Object" resultMap="detail">
 		select i.item_id,i.weight,i.item_code,i.sku,g.goods_name,g.goods_id,gfc.name,i.excise_tax,b.increment_tax,b.tariff,i.info,p.retail_price,
-		g.type,g.supplier_id,g.origin,b.brand,p.min,p.max 
+		g.type,g.supplier_id,g.origin,b.brand,p.min,p.max,s.fxqty 
 		from goods_item i 
 		left join goods g on i.goods_id = g.goods_id 
 		left join base b on g.base_id = b.id 
 		left join goods_price p on i.item_id = p.item_id 
 		left join goods_first_category gfc on b.first_category = gfc.first_id
+		left join goods_stock s on i.item_id = s.item_id
 		where i.status = 1 and i.is_fx = 1 and i.item_id in 
 		<foreach collection="array" open="(" close=")" separator="," item="item">
 			#{item}
@@ -58,12 +60,13 @@
 	
 	<select id="listGoodsDetailByPage" parameterType="Object" resultMap="detail">
 		select i.item_id,i.weight,i.item_code,i.sku,i.excise_tax,gfc.name, g.goods_name,g.goods_id,b.increment_tax,b.tariff,i.info,p.retail_price,
-		g.type,g.supplier_id,g.origin,b.brand,p.min,p.max 
+		g.type,g.supplier_id,g.origin,b.brand,p.min,p.max,s.fxqty 
 		from goods_item i 
 		left join goods g on i.goods_id = g.goods_id 
 		left join base b on g.base_id = b.id 
 		left join goods_price p on i.item_id = p.item_id 
 		left join goods_first_category gfc on b.first_category = gfc.first_id
+		left join goods_stock s on i.item_id = s.item_id
 		where i.status = 1 and i.is_fx = 1 order by i.create_time
 		limit #{startRow},#{pageSize}
 	</select>

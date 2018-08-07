@@ -2,10 +2,13 @@ package com.zm.supplier.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -107,5 +110,48 @@ public class SignUtil {
 		
 		return DigestUtils.md5Hex(appKey+appSecret);
 	}
+	
+	/**
+	 * 签名
+	 * 
+	 * @param params
+	 *            参数
+	 * @return 签名结果
+	 */
+	public static String edbSignature(Map<String, String> params,String appScret,String token,String appKey) {
+		Map<String, String> treeMap = new TreeMap<String, String>(comparator);
+		treeMap.putAll(params);
+		treeMap.put("appscret", appScret);
+		treeMap.put("token", token);
+		// 拼接要签名的字符串
+		StringBuilder builder = new StringBuilder(appKey);
+		for (String key : treeMap.keySet()) {
+			if ("".equals(key) || "".equals(treeMap.get(key)))
+				continue;
+			builder.append(key).append(treeMap.get(key));
+		}
+		System.out.println("签名明文:" + builder);
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] bytes = md.digest(builder.toString().getBytes("utf-8"));
+			builder.setLength(0);
+			for (byte b : bytes) {
+				String hx = Integer.toHexString(b & 0XFF);
+				builder.append(hx.length() == 1 ? "0" + hx : hx);
+			}
+			return builder.toString().toUpperCase();
+		} catch (Exception e) {
+			return "签名异常";
+		}
+	}
+
+	/**
+	 * 比较器
+	 */
+	private static Comparator<String> comparator = new Comparator<String>() {
+		public int compare(String k1, String k2) {
+			return k1.compareToIgnoreCase(k2);
+		}
+	};
 
 }

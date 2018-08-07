@@ -92,7 +92,7 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 	private <T> Set<T> sendXinYunWarehouse(String url, String msg, Class<T> clazz, String param) {
 
 		logger.info("发送报文：" + msg);
-		String result = HttpClientUtil.post(url, msg);
+		String result = HttpClientUtil.post(url, msg, null);
 		logger.info("返回：" + param + "=====" + result);
 
 		if (msg.contains("get_goods_stock")) {
