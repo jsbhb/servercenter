@@ -31,6 +31,7 @@ public class GoodsDetail {
 	private String sku;
 	private Double exciseTax;
 	private String firstCategory;
+	private Integer quantity;
 	
 	public void infoFilter() {
 		if (info != null && !"".equals(info.trim())) {
@@ -45,6 +46,14 @@ public class GoodsDetail {
 		}
 	}
 	
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
 	public String getFirstCategory() {
 		return firstCategory;
 	}

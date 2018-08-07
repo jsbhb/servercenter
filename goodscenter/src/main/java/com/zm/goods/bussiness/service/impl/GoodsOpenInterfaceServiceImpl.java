@@ -32,20 +32,20 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 
 	@Resource
 	GoodsOpenInterfaceMapper goodsOpenInterfaceMapper;
-	
+
 	@Resource
 	UserFeignClient userFeignClient;
-	
+
 	@Resource
 	RedisTemplate<String, String> template;
-	
+
 	private final int MAX_SIZE = 100;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel getGoodsStock(String data) {
-		
-		Map<String,String> param = null;
+
+		Map<String, String> param = null;
 		try {
 			param = JSONUtil.parse(data, Map.class);
 		} catch (Exception e) {
@@ -59,7 +59,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 		}
 		String[] itemIdArr = itemId.split(",");
-		if(itemIdArr.length > MAX_SIZE){
+		if (itemIdArr.length > MAX_SIZE) {
 			return new ResultModel(false, ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorCode(),
 					ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorMsg());
 		}
@@ -69,7 +69,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.NO_DATA_ERROR.getErrorCode(),
 					ErrorCodeEnum.NO_DATA_ERROR.getErrorMsg());
 		}
-		
+
 		if (list.size() != itemIdArr.length) {
 			Map<String, GoodsStock> temp = new HashMap<String, GoodsStock>();
 			for (GoodsStock detail : list) {
@@ -85,15 +85,15 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
 					"itemId:" + s + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 		}
-		
+
 		return new ResultModel(true, list);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel getGoodsDetail(String data) {
-		
-		Map<String,Object> param = null;
+
+		Map<String, Object> param = null;
 		try {
 			param = JSONUtil.parse(data, Map.class);
 		} catch (Exception e) {
@@ -101,11 +101,11 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.FORMAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.FORMAT_ERROR.getErrorMsg());
 		}
-		
+
 		String itemId = param.get("itemId") == null ? null : param.get("itemId").toString();
 		if (itemId != null) {
 			String[] itemIdArr = itemId.split(",");
-			if(itemIdArr.length > MAX_SIZE){
+			if (itemIdArr.length > MAX_SIZE) {
 				return new ResultModel(false, ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorCode(),
 						ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorMsg());
 			}
@@ -130,7 +130,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
 						"itemId:" + s + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 			}
-			//规格信息格式化
+			// 规格信息格式化
 			infoFormat(list);
 			return new ResultModel(true, list);
 		}
@@ -150,28 +150,28 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.NUMBER_FORMAT_ERROR.getErrorCode(),
 					ErrorCodeEnum.NUMBER_FORMAT_ERROR.getErrorMsg());
 		}
-		if(pageSize > MAX_SIZE){
+		if (pageSize > MAX_SIZE) {
 			return new ResultModel(false, ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorCode(),
 					ErrorCodeEnum.EXCEED_MAX_SIZE.getErrorMsg());
 		}
-		int startRow = page > 0 ? (page-1) * pageSize : 0;
-		Map<String,Object> queryParam = new HashMap<String,Object>();
+		int startRow = page > 0 ? (page - 1) * pageSize : 0;
+		Map<String, Object> queryParam = new HashMap<String, Object>();
 		queryParam.put("startRow", startRow);
 		queryParam.put("pageSize", pageSize);
-		
+
 		List<GoodsDetail> list = goodsOpenInterfaceMapper.listGoodsDetailByPage(queryParam);
 		if (list == null || list.size() == 0) {
 			return new ResultModel(false, ErrorCodeEnum.NO_DATA_ERROR.getErrorCode(),
 					ErrorCodeEnum.NO_DATA_ERROR.getErrorMsg());
 		}
-		//规格信息格式化
+		// 规格信息格式化
 		infoFormat(list);
-		
+
 		return new ResultModel(true, list);
 	}
-	
-	private void infoFormat(List<GoodsDetail> list){
-		for(GoodsDetail detail : list){
+
+	private void infoFormat(List<GoodsDetail> list) {
+		for (GoodsDetail detail : list) {
 			detail.infoFilter();
 		}
 	}
@@ -179,57 +179,63 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 	@Override
 	public void sendGoodsInfo(List<String> itemIdList) {
 		Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
-		List<GoodsDetail> list = goodsOpenInterfaceMapper.listGoodsDetail(itemIdList.toArray(new String[itemIdList.size()]));
-		if(set != null && set.size() > 0 && list != null && list.size() > 0){
-			//规格信息格式化
+		List<GoodsDetail> list = goodsOpenInterfaceMapper
+				.listGoodsDetail(itemIdList.toArray(new String[itemIdList.size()]));
+		if (set != null && set.size() > 0 && list != null && list.size() > 0) {
+			// 规格信息格式化
 			infoFormat(list);
-			String nonceStr = System.currentTimeMillis()+"";
+			String nonceStr = System.currentTimeMillis() + "";
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put(METHOD, GOODS_UP_SHELVES);
 			param.put(NONCESTR, nonceStr);
 			param.put(VERSION, 1.0);
 			param.put(DATA, JSONUtil.toJson(list));
 			ButtjointUserBO bo = null;
-			for(String str : set){
+			for (String str : set) {
 				bo = JSONUtil.parse(str, ButtjointUserBO.class);
-				LogUtil.writeLog("下发上架信息："+bo.getAppKey());
-				if(bo.getUrl() == null || "".equals(bo.getUrl())){
+				LogUtil.writeLog("下发上架信息：" + bo.getAppKey());
+				if (bo.getUrl() == null || "".equals(bo.getUrl())) {
 					continue;
 				}
 				param.put(APP_KEY, bo.getAppKey());
 				param.put(APP_SECRET, bo.getAppSecret());
 				param.put(SIGN, sign(param));
 				param.remove(APP_SECRET);
-				HttpClientUtil.post(bo.getUrl(), param);
+				String result = HttpClientUtil.post(bo.getUrl(), param);
+				LogUtil.writeLog(
+						"下发上架信息:" + itemIdList.toString() + "******" + bo.getAppKey() + "返回结果：" + "===" + result);
 			}
-		} 
+		}
 	}
 
 	@Override
 	public void sendGoodsDownShelves(List<String> itemIdList) {
 		Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
-		if(set != null && set.size() > 0){
-			String nonceStr = System.currentTimeMillis()+"";
+		if (set != null && set.size() > 0) {
+			String nonceStr = System.currentTimeMillis() + "";
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put(METHOD, GOODS_DOWN_SHELVES);
 			param.put(NONCESTR, nonceStr);
 			param.put(VERSION, 1.0);
 			param.put(DATA, JSONUtil.toJson(itemIdList));
 			ButtjointUserBO bo = null;
-			for(String str : set){
+			for (String str : set) {
 				bo = JSONUtil.parse(str, ButtjointUserBO.class);
-				LogUtil.writeLog("下发下架信息："+bo.getAppKey());
-				if(bo.getUrl() == null || "".equals(bo.getUrl())){
+				LogUtil.writeLog("下发下架信息：" + bo.getAppKey());
+				if (bo.getUrl() == null || "".equals(bo.getUrl())) {
 					continue;
 				}
 				param.put(APP_KEY, bo.getAppKey());
 				param.put(APP_SECRET, bo.getAppSecret());
 				param.put(SIGN, sign(param));
 				param.remove(APP_SECRET);
-				HttpClientUtil.post(bo.getUrl(), param);
+				String result = HttpClientUtil.post(bo.getUrl(), param);
+				LogUtil.writeLog(
+						"下发下架信息:" + itemIdList.toString() + "*****" + bo.getAppKey() + "返回结果：" + "===" + result);
 			}
-		} 
+		}
 	}
+
 	private final String GOODS_UP_SHELVES = "upShelves";
 	private final String GOODS_DOWN_SHELVES = "downShelves";
 	private final String METHOD = "method";
@@ -239,7 +245,7 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 	private final String DATA = "data";
 	private final String VERSION = "version";
 	private final String NONCESTR = "nonceStr";
-	
+
 	private String sign(Map<String, Object> param) {
 		String s = sort(param);
 		String str = s.substring(0, s.length() - 1);

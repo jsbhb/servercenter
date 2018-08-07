@@ -58,7 +58,7 @@ public class GoodsOpenInterfaceController {
 			String appKey = req.getParameter("appKey");
 			if (data == null || appKey == null || "".equals(data) || "".equals(appKey)) {
 				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
-						ErrorCodeEnum.MISSING_PARAM.getErrorCode());
+						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
 			}
 			try {
 				return goodsOpenInterfaceService.getGoodsDetail(data);
