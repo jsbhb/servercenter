@@ -197,6 +197,7 @@
 		<result column="carton" property="carton"/>
 		<result column="shelf_life" property="shelfLife"/>
 		<result column="goods_type" property="goodsType"/>
+		<result column="unit" property="unit"/>
 		<collection property="goodsTagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
 			<id column="gtbid" property="id"/>
 			<result column="tag_name" property="tagName"/>
@@ -474,7 +475,7 @@
 	
 	<select id="selectGoodsListForDownload" parameterType="Object" resultMap="goodsInfoListForDownload">
 		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
-		gi.is_fx goods_status,gi.status item_status,g.supplier_name,gs.fxqty,
+		gi.is_fx goods_status,gi.status item_status,g.supplier_name,gs.fxqty,b.unit,
 		b.first_category first_name,b.second_category second_name,b.third_category third_name,
 		gp.proxy_price,gp.fxprice,gp.retail_price,gr.grade_type,gr.proportion,
 		gtb.id gtbid,gt.tag_name,gpr.id gprid,grp.ratio_platform_name,gpr.ratio_price,
@@ -667,7 +668,7 @@
 	</insert>
 	
 	<select id="listPublishError" parameterType="Object" resultMap="entity">
-		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods g left join goods_file gf on g.goods_id = gf.goods_id 
+		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name from goods g 
 		where g.status = 1 and is_publish = 0 
 		<if test="entity.goodsName != null and entity.goodsName != ''">
 			and goods_name like concat('%',#{entity.goodsName},'%') 
@@ -675,8 +676,7 @@
 	</select>
 	
 	<select id="listUnPublishError" parameterType="Object" resultMap="entity">
-		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name,gf.path from goods g 
-		left join goods_file gf on g.goods_id = gf.goods_id 
+		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name from goods g 
 		where g.status = 0 and is_publish = 1 
 		<if test="entity.goodsName != null and entity.goodsName != ''">
 			and goods_name like concat('%',#{entity.goodsName},'%') 

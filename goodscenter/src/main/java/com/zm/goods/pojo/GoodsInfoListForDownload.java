@@ -30,6 +30,7 @@ public class GoodsInfoListForDownload {
 	private String carton;
 	private String shelfLife;
 	private String goodsType;
+	private String unit;
 	
 	public String getGoodsId() {
 		return goodsId;
@@ -187,5 +188,11 @@ public class GoodsInfoListForDownload {
 	}
 	public void setGoodsType(String goodsType) {
 		this.goodsType = goodsType;
+	}
+	public String getUnit() {
+		return unit;
+	}
+	public void setUnit(String unit) {
+		this.unit = unit;
 	}
 }

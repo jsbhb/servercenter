@@ -771,12 +771,38 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		param.put("entity", entity);
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		if (PUBLISH_ERROR == type) {
-			return goodsBackMapper.listPublishError(param);
+			Page<GoodsEntity> page = goodsBackMapper.listPublishError(param);
+			return getListGoodsInfoByPageGoodsInfo(page);
 		}
 		if(UN_PUBLISH_ERROR == type){
-			return goodsBackMapper.listUnPublishError(param);
+			Page<GoodsEntity> page = goodsBackMapper.listUnPublishError(param);
+			return getListGoodsInfoByPageGoodsInfo(page);
 		}
 		return null;
+	}
+	private Page<GoodsEntity> getListGoodsInfoByPageGoodsInfo(Page<GoodsEntity> page) {
+		List<GoodsEntity> tmpPageGoodsInfoList = (List<GoodsEntity>)page;
+		if (tmpPageGoodsInfoList.size() > 0) {
+			List<String> ids = new ArrayList<String>();
+			for (GoodsEntity ge: tmpPageGoodsInfoList) {
+				ids.add(ge.getGoodsId());
+			}
+			Map<String, Object> fileParam = new HashMap<String, Object>();
+			fileParam.put("list", ids);
+			List<GoodsFile> files = goodsBackMapper.selectGoodsFileByParam(fileParam);
+			for (GoodsEntity ge: tmpPageGoodsInfoList) {
+				for (GoodsFile file : files) {
+					if (file.getGoodsId().equals(ge.getGoodsId())) {
+						List<GoodsFile> gfiles = new ArrayList<GoodsFile>();
+						gfiles.add(file);
+						ge.setFiles(gfiles);
+						break;
+					}
+				}
+			}
+			page = (Page<GoodsEntity>)tmpPageGoodsInfoList;
+		}
+		return page;
 	}
 	
 	private Integer calcGoodsTagRatio(List<ERPGoodsTagBindEntity> checkList) {
