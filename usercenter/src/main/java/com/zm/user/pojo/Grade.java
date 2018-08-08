@@ -91,6 +91,8 @@ public class Grade extends Pagination{
 	
 	private String appSecret;
 	
+	private Double welfareRebate;
+	
 	public boolean check(){
 		if(Constants.AREA_CENTER.equals(gradeType)){
 //			if(redirectUrl == null || mobileUrl == null){
@@ -413,6 +415,14 @@ public class Grade extends Pagination{
 
 	public void setGradeTypeName(String gradeTypeName) {
 		this.gradeTypeName = gradeTypeName;
+	}
+
+	public Double getWelfareRebate() {
+		return welfareRebate;
+	}
+
+	public void setWelfareRebate(Double welfareRebate) {
+		this.welfareRebate = welfareRebate;
 	}
 	
 }

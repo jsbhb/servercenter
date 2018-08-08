@@ -44,6 +44,7 @@
 		<result column="pic3_path" property="picPath3" jdbcType="VARCHAR" />
 		<result column="pic4_path" property="picPath4" jdbcType="VARCHAR" />
 		<result column="gradeTypeName" property="gradeTypeName" jdbcType="VARCHAR" />
+		<result column="welfare_rebate" property="welfareRebate" jdbcType="DECIMAL" />
 	</resultMap>
 	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -86,6 +87,21 @@
 		</if>
 		<if test="gradeType!=null and gradeType!=''">
 			,grade_type = #{gradeType}
+		</if>
+		<if test="redirectUrl!=null and redirectUrl!=''">
+			,redirect_url = #{redirectUrl}
+		</if>
+		<if test="type!=null and type!=''">
+			,type = #{type}
+		</if>
+		<if test="appKey!=null and appKey!=''">
+			,appKey = #{appKey}
+		</if>
+		<if test="appSecret!=null and appSecret!=''">
+			,appSecret = #{appSecret}
+		</if>
+		<if test="welfareRebate!=null and welfareRebate!=''">
+			,welfare_rebate = #{welfareRebate}
 		</if>
 		where id = #{id}
 	</update>
