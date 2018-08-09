@@ -1,5 +1,6 @@
 package com.zm.thirdcenter.bussiness.phone.controller;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -22,6 +23,7 @@ import com.zm.thirdcenter.pojo.NotifyTypeEnum;
 import com.zm.thirdcenter.pojo.PhoneValidata;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.utils.CommonUtil;
+import com.zm.thirdcenter.utils.LogUtil;
 import com.zm.thirdcenter.utils.SmsSendUtil;
 
 import io.swagger.annotations.Api;
@@ -158,6 +160,29 @@ public class ThirdPartPhoneController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			SmsSendUtil.sendMessage(notifyMsg);
 		}
+	}
+	
+	/**
+	 * @fun 批量发送邀请码
+	 */
+	@RequestMapping(value = "{version}/third-part/phone", method = RequestMethod.POST)
+	public ResultModel sendCode(@PathVariable("version") Double version, @RequestBody List<NotifyMsg> notifyList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			if(notifyList != null && notifyList.size() > 0){
+				StringBuilder sb = new StringBuilder();
+				for(NotifyMsg notifyMsg : notifyList){
+					try {
+						SmsSendUtil.sendMessage(notifyMsg);
+					} catch (Exception e) {
+						sb.append(notifyMsg.getPhone()+",");
+						LogUtil.writeErrorLog("Phone:"+notifyMsg.getPhone()+"，发送失败", e);
+					}
+				}
+				return new ResultModel(true, sb.toString());
+			}
+			return new ResultModel(false, "没有数据");
+		}
+		return new ResultModel(false, "版本号错误");
 	}
 
 }

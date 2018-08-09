@@ -79,11 +79,26 @@ public class SmsSendUtil {
 			return packageAuditRequest(notifyMsg);
 		case REPAYING:
 			return packageRepayingRequest(notifyMsg);
+		case INVITATION_CODE:
+			return packageInvitationCodeRequest(notifyMsg);
 		default:
 			logger.error("短信模板类型出错====================");
 			return null;
 		}
 
+	}
+
+	private static SendSmsRequest packageInvitationCodeRequest(NotifyMsg notifyMsg) {
+		SendSmsRequest request = new SendSmsRequest();
+		request.setMethod(MethodType.POST);
+		request.setPhoneNumbers(notifyMsg.getPhone());
+		request.setSignName(Constants.SMS_SIGN);
+		request.setTemplateCode(Constants.INVITATION_CODE);
+		String json = "{\"name\":\"" + notifyMsg.getName() + "\",\"store\":\"" + notifyMsg.getShopName()
+				+ "\",\"code\":\"" + notifyMsg.getMsg() + "\"}";
+		logger.info("json===========" + json);
+		request.setTemplateParam(json);
+		return request;
 	}
 
 	private static SendSmsRequest packageRepayingRequest(NotifyMsg notifyMsg) {

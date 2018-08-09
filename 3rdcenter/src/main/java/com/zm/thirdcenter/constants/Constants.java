@@ -13,6 +13,8 @@ public class Constants {
 	public static final String PUSH_USER_AUDIT = "SMS_126460468";
 	
 	public static final String PUSH_USER_REPAYING = "SMS_126460455";
+	
+	public static final String INVITATION_CODE = "SMS_141616861";
 
 	public static final String SMS_SIGN = "中国供销海外购";
 
