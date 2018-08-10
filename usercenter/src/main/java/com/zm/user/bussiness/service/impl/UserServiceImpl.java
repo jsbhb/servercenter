@@ -380,13 +380,11 @@ public class UserServiceImpl implements UserService {
 
 		// 添加注册信息存储
 		userMapper.saveGradeData(grade);
-		// 通知订单中心新增grade
-		GradeBO gradeBO = new GradeBO();
-		gradeBO.setId(grade.getId());
-		gradeBO.setParentId(grade.getParentId());
-		gradeBO.setGradeType(grade.getGradeType());
-
-		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
+		
+		// 通知订单中心新增grade并做缓存
+		GradeBO gradeBO = ConvertUtil.converToGradeBO(grade);
+		template.opsForHash().put(Constants.GRADEBO_INFO, grade.getId(), JSONUtil.toJson(gradeBO));
+		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);//ordercenter需要实时推送，需要更新统计信息
 		if (Constants.BUTT_JOINT_USER.equals(grade.getType())) {
 			template.opsForSet().add(Constants.BUTT_JOINT_USER_PREFIX,
 					JSONUtil.toJson(ConvertUtil.converToButtjoinUserBO(grade)));

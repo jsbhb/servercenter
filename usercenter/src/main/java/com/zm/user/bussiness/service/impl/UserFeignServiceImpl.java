@@ -31,17 +31,8 @@ public class UserFeignServiceImpl implements UserFeignService {
 		List<Grade> list = gradeMapper.listGrade();
 		List<GradeBO> gradeList = new ArrayList<GradeBO>();
 		if (list != null && list.size() > 0) {
-			GradeBO gradeBO = null;
 			for (Grade grade : list) {
-				gradeBO = new GradeBO();
-				gradeBO.setId(grade.getId());
-				gradeBO.setGradeType(grade.getGradeType());
-				gradeBO.setParentId(grade.getParentId());
-				gradeBO.setName(grade.getGradeName());
-				gradeBO.setCompany(grade.getCompany());
-				gradeBO.setGradeTypeName(grade.getGradeTypeName());
-				gradeBO.setType(grade.getType());
-				gradeList.add(gradeBO);
+				gradeList.add(ConvertUtil.converToGradeBO(grade));
 			}
 		}
 		return gradeList;

@@ -97,15 +97,10 @@ public class GradeServiceImpl implements GradeService {
 				}
 			}
 		}
-		if(!grade.getGradeType().equals(entity.getGradeType())){
-			// 通知订单中心新增grade
-			GradeBO gradeBO = new GradeBO();
-			gradeBO.setId(grade.getId());
-			gradeBO.setParentId(grade.getParentId());
-			gradeBO.setGradeType(entity.getGradeType());
-
-			orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
-		}
+		// 更新redis内gradeBO信息
+		GradeBO gradeBO = ConvertUtil.converToGradeBO(grade);
+		template.opsForHash().put(Constants.GRADEBO_INFO, grade.getId(), JSONUtil.toJson(gradeBO));
+		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);//ordercenter不能用redis需要实时通知更新统计信息
 	}
 
 	@Override
