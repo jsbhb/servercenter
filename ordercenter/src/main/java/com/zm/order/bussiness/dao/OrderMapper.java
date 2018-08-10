@@ -51,7 +51,7 @@ public interface OrderMapper {
 	
 	void saveShoppingCart(ShoppingCart cart);
 	
-	List<ShoppingCart> listShoppingCart(Map<String,Object> param);
+	List<ShoppingCart> listShoppingCart(ShoppingCart shoppingCart);
 	
 	int updateOrderDetailPayTime(Map<String,Object> param);
 	

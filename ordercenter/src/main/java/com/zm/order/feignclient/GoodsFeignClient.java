@@ -21,18 +21,33 @@ import com.zm.order.pojo.bo.GoodsItemBO;
 @FeignClient("goodscenter")
 public interface GoodsFeignClient {
 
+	/**
+	 * @fun 获取订单商品的价格和税率等信息
+	 * @param version 版本默认1.0
+	 * @param list 订单商品信息
+	 * @param supplierId 供应商ID
+	 * @param vip 用户是否vip
+	 * @param centerId 商城ID
+	 * @param orderFlag 订单类型 0跨境，2一般贸易
+	 * @param couponIds 优惠券id
+	 * @param userId 用户ID
+	 * @param isFx 是否获取分销商品
+	 * @param platformSource 订单来源，福利网站单独计算
+	 * @param gradeId 分级ID 如果是福利网站需要用到
+	 * @return
+	 */
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version,
 			@RequestBody List<OrderBussinessModel> list, @RequestParam("supplierId") Integer supplierId,
 			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
 			@RequestParam("orderFlag") Integer orderFlag,
 			@RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId,
-			@RequestParam("isFx") boolean isFx);
+			@RequestParam(value = "userId", required = false) Integer userId, @RequestParam("isFx") boolean isFx,
+			@RequestParam("platformSource") int platformSource, @RequestParam("gradeId") int gradeId);
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
-			@RequestParam("centerId") Integer centerId, @RequestParam("source") String source);
+			@RequestParam("source") String source, @RequestParam("platformSource") int platformSource);
 
 	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
 	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,
@@ -44,11 +59,6 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "{version}/goods/costPrice", method = RequestMethod.POST)
 	public Double getCostPrice(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list);
-
-	@RequestMapping(value = "{version}/goods/for-buttjoinorder", method = RequestMethod.POST)
-	public ResultModel delButtjoinOrderStock(@PathVariable("version") Double version,
-			@RequestBody List<OrderBussinessModel> list, @RequestParam("supplierId") Integer supplierId,
-			@RequestParam("orderFlag") Integer orderFlag);
 
 	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
 	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version,

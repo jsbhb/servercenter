@@ -7,26 +7,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.Resource;
+
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import com.zm.goods.constants.Constants;
+import com.zm.goods.exception.WrongPlatformSource;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.bo.GradeBO;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.CommonUtils;
 import com.zm.goods.utils.JSONUtil;
 
-public class GoodsServiceUtil {
+@Component
+public class GoodsServiceComponent {
 
-	private static Logger logger = LoggerFactory.getLogger(GoodsServiceUtil.class);
+	@Resource
+	RedisTemplate<String, String> template;
 
+	/**
+	 * @fun 计算订单价格，根据是否福利网站，分级ID计算不同价格
+	 * @param vip
+	 *            用户是否vip
+	 * @param specs
+	 *            商品规格详情
+	 * @param model
+	 *            订单商品
+	 * @param promotion
+	 *            促销折扣
+	 * @param platformSource
+	 *            平台类型
+	 * @param gradeId
+	 *            分级ID
+	 * @return
+	 * @throws WrongPlatformSource
+	 */
 	// 计算价格
-	public static Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion) {
+	public Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion,
+			int platformSource, int gradeId) throws WrongPlatformSource {
 		Double totalAmount = 0.0;
 		getPriceInterval(specs, promotion);
 		boolean calculation = false;
@@ -36,25 +62,17 @@ public class GoodsServiceUtil {
 		}
 		discount = CalculationUtils.div(discount, 10.0);
 		for (GoodsPrice price : specs.getPriceList()) {
-			logger.info("购买数量====：" + model.getQuantity() + ",最小数量！！！！====：" + price.getMin() + ",最大数量******："
+			LogUtil.writeLog("购买数量====：" + model.getQuantity() + ",最小数量！！！！====：" + price.getMin() + ",最大数量******："
 					+ price.getMax());
+			// 判断购买数量是否在规定的范围内
 			boolean flag = model.getQuantity() >= price.getMin()
 					&& (price.getMax() == null || price.getMax() == 0 || model.getQuantity() <= price.getMax());
 			if (flag) {
-				if (model.getDeliveryPlace() != null) {
-					if (model.getDeliveryPlace().equals(price.getDeliveryPlace())) {
-						totalAmount += model.getQuantity()
-								* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
-						calculation = true;
-						break;
-					}
-				} else {
-					totalAmount += model.getQuantity()
-							* (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
-					calculation = true;
-					break;
-				}
+				calPrice(platformSource, gradeId, vip, model, price);
+				calculation = true;
+				break;
 			}
+
 		}
 		if (!calculation) {
 			return null;
@@ -63,9 +81,19 @@ public class GoodsServiceUtil {
 		return CalculationUtils.mul(totalAmount, discount);
 	}
 
-	// 封装商品属性
+	/**
+	 * @fun 封装商品图片和规格信息
+	 * @param goodsList
+	 *            商品列表
+	 * @param fileList
+	 *            图片列表
+	 * @param specsList
+	 *            规格列表
+	 * @param flag
+	 *            false--搜索界面把规格按字符串拼接，true--获取商品详情，封装规格详情
+	 */
 	@SuppressWarnings("unchecked")
-	public static void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList,
+	public void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList,
 			boolean flag) {
 
 		Map<String, GoodsItem> goodsMap = new HashMap<String, GoodsItem>();
@@ -134,8 +162,13 @@ public class GoodsServiceUtil {
 		}
 	}
 
-	// 封装价格区间
-	public static void getPriceInterval(GoodsSpecs specs, Double discountParam) {
+	/**
+	 * @fun 封装价格区间，获取规格的最大价格和最小价格
+	 * @param specs
+	 * @param discountParam
+	 *            折扣
+	 */
+	public void getPriceInterval(GoodsSpecs specs, Double discountParam) {
 		List<GoodsPrice> priceList = specs.getPriceList();
 		specs.infoFilter();
 		if (priceList == null) {
@@ -182,16 +215,33 @@ public class GoodsServiceUtil {
 		}
 	}
 
-	public static String judgeCenterId(Integer id) {
+	public String judgeCenterId(Integer id) {
 		if (Constants.PREDETERMINE_PLAT_TYPE == id) {
 			return "_2B";
 		}
 		return "_" + id;
 	}
 
-	public static Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs,
-			OrderBussinessModel model) {
-		Double amount = getAmount(vip, specs, model, 10.0);
+	/**
+	 * @fun 判断订单商品是否在指定购买数量内 并返回单个商品的总价
+	 * @param vip
+	 *            用户是否vip用户
+	 * @param result
+	 *            用于判断是否成功
+	 * @param specs
+	 *            规格
+	 * @param model
+	 *            订单商品
+	 * @param platformSource
+	 *            平台类型，0普通；1福利网站
+	 * @param gradeId
+	 *            分级ID
+	 * @return
+	 * @throws WrongPlatformSource
+	 */
+	public Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs, OrderBussinessModel model,
+			int platformSource, int gradeId) throws WrongPlatformSource {
+		Double amount = getAmount(vip, specs, model, 10.0, platformSource, gradeId);
 		if (amount == null) {
 			result.setSuccess(false);
 			result.setErrorMsg("购买数量不在指定范围内");
@@ -199,7 +249,12 @@ public class GoodsServiceUtil {
 		return amount;
 	}
 
-	public static Map<String, Double> getMinPrice(List<GoodsSpecs> specsList) {
+	/**
+	 * @fun 获取规格列表中的最低价格
+	 * @param specsList
+	 * @return
+	 */
+	public Map<String, Double> getMinPrice(List<GoodsSpecs> specsList) {
 		Map<String, Double> result = new HashMap<String, Double>();
 		if (specsList == null || specsList.size() == 0) {
 			result.put("price", 0.0);
@@ -225,5 +280,68 @@ public class GoodsServiceUtil {
 			}
 		}
 		return result;
+	}
+
+	private Double calPrice(int platformSource, int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price)
+			throws WrongPlatformSource {
+		switch (platformSource) {
+		case Constants.WELFARE_WEBSITE:
+			return getWelfareWebsitePrice(gradeId, vip, model, price);
+		default:
+			return getDefaultPrice(vip, model, price);
+		}
+	}
+
+	private Double getDefaultPrice(boolean vip, OrderBussinessModel model, GoodsPrice price) {
+		return model.getQuantity() * (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
+	}
+
+	private final int GRADESTYLE_WELFARE_WEBSITE = 3;// 福利分级编号
+
+	private Double getWelfareWebsitePrice(int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price)
+			throws WrongPlatformSource {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + model.getItemId());
+		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
+		if (gradeBO.getType() != GRADESTYLE_WELFARE_WEBSITE) {
+			throw new WrongPlatformSource("该分级已经不是福利网站类型");
+		}
+		double welfareRebate = gradeBO.getWelfareRebate();// 福利网站拿的返佣比例
+		int gradeType = gradeBO.getGradeType();
+		// 获取该类型的返佣的比例
+		double proportion = Double
+				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
+		double amount = CalculationUtils.mul(model.getQuantity(),
+				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
+		double temp = CalculationUtils.mul(proportion, CalculationUtils.sub(1, welfareRebate));// 扣除福利网站自己的返佣后
+		amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, temp));
+		return amount;
+	}
+
+	/**
+	 * @fun 获取福利网站的福利价格
+	 * @param specs
+	 * @param discount
+	 * @param gradeId
+	 * @throws WrongPlatformSource
+	 */
+	public void getWelfareWebsitePriceInterval(GoodsSpecs specs, Double discount, int gradeId)
+			throws WrongPlatformSource {
+		getPriceInterval(specs, discount);
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
+		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
+		if (gradeBO.getType() != GRADESTYLE_WELFARE_WEBSITE) {
+			throw new WrongPlatformSource("该分级已经不是福利网站类型");
+		}
+		double welfareRebate = gradeBO.getWelfareRebate();// 福利网站拿的返佣比例
+		int gradeType = gradeBO.getGradeType();
+		// 获取该类型的返佣的比例
+		double proportion = Double
+				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
+		double temp = CalculationUtils.mul(proportion, CalculationUtils.sub(1, welfareRebate));// 扣除福利网站自己的返佣后
+		double welfarePrice = CalculationUtils.mul(specs.getPriceList().get(0).getPrice(),
+				CalculationUtils.sub(1, temp));
+		specs.setWelfarePrice(welfarePrice);
 	}
 }

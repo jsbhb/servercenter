@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zm.goods.bussiness.component.ActivityComponent;
-import com.zm.goods.bussiness.component.GoodsServiceUtil;
+import com.zm.goods.bussiness.component.GoodsServiceComponent;
 import com.zm.goods.bussiness.component.PriceComponent;
 import com.zm.goods.bussiness.component.ThreadPoolComponent;
 import com.zm.goods.bussiness.dao.GoodsMapper;
@@ -24,6 +23,7 @@ import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.convertor.LucenceModelConvertor;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
@@ -78,11 +78,14 @@ public class GoodsServiceImpl implements GoodsService {
 	@Resource
 	SupplierFeignClient supplierFeignClient;
 
-	@Resource
-	ActivityComponent activityComponent;
+	// @Resource
+	// ActivityComponent activityComponent;
 
 	@Resource
 	PriceComponent priceComponent;
+
+	@Resource
+	GoodsServiceComponent goodsServiceComponent;
 
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
@@ -112,10 +115,11 @@ public class GoodsServiceImpl implements GoodsService {
 		parameter.put("type", PICTURE_TYPE);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
-		GoodsServiceUtil.packageGoodsItem(goodsList, fileList, specsList, true);
-		if (param.get("goodsId") != null && Constants.PREDETERMINE_PLAT_TYPE != centerId) {
-			activityComponent.doPackCoupon(centerId, userId, goodsList);
-		}
+		goodsServiceComponent.packageGoodsItem(goodsList, fileList, specsList, true);
+		// if (param.get("goodsId") != null && Constants.PREDETERMINE_PLAT_TYPE
+		// != centerId) {
+		// activityComponent.doPackCoupon(centerId, userId, goodsList);
+		// }
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<Integer, List<GoodsItem>> tempMap = new HashMap<Integer, List<GoodsItem>>();
 		List<GoodsItem> tempList = null;
@@ -178,7 +182,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if (specs == null) {
 			return null;
 		}
-		GoodsServiceUtil.getPriceInterval(specs, specs.getDiscount());
+		goodsServiceComponent.getPriceInterval(specs, specs.getDiscount());
 
 		List<String> idList = new ArrayList<String>();
 		idList.add(specs.getGoodsId());
@@ -197,7 +201,7 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source) {
+	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", list);
 		param.put("source", source);
@@ -205,9 +209,13 @@ public class GoodsServiceImpl implements GoodsService {
 		if (specsList == null || specsList.size() == 0) {
 			return null;
 		}
-
-		for (GoodsSpecs specs : specsList) {
-			GoodsServiceUtil.getPriceInterval(specs, specs.getDiscount());
+		switch (platformSource) {
+		case Constants.WELFARE_WEBSITE:
+			getWelfareWebsitePriceInterval(specsList,gradeId);
+			break;
+		default:
+			getPriceInterval(specsList);
+			break;
 		}
 
 		List<String> idList = new ArrayList<String>();
@@ -229,14 +237,27 @@ public class GoodsServiceImpl implements GoodsService {
 		return result;
 	}
 
+	private void getWelfareWebsitePriceInterval(List<GoodsSpecs> specsList, int gradeId) throws WrongPlatformSource {
+		for (GoodsSpecs specs : specsList) {
+			goodsServiceComponent.getWelfareWebsitePriceInterval(specs, specs.getDiscount(),gradeId);
+		}
+	}
+
+	private void getPriceInterval(List<GoodsSpecs> specsList) {
+		for (GoodsSpecs specs : specsList) {
+			goodsServiceComponent.getPriceInterval(specs, specs.getDiscount());
+		}
+	}
+
 	private final String FX = "fx";
 	private final String NOT_FX = "notfx";
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag, String couponIds, Integer userId, boolean isFx) {
+			Integer centerId, Integer orderFlag, String couponIds, Integer userId, boolean isFx, int platformSource,
+			int gradeId) {
 
-		//初始化参数
+		// 初始化参数
 		ResultModel result = new ResultModel(true, "");
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();
@@ -251,7 +272,7 @@ public class GoodsServiceImpl implements GoodsService {
 		for (OrderBussinessModel model : list) {
 			itemIds.add(model.getItemId());
 		}
-		//判断所有商品是否都是同个仓库
+		// 判断所有商品是否都是同个仓库
 		param.put("supplierId", supplierId);
 		param.put("list", itemIds);
 		int count = goodsMapper.countGoodsBySupplierIdAndItemId(param);
@@ -259,7 +280,7 @@ public class GoodsServiceImpl implements GoodsService {
 			return new ResultModel(false, ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorCode(),
 					ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorMsg());
 		}
-		//获取所有item的规格
+		// 获取所有item的规格
 		param.put("list", itemIds);
 		param.put("isFx", isFx ? FX : NOT_FX);
 		List<GoodsSpecs> specsList = goodsMapper.getGoodsSpecsForOrder(param);
@@ -270,12 +291,12 @@ public class GoodsServiceImpl implements GoodsService {
 		for (GoodsSpecs tempspecs : specsList) {
 			tempSpecsMap.put(tempspecs.getItemId(), tempspecs);
 		}
-		//获取所有税率信息
+		// 获取所有税率信息
 		List<Tax> taxList = goodsMapper.getTax(itemIds);
 		for (Tax tax : taxList) {
 			tempTaxMap.put(tax.getItemId(), tax);
 		}
-		
+
 		for (OrderBussinessModel model : list) {
 			specs = tempSpecsMap.get(model.getItemId());
 			if (specs == null) {
@@ -283,7 +304,12 @@ public class GoodsServiceImpl implements GoodsService {
 						"itemId=" + model.getItemId() + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 			}
 			weight += specs.getWeight() * model.getQuantity();
-			Double amount = GoodsServiceUtil.judgeQuantityRange(vip, result, specs, model);
+			Double amount = 0.0;
+			try {
+				amount = goodsServiceComponent.judgeQuantityRange(vip, result, specs, model, platformSource, gradeId);
+			} catch (WrongPlatformSource e) {
+				return new ResultModel(false, e.getMessage());
+			}
 			if (!result.isSuccess()) {
 				return new ResultModel(false, ErrorCodeEnum.OUT_OF_RANGE.getErrorCode(),
 						ErrorCodeEnum.OUT_OF_RANGE.getErrorMsg());
@@ -300,7 +326,12 @@ public class GoodsServiceImpl implements GoodsService {
 			specsMap.put(model.getItemId(), specs);
 		}
 
-		totalAmount = priceComponent.calPrice(list, specsMap, couponIds, false, vip, centerId, result, userId);
+		try {
+			totalAmount = priceComponent.calPrice(list, specsMap, couponIds, vip, centerId, result, userId,
+					platformSource, gradeId);
+		} catch (WrongPlatformSource e) {
+			return new ResultModel(false, e.getMessage());
+		}
 		if (!result.isSuccess()) {
 			return result;
 		}
@@ -322,7 +353,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public List<Layout> getModular(String page, Integer centerId, Integer pageType) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
+		String id = goodsServiceComponent.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("page", page);
 		param.put("pageType", pageType);
@@ -333,7 +364,7 @@ public class GoodsServiceImpl implements GoodsService {
 	public List<PageModule> getModularData(Integer pageType, String page, Layout layout, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		List<PageModule> result = new ArrayList<PageModule>();
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
+		String id = goodsServiceComponent.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("page", page);
 		param.put("pageType", pageType);
@@ -381,7 +412,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void updateActiveStart(Integer centerId, Integer activeId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
+		String id = goodsServiceComponent.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("activeId", activeId);
 		goodsMapper.updateActivitiesStart(param);
@@ -391,7 +422,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void updateActiveEnd(Integer centerId, Integer activeId) {
 		Map<String, Object> param = new HashMap<String, Object>();
-		String id = GoodsServiceUtil.judgeCenterId(centerId);
+		String id = goodsServiceComponent.judgeCenterId(centerId);
 		param.put("centerId", id);
 		param.put("activeId", activeId);
 		goodsMapper.updateActivitiesEnd(param);
@@ -447,7 +478,7 @@ public class GoodsServiceImpl implements GoodsService {
 				search = new GoodsSearch();
 				LucenceModelConvertor.convertToGoodsSearch(item, search);
 				if (item.getGoodsSpecsList() != null) {
-					result = GoodsServiceUtil.getMinPrice(item.getGoodsSpecsList());
+					result = goodsServiceComponent.getMinPrice(item.getGoodsSpecsList());
 					search.setPrice(result.get("realPrice"));
 					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
 						if (specs.getTagList() != null) {
@@ -503,7 +534,7 @@ public class GoodsServiceImpl implements GoodsService {
 			for (Map.Entry<String, GoodsSearch> entry : temp.entrySet()) {
 				tempList = tempSpecs.get(entry.getKey());
 				if (tempList != null && tempList.size() > 0) {
-					result = GoodsServiceUtil.getMinPrice(tempList);
+					result = goodsServiceComponent.getMinPrice(tempList);
 					sb.delete(0, sb.length());
 					for (GoodsSpecs specs : tempList) {
 						if (specs.getTagList() != null && specs.getTagList().size() > 0) {
@@ -585,7 +616,7 @@ public class GoodsServiceImpl implements GoodsService {
 			for (GoodsItem model : goodsList) {
 				temList = temp.get(model.getGoodsId());
 				model.setGoodsSpecsList(temList);
-				result = GoodsServiceUtil.getMinPrice(temList);
+				result = goodsServiceComponent.getMinPrice(temList);
 				for (GoodsSpecs specs : temList) {
 					if (model.getSpecsInfo() == null) {
 						specsSet = new HashSet<>();
@@ -714,13 +745,13 @@ public class GoodsServiceImpl implements GoodsService {
 			param.put("list", goodsMapper.getGoodsIdByItemId(itemIdList));
 			List<String> updateTagList = renderLuceneModel(param, centerId, itemIdList);
 			goodsMapper.updateGoodsItemUpShelves(itemIdList);
-			
+
 			// 结果处理
 			if (updateTagList != null && updateTagList.size() > 0) {// 更新标签
 				updateLuceneIndex(updateTagList, centerId);
 			}
 			threadPoolComponent.publish(itemIdList, centerId);// 发布商品
-			threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户商品上架
+			threadPoolComponent.sendGoodsInfo(itemIdList);// 通知对接用户商品上架
 			return new ResultModel(true, "");
 		} else {
 			return new ResultModel(false, "没有提供上架商品信息");
@@ -828,7 +859,7 @@ public class GoodsServiceImpl implements GoodsService {
 			updateLuceneIndex(updateTagGoodsIdList, centerId);
 		}
 		threadPoolComponent.delPublish(itemIdList, centerId);// 删除商品和重新发布商品
-		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户商品下架
+		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);// 通知对接用户商品下架
 		return new ResultModel(true, "");
 	}
 
@@ -904,43 +935,6 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 		}
 		return new ResultModel(true, "同步完成");
-	}
-
-	@Override
-	public ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
-		ResultModel result = new ResultModel(true, "");
-		GoodsSpecs specs = null;
-
-		Double temp = 0.0;
-		for (OrderBussinessModel model : list) {
-			specs = goodsMapper.getGoodsSpecsForButtJoinOrder(model.getItemId());
-			if (specs == null) {
-				return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
-						"itemId=" + model.getItemId() + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
-			}
-			Double amount = GoodsServiceUtil.judgeQuantityRange(false, result, specs, model);
-			if (!result.isSuccess()) {
-				return new ResultModel(false, ErrorCodeEnum.OUT_OF_RANGE.getErrorCode(),
-						ErrorCodeEnum.OUT_OF_RANGE.getErrorMsg());
-			}
-			temp = CalculationUtils.mul(model.getItemPrice(), model.getQuantity());
-			if (CalculationUtils.sub(temp, amount) < -3 || CalculationUtils.sub(temp, amount) > 3) {
-				return new ResultModel(false, ErrorCodeEnum.RETAIL_PRICE_ERROR.getErrorCode(),
-						ErrorCodeEnum.RETAIL_PRICE_ERROR.getErrorMsg());
-			}
-		}
-
-		if (supplierId != null) {
-			supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
-		}
-
-		result = processWarehouse.processWarehouse(orderFlag, list);
-		if (!result.isSuccess()) {
-			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
-					ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
-		}
-
-		return result;
 	}
 
 	@Override

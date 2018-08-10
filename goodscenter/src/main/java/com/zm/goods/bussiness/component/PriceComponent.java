@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
@@ -20,6 +21,9 @@ public class PriceComponent {
 
 	@Resource
 	ActivityComponent activityComponent;
+	
+	@Resource
+	GoodsServiceComponent goodsServiceComponent;
 
 	private final int FULL_RANGE = 0;
 	private final int FIRST_RANGE = 1;
@@ -27,16 +31,40 @@ public class PriceComponent {
 	private final int THIRD_RANGE = 3;
 	private final int GIVEN_RANGE = 4;
 
+	/**
+	 * @fun 获取商品订单价格，判断优惠券是否可用，调用getAmount方法获取订单价格
+	 * @param list
+	 *            订单商品
+	 * @param specsMap
+	 *            规格Map
+	 * @param couponIds
+	 *            优惠券
+	 * @param vip
+	 *            用户是否vip
+	 * @param centerId
+	 *            商城ID
+	 * @param result
+	 *            返回是否成功结果
+	 * @param userId
+	 *            用户ID
+	 * @param platformSource
+	 *            平台类型 0普通；1福利
+	 * @param gradeId
+	 *            分级ID
+	 * @return
+	 * @throws WrongPlatformSource 
+	 */
 	@SuppressWarnings("unchecked")
 	public Double calPrice(List<OrderBussinessModel> list, Map<String, GoodsSpecs> specsMap, String couponIds,
-			boolean activity, boolean vip, Integer centerId, ResultModel result, Integer userId) {
+			boolean vip, Integer centerId, ResultModel result, Integer userId, int platformSource, int gradeId) throws WrongPlatformSource {
 
 		Double totalAmount = 0.0;
 		GoodsSpecs specs = null;
 		if (couponIds == null) {
 			for (OrderBussinessModel model : list) {
 				specs = specsMap.get(model.getItemId());
-				totalAmount += GoodsServiceUtil.getAmount(vip, specs, model, specs.getDiscount());
+				totalAmount += goodsServiceComponent.getAmount(vip, specs, model, specs.getDiscount(), platformSource,
+						gradeId);
 			}
 		} else {
 			// 获取优惠券并判断用户是否有该优惠券
@@ -44,52 +72,63 @@ public class PriceComponent {
 			if (!resultModel.isSuccess()) {
 				result.setSuccess(false);
 				result.setErrorMsg(resultModel.getErrorMsg());
-				return totalAmount;
+				return null;
 			}
-			List<Map<String,Object>> mapList = (List<Map<String, Object>>) resultModel.getObj();
+			List<Map<String, Object>> mapList = (List<Map<String, Object>>) resultModel.getObj();
 			List<Coupon> couponList = new ArrayList<Coupon>();
-			for(Map<String,Object> map : mapList){
+			for (Map<String, Object> map : mapList) {
 				Coupon c = JSONUtil.parse(JSONUtil.toJson(map), Coupon.class);
 				couponList.add(c);
 			}
 			// 判断条件是否满足和是否叠加使用
-			judgeCouponLegitimate(couponList, specsMap, list, result, vip);
+			totalAmount = judgeCouponLegitimate(couponList, specsMap, list, result, vip, platformSource, gradeId);
 			if (!result.isSuccess()) {
-				return totalAmount;
+				return null;
 			}
-			totalAmount = doCalPrice(couponList, specsMap, list, vip, activity);
+			totalAmount = doCalPrice(couponList, totalAmount);
 		}
 		return totalAmount;
 	}
 
-	private Double doCalPrice(List<Coupon> couponList, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			boolean vip, boolean activity) {
+	/**
+	 * @fun 获取扣除优惠券后的订单价格
+	 * @param couponList
+	 * @param totalAmount
+	 * @return
+	 */
+	private Double doCalPrice(List<Coupon> couponList, Double totalAmount) {
 
 		Double couponAmount = 0.0;
-		Double totalAmount = 0.0;
-		GoodsSpecs specs = null;
 		for (Coupon c : couponList) {
 			couponAmount += c.getRule().getDeductibleValue();
-		}
-		for (OrderBussinessModel model : list) {
-			specs = specsMap.get(model.getItemId());
-			totalAmount += GoodsServiceUtil.getAmount(vip, specs, model, specs.getDiscount());
 		}
 		return totalAmount - couponAmount;
 	}
 
 	private final Integer UNSUPERPOSITION = 0;// 0不可叠加使用
 
-	private void judgeCouponLegitimate(List<Coupon> couponList, Map<String, GoodsSpecs> specsMap,
-			List<OrderBussinessModel> list, ResultModel result, boolean vip) {
+	/**
+	 * @fun 判断优惠券是否满足使用条件
+	 * @param couponList
+	 * @param specsMap
+	 * @param list
+	 * @param result
+	 * @param vip
+	 * @param platformSource
+	 * @param gradeId
+	 * @return
+	 * @throws WrongPlatformSource 
+	 */
+	private Double judgeCouponLegitimate(List<Coupon> couponList, Map<String, GoodsSpecs> specsMap,
+			List<OrderBussinessModel> list, ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource {
 
 		List<Integer> superposition = new ArrayList<Integer>();
 		for (Coupon c : couponList) {
 			if (UNSUPERPOSITION.equals(c.getRule().getSuperposition())) {
-				if(superposition.contains(UNSUPERPOSITION)){
+				if (superposition.contains(UNSUPERPOSITION)) {
 					result.setSuccess(false);
 					result.setErrorMsg("不可叠加使用");
-					return;
+					return null;
 				} else {
 					superposition.add(c.getRule().getSuperposition());
 				}
@@ -97,29 +136,34 @@ public class PriceComponent {
 			Integer range = c.getRule().getRange();
 			switch (range) {
 			case FULL_RANGE:
-				doJudgeFullRange(c, specsMap, list, result, vip);
-				break;
+				return doJudgeFullRange(c, specsMap, list, result, vip, platformSource, gradeId);
 			case FIRST_RANGE:
-				doJudgeCategoryRange(c, specsMap, list, result, vip, FIRST_RANGE);
-				break;
+				return doJudgeCategoryRange(c, specsMap, list, result, vip, FIRST_RANGE, platformSource, gradeId);
 			case SECOND_RANGE:
-				doJudgeCategoryRange(c, specsMap, list, result, vip, SECOND_RANGE);
-				break;
+				return doJudgeCategoryRange(c, specsMap, list, result, vip, SECOND_RANGE, platformSource, gradeId);
 			case THIRD_RANGE:
-				doJudgeCategoryRange(c, specsMap, list, result, vip, THIRD_RANGE);
-				break;
+				return doJudgeCategoryRange(c, specsMap, list, result, vip, THIRD_RANGE, platformSource, gradeId);
 			case GIVEN_RANGE:
-				doJudgeGivenRange(c, specsMap, list, result, vip);
-				break;
-			}
-			if (!result.isSuccess()) {
-				return;
+				return doJudgeGivenRange(c, specsMap, list, result, vip, platformSource, gradeId);
 			}
 		}
+		return null;
 	}
 
-	private void doJudgeGivenRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			ResultModel result, boolean vip) {
+	/**
+	 * @fun 判断是否指定商品的优惠券，成功返回总计商品总价
+	 * @param c
+	 * @param specsMap
+	 * @param list
+	 * @param result
+	 * @param vip
+	 * @param platformSource
+	 * @param gradeId
+	 * @return
+	 * @throws WrongPlatformSource 
+	 */
+	private Double doJudgeGivenRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
+			ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource {
 		Double totalAmount = 0.0;
 		List<CouponGoodsbinding> bindList = c.getRule().getBindingList();
 		List<String> goodsIdList = new ArrayList<String>();
@@ -130,8 +174,8 @@ public class PriceComponent {
 			if (goodsIdList.contains(entry.getValue().getGoodsId())) {
 				for (OrderBussinessModel model : list) {
 					if (model.getItemId().equals(entry.getValue().getItemId())) {
-						totalAmount += GoodsServiceUtil.getAmount(vip, entry.getValue(), model,
-								entry.getValue().getDiscount());
+						totalAmount += goodsServiceComponent.getAmount(vip, entry.getValue(), model,
+								entry.getValue().getDiscount(), platformSource, gradeId);
 					}
 				}
 			}
@@ -139,11 +183,26 @@ public class PriceComponent {
 		if (totalAmount < c.getRule().getCondition()) {
 			result.setErrorMsg("不符合优惠券使用条件");
 			result.setSuccess(false);
+			return null;
 		}
+		return totalAmount;
 	}
 
-	private void doJudgeCategoryRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			ResultModel result, boolean vip, int cate) {
+	/**
+	 * @fun 判断优惠券根据分类使用是否成功，成功返回商品总价
+	 * @param c
+	 * @param specsMap
+	 * @param list
+	 * @param result
+	 * @param vip
+	 * @param cate
+	 * @param platformSource
+	 * @param gradeId
+	 * @return
+	 * @throws WrongPlatformSource 
+	 */
+	private Double doJudgeCategoryRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
+			ResultModel result, boolean vip, int cate, int platformSource, int gradeId) throws WrongPlatformSource {
 
 		Double totalAmount = 0.0;
 		String category = null;
@@ -153,8 +212,8 @@ public class PriceComponent {
 			if (category.equals(c.getRule().getCategory())) {
 				for (OrderBussinessModel model : list) {
 					if (model.getItemId().equals(entry.getValue().getItemId())) {
-						totalAmount += GoodsServiceUtil.getAmount(vip, entry.getValue(), model,
-								entry.getValue().getDiscount());
+						totalAmount += goodsServiceComponent.getAmount(vip, entry.getValue(), model,
+								entry.getValue().getDiscount(), platformSource, gradeId);
 					}
 				}
 			}
@@ -162,7 +221,9 @@ public class PriceComponent {
 		if (totalAmount < c.getRule().getCondition()) {
 			result.setErrorMsg("不符合优惠券使用条件");
 			result.setSuccess(false);
+			return null;
 		}
+		return totalAmount;
 	}
 
 	private String getCategory(int cate, Map.Entry<String, GoodsSpecs> entry) {
@@ -177,18 +238,32 @@ public class PriceComponent {
 		return null;
 	}
 
-	private void doJudgeFullRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			ResultModel result, boolean vip) {
+	/**
+	 * @fun 判断优惠券全场使用是否符合，返回商品订单总计
+	 * @param c
+	 * @param specsMap
+	 * @param list
+	 * @param result
+	 * @param vip
+	 * @param platformSource
+	 * @param gradeId
+	 * @return
+	 * @throws WrongPlatformSource 
+	 */
+	private Double doJudgeFullRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
+			ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource {
 
 		Double totalAmount = 0.0;
 		GoodsSpecs specs = null;
 		for (OrderBussinessModel model : list) {
 			specs = specsMap.get(model.getItemId());
-			totalAmount += GoodsServiceUtil.getAmount(vip, specs, model, specs.getDiscount());
+			totalAmount += goodsServiceComponent.getAmount(vip, specs, model, specs.getDiscount(), platformSource, gradeId);
 		}
 		if (totalAmount < c.getRule().getCondition()) {
 			result.setErrorMsg("不符合优惠券使用条件");
 			result.setSuccess(false);
+			return null;
 		}
+		return totalAmount;
 	}
 }

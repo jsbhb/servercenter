@@ -55,7 +55,7 @@ public class ShareProfitComponent {
 
 	@Resource
 	CacheAbstractService cacheAbstractService;
-	
+
 	@Resource
 	OrderOpenInterfaceMapper orderOpenInterfaceMapper;
 
@@ -357,8 +357,10 @@ public class ShareProfitComponent {
 					continue;
 				}
 				try {
+					boolean isWelfareWebsite = Constants.WELFARE_WEBSITE == orderInfo.getOrderSource() ? true : false;
 					double amount = CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity());
 					double nextProportion = 0;// 下一级的返佣比例
+					double welfareWebsiteRebate = 1;//福利网站返佣比例，默认是拿全部返佣
 					// 获取父级的时候已经按照先进先出排完续
 					while (!superNodeList.isEmpty()) {
 						grade = superNodeList.poll();
@@ -366,13 +368,21 @@ public class ShareProfitComponent {
 						if (grade.getId().equals(Constants.CNCOOPBUY)) {
 							continue;
 						}
+						if(isWelfareWebsite){//如果是福利网站
+							if(orderInfo.getShopId() == grade.getId()){
+								welfareWebsiteRebate = grade.getWelfareRebate() == null ? 0 : grade.getWelfareRebate();
+							} else {
+								welfareWebsiteRebate = 1;
+							}
+						}
 						// 获取已经计算的返佣的值
 						double rebate = rebateMap.get(grade.getId()) == null ? 0 : rebateMap.get(grade.getId());
 						// 获取该类型的返佣的比例
 						double proportion = Double.valueOf(goodsRebate.get(grade.getGradeType() + "") == null ? "0"
 								: goodsRebate.get(grade.getGradeType() + ""));
+						//返佣放入map，计算（上一级返佣比例减去下一级返佣比例 乘以福利网站返佣
 						rebateMap.put(grade.getId(), CalculationUtils.add(rebate,
-								CalculationUtils.mul(amount, CalculationUtils.sub(proportion, nextProportion))));
+								CalculationUtils.mul(amount, CalculationUtils.mul(welfareWebsiteRebate, CalculationUtils.sub(proportion, nextProportion)))));
 						nextProportion = proportion;// 记录下一级的返佣比例
 
 					}
@@ -441,14 +451,14 @@ public class ShareProfitComponent {
 		}
 		try {// 资金够的更新出错需要回滚
 			if (orderIdListForCapitalEnough.size() > 0) {
-				if(Constants.OPEN_INTERFACE_TYPE != orderInfo.getCreateType()){
+				if (Constants.OPEN_INTERFACE_TYPE != orderInfo.getCreateType()) {
 					orderMapper.updateOrderCapitalEnough(orderIdListForCapitalEnough);
-				} else {//对接订单单独处理
-					Map<String,Object> param = new HashMap<String, Object>();
+				} else {// 对接订单单独处理
+					Map<String, Object> param = new HashMap<String, Object>();
 					param.put("list", orderIdListForCapitalEnough);
-					if(orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)){//一般贸易订单状态为12
+					if (orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)) {// 一般贸易订单状态为12
 						param.put("status", Constants.CAPITAL_POOL_ENOUGH);
-					} else if(orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)){//跨境订单状态为支付单报关
+					} else if (orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)) {// 跨境订单状态为支付单报关
 						param.put("status", Constants.ORDER_PAY_CUSTOMS);
 					}
 					orderOpenInterfaceMapper.updateOrderStatus(param);

@@ -297,15 +297,15 @@
 
 	<insert id="saveShoppingCart" parameterType="Object">
 		insert into
-		order_shopping_cart(user_id,item_id,item_quantity,goods_name,supplier_id,supplier_name,type,grade_id,create_time)
-		values(#{userId},#{itemId},#{quantity},#{goodsName},#{supplierId},#{supplierName},#{type},#{gradeId},now())
+		order_shopping_cart(user_id,item_id,item_quantity,goods_name,supplier_id,supplier_name,type,grade_id,create_time,platform_type)
+		values(#{userId},#{itemId},#{quantity},#{goodsName},#{supplierId},#{supplierName},#{type},#{gradeId},now(),#{platformSource})
 		on duplicate key update item_quantity= #{quantity} +
 		item_quantity,update_time=now()
 	</insert>
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
 		select * from order_shopping_cart where user_id = #{userId} and
-		grade_id = #{gradeId} order by create_time
+		grade_id = #{gradeId} and platform_type = #{platformSource} order by create_time
 <!-- 		limit 
  		#{pagination.startRow},#{pagination.numPerPage} -->
 	</select>
@@ -383,7 +383,7 @@
 	<!-- 返佣 -->
 	<select id="getOrderByOrderIdForRebate" parameterType="Object" resultMap="orderBase">
 		select
-		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,od.id
+		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,o.order_source,od.id
 		as
 		detail_id,od.payment,o.grade_id,o.order_source,o.create_time,
 		o.mall_id,og.id as

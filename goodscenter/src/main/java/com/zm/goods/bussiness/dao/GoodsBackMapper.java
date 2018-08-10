@@ -311,9 +311,9 @@ public interface GoodsBackMapper {
 
 	void insertTagBindList(List<ERPGoodsTagBindEntity> entityList);
 
-	Page<GoodsEntity> listPublishError(Map<String, Object> param);
+	Page<GoodsEntity> listPublishError(GoodsEntity entity);
 
-	Page<GoodsEntity> listUnPublishError(Map<String, Object> param);
+	Page<GoodsEntity> listUnPublishError(GoodsEntity entity);
 
 	List<ERPGoodsTagBindEntity> selectGoodsTagBindListByItemId(GoodsItemEntity entity);
 

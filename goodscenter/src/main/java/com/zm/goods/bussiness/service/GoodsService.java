@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
@@ -59,7 +60,7 @@ public interface GoodsService {
 	 * @since JDK 1.7
 	 */
 	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip, Integer centerId,
-			Integer orderFlag, String couponIds, Integer userId, boolean isFx);
+			Integer orderFlag, String couponIds, Integer userId, boolean isFx, int platformSource, int gradeId);
 
 	/**
 	 * listGoodsSpecs:获取规格信息.
@@ -70,7 +71,7 @@ public interface GoodsService {
 	 *            feign：通过feign调用该函数，mall默认值，为商城端调用
 	 * @return
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
+	Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource;
 
 	/**
 	 * getActivity:获取活动信息. <br/>
@@ -198,8 +199,6 @@ public interface GoodsService {
 	ResultModel unDistribution(List<String> itemIdList);
 
 	ResultModel syncStock(List<String> itemIdList);
-
-	ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
 
 	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
 

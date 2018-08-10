@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.zm.goods.bussiness.component.GoodsServiceUtil;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
@@ -766,16 +765,13 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	public Page<GoodsEntity> listPublishExceptionGoods(Integer type, GoodsEntity entity, Integer centerId) {
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("centerId", GoodsServiceUtil.judgeCenterId(centerId));
-		param.put("entity", entity);
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		if (PUBLISH_ERROR == type) {
-			Page<GoodsEntity> page = goodsBackMapper.listPublishError(param);
+			Page<GoodsEntity> page = goodsBackMapper.listPublishError(entity);
 			return getListGoodsInfoByPageGoodsInfo(page);
 		}
 		if(UN_PUBLISH_ERROR == type){
-			Page<GoodsEntity> page = goodsBackMapper.listUnPublishError(param);
+			Page<GoodsEntity> page = goodsBackMapper.listUnPublishError(entity);
 			return getListGoodsInfoByPageGoodsInfo(page);
 		}
 		return null;

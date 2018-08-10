@@ -29,7 +29,6 @@ import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
-import com.zm.order.feignclient.ActivityFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.SupplierFeignClient;
@@ -98,8 +97,8 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	ShareProfitComponent shareProfitComponent;
 
-	@Resource
-	ActivityFeignClient activityFeignClient;
+	// @Resource
+	// ActivityFeignClient activityFeignClient;
 
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
@@ -114,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
-		ResultModel result = new ResultModel(true,null);
+		ResultModel result = new ResultModel(true, null);
 		String openId = req.getParameter("openId");
 
 		// 判断参数有效性
@@ -143,7 +142,8 @@ public class OrderServiceImpl implements OrderService {
 		StringBuilder detail = new StringBuilder();
 		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(info, detail);
 		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
-				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId(), false);
+				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId(), false, info.getOrderSource(),
+				info.getShopId());
 		if (!result.isSuccess()) {
 			return result;
 		}
@@ -200,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
 			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
-		
+
 		amount = CalculationUtils.add(amount, taxFee.getTaxFee(), postFee);
 		amount = CalculationUtils.round(2, amount);
 		int totalAmount = (int) CalculationUtils.mul(amount, 100);
@@ -211,10 +211,11 @@ public class OrderServiceImpl implements OrderService {
 			return result;
 		}
 
-		if (info.getCouponIds() != null) {
-			activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION, info.getCenterId(), info.getUserId(),
-					info.getCouponIds());
-		}
+		// if (info.getCouponIds() != null) {
+		// activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION,
+		// info.getCenterId(), info.getUserId(),
+		// info.getCouponIds());
+		// }
 
 		if (info.getPushUserId() != null) {// 如果是推手订单，判断该推手是否有效
 			boolean flag = userFeignClient.verifyEffective(Constants.FIRST_VERSION, info.getShopId(),
@@ -353,9 +354,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<ShoppingCart> listShoppingCart(Map<String, Object> param) throws Exception {
+	public List<ShoppingCart> listShoppingCart(ShoppingCart shoppingCart, Pagination pagination) throws Exception {
 
-		List<ShoppingCart> list = orderMapper.listShoppingCart(param);
+		List<ShoppingCart> list = orderMapper.listShoppingCart(shoppingCart);
 
 		if (list.size() == 0 || list == null) {
 			return null;
@@ -368,8 +369,8 @@ public class OrderServiceImpl implements OrderService {
 
 		String ids = sb.substring(0, sb.length() - 1);
 
-		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids,
-				(Integer) param.get("centerId"), "feign");
+		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids, "feign",
+				shoppingCart.getPlatformSource());
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
 			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");

@@ -113,7 +113,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<ShoppingCart> listShoppingCart(Map<String, Object> param) throws Exception;
+	List<ShoppingCart> listShoppingCart(ShoppingCart shoppingCart, Pagination pagination) throws Exception;
 
 	/**
 	 * getCountByStatus:获取各状态的订单数量. <br/>

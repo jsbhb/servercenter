@@ -97,7 +97,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		// 判断费用
 		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(orderInfo, null);
 		resultModel = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
-				false, 2, orderInfo.getOrderFlag(), orderInfo.getCouponIds(), orderInfo.getUserId(), true);
+				false, 2, orderInfo.getOrderFlag(), orderInfo.getCouponIds(), orderInfo.getUserId(), true, 0, 0);
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}

@@ -80,6 +80,16 @@ public class GoodsSpecs implements Serializable {
 	private Integer conversion;//商品转换比例
 	
 	private String carton;
+	
+	private double welfarePrice;//福利价格
+
+	public double getWelfarePrice() {
+		return welfarePrice;
+	}
+
+	public void setWelfarePrice(double welfarePrice) {
+		this.welfarePrice = welfarePrice;
+	}
 
 	public String getCarton() {
 		return carton;

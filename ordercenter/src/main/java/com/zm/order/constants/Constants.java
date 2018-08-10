@@ -103,6 +103,8 @@ public class Constants {
 	// **********************销售额当天统计前缀***********************
 	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";
 	
+	public static final String GRADEBO_INFO = "gradeBO:";//每个ID的gradeBO信息
+	
 	
 	//*********************包邮包税redis前缀***************************
 	public static final String POST_TAX = "post_tax:";
@@ -114,12 +116,13 @@ public class Constants {
 	
 	
 	//*******************订单来源**********************
-	public static final Integer ORDER_SOURCE_YOUZAN = 3;
-	public static final Integer ORDER_SOURCE_EXHIBITION = 5;
-	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;
+	public static final Integer ORDER_SOURCE_YOUZAN = 3;//有赞
+	public static final Integer ORDER_SOURCE_EXHIBITION = 5;//展厅
+	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;//大客户
+	public static final int WELFARE_WEBSITE = 7;//福利网站
 	
-	//*******************订单来源**********************
-	public static final Integer OPEN_INTERFACE_TYPE = 5;
+	//*******************订单创建类型**********************
+	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
 	
 	//*******************一般贸易金额**********************
 	public static final Integer GENERAL_TRADE_FEE = 500;

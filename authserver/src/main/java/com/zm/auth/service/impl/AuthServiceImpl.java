@@ -116,8 +116,8 @@ public class AuthServiceImpl implements AuthService {
 			}
 			//插入平台用户
 			PlatformUser consumerPlat = new PlatformUser(userId,PlatUserType.CONSUMER.getIndex());
-			PlatformUser pushUserPlat = new PlatformUser(userId,PlatUserType.PUSH_USER.getIndex());
-			set.add(pushUserPlat);
+//			PlatformUser pushUserPlat = new PlatformUser(userId,PlatUserType.PUSH_USER.getIndex());
+//			set.add(pushUserPlat);
 			set.add(consumerPlat);
 			//end
 		}
@@ -282,7 +282,7 @@ public class AuthServiceImpl implements AuthService {
 		if (userInfo == null) {
 			String authUserId = userMapper.getUserIdByUserName(phone);
 			PlatformUser consumerPlat = null;
-			PlatformUser pushUserPlat = null;
+//			PlatformUser pushUserPlat = null;
 			PlatformUser platformUser = null;
 			Set<PlatformUser> set = new HashSet<PlatformUser>();
 			if(authUserId == null){
@@ -295,8 +295,8 @@ public class AuthServiceImpl implements AuthService {
 				userMapper.insert(userInfo);
 				authUserId = userInfo.getUserId();
 				consumerPlat = new PlatformUser(authUserId,PlatUserType.CONSUMER.getIndex());
-				pushUserPlat = new PlatformUser(authUserId,PlatUserType.PUSH_USER.getIndex());
-				set.add(pushUserPlat);
+//				pushUserPlat = new PlatformUser(authUserId,PlatUserType.PUSH_USER.getIndex());
+//				set.add(pushUserPlat);
 				set.add(consumerPlat);
 			}
 			platformUser = new PlatformUser(authUserId,platUserType);

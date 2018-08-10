@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.zm.goods.bussiness.service.GoodsService;
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
@@ -24,18 +25,18 @@ import com.zm.goods.pojo.vo.PageModule;
  * @author user
  *
  */
-public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
+public abstract class GoodsServiceDecoratorAbstract implements GoodsService {
 
-	
 	@Override
 	public abstract Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion);
-	
-	@Override
-	public abstract Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination);
 
 	@Override
-	public abstract Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source);
-	
+	public abstract Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList,
+			Pagination pagination);
+
+	@Override
+	public abstract Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource;
+
 	@Override
 	public List<GoodsFile> listGoodsCookFile(String goodsId) {
 		return null;
@@ -48,7 +49,8 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag, String couponIds, Integer userId, boolean isFx) {
+			Integer centerId, Integer orderFlag, String couponIds, Integer userId, boolean isFx, int platformSource,
+			int gradeId) {
 		return null;
 	}
 
@@ -69,12 +71,12 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 
 	@Override
 	public void updateActiveStart(Integer centerId, Integer activeId) {
-		
+
 	}
 
 	@Override
 	public void updateActiveEnd(Integer centerId, Integer activeId) {
-		
+
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 
 	@Override
 	public void stockBack(List<OrderBussinessModel> list, Integer orderFlag) {
-		
+
 	}
 
 	@Override
@@ -138,17 +140,12 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService{
 	}
 
 	@Override
-	public ResultModel delButtjoinOrderStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
+	public Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set) {
 		return null;
 	}
-	
+
 	@Override
-	public Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set){
-		return null;
-	}
-	
-	@Override
-	public ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag){
+	public ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
 		return null;
 	}
 

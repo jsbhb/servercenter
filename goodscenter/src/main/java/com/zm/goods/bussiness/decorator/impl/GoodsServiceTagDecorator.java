@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.decorator.GoodsServiceDecoratorAbstract;
 import com.zm.goods.bussiness.service.GoodsService;
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.GoodsTagEntity;
@@ -95,8 +96,8 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, Integer centerId, String source) {
-		Map<String, Object> result = goodsServiceImpl.listGoodsSpecs(list, centerId, source);
+	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource {
+		Map<String, Object> result = goodsServiceImpl.listGoodsSpecs(list, source, platformSource, gradeId);
 		List<GoodsSpecs> specsList = (List<GoodsSpecs>) result.get("specsList");
 		List<String> itemIdList = new ArrayList<String>();
 		for (GoodsSpecs specs : specsList) {

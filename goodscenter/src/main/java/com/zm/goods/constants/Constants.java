@@ -57,4 +57,9 @@ public class Constants {
 	//************************redis前缀********************************//
 	public static final String BUTT_JOINT_USER_PREFIX = "buttjoint:";//对接用户
 	
+	public static final String GRADEBO_INFO = "gradeBO:";//每个ID的gradeBO信息
+	
+	//************************福利网站的平台来源ID********************************//
+	public static final int WELFARE_WEBSITE = 7;
+	
 }

@@ -40,6 +40,16 @@ public class ShoppingCart {
 	private Integer freeTax;
 
 	private String href;
+	
+	private int platformSource;
+
+	public int getPlatformSource() {
+		return platformSource;
+	}
+
+	public void setPlatformSource(int platformSource) {
+		this.platformSource = platformSource;
+	}
 
 	public String getHref() {
 		return href;

@@ -8,6 +8,20 @@ public class GradeBO{
 	private Integer parentId;
 	private Integer gradeType;
 	private List<GradeBO> children;
+	private Integer type;
+	private Double welfareRebate;
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
+	public Double getWelfareRebate() {
+		return welfareRebate;
+	}
+	public void setWelfareRebate(Double welfareRebate) {
+		this.welfareRebate = welfareRebate;
+	}
 	public List<GradeBO> getChildren() {
 		return children;
 	}

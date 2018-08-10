@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.Layout;
@@ -147,22 +148,28 @@ public class GoodsController {
 	@ApiOperation(value = "获取多个商品规格接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "query", name = "itemIds", dataType = "String", required = true, value = "商品唯一编码itemId,以逗号隔开"),
-			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+			@ApiImplicitParam(paramType = "query", name = "itemIds", dataType = "String", required = true, value = "商品唯一编码itemId,以逗号隔开") })
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res,
-			@RequestParam(value = "source", required = false, defaultValue = "mall") String source) {
+			@RequestParam(value = "source", required = false, defaultValue = "mall") String source,
+			@RequestParam(value = "platformSource", required = false, defaultValue = "0") int platformSource,
+			@RequestParam(value = "gradeId", required = false, defaultValue = "0") int gradeId) {
 
 		ResultModel result = new ResultModel();
 		String ids = req.getParameter("itemIds");
-		Integer centerId = Integer.valueOf(req.getParameter("centerId"));
 
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = goodsService.listGoodsSpecs(list, centerId, source);
-			// Map<String, Object> resultMap =
-			// goodsTagDecorator.listGoodsSpecs(list, centerId, source);
+			Map<String, Object> resultMap = null;
+			try {
+				resultMap = goodsService.listGoodsSpecs(list, source, platformSource, gradeId);
+			} catch (WrongPlatformSource e) {
+				LogUtil.writeErrorLog("获取规格信息出错", e);
+				result.setSuccess(false);
+				result.setErrorMsg(e.getMessage());
+				return result;
+			}
 
 			result.setSuccess(true);
 			result.setObj(resultMap);
@@ -176,35 +183,17 @@ public class GoodsController {
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
 			Integer centerId, Integer orderFlag, @RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId, boolean isFx) {
+			@RequestParam(value = "userId", required = false) Integer userId, boolean isFx, int platformSource,
+			int gradeId) {
 
 		ResultModel result = new ResultModel();
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
 				result = goodsService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds, userId,
-						isFx);
+						isFx, platformSource, gradeId);
 			}
 		} catch (Exception e) {
 			LogUtil.writeErrorLog("【获取商品价格信息出错】", e);
-			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
-			result.setSuccess(false);
-			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());
-		}
-
-		return result;
-	}
-
-	@RequestMapping(value = "{version}/goods/for-buttjoinorder", method = RequestMethod.POST)
-	@ApiIgnore
-	public ResultModel delButtjoinOrderStock(@PathVariable("version") Double version,
-			@RequestBody List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag) {
-		ResultModel result = new ResultModel();
-		try {
-			if (Constants.FIRST_VERSION.equals(version)) {
-				result = goodsService.delButtjoinOrderStock(list, supplierId, orderFlag);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 			result.setErrorMsg(ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			result.setSuccess(false);
 			result.setErrorCode(ErrorCodeEnum.SERVER_ERROR.getErrorCode());

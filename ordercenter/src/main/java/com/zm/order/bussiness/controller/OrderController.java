@@ -271,22 +271,20 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "gradeID") })
 	public ResultModel listShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId,
-			Pagination pagination) {
+			Pagination pagination,@RequestParam(value="platformSource",required = false, defaultValue = "0") int platformSource) {
 
-		ResultModel result = new ResultModel();
+		ResultModel result = new ResultModel(); 
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			Integer mallId = Integer.valueOf(req.getParameter("centerId"));
+			ShoppingCart shoppingCart = new ShoppingCart();
 			pagination.init();
-			param.put("userId", userId);
-			param.put("gradeId", gradeId);
-			param.put("pagination", pagination);
-			param.put("centerId", mallId);
+			shoppingCart.setUserId(userId);
+			shoppingCart.setGradeId(gradeId);
+			shoppingCart.setPlatformSource(platformSource);
 
 			List<ShoppingCart> list = null;
 			try {
-				list = orderService.listShoppingCart(param);
+				list = orderService.listShoppingCart(shoppingCart,pagination);
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("获取用户购物车接口", e);
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),

@@ -670,16 +670,16 @@
 	<select id="listPublishError" parameterType="Object" resultMap="entity">
 		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name from goods g 
 		where g.status = 1 and is_publish = 0 
-		<if test="entity.goodsName != null and entity.goodsName != ''">
-			and goods_name like concat('%',#{entity.goodsName},'%') 
+		<if test="goodsName != null and goodsName != ''">
+			and goods_name like concat('%',#{goodsName},'%') 
 		</if>
 	</select>
 	
 	<select id="listUnPublishError" parameterType="Object" resultMap="entity">
 		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name from goods g 
 		where g.status = 0 and is_publish = 1 
-		<if test="entity.goodsName != null and entity.goodsName != ''">
-			and goods_name like concat('%',#{entity.goodsName},'%') 
+		<if test="goodsName != null and goodsName != ''">
+			and goods_name like concat('%',#{goodsName},'%') 
 		</if>
 	</select>
 	
