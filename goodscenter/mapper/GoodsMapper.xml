@@ -341,7 +341,11 @@
 		left join goods_stock stock on gi.item_id = stock.item_id 
 		left join goods g on gi.goods_id = g.goods_id 
 		left join goods_price bgp on gi.item_id = bgp.item_id 
-		where gi.status = 1 and gi.is_del = 0 and gi.goods_id in
+		where gi.status = 1 and gi.is_del = 0 
+		<if test="isFx != null">
+			and gi.is_fx = #{isFx} 
+		</if>
+		and gi.goods_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item,jdbcType = VARCHAR}

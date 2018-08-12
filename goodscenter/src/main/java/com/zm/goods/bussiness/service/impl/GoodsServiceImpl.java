@@ -620,7 +620,7 @@ public class GoodsServiceImpl implements GoodsService {
 			// }
 			//
 			// }
-
+			searchParm.put("isFx", searchModel.getFx());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
 			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
 			List<GoodsSpecs> temList = null;
