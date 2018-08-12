@@ -109,6 +109,7 @@ public class GoodsLucene extends AbstractLucene {
 		doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
 		doc.add(new IntField("ratio", model.getRatio() == null ? 0 : model.getRatio(), Store.NO));
 		doc.add(new StringField("type", model.getType() == null ? "0" : model.getType() + "", Store.NO));
+		doc.add(new StringField("fx", model.getFx() == null ? "0" : model.getFx() + "", Store.NO));
 		doc.add(new StringField("upShelves", "1", Store.NO));
 		doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
 		doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));

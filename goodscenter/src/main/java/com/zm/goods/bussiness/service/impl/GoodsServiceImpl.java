@@ -466,7 +466,8 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	// 更新上架中goods的tag lucene索引
-	private void updateLuceneIndex(List<String> updateTagList, Integer centerId) {
+	@Override
+	public void updateLuceneIndex(List<String> updateTagList, Integer centerId) {
 		List<GoodsItem> itemList = goodsMapper.listGoodsForLuceneUpdateTag(updateTagList);
 		if (itemList != null && itemList.size() > 0) {
 			GoodsSearch search = null;
@@ -474,6 +475,7 @@ public class GoodsServiceImpl implements GoodsService {
 			List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
 			Map<String, Double> result = null;
 			for (GoodsItem item : itemList) {
+				boolean isFx = false;
 				sb.delete(0, sb.length());
 				search = new GoodsSearch();
 				LucenceModelConvertor.convertToGoodsSearch(item, search);
@@ -481,6 +483,9 @@ public class GoodsServiceImpl implements GoodsService {
 					result = goodsServiceComponent.getMinPrice(item.getGoodsSpecsList());
 					search.setPrice(result.get("realPrice"));
 					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
+						if(specs.getFx() == CAN_BE_FX){//有一个可以分销的就要做进lucene
+							isFx = true;
+						}
 						if (specs.getTagList() != null) {
 							for (GoodsTagEntity entity : specs.getTagList()) {
 								sb.append(entity.getTagName() + ",");
@@ -492,6 +497,11 @@ public class GoodsServiceImpl implements GoodsService {
 					} else {
 						search.setTag(sb.toString());
 					}
+					if(isFx){
+						search.setFx(CAN_BE_FX);
+					} else {
+						search.setFx(CAN_NOT_BE_FX);
+					}
 				}
 				searchList.add(search);
 			}
@@ -499,6 +509,9 @@ public class GoodsServiceImpl implements GoodsService {
 			lucene.updateIndex(searchList);
 		}
 	}
+	
+	private final Integer CAN_BE_FX = 1;
+	private final Integer CAN_NOT_BE_FX = 0;
 
 	private void createNewLucenIndex(Map<String, Object> param, List<GoodsSearch> searchList, List<GoodsItem> itemList,
 			List<String> goodsIds, List<String> itemIds) {
@@ -533,10 +546,14 @@ public class GoodsServiceImpl implements GoodsService {
 			StringBuilder sb = new StringBuilder();
 			for (Map.Entry<String, GoodsSearch> entry : temp.entrySet()) {
 				tempList = tempSpecs.get(entry.getKey());
+				boolean isFx = false;
 				if (tempList != null && tempList.size() > 0) {
 					result = goodsServiceComponent.getMinPrice(tempList);
 					sb.delete(0, sb.length());
 					for (GoodsSpecs specs : tempList) {
+						if(specs.getFx() == CAN_BE_FX){
+							isFx = true;
+						}
 						if (specs.getTagList() != null && specs.getTagList().size() > 0) {
 							for (GoodsTagEntity entity : specs.getTagList()) {
 								sb.append(entity.getTagName());
@@ -549,6 +566,11 @@ public class GoodsServiceImpl implements GoodsService {
 						entry.getValue().setTag(sb.substring(0, sb.length() - 1));
 					} else {
 						entry.getValue().setTag(sb.toString());
+					}
+					if(isFx){
+						entry.getValue().setFx(CAN_BE_FX);
+					} else {
+						entry.getValue().setFx(CAN_NOT_BE_FX);
 					}
 				}
 			}

@@ -46,6 +46,11 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService {
 	public Map<String, Object> tradeGoodsDetail(String itemId, Integer centerId) {
 		return null;
 	}
+	
+	@Override
+	public void updateLuceneIndex(List<String> updateTagList, Integer centerId) {
+		
+	}
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,

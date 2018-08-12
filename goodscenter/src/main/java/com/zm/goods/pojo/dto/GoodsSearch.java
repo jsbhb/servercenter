@@ -54,6 +54,17 @@ public class GoodsSearch {
 	private String tag;
 
 	private Integer ratio;
+	
+	@SearchCondition(value = SearchCondition.FILTER)
+	private Integer fx;
+
+	public Integer getFx() {
+		return fx;
+	}
+
+	public void setFx(Integer fx) {
+		this.fx = fx;
+	}
 
 	public Integer getRatio() {
 		return ratio;

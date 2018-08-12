@@ -40,6 +40,7 @@
 		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
 			<id column="specs_id" property="id" jdbcType="INTEGER" />
 			<result column="info" property="info" jdbcType="VARCHAR" />
+			<result column="is_fx" property="fx" jdbcType="INTEGER" />
 			<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
 				<id column="price_id" property="id" jdbcType="INTEGER" />
 				<result column="price" property="price" jdbcType="NUMERIC" />
@@ -84,6 +85,7 @@
 		<result column="info" property="info" jdbcType="VARCHAR" />
 		<result column="carton" property="carton" jdbcType="VARCHAR" />
 		<result column="qpqty" property="stock" jdbcType="INTEGER" />
+		<result column="is_fx" property="fx" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
@@ -459,7 +461,7 @@
 	<select id="listGoodsForLuceneUpdateTag" resultMap="goodsItem" parameterType="Object">
 		select g.id,g.goods_id,gi.id as specs_id, gt.id as tag_id,gt.tag_name,g.create_time, 
 		g.goods_name as customGoodsName ,g.is_popular, g.type,gi.info,bgp.id as price_id, 
-		bgp.retail_price as price, gi.discount,
+		bgp.retail_price as price, gi.discount,gi.is_fx,
 		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category 
 		from goods g 
 		left join goods_item gi on g.goods_id = gi.goods_id 
@@ -496,7 +498,7 @@
 	</select>
 	
 	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
-		select gi.id,gi.goods_id,gi.info,bgp.id as price_id, bgp.retail_price as price, gi.discount,gt.id as tag_id,gt.tag_name 
+		select gi.id,gi.goods_id,gi.is_fx,gi.info,bgp.id as price_id, bgp.retail_price as price, gi.discount,gt.id as tag_id,gt.tag_name 
 		from goods_item gi 
 		left join goods_price bgp on gi.item_id = bgp.item_id 
 		left join goods_tag_bind gtb on gi.item_id = gtb.item_id 

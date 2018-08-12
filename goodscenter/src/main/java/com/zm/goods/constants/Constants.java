@@ -62,4 +62,6 @@ public class Constants {
 	//************************福利网站的平台来源ID********************************//
 	public static final int WELFARE_WEBSITE = 7;
 	
+	public static final Integer CNCOOPBUY = 2;
+	
 }

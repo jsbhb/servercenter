@@ -271,4 +271,6 @@ public interface GoodsItemMapper {
 	void updateGoodsItemNotBeFxForBatch(List<String> list);
 
 	void updateGoodsItemUpdateTimeByItemIdList(List<String> list);
+	
+	List<GoodsEntity> listGoodsIdByItemList(List<String> list);
 }

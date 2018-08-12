@@ -26,7 +26,11 @@ import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsItemService;
+import com.zm.goods.bussiness.service.GoodsService;
+import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.GoodsStatusEnum;
+import com.zm.goods.enummodel.PublishType;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
@@ -36,6 +40,9 @@ import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
+import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.seo.publish.PublishComponent;
+import com.zm.goods.utils.JSONUtil;
 
 /**
  * ClassName: GoodsBackServiceImpl <br/>
@@ -59,6 +66,9 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
+	
+	@Resource
+	GoodsService goodsService;
 
 	@Override
 	public Page<GoodsItemEntity> queryByPage(GoodsItemEntity entity) {
@@ -125,7 +135,29 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		goodsItemMapper.updateIsFXStatus(entity);
 		List<String> itemIdList = new ArrayList<String>();
 		itemIdList.add(entity.getItemId());
+		//更新索引并发布
+		updateLuceneAndPublish(itemIdList);
 		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
+	}
+
+	private void updateLuceneAndPublish(List<String> itemIdList, PublishType publishType) {
+		List<String> goodsIdList = new ArrayList<String>();
+		Map<String,List<String>> publishMap = new HashMap<String,List<String>>();
+		List<String> tempList = null;
+		List<GoodsEntity> goodsList = goodsItemMapper.listGoodsIdByItemList(itemIdList);
+		for(GoodsEntity temp : goodsList){
+			goodsIdList.add(temp.getGoodsId());
+			tempList = new ArrayList<String>();
+			for(GoodsItemEntity itemEntity : temp.getItems()){
+				tempList.add(itemEntity.getItemId());
+			}
+			publishMap.put(temp.getGoodsId(), tempList);
+		}
+		ResultModel result = PublishComponent.publish(JSONUtil.toJson(publishMap), publishType);//前端发布
+		if(!result.isSuccess()){
+			LogUtil.writeLog(publishType.getUrl() + "发布失败" + JSONUtil.toJson(publishMap));
+		}
+		goodsService.updateLuceneIndex(goodsIdList, Constants.CNCOOPBUY);//更新LUCENE
 	}
 
 	@Override
@@ -134,6 +166,8 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		goodsItemMapper.updateIsFXStatus(entity);
 		List<String> itemIdList = new ArrayList<String>();
 		itemIdList.add(entity.getItemId());
+		//更新索引并发布
+		updateLuceneAndPublish(itemIdList);
 		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
@@ -239,6 +273,8 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
+		//更新索引并发布
+		updateLuceneAndPublish(itemIdList, publishType);
 		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
@@ -248,6 +284,8 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemNotBeFxForBatch(itemIdList);
+		//更新索引并发布
+		updateLuceneAndPublish(itemIdList, publishType);
 		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 

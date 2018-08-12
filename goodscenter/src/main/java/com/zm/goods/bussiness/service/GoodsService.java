@@ -203,5 +203,12 @@ public interface GoodsService {
 	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
 
 	ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
+	
+	/**
+	 * @fun 更新lucene索引
+	 * @param updateTagList
+	 * @param centerId
+	 */
+	void updateLuceneIndex(List<String> updateTagList, Integer centerId);
 
 }

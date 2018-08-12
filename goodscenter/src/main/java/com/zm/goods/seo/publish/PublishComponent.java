@@ -8,10 +8,10 @@ import com.zm.goods.utils.JSONUtil;
 
 public class PublishComponent {
 
-		public static ResultModel publish(String jsonStr,PublishType type){
-			LogUtil.writeLog(jsonStr);
-			String result = HttpClientUtil.post(type.getUrl(), jsonStr, type.getMethod());
-			LogUtil.writeLog(result);
-			return JSONUtil.parse(result, ResultModel.class);
-		}
+	public static ResultModel publish(String jsonStr, PublishType type) {
+		LogUtil.writeLog(jsonStr);
+		String result = HttpClientUtil.post(type.getUrl(), jsonStr, type.getMethod());
+		LogUtil.writeLog(result);
+		return JSONUtil.parse(result, ResultModel.class);
+	}
 }

@@ -789,6 +789,14 @@
 		update goods_item set is_fx= #{status},update_time=now() where item_id  = #{itemId}
 	</update>
 	
+	<select id="listGoodsIdByItemList" resultMap="goodsItems">
+		select goods_id,item_id from goods_item where item_id in 
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+		</foreach>
+		order by goods_id
+	</select>
+	
 	<update id="updateGoodsItemNotBeFxForBatch" parameterType="Object">
 		update goods_item set is_fx = 0, update_time=now() where status = 1 and item_id in
 		<foreach collection="list" item="item" open="(" close=")"
