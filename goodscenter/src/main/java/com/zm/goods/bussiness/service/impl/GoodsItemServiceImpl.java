@@ -136,7 +136,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		List<String> itemIdList = new ArrayList<String>();
 		itemIdList.add(entity.getItemId());
 		//更新索引并发布
-		updateLuceneAndPublish(itemIdList);
+		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_DELETE);
 		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 
@@ -167,7 +167,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		List<String> itemIdList = new ArrayList<String>();
 		itemIdList.add(entity.getItemId());
 		//更新索引并发布
-		updateLuceneAndPublish(itemIdList);
+		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_CREATE);
 		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
@@ -274,7 +274,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
 		//更新索引并发布
-		updateLuceneAndPublish(itemIdList, publishType);
+		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_CREATE);
 		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
@@ -285,7 +285,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemNotBeFxForBatch(itemIdList);
 		//更新索引并发布
-		updateLuceneAndPublish(itemIdList, publishType);
+		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_DELETE);
 		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 
