@@ -188,6 +188,13 @@
 		<result column="opt" property="opt"/>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsItems">
+		<id column="goods_id" property="goodsId"/>
+		<collection property="items" ofType="com.zm.goods.pojo.GoodsItemEntity">
+			<id column="item_id" property="itemId"/>
+		</collection>
+	</resultMap>
+	
 	<select id="selectById" parameterType="Object" resultMap="entity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,
 		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
