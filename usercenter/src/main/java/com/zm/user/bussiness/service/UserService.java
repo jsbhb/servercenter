@@ -202,4 +202,8 @@ public interface UserService {
 	String getPhoneByUserId(Integer userId);
 
 	ResultModel getAllCustomer();
+
+	ResultModel userBindInviterCode(UserInfo info);
+
+	ResultModel userCheckInviterInfo(UserInfo info);
 }

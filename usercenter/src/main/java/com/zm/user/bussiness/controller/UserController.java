@@ -225,8 +225,14 @@ public class UserController {
 				}
 				if (flag) {
 					Integer userId = userService.saveUser(info);
-					result.setObj(userId);
-					result.setSuccess(true);
+					//如果userId是负数则提示邀请码校验失败
+					if (userId < 0) {
+						result.setSuccess(false);
+						result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+					} else {
+						result.setObj(userId);
+						result.setSuccess(true);
+					}
 				} else {
 					result.setObj(Constants.PHONE_VERIFY_ERROR_CODE);
 					result.setSuccess(false);
@@ -548,6 +554,26 @@ public class UserController {
 	public ResultModel getAllCustomer(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return userService.getAllCustomer();
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/user/bindInviterCode", method = RequestMethod.POST)
+	public ResultModel bindInviterCode(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @RequestBody UserInfo info) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return userService.userBindInviterCode(info);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/user/checkInviterInfo", method = RequestMethod.POST)
+	public ResultModel checkInviterInfo(@PathVariable("version") Double version, HttpServletResponse res,
+			HttpServletRequest req, @RequestBody UserInfo info) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return userService.userCheckInviterInfo(info);
 		}
 		return new ResultModel(false, "版本错误");
 	}

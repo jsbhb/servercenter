@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.user.bussiness.dao.WelfareMapper">
+	<resultMap type="com.zm.user.pojo.InviterEntity" id="inviter">
+		<id column="id" property="id"/>
+		<result column="grade_id" property="gradeId" />
+		<result column="name" property="name"/>
+		<result column="phone" property="phone"/>
+		<result column="invitation_code" property="invitationCode"/>
+		<result column="status" property="status"/>
+		<result column="user_center_id" property="userCenterId"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<result column="bind_name" property="bindName"/>
+		<result column="bind_phone" property="bindPhone"/>
+	</resultMap>
+	
+	<insert id="insertInviterInfo" parameterType="Object">
+		insert into welfare_inviter 
+		(grade_id,name,phone,status,create_time,update_time,opt)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.gradeId},#{item.name},#{item.phone},#{item.status},now(),now(),#{item.opt})
+		</foreach>
+	</insert>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="inviter">
+		select wi.*,u.phone bind_phone,ifnull(ud.name,ud.nick_name) bind_name
+		from welfare_inviter wi 
+		left join user u on wi.user_center_id = u.id
+		left join user_detail ud on wi.user_center_id = ud.user_id
+		where 1=1 
+		<if test="gradeId !=null and gradeId !=''">
+			and wi.grade_id = #{gradeId}
+		</if>
+		<if test="name !=null and name !=''">
+			and wi.name = #{name}
+		</if>
+		<if test="phone !=null and phone !=''">
+			and wi.phone = #{phone}
+		</if>
+		<if test="invitationCode !=null and invitationCode !=''">
+			and wi.invitation_code = #{invitationCode}
+		</if>
+		<if test="status !=null and status !=-1">
+			and wi.status = #{status}
+		</if>
+		<if test="bindName !=null and bindName !=''">
+			and (ud.name like concat('%',#{bindName},'%') or ud.nick_name like concat('%',#{bindName},'%'))
+		</if>
+		<if test="bindPhone !=null and bindPhone !=''">
+			and u.phone = #{bindPhone}
+		</if>
+		order by wi.update_time desc,wi.create_time desc
+	</select>
+	
+	<update id="updateInviterInfo" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update welfare_inviter
+	        <set>
+				<if test="item.name !=null and item.name !=''">
+					name = #{item.name},
+				</if>
+				<if test="item.phone !=null and item.phone !=''">
+					phone = #{item.phone},
+				</if>
+				<if test="item.invitationCode !=null and item.invitationCode !=''">
+					invitation_code = #{item.invitationCode},
+				</if>
+				<if test="item.status !=null and item.status !=-1">
+					status = #{item.status},
+				</if>
+				<if test="item.userCenterId !=null and item.userCenterId !=''">
+					user_center_id = #{item.userCenterId},
+				</if>
+				<if test="item.opt !=null and item.opt !=''">
+					opt = #{item.opt},
+				</if>
+		        update_time = now()
+			</set>
+			where id = #{item.id}
+		</foreach>
+	</update>
+	
+	<select id="selectInviterListByParam" parameterType="Object" resultMap="inviter">
+		select wi.*,u.phone bind_phone,ifnull(ud.name,ud.nick_name) bind_name
+		from welfare_inviter wi 
+		left join user u on wi.user_center_id = u.id
+		left join user_detail ud on wi.user_center_id = ud.user_id
+		where 1=1 
+		<if test="entity.gradeId !=null and entity.gradeId !=''">
+			and wi.grade_id = #{entity.gradeId}
+		</if>
+		<if test="entity.status !=null and entity.status !=-1">
+			and wi.status = #{entity.status}
+		</if>
+		<if test="gradeId !=null and gradeId !=''">
+			and wi.grade_id = #{gradeId}
+		</if>
+		<if test="invitationCode !=null and invitationCode !=''">
+			and wi.invitation_code = #{invitationCode}
+		</if>
+		<if test="regChkStatus !=null and regChkStatus !=-1">
+			and wi.status not in (0,3,4)
+		</if>
+		<if test="list != null and list.size() > 0">
+			and wi.id in 
+			<foreach collection="list" item="item" open="(" separator="," close=")">
+                #{item}
+			</foreach>
+		</if>
+		<if test="userCenterId !=null and userCenterId !=-1">
+			and wi.user_center_id =#{userCenterId}
+		</if>
+	</select>
+</mapper>

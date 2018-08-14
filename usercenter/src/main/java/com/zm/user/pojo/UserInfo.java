@@ -66,6 +66,8 @@ public class UserInfo {
 	private Integer vipLevel;
 	
 	private Address address;
+	
+	private String invitationCode;
 
 	public boolean check() {
 		return (account != null || phone != null || email != null) && centerId != null;
@@ -293,6 +295,14 @@ public class UserInfo {
 
 	public void setUserDetail(UserDetail userDetail) {
 		this.userDetail = userDetail;
+	}
+
+	public String getInvitationCode() {
+		return invitationCode;
+	}
+
+	public void setInvitationCode(String invitationCode) {
+		this.invitationCode = invitationCode;
 	}
 
 	@Override

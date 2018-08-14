@@ -1,5 +1,6 @@
 package com.zm.user.bussiness.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.dao.UserMapper;
+import com.zm.user.bussiness.dao.WelfareMapper;
 import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
@@ -23,6 +25,7 @@ import com.zm.user.feignclient.model.PayModel;
 import com.zm.user.pojo.AbstractPayConfig;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.Grade;
+import com.zm.user.pojo.InviterEntity;
 import com.zm.user.pojo.ThirdLogin;
 import com.zm.user.pojo.UserDetail;
 import com.zm.user.pojo.UserInfo;
@@ -69,6 +72,9 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	RedisTemplate<String, String> template;// 反序列化用的是stringSerializer，后期代码都采用该方法
+	
+	@Resource
+	WelfareMapper welfareMapper;
 
 	@Override
 	public boolean userNameVerify(Map<String, String> param) {
@@ -130,6 +136,9 @@ public class UserServiceImpl implements UserService {
 				userMapper.saveWechat(new ThirdLogin(userId, info.getWechat(), Constants.WX_LOGIN));
 			}
 
+			info.setId(userId);
+			userId = checkInviterCode(info);
+			
 			return userId;
 		}
 
@@ -159,7 +168,24 @@ public class UserServiceImpl implements UserService {
 			info.getAddress().setUserId(info.getId());
 			saveAddress(info.getAddress());
 		}
+		
+		info.setId(checkInviterCode(info));
 
+		return info.getId();
+	}
+	
+	private Integer checkInviterCode(UserInfo info) {
+		//校验邀请码是否正确，不正确时将user_id的值做负处理
+		if (info.getInvitationCode() != null && !"".equals(info.getInvitationCode())) {
+			Map<String,Object> param = new HashMap<String,Object>();
+			param.put("gradeId", info.getCenterId());
+			param.put("invitationCode", info.getInvitationCode());
+			param.put("regChkStatus", 1);
+			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
+			if (inviterList == null || inviterList.size() <= 0) {
+				info.setId(info.getId() * -1);
+			}
+		}
 		return info.getId();
 	}
 
@@ -384,7 +410,7 @@ public class UserServiceImpl implements UserService {
 		// 通知订单中心新增grade并做缓存
 		GradeBO gradeBO = ConvertUtil.converToGradeBO(grade);
 		template.opsForHash().put(Constants.GRADEBO_INFO, grade.getId(), JSONUtil.toJson(gradeBO));
-		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);//ordercenter需要实时推送，需要更新统计信息
+		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
 		if (Constants.BUTT_JOINT_USER.equals(grade.getType())) {
 			template.opsForSet().add(Constants.BUTT_JOINT_USER_PREFIX,
 					JSONUtil.toJson(ConvertUtil.converToButtjoinUserBO(grade)));
@@ -419,6 +445,67 @@ public class UserServiceImpl implements UserService {
 	public ResultModel getAllCustomer() {
 		List<UserDetail> list = userMapper.getAllCustomer();
 		return new ResultModel(true, list);
+	}
+
+	@Override
+	public ResultModel userBindInviterCode(UserInfo info) {
+		ResultModel result = new ResultModel();
+		
+		info.setId(checkInviterCode(info));
+		if (info.getId() < 0) {
+			result.setSuccess(false);
+			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+		} else {
+			Map<String,Object> param = new HashMap<String,Object>();
+			param.put("gradeId", info.getCenterId());
+			param.put("invitationCode", info.getInvitationCode());
+			param.put("regChkStatus", 1);
+			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
+			if (inviterList == null || inviterList.size() <= 0) {
+				result.setSuccess(false);
+				result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+				return result;
+			}
+			
+			InviterEntity inviter = null;
+			List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
+			for (InviterEntity ie: inviterList) {
+				if (ie.getPhone().equals(info.getPhone())) {
+					ie.setUserCenterId(info.getId());
+					ie.setStatus(3);
+					inviter = ie;
+					break;
+				}
+			}
+			if (inviter == null) {
+				inviter = inviterList.get(0);
+				inviter.setUserCenterId(info.getId());
+				inviter.setStatus(3);
+			}
+			updInviterList.add(inviter);
+			welfareMapper.updateInviterInfo(updInviterList);
+			result.setSuccess(true);
+		}
+		return result;
+	}
+
+	@Override
+	public ResultModel userCheckInviterInfo(UserInfo info) {
+		ResultModel result = new ResultModel();
+		
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("gradeId", info.getCenterId());
+		param.put("userCenterId", info.getId());
+		param.put("regChkStatus", 1);
+		List<InviterEntity> infoList = welfareMapper.selectInviterListByParam(param);
+		if (infoList != null && infoList.size() > 0) {
+			result.setSuccess(true);
+		} else {
+			result.setSuccess(false);
+			result.setErrorMsg("当前账号没有绑定邀请码，请绑定邀请码！");
+		}
+		
+		return result;
 	}
 
 }
