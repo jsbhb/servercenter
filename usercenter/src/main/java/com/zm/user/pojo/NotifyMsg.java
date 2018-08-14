@@ -53,5 +53,11 @@ public class NotifyMsg {
 	public void setType(NotifyTypeEnum type) {
 		this.type = type;
 	}
+
+	@Override
+	public String toString() {
+		return "NotifyMsg [phone=" + phone + ", time=" + time + ", name=" + name + ", shopName=" + shopName + ", msg="
+				+ msg + ", type=" + type + "]";
+	}
 	
 }

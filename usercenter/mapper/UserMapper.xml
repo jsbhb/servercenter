@@ -369,7 +369,7 @@
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
 		create_time,opt,company,redirect_url,mobile_url,type,appKey,appSecret,welfare_rebate)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company},#{redirectUrl},#{mobileUrl},#{type},#{appKey},#{appSecret},{#welfareRebate})
+		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company},#{redirectUrl},#{mobileUrl},#{type},#{appKey},#{appSecret},#{welfareRebate})
 	</insert>
 	
 	<select id="listCenterId" resultType="java.lang.Integer">
