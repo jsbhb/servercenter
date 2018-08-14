@@ -196,7 +196,7 @@ public class EncryptionUtil {
     private static final int binLen=r.length;
 
     /** 序列最小长度 */
-    private static final int s=6;
+    private static final int s=10;
     
     /**
      * 根据ID生成六位随机码
