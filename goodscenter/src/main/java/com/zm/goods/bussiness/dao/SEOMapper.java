@@ -3,25 +3,28 @@ package com.zm.goods.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.PagePO;
+import com.zm.goods.seo.model.CategoryPath;
 import com.zm.goods.seo.model.GoodsTempModel;
 import com.zm.goods.seo.model.SEOModel;
 
 public interface SEOMapper {
 	
-	GoodsItem getGoods(String goodsId);
+	List<GoodsItem> listGoods(List<String> goodsIdList);
 
-	String queryGoodsCategoryPath(String thirdCategory);
+	List<CategoryPath> queryGoodsCategoryPath(List<String> thirdCategoryList);
 	
 	List<String> listItemIdsByGoodsId(String goodsId);
 
 	List<ItemStockBO> listStockByItemIds(List<String> itemIds);
 	
-	void updateGoodsAccessPath(Map<String,Object> param);
+	void updateGoodsAccessPath(@Param("map") Map<String,Object> param);
 	
-	SEOModel getGoodsSEO(String goodsId);
+	List<SEOModel> listGoodsSEO(List<String> goodsIdList);
 	
 	SEOModel getPageSEO(Integer id);
 	
@@ -37,11 +40,11 @@ public interface SEOMapper {
 	
 	String getGoodsIdByItemId(String itemId);
 
-	void updateGoodsPublishByGoodsId(String goodsId);
+	void updateGoodsPublishByGoodsId(List<String> goodsIdList);
 
 	void updateGoodsDelPublishByGoodsId(String goodsId);
 	
-	void updateGoodsRePublishByGoodsId(Map<String, Object> param);
+	void updateGoodsRePublishByGoodsId(List<String> goodsIdList);
 	
 	List<GoodsTempModel> getDownShelvesGoodsIdByGoodsId(List<String> goodsIdList);
 

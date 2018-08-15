@@ -101,7 +101,7 @@
 		</collection>
 	</resultMap>
 	
-	<select id="getGoods" parameterType="Object" resultMap="goodsItem">
+	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select g.id,g.goods_id ,g.goods_name as customGoodsName, g.description,g.detail_path,gf.id as file_id,gf.path,
 		gi.excise_tax,gi.info,gi.conversion,gi.item_id,gi.item_code,gi.sku,gi.weight,gi.carton,gp.min,gp.max,gp.retail_price,
 		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,gi.is_fx,
@@ -112,7 +112,11 @@
 		left join goods_file gf on g.goods_id = gf.goods_id 
 		left join goods_item gi on g.goods_id = gi.goods_id 
 		left join goods_price gp on gp.item_id = gi.item_id 
-		where g.goods_id = #{goodsId} and gi.status = 1 and g.is_del = 0 order by file_id
+		where g.goods_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+		and gi.status = 1 and g.is_del = 0 order by g.goods_id, file_id
 	</select>
 	
 	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
@@ -129,18 +133,26 @@
 		</foreach> 
 	</select>
 	
-	<select id="queryGoodsCategoryPath" parameterType="Object" resultType="java.lang.String">
-		select concat_ws('/',gfc.access_path,gsc.access_path,gtc.access_path) as path from goods_first_category gfc left join
+	<select id="queryGoodsCategoryPath" parameterType="Object" resultType="com.zm.goods.seo.model.CategoryPath">
+		select distinct gtc.third_id as thirdId,concat_ws('/',gfc.access_path,gsc.access_path,gtc.access_path) as path from goods_first_category gfc left join
 		goods_second_category gsc on gfc.first_id = gsc.first_id left join goods_third_category gtc 
-		on gsc.second_id = gtc.second_id where gtc.third_id = #{thirdId} 
+		on gsc.second_id = gtc.second_id where gtc.third_id in  
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
 	</select>
 	
 	<update id="updateGoodsAccessPath" parameterType="Object">
-		update goods set access_path = #{accessPath} where goods_id = #{goodsId}
+		<foreach collection="map.entrySet()" item="value" index="key" separator=";">  
+			update goods set access_path = #{value} where goods_id = #{key}
+		</foreach>
 	</update>
 	
-	<select id="getGoodsSEO" parameterType="Object" resultType="com.zm.goods.seo.model.SEOModel">
-		select keywords, title, description from goods_seo where goods_id = #{goodsId}
+	<select id="listGoodsSEO" parameterType="Object" resultType="com.zm.goods.seo.model.SEOModel">
+		select goods_id as goodsId,keywords, title, description from goods_seo where goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
 	</select>
 	
 	<select id="getGoodsAccessPath" parameterType="Object" resultType="java.lang.String">
@@ -182,7 +194,11 @@
 	</select>
 	
 	<update id="updateGoodsPublishByGoodsId" parameterType="Object" >
-		update goods set is_publish = 1 where goods_id = #{goodsId} and status = 1
+		update goods set is_publish = 1 where goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
+		and status = 1
 	</update>
 	
 	<update id="updateGoodsDelPublishByGoodsId" parameterType="Object">
@@ -198,7 +214,10 @@
 	</select>
 		
 	<update id="updateGoodsRePublishByGoodsId" parameterType="Object">
-		update goods set is_publish = 0 where goods_id = #{goodsId}
+		update goods set is_publish = 0 where goods_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+		</foreach>
 	</update>
 	
 </mapper>

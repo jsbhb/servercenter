@@ -88,9 +88,6 @@
 		<if test="gradeType!=null and gradeType!=''">
 			,grade_type = #{gradeType}
 		</if>
-		<if test="redirectUrl!=null and redirectUrl!=''">
-			,redirect_url = #{redirectUrl}
-		</if>
 		<if test="type!=null and type!=''">
 			,type = #{type}
 		</if>

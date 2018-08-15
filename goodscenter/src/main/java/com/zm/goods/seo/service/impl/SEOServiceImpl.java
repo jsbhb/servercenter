@@ -26,6 +26,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
+import com.zm.goods.seo.model.CategoryPath;
 import com.zm.goods.seo.model.GoodsTempModel;
 import com.zm.goods.seo.model.SEOBase;
 import com.zm.goods.seo.model.SEODetail;
@@ -88,32 +89,35 @@ public class SEOServiceImpl implements SEOService {
 		return temp.isSuccess();
 	}
 
-	private GoodsItem getGoods(String goodsId) {
-		GoodsItem goodsItem = seoMapper.getGoods(goodsId);
-		if (goodsItem == null) {
+	private List<GoodsItem> getGoods(List<String> goodsIdList) {
+		List<GoodsItem> goodsItemList = seoMapper.listGoods(goodsIdList);
+		if (goodsItemList == null) {
 			return null;
 		}
-		if (goodsItem.getGoodsSpecsList() != null) {
-			for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
-				specs.infoFilter();
-			}
-		}
-		//加标签
-		addItemGoodsTag(goodsItem);
-		
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<String, String> map = hashOperations.entries(Constants.POST_TAX + goodsItem.getSupplierId());
-		if (map != null) {
-			String post = map.get("post");
-			String tax = map.get("tax");
-			try {
-				goodsItem.setFreePost(Integer.valueOf(post == null ? "0" : post));
-				goodsItem.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
-			} catch (Exception e) {
-				LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
+		for(GoodsItem goodsItem : goodsItemList){
+			if (goodsItem.getGoodsSpecsList() != null) {
+				for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
+					specs.infoFilter();
+				}
 			}
+			//加标签
+			addItemGoodsTag(goodsItem);
+			Map<String, String> map = hashOperations.entries(Constants.POST_TAX + goodsItem.getSupplierId());
+			if (map != null) {
+				String post = map.get("post");
+				String tax = map.get("tax");
+				try {
+					goodsItem.setFreePost(Integer.valueOf(post == null ? "0" : post));
+					goodsItem.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
+				} catch (Exception e) {
+					LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
+				}
+			}
+
 		}
-		return goodsItem;
+		
+		return goodsItemList;
 	}
 
 	@Override
@@ -123,8 +127,8 @@ public class SEOServiceImpl implements SEOService {
 		List<GoodsIndustryModel> list = goodsMapper.queryGoodsCategory();
 		SEONavigation seoNav = new SEONavigation("nav-1", SystemEnum.PCMALL, list);
 		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
-		seoNav = new SEONavigation("nav-1", SystemEnum.MPMALL, list);
-		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
+//		seoNav = new SEONavigation("nav-1", SystemEnum.MPMALL, list);
+//		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
 		if (sb.length() > 0) {
 			sb.append("发布失败");
 			result.setErrorMsg(sb.toString());
@@ -251,36 +255,69 @@ public class SEOServiceImpl implements SEOService {
 		boolean success;
 		if (goodsIdList != null && goodsIdList.size() > 0) {
 			Map<String, Object> param = new HashMap<String, Object>();
-			for (String goodsId : goodsIdList) {
-				GoodsItem goodsItem = getGoods(goodsId);
-				if (goodsItem == null) {
-					continue;
+			List<String> rePublishGoodsIdList = new ArrayList<String>();//需要更新成发布失败的goodsId
+			List<String> successGoodsIdList = new ArrayList<String>();//需要更新成正常状态的goodsId
+			List<GoodsItem> goodsItemList = getGoods(goodsIdList);
+			if (goodsItemList == null) {
+				return result;
+			}
+			//获取seo信息
+			List<SEOModel> seoModelList = seoMapper.listGoodsSEO(goodsIdList);
+			Map<String,SEOModel> seoParam = new HashMap<String,SEOModel>();
+			if(seoModelList != null && seoModelList.size() > 0){
+				for(SEOModel seoModel : seoModelList){
+					seoParam.put(seoModel.getGoodsId(), seoModel);
 				}
-				
+			}
+			//获取商品路径
+			List<String> thirdIdList = new ArrayList<String>();
+			Map<String,String> pathParam = new HashMap<String,String>();
+			for(GoodsItem item : goodsItemList){
+				thirdIdList.add(item.getThirdCategory());
+			}
+			List<CategoryPath> pathList = seoMapper.queryGoodsCategoryPath(thirdIdList);
+			for(CategoryPath categoryPath : pathList){
+				pathParam.put(categoryPath.getThirdId(), categoryPath.getPath());
+			}
+			//开始处理商品
+			for (GoodsItem goodsItem : goodsItemList) {
+				String goodsId = goodsItem.getGoodsId();
 				LogUtil.writeLog("SPECS-SIZE:"+goodsItem.getGoodsSpecsList().size());
-				if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
-					seoMapper.updateGoodsRePublishByGoodsId(param);
-				}
-				String path = seoMapper.queryGoodsCategoryPath(goodsItem.getThirdCategory());
-				template.opsForValue().set("href:" + goodsId, "/" + path + "/" + goodsId + ".html");
-				param.put("accessPath", path);
-				param.put("goodsId", goodsId);
-				SEOModel seoModel = seoMapper.getGoodsSEO(goodsId);
+				String path = pathParam.get(goodsItem.getThirdCategory());
+				String href = "/" + path + "/" + goodsItem.getGoodsId() + ".html";
+				template.opsForValue().set("href:" + goodsId, href);
+				goodsItem.setHref(href);
+				SEOModel seoModel = seoParam.get(goodsId);
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
 						pageList);
 				
 				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				if (!success) {
+					if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
+						rePublishGoodsIdList.add(goodsId);
+					}
 					continue;
 				}
-				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.MPMALL,
+				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.FMPMALL,
 						pageList);
 				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				if (!success) {
+					if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
+						rePublishGoodsIdList.add(goodsId);
+					}
 					continue;
 				}
+				param.put(goodsId, path);
+				successGoodsIdList.add(goodsId);
+			}
+			if(param.size() > 0){
 				seoMapper.updateGoodsAccessPath(param);
-				seoMapper.updateGoodsPublishByGoodsId(goodsId);
+			}
+			if(successGoodsIdList.size() > 0){
+				seoMapper.updateGoodsPublishByGoodsId(successGoodsIdList);
+			}
+			if(rePublishGoodsIdList.size() > 0){
+				seoMapper.updateGoodsRePublishByGoodsId(rePublishGoodsIdList);
 			}
 			if (sb.length() > 0) {
 				sb.append("发布失败");
@@ -315,7 +352,7 @@ public class SEOServiceImpl implements SEOService {
 					if (!success) {
 						continue;
 					}
-					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.MPMALL, goodsId + ".html");
+					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.FMPMALL, goodsId + ".html");
 					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.PAGE_DELETE);
 					if (!success) {
 						continue;

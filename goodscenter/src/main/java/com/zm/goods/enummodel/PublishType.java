@@ -7,7 +7,7 @@ public enum PublishType {
 	REGION_DELETE("http://192.168.70.122:8888/Region/handle","DELETE"),
 	PAGE_CREATE("http://192.168.70.122:8888/Page/handle","POST"),
 	PAGE_DELETE("http://192.168.70.122:8888/Page/handle","DELETE"),
-	MODULE_CREATE("http://192.168.70.122:8888/Module/data","POST"),
+	MODULE_CREATE("http://192.168.70.122:8888/Data/handle/nav","POST"),
 	MODULE_DELETE("http://192.168.70.122:8888/Module/data","DELETE"),
 	DISTRIBUTION_CREATE("http://192.168.70.122:8888/Data/handle/distribution","POST"),
 	DISTRIBUTION_DELETE("http://192.168.70.122:8888/Data/handle/distribution","DELETE");
@@ -17,8 +17,10 @@ public enum PublishType {
 //	REGION_DELETE("http://192.168.182.119:8888/Region/handle","DELETE"),
 //	PAGE_CREATE("http://192.168.182.119:8888/Page/handle","POST"),
 //	PAGE_DELETE("http://192.168.182.119:8888/Page/handle","DELETE"),
-//	MODULE_CREATE("http://192.168.182.119:8888/Module/data","POST"),
+//	MODULE_CREATE("http://192.168.182.119:8888/Data/handle/nav","POST"),
 //	MODULE_DELETE("http://192.168.182.119:8888/Module/data","DELETE");
+//	DISTRIBUTION_CREATE("http://192.168.182.119:8888/Data/handle/distribution","POST"),
+//	DISTRIBUTION_DELETE("http://192.168.182.119:8888/Data/handle/distribution","DELETE");
 	
 	private String url;
 	private String method;

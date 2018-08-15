@@ -308,7 +308,7 @@ public class CacheServiceImpl extends CacheAbstractService {
 		}
 		for (Integer temGradeId : list) {
 			String temp = entries(Constants.SALES_STATISTICS_DAY + temGradeId, "sales");
-			amount = CalculationUtils.add(Double.valueOf(temp), amount);
+			amount = CalculationUtils.add(Double.valueOf(temp == null ? "0" : temp), amount);
 		}
 		result.put("销售额", amount + "");
 

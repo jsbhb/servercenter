@@ -22,6 +22,7 @@ import com.zm.user.bussiness.service.GradeService;
 import com.zm.user.common.Pagination;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
+import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
@@ -91,6 +92,7 @@ public class GradeController {
 				gradeService.update(entity);
 				return new ResultModel(true, "");
 			} catch (Exception e) {
+				LogUtil.writeErrorLog("更新分级出错", e);
 				return new ResultModel(false, e.getMessage());
 			}
 		}

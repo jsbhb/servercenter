@@ -2,7 +2,7 @@ package com.zm.goods.enummodel;
 
 public enum SystemEnum {
 
-	PCMALL("pcMall"),MPMALL("mpMall");
+	PCMALL("pcMall"),MPMALL("mpMall"),FMPMALL("fmpMall,mpMall");
 	
 	private String name;
 	private SystemEnum(String name){

@@ -29,6 +29,8 @@ public class SEODetail extends SEOBase {
 		case MPMALL:
 			initData(item, pageList,SystemEnum.MPMALL.getName());
 			break;
+		case FMPMALL:
+			initData(item, pageList,SystemEnum.FMPMALL.getName());
 		}
 
 	}

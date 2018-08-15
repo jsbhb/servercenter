@@ -2,9 +2,16 @@ package com.zm.goods.seo.model;
 
 public class SEOModel {
 
+	private String goodsId;
 	private String title;
 	private String keywords;
 	private String description;
+	public String getGoodsId() {
+		return goodsId;
+	}
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
+	}
 	public String getTitle() {
 		return title;
 	}
