@@ -258,7 +258,7 @@ public class SEOServiceImpl implements SEOService {
 			List<String> rePublishGoodsIdList = new ArrayList<String>();//需要更新成发布失败的goodsId
 			List<String> successGoodsIdList = new ArrayList<String>();//需要更新成正常状态的goodsId
 			List<GoodsItem> goodsItemList = getGoods(goodsIdList);
-			if (goodsItemList == null) {
+			if (goodsItemList == null || goodsItemList.size() == 0) {
 				return result;
 			}
 			//获取seo信息

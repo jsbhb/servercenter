@@ -38,7 +38,7 @@ public class SEODetail extends SEOBase {
 	private void initData(Object item, List<PagePO> pageList, String system) {
 		PagePO page = null;
 		for(PagePO tem : pageList){
-			if(system.equals(tem.getClient())){
+			if(system.contains(tem.getClient())){
 				page = tem;
 				break;
 			}
