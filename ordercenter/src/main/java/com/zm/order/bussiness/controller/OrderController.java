@@ -88,7 +88,7 @@ public class OrderController {
 				return result;
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.writeErrorLog("创建订单出错", e);
 				result.setSuccess(false);
 				result.setErrorMsg(e.getMessage());
 				return result;

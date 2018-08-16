@@ -68,7 +68,7 @@ public class GoodsServiceComponent {
 			boolean flag = model.getQuantity() >= price.getMin()
 					&& (price.getMax() == null || price.getMax() == 0 || model.getQuantity() <= price.getMax());
 			if (flag) {
-				calPrice(platformSource, gradeId, vip, model, price);
+				totalAmount = calPrice(platformSource, gradeId, vip, model, price);
 				calculation = true;
 				break;
 			}
@@ -294,6 +294,12 @@ public class GoodsServiceComponent {
 
 	private Double getDefaultPrice(boolean vip, OrderBussinessModel model, GoodsPrice price) {
 		return model.getQuantity() * (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
+	}
+	
+	public static void main(String[] args) {
+		Double i = null;
+		boolean vip = false;
+		System.out.println(1 * (vip ? (i == null ? 0 : i) : 12));
 	}
 
 	private final int GRADESTYLE_WELFARE_WEBSITE = 3;// 福利分级编号
