@@ -17,7 +17,7 @@
 	</resultMap>
 	
 	<insert id="insertInviterInfo" parameterType="Object">
-		insert into welfare_inviter 
+		insert ignore into welfare_inviter 
 		(grade_id,name,phone,invitation_code,status,create_time,update_time,opt)
 		values
 		<foreach collection="list" item="item" separator=",">

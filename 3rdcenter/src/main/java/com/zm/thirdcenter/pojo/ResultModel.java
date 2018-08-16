@@ -52,6 +52,12 @@ public class ResultModel {
 	public void setObj(Object obj) {
 		this.obj = obj;
 	}
+
+	@Override
+	public String toString() {
+		return "ResultModel [errorCode=" + errorCode + ", errorMsg=" + errorMsg + ", success=" + success + ", obj="
+				+ obj + "]";
+	}
 	
 	
 }

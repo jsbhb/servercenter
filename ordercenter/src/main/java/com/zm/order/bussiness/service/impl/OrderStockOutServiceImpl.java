@@ -246,8 +246,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		}
 		int orderFlag = 0;
 		int supplierId = 0;
-		double amount = 0;
 		for (OrderInfo info : list) {
+			double amount = 0;
 			for (OrderGoods goods : info.getOrderGoodsList()) {
 				if (goods.getItemId() != null && !"".equals(goods.getItemId())) {
 					itemBO = tempMap.get(goods.getItemId());

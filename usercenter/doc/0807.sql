@@ -23,6 +23,7 @@ CREATE TABLE `zm_user`.`welfare_inviter` (
   INDEX `idx_status` (`status`),
   INDEX `idx_user_center_id` (`user_center_id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  UNIQUE INDEX `grade_id_invitation_code_UNIQUE` (`grade_id`,`phone` ASC),
   UNIQUE INDEX `grade_id_invitation_code_UNIQUE` (`grade_id`,`invitation_code` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '福利商城邀请人表';
