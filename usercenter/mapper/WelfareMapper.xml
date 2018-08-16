@@ -104,6 +104,9 @@
 		<if test="regChkStatus !=null and regChkStatus !=-1">
 			and wi.status not in (0,3,4)
 		</if>
+		<if test="inviterChkStatus !=null and inviterChkStatus !=-1">
+			and wi.status = 3
+		</if>
 		<if test="list != null and list.size() > 0">
 			and wi.id in 
 			<foreach collection="list" item="item" open="(" separator="," close=")">

@@ -496,7 +496,7 @@ public class UserServiceImpl implements UserService {
 		Map<String,Object> param = new HashMap<String,Object>();
 		param.put("gradeId", info.getCenterId());
 		param.put("userCenterId", info.getId());
-		param.put("regChkStatus", 1);
+		param.put("inviterChkStatus", 1);
 		List<InviterEntity> infoList = welfareMapper.selectInviterListByParam(param);
 		if (infoList != null && infoList.size() > 0) {
 			result.setSuccess(true);
