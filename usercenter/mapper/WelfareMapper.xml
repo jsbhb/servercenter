@@ -18,10 +18,10 @@
 	
 	<insert id="insertInviterInfo" parameterType="Object">
 		insert into welfare_inviter 
-		(grade_id,name,phone,status,create_time,update_time,opt)
+		(grade_id,name,phone,invitation_code,status,create_time,update_time,opt)
 		values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.gradeId},#{item.name},#{item.phone},#{item.status},now(),now(),#{item.opt})
+			(#{item.gradeId},#{item.name},#{item.phone},#{item.invitationCode},#{item.status},now(),now(),#{item.opt})
 		</foreach>
 	</insert>
 	
