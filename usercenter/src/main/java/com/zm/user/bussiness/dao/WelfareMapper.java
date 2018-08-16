@@ -15,4 +15,6 @@ public interface WelfareMapper {
 	void updateInviterInfo(List<InviterEntity> list);
 	
 	List<InviterEntity> selectInviterListByParam(Map<String,Object> param);
+
+	void updateInviterStatus(List<InviterEntity> list);
 }

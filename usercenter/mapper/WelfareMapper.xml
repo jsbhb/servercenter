@@ -83,6 +83,20 @@
 		</foreach>
 	</update>
 	
+	
+	<update id="updateInviterStatus" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update welfare_inviter
+	        <set>
+				status = #{item.status},
+				opt = #{item.opt},
+				remark = #{item.remark},
+		        update_time = now()
+			</set>
+			where id = #{item.id}
+		</foreach>
+	</update>
+	
 	<select id="selectInviterListByParam" parameterType="Object" resultMap="inviter">
 		select wi.*,u.phone bind_phone,ifnull(ud.name,ud.nick_name) bind_name
 		from welfare_inviter wi 

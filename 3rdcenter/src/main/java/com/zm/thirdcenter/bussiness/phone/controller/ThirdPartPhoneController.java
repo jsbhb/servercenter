@@ -1,6 +1,8 @@
 package com.zm.thirdcenter.bussiness.phone.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -161,24 +163,28 @@ public class ThirdPartPhoneController {
 			SmsSendUtil.sendMessage(notifyMsg);
 		}
 	}
-	
+
 	/**
 	 * @fun 批量发送邀请码
 	 */
 	@RequestMapping(value = "{version}/third-part/phone", method = RequestMethod.POST)
 	public ResultModel sendCode(@PathVariable("version") Double version, @RequestBody List<NotifyMsg> notifyList) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if(notifyList != null && notifyList.size() > 0){
-				StringBuilder sb = new StringBuilder();
-				for(NotifyMsg notifyMsg : notifyList){
+			if (notifyList != null && notifyList.size() > 0) {
+				ResultModel result = null;
+				Map<String,String> remarkParam = new HashMap<String,String>();
+				for (NotifyMsg notifyMsg : notifyList) {
 					try {
-						SmsSendUtil.sendMessage(notifyMsg);
+						result = SmsSendUtil.sendMessage(notifyMsg);
+						if (!result.isSuccess()) {
+							remarkParam.put(notifyMsg.getPhone(),result.getErrorMsg());
+						}
 					} catch (Exception e) {
-						sb.append(notifyMsg.getPhone()+",");
-						LogUtil.writeErrorLog("Phone:"+notifyMsg.getPhone()+"，发送失败", e);
+						remarkParam.put(notifyMsg.getPhone(),e.getMessage());
+						LogUtil.writeErrorLog("Phone:" + notifyMsg.getPhone() + "，发送失败", e);
 					}
 				}
-				return new ResultModel(true, sb.toString());
+				return new ResultModel(remarkParam);
 			}
 			return new ResultModel(false, "没有数据");
 		}

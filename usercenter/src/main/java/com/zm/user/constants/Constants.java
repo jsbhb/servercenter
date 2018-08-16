@@ -58,4 +58,11 @@ public class Constants {
 	public static final String BUTT_JOINT_USER_PREFIX = "buttjoint:";//对接用户
 	
 	public static final String GRADEBO_INFO = "gradeBO:";//每个ID的gradeBO信息
+	
+	//*********************发送邀请码状态**************************
+	public static final Integer UN_SEND = 1;
+	public static final Integer SEND = 2;
+	public static final Integer BIND = 3;
+	public static final Integer INVALID = 4;
+	public static final Integer SEND_ERROR = 5;
 }

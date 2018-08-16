@@ -29,33 +29,33 @@ import com.zm.user.utils.EncryptionUtil;
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class WelfareServiceImpl implements WelfareService {
-	
+
 	@Resource
 	WelfareMapper welfareMapper;
-	
+
 	@Resource
 	GradeMapper<Grade> gradeMapper;
-	
+
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
-	
+
 	@Override
 	public ResultModel ImportInviterList(List<InviterEntity> importList) {
-		for(InviterEntity ie:importList) {
+		for (InviterEntity ie : importList) {
 			ie.setInvitationCode(EncryptionUtil.toSerialCode(Integer.parseInt(ie.getPhone())));
 			ie.setStatus(1);
 		}
 		welfareMapper.insertInviterInfo(importList);
 		return new ResultModel(true, "");
 	}
-	
+
 	@Override
 	public Page<InviterEntity> queryForPage(InviterEntity entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		Page<InviterEntity> page = welfareMapper.selectForPage(entity);
 		return page;
 	}
-	
+
 	@Override
 	public ResultModel updateInviter(InviterEntity entity) {
 		List<InviterEntity> list = new ArrayList<InviterEntity>();
@@ -63,10 +63,10 @@ public class WelfareServiceImpl implements WelfareService {
 		welfareMapper.updateInviterInfo(list);
 		return new ResultModel(true, "");
 	}
-	
+
 	@Override
 	public ResultModel produceCode(InviterEntity entity) {
-		Map<String,Object> param = new HashMap<String,Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("entity", entity);
 		if (entity.getIds() != null && !"".equals(entity.getIds())) {
 			String[] tmpIds = entity.getIds().split(",");
@@ -75,7 +75,7 @@ public class WelfareServiceImpl implements WelfareService {
 		}
 		List<InviterEntity> list = welfareMapper.selectInviterListByParam(param);
 		if (list != null && list.size() > 0) {
-			for (InviterEntity ie:list) {
+			for (InviterEntity ie : list) {
 				ie.setName(null);
 				ie.setPhone(null);
 				ie.setInvitationCode(EncryptionUtil.toSerialCode(ie.getId()));
@@ -86,10 +86,11 @@ public class WelfareServiceImpl implements WelfareService {
 		}
 		return new ResultModel(true, "");
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel sendProduceCode(InviterEntity entity) {
-		Map<String,Object> param = new HashMap<String,Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("entity", entity);
 		if (entity.getIds() != null && !"".equals(entity.getIds())) {
 			String[] tmpIds = entity.getIds().split(",");
@@ -101,7 +102,7 @@ public class WelfareServiceImpl implements WelfareService {
 			Grade grade = gradeMapper.selectById(entity.getGradeId());
 			List<NotifyMsg> sendList = new ArrayList<NotifyMsg>();
 			NotifyMsg tmpMsg = null;
-			for (InviterEntity ie:list) {
+			for (InviterEntity ie : list) {
 				tmpMsg = new NotifyMsg();
 				tmpMsg.setType(NotifyTypeEnum.INVITATION_CODE);
 				tmpMsg.setName(ie.getName());
@@ -110,29 +111,24 @@ public class WelfareServiceImpl implements WelfareService {
 				tmpMsg.setMsg(ie.getInvitationCode());
 				sendList.add(tmpMsg);
 			}
-			
-			//调用三方接口发送邀请短信
+
+			// 调用三方接口发送邀请短信
 			ResultModel thirdcenter_result = thirdPartFeignClient.sendCode(Constants.FIRST_VERSION, sendList);
 
-			for (InviterEntity ie:list) {
-				ie.setName(null);
-				ie.setPhone(null);
-				ie.setStatus(2);
-				ie.setOpt(entity.getOpt());
-			}
-			
-			if (!thirdcenter_result.isSuccess()) {
-				String[] tmpSendFaildPhone = thirdcenter_result.getErrorMsg().split(",");
-				List<String> faildPhoneList = Arrays.asList(tmpSendFaildPhone);
-				for (String faildPhone :faildPhoneList) {
-					for (InviterEntity ie:list) {
-						if (ie.getPhone().equals(faildPhone)) {
-							ie.setStatus(entity.getStatus());
-						}
-					}
+			Map<String, String> remarkParam = (Map<String, String>) thirdcenter_result.getObj();
+
+			for (InviterEntity ie : list) {
+				if (remarkParam.containsKey(ie.getPhone())) {
+					ie.setStatus(Constants.SEND_ERROR);
+					ie.setRemark(remarkParam.get(ie.getPhone()));
+					ie.setOpt(entity.getOpt());
+				} else {
+					ie.setStatus(Constants.SEND);
+					ie.setOpt(entity.getOpt());
 				}
 			}
-			welfareMapper.updateInviterInfo(list);
+
+			welfareMapper.updateInviterStatus(list);
 		}
 		return new ResultModel(true, "");
 	}
