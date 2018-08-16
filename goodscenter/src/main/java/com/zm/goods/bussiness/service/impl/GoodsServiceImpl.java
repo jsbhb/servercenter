@@ -201,7 +201,8 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource {
+	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId)
+			throws WrongPlatformSource {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", list);
 		param.put("source", source);
@@ -211,7 +212,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		switch (platformSource) {
 		case Constants.WELFARE_WEBSITE:
-			getWelfareWebsitePriceInterval(specsList,gradeId);
+			getWelfareWebsitePriceInterval(specsList, gradeId);
 			break;
 		default:
 			getPriceInterval(specsList);
@@ -239,7 +240,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	private void getWelfareWebsitePriceInterval(List<GoodsSpecs> specsList, int gradeId) throws WrongPlatformSource {
 		for (GoodsSpecs specs : specsList) {
-			goodsServiceComponent.getWelfareWebsitePriceInterval(specs, specs.getDiscount(),gradeId);
+			goodsServiceComponent.getWelfareWebsitePriceInterval(specs, specs.getDiscount(), gradeId);
 		}
 	}
 
@@ -251,6 +252,7 @@ public class GoodsServiceImpl implements GoodsService {
 
 	private final String FX = "fx";
 	private final String NOT_FX = "notfx";
+	private final int DEFAULT_PLATFORMSOURCE = 1;
 
 	@Override
 	public ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip,
@@ -306,7 +308,9 @@ public class GoodsServiceImpl implements GoodsService {
 			weight += specs.getWeight() * model.getQuantity();
 			Double amount = 0.0;
 			try {
-				amount = goodsServiceComponent.judgeQuantityRange(vip, result, specs, model, platformSource, gradeId);
+				// 这里获取的是商品原总价用来计算税率 platformSource不能传福利商城的 值，vip传false
+				amount = goodsServiceComponent.judgeQuantityRange(false, result, specs, model, DEFAULT_PLATFORMSOURCE,
+						gradeId);
 			} catch (WrongPlatformSource e) {
 				return new ResultModel(false, e.getMessage());
 			}
@@ -327,6 +331,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		try {
+			// 获取商品优惠后的价格
 			totalAmount = priceComponent.calPrice(list, specsMap, couponIds, vip, centerId, result, userId,
 					platformSource, gradeId);
 		} catch (WrongPlatformSource e) {
@@ -483,7 +488,7 @@ public class GoodsServiceImpl implements GoodsService {
 					result = goodsServiceComponent.getMinPrice(item.getGoodsSpecsList());
 					search.setPrice(result.get("realPrice"));
 					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
-						if(specs.getFx() == CAN_BE_FX){//有一个可以分销的就要做进lucene
+						if (specs.getFx() == CAN_BE_FX) {// 有一个可以分销的就要做进lucene
 							isFx = true;
 						}
 						if (specs.getTagList() != null) {
@@ -497,7 +502,7 @@ public class GoodsServiceImpl implements GoodsService {
 					} else {
 						search.setTag(sb.toString());
 					}
-					if(isFx){
+					if (isFx) {
 						search.setFx(CAN_BE_FX);
 					} else {
 						search.setFx(CAN_NOT_BE_FX);
@@ -509,7 +514,7 @@ public class GoodsServiceImpl implements GoodsService {
 			lucene.updateIndex(searchList);
 		}
 	}
-	
+
 	private final Integer CAN_BE_FX = 1;
 	private final Integer CAN_NOT_BE_FX = 0;
 
@@ -551,7 +556,7 @@ public class GoodsServiceImpl implements GoodsService {
 					result = goodsServiceComponent.getMinPrice(tempList);
 					sb.delete(0, sb.length());
 					for (GoodsSpecs specs : tempList) {
-						if(specs.getFx() == CAN_BE_FX){
+						if (specs.getFx() == CAN_BE_FX) {
 							isFx = true;
 						}
 						if (specs.getTagList() != null && specs.getTagList().size() > 0) {
@@ -567,7 +572,7 @@ public class GoodsServiceImpl implements GoodsService {
 					} else {
 						entry.getValue().setTag(sb.toString());
 					}
-					if(isFx){
+					if (isFx) {
 						entry.getValue().setFx(CAN_BE_FX);
 					} else {
 						entry.getValue().setFx(CAN_NOT_BE_FX);
