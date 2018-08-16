@@ -89,11 +89,13 @@
 		left join user u on wi.user_center_id = u.id
 		left join user_detail ud on wi.user_center_id = ud.user_id
 		where 1=1 
-		<if test="entity.gradeId !=null and entity.gradeId !=''">
+		<if test="entity !=null">
+			<if test="entity.gradeId !=null and entity.gradeId !=''">
 			and wi.grade_id = #{entity.gradeId}
-		</if>
-		<if test="entity.status !=null and entity.status !=-1">
-			and wi.status = #{entity.status}
+			</if>
+			<if test="entity.status !=null and entity.status !=-1">
+				and wi.status = #{entity.status}
+			</if>
 		</if>
 		<if test="gradeId !=null and gradeId !=''">
 			and wi.grade_id = #{gradeId}
