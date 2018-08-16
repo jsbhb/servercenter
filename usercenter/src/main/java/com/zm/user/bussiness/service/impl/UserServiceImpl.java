@@ -449,11 +449,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResultModel userBindInviterCode(UserInfo info) {
+		//前端要求收到请求后返回的结果为true，校验结果放在obj字段，错误信息放在errorMsg
 		ResultModel result = new ResultModel();
+		result.setSuccess(true);
 		
 		info.setId(checkInviterCode(info));
 		if (info.getId() < 0) {
-			result.setSuccess(false);
+			result.setObj(false);
 			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
 		} else {
 			Map<String,Object> param = new HashMap<String,Object>();
@@ -462,7 +464,7 @@ public class UserServiceImpl implements UserService {
 			param.put("regChkStatus", 1);
 			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
 			if (inviterList == null || inviterList.size() <= 0) {
-				result.setSuccess(false);
+				result.setObj(false);
 				result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
 				return result;
 			}
@@ -484,13 +486,14 @@ public class UserServiceImpl implements UserService {
 			}
 			updInviterList.add(inviter);
 			welfareMapper.updateInviterInfo(updInviterList);
-			result.setSuccess(true);
+			result.setObj(true);
 		}
 		return result;
 	}
 
 	@Override
 	public ResultModel userCheckInviterInfo(UserInfo info) {
+		//前端要求收到请求后返回的结果为true，校验结果放在obj字段，错误信息放在errorMsg
 		ResultModel result = new ResultModel();
 		
 		Map<String,Object> param = new HashMap<String,Object>();
@@ -499,11 +502,12 @@ public class UserServiceImpl implements UserService {
 		param.put("inviterChkStatus", 1);
 		List<InviterEntity> infoList = welfareMapper.selectInviterListByParam(param);
 		if (infoList != null && infoList.size() > 0) {
-			result.setSuccess(true);
+			result.setObj(true);
 		} else {
-			result.setSuccess(false);
+			result.setObj(false);
 			result.setErrorMsg("当前账号没有绑定邀请码，请绑定邀请码！");
 		}
+		result.setSuccess(true);
 		
 		return result;
 	}

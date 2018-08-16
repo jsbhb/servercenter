@@ -41,6 +41,10 @@ public class WelfareServiceImpl implements WelfareService {
 	
 	@Override
 	public ResultModel ImportInviterList(List<InviterEntity> importList) {
+		for(InviterEntity ie:importList) {
+			ie.setInvitationCode(EncryptionUtil.toSerialCode(Integer.parseInt(ie.getPhone())));
+			ie.setStatus(1);
+		}
 		welfareMapper.insertInviterInfo(importList);
 		return new ResultModel(true, "");
 	}
