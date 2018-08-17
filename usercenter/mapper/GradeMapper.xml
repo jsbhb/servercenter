@@ -104,7 +104,7 @@
 		<if test="welfareType!=null and welfareType!=-1">
 			,welfare_type = #{welfareType}
 		</if>
-		<if test="welfareRebate!=null and welfareRebate!=''">
+		<if test="welfareRebate!=null and welfareRebate>=0">
 			,welfare_rebate = #{welfareRebate}
 		</if>
 		where id = #{id}
@@ -146,6 +146,7 @@
 		<if test="welfareType!=null and welfareType!=-1">
 			and a.welfare_type = #{welfareType}
 		</if>
+		order by a.id
 	</select>
 
 	<update id="updateGradeData" parameterType="Object">
