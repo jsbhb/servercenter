@@ -104,7 +104,7 @@
 		<if test="welfareType!=null and welfareType!=-1">
 			,welfare_type = #{welfareType}
 		</if>
-		<if test="welfareRebate!=null and welfareRebate!=''">
+		<if test="welfareRebate!=null and welfareRebate>=0">
 			,welfare_rebate = #{welfareRebate}
 		</if>
 		where id = #{id}
