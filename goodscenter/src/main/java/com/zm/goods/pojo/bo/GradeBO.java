@@ -9,8 +9,15 @@ public class GradeBO {
 	private String company;
 	private String gradeTypeName;
 	private Integer type;
+	private Integer welfareType;
 	private Double welfareRebate;
 	
+	public Integer getWelfareType() {
+		return welfareType;
+	}
+	public void setWelfareType(Integer welfareType) {
+		this.welfareType = welfareType;
+	}
 	public Double getWelfareRebate() {
 		return welfareRebate;
 	}

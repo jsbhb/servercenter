@@ -83,7 +83,6 @@ public class GradeServiceImpl implements GradeService {
 		Grade grade = gradeMapper.selectById(entity.getId());
 		gradeMapper.update(entity);
 		gradeMapper.updateGradeData(entity);
-		LogUtil.writeLog("type===" + entity.getType());
 		if (Constants.BUTT_JOINT_USER.equals(entity.getType())) {
 			Set<String> set = template.opsForSet().members(Constants.BUTT_JOINT_USER_PREFIX);
 			ButtjointUserBO bo = null;

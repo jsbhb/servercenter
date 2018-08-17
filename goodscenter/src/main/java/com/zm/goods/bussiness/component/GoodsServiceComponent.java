@@ -296,20 +296,14 @@ public class GoodsServiceComponent {
 		return model.getQuantity() * (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
 	}
 	
-	public static void main(String[] args) {
-		Double i = null;
-		boolean vip = false;
-		System.out.println(1 * (vip ? (i == null ? 0 : i) : 12));
-	}
-
-	private final int GRADESTYLE_WELFARE_WEBSITE = 3;// 福利分级编号
+	private final int GRADESTYLE_WELFARE_WEBSITE = 1;// 福利商城标志位
 
 	private Double getWelfareWebsitePrice(int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price)
 			throws WrongPlatformSource {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + model.getItemId());
 		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
-		if (gradeBO.getType() != GRADESTYLE_WELFARE_WEBSITE) {
+		if (gradeBO.getWelfareType() != GRADESTYLE_WELFARE_WEBSITE) {
 			throw new WrongPlatformSource("该分级已经不是福利网站类型");
 		}
 		double welfareRebate = gradeBO.getWelfareRebate();// 福利网站拿的返佣比例
@@ -337,7 +331,7 @@ public class GoodsServiceComponent {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
 		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
-		if (gradeBO.getType() != GRADESTYLE_WELFARE_WEBSITE) {
+		if (gradeBO.getWelfareType() != GRADESTYLE_WELFARE_WEBSITE) {
 			throw new WrongPlatformSource("该分级已经不是福利网站类型");
 		}
 		double welfareRebate = gradeBO.getWelfareRebate();// 福利网站拿的返佣比例
