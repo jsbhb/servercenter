@@ -153,7 +153,7 @@
 		goods_id,og.item_id,og.item_name,og.item_img,og.item_quantity,og.item_price,og.actual_price,og.item_info,og.goods_id as goodsId 
 		from (select
 		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.create_type,
-		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag,ob.remark
+		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag,ob.remark, ob.order_source 
 		from order_base ob where
 		is_del = 0
 		<if test="info.status != null">
@@ -341,7 +341,8 @@
 	</select>
 
 	<delete id="removeShoppingCart" parameterType="Object">
-		delete from order_shopping_cart where user_id=#{userId} and grade_id = #{gradeId} and id in
+		delete from order_shopping_cart where user_id=#{userId} and grade_id = #{gradeId} and 
+		platform_type = #{platformSource} and id in
 		<foreach collection="idArr" separator="," item="item" open="("
 			close=")">
 			#{item}
@@ -351,7 +352,7 @@
 	<select id="countShoppingCart" parameterType="Object"
 		resultType="java.lang.Integer">
 		select count(*) from order_shopping_cart where grade_id =
-		#{gradeId} and user_id = #{userId}
+		#{gradeId} and user_id = #{userId} and platform_type = #{platformSource}
 	</select>
 
 	<select id="isExist" parameterType="Object"
@@ -610,7 +611,7 @@
 	<select id="countShoppingCartQuantity" parameterType="Object"
 		resultType="java.lang.Integer">
 		select item_quantity from order_shopping_cart where
-		grade_id = #{gradeId} and user_id=#{userId} and item_id=#{itemId}
+		grade_id = #{gradeId} and user_id=#{userId} and item_id=#{itemId} and platform_type = #{platformSource}
 	</select>
 
 	<select id="listUnDeliverOrder" parameterType="Object"
