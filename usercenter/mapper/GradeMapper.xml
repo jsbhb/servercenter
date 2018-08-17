@@ -101,7 +101,7 @@
 		<if test="appSecret!=null and appSecret!=''">
 			,appSecret = #{appSecret}
 		</if>
-		<if test="welfareType!=null and welfareType!=''">
+		<if test="welfareType!=null and welfareType!=-1">
 			,welfare_type = #{welfareType}
 		</if>
 		<if test="welfareRebate!=null and welfareRebate!=''">
@@ -142,6 +142,9 @@
 		</if>
 		<if test="phone != null and phone != ''">
 			and a.phone = #{phone}
+		</if>
+		<if test="welfareType!=null and welfareType!=-1">
+			and a.welfare_type = #{welfareType}
 		</if>
 	</select>
 
