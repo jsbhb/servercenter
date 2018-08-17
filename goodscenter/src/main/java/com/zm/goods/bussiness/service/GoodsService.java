@@ -71,7 +71,8 @@ public interface GoodsService {
 	 *            feign：通过feign调用该函数，mall默认值，为商城端调用
 	 * @return
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource;
+	Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId)
+			throws WrongPlatformSource;
 
 	/**
 	 * getActivity:获取活动信息. <br/>
@@ -141,7 +142,8 @@ public interface GoodsService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination);
+	Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination, int gradeId,
+			boolean welfare) throws WrongPlatformSource;
 
 	/**
 	 * loadIndexNavigation:获取导航栏. <br/>
@@ -203,7 +205,7 @@ public interface GoodsService {
 	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
 
 	ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
-	
+
 	/**
 	 * @fun 更新lucene索引
 	 * @param updateTagList

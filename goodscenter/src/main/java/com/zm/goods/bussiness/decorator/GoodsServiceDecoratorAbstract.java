@@ -32,10 +32,11 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService {
 
 	@Override
 	public abstract Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList,
-			Pagination pagination);
+			Pagination pagination, int gradeId, boolean welfare) throws WrongPlatformSource;
 
 	@Override
-	public abstract Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource;
+	public abstract Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource,
+			int gradeId) throws WrongPlatformSource;
 
 	@Override
 	public List<GoodsFile> listGoodsCookFile(String goodsId) {
@@ -46,10 +47,10 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService {
 	public Map<String, Object> tradeGoodsDetail(String itemId, Integer centerId) {
 		return null;
 	}
-	
+
 	@Override
 	public void updateLuceneIndex(List<String> updateTagList, Integer centerId) {
-		
+
 	}
 
 	@Override
