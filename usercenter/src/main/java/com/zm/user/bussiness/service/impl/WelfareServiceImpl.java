@@ -106,7 +106,7 @@ public class WelfareServiceImpl implements WelfareService {
 			Grade grade = null;
 			for (InviterEntity ie : list) {
 				if (!gradeMap.containsKey(ie.getGradeId())) {
-					grade = gradeMapper.selectById(entity.getGradeId());
+					grade = gradeMapper.selectById(ie.getGradeId());
 					gradeMap.put(ie.getGradeId(), grade.getGradeName());
 				}
 				tmpMsg = new NotifyMsg();
