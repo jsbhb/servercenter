@@ -146,6 +146,7 @@
 		<if test="welfareType!=null and welfareType!=-1">
 			and a.welfare_type = #{welfareType}
 		</if>
+		order by a.id
 	</select>
 
 	<update id="updateGradeData" parameterType="Object">
