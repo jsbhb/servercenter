@@ -14,6 +14,7 @@ import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.model.PayModel;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
@@ -90,6 +91,8 @@ public class OrderComponentUtil {
 						CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
 						Constants.TAX_DISCOUNT);
 			}
+			LogUtil.writeLog("totalIncremTax=====" + totalIncremTax + ",fee====" + fee + ",postFee======" + postFee
+					+ ",unDiscountAmount ======" + unDiscountAmount);
 		}
 		taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 

@@ -149,11 +149,12 @@ public class OrderServiceImpl implements OrderService {
 		}
 		priceAndWeightMap = (Map<String, Object>) result.getObj();
 		amount = (Double) priceAndWeightMap.get("totalAmount");// 商品总价（扣掉了优惠券，折扣）
+		
 
 		// 邮费和税费初始值
 		Double postFee = 0.0;
 		TaxFeeBO taxFee = new TaxFeeBO();// 税费对象
-		Double unDiscountAmount = 0.0;// 商品原总价
+		Double unDiscountAmount = (Double) priceAndWeightMap.get("originalPrice");// 商品原总价
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
 		// 获取包邮包税
@@ -169,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
 		if (!freePost) {
 			// 计算邮费(自提不算邮费)
 			if (Constants.EXPRESS.equals(info.getExpressType())) {
-				postFee = orderComponentUtil.getPostFee(info, unDiscountAmount, weight);
+				postFee = orderComponentUtil.getPostFee(info, amount, weight);
 			}
 		}
 		if (!freeTax) {
@@ -177,10 +178,6 @@ public class OrderServiceImpl implements OrderService {
 			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
 				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
 
-				// 计算商品总价
-				for (Map.Entry<String, Double> entry : map.entrySet()) {
-					unDiscountAmount += entry.getValue();
-				}
 				// 获取税费
 				taxFee = orderComponentUtil.getTaxFee(map, unDiscountAmount, postFee, result);
 				if (!result.isSuccess()) {
