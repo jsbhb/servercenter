@@ -271,9 +271,10 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "gradeID") })
 	public ResultModel listShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId,
-			Pagination pagination,@RequestParam(value="platformSource",required = false, defaultValue = "0") int platformSource) {
+			Pagination pagination,
+			@RequestParam(value = "platformSource", required = false, defaultValue = "0") int platformSource) {
 
-		ResultModel result = new ResultModel(); 
+		ResultModel result = new ResultModel();
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			ShoppingCart shoppingCart = new ShoppingCart();
@@ -284,7 +285,7 @@ public class OrderController {
 
 			List<ShoppingCart> list = null;
 			try {
-				list = orderService.listShoppingCart(shoppingCart,pagination);
+				list = orderService.listShoppingCart(shoppingCart, pagination);
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("获取用户购物车接口", e);
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
@@ -333,7 +334,8 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "ids", dataType = "String", required = true, value = "id,多个用‘，’隔开") })
 	public ResultModel removeShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("ids") String ids,
-			@PathVariable("gradeId") Integer gradeId) {
+			@PathVariable("gradeId") Integer gradeId,
+			@RequestParam(value = "platformSource", required = false, defaultValue = "0") int platformSource) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -342,6 +344,7 @@ public class OrderController {
 			param.put("userId", userId);
 			param.put("idArr", idArr);
 			param.put("gradeId", gradeId);
+			param.put("platformSource", platformSource);
 			orderService.removeShoppingCart(param);
 			result.setSuccess(true);
 			return result;
@@ -358,13 +361,15 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "userId", dataType = "Integer", required = true, value = "用户ID"),
 			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel countShoppingCart(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId) {
+			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("gradeId") Integer gradeId,
+			@RequestParam(value = "platformSource", required = false, defaultValue = "0") int platformSource) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("userId", userId);
 			param.put("gradeId", gradeId);
+			param.put("platformSource", platformSource);
 			Integer count = orderService.countShoppingCart(param);
 			result.setSuccess(true);
 			result.setObj(count);
@@ -384,7 +389,8 @@ public class OrderController {
 			@ApiImplicitParam(paramType = "path", name = "gradeId", dataType = "Integer", required = true, value = "客户端ID") })
 	public ResultModel getShopCartQuantityByItemId(@PathVariable("version") Double version, HttpServletRequest req,
 			HttpServletResponse res, @PathVariable("userId") Integer userId, @PathVariable("itemId") String itemId,
-			@PathVariable("gradeId") Integer gradeId) {
+			@PathVariable("gradeId") Integer gradeId,
+			@RequestParam(value = "platformSource", required = false, defaultValue = "0") int platformSource) {
 
 		ResultModel result = new ResultModel();
 		if (Constants.FIRST_VERSION.equals(version)) {
@@ -392,6 +398,7 @@ public class OrderController {
 			param.put("userId", userId);
 			param.put("itemId", itemId);
 			param.put("gradeId", gradeId);
+			param.put("platformSource", platformSource);
 			Integer count = orderService.countShoppingCartQuantity(param);
 			result.setSuccess(true);
 			result.setObj(count);
