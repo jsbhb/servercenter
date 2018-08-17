@@ -571,7 +571,7 @@ public class UserController {
 			HttpServletRequest req, @RequestBody UserInfo info) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if (info.getId() == 0 || info.getCenterId() == 0 || 
+			if (info.getId() == 0 || info.getShopId() == 0 || 
 				info.getInvitationCode() == null || "".equals(info.getInvitationCode())) {
 				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM);
 			}
@@ -585,7 +585,7 @@ public class UserController {
 			HttpServletRequest req, @RequestBody UserInfo info) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if (info.getId() == 0 || info.getCenterId() == 0) {
+			if (info.getId() == 0 || info.getShopId() == 0) {
 				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM);
 			}
 			return userService.userCheckInviterInfo(info);

@@ -178,7 +178,7 @@ public class UserServiceImpl implements UserService {
 		//校验邀请码是否正确，不正确时将user_id的值做负处理
 		if (info.getInvitationCode() != null && !"".equals(info.getInvitationCode())) {
 			Map<String,Object> param = new HashMap<String,Object>();
-			param.put("gradeId", info.getCenterId());
+			param.put("gradeId", info.getShopId());
 			param.put("invitationCode", info.getInvitationCode());
 			param.put("regChkStatus", 1);
 			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
@@ -459,7 +459,7 @@ public class UserServiceImpl implements UserService {
 			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
 		} else {
 			Map<String,Object> param = new HashMap<String,Object>();
-			param.put("gradeId", info.getCenterId());
+			param.put("gradeId", info.getShopId());
 			param.put("invitationCode", info.getInvitationCode());
 			param.put("regChkStatus", 1);
 			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
@@ -497,7 +497,7 @@ public class UserServiceImpl implements UserService {
 		ResultModel result = new ResultModel();
 		
 		Map<String,Object> param = new HashMap<String,Object>();
-		param.put("gradeId", info.getCenterId());
+		param.put("gradeId", info.getShopId());
 		param.put("userCenterId", info.getId());
 		param.put("inviterChkStatus", 1);
 		List<InviterEntity> infoList = welfareMapper.selectInviterListByParam(param);
