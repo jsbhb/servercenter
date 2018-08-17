@@ -49,8 +49,9 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination) {
-		Map<String, Object> result = goodsServiceImpl.queryGoods(searchModel, sortList, pagination);
+	public Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination,
+			int gradeId, boolean welfare) throws WrongPlatformSource {
+		Map<String, Object> result = goodsServiceImpl.queryGoods(searchModel, sortList, pagination, gradeId, welfare);
 		List<GoodsItem> goodsList = (List<GoodsItem>) result.get(GOODS_LIST);
 		addItemGoodsTag(goodsList);
 		return result;
@@ -96,7 +97,8 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId) throws WrongPlatformSource {
+	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId)
+			throws WrongPlatformSource {
 		Map<String, Object> result = goodsServiceImpl.listGoodsSpecs(list, source, platformSource, gradeId);
 		List<GoodsSpecs> specsList = (List<GoodsSpecs>) result.get("specsList");
 		List<String> itemIdList = new ArrayList<String>();

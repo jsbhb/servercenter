@@ -252,30 +252,43 @@ public class GoodsServiceComponent {
 	/**
 	 * @fun 获取规格列表中的最低价格
 	 * @param specsList
+	 * @param needToPriceInterval 判断需不需要进行价格区间的封装
 	 * @return
 	 */
-	public Map<String, Double> getMinPrice(List<GoodsSpecs> specsList) {
+	public Map<String, Double> getMinPrice(List<GoodsSpecs> specsList, boolean needToPriceInterval) {
 		Map<String, Double> result = new HashMap<String, Double>();
 		if (specsList == null || specsList.size() == 0) {
 			result.put("price", 0.0);
 			result.put("realPrice", 0.0);
 			return result;
 		}
-		for (GoodsSpecs specs : specsList) {
-			getPriceInterval(specs, specs.getDiscount());
+		if(!needToPriceInterval){
+			for (GoodsSpecs specs : specsList) {
+				getPriceInterval(specs, specs.getDiscount());
+			}
 		}
 		int len = specsList.size();
 
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
 				result.put("price", specsList.get(i).getMinPrice());
-				result.put("realPrice", specsList.get(i).getRealMinPrice());
+				if(specsList.get(i).getWelfarePrice() > 0){
+					result.put("realPrice", specsList.get(i).getWelfarePrice());
+				} else {
+					result.put("realPrice", specsList.get(i).getRealMinPrice());
+				}
 			} else {
 				if (specsList.get(i).getMinPrice() < result.get("price")) {
 					result.put("price", specsList.get(i).getMinPrice());
 				}
-				if (specsList.get(i).getRealMinPrice() < result.get("realPrice")) {
-					result.put("realPrice", specsList.get(i).getRealMinPrice());
+				if(specsList.get(i).getWelfarePrice() > 0){
+					if (specsList.get(i).getWelfarePrice() < result.get("realPrice")) {
+						result.put("realPrice", specsList.get(i).getWelfarePrice());
+					}
+				} else {
+					if (specsList.get(i).getRealMinPrice() < result.get("realPrice")) {
+						result.put("realPrice", specsList.get(i).getRealMinPrice());
+					}
 				}
 			}
 		}
@@ -330,7 +343,11 @@ public class GoodsServiceComponent {
 		getPriceInterval(specs, discount);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
-		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
+		String json = hashOperations.get(Constants.GRADEBO_INFO, gradeId + "");
+		if(json == null || "".equals(json)){
+			throw new WrongPlatformSource("该分级已经不是福利网站类型");
+		}
+		GradeBO gradeBO = JSONUtil.parse(json, GradeBO.class);
 		if (gradeBO.getWelfareType() != GRADESTYLE_WELFARE_WEBSITE) {
 			throw new WrongPlatformSource("该分级已经不是福利网站类型");
 		}

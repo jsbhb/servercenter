@@ -485,7 +485,7 @@ public class GoodsServiceImpl implements GoodsService {
 				search = new GoodsSearch();
 				LucenceModelConvertor.convertToGoodsSearch(item, search);
 				if (item.getGoodsSpecsList() != null) {
-					result = goodsServiceComponent.getMinPrice(item.getGoodsSpecsList());
+					result = goodsServiceComponent.getMinPrice(item.getGoodsSpecsList(), false);
 					search.setPrice(result.get("realPrice"));
 					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
 						if (specs.getFx() == CAN_BE_FX) {// 有一个可以分销的就要做进lucene
@@ -553,7 +553,7 @@ public class GoodsServiceImpl implements GoodsService {
 				tempList = tempSpecs.get(entry.getKey());
 				boolean isFx = false;
 				if (tempList != null && tempList.size() > 0) {
-					result = goodsServiceComponent.getMinPrice(tempList);
+					result = goodsServiceComponent.getMinPrice(tempList, false);
 					sb.delete(0, sb.length());
 					for (GoodsSpecs specs : tempList) {
 						if (specs.getFx() == CAN_BE_FX) {
@@ -587,7 +587,8 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@SuppressWarnings({ "unchecked", "unused" })
 	@Override
-	public Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination) {
+	public Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList, Pagination pagination,
+			int gradeId, boolean welfare) throws WrongPlatformSource {
 		Map<String, Object> resultMap = new HashMap<String, Object>(16);
 		Map<String, Object> luceneMap = new HashMap<String, Object>();
 
@@ -627,6 +628,9 @@ public class GoodsServiceImpl implements GoodsService {
 			// }
 			searchParm.put("isFx", searchModel.getFx());
 			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(searchParm);
+			if (welfare) {
+				getWelfareWebsitePriceInterval(specsList, gradeId);
+			}
 			Map<String, List<GoodsSpecs>> temp = new HashMap<String, List<GoodsSpecs>>();
 			List<GoodsSpecs> temList = null;
 			for (GoodsSpecs specs : specsList) {
@@ -643,7 +647,7 @@ public class GoodsServiceImpl implements GoodsService {
 			for (GoodsItem model : goodsList) {
 				temList = temp.get(model.getGoodsId());
 				model.setGoodsSpecsList(temList);
-				result = goodsServiceComponent.getMinPrice(temList);
+				result = goodsServiceComponent.getMinPrice(temList, welfare);
 				for (GoodsSpecs specs : temList) {
 					if (model.getSpecsInfo() == null) {
 						specsSet = new HashSet<>();

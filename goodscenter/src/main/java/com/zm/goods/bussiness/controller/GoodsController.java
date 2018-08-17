@@ -64,13 +64,18 @@ public class GoodsController {
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel listGoods(@PathVariable("version") Double version, @ModelAttribute Pagination pagination,
-			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList) {
+			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList,
+			@RequestParam(value = "gradeId", required = false, defaultValue = "0") int gradeId,
+			@RequestParam(value = "welfare", required = false, defaultValue = "false") boolean welfare) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			// Map<String, Object> resultMap =
-			// goodsService.queryGoods(searchModel, sortList, pagination);
-			Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination);
-			return new ResultModel(true, resultMap);
+			try {
+				Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination,gradeId,welfare);
+				return new ResultModel(true, resultMap);
+			} catch (WrongPlatformSource e) {
+				e.printStackTrace();
+				return new ResultModel(false, "该分级没有福利商城的资格");
+			}
 		}
 
 		return new ResultModel(false, "版本错误");
