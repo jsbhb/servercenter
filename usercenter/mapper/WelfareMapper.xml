@@ -52,7 +52,7 @@
 		<if test="bindPhone !=null and bindPhone !=''">
 			and u.phone = #{bindPhone}
 		</if>
-		order by wi.update_time desc,wi.create_time desc
+		order by wi.grade_id,wi.update_time desc,wi.create_time desc
 	</select>
 	
 	<update id="updateInviterInfo" parameterType="Object">
@@ -104,7 +104,7 @@
 		left join user_detail ud on wi.user_center_id = ud.user_id
 		where 1=1 
 		<if test="entity !=null">
-			<if test="entity.gradeId !=null and entity.gradeId !=''">
+			<if test="entity.gradeId !=null and entity.gradeId !=-1">
 			and wi.grade_id = #{entity.gradeId}
 			</if>
 			<if test="entity.status !=null and entity.status !=-1">
@@ -132,6 +132,7 @@
 		<if test="userCenterId !=null and userCenterId !=-1">
 			and wi.user_center_id =#{userCenterId}
 		</if>
+		order by wi.grade_id,wi.update_time desc
 	</select>
 	
 	<select id="inviterStatistic" parameterType="Object" resultType="com.zm.user.pojo.bo.WelfareMembeStatistic">

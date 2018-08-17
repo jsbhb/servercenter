@@ -99,16 +99,21 @@ public class WelfareServiceImpl implements WelfareService {
 			param.put("list", idList);
 		}
 		List<InviterEntity> list = welfareMapper.selectInviterListByParam(param);
+		Map<Integer,String> gradeMap = new HashMap<Integer,String>();
 		if (list != null && list.size() > 0) {
-			Grade grade = gradeMapper.selectById(entity.getGradeId());
 			List<NotifyMsg> sendList = new ArrayList<NotifyMsg>();
 			NotifyMsg tmpMsg = null;
+			Grade grade = null;
 			for (InviterEntity ie : list) {
+				if (!gradeMap.containsKey(ie.getGradeId())) {
+					grade = gradeMapper.selectById(entity.getGradeId());
+					gradeMap.put(ie.getGradeId(), grade.getGradeName());
+				}
 				tmpMsg = new NotifyMsg();
 				tmpMsg.setType(NotifyTypeEnum.INVITATION_CODE);
 				tmpMsg.setName(ie.getName());
 				tmpMsg.setPhone(ie.getPhone());
-				tmpMsg.setShopName(grade.getGradeName());
+				tmpMsg.setShopName(gradeMap.get(ie.getGradeId()));
 				tmpMsg.setMsg(ie.getInvitationCode());
 				sendList.add(tmpMsg);
 			}
