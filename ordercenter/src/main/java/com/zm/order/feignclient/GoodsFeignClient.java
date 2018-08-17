@@ -23,17 +23,28 @@ public interface GoodsFeignClient {
 
 	/**
 	 * @fun 获取订单商品的价格和税率等信息
-	 * @param version 版本默认1.0
-	 * @param list 订单商品信息
-	 * @param supplierId 供应商ID
-	 * @param vip 用户是否vip
-	 * @param centerId 商城ID
-	 * @param orderFlag 订单类型 0跨境，2一般贸易
-	 * @param couponIds 优惠券id
-	 * @param userId 用户ID
-	 * @param isFx 是否获取分销商品
-	 * @param platformSource 订单来源，福利网站单独计算
-	 * @param gradeId 分级ID 如果是福利网站需要用到
+	 * @param version
+	 *            版本默认1.0
+	 * @param list
+	 *            订单商品信息
+	 * @param supplierId
+	 *            供应商ID
+	 * @param vip
+	 *            用户是否vip
+	 * @param centerId
+	 *            商城ID
+	 * @param orderFlag
+	 *            订单类型 0跨境，2一般贸易
+	 * @param couponIds
+	 *            优惠券id
+	 * @param userId
+	 *            用户ID
+	 * @param isFx
+	 *            是否获取分销商品
+	 * @param platformSource
+	 *            订单来源，福利网站单独计算
+	 * @param gradeId
+	 *            分级ID 如果是福利网站需要用到
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
@@ -47,7 +58,8 @@ public interface GoodsFeignClient {
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
-			@RequestParam("source") String source, @RequestParam("platformSource") int platformSource);
+			@RequestParam("source") String source, @RequestParam("platformSource") int platformSource,
+			@RequestParam("gradeId") int gradeId);
 
 	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
 	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,

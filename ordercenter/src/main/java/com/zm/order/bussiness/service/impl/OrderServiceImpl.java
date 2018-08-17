@@ -217,13 +217,15 @@ public class OrderServiceImpl implements OrderService {
 		// info.getCouponIds());
 		// }
 
-//		if (info.getPushUserId() != null) {// 如果是推手订单，判断该推手是否有效
-//			boolean flag = userFeignClient.verifyEffective(Constants.FIRST_VERSION, info.getShopId(),
-//					info.getPushUserId());
-//			if (!flag) {// 失效推手ID设为null
-//				info.setPushUserId(null);
-//			}
-//		}
+		// if (info.getPushUserId() != null) {// 如果是推手订单，判断该推手是否有效
+		// boolean flag =
+		// userFeignClient.verifyEffective(Constants.FIRST_VERSION,
+		// info.getShopId(),
+		// info.getPushUserId());
+		// if (!flag) {// 失效推手ID设为null
+		// info.setPushUserId(null);
+		// }
+		// }
 
 		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(),
 				info.getOrderFlag());
@@ -370,7 +372,7 @@ public class OrderServiceImpl implements OrderService {
 		String ids = sb.substring(0, sb.length() - 1);
 
 		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids, "feign",
-				shoppingCart.getPlatformSource());
+				shoppingCart.getPlatformSource(), shoppingCart.getGradeId());
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
 			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");

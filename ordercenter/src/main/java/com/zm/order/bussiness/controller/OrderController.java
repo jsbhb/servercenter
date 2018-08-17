@@ -401,7 +401,7 @@ public class OrderController {
 			param.put("platformSource", platformSource);
 			Integer count = orderService.countShoppingCartQuantity(param);
 			result.setSuccess(true);
-			result.setObj(count);
+			result.setObj(count == null ? 0 : count);
 			return result;
 		}
 

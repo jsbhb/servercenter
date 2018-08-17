@@ -133,4 +133,12 @@
 			and wi.user_center_id =#{userCenterId}
 		</if>
 	</select>
+	
+	<select id="inviterStatistic" parameterType="Object" resultType="com.zm.user.pojo.bo.WelfareMembeStatistic">
+		select status,count(*) as count from welfare_inviter 
+		<if test="gradeId != null and gradeId != '' and gradeId != 0">
+			where gradeId = #{gradeId}
+		</if>
+		group by status
+	</select>
 </mapper>

@@ -770,8 +770,8 @@ public class GoodsServiceImpl implements GoodsService {
 
 		if (itemIdList != null && itemIdList.size() > 0) {
 			param.put("list", goodsMapper.getGoodsIdByItemId(itemIdList));
-			List<String> updateTagList = renderLuceneModel(param, centerId, itemIdList);
 			goodsMapper.updateGoodsItemUpShelves(itemIdList);
+			List<String> updateTagList = renderLuceneModel(param, centerId, itemIdList);
 
 			// 结果处理
 			if (updateTagList != null && updateTagList.size() > 0) {// 更新标签

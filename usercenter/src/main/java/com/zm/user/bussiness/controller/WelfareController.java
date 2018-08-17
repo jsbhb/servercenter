@@ -99,4 +99,19 @@ public class WelfareController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+	
+	@RequestMapping(value = "{version}/welfare/inviter/statistic/{gradeId}", method = RequestMethod.GET)
+	public ResultModel inviterStatistic(HttpServletRequest request, @PathVariable("version") Double version,
+			@PathVariable("gradeId") Integer gradeId) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				return welfareService.inviterStatistic(gradeId);
+			} else {
+				return new ResultModel(false, "版本错误");
+			}
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 }

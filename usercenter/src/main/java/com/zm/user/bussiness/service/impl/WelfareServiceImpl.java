@@ -24,6 +24,7 @@ import com.zm.user.feignclient.ThirdPartFeignClient;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.InviterEntity;
 import com.zm.user.pojo.NotifyMsg;
+import com.zm.user.pojo.bo.WelfareMembeStatistic;
 import com.zm.user.utils.EncryptionUtil;
 
 @Service
@@ -131,5 +132,13 @@ public class WelfareServiceImpl implements WelfareService {
 			welfareMapper.updateInviterStatus(list);
 		}
 		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel inviterStatistic(Integer gradeId) {
+		Map<String,Object> param = new HashMap<String, Object>();
+		param.put("gradeId", gradeId);
+		List<WelfareMembeStatistic> statisticList = welfareMapper.inviterStatistic(param);
+		return new ResultModel(true, statisticList);
 	}
 }

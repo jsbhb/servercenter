@@ -17,4 +17,6 @@ public interface WelfareService {
 	ResultModel produceCode(InviterEntity entity);
 	
 	ResultModel sendProduceCode(InviterEntity entity);
+
+	ResultModel inviterStatistic(Integer gradeId);
 }
