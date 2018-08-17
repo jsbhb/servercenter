@@ -41,6 +41,7 @@ public class OrderInfoListForDownload {
 	private String receivePhone;
 	private String itemInfo;
 	private String conversion;
+	private Integer orderFlg;
 	
 	public String getOrderId() {
 		return orderId;
@@ -263,6 +264,12 @@ public class OrderInfoListForDownload {
 	}
 	public void setConversion(String conversion) {
 		this.conversion = conversion;
+	}
+	public Integer getOrderFlg() {
+		return orderFlg;
+	}
+	public void setOrderFlg(Integer orderFlg) {
+		this.orderFlg = orderFlg;
 	}
 
 }
