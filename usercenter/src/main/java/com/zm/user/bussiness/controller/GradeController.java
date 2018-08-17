@@ -212,4 +212,24 @@ public class GradeController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+
+	@RequestMapping(value = "{version}/grade/updateWelfareType", method = RequestMethod.POST)
+	public ResultModel updateWelfareType(@PathVariable("version") Double version, @RequestBody Grade entity) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				if (entity.getId() == 0) {
+					return new ResultModel(false, "没有分级编号");
+
+				}
+				gradeService.updateWelfareType(entity);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				LogUtil.writeErrorLog("更新福利类型出错", e);
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

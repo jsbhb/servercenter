@@ -93,6 +93,8 @@ public class Grade extends Pagination{
 	
 	private Double welfareRebate;
 	
+	private Integer welfareType;//福利类型
+	
 	public boolean check(){
 		if(Constants.AREA_CENTER.equals(gradeType)){
 //			if(redirectUrl == null || mobileUrl == null){
@@ -423,6 +425,14 @@ public class Grade extends Pagination{
 
 	public void setWelfareRebate(Double welfareRebate) {
 		this.welfareRebate = welfareRebate;
+	}
+
+	public Integer getWelfareType() {
+		return welfareType;
+	}
+
+	public void setWelfareType(Integer welfareType) {
+		this.welfareType = welfareType;
 	}
 	
 }

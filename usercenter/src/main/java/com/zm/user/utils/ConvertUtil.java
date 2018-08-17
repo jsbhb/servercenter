@@ -23,6 +23,7 @@ public class ConvertUtil {
 		gradeBO.setCompany(grade.getCompany());
 		gradeBO.setGradeTypeName(grade.getGradeTypeName());
 		gradeBO.setType(grade.getType());
+		gradeBO.setWelfareType(grade.getWelfareType());
 		gradeBO.setWelfareRebate(grade.getWelfareRebate());
 		return gradeBO;
 	}

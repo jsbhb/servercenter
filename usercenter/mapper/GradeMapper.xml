@@ -45,6 +45,7 @@
 		<result column="pic4_path" property="picPath4" jdbcType="VARCHAR" />
 		<result column="gradeTypeName" property="gradeTypeName" jdbcType="VARCHAR" />
 		<result column="welfare_rebate" property="welfareRebate" jdbcType="DECIMAL" />
+		<result column="welfare_type" property="welfareType" jdbcType="INTEGER" />
 	</resultMap>
 	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -66,7 +67,10 @@
 	</resultMap>
 	
 	<update id="update" parameterType="Object">
-		update grade set update_time = now(), redirect_url = #{redirectUrl}
+		update grade set update_time = now()
+		<if test="redirectUrl!=null and redirectUrl!=''">
+			,redirect_url = #{redirectUrl}
+		</if>
 		<if test="gradeName!=null and gradeName!=''">
 			,grade_name = #{gradeName}
 		</if>
@@ -96,6 +100,9 @@
 		</if>
 		<if test="appSecret!=null and appSecret!=''">
 			,appSecret = #{appSecret}
+		</if>
+		<if test="welfareType!=null and welfareType!=''">
+			,welfare_type = #{welfareType}
 		</if>
 		<if test="welfareRebate!=null and welfareRebate!=''">
 			,welfare_rebate = #{welfareRebate}
@@ -129,6 +136,12 @@
 		</if>
 		<if test="company != null and company != ''">
 			and a.company like CONCAT('%',#{company},'%')
+		</if>
+		<if test="gradeType != null and gradeType != 0">
+			and a.grade_type = #{gradeType}
+		</if>
+		<if test="phone != null and phone != ''">
+			and a.phone = #{phone}
 		</if>
 	</select>
 

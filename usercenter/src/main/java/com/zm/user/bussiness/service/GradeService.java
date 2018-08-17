@@ -95,4 +95,6 @@ public interface GradeService {
 	ResultModel getGradeType(Integer id);
 
 	ResultModel initAreaCenter(Integer id);
+	
+	void updateWelfareType(Grade entity);
 }

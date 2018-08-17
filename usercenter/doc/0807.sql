@@ -1,5 +1,6 @@
 use zm_user;
 
+alter table grade add column welfare_type TINYINT UNSIGNED NOT NULL DEFAULT 0 comment '福利类型';
 alter table grade add column welfare_rebate decimal(12,6) default 0 comment '福利比例';
 
 drop table if exists  `welfare_inviter`;
@@ -23,7 +24,7 @@ CREATE TABLE `zm_user`.`welfare_inviter` (
   INDEX `idx_status` (`status`),
   INDEX `idx_user_center_id` (`user_center_id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `grade_id_invitation_code_UNIQUE` (`grade_id`,`phone` ASC),
+  UNIQUE INDEX `grade_id_phone_UNIQUE` (`grade_id`,`phone` ASC),
   UNIQUE INDEX `grade_id_invitation_code_UNIQUE` (`grade_id`,`invitation_code` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '福利商城邀请人表';

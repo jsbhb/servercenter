@@ -221,4 +221,14 @@ public class GradeServiceImpl implements GradeService {
 		return new ResultModel(true, null);
 	}
 
+	@Override
+	public void updateWelfareType(Grade entity) {
+		Grade grade = gradeMapper.selectById(entity.getId());
+		gradeMapper.update(entity);
+		// 更新redis内gradeBO信息
+		GradeBO gradeBO = ConvertUtil.converToGradeBO(grade);
+		template.opsForHash().put(Constants.GRADEBO_INFO, grade.getId() + "", JSONUtil.toJson(gradeBO));
+		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);// ordercenter不能用redis需要实时通知更新统计信息
+	}
+
 }

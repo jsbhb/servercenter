@@ -505,7 +505,7 @@ public class UserServiceImpl implements UserService {
 			result.setObj(true);
 		} else {
 			result.setObj(false);
-			result.setErrorMsg("当前账号没有绑定邀请码，请绑定邀请码！");
+			result.setErrorMsg("当前账号还不是VIP用户，请先升级！");
 		}
 		result.setSuccess(true);
 		

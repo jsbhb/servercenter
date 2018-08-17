@@ -230,6 +230,14 @@ public class UserController {
 						result.setSuccess(false);
 						result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
 					} else {
+						if (info.getInvitationCode() != null && !"".equals(info.getInvitationCode())) {
+							ResultModel bindResult = userService.userBindInviterCode(info);
+							if(bindResult.getErrorMsg() != null && !"".equals(bindResult.getErrorMsg())) {
+								result.setSuccess(false);
+								result.setErrorMsg(bindResult.getErrorMsg());
+								return result;
+							}
+						}
 						result.setObj(userId);
 						result.setSuccess(true);
 					}
