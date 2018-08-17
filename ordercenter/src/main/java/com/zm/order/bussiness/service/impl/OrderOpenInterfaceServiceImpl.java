@@ -108,7 +108,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 
 		// 邮费和税费初始值
 		Double postFee = 0.0;// 邮费
-		Double unDiscountAmount = 0.0;// 商品原总价
+		Double unDiscountAmount = (Double) priceAndWeightMap.get("originalPrice");// 商品原总价
 		TaxFeeBO taxFee = new TaxFeeBO();// 税费对象
 		Integer weight = (Integer) priceAndWeightMap.get("weight");
 
@@ -130,10 +130,6 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			// 计算税费相关
 			if (Constants.O2O_ORDER_TYPE.equals(orderInfo.getOrderFlag())) {
 				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
-				// 计算商品总价
-				for (Map.Entry<String, Double> entry : map.entrySet()) {
-					unDiscountAmount += entry.getValue();
-				}
 				// 获取税费
 				taxFee = orderComponentUtil.getTaxFee(map, unDiscountAmount, postFee, resultModel);
 				if (!resultModel.isSuccess()) {

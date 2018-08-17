@@ -268,6 +268,7 @@ public class GoodsServiceImpl implements GoodsService {
 		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
+		Double originalPrice = 0.0;
 		Integer weight = 0;
 		Map<String, GoodsSpecs> specsMap = new HashMap<String, GoodsSpecs>();
 		List<String> itemIds = new ArrayList<String>();
@@ -311,6 +312,8 @@ public class GoodsServiceImpl implements GoodsService {
 				// 这里获取的是商品原总价用来计算税率 platformSource不能传福利商城的 值，vip传false
 				amount = goodsServiceComponent.judgeQuantityRange(false, result, specs, model, DEFAULT_PLATFORMSOURCE,
 						gradeId);
+				originalPrice = CalculationUtils.add(originalPrice, amount);
+				LogUtil.writeLog("originalPrice===" + originalPrice);
 			} catch (WrongPlatformSource e) {
 				return new ResultModel(false, e.getMessage());
 			}
@@ -341,7 +344,7 @@ public class GoodsServiceImpl implements GoodsService {
 			return result;
 		}
 		map.put("tax", taxMap);
-
+		map.put("originalPrice", originalPrice);
 		map.put("weight", weight);
 		map.put("totalAmount", totalAmount);
 		result.setSuccess(true);
