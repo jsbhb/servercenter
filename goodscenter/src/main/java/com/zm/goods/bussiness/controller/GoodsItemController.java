@@ -17,6 +17,7 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.enummodel.ChannelType;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
@@ -40,27 +41,20 @@ public class GoodsItemController {
 
 	@Resource
 	GoodsItemService goodsItemService;
-	
+
 	@Resource
 	GoodsBackService goodsBackService;
 
 	@RequestMapping(value = "{version}/goods/item/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsItemEntity entity, @RequestParam(value = "type",required = false) String type) {
+			@RequestBody GoodsItemEntity entity, @RequestParam(value = "type", required = false) String type) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String gradeLevel = request.getParameter("gradeLevel");
-			
-			if ("1".equals(gradeLevel) || "1".equals(type)) {
+			try {
 				Page<GoodsItemEntity> page = goodsItemService.queryByPage(entity);
 				return new ResultModel(true, page, new Pagination(page));
-			} else {
-				String centerId = request.getParameter("centerId");
-				if (centerId == null || "".equals(centerId)) {
-					new ResultModel(false, "没有获取区域中心编号");
-				}
-				Page<GoodsItemEntity> page = goodsItemService.queryCenterByPage(entity, Integer.parseInt(centerId));
-				return new ResultModel(true, page, new Pagination(page));
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
 			}
 
 		}
@@ -82,7 +76,7 @@ public class GoodsItemController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/update", method = RequestMethod.POST)
 	public ResultModel update(@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
 
@@ -157,7 +151,7 @@ public class GoodsItemController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/queryPurchaseItem", method = RequestMethod.POST)
 	public ResultModel queryPurchaseItem(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsItemEntity entity) {
@@ -173,43 +167,43 @@ public class GoodsItemController {
 	@RequestMapping(value = "{version}/goods/item/queryPurchaseItemForEdit", method = RequestMethod.POST)
 	public ResultModel queryPurchaseItemForEdit(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsItemEntity entity) {
-	
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			GoodsPrice result = goodsItemService.queryPurchaseCenterItemForEdit(entity);
 			return new ResultModel(true, result);
 		}
-	
+
 		return new ResultModel(false, "版本错误");
 	}
 
 	@RequestMapping(value = "{version}/goods/item/queryPurchaseItemForCheck", method = RequestMethod.POST)
 	public ResultModel queryPurchaseItemForCheck(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsItemEntity entity) {
-	
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			GoodsPrice result = goodsItemService.queryItemPrice(entity.getItemId());
 			return new ResultModel(true, result);
 		}
-	
+
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/editPurchaseItem", method = RequestMethod.POST)
 	public ResultModel editPurchaseItem(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody GoodsPrice entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				//先确认当前商品的起批量是否在总部设置的区间内
+				// 先确认当前商品的起批量是否在总部设置的区间内
 				GoodsPrice chkGoodsPrice = goodsItemService.queryItemPrice(entity.getItemId());
 				if (chkGoodsPrice == null) {
 					return new ResultModel(false, "当前商品数据异常，请联系系统管理员");
 				}
 				if (chkGoodsPrice.getMin() > entity.getMin()) {
-					return new ResultModel(false, "当前商品最小起批量应大于等于"+chkGoodsPrice.getMin());
+					return new ResultModel(false, "当前商品最小起批量应大于等于" + chkGoodsPrice.getMin());
 				}
 				if (chkGoodsPrice.getMax() < entity.getMax()) {
-					return new ResultModel(false, "当前商品最大起批量应小于等于"+chkGoodsPrice.getMax());
+					return new ResultModel(false, "当前商品最大起批量应小于等于" + chkGoodsPrice.getMax());
 				}
 				goodsItemService.updateItemPrice(entity);
 				return new ResultModel(true, "");
@@ -228,19 +222,22 @@ public class GoodsItemController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Page<GoodsEntity> page = goodsItemService.queryByPageDownload(entity);
 			return new ResultModel(true, page, new Pagination(page));
-//			String gradeLevel = request.getParameter("gradeLevel");
-//
-//			if ("1".equals(gradeLevel)) {
-//				Page<GoodsEntity> page = goodsItemService.queryByPageDownload(entity);
-//				return new ResultModel(true, page, new Pagination(page));
-//			} else {
-//				String centerId = request.getParameter("centerId");
-//				if (centerId == null || "".equals(centerId)) {
-//					new ResultModel(false, "没有获取区域中心编号");
-//				}
-//				Page<GoodsEntity> page = goodsItemService.queryCenterByPageDownload(entity, Integer.parseInt(centerId));
-//				return new ResultModel(true, page, new Pagination(page));
-//			}
+			// String gradeLevel = request.getParameter("gradeLevel");
+			//
+			// if ("1".equals(gradeLevel)) {
+			// Page<GoodsEntity> page =
+			// goodsItemService.queryByPageDownload(entity);
+			// return new ResultModel(true, page, new Pagination(page));
+			// } else {
+			// String centerId = request.getParameter("centerId");
+			// if (centerId == null || "".equals(centerId)) {
+			// new ResultModel(false, "没有获取区域中心编号");
+			// }
+			// Page<GoodsEntity> page =
+			// goodsItemService.queryCenterByPageDownload(entity,
+			// Integer.parseInt(centerId));
+			// return new ResultModel(true, page, new Pagination(page));
+			// }
 
 		}
 
@@ -248,25 +245,28 @@ public class GoodsItemController {
 	}
 
 	@RequestMapping(value = "{version}/goods/item/queryGoodsExtensionForPageDownload", method = RequestMethod.POST)
-	public ResultModel queryGoodsExtensionForPageDownload(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsItemEntity entity) {
+	public ResultModel queryGoodsExtensionForPageDownload(HttpServletRequest request,
+			@PathVariable("version") Double version, @RequestBody GoodsItemEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionByPageDownload(entity);
 			return new ResultModel(true, page, new Pagination(page));
-//			String gradeLevel = request.getParameter("gradeLevel");
-//
-//			if ("1".equals(gradeLevel)) {
-//				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionByPageDownload(entity);
-//				return new ResultModel(true, page, new Pagination(page));
-//			} else {
-//				String centerId = request.getParameter("centerId");
-//				if (centerId == null || "".equals(centerId)) {
-//					new ResultModel(false, "没有获取区域中心编号");
-//				}
-//				Page<GoodsExtensionEntity> page = goodsItemService.queryGoodsExtensionCenterByPageDownload(entity, Integer.parseInt(centerId));
-//				return new ResultModel(true, page, new Pagination(page));
-//			}
+			// String gradeLevel = request.getParameter("gradeLevel");
+			//
+			// if ("1".equals(gradeLevel)) {
+			// Page<GoodsExtensionEntity> page =
+			// goodsItemService.queryGoodsExtensionByPageDownload(entity);
+			// return new ResultModel(true, page, new Pagination(page));
+			// } else {
+			// String centerId = request.getParameter("centerId");
+			// if (centerId == null || "".equals(centerId)) {
+			// new ResultModel(false, "没有获取区域中心编号");
+			// }
+			// Page<GoodsExtensionEntity> page =
+			// goodsItemService.queryGoodsExtensionCenterByPageDownload(entity,
+			// Integer.parseInt(centerId));
+			// return new ResultModel(true, page, new Pagination(page));
+			// }
 
 		}
 
@@ -284,9 +284,10 @@ public class GoodsItemController {
 
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/goods/item/updateGoodsExtensionInfo", method = RequestMethod.POST)
-	public ResultModel updateGoodsExtensionInfo(@PathVariable("version") Double version, @RequestBody GoodsExtensionEntity entity) {
+	public ResultModel updateGoodsExtensionInfo(@PathVariable("version") Double version,
+			@RequestBody GoodsExtensionEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
@@ -313,8 +314,8 @@ public class GoodsItemController {
 	}
 
 	@RequestMapping(value = "{version}/goods/item/queryGoodsRatioPlatformForPage", method = RequestMethod.POST)
-	public ResultModel queryGoodsRatioPlatformForPage(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsRatioPlatformEntity entity) {
+	public ResultModel queryGoodsRatioPlatformForPage(HttpServletRequest request,
+			@PathVariable("version") Double version, @RequestBody GoodsRatioPlatformEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Page<GoodsRatioPlatformEntity> page = goodsItemService.queryGoodsRatioPlanformPage(entity);
@@ -325,8 +326,8 @@ public class GoodsItemController {
 	}
 
 	@RequestMapping(value = "{version}/goods/item/queryGoodsRatioPlatformForEdit", method = RequestMethod.POST)
-	public ResultModel queryGoodsRatioPlatformForEdit(HttpServletRequest request, @PathVariable("version") Double version,
-			@RequestBody GoodsRatioPlatformEntity entity) {
+	public ResultModel queryGoodsRatioPlatformForEdit(HttpServletRequest request,
+			@PathVariable("version") Double version, @RequestBody GoodsRatioPlatformEntity entity) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			GoodsRatioPlatformEntity ratioPlatformInfo = goodsItemService.queryGoodsRatioPlanformInfo(entity);

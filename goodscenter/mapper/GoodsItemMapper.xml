@@ -249,6 +249,9 @@
 			and i.status = '1'
 			and ifnull(i.is_fx,0) = 1
 		</if>
+		<if test="goodsId!=null and goodsId!=''">
+			and g.goods_id = #{goodsId}
+		</if>
 		<if test="itemId!=null and itemId!=''">
 			and i.item_id = #{itemId}
 		</if>
@@ -274,8 +277,17 @@
 				and g.type = #{goodsEntity.type}
 			</if>
 		</if>
-<!-- 		order by i.id desc -->
-		order by i.update_time desc,i.create_time desc
+		<if test="startTime !=null and startTime !=''">
+			and i.update_time &gt;= #{startTime} 
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and i.update_time &lt;= #{endTime} 
+		</if>
+		order by 
+		<if test="orderByProperty!=null">
+				${orderByProperty} ${orderByParam},
+		</if> 
+		i.update_time desc
 	</select>
 	
 	<select id="selectCenterForPage" parameterType="Object" resultMap="entity">

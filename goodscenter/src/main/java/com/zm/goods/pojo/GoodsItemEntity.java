@@ -55,6 +55,10 @@ public class GoodsItemEntity extends Pagination {
 	private List<GoodsRebateEntity> goodsRebateList;
 	private String isCreate;
 	private Integer isFx;
+	private String orderByParam;
+	private String orderByProperty;
+	private String startTime;
+	private String endTime;
 
 	public List<GoodsTagEntity> getTagList() {
 		return tagList;
@@ -326,5 +330,37 @@ public class GoodsItemEntity extends Pagination {
 
 	public void setIsFx(Integer isFx) {
 		this.isFx = isFx;
+	}
+
+	public String getOrderByParam() {
+		return orderByParam;
+	}
+
+	public void setOrderByParam(String orderByParam) {
+		this.orderByParam = orderByParam;
+	}
+
+	public String getOrderByProperty() {
+		return orderByProperty;
+	}
+
+	public void setOrderByProperty(String orderByProperty) {
+		this.orderByProperty = orderByProperty;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
 	}
 }
