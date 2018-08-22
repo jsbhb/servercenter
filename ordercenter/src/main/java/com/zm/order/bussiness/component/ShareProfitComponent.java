@@ -13,6 +13,8 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.bussiness.component.model.ShareProfitModel;
 import com.zm.order.bussiness.dao.OrderMapper;
@@ -36,6 +38,7 @@ import com.zm.order.utils.JSONUtil;
 import com.zm.order.utils.TreeNodeUtil;
 
 @Component
+@Transactional(isolation = Isolation.READ_UNCOMMITTED)
 public class ShareProfitComponent {
 
 	@Resource
