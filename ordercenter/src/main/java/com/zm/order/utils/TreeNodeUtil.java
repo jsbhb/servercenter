@@ -64,7 +64,7 @@ public class TreeNodeUtil {
 			for (GradeBO grade : set) {
 				grade.setChildren(null);
 				if (gradeId != 0) {
-					if (grade.getId() == gradeId) {
+					if (grade.getId().equals(gradeId)) {
 						rootList.add(grade);
 					}
 				} else {
