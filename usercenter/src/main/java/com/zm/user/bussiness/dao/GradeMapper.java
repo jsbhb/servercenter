@@ -14,6 +14,7 @@ import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 import com.zm.user.pojo.po.GradeTypePO;
+import com.zm.user.pojo.po.RebateFormula;
 
 /**
  * ClassName: GradeMapper <br/>
@@ -147,5 +148,17 @@ public interface GradeMapper<T> {
 	void updateGradeInit(Integer id);
 	
 	List<Grade> listButtjointGrade();
+
+	void saveGradeTypeRebateFormula(RebateFormula rebateFormula);
+
+	void updateGradeTypeRebateFormula(RebateFormula rebateFormula);
+
+	Page<RebateFormula> listGradeTypeRebateFormula(RebateFormula rebateFormula);
+
+	RebateFormula getGradeTypeRebateFormulaById(Integer id);
+
+	Integer getIdByGradeTypeId(Integer gradeTypeId);
+
+	List<RebateFormula> listAllGradeTypeRebateFormula();
 
 }

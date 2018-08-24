@@ -276,4 +276,57 @@
 	<select id="listButtjointGrade" parameterType="Object">
 		select appKey,appSecret,redirect_url from grade where type = 2
 	</select>
+	
+	<!-- 分级类型返佣公式SQL -->
+	<resultMap type="com.zm.user.pojo.po.RebateFormula" id="rebateFormula">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="grade_type_id" property="gradeTypeId" jdbcType="INTEGER" />
+		<result column="formula" property="formula" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="name" property="gradeTypeName" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="backup" property="backup" jdbcType="VARCHAR" />
+	</resultMap>
+	<insert id="saveGradeTypeRebateFormula" parameterType="Object">
+		insert into grade_type_rebate_formula(grade_type_id,formula,remark,create_time,opt) values
+		(#{gradeTypeId},#{formula},#{remark},now(),#{opt})
+	</insert>
+	
+	<update id="updateGradeTypeRebateFormula" parameterType="Object">
+		update grade_type_rebate_formula 
+		<set>
+			<if test="formula != null and formula != ''">
+				formula = #{formula},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+			update_time = now(),
+			opt = #{opt}
+		</set>
+		where id = #{id}
+	</update>
+	
+	<select id="listGradeTypeRebateFormula" parameterType="Object" resultMap="rebateFormula">
+		select r.*,g.name from grade_type_rebate_formula r left join grade_type g on r.grade_type_id = g.id where 1=1
+		<if test="gradeTypeName != null and gradeTypeName != ''">
+			and g.name like CONCAT('%',#{gradeTypeName},'%')
+		</if>
+		order by g.id
+	</select>
+	
+	<select id="getGradeTypeRebateFormulaById" parameterType="Object" resultMap="rebateFormula">
+		select r.*,g.name from grade_type_rebate_formula r left join grade_type g on r.grade_type_id = g.id where r.id=#{id}
+	</select>
+	
+	<select id="getIdByGradeTypeId" parameterType="Object" resultType="java.lang.Integer">
+		select id from grade_type_rebate_formula where grade_type_id = #{gradeTypeId}
+	</select>
+	
+	<select id="listAllGradeTypeRebateFormula" parameterType="Object" resultMap="rebateFormula">
+		select r.*,g.name from grade_type_rebate_formula r left join grade_type g on r.grade_type_id = g.id
+	</select>
 </mapper>

@@ -27,6 +27,7 @@ import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 import com.zm.user.pojo.po.GradeTypePO;
+import com.zm.user.pojo.po.RebateFormula;
 
 /**
  * ClassName: GradeController <br/>
@@ -230,6 +231,42 @@ public class GradeController {
 			}
 		}
 
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/grade/rebate/formula", method = RequestMethod.POST)
+	public ResultModel saveGradeTypeRebateFormula(@PathVariable("version") Double version,
+			@RequestBody RebateFormula rebateFormula) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.saveGradeTypeRebateFormula(rebateFormula);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/grade/rebate/formula/update", method = RequestMethod.POST)
+	public ResultModel updateGradeTypeRebateFormula(@PathVariable("version") Double version,
+			@RequestBody RebateFormula rebateFormula) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.updateGradeTypeRebateFormula(rebateFormula);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/grade/rebate/formula/{needPaging}", method = RequestMethod.POST)
+	public ResultModel listGradeTypeRebateFormula(@PathVariable("version") Double version,
+			@PathVariable("needPaging") boolean needPaging, @RequestBody RebateFormula rebateFormula) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.listGradeTypeRebateFormula(rebateFormula, needPaging);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/grade/rebate/formula/{id}", method = RequestMethod.GET)
+	public ResultModel getGradeTypeRebateFormulaById(@PathVariable("version") Double version,
+			@PathVariable("id") Integer id) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.getGradeTypeRebateFormulaById(id);
+		}
 		return new ResultModel(false, "版本错误");
 	}
 }

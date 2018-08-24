@@ -3,6 +3,8 @@ package com.zm.user.utils;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.bo.ButtjointUserBO;
 import com.zm.user.pojo.bo.GradeBO;
+import com.zm.user.pojo.bo.RebateFormulaBO;
+import com.zm.user.pojo.po.RebateFormula;
 
 public class ConvertUtil {
 
@@ -26,6 +28,13 @@ public class ConvertUtil {
 		gradeBO.setWelfareType(grade.getWelfareType());
 		gradeBO.setWelfareRebate(grade.getWelfareRebate());
 		return gradeBO;
+	}
+
+	public static RebateFormulaBO converToRebateFormulaBO(RebateFormula temp) {
+		RebateFormulaBO bo = new RebateFormulaBO();
+		bo.setFormula(temp.getFormula());
+		bo.setGradeTypeId(temp.getGradeTypeId());
+		return bo;
 	}
 
 }

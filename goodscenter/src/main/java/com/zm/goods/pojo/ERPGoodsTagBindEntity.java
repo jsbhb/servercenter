@@ -16,7 +16,7 @@ package com.zm.goods.pojo;
  * @version
  * @since JDK 1.7
  */
-public class ERPGoodsTagBindEntity {
+public class ERPGoodsTagBindEntity extends GoodsTagBindEntity{
 
 	private int id;
 	private String itemId;// itemId

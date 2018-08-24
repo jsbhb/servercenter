@@ -23,6 +23,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.service.GradeService;
+import com.zm.user.common.Pagination;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.enummodel.BackManagerErrorEnum;
@@ -35,8 +36,10 @@ import com.zm.user.pojo.ShopEntity;
 import com.zm.user.pojo.bo.ButtjointUserBO;
 import com.zm.user.pojo.bo.CreateAreaCenterSEO;
 import com.zm.user.pojo.bo.GradeBO;
+import com.zm.user.pojo.bo.RebateFormulaBO;
 import com.zm.user.pojo.dto.GradeTypeDTO;
 import com.zm.user.pojo.po.GradeTypePO;
+import com.zm.user.pojo.po.RebateFormula;
 import com.zm.user.seo.publish.PublishComponent;
 import com.zm.user.utils.ConvertUtil;
 import com.zm.user.utils.JSONUtil;
@@ -229,7 +232,45 @@ public class GradeServiceImpl implements GradeService {
 		// 更新redis内gradeBO信息
 		GradeBO gradeBO = ConvertUtil.converToGradeBO(grade);
 		template.opsForHash().put(Constants.GRADEBO_INFO, grade.getId() + "", JSONUtil.toJson(gradeBO));
-//		orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);// ordercenter不能用redis需要实时通知更新统计信息
+		// orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION,
+		// gradeBO);// ordercenter不能用redis需要实时通知更新统计信息
+	}
+
+	@Override
+	public ResultModel saveGradeTypeRebateFormula(RebateFormula rebateFormula) {
+		Integer id = gradeMapper.getIdByGradeTypeId(rebateFormula.getGradeTypeId());
+		if (id != null) {
+			return new ResultModel(false, "","该分级类型公式已经存在");
+		}
+		gradeMapper.saveGradeTypeRebateFormula(rebateFormula);
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel updateGradeTypeRebateFormula(RebateFormula rebateFormula) {
+		gradeMapper.updateGradeTypeRebateFormula(rebateFormula);
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel listGradeTypeRebateFormula(RebateFormula rebateFormula, boolean needPaging) {
+		if (needPaging) {
+			PageHelper.startPage(rebateFormula.getCurrentPage(), rebateFormula.getNumPerPage(), true);
+			Page<RebateFormula> page = gradeMapper.listGradeTypeRebateFormula(rebateFormula);
+			return new ResultModel(true, page, new Pagination(page));
+		} else {
+			List<RebateFormula> page = gradeMapper.listAllGradeTypeRebateFormula();
+			List<RebateFormulaBO> list = new ArrayList<RebateFormulaBO>();
+			for (RebateFormula temp : page) {
+				list.add(ConvertUtil.converToRebateFormulaBO(temp));
+			}
+			return new ResultModel(true, list);
+		}
+	}
+
+	@Override
+	public ResultModel getGradeTypeRebateFormulaById(Integer id) {
+		return new ResultModel(true, gradeMapper.getGradeTypeRebateFormulaById(id));
 	}
 
 }

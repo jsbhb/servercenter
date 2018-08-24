@@ -317,10 +317,10 @@
 	</insert>
 	
 	<insert id="insertBatch" parameterType="Object">
-		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt) value
+		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt,goods_tag_ratio) value
 		<foreach collection="list" item="item" separator=",">
 			(#{item.goodsId},#{item.templateId},#{item.baseId},#{item.supplierId},#{item.supplierName},#{item.goodsName},#{item.description},#{item.origin},0,
-			#{item.detailPath},0,#{item.type},now(),now(),#{item.opt})
+			#{item.detailPath},0,#{item.type},now(),now(),#{item.opt},#{item.goodsTagRatio})
 		</foreach>
 	</insert>
 	

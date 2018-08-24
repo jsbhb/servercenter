@@ -6,6 +6,7 @@ import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
 import com.zm.user.pojo.po.GradeTypePO;
+import com.zm.user.pojo.po.RebateFormula;
 
 /**
  * 
@@ -97,4 +98,13 @@ public interface GradeService {
 	ResultModel initAreaCenter(Integer id);
 	
 	void updateWelfareType(Grade entity);
+
+	ResultModel saveGradeTypeRebateFormula(RebateFormula rebateFormula);
+
+	ResultModel updateGradeTypeRebateFormula(RebateFormula rebateFormula);
+
+	ResultModel listGradeTypeRebateFormula(RebateFormula rebateFormula, boolean needPaging);
+
+	ResultModel getGradeTypeRebateFormulaById(Integer id);
+
 }

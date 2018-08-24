@@ -578,16 +578,22 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		List<GoodsPrice> priceList = new ArrayList<GoodsPrice>();
 		List<GoodsStockEntity> stockList = new ArrayList<GoodsStockEntity>();
 		List<GoodsRebateEntity> rebateList = new ArrayList<GoodsRebateEntity>();
+		List<GoodsTagBindEntity> tagBingList = new ArrayList<GoodsTagBindEntity>();
 		if (list != null && list.size() > 0) {
 			for (GoodsInfoEntity entity : list) {
 				for (GoodsItemEntity goodsItem : entity.getGoods().getItems()) {
 					itemList.add(goodsItem);
 					priceList.add(goodsItem.getGoodsPrice());
 					stockList.add(goodsItem.getStock());
-					rebateList.addAll(goodsItem.getGoodsRebateList());
+					if(goodsItem.getGoodsRebateList() != null){
+						rebateList.addAll(goodsItem.getGoodsRebateList());
+					}
 				}
 				baseList.add(entity.getGoodsBase());
 				goodsList.add(entity.getGoods());
+				if(entity.getGoods().getGoodsTagBindList() != null){
+					tagBingList.addAll(entity.getGoods().getGoodsTagBindList());
+				}
 			}
 			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(itemList);
 			if (tempList != null && tempList.size() > 0) {
@@ -599,9 +605,6 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			}
 			if (baseList.size() > 0) {
 				goodsBaseMapper.insertBatch(baseList);
-			}
-			if (goodsList.size() > 0) {
-				goodsBackMapper.insertBatch(goodsList);
 			}
 			if (itemList.size() > 0) {
 				goodsItemMapper.insertBatch(itemList);
@@ -615,8 +618,44 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			if (rebateList.size() > 0) {
 				insertGoodsRebate(rebateList);
 			}
+			if(tagBingList.size() > 0){
+				//批量插入标签
+				goodsTagMapper.batchInsert(tagBingList);
+				calTagRatio(goodsList, tagBingList);
+			}
+			if (goodsList.size() > 0) {
+				goodsBackMapper.insertBatch(goodsList);
+			}
 		}
 		return new ResultModel(true, "操作成功");
+	}
+
+	/**
+	 * @fun 计算goods的权重
+	 * @param goodsList
+	 * @param tagBingList
+	 */
+	private void calTagRatio(List<GoodsEntity> goodsList, List<GoodsTagBindEntity> tagBingList) {
+		List<ERPGoodsTagBindEntity> tmpGoodsTagBindEntityList = null;
+		Map<String,List<ERPGoodsTagBindEntity>> tempMap = new HashMap<String,List<ERPGoodsTagBindEntity>>();
+		for(GoodsTagBindEntity gtbe:tagBingList) {
+			if(tempMap.get(gtbe.getItemId()) == null){
+				tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
+				tmpGoodsTagBindEntityList.add(convertToERPGoodsTagBindEntity(gtbe));
+				tempMap.put(gtbe.getItemId(), tmpGoodsTagBindEntityList);
+			} else {
+				tempMap.get(gtbe.getItemId()).add(convertToERPGoodsTagBindEntity(gtbe));
+			}
+		}
+		for(GoodsEntity ge:goodsList) {
+			tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
+			for(GoodsItemEntity gie:ge.getItems()) {
+				if(tempMap.get(gie.getItemId()) != null){
+					tmpGoodsTagBindEntityList.addAll(tempMap.get(gie.getItemId()));
+				}
+			}
+			ge.setGoodsTagRatio(calcGoodsTagRatio(tmpGoodsTagBindEntityList));
+		}
 	}
 
 	@Override
@@ -650,26 +689,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			
 			//设定权重
 			List<GoodsEntity> goodsIdList = goodsTagMapper.listGoodsIdByItemList(itemList);
-			List<ERPGoodsTagBindEntity> tmpGoodsTagBindEntityList = null;
-			Map<String,List<ERPGoodsTagBindEntity>> tempMap = new HashMap<String,List<ERPGoodsTagBindEntity>>();
-			for(GoodsTagBindEntity gtbe:list) {
-				if(tempMap.get(gtbe.getItemId()) == null){
-					tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
-					tmpGoodsTagBindEntityList.add(convertToERPGoodsTagBindEntity(gtbe));
-					tempMap.put(gtbe.getItemId(), tmpGoodsTagBindEntityList);
-				} else {
-					tempMap.get(gtbe.getItemId()).add(convertToERPGoodsTagBindEntity(gtbe));
-				}
-			}
-			for(GoodsEntity ge:goodsIdList) {
-				tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
-				for(GoodsItemEntity gie:ge.getItems()) {
-					if(tempMap.get(gie.getItemId()) != null){
-						tmpGoodsTagBindEntityList.addAll(tempMap.get(gie.getItemId()));
-					}
-				}
-				ge.setGoodsTagRatio(calcGoodsTagRatio(tmpGoodsTagBindEntityList));
-			}
+			calTagRatio(goodsIdList, list);
 			goodsBackMapper.updateGoodsTagRatioByList(goodsIdList);
 		}
 		return new ResultModel(true, null);
