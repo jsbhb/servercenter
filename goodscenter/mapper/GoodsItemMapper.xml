@@ -249,6 +249,9 @@
 			and i.status = '1'
 			and ifnull(i.is_fx,0) = 1
 		</if>
+		<if test="status !=null and status==3">
+			and (ifnull(s.fxqty,0) &lt;= 0 or i.is_tmpdown = '1')
+		</if>
 		<if test="goodsId!=null and goodsId!=''">
 			and g.goods_id = #{goodsId}
 		</if>
