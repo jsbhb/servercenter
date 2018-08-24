@@ -84,5 +84,9 @@ public class ERPGoodsTagEntity extends Pagination {
 	public void setTagRatio(Integer tagRatio) {
 		this.tagRatio = tagRatio;
 	}
+	@Override
+	public String toString() {
+		return "ERPGoodsTagEntity [id=" + id + ", tagName=" + tagName + ", tagRatio=" + tagRatio + "]";
+	}
 	
 }

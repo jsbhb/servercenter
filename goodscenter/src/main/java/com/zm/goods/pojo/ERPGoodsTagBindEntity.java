@@ -60,5 +60,9 @@ public class ERPGoodsTagBindEntity extends GoodsTagBindEntity{
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
+	@Override
+	public String toString() {
+		return "ERPGoodsTagBindEntity [itemId=" + itemId + ", tagId=" + tagId + "]";
+	}
 
 }

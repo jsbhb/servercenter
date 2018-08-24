@@ -60,5 +60,9 @@ public class GoodsTagBindEntity {
 	public void setOpt(String opt) {
 		this.opt = opt;
 	}
+	@Override
+	public String toString() {
+		return "GoodsTagBindEntity [itemId=" + itemId + ", tagId=" + tagId + "]";
+	}
 
 }
