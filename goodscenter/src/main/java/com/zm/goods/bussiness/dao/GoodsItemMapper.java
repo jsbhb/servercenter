@@ -273,4 +273,12 @@ public interface GoodsItemMapper {
 	void updateGoodsItemUpdateTimeByItemIdList(List<String> list);
 	
 	List<GoodsEntity> listGoodsIdByItemList(List<String> list);
+
+	List<GoodsItemEntity> stockQtyNotEnoughGoodsItemList();
+
+	void updateGoodsItemForStockNotEnough(List<String> list);
+
+	List<GoodsItemEntity> stockQtyEnoughGoodsItemList();
+
+	void updateGoodsItemForStockEnough(List<String> list);
 }

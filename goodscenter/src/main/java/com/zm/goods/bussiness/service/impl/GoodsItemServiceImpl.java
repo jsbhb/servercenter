@@ -348,4 +348,42 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	public void syncGoodsPriceRatioInfo(List<GoodsPriceRatioEntity> list) {
 		goodsItemMapper.syncGoodsPriceRatioInfo(list);
 	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public ResultModel syncStockQtyNotEnoughItemList() {
+		ResultModel result = new ResultModel();
+		result.setSuccess(true);
+		List<GoodsItemEntity> list = goodsItemMapper.stockQtyNotEnoughGoodsItemList();
+		if (list != null  && list.size() > 0) {
+			List<String> itemIdList = new ArrayList<String>();
+			for (GoodsItemEntity gie:list) {
+				itemIdList.add(gie.getItemId());
+			}
+			result = goodsService.downShelves(itemIdList, Constants.CNCOOPBUY);
+			if (result.isSuccess()) {
+				goodsItemMapper.updateGoodsItemForStockNotEnough(itemIdList);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	@Transactional(isolation=Isolation.READ_COMMITTED)
+	public ResultModel syncStockQtyEnoughItemList() {
+		ResultModel result = new ResultModel();
+		result.setSuccess(true);
+		List<GoodsItemEntity> list = goodsItemMapper.stockQtyEnoughGoodsItemList();
+		if (list != null  && list.size() > 0) {
+			List<String> itemIdList = new ArrayList<String>();
+			for (GoodsItemEntity gie:list) {
+				itemIdList.add(gie.getItemId());
+			}
+			result = goodsService.upShelves(itemIdList, Constants.CNCOOPBUY);
+			if (result.isSuccess()) {
+				goodsItemMapper.updateGoodsItemForStockEnough(itemIdList);
+			}
+		}
+		return result;
+	}
 }

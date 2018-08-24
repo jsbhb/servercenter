@@ -51,4 +51,20 @@ public interface GoodsFeignClient {
 	 */
 	@RequestMapping(value = "{version}/goods/checkStock", method = RequestMethod.GET)
 	public List<OrderBussinessModel> checkStock(@PathVariable("version") Double version);
+	
+	/**
+	 * @fun 查找没有库存的商品并临时下架
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/item/timeTaskQueryStockQtyNotEnoughList", method = RequestMethod.POST)
+	public ResultModel stockQtyNotEnoughList(@PathVariable("version") Double version);
+	
+	/**
+	 * @fun 查找维护过库存的商品并上架
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/item/timeTaskQueryStockQtyEnoughList", method = RequestMethod.POST)
+	public ResultModel stockQtyEnoughList(@PathVariable("version") Double version);
 }

@@ -17,7 +17,6 @@ import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsItemService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.enummodel.ChannelType;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
@@ -25,6 +24,8 @@ import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.ResultModel;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * ClassName: GoodsItemController <br/>
@@ -370,6 +371,24 @@ public class GoodsItemController {
 			return new ResultModel(true, "");
 		}
 
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/item/timeTaskQueryStockQtyNotEnoughList", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel stockQtyNotEnoughList(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsItemService.syncStockQtyNotEnoughItemList();
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/item/timeTaskQueryStockQtyEnoughList", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel stockQtyEnoughList(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsItemService.syncStockQtyNotEnoughItemList();
+		}
 		return new ResultModel(false, "版本错误");
 	}
 }
