@@ -39,6 +39,7 @@ import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
+import com.zm.goods.pojo.GoodsShelveRecordEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.seo.publish.PublishComponent;
@@ -355,14 +356,27 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		ResultModel result = new ResultModel();
 		result.setSuccess(true);
 		List<GoodsItemEntity> list = goodsItemMapper.stockQtyNotEnoughGoodsItemList();
+		LogUtil.writeLog("StockQtyNotEnoughItemList:"+list.size());
 		if (list != null  && list.size() > 0) {
 			List<String> itemIdList = new ArrayList<String>();
+			String tmpRecordDetail = "";
 			for (GoodsItemEntity gie:list) {
 				itemIdList.add(gie.getItemId());
+				tmpRecordDetail = tmpRecordDetail + gie.getItemId() + "(" + gie.getStock().getFxQty() + "),";
 			}
+			
+			GoodsShelveRecordEntity record = new GoodsShelveRecordEntity();
+			record.setShelveType(Constants.GOODS_SHELVE_TYPE_DOWN);
+			record.setShelveMode(Constants.GOODS_SHELVE_MODE_AUTO);
+			record.setNumber(itemIdList.size());
+			record.setDetail(tmpRecordDetail);
+			
+			LogUtil.writeLog("downShelvesItemList:"+itemIdList.size());
 			result = goodsService.downShelves(itemIdList, Constants.CNCOOPBUY);
+			LogUtil.writeLog("downShelveStatus:"+result.isSuccess());
 			if (result.isSuccess()) {
 				goodsItemMapper.updateGoodsItemForStockNotEnough(itemIdList);
+				goodsItemMapper.insertGoodsShelveRecord(record);
 			}
 		}
 		return result;
@@ -374,14 +388,27 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		ResultModel result = new ResultModel();
 		result.setSuccess(true);
 		List<GoodsItemEntity> list = goodsItemMapper.stockQtyEnoughGoodsItemList();
+		LogUtil.writeLog("StockQtyEnoughItemList:"+list.size());
 		if (list != null  && list.size() > 0) {
 			List<String> itemIdList = new ArrayList<String>();
+			String tmpRecordDetail = "";
 			for (GoodsItemEntity gie:list) {
 				itemIdList.add(gie.getItemId());
+				tmpRecordDetail = tmpRecordDetail + gie.getItemId() + "(" + gie.getStock().getFxQty() + "),";
 			}
+			
+			GoodsShelveRecordEntity record = new GoodsShelveRecordEntity();
+			record.setShelveType(Constants.GOODS_SHELVE_TYPE_UP);
+			record.setShelveMode(Constants.GOODS_SHELVE_MODE_AUTO);
+			record.setNumber(itemIdList.size());
+			record.setDetail(tmpRecordDetail);
+			
+			LogUtil.writeLog("upShelvesItemList:"+itemIdList.size());
 			result = goodsService.upShelves(itemIdList, Constants.CNCOOPBUY);
+			LogUtil.writeLog("upShelveStatus:"+result.isSuccess());
 			if (result.isSuccess()) {
 				goodsItemMapper.updateGoodsItemForStockEnough(itemIdList);
+				goodsItemMapper.insertGoodsShelveRecord(record);
 			}
 		}
 		return result;

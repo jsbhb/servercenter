@@ -63,5 +63,9 @@ public class Constants {
 	public static final int WELFARE_WEBSITE = 7;
 	
 	public static final Integer CNCOOPBUY = 2;
+	//************************商品上下架记录管理********************************//
+	public static final int GOODS_SHELVE_TYPE_UP = 0;
+	public static final int GOODS_SHELVE_TYPE_DOWN = 1;
+	public static final int GOODS_SHELVE_MODE_AUTO = 0;
 	
 }

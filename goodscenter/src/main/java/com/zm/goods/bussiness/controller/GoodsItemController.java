@@ -387,7 +387,7 @@ public class GoodsItemController {
 	@ApiIgnore
 	public ResultModel stockQtyEnoughList(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsItemService.syncStockQtyNotEnoughItemList();
+			return goodsItemService.syncStockQtyEnoughItemList();
 		}
 		return new ResultModel(false, "版本错误");
 	}
