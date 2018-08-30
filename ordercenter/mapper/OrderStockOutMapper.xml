@@ -196,6 +196,9 @@
 		<if test="entity.orderFlag != null">
 			and ob.order_flag = #{entity.orderFlag,jdbcType = INTEGER}
 		</if>
+		<if test="entity.orderSource != null">
+			and ob.order_source = #{entity.orderSource,jdbcType = INTEGER}
+		</if>
 <!-- 		order by ob.create_time desc limit #{entity.startRow},#{entity.numPerPage} -->
 		) o 
 		left join order_detail od on o.order_id = od.order_id 
