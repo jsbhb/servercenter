@@ -144,7 +144,7 @@ public class OrderStockOutController {
 	}
 
 	@RequestMapping(value = "{version}/order/import", method = RequestMethod.POST)
-	public ResultModel importOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> list) {
+	public com.zm.order.pojo.ResultModel importOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
@@ -152,16 +152,16 @@ public class OrderStockOutController {
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("批量导入出错", e);
 				if (e.getMessage().contains("Duplicate entry")) {
-					return new ResultModel(false,
+					return new com.zm.order.pojo.ResultModel(false,
 							"订单号或支付单重复" + e.getMessage().substring(
 									e.getMessage().indexOf("Duplicate entry") + "Duplicate entry".length(),
 									e.getMessage().indexOf("for key")));
 				}
-				return new ResultModel(false, e.getMessage());
+				return new com.zm.order.pojo.ResultModel(false, e.getMessage());
 			}
 		}
 
-		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+		return new com.zm.order.pojo.ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 	@RequestMapping(value = "{version}/order/stockOut/sendStockInGoodsInfoToMJY", method = RequestMethod.POST)

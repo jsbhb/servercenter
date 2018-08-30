@@ -786,4 +786,12 @@
 		</foreach> 
 	</select>
 	
+	<select id="getOrderGoodsType" parameterType="Object" resultType="java.lang.Integer">
+		select distinct g.type from goods g left join goods_item gi on g.goods_id = gi.goods_id 
+		where g.supplier_id = #{supplierId} and item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach> 
+	</select>
+	
 </mapper>

@@ -80,7 +80,7 @@ public interface GoodsFeignClient {
 	public List<String> listPreSellItemIds(@PathVariable("version") Double version);
 
 	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
-	public com.zm.order.common.ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
+	public ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
 			@RequestBody List<GoodsItemBO> set);
 
 	@RequestMapping(value = "{version}/goods/cal-stock", method = RequestMethod.POST)

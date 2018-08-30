@@ -99,7 +99,7 @@ public class OpenInterfaceUtil {
 			}
 		}
 		//一般贸易订单需要大于500
-		if (orderInfo.getOrderFlag() == Constants.GENERAL_TRADE && orderInfo.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
+		if (orderInfo.getSupplierId().equals(Constants.GENERAL_WAREHOUSE_ID) && orderInfo.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
 					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 		}

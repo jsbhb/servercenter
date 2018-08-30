@@ -283,6 +283,19 @@ public class GoodsServiceImpl implements GoodsService {
 			return new ResultModel(false, ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorCode(),
 					ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorMsg());
 		}
+		//判断订单属性和商品属性是否一致
+		try {
+			int type = goodsMapper.getOrderGoodsType(param);
+			if(!orderFlag.equals(type)){
+				return new ResultModel(false, ErrorCodeEnum.TYPE_ERROR.getErrorCode(),
+						ErrorCodeEnum.TYPE_ERROR.getErrorMsg());
+			}
+		} catch (Exception e) {
+			LogUtil.writeErrorLog("判断订单属性和商品属性出错", e);
+			return new ResultModel(false, ErrorCodeEnum.TYPE_ERROR.getErrorCode(),
+					ErrorCodeEnum.TYPE_ERROR.getErrorMsg());
+		}
+		
 		// 获取所有item的规格
 		param.put("list", itemIds);
 		param.put("isFx", isFx ? FX : NOT_FX);

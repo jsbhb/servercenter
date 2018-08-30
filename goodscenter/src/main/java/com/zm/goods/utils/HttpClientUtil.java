@@ -88,7 +88,7 @@ public class HttpClientUtil {
 
 			// 如果连接状态异常，则直接关闭
 			if (response.getStatusLine().getStatusCode() != 200) {
-				logger.info("httpclient 访问异常 ");
+				logger.info("httpclient 访问异常 ,链接状态：" + response.getStatusLine().getStatusCode());
 				http.abort();
 				return null;
 			}

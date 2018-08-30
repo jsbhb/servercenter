@@ -84,11 +84,11 @@ public interface OrderStockOutService {
 	void maintenanceExpress(List<OrderMaintenanceBO> list);
 
 	/**
-	 * @fun 商品导入
+	 * @fun 订单导入
 	 * @param list
 	 * @return
 	 */
-	ResultModel importOrder(List<OrderInfo> list);
+	com.zm.order.pojo.ResultModel importOrder(List<OrderInfo> list);
 
 	ResultModel getStockInGoodsInfoByOrderId(String orderId);
 

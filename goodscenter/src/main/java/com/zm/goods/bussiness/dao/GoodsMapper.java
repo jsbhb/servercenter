@@ -154,4 +154,6 @@ public interface GoodsMapper {
 
 	int countGoodsBySupplierIdAndItemId(Map<String, Object> param);
 
+	int getOrderGoodsType(Map<String, Object> param);
+
 }

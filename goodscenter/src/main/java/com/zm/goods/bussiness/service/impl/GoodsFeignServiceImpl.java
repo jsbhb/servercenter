@@ -46,6 +46,10 @@ public class GoodsFeignServiceImpl implements GoodsFeignService {
 		}
 		if (receiveList == null || receiveList.size() == 0) {
 			return new ResultModel(false, "导入的订单商品在系统中没有，请先在系统完善商品");
+		} else {
+			for(GoodsItemEntity tem : receiveList){
+				tem.infoFilter();
+			}
 		}
 		return new ResultModel(true, receiveList);
 	}

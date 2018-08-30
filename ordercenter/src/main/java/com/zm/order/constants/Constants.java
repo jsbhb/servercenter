@@ -124,8 +124,11 @@ public class Constants {
 	//*******************订单创建类型**********************
 	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
 	
-	//*******************一般贸易金额**********************
+	//*******************一般贸易仓金额**********************
 	public static final Integer GENERAL_TRADE_FEE = 500;
+	
+	//*******************一般贸易仓ID**********************
+	public static final Integer GENERAL_WAREHOUSE_ID = 6;
 	
 	//*******************金额允许偏离范围**********************
 	public static final Integer DEVIATION = 5;

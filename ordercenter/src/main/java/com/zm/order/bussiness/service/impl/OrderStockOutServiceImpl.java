@@ -9,8 +9,10 @@ package com.zm.order.bussiness.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.order.bussiness.component.OrderComponentUtil;
 import com.zm.order.bussiness.component.ThreadPoolComponent;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderStockOutMapper;
@@ -81,6 +84,9 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	@Resource
 	ThirdPartFeignClient thirdPartFeignClient;
 
+	@Resource
+	OrderComponentUtil orderComponentUtil;
+
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -90,22 +96,22 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, entity.getShopId());
 			param.put("list", childrenIds);
 		}
-//		Integer count = orderBackMapper.queryCountOrderInfo(param);
-//		List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
+		// Integer count = orderBackMapper.queryCountOrderInfo(param);
+		// List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
 		param.put("page", "true");
 		List<OrderInfo> pageOrderList = orderBackMapper.selectForPage(param);
 		param.put("pageNeed", "true");
 		List<OrderInfo> pageNeedOrderList = orderBackMapper.selectForPage(param);
 		Integer count = pageOrderList.size();
 		List<String> orderIds = new ArrayList<String>();
-		for (OrderInfo oi:pageNeedOrderList) {
+		for (OrderInfo oi : pageNeedOrderList) {
 			orderIds.add(oi.getOrderId());
 		}
 		param.remove("page");
 		param.remove("pageNeed");
 		param.put("orderIds", orderIds);
 		List<OrderInfo> orderList = orderBackMapper.selectForPage(param);
-		
+
 		entity.setTotalRows(count);
 		entity.webListConverter();// 计算总页数
 		Page<OrderInfo> page = new Page<OrderInfo>(entity.getCurrentPage(), entity.getNumPerPage(), count);
@@ -170,7 +176,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	}
 
 	@Override
-	public ResultModel importOrder(List<OrderInfo> list) {
+	public com.zm.order.pojo.ResultModel importOrder(List<OrderInfo> list) {
 		if (list != null && list.size() > 0) {
 			List<GoodsItemBO> itemList = new ArrayList<GoodsItemBO>();
 			GoodsItemBO item = null;
@@ -189,13 +195,22 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				goodsList.addAll(info.getOrderGoodsList());
 				detailList.add(info.getOrderDetail());
 			}
-			ResultModel result = goodsFeignClient.manualOrderGoodsCheck(Constants.FIRST_VERSION, itemList);
+			com.zm.order.pojo.ResultModel result = goodsFeignClient.manualOrderGoodsCheck(Constants.FIRST_VERSION,
+					itemList);
 			if (!result.isSuccess()) {
 				return result;
 			}
-			result = consummateOrderGoods(list, result);
+			consummateOrderGoods(list, result);
 			if (!result.isSuccess()) {
 				return result;
+			}
+
+			for (OrderInfo info : list) {
+				orderComponentUtil.paramValidate(info, null, null, result, null);
+				if (!result.isSuccess()) {
+					result.setErrorMsg("订单编号：" + info.getOrderId() + "," + result.getErrorMsg());
+					return result;
+				}
 			}
 
 			orderBackMapper.insertOrderBaseBatch(list);
@@ -225,13 +240,13 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				}
 			}
 			// end
-			return new ResultModel(true, "操作成功");
+			return new com.zm.order.pojo.ResultModel(true, "操作成功");
 		}
-		return new ResultModel(false, "没有订单信息");
+		return new com.zm.order.pojo.ResultModel(false, "没有订单信息");
 	}
 
 	@SuppressWarnings("unchecked")
-	private ResultModel consummateOrderGoods(List<OrderInfo> list, ResultModel result) {
+	private void consummateOrderGoods(List<OrderInfo> list, com.zm.order.pojo.ResultModel result) {
 		List<Map<String, Object>> tempList = (List<Map<String, Object>>) result.getObj();
 		List<GoodsItemBO> itemList = new ArrayList<GoodsItemBO>();
 		GoodsItemBO itemBO = null;
@@ -246,24 +261,33 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		}
 		int orderFlag = 0;
 		int supplierId = 0;
+		Set<Integer> supplierSet = null;// 用来判断一个订单里面的商品是否都属于同一个供应商
+		Set<Integer> typeSet = null;// 用来判断一个订单里面的商品是否都属于跨境或一般贸易
 		for (OrderInfo info : list) {
 			double amount = 0;
+			supplierSet = new HashSet<Integer>();
+			typeSet = new HashSet<Integer>();
 			for (OrderGoods goods : info.getOrderGoodsList()) {
 				if (goods.getItemId() != null && !"".equals(goods.getItemId())) {
 					itemBO = tempMap.get(goods.getItemId());
 					if (itemBO == null) {
-						return new ResultModel(false, "商品编号：" + goods.getItemId() + ",不存在");
+						result.setSuccess(false);
+						result.setErrorMsg("商品编号：" + goods.getItemId() + ",不存在");
+						return;
 					}
 					goods.setSku(itemBO.getSku());
 					goods.setItemCode(itemBO.getItemCode());
+					goods.setItemInfo(itemBO.getInfo());
 				} else {
 					itemBO = tempMap.get(goods.getSku() + "," + goods.getConversion());
 					if (itemBO == null) {
-						return new ResultModel(false,
-								"自有编号：" + goods.getSku() + ",换算比例：" + goods.getConversion() + ",不存在");
+						result.setSuccess(false);
+						result.setErrorMsg("自有编号：" + goods.getSku() + ",换算比例：" + goods.getConversion() + ",不存在");
+						return;
 					}
 					goods.setItemId(itemBO.getItemId());
 					goods.setItemCode(itemBO.getItemCode());
+					goods.setItemInfo(itemBO.getInfo());
 				}
 				goods.setItemName(itemBO.getGoodsName());
 				if (goods.getItemPrice() == null || "".equals(goods.getItemPrice())) {
@@ -274,41 +298,48 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 						CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity()));
 				orderFlag = itemBO.getType();
 				supplierId = itemBO.getSupplierId();
+				supplierSet.add(itemBO.getSupplierId());
+				typeSet.add(itemBO.getType());
+			}
+			if (supplierSet.size() > 1 || typeSet.size() > 1) {
+				result.setSuccess(false);
+				result.setErrorMsg("订单号：" + info.getOrderId() + "商品不属于同一个仓库或者包含跨境和一般贸易");
+				return;
 			}
 			info.setOrderFlag(orderFlag);
 			info.setSupplierId(supplierId);
 			info.getOrderDetail().setPayment(CalculationUtils.round(2, amount));
 		}
-		return new ResultModel(true, null);
 	}
 
 	@Override
 	public ResultModel getStockInGoodsInfoByOrderId(String orderId) {
 		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockInByOrderIdForMJY(orderId);
 		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockInVoucherSkus().size()) {
-			//获取业务流水号：MJYSTOCKIN+时间+4位随机数
+			// 获取业务流水号：MJYSTOCKIN+时间+4位随机数
 			goodsInfo.setCode(CommonUtils.getMJYStockInOrderId());
-			
-			//将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
+
+			// 将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
 			List<String> goodsIds = new ArrayList<String>();
-			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
+			for (StockInVoucherSku sivs : goodsInfo.getStockInVoucherSkus()) {
 				if (!"".equals(sivs.getGoodsId().trim())) {
 					goodsIds.add(sivs.getGoodsId().trim());
 				} else {
 					return new ResultModel(false, "订单内商品对应的goodsId为空，请修改后重试");
 				}
 			}
-			List<GoodsItemEntity> items = goodsFeignClient.queryGoodsItemInfoByGoodsIdForEshop(Constants.FIRST_VERSION, goodsIds);
-			if (items == null || items.size() <=0) {
+			List<GoodsItemEntity> items = goodsFeignClient.queryGoodsItemInfoByGoodsIdForEshop(Constants.FIRST_VERSION,
+					goodsIds);
+			if (items == null || items.size() <= 0) {
 				return new ResultModel(false, "订单内商品对应的转换信息为空，请修改后重试");
 			}
-			//将订单内的商品信息转换为单包装的商品信息
+			// 将订单内的商品信息转换为单包装的商品信息
 			GoodsItemEntity tmpConverItem;
 			GoodsItemEntity tmpItem;
-			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
+			for (StockInVoucherSku sivs : goodsInfo.getStockInVoucherSkus()) {
 				tmpConverItem = null;
 				tmpItem = null;
-				for(GoodsItemEntity gie:items) {
+				for (GoodsItemEntity gie : items) {
 					if (sivs.getGoodsId().equals(gie.getGoodsId())) {
 						if (tmpConverItem == null && gie.getConversion() == 1) {
 							tmpConverItem = gie;
@@ -320,44 +351,44 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					}
 				}
 				if (tmpConverItem == null) {
-					return new ResultModel(false, "商品编号"+sivs.getSkuCode()+"对应的单包装信息为空，请修改后重试");
+					return new ResultModel(false, "商品编号" + sivs.getSkuCode() + "对应的单包装信息为空，请修改后重试");
 				}
 				if (tmpItem == null) {
-					return new ResultModel(false, "商品编号"+sivs.getSkuCode()+"对应的转换信息为空，请联系技术");
+					return new ResultModel(false, "商品编号" + sivs.getSkuCode() + "对应的转换信息为空，请联系技术");
 				}
 				Integer tmpConversionQty = sivs.getExpectedQuantity() * tmpItem.getConversion();
 				sivs.setExpectedQuantity(tmpConversionQty);
 				sivs.setSkuCode(tmpConverItem.getItemId());
 				sivs.setPrice(tmpConverItem.getRetailPrice());
 			}
-			
+
 			Integer tmpQty = 0;
-			Map<String,Object> stockInMap = new HashMap<String,Object>();
+			Map<String, Object> stockInMap = new HashMap<String, Object>();
 			List<StockInVoucherSku> newStockInList = new ArrayList<StockInVoucherSku>();
-			for(StockInVoucherSku sivs:goodsInfo.getStockInVoucherSkus()) {
+			for (StockInVoucherSku sivs : goodsInfo.getStockInVoucherSkus()) {
 				tmpQty = tmpQty + sivs.getExpectedQuantity();
 				if (!stockInMap.containsKey(sivs.getSkuCode())) {
 					stockInMap.put(sivs.getSkuCode(), sivs);
 				} else {
-					StockInVoucherSku tmpSku = (StockInVoucherSku)stockInMap.get(sivs.getSkuCode());
+					StockInVoucherSku tmpSku = (StockInVoucherSku) stockInMap.get(sivs.getSkuCode());
 					tmpSku.setExpectedQuantity(sivs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
 					stockInMap.put(sivs.getSkuCode(), tmpSku);
 				}
 			}
-			for (Map.Entry<String, Object> entry:stockInMap.entrySet()) {
-				StockInVoucherSku tmpSku = (StockInVoucherSku)entry.getValue();
+			for (Map.Entry<String, Object> entry : stockInMap.entrySet()) {
+				StockInVoucherSku tmpSku = (StockInVoucherSku) entry.getValue();
 				newStockInList.add(tmpSku);
 			}
 			goodsInfo.setStockInVoucherSkus(newStockInList);
 			goodsInfo.setExpectedSkuQuantity(tmpQty);
-			
+
 			ResultModel createResult = thirdPartFeignClient.addStoreSio(Constants.FIRST_VERSION, goodsInfo);
-			
+
 			if (!createResult.isSuccess()) {
 				return new ResultModel(false, createResult.getErrorMsg());
 			}
-			//返回成功后将orderBase的is_eshop_in状态修改
-			Map<String,Object> param = new HashMap<String,Object>();
+			// 返回成功后将orderBase的is_eshop_in状态修改
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("orderId", orderId);
 			param.put("isEshopIn", 1);
 			orderBackMapper.updateOrderBaseEshopIn(param);
@@ -372,29 +403,30 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	public ResultModel getStockOutGoodsInfoByOrderId(String orderId) {
 		OrderInfoEntityForMJY goodsInfo = orderBackMapper.selectStockOutByOrderIdForMJY(orderId);
 		if (goodsInfo.getExpectedSkuQuantity() == goodsInfo.getStockOutVoucherSkus().size()) {
-			//获取业务流水号：MJYSTOCKOUT+时间+4位随机数
+			// 获取业务流水号：MJYSTOCKOUT+时间+4位随机数
 			goodsInfo.setCode(CommonUtils.getMJYStockOutOrderId());
-			
-			//将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
+
+			// 将订单中商品的goodsId都拿出来，查询每个goodsId对应最小单位的itemId
 			List<String> goodsIds = new ArrayList<String>();
-			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
+			for (StockOutVoucherSku sovs : goodsInfo.getStockOutVoucherSkus()) {
 				if (!"".equals(sovs.getGoodsId().trim())) {
 					goodsIds.add(sovs.getGoodsId().trim());
 				} else {
 					return new ResultModel(false, "订单内商品对应的goodsId为空，请修改后重试");
 				}
 			}
-			List<GoodsItemEntity> items = goodsFeignClient.queryGoodsItemInfoByGoodsIdForEshop(Constants.FIRST_VERSION, goodsIds);
-			if (items == null || items.size() <=0) {
+			List<GoodsItemEntity> items = goodsFeignClient.queryGoodsItemInfoByGoodsIdForEshop(Constants.FIRST_VERSION,
+					goodsIds);
+			if (items == null || items.size() <= 0) {
 				return new ResultModel(false, "订单内商品对应的转换信息为空，请修改后重试");
 			}
-			//将订单内的商品信息转换为单包装的商品信息
+			// 将订单内的商品信息转换为单包装的商品信息
 			GoodsItemEntity tmpConverItem;
 			GoodsItemEntity tmpItem;
-			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
+			for (StockOutVoucherSku sovs : goodsInfo.getStockOutVoucherSkus()) {
 				tmpConverItem = null;
 				tmpItem = null;
-				for(GoodsItemEntity gie:items) {
+				for (GoodsItemEntity gie : items) {
 					if (sovs.getGoodsId().equals(gie.getGoodsId())) {
 						if (tmpConverItem == null && gie.getConversion() == 1) {
 							tmpConverItem = gie;
@@ -406,43 +438,43 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					}
 				}
 				if (tmpConverItem == null) {
-					return new ResultModel(false, "商品编号"+sovs.getSkuCode()+"对应的单包装信息为空，请修改后重试");
+					return new ResultModel(false, "商品编号" + sovs.getSkuCode() + "对应的单包装信息为空，请修改后重试");
 				}
 				if (tmpItem == null) {
-					return new ResultModel(false, "商品编号"+sovs.getSkuCode()+"对应的转换信息为空，请联系技术");
+					return new ResultModel(false, "商品编号" + sovs.getSkuCode() + "对应的转换信息为空，请联系技术");
 				}
 				Integer tmpConversionQty = sovs.getExpectedQuantity() * tmpItem.getConversion();
 				sovs.setExpectedQuantity(tmpConversionQty);
 				sovs.setSkuCode(tmpConverItem.getItemId());
 			}
-			
+
 			Integer tmpQty = 0;
-			Map<String,Object> stockOutMap = new HashMap<String,Object>();
+			Map<String, Object> stockOutMap = new HashMap<String, Object>();
 			List<StockOutVoucherSku> newStockOutList = new ArrayList<StockOutVoucherSku>();
-			for(StockOutVoucherSku sovs:goodsInfo.getStockOutVoucherSkus()) {
+			for (StockOutVoucherSku sovs : goodsInfo.getStockOutVoucherSkus()) {
 				tmpQty = tmpQty + sovs.getExpectedQuantity();
 				if (!stockOutMap.containsKey(sovs.getSkuCode())) {
 					stockOutMap.put(sovs.getSkuCode(), sovs);
 				} else {
-					StockOutVoucherSku tmpSku = (StockOutVoucherSku)stockOutMap.get(sovs.getSkuCode());
+					StockOutVoucherSku tmpSku = (StockOutVoucherSku) stockOutMap.get(sovs.getSkuCode());
 					tmpSku.setExpectedQuantity(sovs.getExpectedQuantity() + tmpSku.getExpectedQuantity());
 					stockOutMap.put(sovs.getSkuCode(), tmpSku);
 				}
 			}
-			for (Map.Entry<String, Object> entry:stockOutMap.entrySet()) {
-				StockOutVoucherSku tmpSku = (StockOutVoucherSku)entry.getValue();
+			for (Map.Entry<String, Object> entry : stockOutMap.entrySet()) {
+				StockOutVoucherSku tmpSku = (StockOutVoucherSku) entry.getValue();
 				newStockOutList.add(tmpSku);
 			}
 			goodsInfo.setStockOutVoucherSkus(newStockOutList);
 			goodsInfo.setExpectedSkuQuantity(tmpQty);
-			
+
 			ResultModel createResult = thirdPartFeignClient.addStoreSoo(Constants.FIRST_VERSION, goodsInfo);
-			
+
 			if (!createResult.isSuccess()) {
 				return new ResultModel(false, createResult.getErrorMsg());
 			}
-			//返回成功后将orderBase的is_eshop_in状态修改
-			Map<String,Object> param = new HashMap<String,Object>();
+			// 返回成功后将orderBase的is_eshop_in状态修改
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("orderId", orderId);
 			param.put("isEshopIn", 0);
 			orderBackMapper.updateOrderBaseEshopIn(param);

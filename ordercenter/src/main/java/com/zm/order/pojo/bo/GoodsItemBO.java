@@ -10,7 +10,14 @@ public class GoodsItemBO {
 	private Integer conversion;
 	private Integer type;
 	private String goodsName;
+	private String info;
 	
+	public String getInfo() {
+		return info;
+	}
+	public void setInfo(String info) {
+		this.info = info;
+	}
 	public String getGoodsName() {
 		return goodsName;
 	}

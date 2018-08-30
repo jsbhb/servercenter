@@ -9,7 +9,9 @@ package com.zm.goods.pojo;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zm.goods.common.Pagination;
+import com.zm.goods.utils.JSONUtil;
 
 /**
  * ClassName: GoodsItemEntity <br/>
@@ -59,6 +61,18 @@ public class GoodsItemEntity extends Pagination {
 	private String orderByProperty;
 	private String startTime;
 	private String endTime;
+	
+	public void infoFilter() {
+		if (info != null && !"".equals(info.trim())) {
+			List<TempSpecs> temList = JSONUtil.parse(info, new TypeReference<List<TempSpecs>>() {
+			});
+			StringBuilder sb = new StringBuilder("{");
+			for (TempSpecs temp : temList) {
+				sb.append(temp.getSkV() + ":" + temp.getSvV() + ",");
+			}
+			info = sb.substring(0, sb.length() - 1);
+		}
+	}
 
 	public List<GoodsTagEntity> getTagList() {
 		return tagList;

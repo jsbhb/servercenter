@@ -164,10 +164,10 @@ public class OrderComponentUtil {
 			}
 		}
 
-		if (info.getOrderFlag().equals(Constants.GENERAL_TRADE)
+		if (info.getSupplierId().equals(Constants.GENERAL_WAREHOUSE_ID)
 				&& info.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
 			result.setSuccess(false);
-			result.setErrorMsg("一般贸易订单起订额需要大于" + Constants.GENERAL_TRADE_FEE + "元");
+			result.setErrorMsg("一般贸易仓(仓库ID：6)订单起订额需要大于" + Constants.GENERAL_TRADE_FEE + "元");
 			return;
 		}
 

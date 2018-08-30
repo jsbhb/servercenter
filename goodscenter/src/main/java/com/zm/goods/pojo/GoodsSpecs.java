@@ -131,7 +131,7 @@ public class GoodsSpecs implements Serializable {
 			});
 			StringBuilder sb = new StringBuilder("{");
 			for (TempSpecs temp : temList) {
-				sb.append("\"" + temp.skV + "\":\"" + temp.svV + "\",");
+				sb.append("\"" + temp.getSkV() + "\":\"" + temp.getSvV() + "\",");
 			}
 			info = sb.substring(0, sb.length() - 1);
 			info = info + "}";
@@ -368,28 +368,6 @@ public class GoodsSpecs implements Serializable {
 				+ ", sku=" + sku + ", promotion=" + promotion + ", info=" + info + ", createTime=" + createTime
 				+ ", updateTime=" + updateTime + ", opt=" + opt + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice
 				+ ", stock=" + stock + ", priceList=" + priceList + "]";
-	}
-
-	private static class TempSpecs {
-		private String svV;
-
-		private String skV;
-
-		@SuppressWarnings("unused")
-		public void setSvV(String svV) {
-			this.svV = svV;
-		}
-
-		@SuppressWarnings("unused")
-		public void setSkV(String skV) {
-			this.skV = skV;
-		}
-
-		@Override
-		public String toString() {
-			return "TempSpecs [svV=" + svV + ", skV=" + skV + "]";
-		}
-
 	}
 
 }
