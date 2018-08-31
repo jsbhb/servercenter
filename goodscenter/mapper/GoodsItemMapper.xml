@@ -844,7 +844,7 @@
 	</update>
 	
 	<select id="stockQtyNotEnoughGoodsItemList" parameterType="Object" resultMap="entity">
-		select gi.item_id,gs.fxqty 
+		select gi.id,gi.item_id,gs.fxqty 
 		from goods_item gi
 		left join goods_stock gs on gi.item_id = gs.item_id
 		where gi.is_del = '0' and gi.status = '1' and gs.fxqty <![CDATA[ <= ]]> '0'
@@ -859,7 +859,7 @@
 	</update>
 	
 	<select id="stockQtyEnoughGoodsItemList" parameterType="Object" resultMap="entity">
-		select gi.item_id,gs.fxqty 
+		select gi.id,gi.item_id,gs.fxqty 
 		from goods_item gi
 		left join goods_stock gs on gi.item_id = gs.item_id
 		where gi.is_del = '0' and gi.status = '0' and gi.is_tmpdown = '1' and gs.fxqty <![CDATA[ > ]]> '0'
@@ -872,4 +872,10 @@
 			#{item}
 		</foreach>
 	</update>
+	
+	<insert id="insertGoodsShelveRecord" parameterType="object">
+		INSERT INTO goods_shelve_record 
+		(create_time,shelve_type,shelve_mode,number,detail) 
+		VALUES (now(),#{shelveType},#{shelveMode},#{number},#{detail})
+	</insert>
 </mapper>
