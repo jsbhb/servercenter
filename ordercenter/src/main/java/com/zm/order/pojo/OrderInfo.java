@@ -73,6 +73,8 @@ public class OrderInfo extends Pagination{
 	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
 	
 	private Integer isEshopIn;//Eshop是否入库，0：未入库；1入库
+	
+	private String deliveryTime;
 
 	public boolean check() {
 		if (orderDetail == null || orderGoodsList == null || orderFlag == null || createType == null || userId == null
@@ -328,6 +330,14 @@ public class OrderInfo extends Pagination{
 
 	public void setIsEshopIn(Integer isEshopIn) {
 		this.isEshopIn = isEshopIn;
+	}
+
+	public String getDeliveryTime() {
+		return deliveryTime;
+	}
+
+	public void setDeliveryTime(String deliveryTime) {
+		this.deliveryTime = deliveryTime;
 	}
 
 	@Override

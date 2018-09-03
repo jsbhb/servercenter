@@ -42,6 +42,9 @@ public class OrderInfoListForDownload {
 	private String itemInfo;
 	private String conversion;
 	private Integer orderFlg;
+	private Double postFee;
+	private Double taxFee;
+	private String deliveryTime;
 	
 	public String getOrderId() {
 		return orderId;
@@ -271,5 +274,22 @@ public class OrderInfoListForDownload {
 	public void setOrderFlg(Integer orderFlg) {
 		this.orderFlg = orderFlg;
 	}
-
+	public Double getPostFee() {
+		return postFee;
+	}
+	public void setPostFee(Double postFee) {
+		this.postFee = postFee;
+	}
+	public Double getTaxFee() {
+		return taxFee;
+	}
+	public void setTaxFee(Double taxFee) {
+		this.taxFee = taxFee;
+	}
+	public String getDeliveryTime() {
+		return deliveryTime;
+	}
+	public void setDeliveryTime(String deliveryTime) {
+		this.deliveryTime = deliveryTime;
+	}
 }
