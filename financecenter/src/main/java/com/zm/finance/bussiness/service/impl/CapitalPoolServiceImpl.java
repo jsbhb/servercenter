@@ -282,12 +282,17 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				Map<String, String> result = hashOperations.entries(key);
 				if (result.get("centerId") == null) {
 					hashOperations.put(key, "centerId", detail.getCenterId() + "");
+					hashOperations.put(key, "status", "1");
+					hashOperations.put(key, "level", "0");
 				}
 				template.opsForHash().increment(key, "money", detail.getMoney());// 增加余额
 				template.opsForHash().increment(key, "countMoney", detail.getMoney());// 增加累计金额
 			}
 		}
 		if (Constants.EXPENDITURE.equals(detail.getPayType())) {
+			if (!template.hasKey(key)) {
+				return new ResultModel(false, "没有该分级资金池");
+			}
 			Double liquidationMoney = CalculationUtils.sub(0, detail.getMoney());
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
 			double balance = hashOperations.increment(key, "money", liquidationMoney);// 扣除资金池

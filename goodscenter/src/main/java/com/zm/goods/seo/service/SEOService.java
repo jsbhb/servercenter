@@ -34,4 +34,19 @@ public interface SEOService {
 	ResultModel publishByGoodsId(List<String> goodsIdList, Integer centerId, boolean isNewPublish);
 
 	ResultModel delPublishByGoodsId(List<String> goodsIdList, Integer centerId);
+
+	
+	/**
+	 * @fun sitemap
+	 * @param domains
+	 * @return
+	 */
+	ResultModel addSitemap(List<String> domains);
+
+	/**
+	 * @fun sitemap
+	 * @param domains
+	 * @return
+	 */
+	ResultModel delsitemap(List<String> domains);
 }

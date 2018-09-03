@@ -49,6 +49,7 @@ import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
+import com.zm.goods.processWarehouse.model.WarehouseModel;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.PinYin4JUtil;
@@ -210,6 +211,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if (specsList == null || specsList.size() == 0) {
 			return null;
 		}
+		//设置价格
 		switch (platformSource) {
 		case Constants.WELFARE_WEBSITE:
 			getWelfareWebsitePriceInterval(specsList, gradeId);
@@ -218,7 +220,19 @@ public class GoodsServiceImpl implements GoodsService {
 			getPriceInterval(specsList);
 			break;
 		}
+		
+		List<WarehouseModel> stockList = goodsMapper.listWarehouse(param);
+		//设置库存
+		for(GoodsSpecs specs : specsList){
+			for(WarehouseModel model : stockList){
+				if(specs.getItemId().equals(model.getItemId())){
+					specs.setStock(model.getFxqty());
+					break;
+				}
+			}
+		}
 
+		//设置图片
 		List<String> idList = new ArrayList<String>();
 		for (GoodsSpecs model : specsList) {
 			idList.add(model.getGoodsId());

@@ -127,4 +127,34 @@ public class SEOController {
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+
+	/**
+	 * @fun addsitemap
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/seo/sitemap", method = RequestMethod.POST)
+	public ResultModel addSitemap(@PathVariable("version") Double version, @RequestBody List<String> domains) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return seoService.addSitemap(domains);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
+	/**
+	 * @fun delsitemap
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/seo/sitemap", method = RequestMethod.DELETE)
+	public ResultModel delsitemap(@PathVariable("version") Double version, @RequestBody List<String> domains) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return seoService.delsitemap(domains);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
 }

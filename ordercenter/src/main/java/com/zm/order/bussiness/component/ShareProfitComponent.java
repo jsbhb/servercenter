@@ -419,21 +419,27 @@ public class ShareProfitComponent {
 					|| Constants.OPEN_INTERFACE_TYPE == orderInfo.getCreateType()) {
 				balance = null;
 				try {
-					balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "money",
-							CalculationUtils.sub(0, orderInfo.getOrderDetail().getPayment()));// 扣除资金池
-					if (balance < 0) {// 如果扣除后小于0，则不发送订单给仓库，并把扣除的资金加回去
+					if(!template.hasKey(Constants.CAPITAL_PERFIX + orderInfo.getShopId())){
 						orderIdListForCapitalNotEnough.add(orderInfo.getOrderId());
 						it.remove();
-						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "money",
-								orderInfo.getOrderDetail().getPayment());
-					} else {// 如果余额足够，把资金放到冻结资金处
-						orderIdListForCapitalEnough.add(orderInfo.getOrderId());
-						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "frozenMoney",
-								orderInfo.getOrderDetail().getPayment());// 冻结资金增加
-						hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "useMoney",
-								orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
-						Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
-						listOperations.leftPush(Constants.CAPITAL_DETAIL, JSONUtil.toJson(capitalPoolDetailMap));
+						continue;
+					} else {
+						balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "money",
+								CalculationUtils.sub(0, orderInfo.getOrderDetail().getPayment()));// 扣除资金池
+						if (balance < 0) {// 如果扣除后小于0，则不发送订单给仓库，并把扣除的资金加回去
+							orderIdListForCapitalNotEnough.add(orderInfo.getOrderId());
+							it.remove();
+							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "money",
+									orderInfo.getOrderDetail().getPayment());
+						} else {// 如果余额足够，把资金放到冻结资金处
+							orderIdListForCapitalEnough.add(orderInfo.getOrderId());
+							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "frozenMoney",
+									orderInfo.getOrderDetail().getPayment());// 冻结资金增加
+							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), "useMoney",
+									orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
+							Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
+							listOperations.leftPush(Constants.CAPITAL_DETAIL, JSONUtil.toJson(capitalPoolDetailMap));
+						}
 					}
 				} catch (Exception e) {
 					if (balance == null) {

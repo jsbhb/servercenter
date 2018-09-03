@@ -12,6 +12,9 @@ public class PublishComponent {
 		LogUtil.writeLog(jsonStr);
 		String result = HttpClientUtil.post(type.getUrl(), jsonStr, type.getMethod());
 		LogUtil.writeLog(result);
+		if(result == null){
+			return new ResultModel(false, "", "写入失败");
+		}
 		return JSONUtil.parse(result, ResultModel.class);
 	}
 }

@@ -63,7 +63,6 @@ public class GoodsSpecs implements Serializable {
 	private String secondCategory;
 	
 	private String firstCategory;
-	@JsonIgnore
 	private Integer stock;
 
 	private Double incrementTax;

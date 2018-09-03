@@ -10,7 +10,9 @@ public enum PublishType {
 	MODULE_CREATE("http://192.168.70.122:8888/Data/handle/nav","POST"),
 	MODULE_DELETE("http://192.168.70.122:8888/Module/data","DELETE"),
 	DISTRIBUTION_CREATE("http://192.168.70.122:8888/Data/handle/distribution","POST"),
-	DISTRIBUTION_DELETE("http://192.168.70.122:8888/Data/handle/distribution","DELETE");
+	DISTRIBUTION_DELETE("http://192.168.70.122:8888/Data/handle/distribution","DELETE"),
+	ADD_SITEMAP("http://192.168.70.122:8888/Sitemap/handle","POST"),
+	DEL_SITEMAP("http://192.168.70.122:8888/Sitemap/handle","DELETE");
 	
 	//produce
 //	REGION_CREATE("http://192.168.182.119:8888/Region/handle","POST"),
@@ -20,7 +22,9 @@ public enum PublishType {
 //	MODULE_CREATE("http://192.168.182.119:8888/Data/handle/nav","POST"),
 //	MODULE_DELETE("http://192.168.182.119:8888/Module/data","DELETE"),
 //	DISTRIBUTION_CREATE("http://192.168.182.119:8888/Data/handle/distribution","POST"),
-//	DISTRIBUTION_DELETE("http://192.168.182.119:8888/Data/handle/distribution","DELETE");
+//	DISTRIBUTION_DELETE("http://192.168.182.119:8888/Data/handle/distribution","DELETE"),
+//	ADD_SITEMAP("http://192.168.182.119:8888/Sitemap/handle","POST"),
+//	DEL_SITEMAP("http://192.168.182.119:8888/Sitemap/handle","DELETE");
 	
 	private String url;
 	private String method;

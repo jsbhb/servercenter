@@ -15,6 +15,7 @@ import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.dao.SEOMapper;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.enummodel.PublishType;
 import com.zm.goods.enummodel.SystemEnum;
 import com.zm.goods.feignclient.UserFeignClient;
@@ -51,10 +52,10 @@ public class SEOServiceImpl implements SEOService {
 
 	@Resource
 	UserFeignClient userFeignClient;
-	
+
 	@Resource
 	GoodsTagMapper goodsTagMapper;
-	
+
 	private static Integer CNCOOPBUY_ID = 2;
 	private static String HTTP_STR = "http";
 
@@ -95,13 +96,13 @@ public class SEOServiceImpl implements SEOService {
 			return null;
 		}
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		for(GoodsItem goodsItem : goodsItemList){
+		for (GoodsItem goodsItem : goodsItemList) {
 			if (goodsItem.getGoodsSpecsList() != null) {
 				for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
 					specs.infoFilter();
 				}
 			}
-			//加标签
+			// 加标签
 			addItemGoodsTag(goodsItem);
 			Map<String, String> map = hashOperations.entries(Constants.POST_TAX + goodsItem.getSupplierId());
 			if (map != null) {
@@ -116,7 +117,7 @@ public class SEOServiceImpl implements SEOService {
 			}
 
 		}
-		
+
 		return goodsItemList;
 	}
 
@@ -127,8 +128,8 @@ public class SEOServiceImpl implements SEOService {
 		List<GoodsIndustryModel> list = goodsMapper.queryGoodsCategory();
 		SEONavigation seoNav = new SEONavigation("nav-1", SystemEnum.PCMALL, list);
 		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
-//		seoNav = new SEONavigation("nav-1", SystemEnum.MPMALL, list);
-//		publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
+		// seoNav = new SEONavigation("nav-1", SystemEnum.MPMALL, list);
+		// publishAndHandle(sb, result, seoNav, PublishType.MODULE_CREATE);
 		if (sb.length() > 0) {
 			sb.append("发布失败");
 			result.setErrorMsg(sb.toString());
@@ -255,34 +256,34 @@ public class SEOServiceImpl implements SEOService {
 		boolean success;
 		if (goodsIdList != null && goodsIdList.size() > 0) {
 			Map<String, Object> param = new HashMap<String, Object>();
-			List<String> rePublishGoodsIdList = new ArrayList<String>();//需要更新成发布失败的goodsId
-			List<String> successGoodsIdList = new ArrayList<String>();//需要更新成正常状态的goodsId
+			List<String> rePublishGoodsIdList = new ArrayList<String>();// 需要更新成发布失败的goodsId
+			List<String> successGoodsIdList = new ArrayList<String>();// 需要更新成正常状态的goodsId
 			List<GoodsItem> goodsItemList = getGoods(goodsIdList);
 			if (goodsItemList == null || goodsItemList.size() == 0) {
 				return result;
 			}
-			//获取seo信息
+			// 获取seo信息
 			List<SEOModel> seoModelList = seoMapper.listGoodsSEO(goodsIdList);
-			Map<String,SEOModel> seoParam = new HashMap<String,SEOModel>();
-			if(seoModelList != null && seoModelList.size() > 0){
-				for(SEOModel seoModel : seoModelList){
+			Map<String, SEOModel> seoParam = new HashMap<String, SEOModel>();
+			if (seoModelList != null && seoModelList.size() > 0) {
+				for (SEOModel seoModel : seoModelList) {
 					seoParam.put(seoModel.getGoodsId(), seoModel);
 				}
 			}
-			//获取商品路径
+			// 获取商品路径
 			List<String> thirdIdList = new ArrayList<String>();
-			Map<String,String> pathParam = new HashMap<String,String>();
-			for(GoodsItem item : goodsItemList){
+			Map<String, String> pathParam = new HashMap<String, String>();
+			for (GoodsItem item : goodsItemList) {
 				thirdIdList.add(item.getThirdCategory());
 			}
 			List<CategoryPath> pathList = seoMapper.queryGoodsCategoryPath(thirdIdList);
-			for(CategoryPath categoryPath : pathList){
+			for (CategoryPath categoryPath : pathList) {
 				pathParam.put(categoryPath.getThirdId(), categoryPath.getPath());
 			}
-			//开始处理商品
+			// 开始处理商品
 			for (GoodsItem goodsItem : goodsItemList) {
 				String goodsId = goodsItem.getGoodsId();
-				LogUtil.writeLog("SPECS-SIZE:"+goodsItem.getGoodsSpecsList().size());
+				LogUtil.writeLog("SPECS-SIZE:" + goodsItem.getGoodsSpecsList().size());
 				String path = pathParam.get(goodsItem.getThirdCategory());
 				String href = "/" + path + "/" + goodsItem.getGoodsId() + ".html";
 				template.opsForValue().set("href:" + goodsId, href);
@@ -290,7 +291,7 @@ public class SEOServiceImpl implements SEOService {
 				SEOModel seoModel = seoParam.get(goodsId);
 				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
 						pageList);
-				
+
 				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				if (!success) {
 					if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
@@ -310,13 +311,13 @@ public class SEOServiceImpl implements SEOService {
 				param.put(goodsId, path);
 				successGoodsIdList.add(goodsId);
 			}
-			if(param.size() > 0){
+			if (param.size() > 0) {
 				seoMapper.updateGoodsAccessPath(param);
 			}
-			if(successGoodsIdList.size() > 0){
+			if (successGoodsIdList.size() > 0) {
 				seoMapper.updateGoodsPublishByGoodsId(successGoodsIdList);
 			}
-			if(rePublishGoodsIdList.size() > 0){
+			if (rePublishGoodsIdList.size() > 0) {
 				seoMapper.updateGoodsRePublishByGoodsId(rePublishGoodsIdList);
 			}
 			if (sb.length() > 0) {
@@ -372,7 +373,7 @@ public class SEOServiceImpl implements SEOService {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @fun 加标签
 	 * @param goodsList
@@ -405,6 +406,29 @@ public class SEOServiceImpl implements SEOService {
 				}
 			}
 		}
+	}
+
+	@Override
+	public ResultModel addSitemap(List<String> domains) {
+		return sitemapHandler(domains, PublishType.ADD_SITEMAP);
+	}
+
+	@Override
+	public ResultModel delsitemap(List<String> domains) {
+		return sitemapHandler(domains, PublishType.DEL_SITEMAP);
+	}
+
+	private ResultModel sitemapHandler(List<String> domains, PublishType type) {
+		if (domains == null || domains.size() == 0) {
+			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+		}
+		Map<String, String> param = new HashMap<String, String>();
+		for (String domain : domains) {
+			param.put("domain", domain);
+			PublishComponent.publish(JSONUtil.toJson(param), type);
+		}
+		return new ResultModel(true, "");
 	}
 
 }
