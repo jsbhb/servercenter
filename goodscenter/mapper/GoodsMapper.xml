@@ -794,4 +794,11 @@
 		</foreach> 
 	</select>
 	
+	<insert id="insertGoodsLifeCycleBatch" parameterType="Object">
+		insert into goods_life_cycle(item_id,status,is_fx,remark,create_time,ip) values 
+		<foreach collection="list" item="item" separator="," >
+			(#{item.itemId},#{item.status},#{item.isFx},#{item.remark},now(),#{item.ip})
+		</foreach>
+	</insert>
+	
 </mapper>

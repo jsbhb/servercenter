@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.goods.annotation.GoodsLifeCycle;
 import com.zm.goods.bussiness.component.ThreadPoolComponent;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
@@ -131,6 +132,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
+	@GoodsLifeCycle(status = 1, isFx = 0, remark = "商品不可分销")
 	public void notBeFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.NOTFX.getIndex()+"");
 		goodsItemMapper.updateIsFXStatus(entity);
@@ -162,6 +164,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
+	@GoodsLifeCycle(status = 1, isFx = 1, remark = "商品可分销")
 	public void beFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.FX.getIndex()+"");
 		goodsItemMapper.updateIsFXStatus(entity);
@@ -270,6 +273,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@GoodsLifeCycle(status = 1, isFx = 1, remark = "商品可分销")
 	public void batchBeFx(GoodsItemEntity entity) {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
@@ -281,6 +285,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@GoodsLifeCycle(status = 1, isFx = 0, remark = "商品不可分销")
 	public void batchNotBeFx(GoodsItemEntity entity) {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);

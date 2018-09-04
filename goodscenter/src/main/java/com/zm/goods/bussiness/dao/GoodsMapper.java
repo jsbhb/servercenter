@@ -20,6 +20,7 @@ import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.bo.CategoryBO;
+import com.zm.goods.pojo.bo.GoodsLifeCycleModel;
 import com.zm.goods.pojo.bo.ItemCountBO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
@@ -155,5 +156,7 @@ public interface GoodsMapper {
 	int countGoodsBySupplierIdAndItemId(Map<String, Object> param);
 
 	int getOrderGoodsType(Map<String, Object> param);
+
+	void insertGoodsLifeCycleBatch(List<GoodsLifeCycleModel> modelList);
 
 }

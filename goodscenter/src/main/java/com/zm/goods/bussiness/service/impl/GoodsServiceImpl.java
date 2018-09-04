@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.goods.annotation.GoodsLifeCycle;
 import com.zm.goods.bussiness.component.GoodsServiceComponent;
 import com.zm.goods.bussiness.component.PriceComponent;
 import com.zm.goods.bussiness.component.ThreadPoolComponent;
@@ -799,6 +800,7 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
+	@GoodsLifeCycle(status = 1, isFx = 1, remark = "商品上架")
 	public ResultModel upShelves(List<String> itemIdList, Integer centerId) {
 		Map<String, Object> param = new HashMap<String, Object>();
 
@@ -891,6 +893,7 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
+	@GoodsLifeCycle(status = 0, isFx = 0, remark = "商品下架")
 	public ResultModel downShelves(List<String> itemIdList, Integer centerId) {
 		if (itemIdList == null || itemIdList.size() == 0) {
 			return new ResultModel(false, "请传入itemId");

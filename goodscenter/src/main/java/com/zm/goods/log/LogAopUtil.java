@@ -25,6 +25,7 @@ import com.zm.goods.log.model.ExceptionLog;
 import com.zm.goods.log.model.LogInfo;
 import com.zm.goods.log.model.OpenInfLog;
 import com.zm.goods.log.model.ServerLogEnum;
+import com.zm.goods.utils.IPUtil;
 import com.zm.goods.utils.JSONUtil;
 
 @Component
@@ -92,7 +93,7 @@ public class LogAopUtil {
 		String methodName = method.getName(); // 获取被拦截的方法名
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpServletRequest request = attributes.getRequest();
-		String ip = getOriginIp(request);
+		String ip = IPUtil.getOriginIp(request);
 //		String callIp = request.getRemoteAddr();
 		StringBuilder sb = new StringBuilder();
 		Enumeration<String> enu = request.getParameterNames();
@@ -125,29 +126,6 @@ public class LogAopUtil {
 		} catch (Exception e) {
 			logger.error("日志记录ERROR====", e);
 		}
-	}
-
-	private String getOriginIp(HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("HTTP_CLIENT_IP");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getRemoteAddr();
-		}
-		if(ip != null){
-			ip = ip.split(",")[0];
-		}
-		return ip;
 	}
 
 	// 自定义注解日志
@@ -199,7 +177,7 @@ public class LogAopUtil {
 		}
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpServletRequest request = attributes.getRequest();
-		String ip = getOriginIp(request);
+		String ip = IPUtil.getOriginIp(request);
 //		String callIp = request.getRemoteAddr();
 		String parameter = "";
 		if(param.length() > 2000){
