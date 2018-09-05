@@ -572,9 +572,10 @@
 				separator="," close="">
 				${sort.sortField} ${sort.sortRule} 
 			</foreach>
+			, g.id desc
 		</if>
 		<if test="sortList == null or sortList.size == 0">
-			order by g.goods_tag_ratio desc
+			order by g.goods_tag_ratio desc, g.id desc
 		</if>
 	</select>
 	
