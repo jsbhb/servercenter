@@ -601,7 +601,9 @@
 			UPDATE goods_stock
 	        SET
 		        qpqty = qpqty + #{item.fxQty},
-		        fxqty = fxqty + #{item.fxQty}
+		        fxqty = fxqty + #{item.fxQty},
+		        update_time = now(),
+		        opt = #{item.opt}
 	        WHERE
 	        	item_id=#{item.itemId}
 		</foreach>
