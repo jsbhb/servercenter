@@ -231,7 +231,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 完善订单信息
-		orderComponentUtil.renderOrderInfo(info, postFee, weight, amount, taxFee, disAmount);
+		orderComponentUtil.renderOrderInfo(info, postFee, weight, amount, taxFee, disAmount, true);
 		// 保存订单
 		orderComponentUtil.saveOrder(info);
 

@@ -45,7 +45,14 @@ public class OrderInfoListForDownload {
 	private Double postFee;
 	private Double taxFee;
 	private String deliveryTime;
+	private String rebate;
 	
+	public String getRebate() {
+		return rebate;
+	}
+	public void setRebate(String rebate) {
+		this.rebate = rebate;
+	}
 	public String getOrderId() {
 		return orderId;
 	}

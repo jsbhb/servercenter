@@ -30,9 +30,11 @@ import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderStockOutService;
 import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
+import com.zm.order.feignclient.FinanceFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.ThirdPartFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.GoodsItemEntity;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
@@ -45,6 +47,7 @@ import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
+import com.zm.order.pojo.bo.RebateDownload;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.DateUtils;
@@ -86,6 +89,9 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Resource
 	OrderComponentUtil orderComponentUtil;
+
+	@Resource
+	FinanceFeignClient financeFeignClient;
 
 	@Override
 	public Page<OrderInfo> queryByPage(OrderInfo entity) {
@@ -211,6 +217,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					result.setErrorMsg("订单编号：" + info.getOrderId() + "," + result.getErrorMsg());
 					return result;
 				}
+				orderComponentUtil.renderOrderInfo(info, null, null, null, null, null, false);
 			}
 
 			orderBackMapper.insertOrderBaseBatch(list);
@@ -483,6 +490,91 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		}
 
 		return new ResultModel(true, null);
+	}
+
+	@Override
+	public List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId) {
+		// 获取订单信息
+		List<RebateDownload> orderResult = listOrderForRebateDownload(startTime, endTime, gradeId);
+		// 获取返佣信息
+		List<RebateDownload> rebateResult = listRebateForDownload(orderResult);
+		// 合并信息
+		List<RebateDownload> result = mergeResult(orderResult, rebateResult);
+		return result;
+
+	}
+
+	private List<RebateDownload> mergeResult(List<RebateDownload> orderResult, List<RebateDownload> rebateResult) {
+		List<RebateDownload> result = new ArrayList<RebateDownload>();
+		RebateDownload rebateDownload = null;
+		for (RebateDownload rebate : rebateResult) {
+			for (RebateDownload order : orderResult) {
+				if (rebate.getOrderId().equals(order.getOrderId())) {
+					rebateDownload = new RebateDownload();
+					rebateDownload.setOrderFlag(order.getOrderFlag());
+					rebateDownload.setOrderId(order.getOrderId());
+					rebateDownload.setTotalRebate(rebate.getTotalRebate());
+					rebateDownload.setConfirmRebateTime(rebate.getConfirmRebateTime());
+					rebateDownload.setGradeId(rebate.getGradeId());
+					rebateDownload.setInfo(order.getInfo());
+					rebateDownload.setItemCode(order.getItemCode());
+					rebateDownload.setItemId(order.getItemId());
+					rebateDownload.setItemPrice(order.getItemPrice());
+					rebateDownload.setQuantity(order.getQuantity());
+					rebateDownload.setRebateTime(rebate.getRebateTime());
+					rebateDownload.setStatus(rebate.getStatus());
+					rebateDownload.setRebate(calSingleRebate(order, rebate.getGradeId()));
+					rebateDownload.setGoodsName(order.getGoodsName());
+					result.add(rebateDownload);
+				}
+			}
+		}
+		return result;
+	}
+
+	// 计算单个商品返佣
+	@SuppressWarnings("unchecked")
+	private String calSingleRebate(RebateDownload order, String gradeId) {
+		String json = order.getRebate();
+		if (json == null || "".equals(json)) {
+			return "0";
+		}
+		Map<String, String> rebateMap = JSONUtil.parse(json, Map.class);
+		String rebate = rebateMap.get(gradeId);
+		double totalMoney = CalculationUtils.mul(order.getItemPrice(), order.getQuantity());
+		try {
+			return String.valueOf(CalculationUtils.round(2, CalculationUtils.mul(totalMoney, Double.valueOf(rebate))));
+		} catch (Exception e) {
+			LogUtil.writeErrorLog("计算单个商品返佣出错", e);
+			return "0";
+		}
+	}
+
+	private List<RebateDownload> listRebateForDownload(List<RebateDownload> orderResult) {
+		Set<String> orderIds = new HashSet<String>();
+		for (RebateDownload temp : orderResult) {
+			orderIds.add(temp.getOrderId());
+		}
+		List<RebateDownload> rebateResult = financeFeignClient.listRebateDetailForDownload(Constants.FIRST_VERSION,
+				orderIds);
+		if (rebateResult == null || rebateResult.size() == 0) {
+			throw new RuntimeException("没有获取到返佣信息");
+		}
+		return rebateResult;
+	}
+
+	private List<RebateDownload> listOrderForRebateDownload(String startTime, String endTime, String gradeId) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("startTime", startTime);
+		param.put("endTime", endTime);
+		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION,
+				Integer.parseInt(gradeId));
+		param.put("list", childrenIds);
+		List<RebateDownload> orderResult = orderBackMapper.queryForRebate(param);
+		if (orderResult == null || orderResult.size() == 0) {
+			throw new RuntimeException("没有获取到返佣信息");
+		}
+		return orderResult;
 	}
 
 }

@@ -157,6 +157,9 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
 					resultModel.getErrorMsg() + ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
 		}
+		
+		//把商品的返佣补全
+		orderComponentUtil.renderOrderInfo(orderInfo, null, null, null, null, null, false);
 
 		// 保存订单
 		orderComponentUtil.saveOrder(orderInfo);

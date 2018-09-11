@@ -1,16 +1,20 @@
 package com.zm.order.bussiness.component;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
+import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.model.PayModel;
@@ -21,9 +25,11 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.Tax;
+import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
 import com.zm.order.utils.JSONUtil;
+import com.zm.order.utils.TreeNodeUtil;
 
 @Component
 public class OrderComponentUtil {
@@ -36,6 +42,9 @@ public class OrderComponentUtil {
 
 	@Resource
 	PayFeignClient payFeignClient;
+
+	@Resource
+	RedisTemplate<String, Object> template;
 
 	/**
 	 * @fun 获取运费
@@ -193,16 +202,65 @@ public class OrderComponentUtil {
 	 * @param disAmount
 	 */
 	public void renderOrderInfo(OrderInfo info, Double postFee, Integer weight, Double amount, TaxFeeBO taxFee,
-			Double disAmount) {
-		info.setWeight(weight);
-		info.setStatus(0);
-		info.getOrderDetail().setPostFee(postFee);
-		info.getOrderDetail().setPayment(amount);
-		info.getOrderDetail().setTaxFee(taxFee.getTaxFee());
-		info.getOrderDetail().setIncrementTax(taxFee.getIncremTax());
-		info.getOrderDetail().setExciseTax(taxFee.getExciseTax());
-		info.getOrderDetail().setTariffTax(0.0);
-		info.getOrderDetail().setDisAmount(disAmount);
+			Double disAmount, boolean fromMall) {
+		if(fromMall){
+			info.setWeight(weight);
+			info.setStatus(0);
+			info.getOrderDetail().setPostFee(postFee);
+			info.getOrderDetail().setPayment(amount);
+			info.getOrderDetail().setTaxFee(taxFee.getTaxFee());
+			info.getOrderDetail().setIncrementTax(taxFee.getIncremTax());
+			info.getOrderDetail().setExciseTax(taxFee.getExciseTax());
+			info.getOrderDetail().setTariffTax(0.0);
+			info.getOrderDetail().setDisAmount(disAmount);
+		}
+		// 封装该订单商品的每一级的返佣比例，返佣计算时可直接从这里拿
+		packGoodsRebateByGrade(info);
+	}
+
+	private void packGoodsRebateByGrade(OrderInfo info) {
+		List<OrderGoods> goodsList = info.getOrderGoodsList();
+		Map<String, String> goodsRebate = null;
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		GradeBO grade = null;
+		StringBuilder sb = null;// 记录每个商品的返佣，用json串
+		for (OrderGoods goods : goodsList) {
+			sb = new StringBuilder("{");
+			// 获取该订单所有的上级,包括推手
+			LinkedList<GradeBO> superNodeList = TreeNodeUtil.getSuperNode(CacheComponent.getInstance().getSet(),
+					info.getShopId());
+			goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + goods.getItemId());
+			if (goodsRebate == null || superNodeList == null || goodsRebate.size() == 0) {
+				continue;
+			}
+			boolean isWelfareWebsite = Constants.WELFARE_WEBSITE == info.getOrderSource() ? true : false;
+			double nextProportion = 0;// 下一级的返佣比例
+			double welfareWebsiteRebate = 1;// 福利网站返佣比例，默认是拿全部返佣
+			// 获取父级的时候已经按照先进先出排完续
+			while (!superNodeList.isEmpty()) {
+				grade = superNodeList.poll();
+				// 如果是海外购，则不进行返佣
+				if (grade.getId().equals(Constants.CNCOOPBUY)) {
+					continue;
+				}
+				if (isWelfareWebsite) {// 如果是福利网站
+					if (info.getShopId() == grade.getId()) {
+						welfareWebsiteRebate = grade.getWelfareRebate() == null ? 0 : grade.getWelfareRebate();
+					} else {
+						welfareWebsiteRebate = 1;
+					}
+				}
+				// 获取该类型的返佣的比例
+				double tempProportion = Double.valueOf(goodsRebate.get(grade.getGradeType() + "") == null ? "0"
+						: goodsRebate.get(grade.getGradeType() + ""));
+				// 真实的返佣
+				double proportion = CalculationUtils.mul(welfareWebsiteRebate,
+						CalculationUtils.sub(tempProportion, nextProportion));
+				nextProportion = proportion;// 记录下一级的返佣比例
+				sb.append("\"" + grade.getId() + "\":" + "\"" + proportion + "\",");
+			}
+			goods.setRebate(sb.substring(0, sb.length() - 1) + "}");// 设置每个商品每个分级的返佣
+		}
 	}
 
 	/**

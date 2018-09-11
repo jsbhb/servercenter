@@ -1,0 +1,1 @@
+alter table rebate_detail add column order_flag tinyint unsigned null comment '订单类型';

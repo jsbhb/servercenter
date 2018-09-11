@@ -1,0 +1,1 @@
+alter table order_goods add column rebate varchar(200) null comment '返佣比例明细'

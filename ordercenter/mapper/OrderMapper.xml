@@ -62,6 +62,7 @@
 			<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
 			<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 			<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
+			<result column="rebate" property="rebate" jdbcType="VARCHAR" />
 		</collection>
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
@@ -276,10 +277,10 @@
 	<insert id="saveOrderGoods" parameterType="Object">
 		INSERT INTO
 		order_goods
-		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
+		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark,rebate)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
+			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark},#{item.rebate})
 		</foreach>
 	</insert>
 
@@ -386,10 +387,10 @@
 		select
 		o.id,o.order_id,o.status,o.user_id,o.create_type,o.push_user_id,o.order_source,od.id
 		as
-		detail_id,od.payment,o.grade_id,o.order_source,o.create_time,
+		detail_id,od.payment,o.grade_id,o.order_flag,o.create_time,
 		o.mall_id,og.id as
 		goods_id,og.goods_id as goodsId,og.item_id,og.item_quantity,og.item_code,
-		og.item_price,og.actual_price,og.sku,od.dis_amount
+		og.item_price,og.actual_price,og.sku,od.dis_amount,og.rebate 
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
 		left join

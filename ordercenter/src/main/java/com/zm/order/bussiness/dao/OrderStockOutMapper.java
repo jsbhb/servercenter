@@ -16,6 +16,7 @@ import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoEntityForMJY;
 import com.zm.order.pojo.OrderInfoListForDownload;
+import com.zm.order.pojo.bo.RebateDownload;
 
 /**  
  * ClassName: OrderBackMapper <br/>  
@@ -78,5 +79,7 @@ public interface OrderStockOutMapper {
 	void insertOrderDetailBatch(List<OrderDetail> detailList);
 	
 	OrderInfo getOrderByOrderId(String orderId);
+
+	List<RebateDownload> queryForRebate(Map<String, Object> param);
 
 }

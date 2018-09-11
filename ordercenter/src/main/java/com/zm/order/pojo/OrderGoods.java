@@ -46,6 +46,16 @@ public class OrderGoods extends Pagination {
 	
 	private String href;
 	
+	private String rebate;
+	
+	public String getRebate() {
+		return rebate;
+	}
+
+	public void setRebate(String rebate) {
+		this.rebate = rebate;
+	}
+
 	public boolean validate() {
 		return (sku != null && itemCode != null && itemQuantity != null && itemPrice != null
 				&& actualPrice != null);

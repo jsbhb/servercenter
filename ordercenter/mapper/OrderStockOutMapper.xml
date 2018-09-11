@@ -72,6 +72,7 @@
 		<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
 		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
 		<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
+		<result column="rebate" property="rebate" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<resultMap type="com.zm.order.pojo.OrderInfoListForDownload" id="orderInfoListForDownload">
@@ -82,6 +83,7 @@
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="rebate" property="rebate" jdbcType="VARCHAR" />
 		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
 		<result column="proxy_price" property="proxyPrice" jdbcType="DECIMAL" />
 		<result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
@@ -276,7 +278,7 @@
 	
 	<select id="selectOrdreListForDownload" resultMap="orderInfoListForDownload" parameterType="Object">
 		select ob.order_id,ob.status,ob.grade_id,ug.grade_name,ob.supplier_id,sb.supplier_name,
-		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_info,og.item_quantity,gfc.first_id,
+		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_info,og.rebate,og.item_quantity,gfc.first_id,
 		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
 		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,i.conversion,
 		od.receive_city,od.receive_area,od.receive_address,od.create_time,od.receive_phone,
@@ -326,10 +328,10 @@
 	<insert id="insertOrderGoodsBatch" parameterType="Object">
 		INSERT INTO
 		order_goods
-		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark)
+		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark,rebate)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark})
+			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),#{item.remark},#{item.rebate})
 		</foreach>
 	</insert>
 	
@@ -385,5 +387,21 @@
 		set is_eshop_in = #{isEshopIn}
 		where order_id = #{orderId}
 	</update>
+	
+	<select id="queryForRebate" parameterType="Object" resultType="com.zm.order.pojo.bo.RebateDownload">
+		select ob.order_id as orderId,ob.order_flag as orderFlag,og.item_id as itemId,og.item_price as itemPrice,
+		og.item_code as itemCode,og.item_quantity as quantity,og.rebate,og.item_info as info, og.item_name as goodsName  
+		from order_base ob left join 
+		order_goods og on ob.order_id = og.order_id where 1=1
+		<if test="list != null and list.size > 0 ">
+			and ob.grade_id in 
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		and ob.status in(1,2,3,4,5,6,7,8,11,12,99)
+		and ob.create_time between #{startTime} and DATE_ADD(#{endTime},interval 1 day)
+		order by ob.grade_id,ob.create_time
+	</select>
 
 </mapper>

@@ -6,6 +6,7 @@
 	<resultMap type="com.zm.finance.pojo.rebate.RebateDetail" id="rebateDetail">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+		<result column="order_flag" property="orderFlag" jdbcType="INTEGER"/>
 		<result column="grade_id" property="gradeId" jdbcType="INTEGER"/>
 		<result column="rebate_money" property="rebateMoney" jdbcType="NUMERIC"/>
 		<result column="status" property="status" jdbcType="INTEGER"/>
@@ -41,10 +42,10 @@
 	
 	<insert id="insertRebateDetail" parameterType="Object">
 		insert into rebate_detail 
-		(order_id,grade_id,rebate_money,remark,create_time)
+		(order_id,grade_id,rebate_money,remark,create_time,order_flag)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.orderId},#{item.gradeId},#{item.rebateMoney},#{item.remark},now())
+			(#{item.orderId},#{item.gradeId},#{item.rebateMoney},#{item.remark},now(),#{item.orderFlag})
 		</foreach>
 	</insert>
 	
@@ -72,5 +73,14 @@
 	<update id="updateRebateDetail" parameterType="Object">
 		update rebate_detail set status = #{status}, update_time = now() where order_id = #{orderId}
 	</update>
+	
+	<select id="listRebateDetailForDownload" parameterType="Object" resultType="com.zm.finance.pojo.RebateDownload">
+		select order_id as orderId, rebate_money as totalRebate, grade_id as gradeId, status, 
+		create_time as rebateTime, update_time as confirmRebateTime 
+		from rebate_detail where order_id in
+		<foreach collection="orderIds" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+	</select>
 	
 </mapper>

@@ -16,6 +16,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
+import com.zm.order.pojo.bo.RebateDownload;
 
 /**
  * ClassName: OrderBackService <br/>
@@ -93,5 +94,7 @@ public interface OrderStockOutService {
 	ResultModel getStockInGoodsInfoByOrderId(String orderId);
 
 	ResultModel getStockOutGoodsInfoByOrderId(String orderId);
+
+	List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId);
 
 }

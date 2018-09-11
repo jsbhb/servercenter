@@ -2,8 +2,12 @@ package com.zm.finance.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.github.pagehelper.Page;
+import com.zm.finance.pojo.RebateDownload;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.rebate.Rebate;
 import com.zm.finance.pojo.rebate.RebateDetail;
@@ -19,5 +23,7 @@ public interface RebateMapper {
 	Page<Rebate> listRebate(RebateSearchModel search);
 
 	void updateRebateDetail(Map<String,Object> param);
+
+	List<RebateDownload> listRebateDetailForDownload(@Param("orderIds")Set<String> orderIds);
 	
 }

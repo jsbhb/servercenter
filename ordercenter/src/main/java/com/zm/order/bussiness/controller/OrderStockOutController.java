@@ -23,6 +23,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderInfoListForDownload;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.OrderMaintenanceBO;
+import com.zm.order.pojo.bo.RebateDownload;
 
 /**
  * ClassName: OrderBackController <br/>
@@ -107,6 +108,8 @@ public class OrderStockOutController {
 		}
 	}
 
+	private final String REBATE_EXPORT = "1";
+
 	@RequestMapping(value = "{version}/order/stockOut/queryOrdreInfoListForDownload", method = RequestMethod.POST)
 	public ResultModel queryOrdreListForDownload(HttpServletRequest request, @PathVariable("version") Double version) {
 
@@ -116,13 +119,19 @@ public class OrderStockOutController {
 				String endTime = request.getParameter("endTime");
 				String gradeId = request.getParameter("gradeId");
 				String supplierId = request.getParameter("supplierId");
+				String type = request.getParameter("type");
 				if (startTime == null || endTime == null) {
 					return new ResultModel(false, "查询日期为空");
 				}
 
-				List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,
-						endTime, gradeId, supplierId);
-				return new ResultModel(true, result);
+				if (REBATE_EXPORT.equals(type)) {
+					List<RebateDownload> result = orderStockOutService.queryForRebate(startTime, endTime, gradeId);
+					return new ResultModel(true, result);
+				} else {
+					List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,
+							endTime, gradeId, supplierId);
+					return new ResultModel(true, result);
+				}
 			}
 
 			return new ResultModel(false, "版本错误");
@@ -144,7 +153,8 @@ public class OrderStockOutController {
 	}
 
 	@RequestMapping(value = "{version}/order/import", method = RequestMethod.POST)
-	public com.zm.order.pojo.ResultModel importOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> list) {
+	public com.zm.order.pojo.ResultModel importOrder(@PathVariable("version") Double version,
+			@RequestBody List<OrderInfo> list) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {

@@ -20,6 +20,7 @@ import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.service.RebateService;
 import com.zm.finance.constants.Constants;
 import com.zm.finance.log.LogUtil;
+import com.zm.finance.pojo.RebateDownload;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.rebate.Rebate;
@@ -71,7 +72,7 @@ public class RebateServiceImpl implements RebateService {
 			List<RebateDetail> detailList = new ArrayList<RebateDetail>();
 			RebateDetail rebateDetail = null;
 			for (Map.Entry<String, String> entry : map.entrySet()) {
-				if ("orderId".equals(entry.getKey())) {
+				if ("orderId".equals(entry.getKey()) || "orderFlag".equals(entry.getKey())) {
 					continue;
 				}
 				if (entry.getValue() != null && Double.valueOf(entry.getValue()) > 0) {
@@ -79,6 +80,8 @@ public class RebateServiceImpl implements RebateService {
 					rebateDetail.setGradeId(Integer.valueOf(entry.getKey()));
 					rebateDetail.setRebateMoney(Double.valueOf(entry.getValue()));
 					rebateDetail.setOrderId(map.get("orderId"));
+					rebateDetail
+							.setOrderFlag(map.get("orderFlag") == null ? -1 : Integer.valueOf(map.get("orderFlag")));
 					detailList.add(rebateDetail);
 				}
 			}
@@ -116,7 +119,7 @@ public class RebateServiceImpl implements RebateService {
 
 	@Override
 	public void updateRebateDetail(String orderId, Integer status) {
-		Map<String,Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("orderId", orderId);
 		param.put("status", status);
 		rebateMapper.updateRebateDetail(param);
@@ -130,6 +133,12 @@ public class RebateServiceImpl implements RebateService {
 	@Override
 	public void redisToolList(String key, String value) {
 		template.opsForSet().add(key, value);
+	}
+
+	@Override
+	public List<RebateDownload> listRebateDetailForDownload(Set<String> orderIds) {
+
+		return rebateMapper.listRebateDetailForDownload(orderIds);
 	}
 
 }

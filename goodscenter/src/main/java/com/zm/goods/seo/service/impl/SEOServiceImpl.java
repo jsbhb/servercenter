@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
@@ -39,6 +41,7 @@ import com.zm.goods.seo.service.SEOService;
 import com.zm.goods.utils.JSONUtil;
 
 @Service("seoService")
+@Transactional(isolation = Isolation.READ_UNCOMMITTED)
 public class SEOServiceImpl implements SEOService {
 
 	@Resource
