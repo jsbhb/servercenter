@@ -2,9 +2,6 @@ package com.zm.finance.bussiness.dao;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.ibatis.annotations.Param;
 
 import com.github.pagehelper.Page;
 import com.zm.finance.pojo.RebateDownload;
@@ -24,6 +21,6 @@ public interface RebateMapper {
 
 	void updateRebateDetail(Map<String,Object> param);
 
-	List<RebateDownload> listRebateDetailForDownload(@Param("orderIds")Set<String> orderIds);
+	List<RebateDownload> listRebateDetailForDownload(Map<String,Object> param);
 	
 }

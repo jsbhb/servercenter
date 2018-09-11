@@ -494,10 +494,13 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 
 	@Override
 	public List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId) {
+		// 获取该分级的下级
+		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION,
+				Integer.parseInt(gradeId));
 		// 获取订单信息
-		List<RebateDownload> orderResult = listOrderForRebateDownload(startTime, endTime, gradeId);
+		List<RebateDownload> orderResult = listOrderForRebateDownload(startTime, endTime, gradeId, childrenIds);
 		// 获取返佣信息
-		List<RebateDownload> rebateResult = listRebateForDownload(orderResult);
+		List<RebateDownload> rebateResult = listRebateForDownload(orderResult, childrenIds);
 		// 合并信息
 		List<RebateDownload> result = mergeResult(orderResult, rebateResult);
 		return result;
@@ -550,25 +553,27 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		}
 	}
 
-	private List<RebateDownload> listRebateForDownload(List<RebateDownload> orderResult) {
+	private List<RebateDownload> listRebateForDownload(List<RebateDownload> orderResult, List<Integer> childrenIds) {
 		Set<String> orderIds = new HashSet<String>();
 		for (RebateDownload temp : orderResult) {
 			orderIds.add(temp.getOrderId());
 		}
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("orderIds", orderIds);
+		param.put("list", childrenIds);
 		List<RebateDownload> rebateResult = financeFeignClient.listRebateDetailForDownload(Constants.FIRST_VERSION,
-				orderIds);
+				param);
 		if (rebateResult == null || rebateResult.size() == 0) {
 			throw new RuntimeException("没有获取到返佣信息");
 		}
 		return rebateResult;
 	}
 
-	private List<RebateDownload> listOrderForRebateDownload(String startTime, String endTime, String gradeId) {
+	private List<RebateDownload> listOrderForRebateDownload(String startTime, String endTime, String gradeId,
+			List<Integer> childrenIds) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("startTime", startTime);
 		param.put("endTime", endTime);
-		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION,
-				Integer.parseInt(gradeId));
 		param.put("list", childrenIds);
 		List<RebateDownload> orderResult = orderBackMapper.queryForRebate(param);
 		if (orderResult == null || orderResult.size() == 0) {

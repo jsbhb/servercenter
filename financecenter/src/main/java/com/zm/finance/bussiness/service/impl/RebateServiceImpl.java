@@ -136,9 +136,8 @@ public class RebateServiceImpl implements RebateService {
 	}
 
 	@Override
-	public List<RebateDownload> listRebateDetailForDownload(Set<String> orderIds) {
-
-		return rebateMapper.listRebateDetailForDownload(orderIds);
+	public List<RebateDownload> listRebateDetailForDownload(Map<String,Object> param) {
+		return rebateMapper.listRebateDetailForDownload(param);
 	}
 
 }

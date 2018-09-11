@@ -259,7 +259,9 @@ public class OrderComponentUtil {
 				nextProportion = proportion;// 记录下一级的返佣比例
 				sb.append("\"" + grade.getId() + "\":" + "\"" + proportion + "\",");
 			}
-			goods.setRebate(sb.substring(0, sb.length() - 1) + "}");// 设置每个商品每个分级的返佣
+			if(sb.lastIndexOf(",") > 0){
+				goods.setRebate(sb.substring(0, sb.length() - 1) + "}");// 设置每个商品每个分级的返佣
+			}
 		}
 	}
 

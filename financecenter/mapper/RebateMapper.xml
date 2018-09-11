@@ -81,6 +81,10 @@
 		<foreach collection="orderIds" open="(" close=")" item="item" separator=",">
 			#{item}
 		</foreach>
+		and grade_id in 
+		<foreach collection="list" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
 	</select>
 	
 </mapper>

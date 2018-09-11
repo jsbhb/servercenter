@@ -2,7 +2,6 @@ package com.zm.finance.bussiness.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -103,13 +102,13 @@ public class RebateController {
 			rebateService.redisToolList(key, value);
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/finance/rebate/detail/download", method = RequestMethod.POST)
 	public List<RebateDownload> listRebateDetailForDownload(@PathVariable("version") Double version,
-			@RequestBody Set<String> orderIds){
-		
+			@RequestBody Map<String,Object> param) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return rebateService.listRebateDetailForDownload(orderIds);
+			return rebateService.listRebateDetailForDownload(param);
 		}
 		return null;
 	}

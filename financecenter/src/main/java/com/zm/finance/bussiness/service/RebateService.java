@@ -2,7 +2,6 @@ package com.zm.finance.bussiness.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.github.pagehelper.Page;
 import com.zm.finance.pojo.RebateDownload;
@@ -37,6 +36,6 @@ public interface RebateService {
 
 	void redisToolList(String key, String value);
 
-	List<RebateDownload> listRebateDetailForDownload(Set<String> orderIds);
+	List<RebateDownload> listRebateDetailForDownload(Map<String,Object> param);
 
 }
