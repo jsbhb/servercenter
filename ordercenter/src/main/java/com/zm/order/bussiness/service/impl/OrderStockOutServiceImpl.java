@@ -285,6 +285,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					goods.setSku(itemBO.getSku());
 					goods.setItemCode(itemBO.getItemCode());
 					goods.setItemInfo(itemBO.getInfo());
+					goods.setGoodsId(itemBO.getGoodsId());
 				} else {
 					itemBO = tempMap.get(goods.getSku() + "," + goods.getConversion());
 					if (itemBO == null) {
@@ -295,6 +296,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					goods.setItemId(itemBO.getItemId());
 					goods.setItemCode(itemBO.getItemCode());
 					goods.setItemInfo(itemBO.getInfo());
+					goods.setGoodsId(itemBO.getGoodsId());
 				}
 				goods.setItemName(itemBO.getGoodsName());
 				if (goods.getItemPrice() == null || "".equals(goods.getItemPrice())) {

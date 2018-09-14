@@ -11,7 +11,14 @@ public class GoodsItemBO {
 	private Integer type;
 	private String goodsName;
 	private String info;
+	private String goodsId;
 	
+	public String getGoodsId() {
+		return goodsId;
+	}
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
+	}
 	public String getInfo() {
 		return info;
 	}

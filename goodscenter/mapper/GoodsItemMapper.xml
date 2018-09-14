@@ -626,7 +626,7 @@
 	
 	<select id="listGoodsItemByParam" parameterType="Object" resultMap="entity">
 		select i.id,i.item_id,i.item_code,i.sku,g.supplier_id,i.info,p.retail_price as retailPrice,i.conversion,
-		g.goods_name,g.type 
+		g.goods_name,g.type,g.goods_id 
 		from goods_item i 
 		left join goods_price p on i.item_id = p.item_id 
 		left join goods g on i.goods_id=g.goods_id 
@@ -638,7 +638,7 @@
 	
 	<select id="listGoodsItemByItemIds" parameterType="Object" resultMap="entity">
 		select i.id,i.item_id,i.item_code,g.supplier_id,i.sku,i.info,p.retail_price as retailPrice,i.conversion,
-		g.goods_name,g.type 
+		g.goods_name,g.type,g.goods_id 
 		from goods_item i 
 		left join goods_price p on i.item_id = p.item_id 
 		left join goods g on i.goods_id=g.goods_id 
