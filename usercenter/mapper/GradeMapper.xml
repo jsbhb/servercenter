@@ -188,8 +188,7 @@
 	<select id="fuzzyListGrade" parameterType="Object"
 		resultType="com.zm.user.pojo.FuzzySearchGrade">
 		select id,grade_name as name from grade where FIND_IN_SET(id, getGradeChildLst(#{centerId})) and
-		(id like
-		CONCAT('%',#{name},'%') or grade_name like CONCAT('%',#{name},'%'))
+		(id = #{name} or grade_name like CONCAT('%',#{name},'%'))
 	</select>
 
 	<insert id="saveGradeType" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
