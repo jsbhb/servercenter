@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -124,11 +125,15 @@ public class ExpressServiceImpl implements ExpressService {
 	}
 
 	private void setPostTaxRedis(ExpressTemplateBO expressTemplate) {
+		template.delete(Constants.POST_TAX + expressTemplate.getSupplierId());
 		Map<String, Object> tempMap = new HashMap<String, Object>();
 		tempMap.put("post", expressTemplate.getFreePost() + "");
 		tempMap.put("tax", expressTemplate.getFreeTax() + "");
 		if (expressTemplate.getRuleBindList() != null && expressTemplate.getRuleBindList().size() > 0) {
-			tempMap.put("rule", JSONUtil.toJson(expressTemplate.getRuleBindList()));
+			List<Integer> paramIdList = expressTemplate.getRuleBindList().stream().map(ExpressRuleBind::getParamId)
+					.collect(Collectors.toList());
+			List<ExpressRule> list = expressMapper.listExpressRule(paramIdList);
+			tempMap.put("rule", JSONUtil.toJson(list));
 		}
 		template.opsForHash().putAll(Constants.POST_TAX + expressTemplate.getSupplierId(), tempMap);
 	}
@@ -172,13 +177,13 @@ public class ExpressServiceImpl implements ExpressService {
 
 	@Override
 	public List<ExpressRulePO> listRule() {
-		
+
 		return expressMapper.listRule();
 	}
 
 	@Override
 	public List<RuleParameterPO> listRuleParam(Integer id) {
-		
+
 		return expressMapper.listRuleParam(id);
 	}
 

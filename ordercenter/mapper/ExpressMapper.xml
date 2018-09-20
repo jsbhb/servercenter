@@ -160,4 +160,11 @@
 		insert into rule_parameter(rule_id,parameter_value,create_time) values 
 		(#{ruleId},#{param},now())
 	</insert>
+	
+	<select id="listExpressRule" parameterType="Object" resultType="com.zm.order.pojo.bo.ExpressRule">
+		select rule_id as type,parameter_value as json from rule_parameter where id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
 </mapper>
