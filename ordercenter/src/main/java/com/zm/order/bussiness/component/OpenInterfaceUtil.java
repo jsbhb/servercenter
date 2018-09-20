@@ -99,12 +99,6 @@ public class OpenInterfaceUtil {
 						ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 			}
 		}
-		// 一般贸易订单需要大于500
-		if (orderInfo.getSupplierId().equals(Constants.GENERAL_WAREHOUSE_ID)
-				&& orderInfo.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
-			return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
-					ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
-		}
 		// 判断电话号码是否合法
 		if (!RegularUtil.isPhone(orderInfo.getPhone())) {
 			return new ResultModel(false, ErrorCodeEnum.BUYER_PHONE_VALIDATE_ERROR.getErrorCode(),

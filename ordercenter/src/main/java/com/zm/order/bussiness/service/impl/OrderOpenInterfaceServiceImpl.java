@@ -15,20 +15,25 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.order.bussiness.component.OpenInterfaceUtil;
 import com.zm.order.bussiness.component.OrderComponentUtil;
 import com.zm.order.bussiness.component.ShareProfitComponent;
+import com.zm.order.bussiness.component.expressrule.ExpressRuleStrategy;
 import com.zm.order.bussiness.convertor.OrderConvertUtil;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.dao.OrderOpenInterfaceMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.bussiness.service.OrderOpenInterfaceService;
 import com.zm.order.constants.Constants;
+import com.zm.order.exception.ParameterException;
+import com.zm.order.exception.RuleCheckException;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.feignclient.model.OrderBussinessModel;
+import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.ButtJointOrder;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderStatus;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
@@ -84,6 +89,21 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		ResultModel resultModel = OpenInterfaceUtil.paramValidate(orderInfo);
 		if (resultModel != null) {
 			return resultModel;
+		}
+
+		// 判断对应仓库的模板规则
+		List<ExpressRule> ruleList = orderMapper.listExpressRule(orderInfo.getSupplierId());
+		if (ruleList != null && ruleList.size() > 0) {
+			try {
+				ExpressRuleStrategy strategy = new ExpressRuleStrategy(ruleList);
+				strategy.judgeExpressRule(orderInfo);
+			} catch (ParameterException e) {
+				LogUtil.writeErrorLog("供应商模板配置出错：ID为" + orderInfo.getSupplierId());
+				return new ResultModel(false, ErrorCodeEnum.PARAM_ERROR.getErrorCode(),
+						ErrorCodeEnum.PARAM_ERROR.getErrorMsg());
+			} catch (RuleCheckException e) {
+				return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(), e.getMessage());
+			}
 		}
 
 		// 注册用户，获取userId
@@ -157,8 +177,8 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
 					resultModel.getErrorMsg() + ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
 		}
-		
-		//把商品的返佣补全
+
+		// 把商品的返佣补全
 		orderComponentUtil.renderOrderInfo(orderInfo, null, null, null, null, null, false);
 
 		// 保存订单

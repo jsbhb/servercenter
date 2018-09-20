@@ -9,18 +9,27 @@
 		<result column="free_post_fee" property="freePost" jdbcType="INTEGER" />
 		<result column="free_tax_fee" property="freeTax" jdbcType="INTEGER" />
 		<result column="enable" property="enable" jdbcType="INTEGER" />
+		<result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
 		<collection property="expressList" ofType="com.zm.order.pojo.ExpressFee">
 			<id column="ef_id" property="id" jdbcType="INTEGER" />
-			<id column="fee" property="fee" />
-			<id column="weight" property="weight" />
-			<id column="heavy_fee" property="heavyFee" />
-			<id column="include_province" property="includeProvince" />
+			<result column="fee" property="fee" />
+			<result column="weight" property="weight" />
+			<result column="heavy_fee" property="heavyFee" />
+			<result column="include_province" property="includeProvince" />
+		</collection>
+		<collection property="ruleBindList" ofType="com.zm.order.pojo.bo.ExpressRuleBind">
+			<id column="bind_id" property="id" jdbcType="INTEGER" />
+			<result column="ruleId" property="ruleId" />
+			<result column="paramId" property="paramId" />
+			<result column="parameter" property="paramKey" />
+			<result column="parameter_value" property="param" />
+			<result column="rule_description" property="description" />
 		</collection>
 	</resultMap>
 	
 	<insert id="saveExpressTemplate" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
-		 insert into express_template (supplier_id,template_name,free_post_fee,free_tax_fee,enable,create_time,opt)
-		 values(#{supplierId},#{templateName},#{freePost},#{freeTax},#{enable},now(),#{opt}) 
+		 insert into express_template (supplier_id,template_name,free_post_fee,free_tax_fee,enable,create_time,opt,rule_name)
+		 values(#{supplierId},#{templateName},#{freePost},#{freeTax},#{enable},now(),#{opt},#{ruleName}) 
 	</insert>
 	
 	<insert id="saveExpressBatch" parameterType="Object">
@@ -33,8 +42,13 @@
 	
 	<select id="getExpressTemplateById" parameterType="Object" resultMap="template">
 		select et.id,et.supplier_id,et.template_name,et.free_post_fee,et.free_tax_fee,
-		ef.id as ef_id,ef.fee,ef.weight,ef.heavy_fee,ef.include_province 
-		from express_template et left join express_fee ef on et.id = ef.template_id where et.id = #{id}
+		ef.id as ef_id,ef.fee,ef.weight,ef.heavy_fee,ef.include_province,er.parameter,
+		rp.parameter_value,er.rule_description,rt.id as bind_id,rp.id as paramId,er.id as ruleId  
+		from express_template et left join express_fee ef on et.id = ef.template_id 
+		left join rule_template rt on et.id = rt.template_id 
+		left join rule_parameter rp on rp.id = rt.parameter_id 
+		left join express_rule er on rp.rule_id = er.id
+		where et.id = #{id}
 	</select>
 	
 	<select id="selectExpressForPage" resultMap="template" parameterType="Object">
@@ -75,6 +89,7 @@
 			<if test="enable != null and enable != '' or enable == 0">
 				enable = #{enable},
 			</if>
+			rule_name = #{ruleName},
 			update_time = now()
 		</set>
 		where id = #{id}
@@ -105,5 +120,44 @@
 	<delete id="delExpressFee" parameterType="Object">
 		delete from express_fee where id = #{id}
 	</delete>
+	
+	<insert id="saveRuleBindBatch" parameterType="Object">
+		insert into rule_template(rule_id,template_id,parameter_id,create_time) values 
+		<foreach collection="list" item="item" separator=",">
+			(#{item.ruleId},#{item.templateId},#{item.paramId},now())
+		</foreach>
+	</insert>
 
+	<update id="updateRuleBindBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";" >
+			update rule_template 
+			<set>
+				<if test="item.ruleId != null and item.ruleId != '' or item.ruleId == 0">
+					rule_id = #{item.ruleId},
+				</if>
+				<if test="item.paramId != null and item.paramId != '' or item.paramId == 0">
+					parameter_id = #{item.paramId},
+				</if>
+				update_time = now()
+			</set>
+			where id = #{item.id}
+		</foreach>
+	</update>
+	
+	<delete id="delRuleBind" parameterType="Object">
+		delete from rule_template where id = #{id}
+	</delete>
+	
+	<select id="listRule" parameterType="Object" resultType="com.zm.order.pojo.po.ExpressRulePO">
+		select id,rule_description as description,parameter as param from express_rule
+	</select>
+	
+	<select id="listRuleParam" parameterType="Object" resultType="com.zm.order.pojo.po.RuleParameterPO">
+		select id, parameter_value as param from rule_parameter where rule_id=#{id}
+	</select>
+	
+	<insert id="addRuleParam" parameterType="Object">
+		insert into rule_parameter(rule_id,parameter_value,create_time) values 
+		(#{ruleId},#{param},now())
+	</insert>
 </mapper>

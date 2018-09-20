@@ -4,7 +4,10 @@ import java.util.List;
 
 import com.github.pagehelper.Page;
 import com.zm.order.pojo.ExpressFee;
+import com.zm.order.pojo.bo.ExpressRuleBind;
 import com.zm.order.pojo.bo.ExpressTemplateBO;
+import com.zm.order.pojo.po.ExpressRulePO;
+import com.zm.order.pojo.po.RuleParameterPO;
 
 public interface ExpressMapper {
 
@@ -25,4 +28,16 @@ public interface ExpressMapper {
 	void updateExpressBatch(List<ExpressFee> expressList);
 
 	void delExpressFee(Integer id);
+
+	void saveRuleBindBatch(List<ExpressRuleBind> ruleList);
+
+	void updateRuleBindBatch(List<ExpressRuleBind> updateList);
+
+	void delRuleBind(Integer id);
+
+	List<ExpressRulePO> listRule();
+
+	List<RuleParameterPO> listRuleParam(Integer id);
+
+	void addRuleParam(RuleParameterPO po);
 }

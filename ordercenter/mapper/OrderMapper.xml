@@ -494,11 +494,21 @@
 	</select>
 
 	<select id="getExpressFee" parameterType="Object" resultMap="expressFee">
-		select * from express_template et left join express_fee ef on et.id = ef.template_id where 
-		et.enable = 1 and et.supplier_id in 
+		select *
+		from express_template et 
+		left join express_fee ef on et.id = ef.template_id 
+		where et.enable = 1 and et.supplier_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
+	</select>
+	
+	<select id="listExpressRule" parameterType="Object" resultType="com.zm.order.pojo.bo.ExpressRule">
+		select rt.rule_id as type,rp.parameter_value as json
+		from rule_template rt
+		left join express_template et on et.id = rt.template_id 
+		left join rule_parameter rp on rt.parameter_id = rp.id 
+		where et.enable = 1 and et.supplier_id = #{supplierId}
 	</select>
 
 	<select id="getDefaultFee" parameterType="Object" resultType="java.lang.Double">

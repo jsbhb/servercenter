@@ -20,6 +20,7 @@ import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
+import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 
 /**  
@@ -159,5 +160,7 @@ public interface OrderMapper {
 	void updateThirdOrderInfoById(ExpressMaintenanceBO model);
 	
 	void saveThirdOrderInfo(ExpressMaintenanceBO model);
+	
+	List<ExpressRule> listExpressRule(Integer supplierId);
 	
 }

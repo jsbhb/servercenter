@@ -12,10 +12,13 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.zm.order.bussiness.component.expressrule.ExpressRuleStrategy;
 import com.zm.order.bussiness.dao.OrderMapper;
 import com.zm.order.bussiness.service.OrderService;
 import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
+import com.zm.order.exception.ParameterException;
+import com.zm.order.exception.RuleCheckException;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.log.LogUtil;
@@ -25,6 +28,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.Tax;
+import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
@@ -173,11 +177,21 @@ public class OrderComponentUtil {
 			}
 		}
 
-		if (info.getSupplierId().equals(Constants.GENERAL_WAREHOUSE_ID)
-				&& info.getOrderDetail().getPayment() < Constants.GENERAL_TRADE_FEE) {
-			result.setSuccess(false);
-			result.setErrorMsg("一般贸易仓(仓库ID：6)订单起订额需要大于" + Constants.GENERAL_TRADE_FEE + "元");
-			return;
+		// 判断对应仓库的模板规则
+		List<ExpressRule> ruleList = orderMapper.listExpressRule(info.getSupplierId());
+		if (ruleList != null && ruleList.size() > 0) {
+			try {
+				ExpressRuleStrategy strategy = new ExpressRuleStrategy(ruleList);
+				strategy.judgeExpressRule(info);
+			} catch (ParameterException e) {
+				result.setSuccess(false);
+				result.setErrorMsg(e.getMessage());
+				return;
+			} catch (RuleCheckException e) {
+				result.setSuccess(false);
+				result.setErrorMsg(e.getMessage());
+				return;
+			}
 		}
 
 		if (Constants.WX_PAY.equals(payType)) {
@@ -203,7 +217,7 @@ public class OrderComponentUtil {
 	 */
 	public void renderOrderInfo(OrderInfo info, Double postFee, Integer weight, Double amount, TaxFeeBO taxFee,
 			Double disAmount, boolean fromMall) {
-		if(fromMall){
+		if (fromMall) {
 			info.setWeight(weight);
 			info.setStatus(0);
 			info.getOrderDetail().setPostFee(postFee);
@@ -259,7 +273,7 @@ public class OrderComponentUtil {
 				nextProportion = proportion;// 记录下一级的返佣比例
 				sb.append("\"" + grade.getId() + "\":" + "\"" + proportion + "\",");
 			}
-			if(sb.lastIndexOf(",") > 0){
+			if (sb.lastIndexOf(",") > 0) {
 				goods.setRebate(sb.substring(0, sb.length() - 1) + "}");// 设置每个商品每个分级的返佣
 			}
 		}
