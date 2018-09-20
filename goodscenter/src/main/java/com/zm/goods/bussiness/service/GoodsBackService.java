@@ -275,4 +275,6 @@ public interface GoodsBackService {
 	
 	GoodsEntity queryGoodsInfoByGoodsId(GoodsEntity entity);
 
+	List<String> getGoodsIdByItemCode(String itemCode);
+
 }
