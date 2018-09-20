@@ -312,7 +312,7 @@ public class GoodsBackController {
 				ERPGoodsTagBindEntity checkEntity = new ERPGoodsTagBindEntity();
 				checkEntity.setTagId(entity.getId());
 				List<ERPGoodsTagBindEntity> existTagList = goodsBackService.queryGoodsTagBindListInfo(checkEntity);
-				if (existTagList == null) {
+				if (existTagList == null || existTagList.size() <= 0) {
 					goodsBackService.deleteGoodsTag(entity);
 					return new ResultModel(true, "");
 				} else if (existTagList.size() > 0) {
@@ -512,5 +512,19 @@ public class GoodsBackController {
 		} catch (Exception e) {
 			return new ResultModel(false, e.getMessage());
 		}
+	}
+
+	@RequestMapping(value = "{version}/goods/maintain/files/queryGoodsIdByItemCode", method = RequestMethod.POST)
+	public ResultModel getGoodsIdByItemCode(@PathVariable("version") Double version, @RequestBody String itemCode) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, goodsBackService.getGoodsIdByItemCode(itemCode));
+			} catch (Exception e) {
+				LogUtil.writeErrorLog("通过ItemCode查询GoodsId出错", e);
+				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			}
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 }

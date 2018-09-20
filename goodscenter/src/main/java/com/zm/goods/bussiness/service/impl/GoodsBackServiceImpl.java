@@ -861,4 +861,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		GoodsEntity retEntity = goodsBackMapper.selectGoodsInfoByGoodsId(entity);
 		return retEntity;
 	}
+
+	@Override
+	public List<String> getGoodsIdByItemCode(String itemCode) {
+		return goodsBackMapper.listGoodsIdsByItemCode(itemCode);
+	}
 }
