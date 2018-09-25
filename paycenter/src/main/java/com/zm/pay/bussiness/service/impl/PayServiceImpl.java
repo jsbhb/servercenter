@@ -282,6 +282,7 @@ public class PayServiceImpl implements PayService {
 	private static final Long time = Constants.PAY_EFFECTIVE_TIME_HOUR * 3600000L;// 支付有效期1小时
 	private static final Integer O2O_ORDER = 0;
 	private static final Integer OWN_SUPPLIER = 1;
+	private static final Integer GZ_SUPPLIER = 5;
 
 	@Override
 	public ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
@@ -304,7 +305,8 @@ public class PayServiceImpl implements PayService {
 		}
 
 		// 如果是跨境第三方仓库的，需要同步库存并判断库存
-		if (O2O_ORDER.equals(info.getOrderFlag()) && !OWN_SUPPLIER.equals(info.getSupplierId())) {
+		if (O2O_ORDER.equals(info.getOrderFlag()) && !OWN_SUPPLIER.equals(info.getSupplierId())
+				&& !GZ_SUPPLIER.equals(info.getSupplierId())) {
 			OrderBussinessModel model = null;
 			List<OrderBussinessModel> list = new ArrayList<OrderBussinessModel>();
 			for (OrderGoods goods : info.getOrderGoodsList()) {

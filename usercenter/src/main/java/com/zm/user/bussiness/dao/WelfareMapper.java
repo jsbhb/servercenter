@@ -20,4 +20,6 @@ public interface WelfareMapper {
 	void updateInviterStatus(List<InviterEntity> list);
 
 	List<WelfareMembeStatistic> inviterStatistic(Map<String,Object> param);
+
+	InviterEntity getInviterByParam(Map<String, Object> param);
 }

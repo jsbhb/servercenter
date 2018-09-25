@@ -2,20 +2,29 @@ package com.zm.user.enummodel;
 
 public enum PublishType {
 
-	 REGION_CREATE("http://192.168.70.122:8888/Region/handle","POST"),
-	 REGION_DELETE("http://192.168.70.122:8888/Region/handle","DELETE"),
-	 PAGE_CREATE("http://192.168.70.122:8888/Page/handle","POST"),
-	 PAGE_DELETE("http://192.168.70.122:8888/Page/handle","DELETE"),
-	 MODULE_CREATE("http://192.168.70.122:8888/Module/data","POST"),
-	 MODULE_DELETE("http://192.168.70.122:8888/Module/data","DELETE");
-	
-	//produce
-//	REGION_CREATE("http://192.168.182.119:8888/Region/handle","POST"),
-//	REGION_DELETE("http://192.168.182.119:8888/Region/handle","DELETE"),
-//	PAGE_CREATE("http://192.168.182.119:8888/Page/handle","POST"),
-//	PAGE_DELETE("http://192.168.182.119:8888/Page/handle","DELETE"),
-//	MODULE_CREATE("http://192.168.182.119:8888/Module/data","POST"),
-//	MODULE_DELETE("http://192.168.182.119:8888/Module/data","DELETE");
+	//test
+		REGION_CREATE("https://testfront.cncoopbuy.com/Region/handle","POST"),
+		REGION_DELETE("https://testfront.cncoopbuy.com/Region/handle","DELETE"),
+		PAGE_CREATE("https://testfront.cncoopbuy.com/Page/handle","POST"),
+		PAGE_DELETE("https://testfront.cncoopbuy.com/Page/handle","DELETE"),
+		MODULE_CREATE("https://testfront.cncoopbuy.com/Data/handle/nav","POST"),
+		MODULE_DELETE("https://testfront.cncoopbuy.com/Module/data","DELETE"),
+		DISTRIBUTION_CREATE("https://testfront.cncoopbuy.com/Data/handle/distribution","POST"),
+		DISTRIBUTION_DELETE("https://testfront.cncoopbuy.com/Data/handle/distribution","DELETE"),
+		ADD_SITEMAP("https://testfront.cncoopbuy.com/Sitemap/handle","POST"),
+		DEL_SITEMAP("https://testfront.cncoopbuy.com/Sitemap/handle","DELETE");
+		
+		//produce
+//		REGION_CREATE("https://front.cncoopbuy.com/Region/handle","POST"),
+//		REGION_DELETE("https://front.cncoopbuy.com/Region/handle","DELETE"),
+//		PAGE_CREATE("https://front.cncoopbuy.com/Page/handle","POST"),
+//		PAGE_DELETE("https://front.cncoopbuy.com/Page/handle","DELETE"),
+//		MODULE_CREATE("https://front.cncoopbuy.com/Data/handle/nav","POST"),
+//		MODULE_DELETE("https://front.cncoopbuy.com/Module/data","DELETE"),
+//		DISTRIBUTION_CREATE("https://front.cncoopbuy.com/Data/handle/distribution","POST"),
+//		DISTRIBUTION_DELETE("https://front.cncoopbuy.com/Data/handle/distribution","DELETE"),
+//		ADD_SITEMAP("https://front.cncoopbuy.com/Sitemap/handle","POST"),
+//		DEL_SITEMAP("https://front.cncoopbuy.com/Sitemap/handle","DELETE");
 	
 	private String url;
 	private String method;

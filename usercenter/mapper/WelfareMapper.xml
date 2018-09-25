@@ -142,4 +142,8 @@
 		</if>
 		group by status
 	</select>
+	
+	<select id="getInviterByParam" parameterType="Object" resultMap="inviter">
+		select * from welfare_inviter where grade_id = #{gradeId} and phone = #{phone}
+	</select>
 </mapper>

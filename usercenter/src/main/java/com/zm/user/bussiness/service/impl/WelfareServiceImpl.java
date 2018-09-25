@@ -99,7 +99,7 @@ public class WelfareServiceImpl implements WelfareService {
 			param.put("list", idList);
 		}
 		List<InviterEntity> list = welfareMapper.selectInviterListByParam(param);
-		Map<Integer,String> gradeMap = new HashMap<Integer,String>();
+		Map<Integer, String> gradeMap = new HashMap<Integer, String>();
 		if (list != null && list.size() > 0) {
 			List<NotifyMsg> sendList = new ArrayList<NotifyMsg>();
 			NotifyMsg tmpMsg = null;
@@ -141,9 +141,65 @@ public class WelfareServiceImpl implements WelfareService {
 
 	@Override
 	public ResultModel inviterStatistic(Integer gradeId) {
-		Map<String,Object> param = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("gradeId", gradeId);
 		List<WelfareMembeStatistic> statisticList = welfareMapper.inviterStatistic(param);
 		return new ResultModel(true, statisticList);
+	}
+
+	private final Integer BEIJING_HUANWEI_ID = 124;
+	private final String BEIJING_HUANWEI_NAME = "北京环卫集团环卫服务有限公司";
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ResultModel applyCode(Integer gradeId, String phone) {
+		if (BEIJING_HUANWEI_ID.equals(gradeId)) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("gradeId", gradeId);
+			param.put("phone", phone);
+			InviterEntity entity = welfareMapper.getInviterByParam(param);
+			List<InviterEntity> inviterList = new ArrayList<InviterEntity>();
+			if (entity == null) {
+				entity = new InviterEntity();
+				entity.setGradeId(gradeId);
+				entity.setPhone(phone);
+				entity.setName(phone);
+				entity.setInvitationCode(EncryptionUtil.toSerialCode(Long.parseLong(phone)));
+				entity.setStatus(1);
+				inviterList.add(entity);
+				welfareMapper.insertInviterInfo(inviterList);
+			} else {
+				inviterList.add(entity);
+			}
+			// 发送邀请码
+			List<NotifyMsg> sendList = new ArrayList<NotifyMsg>();
+			NotifyMsg tmpMsg = new NotifyMsg();
+			tmpMsg.setType(NotifyTypeEnum.INVITATION_CODE);
+			tmpMsg.setName(entity.getName());
+			tmpMsg.setPhone(entity.getPhone());
+			tmpMsg.setShopName(BEIJING_HUANWEI_NAME);
+			tmpMsg.setMsg(entity.getInvitationCode());
+			sendList.add(tmpMsg);
+			// 调用三方接口发送邀请短信
+			ResultModel thirdcenter_result = thirdPartFeignClient.sendCode(Constants.FIRST_VERSION, sendList);
+
+			Map<String, String> remarkParam = (Map<String, String>) thirdcenter_result.getObj();
+
+			for (InviterEntity ie : inviterList) {
+				if (remarkParam.containsKey(ie.getPhone())) {
+					ie.setStatus(Constants.SEND_ERROR);
+					ie.setRemark(remarkParam.get(ie.getPhone()));
+					ie.setOpt(entity.getOpt());
+				} else {
+					ie.setStatus(Constants.SEND);
+					ie.setOpt(entity.getOpt());
+				}
+			}
+
+			welfareMapper.updateInviterStatus(inviterList);
+			
+			return new ResultModel(true, null);
+		}
+		return new ResultModel(false, "", "该分级不能自己申请邀请码");
 	}
 }

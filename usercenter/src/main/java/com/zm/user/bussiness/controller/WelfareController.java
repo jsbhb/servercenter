@@ -38,7 +38,7 @@ public class WelfareController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/welfare/inviter/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody InviterEntity entity) {
@@ -54,7 +54,7 @@ public class WelfareController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/welfare/inviter/update", method = RequestMethod.POST)
 	public ResultModel updateInviter(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody InviterEntity entity) {
@@ -69,7 +69,7 @@ public class WelfareController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/welfare/inviter/produceCode", method = RequestMethod.POST)
 	public ResultModel produceCode(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody InviterEntity entity) {
@@ -84,7 +84,7 @@ public class WelfareController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/welfare/inviter/sendProduceCode", method = RequestMethod.POST)
 	public ResultModel sendProduceCode(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody InviterEntity entity) {
@@ -99,7 +99,7 @@ public class WelfareController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/welfare/inviter/statistic/{gradeId}", method = RequestMethod.GET)
 	public ResultModel inviterStatistic(HttpServletRequest request, @PathVariable("version") Double version,
 			@PathVariable("gradeId") Integer gradeId) {
@@ -107,6 +107,21 @@ public class WelfareController {
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
 				return welfareService.inviterStatistic(gradeId);
+			} else {
+				return new ResultModel(false, "版本错误");
+			}
+		} catch (Exception e) {
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/welfare/inviter/apply/code/{gradeId}/{phone}", method = RequestMethod.GET)
+	public ResultModel applyCode(HttpServletRequest request, @PathVariable("version") Double version,
+			@PathVariable("gradeId") Integer gradeId, @PathVariable("phone") String phone) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				return welfareService.applyCode(gradeId, phone);
 			} else {
 				return new ResultModel(false, "版本错误");
 			}
