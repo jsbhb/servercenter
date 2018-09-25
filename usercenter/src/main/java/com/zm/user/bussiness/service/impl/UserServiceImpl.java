@@ -453,41 +453,80 @@ public class UserServiceImpl implements UserService {
 		ResultModel result = new ResultModel();
 		result.setSuccess(true);
 		
-		info.setId(checkInviterCode(info));
-		if (info.getId() < 0) {
+//		info.setId(checkInviterCode(info));
+//		if (info.getId() < 0) {
+//			result.setObj(false);
+//			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+//		} else {
+//			Map<String,Object> param = new HashMap<String,Object>();
+//			param.put("gradeId", info.getShopId());
+//			param.put("invitationCode", info.getInvitationCode());
+//			param.put("regChkStatus", 1);
+//			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
+//			if (inviterList == null || inviterList.size() <= 0) {
+//				result.setObj(false);
+//				result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+//				return result;
+//			}
+//			
+//			InviterEntity inviter = null;
+//			List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
+//			for (InviterEntity ie: inviterList) {
+//				if (ie.getPhone().equals(info.getPhone())) {
+//					ie.setUserCenterId(info.getId());
+//					ie.setStatus(3);
+//					inviter = ie;
+//					break;
+//				}
+//			}
+//			if (inviter == null) {
+//				inviter = inviterList.get(0);
+//				inviter.setUserCenterId(info.getId());
+//				inviter.setStatus(3);
+//			}
+//			updInviterList.add(inviter);
+//			welfareMapper.updateInviterInfo(updInviterList);
+//			result.setObj(true);
+//		}
+		
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("gradeId", info.getShopId());
+		param.put("invitationCode", info.getInvitationCode());
+//		param.put("regChkStatus", 1);
+		List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
+		if (inviterList == null || inviterList.size() <= 0) {
 			result.setObj(false);
 			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
-		} else {
-			Map<String,Object> param = new HashMap<String,Object>();
-			param.put("gradeId", info.getShopId());
-			param.put("invitationCode", info.getInvitationCode());
-			param.put("regChkStatus", 1);
-			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
-			if (inviterList == null || inviterList.size() <= 0) {
+			return result;
+		}
+		
+		InviterEntity inviter = null;
+		List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
+		for (InviterEntity ie: inviterList) {
+			if (ie.getStatus() == 3) {
 				result.setObj(false);
-				result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+				result.setErrorMsg("当前邀请码已被绑定，绑定的手机号为："+ie.getBindPhone());
+				return result;
+			} else if (ie.getStatus() == 4) {
+				result.setObj(false);
+				result.setErrorMsg("当前邀请码已被作废，无法绑定！");
 				return result;
 			}
-			
-			InviterEntity inviter = null;
-			List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
-			for (InviterEntity ie: inviterList) {
-				if (ie.getPhone().equals(info.getPhone())) {
-					ie.setUserCenterId(info.getId());
-					ie.setStatus(3);
-					inviter = ie;
-					break;
-				}
+			if (ie.getPhone().equals(info.getPhone())) {
+				ie.setUserCenterId(info.getId());
+				ie.setStatus(3);
+				inviter = ie;
+				break;
 			}
-			if (inviter == null) {
-				inviter = inviterList.get(0);
-				inviter.setUserCenterId(info.getId());
-				inviter.setStatus(3);
-			}
-			updInviterList.add(inviter);
-			welfareMapper.updateInviterInfo(updInviterList);
-			result.setObj(true);
 		}
+		if (inviter == null) {
+			inviter = inviterList.get(0);
+			inviter.setUserCenterId(info.getId());
+			inviter.setStatus(3);
+		}
+		updInviterList.add(inviter);
+		welfareMapper.updateInviterInfo(updInviterList);
+		result.setObj(true);
 		return result;
 	}
 
