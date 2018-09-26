@@ -22,4 +22,6 @@ public interface WelfareMapper {
 	List<WelfareMembeStatistic> inviterStatistic(Map<String,Object> param);
 
 	InviterEntity getInviterByParam(Map<String, Object> param);
+	
+	void insertInviterInfoSingle(InviterEntity entity);
 }

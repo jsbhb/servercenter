@@ -25,6 +25,13 @@
 		</foreach>
 	</insert>
 	
+	<insert id="insertInviterInfoSingle" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
+		insert ignore into welfare_inviter 
+		(grade_id,name,phone,invitation_code,status,create_time,update_time,opt)
+		values
+		(#{gradeId},#{name},#{phone},#{invitationCode},#{status},now(),now(),#{opt})
+	</insert>
+	
 	<select id="selectForPage" parameterType="Object" resultMap="inviter">
 		select wi.*,u.phone bind_phone,ifnull(ud.name,ud.nick_name) bind_name
 		from welfare_inviter wi 

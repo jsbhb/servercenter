@@ -166,8 +166,8 @@ public class WelfareServiceImpl implements WelfareService {
 				entity.setName(phone);
 				entity.setInvitationCode(EncryptionUtil.toSerialCode(Long.parseLong(phone)));
 				entity.setStatus(1);
+				welfareMapper.insertInviterInfoSingle(entity);
 				inviterList.add(entity);
-				welfareMapper.insertInviterInfo(inviterList);
 			} else {
 				inviterList.add(entity);
 			}
