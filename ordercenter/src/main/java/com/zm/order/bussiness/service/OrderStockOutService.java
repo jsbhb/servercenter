@@ -48,13 +48,13 @@ public interface OrderStockOutService {
 	 */
 	OrderInfo queryByOrderId(String orderId);
 
-	/**  
-	 * queryByPageForGoods:查询订单商品. <br/>  
-	 *  
-	 * @author hebin  
+	/**
+	 * queryByPageForGoods:查询订单商品. <br/>
+	 * 
+	 * @author hebin
 	 * @param entity
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	Page<OrderGoods> queryByPageForGoods(OrderGoods entity);
 
@@ -76,7 +76,8 @@ public interface OrderStockOutService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId, String supplierId);
+	List<OrderInfoListForDownload> queryOrdreListForDownload(String startTime, String endTime, String gradeId,
+			String supplierId);
 
 	/**
 	 * @fun 维护没有系统对接的订单物流单号
@@ -95,6 +96,6 @@ public interface OrderStockOutService {
 
 	ResultModel getStockOutGoodsInfoByOrderId(String orderId);
 
-	List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId);
+	List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId, Integer exportType);
 
 }

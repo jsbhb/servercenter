@@ -125,7 +125,9 @@ public class OrderStockOutController {
 				}
 
 				if (REBATE_EXPORT.equals(type)) {
-					List<RebateDownload> result = orderStockOutService.queryForRebate(startTime, endTime, gradeId);
+					Integer exportType = Integer.valueOf(request.getParameter("exportType"));
+					List<RebateDownload> result = orderStockOutService.queryForRebate(startTime, endTime, gradeId,
+							exportType);
 					return new ResultModel(true, result);
 				} else {
 					List<OrderInfoListForDownload> result = orderStockOutService.queryOrdreListForDownload(startTime,

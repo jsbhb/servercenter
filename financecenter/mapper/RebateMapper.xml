@@ -52,8 +52,23 @@
 	
 	<select id="selectRebateDetailById" parameterType="Object" resultMap="rebateDetail">
 		select * from rebate_detail where 1=1 
-		<if test="gradeId != null and gradeId != ''">
+		<if test="gradeId != null and gradeId != '' or gradeId == 0">
 			and grade_id = #{gradeId}
+		</if>
+		<if test="orderId != null and orderId != ''">
+			and order_id = #{orderId}
+		</if>
+		<if test="status != null and status != '' or status == 0">
+			and status = #{status}
+		</if>
+		<if test="orderFlag != null and orderFlag != '' or orderFlag == 0">
+			and order_flag = #{orderFlag}
+		</if>
+		<if test="createTime != null and createTime != ''">
+			and create_time &gt;= #{createTime} 
+		</if>
+		<if test="updateTime != null and updateTime != ''">
+			and create_time &lt;= #{updateTime} 
 		</if>
 		and status != 11 
 		order by create_time desc
@@ -67,7 +82,6 @@
 				#{item}
 			</foreach>
 		</if>
-		
 	</select>
 	
 	<update id="updateRebateDetail" parameterType="Object">
@@ -77,14 +91,11 @@
 	<select id="listRebateDetailForDownload" parameterType="Object" resultType="com.zm.finance.pojo.RebateDownload">
 		select order_id as orderId, rebate_money as totalRebate, grade_id as gradeId, status, 
 		create_time as rebateTime, update_time as confirmRebateTime 
-		from rebate_detail where order_id in
-		<foreach collection="orderIds" open="(" close=")" item="item" separator=",">
-			#{item}
-		</foreach>
-		and grade_id in 
+		from rebate_detail where grade_id in 
 		<foreach collection="list" open="(" close=")" item="item" separator=",">
 			#{item}
 		</foreach>
+		and create_time between #{startTime} and DATE_ADD(#{endTime},interval 1 day)
 	</select>
 	
 </mapper>

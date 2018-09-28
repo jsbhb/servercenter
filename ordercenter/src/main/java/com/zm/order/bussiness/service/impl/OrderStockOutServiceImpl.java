@@ -494,15 +494,27 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		return new ResultModel(true, null);
 	}
 
+	private final Integer ONLY_SELF = 0;
+
 	@Override
-	public List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId) {
-		// 获取该分级的下级
-		List<Integer> childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION,
-				Integer.parseInt(gradeId));
-		// 获取订单信息
-		List<RebateDownload> orderResult = listOrderForRebateDownload(startTime, endTime, gradeId, childrenIds);
+	public List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId, Integer exportType) {
+		List<Integer> childrenIds = new ArrayList<Integer>();
+		if (!ONLY_SELF.equals(exportType)) {
+			// 获取该分级的下级
+			childrenIds = userFeignClient.listChildrenGrade(Constants.FIRST_VERSION, Integer.parseInt(gradeId));
+		} else {
+			childrenIds.add(Integer.parseInt(gradeId));
+		}
 		// 获取返佣信息
-		List<RebateDownload> rebateResult = listRebateForDownload(orderResult, childrenIds);
+		List<RebateDownload> rebateResult = listRebateForDownload(startTime, endTime, childrenIds);
+		if (rebateResult == null || rebateResult.size() == 0) {
+			return new ArrayList<RebateDownload>();
+		}
+		// 获取订单信息
+		List<RebateDownload> orderResult = listOrderForRebateDownload(rebateResult);
+		if (orderResult == null || orderResult.size() == 0) {
+			return new ArrayList<RebateDownload>();
+		}
 		// 合并信息
 		List<RebateDownload> result = mergeResult(orderResult, rebateResult);
 		return result;
@@ -555,32 +567,24 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		}
 	}
 
-	private List<RebateDownload> listRebateForDownload(List<RebateDownload> orderResult, List<Integer> childrenIds) {
-		Set<String> orderIds = new HashSet<String>();
-		for (RebateDownload temp : orderResult) {
-			orderIds.add(temp.getOrderId());
-		}
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("orderIds", orderIds);
-		param.put("list", childrenIds);
-		List<RebateDownload> rebateResult = financeFeignClient.listRebateDetailForDownload(Constants.FIRST_VERSION,
-				param);
-		if (rebateResult == null || rebateResult.size() == 0) {
-			throw new RuntimeException("没有获取到返佣信息");
-		}
-		return rebateResult;
-	}
-
-	private List<RebateDownload> listOrderForRebateDownload(String startTime, String endTime, String gradeId,
-			List<Integer> childrenIds) {
+	private List<RebateDownload> listRebateForDownload(String startTime, String endTime, List<Integer> childrenIds) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("startTime", startTime);
 		param.put("endTime", endTime);
 		param.put("list", childrenIds);
-		List<RebateDownload> orderResult = orderBackMapper.queryForRebate(param);
-		if (orderResult == null || orderResult.size() == 0) {
-			throw new RuntimeException("没有获取到返佣信息");
+		List<RebateDownload> rebateResult = financeFeignClient.listRebateDetailForDownload(Constants.FIRST_VERSION,
+				param);
+		return rebateResult;
+	}
+
+	private List<RebateDownload> listOrderForRebateDownload(List<RebateDownload> rebateResult) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		Set<String> orderIds = new HashSet<String>();
+		for(RebateDownload temp : rebateResult){
+			orderIds.add(temp.getOrderId());
 		}
+		param.put("orderIds", orderIds);
+		List<RebateDownload> orderResult = orderBackMapper.queryForRebate(param);
 		return orderResult;
 	}
 

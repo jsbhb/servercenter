@@ -393,14 +393,13 @@
 		og.item_code as itemCode,og.item_quantity as quantity,og.rebate,og.item_info as info, og.item_name as goodsName  
 		from order_base ob left join 
 		order_goods og on ob.order_id = og.order_id where 1=1
-		<if test="list != null and list.size > 0 ">
-			and ob.grade_id in 
-			<foreach collection="list" item="item" open="(" close=")" separator=",">
+		<if test="orderIds != null and orderIds.size > 0 ">
+			and ob.order_id in 
+			<foreach collection="orderIds" item="item" open="(" close=")" separator=",">
 				#{item}
 			</foreach>
 		</if>
 		and ob.status in(1,2,3,4,5,6,7,8,11,12,99)
-		and ob.create_time between #{startTime} and DATE_ADD(#{endTime},interval 1 day)
 		order by ob.grade_id,ob.create_time
 	</select>
 
