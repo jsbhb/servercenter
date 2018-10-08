@@ -20,6 +20,7 @@
 		<module>suppliercenter</module>
 		<module>activitycenter</module>
 		<module>financecenter</module>
+		<module>config-server</module>
 	</modules>
 
 	<parent>
