@@ -59,7 +59,7 @@ public class MallController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
 				mallService.saveDict(entity);
-				return new ResultModel(true, "");
+				return new ResultModel(true, entity.getId().toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 				return new ResultModel(false, e.getMessage());

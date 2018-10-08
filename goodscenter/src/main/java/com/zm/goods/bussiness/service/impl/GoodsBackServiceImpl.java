@@ -542,34 +542,50 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			GoodsEntity entity = null;
 			GoodsFile goodsFile = null;
 			List<GoodsFile> fileList = null;
-			List<String> goodsIdList = null;
+//			List<String> goodsIdList = null;
 			for (GoodsFielsMaintainBO model : list) {
-				goodsIdList = goodsBackMapper.listGoodsIdsByItemCode(model.getItemCode());
-				if (goodsIdList != null && goodsIdList.size() > 0) {
-					for (String goodsId : goodsIdList) {
-						entity = new GoodsEntity();
-						entity.setGoodsId(goodsId);
-						entity.setDetailPath(model.getGoodsDetailPath());
-						goodsBackMapper.updateDetailPath(entity);
-						if (model.getPicPathList() != null && model.getPicPathList().size() > 0) {
-							fileList = new ArrayList<GoodsFile>();
-							for (String str : model.getPicPathList()) {
-								goodsFile = new GoodsFile();
-								goodsFile.setGoodsId(goodsId);
-								goodsFile.setPath(str);
-								goodsFile.setOpt("batch");
-								fileList.add(goodsFile);
-							}
-							goodsItemMapper.insertFiles(fileList);
-						}
+//				goodsIdList = goodsBackMapper.listGoodsIdsByItemCode(model.getItemCode());
+//				if (goodsIdList != null && goodsIdList.size() > 0) {
+//					for (String goodsId : goodsIdList) {
+//						entity = new GoodsEntity();
+//						entity.setGoodsId(goodsId);
+//						entity.setDetailPath(model.getGoodsDetailPath());
+//						goodsBackMapper.updateDetailPath(entity);
+//						if (model.getPicPathList() != null && model.getPicPathList().size() > 0) {
+//							fileList = new ArrayList<GoodsFile>();
+//							for (String str : model.getPicPathList()) {
+//								goodsFile = new GoodsFile();
+//								goodsFile.setGoodsId(goodsId);
+//								goodsFile.setPath(str);
+//								goodsFile.setOpt("batch");
+//								fileList.add(goodsFile);
+//							}
+//							goodsItemMapper.insertFiles(fileList);
+//						}
+//					}
+//				} else {
+//					sb.append(model.getItemCode() + ",");
+//				}
+				
+				entity = new GoodsEntity();
+				entity.setGoodsId(model.getItemCode());
+				entity.setDetailPath(model.getGoodsDetailPath());
+				goodsBackMapper.updateDetailPath(entity);
+				if (model.getPicPathList() != null && model.getPicPathList().size() > 0) {
+					fileList = new ArrayList<GoodsFile>();
+					for (String str : model.getPicPathList()) {
+						goodsFile = new GoodsFile();
+						goodsFile.setGoodsId(model.getItemCode());
+						goodsFile.setPath(str);
+						goodsFile.setOpt("batch");
+						fileList.add(goodsFile);
 					}
-				} else {
-					sb.append(model.getItemCode() + ",");
+					goodsItemMapper.insertFiles(fileList);
 				}
 			}
-			if (sb.length() > 0) {
-				sb.append("没有找到以上商家编码商品,请核对后重新上传以上商品");
-			}
+//			if (sb.length() > 0) {
+//				sb.append("没有找到以上商家编码商品,请核对后重新上传以上商品");
+//			}
 		}
 		return sb.toString();
 	}

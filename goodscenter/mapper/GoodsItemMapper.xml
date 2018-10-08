@@ -459,6 +459,7 @@
 		<foreach collection="list" item="item"  index="index" separator=",">
 		(#{item.goodsId},#{item.path},0,0,now(),now(),#{item.opt})
 		</foreach>
+		ON DUPLICATE KEY UPDATE update_time = now()
 	</insert>
 	
 	<delete id="delete" parameterType="Object">

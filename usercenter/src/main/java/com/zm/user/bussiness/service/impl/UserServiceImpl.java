@@ -39,6 +39,7 @@ import com.zm.user.utils.ConvertUtil;
 import com.zm.user.utils.EmojiFilter;
 import com.zm.user.utils.EncryptionUtil;
 import com.zm.user.utils.JSONUtil;
+import com.zm.user.utils.ParamReplaceUtil;
 import com.zm.user.utils.RegularUtil;
 import com.zm.user.wx.ApiResult;
 
@@ -72,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
 	@Resource
 	RedisTemplate<String, String> template;// 反序列化用的是stringSerializer，后期代码都采用该方法
-	
+
 	@Resource
 	WelfareMapper welfareMapper;
 
@@ -138,7 +139,7 @@ public class UserServiceImpl implements UserService {
 
 			info.setId(userId);
 			userId = checkInviterCode(info);
-			
+
 			return userId;
 		}
 
@@ -168,16 +169,16 @@ public class UserServiceImpl implements UserService {
 			info.getAddress().setUserId(info.getId());
 			saveAddress(info.getAddress());
 		}
-		
+
 		info.setId(checkInviterCode(info));
 
 		return info.getId();
 	}
-	
+
 	private Integer checkInviterCode(UserInfo info) {
-		//校验邀请码是否正确，不正确时将user_id的值做负处理
+		// 校验邀请码是否正确，不正确时将user_id的值做负处理
 		if (info.getInvitationCode() != null && !"".equals(info.getInvitationCode())) {
-			Map<String,Object> param = new HashMap<String,Object>();
+			Map<String, Object> param = new HashMap<String, Object>();
 			param.put("gradeId", info.getShopId());
 			param.put("invitationCode", info.getInvitationCode());
 			param.put("regChkStatus", 1);
@@ -404,6 +405,12 @@ public class UserServiceImpl implements UserService {
 		}
 		userMapper.updatePersonInChargeId(grade);
 
+		// 将图片地址内的临时路径替换成gradeid
+		ParamReplaceUtil pru = new ParamReplaceUtil(grade);
+		String tmpPicPath = grade.getPicPath1();
+		String oldStr = tmpPicPath.substring(tmpPicPath.indexOf("tmp"),tmpPicPath.indexOf("/", tmpPicPath.indexOf("tmp")));
+		pru.paramReplace("picPath", oldStr, grade.getId()+"");
+		
 		// 添加注册信息存储
 		userMapper.saveGradeData(grade);
 
@@ -449,63 +456,64 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResultModel userBindInviterCode(UserInfo info) {
-		//前端要求收到请求后返回的结果为true，校验结果放在obj字段，错误信息放在errorMsg
+		// 前端要求收到请求后返回的结果为true，校验结果放在obj字段，错误信息放在errorMsg
 		ResultModel result = new ResultModel();
 		result.setSuccess(true);
-		
-//		info.setId(checkInviterCode(info));
-//		if (info.getId() < 0) {
-//			result.setObj(false);
-//			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
-//		} else {
-//			Map<String,Object> param = new HashMap<String,Object>();
-//			param.put("gradeId", info.getShopId());
-//			param.put("invitationCode", info.getInvitationCode());
-//			param.put("regChkStatus", 1);
-//			List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
-//			if (inviterList == null || inviterList.size() <= 0) {
-//				result.setObj(false);
-//				result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
-//				return result;
-//			}
-//			
-//			InviterEntity inviter = null;
-//			List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
-//			for (InviterEntity ie: inviterList) {
-//				if (ie.getPhone().equals(info.getPhone())) {
-//					ie.setUserCenterId(info.getId());
-//					ie.setStatus(3);
-//					inviter = ie;
-//					break;
-//				}
-//			}
-//			if (inviter == null) {
-//				inviter = inviterList.get(0);
-//				inviter.setUserCenterId(info.getId());
-//				inviter.setStatus(3);
-//			}
-//			updInviterList.add(inviter);
-//			welfareMapper.updateInviterInfo(updInviterList);
-//			result.setObj(true);
-//		}
-		
-		Map<String,Object> param = new HashMap<String,Object>();
+
+		// info.setId(checkInviterCode(info));
+		// if (info.getId() < 0) {
+		// result.setObj(false);
+		// result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+		// } else {
+		// Map<String,Object> param = new HashMap<String,Object>();
+		// param.put("gradeId", info.getShopId());
+		// param.put("invitationCode", info.getInvitationCode());
+		// param.put("regChkStatus", 1);
+		// List<InviterEntity> inviterList =
+		// welfareMapper.selectInviterListByParam(param);
+		// if (inviterList == null || inviterList.size() <= 0) {
+		// result.setObj(false);
+		// result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
+		// return result;
+		// }
+		//
+		// InviterEntity inviter = null;
+		// List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
+		// for (InviterEntity ie: inviterList) {
+		// if (ie.getPhone().equals(info.getPhone())) {
+		// ie.setUserCenterId(info.getId());
+		// ie.setStatus(3);
+		// inviter = ie;
+		// break;
+		// }
+		// }
+		// if (inviter == null) {
+		// inviter = inviterList.get(0);
+		// inviter.setUserCenterId(info.getId());
+		// inviter.setStatus(3);
+		// }
+		// updInviterList.add(inviter);
+		// welfareMapper.updateInviterInfo(updInviterList);
+		// result.setObj(true);
+		// }
+
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("gradeId", info.getShopId());
 		param.put("invitationCode", info.getInvitationCode());
-//		param.put("regChkStatus", 1);
+		// param.put("regChkStatus", 1);
 		List<InviterEntity> inviterList = welfareMapper.selectInviterListByParam(param);
 		if (inviterList == null || inviterList.size() <= 0) {
 			result.setObj(false);
 			result.setErrorMsg("邀请码校验失败，请确认邀请码是否输入正确！");
 			return result;
 		}
-		
+
 		InviterEntity inviter = null;
 		List<InviterEntity> updInviterList = new ArrayList<InviterEntity>();
-		for (InviterEntity ie: inviterList) {
+		for (InviterEntity ie : inviterList) {
 			if (ie.getStatus() == 3) {
 				result.setObj(false);
-				result.setErrorMsg("当前邀请码已被绑定，绑定的手机号为："+ie.getBindPhone());
+				result.setErrorMsg("当前邀请码已被绑定，绑定的手机号为：" + ie.getBindPhone());
 				return result;
 			} else if (ie.getStatus() == 4) {
 				result.setObj(false);
@@ -532,10 +540,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResultModel userCheckInviterInfo(UserInfo info) {
-		//前端要求收到请求后返回的结果为true，校验结果放在obj字段，错误信息放在errorMsg
+		// 前端要求收到请求后返回的结果为true，校验结果放在obj字段，错误信息放在errorMsg
 		ResultModel result = new ResultModel();
-		
-		Map<String,Object> param = new HashMap<String,Object>();
+
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("gradeId", info.getShopId());
 		param.put("userCenterId", info.getId());
 		param.put("inviterChkStatus", 1);
@@ -547,7 +555,7 @@ public class UserServiceImpl implements UserService {
 			result.setErrorMsg("当前账号还不是VIP用户，请先升级！");
 		}
 		result.setSuccess(true);
-		
+
 		return result;
 	}
 

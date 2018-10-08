@@ -507,11 +507,13 @@ public class UserController {
 	public ResultModel saveGrade(@PathVariable("version") Double version, @RequestBody Grade grade) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-
-			return userService.saveGrade(grade);
-
+			try {
+				return userService.saveGrade(grade);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
 		}
-
 		return new ResultModel(false, "版本错误");
 	}
 
