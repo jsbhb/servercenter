@@ -180,7 +180,8 @@ public class SEOServiceImpl implements SEOService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	private SEODetail convertToSEODetail(PagePO pagePo) {
+	@Override
+	public SEODetail convertToSEODetail(PagePO pagePo) {
 		List<PagePO> pageList = new ArrayList<PagePO>();
 		pageList.add(pagePo);
 		SEODetail seoDetail = new SEODetail(null, pagePo.getsEOModel(), null, null,
@@ -206,7 +207,8 @@ public class SEOServiceImpl implements SEOService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	private PagePO retrievePageData(Integer id) {
+	@Override
+	public PagePO retrievePageData(Integer id) {
 		PagePO page = seoMapper.getPageById(id);
 		page.setsEOModel(seoMapper.getPageSEO(id));
 		return page;
