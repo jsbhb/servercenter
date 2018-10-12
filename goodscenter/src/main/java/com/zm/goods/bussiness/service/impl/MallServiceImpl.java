@@ -25,6 +25,7 @@ import com.zm.goods.bussiness.service.MallService;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
+import com.zm.goods.utils.ParamReplaceUtil;
 
 /**
  * ClassName: MallServiceImpl <br/>
@@ -55,12 +56,18 @@ public class MallServiceImpl implements MallService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void saveDict(PopularizeDict entity) {
 		entity.getLayout().setCenterId(entity.getCenterId());
 		mallMapper.insertLayout(entity.getLayout());
 		entity.setLayoutId(entity.getLayout().getId());
 		mallMapper.insertDict(entity);
+		// 将图片地址内的临时路径替换成dictid
+		String tmpPicPath = entity.getPicPath1();
+		ParamReplaceUtil pru = new ParamReplaceUtil(entity);
+		String oldStr = tmpPicPath.substring(tmpPicPath.indexOf("tmp"),tmpPicPath.indexOf("/", tmpPicPath.indexOf("tmp")));
+		pru.paramReplace("picPath", oldStr, entity.getId()+"");
+		mallMapper.updateDict(entity);
 	}
 
 	@Override
@@ -85,7 +92,7 @@ public class MallServiceImpl implements MallService {
 	}
 
 	@Override
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void initData(PopularizeDict entity) {
 		mallMapper.insertLayout(entity.getLayout());
 		entity.setLayoutId(entity.getLayout().getId());
@@ -98,21 +105,21 @@ public class MallServiceImpl implements MallService {
 				data.setDictId(entity.getId());
 				dataList.add(data);
 			}
-			Map<String,Object> map = new HashMap<String,Object>();
-			map.put("centerId",entity.getCenterId());
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("centerId", entity.getCenterId());
 			map.put("list", dataList);
 			mallMapper.insertDataBatch(map);
 		}
-		
-		if("module_00003".equals(entity.getLayout().getCode())){
+
+		if ("module_00003".equals(entity.getLayout().getCode())) {
 			List<DictData> dataList = new ArrayList<DictData>();
 			for (int i = 0; i < BANNER_NUM; i++) {
 				DictData data = new DictData();
 				data.setDictId(entity.getId());
 				dataList.add(data);
 			}
-			Map<String,Object> map = new HashMap<String,Object>();
-			map.put("centerId",entity.getCenterId());
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("centerId", entity.getCenterId());
 			map.put("list", dataList);
 			mallMapper.insertDataBatch(map);
 		}
@@ -122,7 +129,7 @@ public class MallServiceImpl implements MallService {
 	public void updateData(DictData entity) {
 		mallMapper.updateData(entity);
 	}
-	
+
 	@Override
 	public void updateDict(PopularizeDict entity) {
 		mallMapper.updateDict(entity);
