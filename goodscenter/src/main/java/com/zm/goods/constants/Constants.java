@@ -4,18 +4,14 @@ public class Constants {
 
 	public static final Double FIRST_VERSION = 1.0;
 	
-	public static final Integer BIG_TRADE = 0;//大贸
-	
-	public static final Integer CROSS_BORDER = 1;//跨境
-	
-	public static final Integer ACTIVE_AREA = 1;//活动范围：全场
-	
-	public static final Integer ACTIVE_MODEL = 1;//活动模块
-	
-	//*********************活动状态************************
-	public static final Integer ACTIVE_START = 1;
-	
-	public static final Integer ACTIVE_UNSTART = 0;
+//	public static final Integer ACTIVE_AREA = 1;//活动范围：全场
+//	
+//	public static final Integer ACTIVE_MODEL = 1;//活动模块
+//	
+//	//*********************活动状态************************
+//	public static final Integer ACTIVE_START = 1;
+//	
+//	public static final Integer ACTIVE_UNSTART = 0;
 	
 	//********************LUCENE*************************
 	public static final String TOTAL = "total";
@@ -45,9 +41,6 @@ public class Constants {
 	
 	//*********************包邮包税redis前缀***************************
 	public static final String POST_TAX = "post_tax:";
-	
-	//*********************商品缓存***********************************
-	public static final String GOODS_CACHE = "goodscache:";
 	
 	//*******************eshopgoodsoperationtype**********************
 	public static final Integer OPERATION_TYPE_PURCHASE_INSTOCK = 101;

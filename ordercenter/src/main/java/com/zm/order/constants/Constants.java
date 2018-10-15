@@ -103,9 +103,6 @@ public class Constants {
 	// **********************销售额当天统计前缀***********************
 	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";
 	
-	public static final String GRADEBO_INFO = "gradeBO:";//每个ID的gradeBO信息
-	
-	
 	//*********************包邮包税redis前缀***************************
 	public static final String POST_TAX = "post_tax:";
 	

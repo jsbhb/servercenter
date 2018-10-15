@@ -36,7 +36,6 @@ import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
-import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.Tax;
@@ -61,9 +60,9 @@ import com.zm.goods.utils.lucene.LuceneFactory;
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class GoodsServiceImpl implements GoodsService {
 
-	private static final Integer PICTURE_TYPE = 0;
+	private final Integer PICTURE_TYPE = 0;
 
-	private static final Integer COOK_BOOK_TYPE = 1;
+	private final Integer COOK_BOOK_TYPE = 1;
 
 	@Resource
 	GoodsMapper goodsMapper;
@@ -419,30 +418,30 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	private void packageData(Map<String, Object> param, List<PageModule> result, Layout temp) {
-		param.put("layoutId", temp.getId());
-		if (Constants.ACTIVE_MODEL.equals(temp.getType())) {
-			List<Activity> activityList = goodsMapper.listActivityByLayoutId(param);
-			if (activityList == null) {
-				return;
-			}
-			for (Activity activity : activityList) {
-				if (Constants.ACTIVE_START.equals(activity.getStatus())
-						|| Constants.ACTIVE_UNSTART.equals(activity.getStatus())) {
-					param.put("activeId", activity.getId());
-					activity.setCode(temp.getCode());
-					result.add(new PageModule(activity, goodsMapper.listActiveData(param)));
-					break;
-				}
-			}
-		} else {
-			PopularizeDict dict = goodsMapper.getDictByLayoutId(param);
-			if (dict == null) {
-				return;
-			}
-			param.put("dictId", dict.getId());
-			dict.setCode(temp.getCode());
-			result.add(new PageModule(dict, goodsMapper.listDictData(param)));
-		}
+//		param.put("layoutId", temp.getId());
+//		if (Constants.ACTIVE_MODEL.equals(temp.getType())) {
+//			List<Activity> activityList = goodsMapper.listActivityByLayoutId(param);
+//			if (activityList == null) {
+//				return;
+//			}
+//			for (Activity activity : activityList) {
+//				if (Constants.ACTIVE_START.equals(activity.getStatus())
+//						|| Constants.ACTIVE_UNSTART.equals(activity.getStatus())) {
+//					param.put("activeId", activity.getId());
+//					activity.setCode(temp.getCode());
+//					result.add(new PageModule(activity, goodsMapper.listActiveData(param)));
+//					break;
+//				}
+//			}
+//		} else {
+//			PopularizeDict dict = goodsMapper.getDictByLayoutId(param);
+//			if (dict == null) {
+//				return;
+//			}
+//			param.put("dictId", dict.getId());
+//			dict.setCode(temp.getCode());
+//			result.add(new PageModule(dict, goodsMapper.listDictData(param)));
+//		}
 	}
 
 	@Override

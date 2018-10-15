@@ -207,31 +207,31 @@ public class GoodsController {
 		return result;
 	}
 
-	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
-	@ApiOperation(value = "获取活动接口", response = ResultModel.class)
-	@ApiImplicitParams({
-			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-			@ApiImplicitParam(paramType = "query", name = "typeStatus", dataType = "Integer", required = true, value = "活动范围，1全场，0特定区域"),
-			@ApiImplicitParam(paramType = "query", name = "type", dataType = "Integer", required = false, value = "活动类型：0：限时抢购；1：满减，2满打折"),
-			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
-	public ResultModel getActivity(@PathVariable("version") Double version,
-			@RequestParam(value = "type", required = false) Integer type,
-			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("typeStatus", typeStatus);
-			if (!Constants.ACTIVE_AREA.equals(typeStatus)) {
-				param.put("type", type);
-			}
-			param.put("centerId", "_" + centerId);
-
-			return new ResultModel(true, goodsService.getActivity(param));
-		}
-
-		return new ResultModel(false, "版本错误");
-
-	}
+//	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
+//	@ApiOperation(value = "获取活动接口", response = ResultModel.class)
+//	@ApiImplicitParams({
+//			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
+//			@ApiImplicitParam(paramType = "query", name = "typeStatus", dataType = "Integer", required = true, value = "活动范围，1全场，0特定区域"),
+//			@ApiImplicitParam(paramType = "query", name = "type", dataType = "Integer", required = false, value = "活动类型：0：限时抢购；1：满减，2满打折"),
+//			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
+//	public ResultModel getActivity(@PathVariable("version") Double version,
+//			@RequestParam(value = "type", required = false) Integer type,
+//			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId) {
+//
+//		if (Constants.FIRST_VERSION.equals(version)) {
+//			Map<String, Object> param = new HashMap<String, Object>();
+//			param.put("typeStatus", typeStatus);
+//			if (!Constants.ACTIVE_AREA.equals(typeStatus)) {
+//				param.put("type", type);
+//			}
+//			param.put("centerId", "_" + centerId);
+//
+//			return new ResultModel(true, goodsService.getActivity(param));
+//		}
+//
+//		return new ResultModel(false, "版本错误");
+//
+//	}
 
 	@RequestMapping(value = "auth/{version}/goods/modular/{centerId}/{page}/{pageType}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取模块布局接口", response = ResultModel.class)
