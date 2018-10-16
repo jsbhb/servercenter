@@ -6,6 +6,7 @@ public class AuditModel {
 	private boolean pass;
 	private String payNo;
 	private String remark;
+	private String operatorName;
 	public Integer getId() {
 		return id;
 	}
@@ -30,5 +31,10 @@ public class AuditModel {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
-	
+	public String getOperatorName() {
+		return operatorName;
+	}
+	public void setOperatorName(String operatorName) {
+		this.operatorName = operatorName;
+	}
 }
