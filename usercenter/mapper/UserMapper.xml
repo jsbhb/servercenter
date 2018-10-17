@@ -54,6 +54,7 @@
 		<result column="last_login_time" property="lastLoginTime"
 			jdbcType="VARCHAR" />
 		<result column="ipcity" property="ipCity" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<association property="userDetail" javaType="com.zm.user.pojo.UserDetail">
 			<id column="detail_id" property="id" jdbcType="INTEGER" />
 			<result column="duserId" property="userId" jdbcType="INTEGER" />
@@ -412,6 +413,24 @@
 	
 	<select id="getAllCustomer" resultMap="UserDetail">
 		select * from user_detail
+	</select>
+	
+	<select id="getAllUserInfoForShopByPageShow" parameterType="Object" resultMap="userInfo">
+		select u.id,u.phone,u.grade_id,
+		ifnull(ud.name,'') name,ifnull(ud.nick_name,'') nick_name,
+		ifnull(ud.sex,0) sex,ud.create_time 
+		from user u 
+		left join user_detail ud on u.id = ud.user_id
+		where u.grade_id = #{shopId}
+	</select>
+	
+	<select id="getAllUserInfoForShopByDownload" parameterType="Object" resultMap="userInfo">
+		select u.id,u.phone,u.grade_id,
+		ifnull(ud.name,'') name,ifnull(ud.nick_name,'') nick_name,
+		ifnull(ud.sex,0) sex,ud.create_time 
+		from user u 
+		left join user_detail ud on u.id = ud.user_id
+		where u.grade_id = #{shopId}
 	</select>
 
 </mapper>

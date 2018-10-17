@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
 import com.zm.user.bussiness.service.GradeService;
+import com.zm.user.bussiness.service.UserService;
 import com.zm.user.common.Pagination;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
@@ -26,6 +27,7 @@ import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ShopEntity;
+import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.po.GradeTypePO;
 import com.zm.user.pojo.po.RebateFormula;
 
@@ -43,6 +45,9 @@ public class GradeController {
 
 	@Resource
 	GradeService gradeService;
+	
+	@Resource
+	UserService userService;
 
 	@RequestMapping(value = "{version}/grade/queryForPage", method = RequestMethod.POST)
 	public ResultModel queryForPage(HttpServletRequest request, @PathVariable("version") Double version,
@@ -117,6 +122,19 @@ public class GradeController {
 			}
 		}
 
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/shop/userInfo/query/{needPaging}", method = RequestMethod.POST)
+	public ResultModel queryUserInfoByShopId(@PathVariable("version") Double version,
+			@PathVariable("needPaging") boolean needPaging, @RequestBody UserInfo entity) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return userService.getAllUserInfoForShopByParam(needPaging, entity);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
 		return new ResultModel(false, "版本错误");
 	}
 

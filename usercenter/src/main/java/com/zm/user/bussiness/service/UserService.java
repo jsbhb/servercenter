@@ -206,4 +206,6 @@ public interface UserService {
 	ResultModel userBindInviterCode(UserInfo info);
 
 	ResultModel userCheckInviterInfo(UserInfo info);
+	
+	ResultModel getAllUserInfoForShopByParam(boolean needPaging, UserInfo entity);
 }

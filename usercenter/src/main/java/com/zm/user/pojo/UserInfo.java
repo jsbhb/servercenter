@@ -1,15 +1,16 @@
 package com.zm.user.pojo;
 
+import com.zm.user.common.Pagination;
+
 /**
  * ClassName: UserInfo <br/>
- * Function: TODO ADD FUNCTION. <br/>
  * date: Aug 16, 2017 2:22:47 PM <br/>
  * 
  * @author wqy
  * @version
  * @since JDK 1.7
  */
-public class UserInfo {
+public class UserInfo extends Pagination {
 
 	private Integer id;
 
