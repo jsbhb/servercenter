@@ -823,7 +823,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void confirmByTimeTask() {
-		String time = DateUtils.getTime(Calendar.DATE, -7, "yyyy-MM-dd HH:mm:ss");
+		String time = DateUtils.getTime(Calendar.DATE, -15, "yyyy-MM-dd HH:mm:ss");
 		List<Order4Confirm> list = orderMapper.listUnConfirmOrder(time);
 		Map<String, Object> param = null;
 		for (Order4Confirm model : list) {
