@@ -3,6 +3,7 @@ package com.zm.user.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.github.pagehelper.Page;
 import com.zm.user.pojo.Address;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.ThirdLogin;
@@ -88,4 +89,8 @@ public interface UserMapper {
 	void saveGradeData(Grade grade);
 	
 	List<UserDetail> getAllCustomer();
+	
+	Page<UserInfo> getAllUserInfoForShopByPageShow(UserInfo info);
+	
+	List<UserInfo> getAllUserInfoForShopByDownload(UserInfo info);
 }

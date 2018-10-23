@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.dao.WelfareMapper;
 import com.zm.user.bussiness.service.UserService;
+import com.zm.user.common.Pagination;
 import com.zm.user.common.ResultModel;
 import com.zm.user.constants.Constants;
 import com.zm.user.feignclient.OrderFeignClient;
@@ -152,7 +155,7 @@ public class UserServiceImpl implements UserService {
 
 		if (info.getWechat() != null && !"".equals(info.getWechat())) {
 			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
-			packageUser(apiResult, info);
+			packageUser(apiResult, info, "wechat");
 			userMapper.saveWechat(new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
 		}
 
@@ -197,12 +200,20 @@ public class UserServiceImpl implements UserService {
 
 	}
 
-	private void packageUser(ApiResult apiResult, UserInfo info) {
+	private void packageUser(ApiResult apiResult, UserInfo info, String thirdName) {
 
 		UserDetail userDetail = new UserDetail();
 		boolean isNum = RegularUtil.isNumeric(apiResult.get("sex") + "");
 		if (isNum) {
-			userDetail.setSex(Integer.valueOf(apiResult.get("sex") + ""));
+			int waitConvertSex = Integer.valueOf(apiResult.get("sex") + "");
+			if ("wechat".equals(thirdName)) {
+				if (waitConvertSex == 1) {
+					waitConvertSex = 0;
+				} else {
+					waitConvertSex = 1;
+				}
+			}
+			userDetail.setSex(waitConvertSex);
 		} else {
 			userDetail.setSex(0);
 		}
@@ -557,6 +568,18 @@ public class UserServiceImpl implements UserService {
 		result.setSuccess(true);
 
 		return result;
+	}
+
+	@Override
+	public ResultModel getAllUserInfoForShopByParam(boolean needPaging, UserInfo entity) {
+		if (needPaging) {
+			PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+			Page<UserInfo> page = userMapper.getAllUserInfoForShopByPageShow(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		} else {
+			List<UserInfo> list = userMapper.getAllUserInfoForShopByDownload(entity);
+			return new ResultModel(true, list);
+		}
 	}
 
 }

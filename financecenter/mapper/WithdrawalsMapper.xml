@@ -21,8 +21,10 @@
 
 	<insert id="insertWithdrawals" parameterType="Object">
 		insert into withdrawals_detail
-		(grade_id,operator_type,start_money,out_money,card_no,card_name,card_bank,create_time)
-		value(#{operatorId},#{operatorType},#{startMoney},#{outMoney},#{cardNo},#{cardName},#{cardBank},now())
+		(grade_id,operator_type,start_money,out_money,card_no,
+		 card_name,card_bank,create_time,update_time,opt)
+		value(#{operatorId},#{operatorType},#{startMoney},#{outMoney},
+			  #{cardNo},#{cardName},#{cardBank},now(),now(),#{opt})
 	</insert>
 	
 	<update id="updatePassWithdrawals" parameterType="Object">
@@ -30,7 +32,8 @@
 		<set>
 			status = 2,
 			pay_no = #{payNo},
-			update_time = now()
+			update_time = now(),
+			opt = #{operatorName}
 		</set>
 		where id = #{id}
 	</update>
@@ -40,7 +43,8 @@
 		<set>
 			status = 3,
 			remark = #{remark},
-			update_time = now()
+			update_time = now(),
+			opt = #{operatorName}
 		</set>
 		where id = #{id}
 	</update>
