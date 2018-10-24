@@ -718,7 +718,7 @@
 		<if test="goodsId!=null and goodsId !=''">
 			and g.goods_id = #{goodsId} 
 		</if>
-		<if test="goodsEntity.type !=null and goodsEntity.type !=''">
+		<if test="goodsEntity.type !=null and goodsEntity.type !=-1">
 			and g.type = #{goodsEntity.type} 
 		</if>
 		order by g.goods_id desc
