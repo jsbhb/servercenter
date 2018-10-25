@@ -23,6 +23,7 @@
 		<result column="already_presented" property="alreadyPresented" jdbcType="NUMERIC"/>
 		<result column="shop_rebate_money" property="shopRebateMoney" jdbcType="NUMERIC"/>
 		<result column="stay_to_account" property="stayToAccount" jdbcType="NUMERIC"/>
+		<result column="already_check" property="alreadyCheck" jdbcType="NUMERIC"/>
 		<result column="refilling" property="refilling" jdbcType="NUMERIC"/>
 		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
 		<result column="remark" property="remark" jdbcType="VARCHAR"/>
@@ -34,7 +35,7 @@
 		(grade_id,can_be_presented,already_presented,stay_to_account,remark,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.gradeId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},now())
+			(#{item.gradeId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},#{item.alreadyCheck},now())
 		</foreach>
 <!-- 		ON DUPLICATE KEY UPDATE can_be_presented = values(can_be_presented),already_presented = values(already_presented), -->
 <!-- 		stay_to_account = values(stay_to_account),remark = values(remark),update_time = now() -->

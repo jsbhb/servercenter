@@ -108,7 +108,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			} else {
 				capitalPoolMapper.updateUnPassRechargeApply(audit);
 				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(),
-						"canBePresented", refilling.getMoney());
+						Constants.ALREADY_CHECK, refilling.getMoney());
 				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "refilling",
 						CalculationUtils.sub("0", refilling.getMoney() + ""));// 已反充金额增加
 
@@ -152,7 +152,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		double balance = 0;
 		String canBePresentedStr = hashOperations.get(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(),
-				"canBePresented");
+				Constants.ALREADY_CHECK);
 		balance = CalculationUtils.sub((canBePresentedStr == null ? "0" : canBePresentedStr),
 				refilling.getMoney() + "");
 		if (balance < 0) {
@@ -164,7 +164,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		capitalMoney = capitalMoney == null ? "0" : capitalMoney;
 		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
-		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
+		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), Constants.ALREADY_CHECK,
 				CalculationUtils.sub("0", refilling.getMoney() + ""));
 		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "refilling",
 				refilling.getMoney());// 已反充金额增加

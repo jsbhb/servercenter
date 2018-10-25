@@ -5,6 +5,7 @@ public class Rebate {
 	private Integer id;
 	private Integer gradeId;
 	private Double canBePresented;//可提现
+	private Double alreadyCheck;//已对账
 	private Double alreadyPresented;//已提现
 	private Double stayToAccount;//待到账
 	private Double refilling;//已反充
@@ -12,6 +13,12 @@ public class Rebate {
 	private String createTime;
 	private String updateTime;
 	private String opt;
+	public Double getAlreadyCheck() {
+		return alreadyCheck;
+	}
+	public void setAlreadyCheck(Double alreadyCheck) {
+		this.alreadyCheck = alreadyCheck;
+	}
 	public Integer getGradeId() {
 		return gradeId;
 	}

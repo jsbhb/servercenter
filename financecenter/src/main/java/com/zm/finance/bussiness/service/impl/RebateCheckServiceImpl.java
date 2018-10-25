@@ -16,6 +16,7 @@ import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.dao.WithdrawalsMapper;
 import com.zm.finance.bussiness.service.RebateCheckService;
 import com.zm.finance.constants.Constants;
+import com.zm.finance.log.LogUtil;
 import com.zm.finance.pojo.rebate.RebateComeIn;
 import com.zm.finance.pojo.rebate.RebateConsume;
 import com.zm.finance.pojo.rebate.RebateWithdrawals;
@@ -38,9 +39,6 @@ public class RebateCheckServiceImpl implements RebateCheckService {
 
 	@Resource
 	RedisTemplate<String, String> template;
-
-	private final String CAN_BE_PRESENTED = "canBePresented";
-	private final String ALREADY_CHECK = "alreadyCheck";
 
 	@Override
 	public void rebateCheck() {
@@ -80,18 +78,18 @@ public class RebateCheckServiceImpl implements RebateCheckService {
 					wtempMoney + "", ctempMoney + "");
 			String perfix = Constants.GRADE_ORDER_REBATE + comeIn.getGradeId();
 			double redisRebate = CalculationUtils.add(
-					hashOperations.get(perfix, CAN_BE_PRESENTED) == null ? "0"
-							: hashOperations.get(perfix, CAN_BE_PRESENTED),
-					hashOperations.get(perfix, ALREADY_CHECK) == null ? "0"
-							: hashOperations.get(perfix, ALREADY_CHECK));
+					hashOperations.get(perfix, Constants.CAN_BE_PRESENTED) == null ? "0"
+							: hashOperations.get(perfix, Constants.CAN_BE_PRESENTED),
+					hashOperations.get(perfix, Constants.ALREADY_CHECK) == null ? "0"
+							: hashOperations.get(perfix, Constants.ALREADY_CHECK));
 			if (CalculationUtils.round(2, rebate + "") == CalculationUtils.round(2, redisRebate + "")) {
-				hashOperations.put(perfix, ALREADY_CHECK, rebate + "");
-				hashOperations.put(perfix, CAN_BE_PRESENTED, "0");
+				hashOperations.put(perfix, Constants.ALREADY_CHECK, rebate + "");
+				hashOperations.put(perfix, Constants.CAN_BE_PRESENTED, "0");
 			} else {
 				sb.append("分级ID:" + comeIn.getGradeId() + ",对账返佣：" + rebate + ",redis内:" + redisRebate + " \r\n");
 			}
 		}
-
+		LogUtil.writeLog(sb.toString());
 		if (sb.length() > 0) {
 			FileUtil fileUtil = new FileUtil();
 			String filePath = fileUtil.writeToFile(sb.toString());

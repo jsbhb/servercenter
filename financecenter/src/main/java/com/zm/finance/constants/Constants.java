@@ -24,4 +24,10 @@ public class Constants {
 	// *********************PAYTYPE 0:收入，1：支出***************************
 	public static final Integer INCOME = 0;
 	public static final Integer EXPENDITURE = 1;
+	
+	
+	//**********************************************************************//
+	public static final String CAN_BE_PRESENTED = "canBePresented";//待对账
+	public static final String ALREADY_CHECK = "alreadyCheck";//已对账，可使用
+	public static final String ALREADY_PRESENTED = "alreadyPresented";//已提现
 }

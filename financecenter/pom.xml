@@ -117,7 +117,7 @@
 				</includes>
 			</resource>
 			<resource>
-				<directory>src/main/resources</directory>
+				<directory>resource</directory>
 				<targetPath>BOOT-INF/classes/</targetPath>
 				<includes>
 					<include>MailServer.properties</include>

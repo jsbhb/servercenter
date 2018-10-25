@@ -13,3 +13,6 @@ CREATE TABLE `zm_financial`.`rebate_order` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '返佣支付订单';
+
+
+alter table rebate add column already_check DECIMAL(12,2) default null comment '已对账的金额'

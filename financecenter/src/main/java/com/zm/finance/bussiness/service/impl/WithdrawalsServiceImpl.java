@@ -27,6 +27,7 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 
 	@Resource
 	RedisTemplate<String, Object> template;
+	
 
 	@Override
 	public ResultModel withdrawalsApply(Withdrawals withdrawals) {
@@ -38,15 +39,15 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 	private ResultModel calWithdrawals(Withdrawals withdrawals, HashOperations<String, String, String> hashOperations,
 			String perfix) {
 		double balance = 0;
-		String canBePresentedStr = hashOperations.get(perfix, "canBePresented");
+		String canBePresentedStr = hashOperations.get(perfix, Constants.ALREADY_CHECK);
 		canBePresentedStr = canBePresentedStr == null ? "0" : canBePresentedStr;
 		balance = CalculationUtils.sub(canBePresentedStr, withdrawals.getOutMoney() + "");
 		if (balance < 0) {
 			return new ResultModel(false, "提现金额超出可提现金额");
 		} else {
-			hashOperations.increment(perfix, "canBePresented",
+			hashOperations.increment(perfix, Constants.ALREADY_CHECK,
 					CalculationUtils.sub("0", withdrawals.getOutMoney() + ""));
-			hashOperations.increment(perfix, "alreadyPresented", withdrawals.getOutMoney());
+			hashOperations.increment(perfix, Constants.ALREADY_PRESENTED, withdrawals.getOutMoney());
 			withdrawals.setStartMoney(Double.valueOf(canBePresentedStr));
 			withdrawalsMapper.insertWithdrawals(withdrawals);
 			return new ResultModel(true, "提交成功");
@@ -55,8 +56,8 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 
 	private ResultModel backWithdrawals(Withdrawals withdrawals, HashOperations<String, String, String> hashOperations,
 			String perfix) {
-		hashOperations.increment(perfix, "alreadyPresented", CalculationUtils.sub("0", withdrawals.getOutMoney() + ""));
-		hashOperations.increment(perfix, "canBePresented", withdrawals.getOutMoney());
+		hashOperations.increment(perfix, Constants.ALREADY_PRESENTED, CalculationUtils.sub("0", withdrawals.getOutMoney() + ""));
+		hashOperations.increment(perfix, Constants.ALREADY_CHECK, withdrawals.getOutMoney());
 		return new ResultModel(true);
 	}
 

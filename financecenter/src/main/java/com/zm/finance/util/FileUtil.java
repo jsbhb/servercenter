@@ -8,7 +8,12 @@ import java.io.IOException;
 public class FileUtil {
 
 	public String writeToFile(String str) {
-		String fileName = DateUtils.getTimeString("yyyy-MM-dd") + "返佣对账错误信息";
+		String fileName = DateUtils.getTimeString("yyyy-MM-dd") + "返佣对账错误信息.txt";
+		
+		File dir = new File("/opt/server/financecenter/rebatecheck");
+		if(!dir.exists()){
+			dir.mkdirs();
+		}
 		String filePaht = "/opt/server/financecenter/rebatecheck/" + fileName;
 		File file = new File(filePaht);
 
