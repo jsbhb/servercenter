@@ -299,8 +299,8 @@ public class OrderComponentUtil {
 		payModel.setOrderId(orderId);
 		payModel.setTotalAmount(totalAmount + "");
 		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
-		if (detailStr.length() > 100) {// 支付宝描述过长会报错
-			detailStr = detailStr.substring(0, 100) + "...";
+		if (detailStr.length() > 60) {// 支付宝描述过长会报错
+			detailStr = detailStr.substring(0, 60) + "...";
 		}
 		payModel.setDetail(detailStr);
 
