@@ -83,4 +83,9 @@
 		where 1=1 and id = #{id}
 	</select>
 	
+	<select id="listRebateWithdrawals" parameterType="Object" resultType="com.zm.finance.pojo.rebate.RebateWithdrawals">
+		SELECT sum(out_money) as totalWithdrawals,grade_id as gradeId 
+		FROM zm_financial.withdrawals_detail where status in (1,2) group by grade_id;
+	</select>
+	
 </mapper>

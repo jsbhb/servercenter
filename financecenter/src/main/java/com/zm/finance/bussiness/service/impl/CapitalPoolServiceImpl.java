@@ -110,7 +110,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(),
 						"canBePresented", refilling.getMoney());
 				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "refilling",
-						CalculationUtils.sub(0, refilling.getMoney()));// 已反充金额增加
+						CalculationUtils.sub("0", refilling.getMoney() + ""));// 已反充金额增加
 
 			}
 		}
@@ -153,8 +153,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		double balance = 0;
 		String canBePresentedStr = hashOperations.get(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(),
 				"canBePresented");
-		balance = CalculationUtils.sub(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr),
-				refilling.getMoney());
+		balance = CalculationUtils.sub((canBePresentedStr == null ? "0" : canBePresentedStr),
+				refilling.getMoney() + "");
 		if (balance < 0) {
 			return new ResultModel(false, "反充金额超出可提现金额");
 		}
@@ -165,7 +165,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
 		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "canBePresented",
-				CalculationUtils.sub(0, refilling.getMoney()));
+				CalculationUtils.sub("0", refilling.getMoney() + ""));
 		hashOperations.increment(Constants.GRADE_ORDER_REBATE + refilling.getCenterId(), "refilling",
 				refilling.getMoney());// 已反充金额增加
 		return new ResultModel(true, "提交成功");
@@ -212,11 +212,11 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	@Override
 	public ResultModel liquidation(Integer centerId, Double money) {
-		Double liquidationMoney = CalculationUtils.sub(0, money);
+		Double liquidationMoney = CalculationUtils.sub("0", money + "");
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + centerId, "money");
 		double balance = 0;
-		balance = CalculationUtils.sub(Double.valueOf(capitalMoney == null ? "0" : capitalMoney), money);
+		balance = CalculationUtils.sub((capitalMoney == null ? "0" : capitalMoney), money + "");
 		if (balance < 0) {
 			return new ResultModel(false, "资金池不足");
 		}
@@ -245,7 +245,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		double init = 0.0;
 		List<Integer> warningIds = new ArrayList<Integer>();
 		for (CapitalPool pool : poolList) {
-			init = CalculationUtils.add(pool.getMoney(), init);
+			init = CalculationUtils.add(pool.getMoney() + "", init + "");
 			if (pool.getMoney() < WARNING_AMOUNT) {
 				warningIds.add(pool.getCenterId());
 			}
@@ -293,7 +293,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			if (!template.hasKey(key)) {
 				return new ResultModel(false, "没有该分级资金池");
 			}
-			Double liquidationMoney = CalculationUtils.sub(0, detail.getMoney());
+			Double liquidationMoney = CalculationUtils.sub("0", detail.getMoney() + "");
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
 			double balance = hashOperations.increment(key, "money", liquidationMoney);// 扣除资金池
 			if (balance < 0) {

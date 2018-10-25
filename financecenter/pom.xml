@@ -97,6 +97,14 @@
 			<artifactId>pagehelper</artifactId>
 			<version>3.2.3</version>
 		</dependency>
+		
+		<!-- mail -->
+		<!-- https://mvnrepository.com/artifact/javax.mail/mail -->
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		    <version>1.4.1</version>
+		</dependency>
 	</dependencies> 
 
 	<build>
@@ -106,6 +114,13 @@
 				<targetPath>BOOT-INF/classes/</targetPath>
 				<includes>
 					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>BOOT-INF/classes/</targetPath>
+				<includes>
+					<include>MailServer.properties</include>
 				</includes>
 			</resource>
 		</resources>

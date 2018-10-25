@@ -98,4 +98,9 @@
 		and create_time between #{startTime} and DATE_ADD(#{endTime},interval 1 day)
 	</select>
 	
+	<select id="listRebateComeIn" parameterType="Object" resultType="com.zm.finance.pojo.rebate.RebateComeIn">
+		SELECT sum(rebate_money) as totalRebate,grade_id as gradeId 
+		FROM zm_financial.rebate_detail where status = 1 group by grade_id;
+	</select>
+	
 </mapper>

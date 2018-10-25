@@ -40,11 +40,12 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 		double balance = 0;
 		String canBePresentedStr = hashOperations.get(perfix, "canBePresented");
 		canBePresentedStr = canBePresentedStr == null ? "0" : canBePresentedStr;
-		balance = CalculationUtils.sub(Double.valueOf(canBePresentedStr), withdrawals.getOutMoney());
+		balance = CalculationUtils.sub(canBePresentedStr, withdrawals.getOutMoney() + "");
 		if (balance < 0) {
 			return new ResultModel(false, "提现金额超出可提现金额");
 		} else {
-			hashOperations.increment(perfix, "canBePresented", CalculationUtils.sub(0, withdrawals.getOutMoney()));
+			hashOperations.increment(perfix, "canBePresented",
+					CalculationUtils.sub("0", withdrawals.getOutMoney() + ""));
 			hashOperations.increment(perfix, "alreadyPresented", withdrawals.getOutMoney());
 			withdrawals.setStartMoney(Double.valueOf(canBePresentedStr));
 			withdrawalsMapper.insertWithdrawals(withdrawals);
@@ -54,7 +55,7 @@ public class WithdrawalsServiceImpl implements WithdrawalsService {
 
 	private ResultModel backWithdrawals(Withdrawals withdrawals, HashOperations<String, String, String> hashOperations,
 			String perfix) {
-		hashOperations.increment(perfix, "alreadyPresented", CalculationUtils.sub(0, withdrawals.getOutMoney()));
+		hashOperations.increment(perfix, "alreadyPresented", CalculationUtils.sub("0", withdrawals.getOutMoney() + ""));
 		hashOperations.increment(perfix, "canBePresented", withdrawals.getOutMoney());
 		return new ResultModel(true);
 	}

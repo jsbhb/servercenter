@@ -7,6 +7,7 @@ import com.github.pagehelper.Page;
 import com.zm.finance.pojo.RebateDownload;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.rebate.Rebate;
+import com.zm.finance.pojo.rebate.RebateComeIn;
 import com.zm.finance.pojo.rebate.RebateDetail;
 
 public interface RebateMapper {
@@ -22,5 +23,7 @@ public interface RebateMapper {
 	void updateRebateDetail(Map<String,Object> param);
 
 	List<RebateDownload> listRebateDetailForDownload(Map<String,Object> param);
+	
+	List<RebateComeIn> listRebateComeIn();
 	
 }

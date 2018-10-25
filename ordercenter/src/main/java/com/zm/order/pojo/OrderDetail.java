@@ -63,12 +63,22 @@ public class OrderDetail {
 	private String receiveZipCode;
 
 	private String remark;
-
+	
+	private Double rebateFee;
+	
 	public boolean validate() {
 		return (payType != null && payment != null && postFee != null && taxFee != null
 				&& tariffTax != null && incrementTax != null && exciseTax != null && disAmount != null
 				&& receiveName != null && receivePhone != null && receiveProvince != null && receiveCity != null
 				&& receiveArea != null && receiveAddress != null);
+	}
+
+	public Double getRebateFee() {
+		return rebateFee;
+	}
+
+	public void setRebateFee(Double rebateFee) {
+		this.rebateFee = rebateFee;
 	}
 
 	public Double getDisAmount() {

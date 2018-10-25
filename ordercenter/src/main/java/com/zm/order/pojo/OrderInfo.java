@@ -74,6 +74,8 @@ public class OrderInfo extends Pagination{
 	
 	private Integer isEshopIn;//Eshop是否入库，0：未入库；1入库
 	
+	private Integer purchasingOrder;//采购订单0：否，1是
+	
 	private String deliveryTime;
 
 	public boolean check() {
@@ -82,6 +84,14 @@ public class OrderInfo extends Pagination{
 			return false;
 		}
 		return true;
+	}
+
+	public Integer getPurchasingOrder() {
+		return purchasingOrder;
+	}
+
+	public void setPurchasingOrder(Integer purchasingOrder) {
+		this.purchasingOrder = purchasingOrder;
 	}
 
 	public Integer getManual() {
