@@ -33,6 +33,7 @@ public class GoodsExtensionEntity extends Pagination {
 	private String createTime;// 创建时间
 	private String updateTime;// 更新时间
 	private String opt;// 操作人
+	private String status;// 操作人
 	
 	
 	public int getId() {
@@ -118,5 +119,11 @@ public class GoodsExtensionEntity extends Pagination {
 	}
 	public void setOpt(String opt) {
 		this.opt = opt;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

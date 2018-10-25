@@ -144,6 +144,7 @@
 			<result column="specs_template_id" property="templateId" jdbcType="INTEGER" />
 			<result column="origin" property="origin" jdbcType="VARCHAR" />
 			<result column="type" property="type" jdbcType="INTEGER" />
+			<result column="detail_path" property="detailPath" jdbcType="VARCHAR" />
 		</association>
 	</resultMap>
 	
@@ -162,6 +163,7 @@
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
+		<result column="status" property="status"/>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsPriceRatioEntity" id="goodsPriceRatioBase">
@@ -206,7 +208,7 @@
 	
 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,g.id g_id,g.origin,g.specs_template_id,g.type,
-		p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
+		g.detail_path,p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,b.id as base_id,b.brand_id,
 		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode b_encode,b.first_category,
 		b.second_category,b.third_category,b.center_id
@@ -708,7 +710,7 @@
 	
 	<select id="selectGoodsExtensionForPageDownload" parameterType="Object" resultMap="goodsExtension">
 		select gel.id,g.goods_id,gel.goods_path,ifnull(gel.goods_name,g.goods_name) as goods_name,
-		gel.brand,gel.specs,gel.origin,gel.custom,gel.shelf_life,gel.reason,gel.remark
+		gel.brand,gel.specs,gel.origin,gel.custom,gel.shelf_life,gel.reason,gel.remark,g.status
 		from goods g 
 		left join goods_extension_label gel on g.goods_id = gel.goods_id
 		where 1=1 and g.is_del = 0
@@ -720,6 +722,9 @@
 		</if>
 		<if test="goodsEntity.type !=null and goodsEntity.type !=-1">
 			and g.type = #{goodsEntity.type} 
+		</if>
+		<if test="goodsEntity.status!=null and goodsEntity.status !=''">
+			and g.status = #{goodsEntity.status} 
 		</if>
 		order by g.goods_id desc
 	</select>
