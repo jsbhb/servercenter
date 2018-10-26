@@ -8,6 +8,7 @@ import com.zm.finance.pojo.RebateDownload;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.rebate.Rebate;
+import com.zm.finance.pojo.rebate.Rebate4Order;
 import com.zm.finance.pojo.rebate.RebateDetail;
 
 public interface RebateService {
@@ -37,5 +38,7 @@ public interface RebateService {
 	void redisToolList(String key, String value);
 
 	List<RebateDownload> listRebateDetailForDownload(Map<String,Object> param);
+
+	ResultModel saveRebate4order(Rebate4Order rebate4Order);
 
 }

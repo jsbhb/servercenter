@@ -20,6 +20,7 @@ import com.zm.finance.pojo.RebateDownload;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.rebate.Rebate;
+import com.zm.finance.pojo.rebate.Rebate4Order;
 import com.zm.finance.pojo.rebate.RebateDetail;
 
 @RestController
@@ -111,6 +112,16 @@ public class RebateController {
 			return rebateService.listRebateDetailForDownload(param);
 		}
 		return null;
+	}
+	
+	@RequestMapping(value = "{version}/finance/rebate4order", method = RequestMethod.POST)
+	public ResultModel rebate4order(@PathVariable("version") Double version,
+			@RequestBody Rebate4Order rebate4Order) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return rebateService.saveRebate4order(rebate4Order);
+		}
+		return new ResultModel(false, "版本号错误");
 	}
 
 }

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.finance.bussiness.dao.RebateConsumeMapper;
 import com.zm.finance.bussiness.dao.RebateMapper;
 import com.zm.finance.bussiness.service.RebateService;
 import com.zm.finance.constants.Constants;
@@ -24,6 +25,7 @@ import com.zm.finance.pojo.RebateDownload;
 import com.zm.finance.pojo.RebateSearchModel;
 import com.zm.finance.pojo.ResultModel;
 import com.zm.finance.pojo.rebate.Rebate;
+import com.zm.finance.pojo.rebate.Rebate4Order;
 import com.zm.finance.pojo.rebate.RebateDetail;
 import com.zm.finance.util.JSONUtil;
 
@@ -36,6 +38,9 @@ public class RebateServiceImpl implements RebateService {
 
 	@Resource
 	RebateMapper rebateMapper;
+	
+	@Resource
+	RebateConsumeMapper rebateConsumeMapper;
 
 	@Override
 	public void updateRebateTask() {
@@ -138,6 +143,12 @@ public class RebateServiceImpl implements RebateService {
 	@Override
 	public List<RebateDownload> listRebateDetailForDownload(Map<String,Object> param) {
 		return rebateMapper.listRebateDetailForDownload(param);
+	}
+
+	@Override
+	public ResultModel saveRebate4order(Rebate4Order rebate4Order) {
+		rebateConsumeMapper.insertRebateConsume(rebate4Order);
+		return new ResultModel(true);
 	}
 
 }
