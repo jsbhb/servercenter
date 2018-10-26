@@ -13,4 +13,7 @@ public interface FinanceFeignClient {
 	
 	@RequestMapping(value = "{version}/finance/rebate", method = RequestMethod.POST)
 	public void updateRebateTask(@PathVariable("version") Double version);
+	
+	@RequestMapping(value="{version}/rebate/check", method = RequestMethod.POST)
+	public void rebateCheck(@PathVariable("version") Double version);
 }
