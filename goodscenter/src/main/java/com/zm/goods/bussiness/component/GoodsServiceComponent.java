@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.zm.goods.constants.Constants;
+import com.zm.goods.exception.OriginalPriceUnEqual;
 import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsFile;
@@ -49,10 +50,11 @@ public class GoodsServiceComponent {
 	 *            分级ID
 	 * @return
 	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual 
 	 */
 	// 计算价格
 	public Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion,
-			int platformSource, int gradeId) throws WrongPlatformSource {
+			int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
 		Double totalAmount = 0.0;
 		getPriceInterval(specs, promotion);
 		boolean calculation = false;
@@ -238,9 +240,10 @@ public class GoodsServiceComponent {
 	 *            分级ID
 	 * @return
 	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual 
 	 */
 	public Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs, OrderBussinessModel model,
-			int platformSource, int gradeId) throws WrongPlatformSource {
+			int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
 		Double amount = getAmount(vip, specs, model, 10.0, platformSource, gradeId);
 		if (amount == null) {
 			result.setSuccess(false);
@@ -252,7 +255,8 @@ public class GoodsServiceComponent {
 	/**
 	 * @fun 获取规格列表中的最低价格
 	 * @param specsList
-	 * @param needToPriceInterval 判断需不需要进行价格区间的封装
+	 * @param needToPriceInterval
+	 *            判断需不需要进行价格区间的封装
 	 * @return
 	 */
 	public Map<String, Double> getMinPrice(List<GoodsSpecs> specsList, boolean needToPriceInterval) {
@@ -262,7 +266,7 @@ public class GoodsServiceComponent {
 			result.put("realPrice", 0.0);
 			return result;
 		}
-		if(!needToPriceInterval){
+		if (!needToPriceInterval) {
 			for (GoodsSpecs specs : specsList) {
 				getPriceInterval(specs, specs.getDiscount());
 			}
@@ -272,7 +276,7 @@ public class GoodsServiceComponent {
 		for (int i = 0; i < len; i++) {
 			if (i == 0) {
 				result.put("price", specsList.get(i).getMinPrice());
-				if(specsList.get(i).getWelfarePrice() > 0){
+				if (specsList.get(i).getWelfarePrice() > 0) {
 					result.put("realPrice", specsList.get(i).getWelfarePrice());
 				} else {
 					result.put("realPrice", specsList.get(i).getRealMinPrice());
@@ -281,7 +285,7 @@ public class GoodsServiceComponent {
 				if (specsList.get(i).getMinPrice() < result.get("price")) {
 					result.put("price", specsList.get(i).getMinPrice());
 				}
-				if(specsList.get(i).getWelfarePrice() > 0){
+				if (specsList.get(i).getWelfarePrice() > 0) {
 					if (specsList.get(i).getWelfarePrice() < result.get("realPrice")) {
 						result.put("realPrice", specsList.get(i).getWelfarePrice());
 					}
@@ -296,19 +300,41 @@ public class GoodsServiceComponent {
 	}
 
 	private Double calPrice(int platformSource, int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price)
-			throws WrongPlatformSource {
+			throws WrongPlatformSource, OriginalPriceUnEqual {
+		// 判断原价是否相等
+		if (!model.getItemPrice().equals(price.getPrice())) {
+			throw new OriginalPriceUnEqual("itemId = " + price.getItemId() + "原价匹配不正确");
+		}
 		switch (platformSource) {
 		case Constants.WELFARE_WEBSITE:
 			return getWelfareWebsitePrice(gradeId, vip, model, price);
+		case Constants.BACK_MANAGER_WEBSITE:
+			return getBackManagerWebsitePrice(gradeId, vip, model, price);
 		default:
 			return getDefaultPrice(vip, model, price);
 		}
 	}
 
-	private Double getDefaultPrice(boolean vip, OrderBussinessModel model, GoodsPrice price) {
-		return model.getQuantity() * (vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice());
+	//计算后台去掉本级返佣后的价格
+	private Double getBackManagerWebsitePrice(int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price) {
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + model.getItemId());
+		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
+		int gradeType = gradeBO.getGradeType();
+		// 获取该类型的返佣的比例
+		double proportion = Double
+				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
+		double amount = CalculationUtils.mul(model.getQuantity(),
+				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
+		amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, proportion));//扣除返佣后的价格
+		return amount;
 	}
-	
+
+	private Double getDefaultPrice(boolean vip, OrderBussinessModel model, GoodsPrice price) {
+		return CalculationUtils.mul(model.getQuantity(),
+				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
+	}
+
 	private final int GRADESTYLE_WELFARE_WEBSITE = 1;// 福利商城标志位
 
 	private Double getWelfareWebsitePrice(int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price)
@@ -344,7 +370,7 @@ public class GoodsServiceComponent {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
 		String json = hashOperations.get(Constants.GRADEBO_INFO, gradeId + "");
-		if(json == null || "".equals(json)){
+		if (json == null || "".equals(json)) {
 			throw new WrongPlatformSource("该分级已经不是福利网站类型");
 		}
 		GradeBO gradeBO = JSONUtil.parse(json, GradeBO.class);

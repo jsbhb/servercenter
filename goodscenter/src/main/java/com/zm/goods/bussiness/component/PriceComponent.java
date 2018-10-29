@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
+import com.zm.goods.exception.OriginalPriceUnEqual;
 import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -21,7 +22,7 @@ public class PriceComponent {
 
 	@Resource
 	ActivityComponent activityComponent;
-	
+
 	@Resource
 	GoodsServiceComponent goodsServiceComponent;
 
@@ -52,11 +53,13 @@ public class PriceComponent {
 	 * @param gradeId
 	 *            分级ID
 	 * @return
-	 * @throws WrongPlatformSource 
+	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual
 	 */
 	@SuppressWarnings("unchecked")
 	public Double calPrice(List<OrderBussinessModel> list, Map<String, GoodsSpecs> specsMap, String couponIds,
-			boolean vip, Integer centerId, ResultModel result, Integer userId, int platformSource, int gradeId) throws WrongPlatformSource {
+			boolean vip, Integer centerId, ResultModel result, Integer userId, int platformSource, int gradeId)
+					throws WrongPlatformSource, OriginalPriceUnEqual {
 
 		Double totalAmount = 0.0;
 		GoodsSpecs specs = null;
@@ -117,10 +120,12 @@ public class PriceComponent {
 	 * @param platformSource
 	 * @param gradeId
 	 * @return
-	 * @throws WrongPlatformSource 
+	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual 
 	 */
 	private Double judgeCouponLegitimate(List<Coupon> couponList, Map<String, GoodsSpecs> specsMap,
-			List<OrderBussinessModel> list, ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource {
+			List<OrderBussinessModel> list, ResultModel result, boolean vip, int platformSource, int gradeId)
+					throws WrongPlatformSource, OriginalPriceUnEqual {
 
 		List<Integer> superposition = new ArrayList<Integer>();
 		for (Coupon c : couponList) {
@@ -160,10 +165,11 @@ public class PriceComponent {
 	 * @param platformSource
 	 * @param gradeId
 	 * @return
-	 * @throws WrongPlatformSource 
+	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual 
 	 */
 	private Double doJudgeGivenRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource {
+			ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
 		Double totalAmount = 0.0;
 		List<CouponGoodsbinding> bindList = c.getRule().getBindingList();
 		List<String> goodsIdList = new ArrayList<String>();
@@ -199,10 +205,11 @@ public class PriceComponent {
 	 * @param platformSource
 	 * @param gradeId
 	 * @return
-	 * @throws WrongPlatformSource 
+	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual 
 	 */
 	private Double doJudgeCategoryRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			ResultModel result, boolean vip, int cate, int platformSource, int gradeId) throws WrongPlatformSource {
+			ResultModel result, boolean vip, int cate, int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
 
 		Double totalAmount = 0.0;
 		String category = null;
@@ -248,16 +255,18 @@ public class PriceComponent {
 	 * @param platformSource
 	 * @param gradeId
 	 * @return
-	 * @throws WrongPlatformSource 
+	 * @throws WrongPlatformSource
+	 * @throws OriginalPriceUnEqual 
 	 */
 	private Double doJudgeFullRange(Coupon c, Map<String, GoodsSpecs> specsMap, List<OrderBussinessModel> list,
-			ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource {
+			ResultModel result, boolean vip, int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
 
 		Double totalAmount = 0.0;
 		GoodsSpecs specs = null;
 		for (OrderBussinessModel model : list) {
 			specs = specsMap.get(model.getItemId());
-			totalAmount += goodsServiceComponent.getAmount(vip, specs, model, specs.getDiscount(), platformSource, gradeId);
+			totalAmount += goodsServiceComponent.getAmount(vip, specs, model, specs.getDiscount(), platformSource,
+					gradeId);
 		}
 		if (totalAmount < c.getRule().getCondition()) {
 			result.setErrorMsg("不符合优惠券使用条件");

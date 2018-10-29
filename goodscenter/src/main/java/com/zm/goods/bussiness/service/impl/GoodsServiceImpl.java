@@ -24,6 +24,7 @@ import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.convertor.LucenceModelConvertor;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.exception.OriginalPriceUnEqual;
 import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.feignclient.SupplierFeignClient;
 import com.zm.goods.feignclient.UserFeignClient;
@@ -211,7 +212,7 @@ public class GoodsServiceImpl implements GoodsService {
 		if (specsList == null || specsList.size() == 0) {
 			return null;
 		}
-		//设置价格
+		// 设置价格
 		switch (platformSource) {
 		case Constants.WELFARE_WEBSITE:
 			getWelfareWebsitePriceInterval(specsList, gradeId);
@@ -220,19 +221,19 @@ public class GoodsServiceImpl implements GoodsService {
 			getPriceInterval(specsList);
 			break;
 		}
-		
+
 		List<WarehouseModel> stockList = goodsMapper.listWarehouse(param);
-		//设置库存
-		for(GoodsSpecs specs : specsList){
-			for(WarehouseModel model : stockList){
-				if(specs.getItemId().equals(model.getItemId())){
+		// 设置库存
+		for (GoodsSpecs specs : specsList) {
+			for (WarehouseModel model : stockList) {
+				if (specs.getItemId().equals(model.getItemId())) {
 					specs.setStock(model.getFxqty());
 					break;
 				}
 			}
 		}
 
-		//设置图片
+		// 设置图片
 		List<String> idList = new ArrayList<String>();
 		for (GoodsSpecs model : specsList) {
 			idList.add(model.getGoodsId());
@@ -275,11 +276,11 @@ public class GoodsServiceImpl implements GoodsService {
 
 		// 初始化参数
 		ResultModel result = new ResultModel(true, "");
-		Map<String, Object> map = new HashMap<String, Object>();
-		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();
-		Map<String, Object> param = new HashMap<String, Object>();
-		Map<String, GoodsSpecs> tempSpecsMap = new HashMap<String, GoodsSpecs>();
-		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();
+		Map<String, Object> map = new HashMap<String, Object>();// 返回结果的map
+		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();// 税费map
+		Map<String, Object> param = new HashMap<String, Object>();// 参数map
+		Map<String, GoodsSpecs> tempSpecsMap = new HashMap<String, GoodsSpecs>();// 规格temp
+		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();// 税费temp
 		GoodsSpecs specs = null;
 		Double totalAmount = 0.0;
 		Double originalPrice = 0.0;
@@ -297,10 +298,10 @@ public class GoodsServiceImpl implements GoodsService {
 			return new ResultModel(false, ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorCode(),
 					ErrorCodeEnum.SUPPLIER_GOODS_ERROR.getErrorMsg());
 		}
-		//判断订单属性和商品属性是否一致
+		// 判断订单属性和商品属性是否一致
 		try {
 			int type = goodsMapper.getOrderGoodsType(param);
-			if(!orderFlag.equals(type)){
+			if (!orderFlag.equals(type)) {
 				return new ResultModel(false, ErrorCodeEnum.TYPE_ERROR.getErrorCode(),
 						ErrorCodeEnum.TYPE_ERROR.getErrorMsg());
 			}
@@ -309,7 +310,7 @@ public class GoodsServiceImpl implements GoodsService {
 			return new ResultModel(false, ErrorCodeEnum.TYPE_ERROR.getErrorCode(),
 					ErrorCodeEnum.TYPE_ERROR.getErrorMsg());
 		}
-		
+
 		// 获取所有item的规格
 		param.put("list", itemIds);
 		param.put("isFx", isFx ? FX : NOT_FX);
@@ -343,6 +344,8 @@ public class GoodsServiceImpl implements GoodsService {
 				LogUtil.writeLog("originalPrice===" + originalPrice);
 			} catch (WrongPlatformSource e) {
 				return new ResultModel(false, e.getMessage());
+			} catch (OriginalPriceUnEqual e1) {
+				return new ResultModel(false, e1.getMessage());
 			}
 			if (!result.isSuccess()) {
 				return new ResultModel(false, ErrorCodeEnum.OUT_OF_RANGE.getErrorCode(),
@@ -364,8 +367,10 @@ public class GoodsServiceImpl implements GoodsService {
 			// 获取商品优惠后的价格
 			totalAmount = priceComponent.calPrice(list, specsMap, couponIds, vip, centerId, result, userId,
 					platformSource, gradeId);
-		} catch (WrongPlatformSource e) {
+		} catch (WrongPlatformSource e) {//福利平台出错
 			return new ResultModel(false, e.getMessage());
+		} catch (OriginalPriceUnEqual e1) {//订单商品原价和现在原价不相等，会引起返佣不一样
+			return new ResultModel(false, e1.getMessage());
 		}
 		if (!result.isSuccess()) {
 			return result;
@@ -418,30 +423,32 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	private void packageData(Map<String, Object> param, List<PageModule> result, Layout temp) {
-//		param.put("layoutId", temp.getId());
-//		if (Constants.ACTIVE_MODEL.equals(temp.getType())) {
-//			List<Activity> activityList = goodsMapper.listActivityByLayoutId(param);
-//			if (activityList == null) {
-//				return;
-//			}
-//			for (Activity activity : activityList) {
-//				if (Constants.ACTIVE_START.equals(activity.getStatus())
-//						|| Constants.ACTIVE_UNSTART.equals(activity.getStatus())) {
-//					param.put("activeId", activity.getId());
-//					activity.setCode(temp.getCode());
-//					result.add(new PageModule(activity, goodsMapper.listActiveData(param)));
-//					break;
-//				}
-//			}
-//		} else {
-//			PopularizeDict dict = goodsMapper.getDictByLayoutId(param);
-//			if (dict == null) {
-//				return;
-//			}
-//			param.put("dictId", dict.getId());
-//			dict.setCode(temp.getCode());
-//			result.add(new PageModule(dict, goodsMapper.listDictData(param)));
-//		}
+		// param.put("layoutId", temp.getId());
+		// if (Constants.ACTIVE_MODEL.equals(temp.getType())) {
+		// List<Activity> activityList =
+		// goodsMapper.listActivityByLayoutId(param);
+		// if (activityList == null) {
+		// return;
+		// }
+		// for (Activity activity : activityList) {
+		// if (Constants.ACTIVE_START.equals(activity.getStatus())
+		// || Constants.ACTIVE_UNSTART.equals(activity.getStatus())) {
+		// param.put("activeId", activity.getId());
+		// activity.setCode(temp.getCode());
+		// result.add(new PageModule(activity,
+		// goodsMapper.listActiveData(param)));
+		// break;
+		// }
+		// }
+		// } else {
+		// PopularizeDict dict = goodsMapper.getDictByLayoutId(param);
+		// if (dict == null) {
+		// return;
+		// }
+		// param.put("dictId", dict.getId());
+		// dict.setCode(temp.getCode());
+		// result.add(new PageModule(dict, goodsMapper.listDictData(param)));
+		// }
 	}
 
 	@Override

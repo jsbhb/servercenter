@@ -19,6 +19,7 @@ public class OrderConvertUtil {
 			model.setItemId(goods.getItemId());
 			model.setQuantity(goods.getItemQuantity());
 			model.setSku(goods.getSku());
+			model.setItemPrice(goods.getItemPrice());
 			list.add(model);
 			if(sb != null){
 				sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");

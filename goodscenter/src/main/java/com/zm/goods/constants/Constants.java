@@ -52,8 +52,9 @@ public class Constants {
 	
 	public static final String GRADEBO_INFO = "gradeBO:";//每个ID的gradeBO信息
 	
-	//************************福利网站的平台来源ID********************************//
+	//************************平台来源ID********************************//
 	public static final int WELFARE_WEBSITE = 7;
+	public static final int BACK_MANAGER_WEBSITE = 8;//后台来源
 	
 	public static final Integer CNCOOPBUY = 2;
 	//************************商品上下架记录管理********************************//
