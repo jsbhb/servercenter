@@ -336,4 +336,25 @@ public class AuthServiceImpl implements AuthService {
 		return new ResultPojo(new AccessToken(token, JWTUtil.EXPIRES));
 	}
 
+	@Override
+	public boolean createBackAccount(String account,Integer userId) {
+		String authUserId = userMapper.getUserIdByUserName(account);
+		if(authUserId == null){
+			Set<PlatformUser> set = new HashSet<PlatformUser>();
+			UserInfo tempUser = new UserInfo();
+			tempUser.setUserName(account);
+			tempUser.setPlatUserType(PlatUserType.CROSS_BORDER.getIndex());
+			tempUser.setUserCenterId(userId);
+			tempUser.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
+			tempUser.setPhone(account);
+			userMapper.insert(tempUser);
+			authUserId = tempUser.getUserId();
+			PlatformUser consumerPlat = new PlatformUser(authUserId,PlatUserType.CONSUMER.getIndex());
+			set.add(consumerPlat);
+			userMapper.insertPlatformUser(set);
+			return true;
+		}
+		return false;
+	}
+
 }

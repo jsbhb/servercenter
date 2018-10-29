@@ -126,6 +126,17 @@ public class UserController {
 		}
 	}
 
+	@RequestMapping(value = "/platform/back/register", method = RequestMethod.POST)
+	public ResultPojo createBackAccount(@RequestParam("userId") Integer userId, @RequestParam("account") String account)
+			throws AuthenticationException {
+		try {
+			return new ResultPojo(authService.createBackAccount(account,userId));
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+			return new ResultPojo("401", e.getMessage());
+		}
+	}
+
 	@RequestMapping(value = "/get_token", method = RequestMethod.POST)
 	public ResultPojo getToken(HttpServletRequest req) {
 		String data = req.getParameter("data");

@@ -1,7 +1,5 @@
 package com.zm.auth.service;
 
-import java.util.Map;
-
 import com.zm.auth.model.GetTokenParam;
 import com.zm.auth.model.ResultPojo;
 import com.zm.auth.model.SecurityUserDetail;
@@ -78,5 +76,8 @@ public interface AuthService {
 	 * @return
 	 */
 	ResultPojo getToken(GetTokenParam param);
+
+
+	boolean createBackAccount(String account,Integer userId);
 	
 }
