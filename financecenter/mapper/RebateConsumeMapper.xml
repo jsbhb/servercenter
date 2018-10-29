@@ -3,7 +3,7 @@
 <mapper namespace="com.zm.finance.bussiness.dao.RebateConsumeMapper">
 
 	<insert id="insertRebateConsume" parameterType="Object">
-		insert into rebate_order(grade_id,order_id,money,create_time)
+		insert into ignore rebate_order(grade_id,order_id,money,create_time)
 		value(#{gradeId},#{orderId},#{money},now())
 	</insert>
 	

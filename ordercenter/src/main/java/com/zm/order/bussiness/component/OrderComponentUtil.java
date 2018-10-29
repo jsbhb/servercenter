@@ -134,11 +134,14 @@ public class OrderComponentUtil {
 	 * @param payMent
 	 * @return
 	 */
-	public boolean judgeAmount(Double amount, TaxFeeBO taxFee, Double postFee, Double payMent) {
+	public boolean judgeAmount(Double amount, TaxFeeBO taxFee, Double postFee, OrderInfo info) {
 		amount = CalculationUtils.add(amount, taxFee.getTaxFee(), postFee);
 		amount = CalculationUtils.round(2, amount);
 		int totalAmount = (int) CalculationUtils.mul(amount, 100);
-		int localAmount = (int) (payMent * 100);
+		int localAmount = (int) (info.getOrderDetail().getPayment() * 100);
+		int rebateFee = (int) ((info.getOrderDetail().getRebateFee() == null ? 0 : info.getOrderDetail().getRebateFee())
+				* 100);
+		localAmount += rebateFee;
 		if (totalAmount - localAmount > Constants.DEVIATION || totalAmount - localAmount < -Constants.DEVIATION) {// 价格区间定义在正负5分
 			return false;
 		}
@@ -204,6 +207,18 @@ public class OrderComponentUtil {
 				}
 			}
 		}
+		if (Constants.BACK_MANAGER_WEBSITE != (info.getOrderSource())) {// 如果不是后台订单
+			if (info.getOrderDetail().getRebateFee() != null || info.getOrderDetail().getRebateFee() > 0) {
+				result.setSuccess(false);
+				result.setErrorMsg("权限错误，不能使用返佣支付");
+				return;
+			}
+			if(Constants.REBATE_PAY.equals(payType)){
+				result.setSuccess(false);
+				result.setErrorMsg("权限错误，不能使用返佣支付");
+				return;
+			}
+		}
 	}
 
 	/**
@@ -215,13 +230,12 @@ public class OrderComponentUtil {
 	 * @param taxFee
 	 * @param disAmount
 	 */
-	public void renderOrderInfo(OrderInfo info, Double postFee, Integer weight, Double amount, TaxFeeBO taxFee,
-			Double disAmount, boolean fromMall) {
+	public void renderOrderInfo(OrderInfo info, Double postFee, Integer weight, TaxFeeBO taxFee, Double disAmount,
+			boolean fromMall) {
 		if (fromMall) {
 			info.setWeight(weight);
 			info.setStatus(0);
 			info.getOrderDetail().setPostFee(postFee);
-			info.getOrderDetail().setPayment(amount);
 			info.getOrderDetail().setTaxFee(taxFee.getTaxFee());
 			info.getOrderDetail().setIncrementTax(taxFee.getIncremTax());
 			info.getOrderDetail().setExciseTax(taxFee.getExciseTax());
@@ -293,10 +307,23 @@ public class OrderComponentUtil {
 	 * @throws Exception
 	 */
 	public void getPayInfo(String payType, String type, HttpServletRequest req, ResultModel result, String openId,
-			String orderId, Integer centerId, StringBuilder detail, int totalAmount) throws Exception {
+			OrderInfo info, StringBuilder detail, int totalAmount) throws Exception {
+		Double rebateFee = info.getOrderDetail().getRebateFee();
+		if (rebateFee != null && rebateFee > 0) {// 如果有返佣抵扣，先进行扣减
+			HashOperations<String, String, String> hashOperations = template.opsForHash();
+			double balance = hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck",
+					CalculationUtils.sub(0, info.getOrderDetail().getRebateFee()));// 扣除返佣
+			if (balance < 0) {
+				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck",
+						info.getOrderDetail().getRebateFee());// 增加返佣
+				result.setSuccess(false);
+				result.setErrorMsg("返佣使用金额超过可以使用金额");
+				return;
+			}
+		}
 		PayModel payModel = new PayModel();
 		payModel.setBody("购物订单");
-		payModel.setOrderId(orderId);
+		payModel.setOrderId(info.getOrderId());
 		payModel.setTotalAmount(totalAmount + "");
 		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
 		if (detailStr.length() > 60) {// 支付宝描述过长会报错
@@ -307,12 +334,13 @@ public class OrderComponentUtil {
 		if (Constants.WX_PAY.equals(payType)) {
 			payModel.setOpenId(openId);
 			payModel.setIP(req.getRemoteAddr());
-			Map<String, String> paymap = payFeignClient.wxPay(centerId, type, payModel);
+			Map<String, String> paymap = payFeignClient.wxPay(info.getCenterId(), type, payModel);
 			result.setObj(paymap);
 		} else if (Constants.ALI_PAY.equals(payType)) {
-			result.setObj(payFeignClient.aliPay(centerId, type, payModel));
+			result.setObj(payFeignClient.aliPay(info.getCenterId(), type, payModel));
 		} else if (Constants.UNION_PAY.equals(payType)) {
-			result.setObj(payFeignClient.unionpay(centerId, type, payModel));
+			result.setObj(payFeignClient.unionpay(info.getCenterId(), type, payModel));
+		} else if (Constants.REBATE_PAY.equals(payType)) {
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");

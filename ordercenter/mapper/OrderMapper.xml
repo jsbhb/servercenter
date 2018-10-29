@@ -26,6 +26,7 @@
 			<result column="payment" property="payment" jdbcType="DECIMAL" />
 			<result column="pay_time" property="payTime" jdbcType="DECIMAL" />
 			<result column="dis_amount" property="disAmount" jdbcType="DECIMAL" />
+			<result column="rebate_fee" property="rebateFee" jdbcType="DECIMAL" />
 			<result column="post_fee" property="postFee" jdbcType="DECIMAL" />
 			<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
 			<result column="tariff_tax" property="tariffTax" jdbcType="DECIMAL" />
@@ -268,10 +269,10 @@
 		order_detail
 		(order_id,pay_type,payment,pay_no,delivery_place,carry_address,receive_name,receive_phone,receive_province,
 		receive_city,receive_area,receive_address,receive_zip_code,post_fee,
-		tax_fee,tariff_tax,increment_tax,excise_tax,create_time,remark,dis_amount,pay_time)
+		tax_fee,tariff_tax,increment_tax,excise_tax,create_time,remark,dis_amount,pay_time,rebate_fee)
 		VALUES
 		(#{orderId},#{payType},#{payment},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
-		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{postFee},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},now(),#{remark},#{disAmount},#{payTime});
+		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{postFee},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},now(),#{remark},#{disAmount},#{payTime},#{rebateFee});
 	</insert>
 
 	<insert id="saveOrderGoods" parameterType="Object">
@@ -370,7 +371,7 @@
 		od.pay_type,od.pay_no,o.mall_id,og.id as
 		goods_id,og.goods_id as goodsId,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
-		od.receive_city,od.receive_area,od.receive_address
+		od.receive_city,od.receive_area,od.receive_address,od.rebate_fee
 		,oe.id as orderExpress_id,oe.order_id as oeorder_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
@@ -691,4 +692,10 @@
 		(#{orderId},#{supplierId},#{expressId},#{expressName},now())
 	</insert>
 	<!-- 手动维护运单end -->
+	
+	
+	<insert id="insertRebateConsume" parameterType="Object">
+		insert into ignore rebate_order(grade_id,order_id,money,create_time)
+		value(#{gradeId},#{orderId},#{money},now())
+	</insert>
 </mapper>

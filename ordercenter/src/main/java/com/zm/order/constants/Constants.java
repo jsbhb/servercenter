@@ -10,6 +10,8 @@ public class Constants {
 	public static final String ALI_PAY = "2";
 
 	public static final String UNION_PAY = "3";
+	
+	public static final String REBATE_PAY = "4";
 
 	public static final String JSAPI = "JSAPI";
 
@@ -117,6 +119,7 @@ public class Constants {
 	public static final Integer ORDER_SOURCE_EXHIBITION = 5;//展厅
 	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;//大客户
 	public static final int WELFARE_WEBSITE = 7;//福利网站
+	public static final int BACK_MANAGER_WEBSITE = 8;//后台来源
 	
 	//*******************订单创建类型**********************
 	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单

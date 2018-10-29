@@ -149,7 +149,6 @@ public class OrderServiceImpl implements OrderService {
 		}
 		priceAndWeightMap = (Map<String, Object>) result.getObj();
 		amount = (Double) priceAndWeightMap.get("totalAmount");// 商品总价（扣掉了优惠券，折扣）
-		
 
 		// 邮费和税费初始值
 		Double postFee = 0.0;
@@ -193,36 +192,18 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 判断价格是否一致
-		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info.getOrderDetail().getPayment())) {
+		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info)) {
 			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		amount = CalculationUtils.add(amount, taxFee.getTaxFee(), postFee);
-		amount = CalculationUtils.round(2, amount);
-		int totalAmount = (int) CalculationUtils.mul(amount, 100);
+		int totalAmount = (int) CalculationUtils.mul(info.getOrderDetail().getPayment(), 100);
 
 		// 调用支付信息
-		orderComponentUtil.getPayInfo(payType, type, req, result, openId, orderId, centerId, detail, totalAmount);
+		orderComponentUtil.getPayInfo(payType, type, req, result, openId, info, detail, totalAmount);
 		if (!result.isSuccess()) {
 			return result;
 		}
-
-		// if (info.getCouponIds() != null) {
-		// activityFeignClient.updateUserCoupon(Constants.FIRST_VERSION,
-		// info.getCenterId(), info.getUserId(),
-		// info.getCouponIds());
-		// }
-
-		// if (info.getPushUserId() != null) {// 如果是推手订单，判断该推手是否有效
-		// boolean flag =
-		// userFeignClient.verifyEffective(Constants.FIRST_VERSION,
-		// info.getShopId(),
-		// info.getPushUserId());
-		// if (!flag) {// 失效推手ID设为null
-		// info.setPushUserId(null);
-		// }
-		// }
 
 		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(),
 				info.getOrderFlag());
@@ -230,16 +211,24 @@ public class OrderServiceImpl implements OrderService {
 			return temp;
 		}
 
-		// 完善订单信息
-		orderComponentUtil.renderOrderInfo(info, postFee, weight, amount, taxFee, disAmount, true);
-		// 保存订单
-		orderComponentUtil.saveOrder(info);
+		try {
+			// 完善订单信息
+			orderComponentUtil.renderOrderInfo(info, postFee, weight, taxFee, disAmount, true);
+			// 保存订单
+			orderComponentUtil.saveOrder(info);
 
-		// 增加缓存订单数量
-		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
-		// 增加月订单数
-		String time = DateUtils.getTimeString("yyyyMM");
-		cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
+			// 增加缓存订单数量
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+			// 增加月订单数
+			String time = DateUtils.getTimeString("yyyyMM");
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
+		} catch (Exception e) {// 如果出错，需要对返佣回滚，TODO 还需要对库存回滚
+			Double rebateFee = info.getOrderDetail().getRebateFee();
+			if (rebateFee != null && rebateFee > 0) {
+				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck", rebateFee);// 增加返佣
+			}
+			throw new RuntimeException(e);// 处理完后往外抛异常，使事务回滚
+		}
 
 		result.setSuccess(true);
 		result.setErrorMsg(orderId);
@@ -331,7 +320,7 @@ public class OrderServiceImpl implements OrderService {
 		if (count > 0) {// 有更新结果后插入状态记录表
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
-
+			threadPoolComponent.rebate4Order(orderId);
 			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
 
@@ -535,6 +524,11 @@ public class OrderServiceImpl implements OrderService {
 			param.put("status", Constants.ORDER_CLOSE);
 			param.put("orderId", orderId);
 			orderMapper.addOrderStatusRecord(param);
+			Double rebateFee = info.getOrderDetail().getRebateFee();
+			if (rebateFee != null && rebateFee > 0) {
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck",
+						rebateFee);// 返佣返回
+			}
 		}
 		stockBack(info);
 		return true;

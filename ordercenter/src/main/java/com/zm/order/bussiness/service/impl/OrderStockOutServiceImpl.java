@@ -217,7 +217,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					result.setErrorMsg("订单编号：" + info.getOrderId() + "," + result.getErrorMsg());
 					return result;
 				}
-				orderComponentUtil.renderOrderInfo(info, null, null, null, null, null, false);
+				orderComponentUtil.renderOrderInfo(info, null, null, null, null, false);
 			}
 
 			orderBackMapper.insertOrderBaseBatch(list);

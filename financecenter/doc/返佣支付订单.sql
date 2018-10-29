@@ -10,6 +10,7 @@ CREATE TABLE `zm_financial`.`rebate_order` (
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',
   PRIMARY KEY (`id`),
+  UNIQUE INDEX `uk_orderId` (`order_id` ASC),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC)) 
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '返佣支付订单';

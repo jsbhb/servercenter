@@ -159,7 +159,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		}
 
 		// 判断价格是否一致
-		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, orderInfo.getOrderDetail().getPayment())) {
+		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, orderInfo)) {
 			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
@@ -179,7 +179,7 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		}
 
 		// 把商品的返佣补全
-		orderComponentUtil.renderOrderInfo(orderInfo, null, null, null, null, null, false);
+		orderComponentUtil.renderOrderInfo(orderInfo, null, null, null, null, false);
 
 		// 保存订单
 		orderComponentUtil.saveOrder(orderInfo);
