@@ -373,22 +373,9 @@ public class UserServiceImpl implements UserService {
 			return new ResultModel(false, "", "对接用户请填写appKey、appSecret和对应网址");
 		}
 		userMapper.saveGrade(grade);// 保存完后需要主键ID
-		// 前端创建文件夹
-		// if (Constants.AREA_CENTER.equals(grade.getGradeType())) {
-		//
-		// CreateAreaCenterSEO createAreaCenterSEO = new
-		// CreateAreaCenterSEO(grade.getId(), grade.getRedirectUrl(),
-		// grade.getMobileUrl());
-		// ResultModel temp =
-		// PublishComponent.publish(JSONUtil.toJson(createAreaCenterSEO),
-		// PublishType.REGION_CREATE);
-		// if (temp.isSuccess()) {
-		// gradeMapper.updateGradeInit(grade.getId());
-		// }
-		// }
 
+		//生成普通用户的userId
 		UserInfo user = new UserInfo();
-
 		Integer mallId = userComponent.getMallId(grade.getId());
 		user.setShopId(grade.getId());
 		user.setCenterId(mallId);
@@ -398,15 +385,34 @@ public class UserServiceImpl implements UserService {
 		if (userId == null) {
 			user.setPhoneValidate(VALIDATE);
 			user.setStatus(1);
+			user.setUserType(5);
 			userMapper.saveUser(user);
 			UserDetail detail = new UserDetail();
 			detail.setUserId(user.getId());
 			detail.setName(grade.getPersonInCharge());
 			userMapper.saveUserDetail(detail);
-			userId = user.getId();
+		}
+		
+		//生成后台账号统一的userId
+		UserInfo backUser = new UserInfo();
+		backUser.setShopId(grade.getId());
+		backUser.setCenterId(mallId);
+
+		backUser.setPhone(grade.getId()+"");
+		Integer backUserId = userMapper.getUserIdByUserInfo(user);
+		if (backUserId == null) {
+			backUser.setPhoneValidate(VALIDATE);
+			backUser.setStatus(1);
+			backUser.setUserType(1);//代表后台账号
+			userMapper.saveUser(backUser);
+			UserDetail detail = new UserDetail();
+			detail.setUserId(backUser.getId());
+			detail.setName(grade.getPersonInCharge());
+			userMapper.saveUserDetail(detail);
+			backUserId = backUser.getId();
 		}
 
-		result.put("userId", userId);
+		result.put("userId", backUserId);
 		result.put("gradeId", grade.getId());
 
 		grade.setPersonInChargeId(userId);
