@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -26,6 +28,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.GradeBO;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.CommonUtils;
+import com.zm.goods.utils.HttpClientUtil;
 import com.zm.goods.utils.JSONUtil;
 
 @Component
@@ -50,7 +53,7 @@ public class GoodsServiceComponent {
 	 *            分级ID
 	 * @return
 	 * @throws WrongPlatformSource
-	 * @throws OriginalPriceUnEqual 
+	 * @throws OriginalPriceUnEqual
 	 */
 	// 计算价格
 	public Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion,
@@ -240,7 +243,7 @@ public class GoodsServiceComponent {
 	 *            分级ID
 	 * @return
 	 * @throws WrongPlatformSource
-	 * @throws OriginalPriceUnEqual 
+	 * @throws OriginalPriceUnEqual
 	 */
 	public Double judgeQuantityRange(boolean vip, ResultModel result, GoodsSpecs specs, OrderBussinessModel model,
 			int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
@@ -315,7 +318,7 @@ public class GoodsServiceComponent {
 		}
 	}
 
-	//计算后台去掉本级返佣后的价格
+	// 计算后台去掉本级返佣后的价格
 	private Double getBackManagerWebsitePrice(int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + model.getItemId());
@@ -326,7 +329,7 @@ public class GoodsServiceComponent {
 				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
 		double amount = CalculationUtils.mul(model.getQuantity(),
 				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
-		amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, proportion));//扣除返佣后的价格
+		amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, proportion));// 扣除返佣后的价格
 		return amount;
 	}
 
@@ -387,7 +390,7 @@ public class GoodsServiceComponent {
 				CalculationUtils.sub(1, temp));
 		specs.setWelfarePrice(welfarePrice);
 	}
-	
+
 	/**
 	 * @fun 获取福利网站的福利价格
 	 * @param specs
@@ -395,7 +398,7 @@ public class GoodsServiceComponent {
 	 * @param gradeId
 	 * @throws WrongPlatformSource
 	 */
-	public void getBackWebsitePriceInterval(GoodsSpecs specs, Double discount, int gradeId){
+	public void getBackWebsitePriceInterval(GoodsSpecs specs, Double discount, int gradeId) {
 		getPriceInterval(specs, discount);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
@@ -408,5 +411,30 @@ public class GoodsServiceComponent {
 		double backPrice = CalculationUtils.mul(specs.getPriceList().get(0).getPrice(),
 				CalculationUtils.sub(1, proportion));
 		specs.setWelfarePrice(backPrice);
+	}
+
+	public void packDetailPath(List<GoodsItem> itemList) {
+		for (GoodsItem item : itemList) {
+			item.setDetailList(getPicPath(HttpClientUtil.get(item.getDetailPath())));
+		}
+	}
+
+	private List<String> getPicPath(String html) {
+		List<String> srcList = new ArrayList<String>(); // 用来存储获取到的图片地址
+		Pattern p = Pattern.compile("<(img|IMG)(.*?)(>|></img>|/>)");// 匹配字符串中的img标签
+		Matcher matcher = p.matcher(html);
+		boolean hasPic = matcher.find();
+		if (hasPic == true) {// 判断是否含有图片
+			while (hasPic) {
+				String group = matcher.group(2);// 获取第二个分组的内容，也就是 (.*?)匹配到的
+				Pattern srcText = Pattern.compile("(src|SRC)=(\"|\')(.*?)(\"|\')");// 匹配图片的地址
+				Matcher matcher2 = srcText.matcher(group);
+				if (matcher2.find()) {
+					srcList.add(matcher2.group(3));// 把获取到的图片地址添加到列表中
+				}
+				hasPic = matcher.find();// 判断是否还有img标签
+			}
+		}
+		return srcList;
 	}
 }

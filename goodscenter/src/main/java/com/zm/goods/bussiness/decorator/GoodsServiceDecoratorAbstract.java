@@ -28,7 +28,8 @@ import com.zm.goods.pojo.vo.PageModule;
 public abstract class GoodsServiceDecoratorAbstract implements GoodsService {
 
 	@Override
-	public abstract Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion);
+	public abstract Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion,
+			boolean isApplet);
 
 	@Override
 	public abstract Map<String, Object> queryGoods(GoodsSearch searchModel, SortModelList sortList,

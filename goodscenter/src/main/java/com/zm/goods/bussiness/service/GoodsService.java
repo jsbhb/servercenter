@@ -21,15 +21,17 @@ import com.zm.goods.pojo.vo.PageModule;
 
 public interface GoodsService {
 
+
 	/**
-	 * listBigTradeGoods:获取商品. <br/>
-	 * 
-	 * @author wqy
+	 * @fun 获取商品
 	 * @param param
+	 * @param centerId
+	 * @param userId
+	 * @param proportion 是否推手
+	 * @param isApplet 是否是小程序端
 	 * @return
-	 * @since JDK 1.7
 	 */
-	Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion);
+	Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion, boolean isApplet);
 
 	/**
 	 * listBigTradeGoods:获取大贸海蒸鲜商品菜谱. <br/>

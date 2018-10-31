@@ -72,6 +72,16 @@ public class GoodsItem extends GoodsBase {
 	private String href;
 	
 	private Integer goodsTagRatio;
+	
+	private List<String> detailList;
+
+	public List<String> getDetailList() {
+		return detailList;
+	}
+
+	public void setDetailList(List<String> detailList) {
+		this.detailList = detailList;
+	}
 
 	public Integer getGoodsTagRatio() {
 		return goodsTagRatio;

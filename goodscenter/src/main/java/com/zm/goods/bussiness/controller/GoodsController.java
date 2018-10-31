@@ -92,7 +92,8 @@ public class GoodsController {
 	public ResultModel listBigTradeGoods(@PathVariable("version") Double version, HttpServletRequest req,
 			Pagination pagination, @PathVariable("centerId") Integer centerId,
 			@RequestParam(value = "userId", required = false) Integer userId,
-			@RequestParam(value = "proportion", required = false, defaultValue = "false") boolean proportion) {
+			@RequestParam(value = "proportion", required = false, defaultValue = "false") boolean proportion,
+			@RequestParam(value = "isApplet", required = false, defaultValue = "false") boolean isApplet) {
 
 		ResultModel result = new ResultModel();
 
@@ -120,7 +121,7 @@ public class GoodsController {
 
 			// result.setObj(goodsService.listGoods(param, centerId, userId,
 			// proportion));
-			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion));
+			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion,isApplet));
 			result.setSuccess(true);
 		}
 

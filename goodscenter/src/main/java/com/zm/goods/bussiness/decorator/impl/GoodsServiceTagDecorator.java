@@ -33,8 +33,9 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
-		Object obj = goodsServiceImpl.listGoods(param, centerId, userId, proportion);
+	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion,
+			boolean isApplet) {
+		Object obj = goodsServiceImpl.listGoods(param, centerId, userId, proportion, isApplet);
 		if (proportion) {
 			Map<String, Object> result = (Map<String, Object>) obj;
 			List<GoodsItem> goodsList = (List<GoodsItem>) result.get(GOODS_LIST);

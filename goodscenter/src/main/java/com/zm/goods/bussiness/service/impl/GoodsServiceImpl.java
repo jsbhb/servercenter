@@ -93,7 +93,8 @@ public class GoodsServiceImpl implements GoodsService {
 	ThreadPoolComponent threadPoolComponent;
 
 	@Override
-	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion) {
+	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion,
+			boolean isApplet) {
 		if (param.get("itemId") != null) {
 			List<String> itemIdList = new ArrayList<String>();
 			itemIdList.add((String) param.get("itemId"));
@@ -122,6 +123,9 @@ public class GoodsServiceImpl implements GoodsService {
 		// != centerId) {
 		// activityComponent.doPackCoupon(centerId, userId, goodsList);
 		// }
+		if(isApplet){
+			goodsServiceComponent.packDetailPath(goodsList);
+		}
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<Integer, List<GoodsItem>> tempMap = new HashMap<Integer, List<GoodsItem>>();
 		List<GoodsItem> tempList = null;
@@ -376,9 +380,9 @@ public class GoodsServiceImpl implements GoodsService {
 			// 获取商品优惠后的价格
 			totalAmount = priceComponent.calPrice(list, specsMap, couponIds, vip, centerId, result, userId,
 					platformSource, gradeId);
-		} catch (WrongPlatformSource e) {//福利平台出错
+		} catch (WrongPlatformSource e) {// 福利平台出错
 			return new ResultModel(false, e.getMessage());
-		} catch (OriginalPriceUnEqual e1) {//订单商品原价和现在原价不相等，会引起返佣不一样
+		} catch (OriginalPriceUnEqual e1) {// 订单商品原价和现在原价不相等，会引起返佣不一样
 			return new ResultModel(false, e1.getMessage());
 		}
 		if (!result.isSuccess()) {
