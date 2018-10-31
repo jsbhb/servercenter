@@ -142,6 +142,7 @@ public class OrderComponentUtil {
 		int rebateFee = (int) ((info.getOrderDetail().getRebateFee() == null ? 0 : info.getOrderDetail().getRebateFee())
 				* 100);
 		localAmount += rebateFee;
+		LogUtil.writeLog("amount:"+amount+",totalAmount:"+totalAmount+",localAmount:"+localAmount+",rebateFee:"+rebateFee);
 		if (totalAmount - localAmount > Constants.DEVIATION || totalAmount - localAmount < -Constants.DEVIATION) {// 价格区间定义在正负5分
 			return false;
 		}
@@ -208,7 +209,7 @@ public class OrderComponentUtil {
 			}
 		}
 		if (Constants.BACK_MANAGER_WEBSITE != (info.getOrderSource())) {// 如果不是后台订单
-			if (info.getOrderDetail().getRebateFee() != null || info.getOrderDetail().getRebateFee() > 0) {
+			if (info.getOrderDetail().getRebateFee() != null && info.getOrderDetail().getRebateFee() > 0) {
 				result.setSuccess(false);
 				result.setErrorMsg("权限错误，不能使用返佣支付");
 				return;
@@ -217,6 +218,14 @@ public class OrderComponentUtil {
 				result.setSuccess(false);
 				result.setErrorMsg("权限错误，不能使用返佣支付");
 				return;
+			}
+		} else {
+			if(Constants.REBATE_PAY.equals(payType)){
+				if(info.getOrderDetail().getPayment() > 0){
+					result.setSuccess(false);
+					result.setErrorMsg("还有余额需要支付，请选择其他支付方式");
+					return;
+				}
 			}
 		}
 	}
@@ -334,17 +343,38 @@ public class OrderComponentUtil {
 		if (Constants.WX_PAY.equals(payType)) {
 			payModel.setOpenId(openId);
 			payModel.setIP(req.getRemoteAddr());
-			Map<String, String> paymap = payFeignClient.wxPay(info.getCenterId(), type, payModel);
-			result.setObj(paymap);
+			try {
+				Map<String, String> paymap = payFeignClient.wxPay(info.getCenterId(), type, payModel);
+				result.setObj(paymap);
+			} catch (Exception e) {
+				exceptionHandle(result, info, rebateFee);
+			}
+			
 		} else if (Constants.ALI_PAY.equals(payType)) {
-			result.setObj(payFeignClient.aliPay(info.getCenterId(), type, payModel));
+			try {
+				result.setObj(payFeignClient.aliPay(info.getCenterId(), type, payModel));
+			} catch (Exception e) {
+				exceptionHandle(result, info, rebateFee);
+			}
 		} else if (Constants.UNION_PAY.equals(payType)) {
-			result.setObj(payFeignClient.unionpay(info.getCenterId(), type, payModel));
+			try {
+				result.setObj(payFeignClient.unionpay(info.getCenterId(), type, payModel));
+			} catch (Exception e) {
+				exceptionHandle(result, info, rebateFee);
+			}
 		} else if (Constants.REBATE_PAY.equals(payType)) {
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");
 		}
+	}
+
+	private void exceptionHandle(ResultModel result, OrderInfo info, Double rebateFee) {
+		if (rebateFee != null && rebateFee > 0) {
+			template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck", rebateFee);// 增加返佣
+		}
+		result.setSuccess(false);
+		result.setErrorMsg("调用支付信息失败");
 	}
 
 }

@@ -165,5 +165,9 @@ public interface OrderMapper {
 	List<ExpressRule> listExpressRule(Integer supplierId);
 	
 	void insertRebateConsume(Rebate4Order rebate4Order);
+
+	List<Rebate4Order> listRebate4Order();
+
+	void deleteRebate4Order(List<Rebate4Order> list);
 	
 }

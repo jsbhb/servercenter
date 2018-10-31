@@ -34,7 +34,7 @@ public class OrderInfo extends Pagination{
 
 	protected Integer tdq;
 	
-	protected Integer orderSource;
+	protected Integer orderSource;//0：PC;1：手机:3：有赞；4：线下；5：展厅；6：大客户；7：福利商城；8：后台订单
 
 	protected Integer weight;
 
@@ -70,7 +70,7 @@ public class OrderInfo extends Pagination{
 	
 	private Integer manual;//是否手工单，0：自动；1手动
 
-	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券
+	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券；4:预售订单；5：对接订单
 	
 	private Integer isEshopIn;//Eshop是否入库，0：未入库；1入库
 	

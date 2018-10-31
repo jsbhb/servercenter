@@ -99,8 +99,10 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 									+ ", setting security context");
 							SecurityContextHolder.getContext().setAuthentication(authentication);
 						}
-						return;
-
+						if(request.getRequestURI().contains("authentication")){
+							return;
+						}
+						
 					} else if (claims.containsKey(JWTUtil.APPKEY)) {
 						user.setUserName((String) claims.get(JWTUtil.APPKEY));
 						userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
@@ -112,7 +114,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 									+ ", setting security context");
 							SecurityContextHolder.getContext().setAuthentication(authentication);
 						}
-						return;
+						if(request.getRequestURI().contains("authentication")){
+							return;
+						}
 					}
 
 					if (JWTUtil.validateToken(authToken, userDetails)) {
@@ -121,7 +125,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 						logger.info("authenticated user " + userDetails.getUsername() + ", setting security context");
 						SecurityContextHolder.getContext().setAuthentication(authentication);
-						return;
+						if(request.getRequestURI().contains("authentication")){
+							return;
+						}
 					}
 				} catch (Exception e) {
 					chain.doFilter(request, response);

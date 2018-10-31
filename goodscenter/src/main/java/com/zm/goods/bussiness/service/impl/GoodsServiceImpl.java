@@ -217,6 +217,9 @@ public class GoodsServiceImpl implements GoodsService {
 		case Constants.WELFARE_WEBSITE:
 			getWelfareWebsitePriceInterval(specsList, gradeId);
 			break;
+		case Constants.BACK_MANAGER_WEBSITE:
+			getBackWebsitePriceInterval(specsList, gradeId);
+			break;
 		default:
 			getPriceInterval(specsList);
 			break;
@@ -251,6 +254,12 @@ public class GoodsServiceImpl implements GoodsService {
 		result.put("pic", fileList);
 
 		return result;
+	}
+
+	private void getBackWebsitePriceInterval(List<GoodsSpecs> specsList, int gradeId) {
+		for (GoodsSpecs specs : specsList) {
+			goodsServiceComponent.getBackWebsitePriceInterval(specs, specs.getDiscount(), gradeId);
+		}
 	}
 
 	private void getWelfareWebsitePriceInterval(List<GoodsSpecs> specsList, int gradeId) throws WrongPlatformSource {

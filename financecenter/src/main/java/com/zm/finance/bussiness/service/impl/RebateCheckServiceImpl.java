@@ -86,7 +86,8 @@ public class RebateCheckServiceImpl implements RebateCheckService {
 				hashOperations.put(perfix, Constants.ALREADY_CHECK, rebate + "");
 				hashOperations.put(perfix, Constants.CAN_BE_PRESENTED, "0");
 			} else {
-				sb.append("分级ID:" + comeIn.getGradeId() + ",对账返佣：" + rebate + ",redis内:" + redisRebate + " \r\n");
+				sb.append("分级ID:" + comeIn.getGradeId() + ",对账返佣：" + rebate + ",redis内:" + redisRebate + ";其中总返佣："
+						+ comeIn.getTotalRebate() + ",提现：" + wtempMoney + "，订单消费：" + ctempMoney + " \r\n");
 			}
 		}
 		LogUtil.writeLog(sb.toString());

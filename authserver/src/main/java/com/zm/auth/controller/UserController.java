@@ -43,7 +43,6 @@ import com.zm.auth.util.JSONUtil;
  * @since JDK 1.7
  */
 @RestController
-@RequestMapping(value = "/auth")
 public class UserController {
 
 	@Value("${jwt.header}")
@@ -57,7 +56,7 @@ public class UserController {
 
 	Logger logger = LoggerFactory.getLogger(UserController.class);
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/login", method = RequestMethod.POST)
 	public ResultPojo createAuthenticationToken(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		try {
 			return new ResultPojo(authService.login(userInfo));
@@ -67,7 +66,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/refresh", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/refresh", method = RequestMethod.GET)
 	public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request)
 			throws AuthenticationException {
 		String token = request.getHeader(tokenHeader);
@@ -79,7 +78,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/register", method = RequestMethod.POST)
 	public ResultPojo register(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		try {
 			return new ResultPojo(authService.register(userInfo));
@@ -89,7 +88,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/check", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/check", method = RequestMethod.POST)
 	public ResultPojo check(@RequestBody UserInfo userInfo) throws AuthenticationException {
 		try {
 			return new ResultPojo(authService.checkAccount(userInfo));
@@ -99,7 +98,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/modifyPwd", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/modifyPwd", method = RequestMethod.POST)
 	public ResultPojo modifyPwd(@RequestBody UserInfo userInfo, @RequestParam("code") String code)
 			throws AuthenticationException {
 		try {
@@ -115,7 +114,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/platform/register", method = RequestMethod.POST)
+	@RequestMapping(value = "platform/register", method = RequestMethod.POST)
 	public ResultPojo createAccount(@RequestParam("userId") Integer userId,
 			@RequestParam("platUserType") Integer platUserType) throws AuthenticationException {
 		try {
@@ -126,7 +125,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/platform/back/register", method = RequestMethod.POST)
+	@RequestMapping(value = "platform/back/register", method = RequestMethod.POST)
 	public ResultPojo createBackAccount(@RequestParam("userId") Integer userId, @RequestParam("account") String account)
 			throws AuthenticationException {
 		try {
@@ -137,7 +136,7 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/get_token", method = RequestMethod.POST)
+	@RequestMapping(value = "auth/get_token", method = RequestMethod.POST)
 	public ResultPojo getToken(HttpServletRequest req) {
 		String data = req.getParameter("data");
 		GetTokenParam param = null;

@@ -387,4 +387,26 @@ public class GoodsServiceComponent {
 				CalculationUtils.sub(1, temp));
 		specs.setWelfarePrice(welfarePrice);
 	}
+	
+	/**
+	 * @fun 获取福利网站的福利价格
+	 * @param specs
+	 * @param discount
+	 * @param gradeId
+	 * @throws WrongPlatformSource
+	 */
+	public void getBackWebsitePriceInterval(GoodsSpecs specs, Double discount, int gradeId){
+		getPriceInterval(specs, discount);
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
+		String json = hashOperations.get(Constants.GRADEBO_INFO, gradeId + "");
+		GradeBO gradeBO = JSONUtil.parse(json, GradeBO.class);
+		int gradeType = gradeBO.getGradeType();
+		// 获取该类型的返佣的比例
+		double proportion = Double
+				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
+		double backPrice = CalculationUtils.mul(specs.getPriceList().get(0).getPrice(),
+				CalculationUtils.sub(1, proportion));
+		specs.setWelfarePrice(backPrice);
+	}
 }

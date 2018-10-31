@@ -10,4 +10,6 @@ public interface RebateConsumeMapper {
 	List<RebateConsume> listRebateConsume();
 	
 	void insertRebateConsume(Rebate4Order rebate4Order);
+
+	void insertRebateConsumeBatch(List<Rebate4Order> list);
 }

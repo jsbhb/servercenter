@@ -123,5 +123,14 @@ public class RebateController {
 		}
 		return new ResultModel(false, "版本号错误");
 	}
+	
+	@RequestMapping(value = "{version}/finance/rebate4order/batch", method = RequestMethod.POST)
+	public void rebate4orderBatch(@PathVariable("version") Double version,
+			@RequestBody List<Rebate4Order> rebate4OrderList) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			rebateService.rebate4orderBatch(rebate4OrderList);
+		}
+	}
 
 }

@@ -695,7 +695,18 @@
 	
 	
 	<insert id="insertRebateConsume" parameterType="Object">
-		insert into ignore rebate_order(grade_id,order_id,money,create_time)
+		insert ignore into rebate_order(grade_id,order_id,money,create_time)
 		value(#{gradeId},#{orderId},#{money},now())
 	</insert>
+	
+	<select id="listRebate4Order" parameterType="Object" resultType="com.zm.order.pojo.bo.Rebate4Order">
+		select grade_id as gradeId,order_id as orderId,money from rebate_order
+	</select>
+	
+	<delete id="deleteRebate4Order" parameterType="Object">
+		delete from rebate_order where order_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item.orderId}
+		</foreach>
+	</delete>
 </mapper>

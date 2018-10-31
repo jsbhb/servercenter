@@ -31,5 +31,9 @@ public interface FinanceFeignClient {
 	@RequestMapping(value = "{version}/finance/rebate4order", method = RequestMethod.POST)
 	public ResultModel rebate4order(@PathVariable("version") Double version,
 			@RequestBody Rebate4Order rebate4Order);
+	
+	@RequestMapping(value = "{version}/finance/rebate4order/batch", method = RequestMethod.POST)
+	public void rebate4orderBatch(@PathVariable("version") Double version,
+			@RequestBody List<Rebate4Order> rebate4OrderList);
 
 }

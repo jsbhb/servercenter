@@ -3,11 +3,18 @@
 <mapper namespace="com.zm.finance.bussiness.dao.RebateConsumeMapper">
 
 	<insert id="insertRebateConsume" parameterType="Object">
-		insert into ignore rebate_order(grade_id,order_id,money,create_time)
+		insert ignore into rebate_order(grade_id,order_id,money,create_time)
 		value(#{gradeId},#{orderId},#{money},now())
 	</insert>
 	
 	<select id="listRebateConsume" parameterType="Object" resultType="com.zm.finance.pojo.rebate.RebateConsume">
 		select sum(money) as totalConsume,grade_id as gradeId from rebate_order group by grade_id
 	</select>
+	
+	<insert id="insertRebateConsumeBatch" parameterType="Object">
+		insert into ignore rebate_order(grade_id,order_id,money,create_time) values 
+		<foreach collection="list" item="item" separator=",">
+			(#{item.gradeId},#{item.orderId},#{item.money},now())
+		</foreach>
+	</insert>
 </mapper>

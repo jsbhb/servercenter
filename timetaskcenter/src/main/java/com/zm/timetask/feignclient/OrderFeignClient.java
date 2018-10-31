@@ -72,4 +72,7 @@ public interface OrderFeignClient {
 
 	@RequestMapping(value = "{version}/cache/month", method = RequestMethod.GET)
 	public void initMonth(@PathVariable("version") Double version);
+	
+	@RequestMapping(value = "{version}/rebateorder/finance/schedule", method = RequestMethod.GET)
+	public void saveRebateOrderToFinancecenter(@PathVariable("version") Double version);
 }

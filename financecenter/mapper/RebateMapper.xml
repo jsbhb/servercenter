@@ -32,7 +32,7 @@
 	
 	<insert id="insertRebate" parameterType="Object">
 		insert into rebate 
-		(grade_id,can_be_presented,already_presented,stay_to_account,remark,create_time)
+		(grade_id,can_be_presented,already_presented,stay_to_account,remark,already_check,create_time)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
 			(#{item.gradeId},#{item.canBePresented},#{item.alreadyPresented},#{item.stayToAccount},#{item.remark},#{item.alreadyCheck},now())

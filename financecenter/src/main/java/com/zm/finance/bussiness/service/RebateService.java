@@ -41,4 +41,6 @@ public interface RebateService {
 
 	ResultModel saveRebate4order(Rebate4Order rebate4Order);
 
+	void rebate4orderBatch(List<Rebate4Order> rebate4OrderList);
+
 }

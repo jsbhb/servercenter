@@ -3,7 +3,7 @@ drop table if exists  `rebate_order`;
 CREATE TABLE `zm_financial`.`rebate_order` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `grade_id` INT NULL COMMENT 'gradeID',
-  `orderId` VARCHAR(200) NOT NULL COMMENT '订单号',
+  `order_id` VARCHAR(200) NOT NULL COMMENT '订单号',
   `money` DECIMAL(12,2) DEFAULT 0 COMMENT '返佣支付金额',
   `remark` VARCHAR(200) NULL COMMENT '备注',
   `create_time` DATETIME NULL COMMENT '注册时间', 

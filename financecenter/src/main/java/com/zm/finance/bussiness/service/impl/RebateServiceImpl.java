@@ -151,4 +151,11 @@ public class RebateServiceImpl implements RebateService {
 		return new ResultModel(true);
 	}
 
+	@Override
+	public void rebate4orderBatch(List<Rebate4Order> rebate4OrderList) {
+		if(rebate4OrderList != null && rebate4OrderList.size() > 0){
+			rebateConsumeMapper.insertRebateConsumeBatch(rebate4OrderList);
+		}
+	}
+
 }

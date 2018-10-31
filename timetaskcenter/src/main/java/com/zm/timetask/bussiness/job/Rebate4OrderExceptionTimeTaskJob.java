@@ -8,16 +8,17 @@ import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Component;
 
 import com.zm.timetask.constants.Constants;
-import com.zm.timetask.feignclient.FinanceFeignClient;
+import com.zm.timetask.feignclient.OrderFeignClient;
 
 @Component
-public class RebateCheckTimeTaskJob implements Job{
+public class Rebate4OrderExceptionTimeTaskJob implements Job{
 
 	@Resource
-	FinanceFeignClient financeFeignClient;
-
+	OrderFeignClient orderFeignClient;
+	
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		financeFeignClient.rebateCheck(Constants.FIRST_VERSION);
+		orderFeignClient.saveRebateOrderToFinancecenter(Constants.FIRST_VERSION);
 	}
+
 }
