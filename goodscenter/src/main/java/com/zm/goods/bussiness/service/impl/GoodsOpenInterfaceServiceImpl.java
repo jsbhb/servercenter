@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -132,6 +133,8 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 			}
 			// 规格信息格式化
 			infoFormat(list);
+			// 包邮包税设定
+			postAndTaxSetting(list);
 			return new ResultModel(true, list);
 		}
 		String pageStr = param.get("page") == null ? null : param.get("page").toString();
@@ -166,8 +169,36 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		}
 		// 规格信息格式化
 		infoFormat(list);
-
+		// 包邮包税设定
+		postAndTaxSetting(list);
 		return new ResultModel(true, list);
+	}
+
+	private void postAndTaxSetting(List<GoodsDetail> list) {
+		Map<Integer, List<GoodsDetail>> tempMap = new HashMap<Integer, List<GoodsDetail>>();
+		List<GoodsDetail> tempList = null;
+		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		for (GoodsDetail item : list) {
+			if (tempMap.get(item.getSupplierId()) == null) {
+				tempList = new ArrayList<GoodsDetail>();
+				tempList.add(item);
+				tempMap.put(item.getSupplierId(), tempList);
+			} else {
+				tempMap.get(item.getSupplierId()).add(item);
+			}
+		}
+		for (Map.Entry<Integer, List<GoodsDetail>> entry : tempMap.entrySet()) {
+			Map<String, String> map = hashOperations.entries(Constants.POST_TAX + entry.getKey());
+			if (map != null) {
+				String post = map.get("post");
+				String tax = map.get("tax");
+				for (GoodsDetail item : entry.getValue()) {
+					item.setFreePost(Integer.valueOf(post == null ? "0" : post));
+					item.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
+				}
+			}
+		}
+
 	}
 
 	private void infoFormat(List<GoodsDetail> list) {

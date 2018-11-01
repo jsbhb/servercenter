@@ -32,6 +32,8 @@ public class GoodsDetail {
 	private Double exciseTax;
 	private String firstCategory;
 	private Integer quantity;
+	private Integer freePost;
+	private Integer freeTax;
 	
 	public void infoFilter() {
 		if (info != null && !"".equals(info.trim())) {
@@ -46,6 +48,22 @@ public class GoodsDetail {
 		}
 	}
 	
+	public Integer getFreePost() {
+		return freePost;
+	}
+
+	public void setFreePost(Integer freePost) {
+		this.freePost = freePost;
+	}
+
+	public Integer getFreeTax() {
+		return freeTax;
+	}
+
+	public void setFreeTax(Integer freeTax) {
+		this.freeTax = freeTax;
+	}
+
 	public Integer getQuantity() {
 		return quantity;
 	}
