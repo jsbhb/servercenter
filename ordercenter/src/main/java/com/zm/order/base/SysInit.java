@@ -26,7 +26,7 @@ public class SysInit {
 	public void init(){
 		loadGradeBO();
 		
-		cacheAbstractService.initCache();
+//		cacheAbstractService.initCache();
 	}
 	
 	private void loadGradeBO(){
