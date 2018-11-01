@@ -57,6 +57,8 @@
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="invite_logo" property="inviteLogo" jdbcType="VARCHAR" />
+		<result column="qrcode_logo" property="qrcodeLogo" jdbcType="VARCHAR" />
 	</resultMap>
 
 	<resultMap type="com.zm.user.pojo.po.GradeTypePO" id="gradeTypePO">
@@ -180,8 +182,8 @@
 	<update id="updateGradeConfig" parameterType="Object">
 		update grade_config
 		set update_time = now(),opt= #{opt},
-		head_img= #{headImg},aboutus=
-		#{aboutUs},name= #{name}
+		head_img= #{headImg},aboutus= #{aboutUs},name= #{name},
+		invite_logo= #{inviteLogo},qrcode_logo= #{qrcodeLogo}
 		where grade_id = #{gradeId}
 	</update>
 

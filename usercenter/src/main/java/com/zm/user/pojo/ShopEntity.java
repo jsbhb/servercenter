@@ -18,6 +18,8 @@ public class ShopEntity {
 	private String createTime;
 	private String updateTime;
 	private String opt;
+	private String inviteLogo;
+	private String qrcodeLogo;
 	
 	public int getId() {
 		return id;
@@ -72,6 +74,18 @@ public class ShopEntity {
 	}
 	public void setOpt(String opt) {
 		this.opt = opt;
+	}
+	public String getInviteLogo() {
+		return inviteLogo;
+	}
+	public void setInviteLogo(String inviteLogo) {
+		this.inviteLogo = inviteLogo;
+	}
+	public String getQrcodeLogo() {
+		return qrcodeLogo;
+	}
+	public void setQrcodeLogo(String qrcodeLogo) {
+		this.qrcodeLogo = qrcodeLogo;
 	}
 	
 }
