@@ -215,6 +215,8 @@ public class GoodsOpenInterfaceServiceImpl implements GoodsOpenInterfaceService 
 		if (set != null && set.size() > 0 && list != null && list.size() > 0) {
 			// 规格信息格式化
 			infoFormat(list);
+			// 包邮包税设定
+			postAndTaxSetting(list);
 			String nonceStr = System.currentTimeMillis() + "";
 			Map<String, Object> param = new HashMap<String, Object>();
 			param.put(METHOD, GOODS_UP_SHELVES);
