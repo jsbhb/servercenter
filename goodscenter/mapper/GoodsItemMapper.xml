@@ -75,6 +75,7 @@
 		<result column="goods_id" property="goodsId" />
 		<result column="goods_name" property="goodsName"/>
 		<result column="detail_path" property="detailPath"/>
+		<result column="gel_goods_path" property="description"/>
 		<association property="baseEntity" javaType="com.zm.goods.pojo.GoodsBaseEntity">
 			<id column="b_id" property="id" jdbcType="INTEGER" />
 			<result column="first_category" property="firstCatalogId" />
@@ -518,10 +519,11 @@
 	</update>
 	
 	<select id="selectForPageDownload" parameterType="Object" resultMap="goods">
-		select g.*,b.id b_id,b.first_category,b.second_category,b.third_category
-		from goods_extension_label gel
-		inner join goods g on g.goods_id = gel.goods_id
+		select g.*,b.id b_id,b.first_category,b.second_category,b.third_category,
+		gel.goods_path gel_goods_path
+		from goods g
 		inner join base b on g.base_id = b.id
+		left join goods_extension_label gel on g.goods_id = gel.goods_id
 		where 1=1 and g.is_del = 0
 		<if test="goodsName!=null and goodsName!=''">
 			and g.goods_name like concat('%',#{goodsName},'%') 
