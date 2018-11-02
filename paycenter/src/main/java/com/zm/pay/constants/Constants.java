@@ -83,5 +83,11 @@ public class Constants {
 	public static String FRONT_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//测试
 //	public static String FRONT_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//正式
 //	public static String BACK_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/unionNotify";//正式
-
+	
+	
+	// ********************易宝支付参数*****************************
+//	public static final String YOP_NOTIFY_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/yop-payNotify";//正式
+//	public static final String YOP_RETURN_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/yop-payReturn";//正式
+	public static final String YOP_NOTIFY_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/yop-payNotify";//测试
+	public static final String YOP_RETURN_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/yop-payReturn";//测试
 }

@@ -127,6 +127,12 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>yop</groupId>
+			<artifactId>java-sdk</artifactId>
+			<version>2.2.0</version>
+		</dependency>
 
 	</dependencies>
 	<build>

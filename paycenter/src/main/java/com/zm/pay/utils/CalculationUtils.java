@@ -68,7 +68,7 @@ public class CalculationUtils {
 	 * @return 两个参数的商
 	 * @throws IllegalAccessException
 	 */
-	public static double div(double value1, double value2, int scale) throws IllegalAccessException {
+	public static double div(String value1, double value2, int scale) throws IllegalAccessException {
 		// 如果精确范围小于0，抛出异常信息
 		if (scale < 0) {
 			throw new IllegalAccessException("精确度不能小于0");

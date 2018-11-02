@@ -1,6 +1,7 @@
 package com.zm.pay.utils;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -32,6 +33,14 @@ public class JSONUtil {
         }
 
         public static <T> T parse(String jsonString, Class<T> type) {
+            try {
+                return objectMapper.readValue(jsonString, type);
+            } catch (Exception e) {
+                throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+            }
+        }
+        
+        public static <T> T parse(String jsonString, TypeReference<T> type) {
             try {
                 return objectMapper.readValue(jsonString, type);
             } catch (Exception e) {
