@@ -1,5 +1,7 @@
 package com.zm.pay.bussiness.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
+import com.zm.pay.exception.PayUtilException;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
@@ -46,6 +49,24 @@ public class PayController {
 			@RequestBody PayModel model, HttpServletRequest req) throws Exception {
 
 		return payService.aliPay(clientId, type, model);
+
+	}
+	
+	@RequestMapping(value = "yoppay/{clientId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public Map<String, Object> yopPay(@PathVariable("clientId") Integer clientId,
+			@RequestBody PayModel model, HttpServletRequest req) throws IOException{
+
+		Map<String,Object> result = new HashMap<String, Object>();
+		try {
+			String url = payService.yopPay(clientId, model);
+			result.put("success", true);
+			result.put("url", url);
+		} catch (PayUtilException e) {
+			result.put("success", false);
+			result.put("msg", e.getMessage());
+		}
+		return result;
 
 	}
 

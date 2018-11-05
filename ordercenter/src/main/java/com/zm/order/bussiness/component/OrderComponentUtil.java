@@ -142,7 +142,8 @@ public class OrderComponentUtil {
 		int rebateFee = (int) ((info.getOrderDetail().getRebateFee() == null ? 0 : info.getOrderDetail().getRebateFee())
 				* 100);
 		localAmount += rebateFee;
-		LogUtil.writeLog("amount:"+amount+",totalAmount:"+totalAmount+",localAmount:"+localAmount+",rebateFee:"+rebateFee);
+		LogUtil.writeLog("amount:" + amount + ",totalAmount:" + totalAmount + ",localAmount:" + localAmount
+				+ ",rebateFee:" + rebateFee);
 		if (totalAmount - localAmount > Constants.DEVIATION || totalAmount - localAmount < -Constants.DEVIATION) {// 价格区间定义在正负5分
 			return false;
 		}
@@ -214,14 +215,14 @@ public class OrderComponentUtil {
 				result.setErrorMsg("权限错误，不能使用返佣支付");
 				return;
 			}
-			if(Constants.REBATE_PAY.equals(payType)){
+			if (Constants.REBATE_PAY.equals(payType)) {
 				result.setSuccess(false);
 				result.setErrorMsg("权限错误，不能使用返佣支付");
 				return;
 			}
 		} else {
-			if(Constants.REBATE_PAY.equals(payType)){
-				if(info.getOrderDetail().getPayment() > 0){
+			if (Constants.REBATE_PAY.equals(payType)) {
+				if (info.getOrderDetail().getPayment() > 0) {
 					result.setSuccess(false);
 					result.setErrorMsg("还有余额需要支付，请选择其他支付方式");
 					return;
@@ -349,7 +350,7 @@ public class OrderComponentUtil {
 			} catch (Exception e) {
 				exceptionHandle(result, info, rebateFee);
 			}
-			
+
 		} else if (Constants.ALI_PAY.equals(payType)) {
 			try {
 				result.setObj(payFeignClient.aliPay(info.getCenterId(), type, payModel));
@@ -363,6 +364,12 @@ public class OrderComponentUtil {
 				exceptionHandle(result, info, rebateFee);
 			}
 		} else if (Constants.REBATE_PAY.equals(payType)) {
+		} else if (Constants.YOP_PAY.equals(payType)) {
+			try {
+				result.setObj(payFeignClient.yopPay(info.getCenterId(), payModel));
+			} catch (Exception e) {
+				exceptionHandle(result, info, rebateFee);
+			}
 		} else {
 			result.setSuccess(false);
 			result.setErrorMsg("请指定正确的支付方式");

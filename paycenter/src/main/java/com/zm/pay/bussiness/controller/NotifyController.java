@@ -560,7 +560,7 @@ public class NotifyController {
 
 	@RequestMapping(value = "auth/payMng/yop-payNotify")
 	@ApiIgnore
-	public void yopPayNotify(HttpServletRequest req, HttpServletResponse res) {
+	public void yopPayNotify(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		// 获取回调数据
 		String responseMsg = req.getParameter("response");
 		Map<String, String> jsonMap = new HashMap<String, String>();
@@ -576,6 +576,18 @@ public class NotifyController {
 		dto = DigitalEnvelopeUtils.decrypt(dto, privateKey, publicKey);
 		System.out.println("解密结果:" + dto.getPlainText());
 		jsonMap = JSONUtil.parse(dto.getPlainText(), new TypeReference<TreeMap<String, String>>() {});
+		String orderId = jsonMap.get("orderId");
+		String payNo = jsonMap.get("uniqueOrderNo");
+		PrintWriter pw = res.getWriter();
+		if (orderId.startsWith("GX")) {
+			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION,
+					orderId, payNo);
+			if(result.isSuccess()){
+				pw.println("SUCCESS");
+				return;
+			}
+		}
+		pw.println("FAIL");
 	}
 
 }

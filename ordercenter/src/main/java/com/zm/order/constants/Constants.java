@@ -12,6 +12,8 @@ public class Constants {
 	public static final String UNION_PAY = "3";
 	
 	public static final String REBATE_PAY = "4";
+	
+	public static final String YOP_PAY = "5";
 
 	public static final String JSAPI = "JSAPI";
 
