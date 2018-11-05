@@ -335,6 +335,7 @@ public class OrderComponentUtil {
 		payModel.setBody("购物订单");
 		payModel.setOrderId(info.getOrderId());
 		payModel.setTotalAmount(totalAmount + "");
+		payModel.setPhone(info.getOrderDetail().getReceivePhone());
 		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
 		if (detailStr.length() > 60) {// 支付宝描述过长会报错
 			detailStr = detailStr.substring(0, 60) + "...";
@@ -366,6 +367,7 @@ public class OrderComponentUtil {
 		} else if (Constants.REBATE_PAY.equals(payType)) {
 		} else if (Constants.YOP_PAY.equals(payType)) {
 			try {
+				payModel.setTotalAmount(CalculationUtils.div(totalAmount, 100, 2) + "");
 				result.setObj(payFeignClient.yopPay(info.getCenterId(), payModel));
 			} catch (Exception e) {
 				exceptionHandle(result, info, rebateFee);

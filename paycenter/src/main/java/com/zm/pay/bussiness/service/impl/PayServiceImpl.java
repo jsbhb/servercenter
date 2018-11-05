@@ -338,7 +338,11 @@ public class PayServiceImpl implements PayService {
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
 		}
-		model.setDetail(sb.toString().substring(0, sb.toString().length() - 1));
+		if (sb.length() > 60) {// 支付宝描述过长会报错
+			model.setDetail(sb.substring(0, 60) + "...");
+		} else {
+			model.setDetail(sb.toString().substring(0, sb.toString().length() - 1));
+		}
 		// end
 		if (Constants.ALI_PAY.equals(payType)) {
 			if (!Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {
@@ -383,6 +387,18 @@ public class PayServiceImpl implements PayService {
 			} else {
 				return new ResultModel(result);
 			}
+		}
+		// 易宝支付
+		if (Constants.YOP_PAY.equals(payType)) {
+			if (!Constants.YOP_PAY.equals(info.getOrderDetail().getPayType())) {
+				OrderDetail detail = new OrderDetail();
+				detail.setPayType(Constants.YOP_PAY);
+				detail.setOrderId(info.getOrderId());
+				orderFeignClient.updateOrderPayType(version, detail);
+			}
+			model.setTotalAmount(info.getOrderDetail().getPayment() + "");
+			model.setPhone(info.getOrderDetail().getReceivePhone());
+			return new ResultModel(yopPay(info.getCenterId(), model));
 		}
 		return null;
 	}
@@ -465,7 +481,7 @@ public class PayServiceImpl implements PayService {
 		// timeoutExpress);//单位：分钟，默认24小时，最小1分钟，最大180天
 		// params.put("requestDate", requestDate);//请求时间，用于计算订单有效期，格式 yyyy-MM-dd
 		// HH:mm:ss，不传默认为易宝接收到请求的时间
-//		params.put("redirectUrl", Constants.YOP_RETURN_URL);//默认停留在易宝支付完成页面
+		// params.put("redirectUrl", Constants.YOP_RETURN_URL);//默认停留在易宝支付完成页面
 		params.put("notifyUrl", Constants.YOP_NOTIFY_URL);
 		params.put("goodsParamExt", goodsParamExt);
 		params.put("paymentParamExt", "");// 支付扩展信息当需要限制交易所使用的卡的时候，可以使用本参数来对支付的卡号，姓名，身份证进行限制，仅对快捷支付有效
@@ -475,7 +491,7 @@ public class PayServiceImpl implements PayService {
 
 		Map<String, String> tempResult = new HashMap<String, String>();
 		String uri = YeepayService.getUrl(YeepayService.TRADEORDER_URL);
-		tempResult = YeepayService.requestYOP(params, uri, YeepayService.TRADEORDER,config);
+		tempResult = YeepayService.requestYOP(params, uri, YeepayService.TRADEORDER, config);
 
 		String token = tempResult.get("token");
 		String codeRe = tempResult.get("code");
@@ -494,7 +510,7 @@ public class PayServiceImpl implements PayService {
 		params.put("userNo", model.getPhone());
 		params.put("userType", "PHONE");
 
-		String url = YeepayService.getUrl(params,config);
+		String url = YeepayService.getUrl(params, config);
 		System.out.println(url);
 		return url;
 	}

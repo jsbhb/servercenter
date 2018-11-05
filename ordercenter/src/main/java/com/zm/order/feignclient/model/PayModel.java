@@ -12,6 +12,9 @@ public class PayModel {
 	
 	private String detail;
 	
+	//易宝支付
+	private String phone;
+	
 	//微信相关
 	private String openId;
 	
@@ -20,6 +23,14 @@ public class PayModel {
 	
 	public String getIP() {
 		return IP;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public void setIP(String iP) {
