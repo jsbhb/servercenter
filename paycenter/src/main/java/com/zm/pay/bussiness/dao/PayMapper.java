@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.pojo.YopConfigModel;
 
 public interface PayMapper {
 
@@ -21,4 +22,8 @@ public interface PayMapper {
 	List<UnionPayConfig> listUnionPayConfig();
 	
 	UnionPayConfig getUnionPayConfig(@Param("centerId") Integer centerId);
+	
+	List<YopConfigModel> listYopPayConfig();
+
+	YopConfigModel getYopPayConfig(@Param("centerId") Integer clientId);
 }

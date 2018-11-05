@@ -11,6 +11,9 @@ public class PayModel {
 	private String orderId;
 
 	private String detail;
+	
+	//易宝支付需要
+	private String phone;
 
 	// 微信相关
 	private String openId;
@@ -21,6 +24,14 @@ public class PayModel {
 	public String getBizContent() {
 		return "{" + "\"out_trade_no\":" + orderId + "," + "\"total_amount\":" + totalAmount + "," + "\"subject\":"
 				+ subject + "," + "\"body\":" + body + "," + "\"timeout_express\":\"15m\"}";
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getIP() {

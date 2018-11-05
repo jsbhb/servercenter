@@ -3,8 +3,6 @@ package com.zm.pay.utils.ali;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dom4j.DocumentException;
-
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;

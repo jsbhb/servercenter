@@ -8,11 +8,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +28,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
+import com.yeepay.g3.sdk.yop.encrypt.CertTypeEnum;
+import com.yeepay.g3.sdk.yop.encrypt.DigitalEnvelopeDTO;
+import com.yeepay.g3.sdk.yop.utils.DigitalEnvelopeUtils;
+import com.yeepay.g3.sdk.yop.utils.InternalConfig;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
@@ -35,12 +43,15 @@ import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.pojo.YopConfigModel;
 import com.zm.pay.utils.IOUtils;
+import com.zm.pay.utils.JSONUtil;
 import com.zm.pay.utils.ali.util.AlipayNotify;
 import com.zm.pay.utils.unionpay.sdk.AcpService;
 import com.zm.pay.utils.unionpay.sdk.Base;
 import com.zm.pay.utils.unionpay.sdk.LogUtil;
 import com.zm.pay.utils.unionpay.sdk.SDKConstants;
+import com.zm.pay.utils.yop.YeepayService;
 
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -318,8 +329,7 @@ public class NotifyController {
 		Map<String, String> respParam = getAllRequestParam(req);
 		Map<String, String> valideData = null;
 		if (null != respParam && !respParam.isEmpty()) {
-			Iterator<Entry<String, String>> it = respParam.entrySet()
-					.iterator();
+			Iterator<Entry<String, String>> it = respParam.entrySet().iterator();
 			valideData = new HashMap<String, String>(respParam.size());
 			while (it.hasNext()) {
 				Entry<String, String> e = it.next();
@@ -394,8 +404,7 @@ public class NotifyController {
 		LogUtil.printRequestLog(respParam);
 		Map<String, String> valideData = null;
 		if (null != respParam && !respParam.isEmpty()) {
-			Iterator<Entry<String, String>> it = respParam.entrySet()
-					.iterator();
+			Iterator<Entry<String, String>> it = respParam.entrySet().iterator();
 			valideData = new HashMap<String, String>(respParam.size());
 			while (it.hasNext()) {
 				Entry<String, String> e = it.next();
@@ -476,6 +485,7 @@ public class NotifyController {
 	 * @param request
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private static Map<String, String> getAllRequestParamStream(final HttpServletRequest request) {
 		Map<String, String> res = new HashMap<String, String>();
 		try {
@@ -498,9 +508,8 @@ public class NotifyController {
 		}
 		return res;
 	}
-	
-	public static Map<String, String> getAllRequestParam(
-			final HttpServletRequest request) {
+
+	public static Map<String, String> getAllRequestParam(final HttpServletRequest request) {
 		Map<String, String> res = new HashMap<String, String>();
 		Enumeration<?> temp = request.getParameterNames();
 		if (null != temp) {
@@ -516,6 +525,57 @@ public class NotifyController {
 			}
 		}
 		return res;
+	}
+
+	@RequestMapping(value = "auth/payMng/yop-payReturn")
+	@ApiIgnore
+	public void yopPayReturn(HttpServletRequest req, HttpServletResponse res) {
+		String merchantNo = req.getParameter("merchantNo");
+		String parentMerchantNo = req.getParameter("parentMerchantNo");
+		String orderId = req.getParameter("orderId");
+		String sign = req.getParameter("sign");
+		Map<String, String> responseMap = new HashMap<String, String>();
+		responseMap.put("merchantNo", merchantNo);
+		responseMap.put("parentMerchantNo", parentMerchantNo);
+		responseMap.put("orderId", orderId);
+		responseMap.put("sign", sign);
+		Integer clientId = null;
+		UserVip user = null;
+		if (orderId != null && orderId.startsWith("GX")) {
+			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+		}
+		if (orderId != null && orderId.startsWith("VIP")) {
+			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = user.getCenterId();
+		}
+		YopConfigModel config = (YopConfigModel) template.opsForValue()
+				.get(Constants.PAY + clientId + Constants.YOP_PAY);
+
+		if (YeepayService.verifyCallback(responseMap, config)) {
+
+		} else {
+			logger.info("易宝支付验签出错");
+		}
+	}
+
+	@RequestMapping(value = "auth/payMng/yop-payNotify")
+	@ApiIgnore
+	public void yopPayNotify(HttpServletRequest req, HttpServletResponse res) {
+		// 获取回调数据
+		String responseMsg = req.getParameter("response");
+		Map<String, String> jsonMap = new HashMap<String, String>();
+		DigitalEnvelopeDTO dto = new DigitalEnvelopeDTO();
+		dto.setCipherText(responseMsg);
+		// InternalConfig internalConfig =
+		// InternalConfig.Factory.getInternalConfig();
+		PrivateKey privateKey = InternalConfig.getISVPrivateKey(CertTypeEnum.RSA2048);
+		System.out.println("privateKey: " + privateKey);
+		PublicKey publicKey = InternalConfig.getYopPublicKey(CertTypeEnum.RSA2048);
+		System.out.println("publicKey: " + publicKey);
+
+		dto = DigitalEnvelopeUtils.decrypt(dto, privateKey, publicKey);
+		System.out.println("解密结果:" + dto.getPlainText());
+		jsonMap = JSONUtil.parse(dto.getPlainText(), new TypeReference<TreeMap<String, String>>() {});
 	}
 
 }

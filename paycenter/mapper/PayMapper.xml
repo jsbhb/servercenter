@@ -35,6 +35,13 @@
 		<result column="middleCert_path" property="middleCertPath" jdbcType="VARCHAR" />
 		<result column="rootCert_path" property="rootCertPath" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.pay.pojo.YopConfigModel" id="yopconfig">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="center_id" property="centerId" jdbcType="INTEGER" />
+		<result column="parentMerchantNo" property="parentMerchantNo" jdbcType="VARCHAR" />
+		<result column="merchantNo" property="merchantNo" jdbcType="VARCHAR" />
+	</resultMap>
 
 
 	<select id="listAliPayConfig" resultMap="aliconfig">
@@ -45,6 +52,14 @@
 	<select id="listWeixinPayConfig" resultMap="wxconfig">
 		select * from
 		wxpay_config;
+	</select>
+	
+	<select id="listYopPayConfig" resultMap="yopconfig">
+		select * from yop_config
+	</select>
+	
+	<select id="getYopPayConfig" parameterType="Object" resultMap="yopconfig">
+		select * from yop_config where center_id = #{centerId}
 	</select>
 	
 	<select id="getAliPayConfig" parameterType="Object" resultMap="aliconfig">

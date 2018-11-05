@@ -36,6 +36,10 @@ public class Constants {
 
 	public static final Integer UNION_PAY = 3;
 	
+	public static final Integer REBATE_PAY = 4;
+	
+	public static final Integer YOP_PAY = 5;
+	
 	public static final String UNION_PAY_MER_ID = "unionpay:mer_id";
 
 	// *********************订单状态******************************/

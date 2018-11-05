@@ -1,10 +1,12 @@
 package com.zm.pay.bussiness.service;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.alipay.api.AlipayApiException;
+import com.zm.pay.exception.PayUtilException;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
@@ -30,9 +32,9 @@ public interface PayService {
 	 */
 	boolean payCustom(CustomModel model) throws Exception;
 
-	Map<String,Object> aliPay(Integer clientId, String type, PayModel model) throws Exception;
-	
-	Map<String,Object> unionPay(Integer clientId, PayModel model, String type);
+	Map<String, Object> aliPay(Integer clientId, String type, PayModel model) throws Exception;
+
+	Map<String, Object> unionPay(Integer clientId, PayModel model, String type);
 
 	/**
 	 * 阿里 退款接口
@@ -41,7 +43,7 @@ public interface PayService {
 	 * @param model
 	 * @return
 	 */
-	Map<String,Object> aliRefundPay(Integer clientId, RefundPayModel model) throws AlipayApiException;
+	Map<String, Object> aliRefundPay(Integer clientId, RefundPayModel model) throws AlipayApiException;
 
 	/**
 	 * 微信 退款接口
@@ -51,7 +53,7 @@ public interface PayService {
 	 * @return
 	 */
 	Map<String, Object> wxRefundPay(Integer clientId, RefundPayModel model) throws Exception;
-	
+
 	/**
 	 * 支付接口
 	 * 
@@ -65,4 +67,14 @@ public interface PayService {
 	 * @return
 	 */
 	String testHttps();
+
+	/**
+	 * 
+	 * @param clientId
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	String yopPay(Integer clientId, PayModel model) throws IOException, PayUtilException;
+
 }

@@ -1,5 +1,6 @@
 package com.zm.pay.bussiness.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.github.wxpay.sdk.WXPay;
 import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
+import com.zm.pay.exception.PayUtilException;
 import com.zm.pay.feignclient.GoodsFeignClient;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
@@ -36,11 +38,13 @@ import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.pojo.YopConfigModel;
 import com.zm.pay.utils.CalculationUtils;
 import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
 import com.zm.pay.utils.unionpay.UnionPayUtil;
 import com.zm.pay.utils.wx.WxPayUtils;
+import com.zm.pay.utils.yop.YeepayService;
 
 /**
  * ClassName: PayServiceImpl <br/>
@@ -429,5 +433,69 @@ public class PayServiceImpl implements PayService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public String yopPay(Integer clientId, PayModel model) throws IOException, PayUtilException {
+		YopConfigModel config = (YopConfigModel) template.opsForValue()
+				.get(Constants.PAY + clientId + Constants.YOP_PAY);
+
+		if (config == null) {
+			config = payMapper.getYopPayConfig(clientId);
+			if (config == null) {
+				throw new PayUtilException("没有支付配置信息");
+			}
+			template.opsForValue().set(Constants.PAY + clientId + Constants.YOP_PAY, config);
+		}
+
+		if (config.getUrl() == null) {
+			String url = userFeignClient.getClientUrl(clientId, Constants.FIRST_VERSION);
+			config.setUrl(url);
+			template.opsForValue().set(Constants.PAY + clientId + Constants.YOP_PAY, config);
+		}
+		String goodsParamExt = "{\"goodsName\":\"" + model.getDetail() + "\",\"goodsDesc\":\"\"}";
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("orderId", model.getOrderId());
+		try {
+			params.put("orderAmount", CalculationUtils.div(model.getTotalAmount(), 100, 2) + "");
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		// params.put("timeoutExpress",
+		// timeoutExpress);//单位：分钟，默认24小时，最小1分钟，最大180天
+		// params.put("requestDate", requestDate);//请求时间，用于计算订单有效期，格式 yyyy-MM-dd
+		// HH:mm:ss，不传默认为易宝接收到请求的时间
+//		params.put("redirectUrl", Constants.YOP_RETURN_URL);//默认停留在易宝支付完成页面
+		params.put("notifyUrl", Constants.YOP_NOTIFY_URL);
+		params.put("goodsParamExt", goodsParamExt);
+		params.put("paymentParamExt", "");// 支付扩展信息当需要限制交易所使用的卡的时候，可以使用本参数来对支付的卡号，姓名，身份证进行限制，仅对快捷支付有效
+		params.put("industryParamExt", "");// 行业拓展参数,预留字段，暂时不需要输入
+		params.put("memo", "");// 自定义自身业务需要使用的字段，如对账时定义该订单应属的会计科目等最多支持21个中文或32位英文字符
+		// params.put("riskParamExt", riskParamExt);//风控拓展参数,如需填写，请联系易宝技术支持提供
+
+		Map<String, String> tempResult = new HashMap<String, String>();
+		String uri = YeepayService.getUrl(YeepayService.TRADEORDER_URL);
+		tempResult = YeepayService.requestYOP(params, uri, YeepayService.TRADEORDER,config);
+
+		String token = tempResult.get("token");
+		String codeRe = tempResult.get("code");
+		if (!"OPR00000".equals(codeRe)) {
+			String message = tempResult.get("message");
+			throw new PayUtilException(message);
+		}
+
+		String parentMerchantNo = config.getParentMerchantNo();
+		String merchantNo = config.getMerchantNo();
+
+		params.put("parentMerchantNo", parentMerchantNo);
+		params.put("merchantNo", merchantNo);
+		params.put("orderId", model.getOrderId());
+		params.put("token", token);
+		params.put("userNo", model.getPhone());
+		params.put("userType", "PHONE");
+
+		String url = YeepayService.getUrl(params,config);
+		System.out.println(url);
+		return url;
 	}
 }
