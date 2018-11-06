@@ -120,8 +120,9 @@ public class Constants {
 	public static final Integer ORDER_SOURCE_YOUZAN = 3;//有赞
 	public static final Integer ORDER_SOURCE_EXHIBITION = 5;//展厅
 	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;//大客户
-	public static final int WELFARE_WEBSITE = 7;//福利网站
+	public static final Integer WELFARE_WEBSITE = 7;//福利网站
 	public static final int BACK_MANAGER_WEBSITE = 8;//后台来源
+	public static final Integer TAIPING_HUIHUI = 9;//太平慧慧
 	
 	//*******************订单创建类型**********************
 	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单

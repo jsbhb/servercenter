@@ -1,6 +1,5 @@
 package com.zm.pay.utils.wx;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +20,6 @@ import com.zm.pay.utils.CommonUtils;
 
 public class WxPayUtils {
 
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-
 	private static final String CUSTOM_URL = "https://api.mch.weixin.qq.com/cgi-bin/mch/customs/customdeclareorder";
 
 	private static final Integer CONNECT_TIMEOUTMS = 5000;
@@ -39,7 +36,7 @@ public class WxPayUtils {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("body", model.getBody());
 		data.put("device_info", "");
-		data.put("out_trade_no", model.getOrderId()+"_"+type);
+		data.put("out_trade_no", model.getOrderId());
 		data.put("fee_type", Constants.FEE_TYPE);
 		data.put("total_fee", model.getTotalAmount());
 		data.put("notify_url", Constants.WX_NOTIFY_URL);

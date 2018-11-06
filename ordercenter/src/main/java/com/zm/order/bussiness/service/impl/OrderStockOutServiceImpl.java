@@ -231,10 +231,11 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				String time = DateUtils.getTimeString("yyyyMM");
 				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
-				// 如果是有赞或展厅的不进行返佣计算
+				// 特定来源不进行返佣计算
 				if (Constants.ORDER_SOURCE_EXHIBITION.equals(info.getOrderSource())
 						|| Constants.ORDER_SOURCE_YOUZAN.equals(info.getOrderSource())
-						|| Constants.ORDER_SOURCE_BIG_CUSTOMER.equals(info.getOrderSource())) {
+						|| Constants.ORDER_SOURCE_BIG_CUSTOMER.equals(info.getOrderSource())
+						|| Constants.TAIPING_HUIHUI.equals(info.getOrderSource())) {
 
 					// 增加当天销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
@@ -580,7 +581,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	private List<RebateDownload> listOrderForRebateDownload(List<RebateDownload> rebateResult) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		Set<String> orderIds = new HashSet<String>();
-		for(RebateDownload temp : rebateResult){
+		for (RebateDownload temp : rebateResult) {
 			orderIds.add(temp.getOrderId());
 		}
 		param.put("orderIds", orderIds);
