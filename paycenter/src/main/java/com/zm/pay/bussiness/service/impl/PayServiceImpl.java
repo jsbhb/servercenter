@@ -1,7 +1,9 @@
 package com.zm.pay.bussiness.service.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ import com.zm.pay.utils.CalculationUtils;
 import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
 import com.zm.pay.utils.unionpay.UnionPayUtil;
+import com.zm.pay.utils.unionpay.sdk.LogUtil;
 import com.zm.pay.utils.wx.WxPayUtils;
 import com.zm.pay.utils.yop.YeepayService;
 
@@ -77,7 +80,7 @@ public class PayServiceImpl implements PayService {
 	private Logger logger = LoggerFactory.getLogger(PayServiceImpl.class);
 
 	@Override
-	public Map<String, String> weiXinPay(Integer clientId, String type, PayModel model) throws Exception {
+	public Map<String, String> weiXinPay(Integer clientId, String type, PayModel model) {
 		WeixinPayConfig config = (WeixinPayConfig) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.WX_PAY);
 
@@ -93,21 +96,22 @@ public class PayServiceImpl implements PayService {
 
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);
-
-		Map<String, String> resp = WxPayUtils.unifiedOrder(type, config, model);
-
-		String return_code = (String) resp.get("return_code");
-		String result_code = (String) resp.get("result_code");
 		Map<String, String> result = new HashMap<String, String>();
-
-		if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
-
-			WxPayUtils.packageReturnParameter(clientId, type, model, config, resp, result);
-		} else {
-			result.put("success", "false");
-			if ("SUCCESS".equals(return_code)) {
-				result.put("errorMsg", (String) resp.get("err_code_des"));
+		try {
+			Map<String, String> resp = WxPayUtils.unifiedOrder(type, config, model);
+			String return_code = (String) resp.get("return_code");
+			String result_code = (String) resp.get("result_code");
+			if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
+				WxPayUtils.packageReturnParameter(clientId, type, model, config, resp, result);
+			} else {
+				result.put("success", "false");
+				if ("SUCCESS".equals(return_code)) {
+					result.put("errorMsg", (String) resp.get("err_code_des"));
+				}
 			}
+		} catch (Exception e) {
+			result.put("success", "false");
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -173,7 +177,7 @@ public class PayServiceImpl implements PayService {
 	}
 
 	@Override
-	public Map<String, Object> aliPay(Integer clientId, String type, PayModel model) throws Exception {
+	public Map<String, Object> aliPay(Integer clientId, String type, PayModel model) {
 		AliPayConfigModel config = (AliPayConfigModel) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.ALI_PAY);
 
@@ -290,7 +294,7 @@ public class PayServiceImpl implements PayService {
 
 	@Override
 	public ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
-			throws Exception {
+			throws PayUtilException {
 
 		OrderInfo info = orderFeignClient.getOrderByOrderIdForPay(version, orderId);
 		if (info == null) {
@@ -390,17 +394,24 @@ public class PayServiceImpl implements PayService {
 		}
 		// 易宝支付
 		if (Constants.YOP_PAY.equals(payType)) {
+			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+				return new ResultModel(false, "跨境订单暂不支持易宝支付");
+			}
 			if (!Constants.YOP_PAY.equals(info.getOrderDetail().getPayType())) {
 				OrderDetail detail = new OrderDetail();
 				detail.setPayType(Constants.YOP_PAY);
 				detail.setOrderId(info.getOrderId());
 				orderFeignClient.updateOrderPayType(version, detail);
 			}
-			model.setTotalAmount(info.getOrderDetail().getPayment() + "");
 			model.setPhone(info.getOrderDetail().getReceivePhone());
 			return new ResultModel(yopPay(info.getCenterId(), model));
 		}
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		Integer i = 0;
+		System.out.println("0".equals(i));
 	}
 
 	@Override
@@ -452,7 +463,7 @@ public class PayServiceImpl implements PayService {
 	}
 
 	@Override
-	public String yopPay(Integer clientId, PayModel model) throws IOException, PayUtilException {
+	public String yopPay(Integer clientId, PayModel model) throws PayUtilException {
 		YopConfigModel config = (YopConfigModel) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.YOP_PAY);
 
@@ -491,13 +502,18 @@ public class PayServiceImpl implements PayService {
 
 		Map<String, String> tempResult = new HashMap<String, String>();
 		String uri = YeepayService.getUrl(YeepayService.TRADEORDER_URL);
-		tempResult = YeepayService.requestYOP(params, uri, YeepayService.TRADEORDER, config);
+		try {
+			tempResult = YeepayService.requestYOP(params, uri, YeepayService.TRADEORDER, config);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new PayUtilException("调用易宝支付创建订单失败");
+		}
 
 		String token = tempResult.get("token");
 		String codeRe = tempResult.get("code");
 		if (!"OPR00000".equals(codeRe)) {
 			String message = tempResult.get("message");
-			throw new PayUtilException(message);
+			throw new PayUtilException(message, codeRe);
 		}
 
 		String parentMerchantNo = config.getParentMerchantNo();
@@ -509,9 +525,19 @@ public class PayServiceImpl implements PayService {
 		params.put("token", token);
 		params.put("userNo", model.getPhone());
 		params.put("userType", "PHONE");
+		params.put("directPayType", "");
+		params.put("cardType", "");
+		params.put("ext", "");
+		params.put("timestamp", Math.round(new Date().getTime() / 1000) + "");
 
-		String url = YeepayService.getUrl(params, config);
-		System.out.println(url);
+		String url = null;
+		try {
+			url = YeepayService.getUrl(params, config);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			throw new PayUtilException("获取易宝标准收银台出错");
+		}
+		LogUtil.writeLog(url);
 		return url;
 	}
 }

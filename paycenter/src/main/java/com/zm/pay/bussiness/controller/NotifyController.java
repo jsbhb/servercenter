@@ -31,10 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
-import com.yeepay.g3.sdk.yop.encrypt.CertTypeEnum;
 import com.yeepay.g3.sdk.yop.encrypt.DigitalEnvelopeDTO;
 import com.yeepay.g3.sdk.yop.utils.DigitalEnvelopeUtils;
-import com.yeepay.g3.sdk.yop.utils.InternalConfig;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
@@ -561,32 +559,34 @@ public class NotifyController {
 	@RequestMapping(value = "auth/payMng/yop-payNotify")
 	@ApiIgnore
 	public void yopPayNotify(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		YopConfigModel config = (YopConfigModel) template.opsForValue().get(Constants.PAY + 2 + Constants.YOP_PAY);
 		// 获取回调数据
 		String responseMsg = req.getParameter("response");
 		Map<String, String> jsonMap = new HashMap<String, String>();
 		DigitalEnvelopeDTO dto = new DigitalEnvelopeDTO();
 		dto.setCipherText(responseMsg);
-		// InternalConfig internalConfig =
-		// InternalConfig.Factory.getInternalConfig();
-		PrivateKey privateKey = InternalConfig.getISVPrivateKey(CertTypeEnum.RSA2048);
+		PrivateKey privateKey = YeepayService.getPrivateKey(config);
 		System.out.println("privateKey: " + privateKey);
-		PublicKey publicKey = InternalConfig.getYopPublicKey(CertTypeEnum.RSA2048);
+		PublicKey publicKey = YeepayService.getPubKey(config);
 		System.out.println("publicKey: " + publicKey);
 
 		dto = DigitalEnvelopeUtils.decrypt(dto, privateKey, publicKey);
 		System.out.println("解密结果:" + dto.getPlainText());
-		jsonMap = JSONUtil.parse(dto.getPlainText(), new TypeReference<TreeMap<String, String>>() {});
+		jsonMap = JSONUtil.parse(dto.getPlainText(), new TypeReference<TreeMap<String, String>>() {
+		});
 		String orderId = jsonMap.get("orderId");
 		String payNo = jsonMap.get("uniqueOrderNo");
 		PrintWriter pw = res.getWriter();
 		if (orderId.startsWith("GX")) {
-			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION,
-					orderId, payNo);
-			if(result.isSuccess()){
+			ResultModel result = orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId,
+					payNo);
+			if (result.isSuccess()) {
+				LogUtil.writeLog("===========易宝支付回调成功===============");
 				pw.println("SUCCESS");
 				return;
 			}
 		}
+		LogUtil.writeErrorLog("******************易宝支付回调失败****************");
 		pw.println("FAIL");
 	}
 

@@ -1,6 +1,5 @@
 package com.zm.pay.bussiness.service;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ import com.zm.pay.pojo.ResultModel;
  */
 public interface PayService {
 
-	Map<String, String> weiXinPay(Integer clientId, String type, PayModel model) throws Exception;
+	Map<String, String> weiXinPay(Integer clientId, String type, PayModel model);
 
 	/**
 	 * @fun 支付报关
@@ -32,7 +31,7 @@ public interface PayService {
 	 */
 	boolean payCustom(CustomModel model) throws Exception;
 
-	Map<String, Object> aliPay(Integer clientId, String type, PayModel model) throws Exception;
+	Map<String, Object> aliPay(Integer clientId, String type, PayModel model);
 
 	Map<String, Object> unionPay(Integer clientId, PayModel model, String type);
 
@@ -60,7 +59,7 @@ public interface PayService {
 	 * @return ResultModel
 	 */
 	ResultModel pay(Double version, String type, Integer payType, HttpServletRequest req, String orderId)
-			throws Exception;
+			throws PayUtilException;
 
 	/**
 	 * @fun 测试验证微信https服务器
@@ -75,6 +74,6 @@ public interface PayService {
 	 * @return
 	 * @throws Exception
 	 */
-	String yopPay(Integer clientId, PayModel model) throws IOException, PayUtilException;
+	String yopPay(Integer clientId, PayModel model) throws PayUtilException;
 
 }

@@ -51,13 +51,13 @@ public class PayController {
 		return payService.aliPay(clientId, type, model);
 
 	}
-	
+
 	@RequestMapping(value = "yoppay/{clientId}", method = RequestMethod.POST)
 	@ApiIgnore
-	public Map<String, Object> yopPay(@PathVariable("clientId") Integer clientId,
-			@RequestBody PayModel model, HttpServletRequest req) throws IOException{
+	public Map<String, Object> yopPay(@PathVariable("clientId") Integer clientId, @RequestBody PayModel model,
+			HttpServletRequest req) throws IOException {
 
-		Map<String,Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			String url = payService.yopPay(clientId, model);
 			result.put("success", true);
@@ -105,13 +105,15 @@ public class PayController {
 			@ApiImplicitParam(paramType = "path", name = "type", dataType = "String", required = true, value = "支付模式，如公众号支付JSAPI"),
 			@ApiImplicitParam(paramType = "path", name = "orderId", dataType = "String", required = true, value = "订单号") })
 	public ResultModel pay(@PathVariable("orderId") String orderId, @PathVariable("version") Double version,
-			@PathVariable("type") String type, @PathVariable("payType") Integer payType, HttpServletRequest req)
-					throws Exception {
+			@PathVariable("type") String type, @PathVariable("payType") Integer payType, HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
-			return payService.pay(version, type, payType, req, orderId);
-
+			try {
+				return payService.pay(version, type, payType, req, orderId);
+			} catch (PayUtilException e) {
+				return new ResultModel(false, e.getMessage(), e.getErrorCode());
+			}
 		}
 
 		return null;
@@ -123,7 +125,7 @@ public class PayController {
 
 		return payService.payCustom(model);
 	}
-	
+
 	@RequestMapping(value = "pay/testHttps", method = RequestMethod.POST)
 	@ApiIgnore
 	public String testHttps() throws Exception {

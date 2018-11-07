@@ -209,6 +209,13 @@ public class OrderComponentUtil {
 				}
 			}
 		}
+		if (Constants.YOP_PAY.equals(payType)) {
+			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
+				result.setSuccess(false);
+				result.setErrorMsg("跨境订单暂不支持易宝支付");
+				return;
+			}
+		}
 		if (Constants.BACK_MANAGER_WEBSITE != (info.getOrderSource())) {// 如果不是后台订单
 			if (info.getOrderDetail().getRebateFee() != null && info.getOrderDetail().getRebateFee() > 0) {
 				result.setSuccess(false);
@@ -367,7 +374,6 @@ public class OrderComponentUtil {
 		} else if (Constants.REBATE_PAY.equals(payType)) {
 		} else if (Constants.YOP_PAY.equals(payType)) {
 			try {
-				payModel.setTotalAmount(CalculationUtils.div(totalAmount, 100, 2) + "");
 				result.setObj(payFeignClient.yopPay(info.getCenterId(), payModel));
 			} catch (Exception e) {
 				exceptionHandle(result, info, rebateFee);

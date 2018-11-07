@@ -41,6 +41,8 @@
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
 		<result column="parentMerchantNo" property="parentMerchantNo" jdbcType="VARCHAR" />
 		<result column="merchantNo" property="merchantNo" jdbcType="VARCHAR" />
+		<result column="privatekey" property="privatekey" jdbcType="VARCHAR" />
+		<result column="publickey" property="publickey" jdbcType="VARCHAR" />
 	</resultMap>
 
 

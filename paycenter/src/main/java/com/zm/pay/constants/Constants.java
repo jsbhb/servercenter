@@ -57,6 +57,9 @@ public class Constants {
 
 	// *********************支付有效时间******************************/
 	public static final Integer PAY_EFFECTIVE_TIME_HOUR = 1;
+	
+	// *********************支付有效时间******************************/
+	public static final Integer O2O_ORDER_TYPE = 0;
 
 	// *********************支付报关参数******************************/
 	public static final String MERCHANT_CUSTOMS_CODE = "3302462230";// 商户在海关备案的编号。

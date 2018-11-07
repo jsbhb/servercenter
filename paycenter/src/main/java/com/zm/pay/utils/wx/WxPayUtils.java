@@ -42,10 +42,10 @@ public class WxPayUtils {
 		data.put("notify_url", Constants.WX_NOTIFY_URL);
 		data.put("detail", model.getDetail() == null ? "" : model.getDetail());
 		// 支付时间设定为5分钟
-//		Calendar cal = Calendar.getInstance();
-//		data.put("time_start", sdf.format(cal.getTime()));
-//		cal.add(Calendar.HOUR, Constants.PAY_EFFECTIVE_TIME_HOUR);
-//		data.put("time_expire", sdf.format(cal.getTime()));
+		// Calendar cal = Calendar.getInstance();
+		// data.put("time_start", sdf.format(cal.getTime()));
+		// cal.add(Calendar.HOUR, Constants.PAY_EFFECTIVE_TIME_HOUR);
+		// data.put("time_expire", sdf.format(cal.getTime()));
 		data.put("trade_type", type);
 		if (Constants.JSAPI.equals(type)) {
 			data.put("openid", model.getOpenId());
@@ -119,7 +119,7 @@ public class WxPayUtils {
 		result.put("success", "true");
 	}
 
-	public static  Map<String,String> fillRequestData(Map<String, String> data, WeixinPayConfig config) {
+	public static Map<String, String> fillRequestData(Map<String, String> data, WeixinPayConfig config) {
 		data.put("appid", config.getAppID());
 		data.put("mch_id", config.getMchID());
 		Set<String> keySet = data.keySet();
@@ -136,7 +136,7 @@ public class WxPayUtils {
 
 		sb.append("key=").append(config.getKey());
 		data.put("sign", DigestUtils.md5Hex(sb.toString()).toUpperCase());
-		
+
 		return data;
 	}
 

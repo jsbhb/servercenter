@@ -18,7 +18,27 @@ public class YopConfigModel implements Serializable{
 	//子商编
 	private String merchantNo;
 	
+	private String privatekey;
+	
+	private String publickey;
+	
 	private String url;
+
+	public String getPrivatekey() {
+		return privatekey;
+	}
+
+	public void setPrivatekey(String privatekey) {
+		this.privatekey = privatekey;
+	}
+
+	public String getPublickey() {
+		return publickey;
+	}
+
+	public void setPublickey(String publickey) {
+		this.publickey = publickey;
+	}
 
 	public String getParentMerchantNo() {
 		return parentMerchantNo;

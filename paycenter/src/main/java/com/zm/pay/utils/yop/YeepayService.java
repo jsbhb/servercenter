@@ -2,8 +2,12 @@ package com.zm.pay.utils.yop;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,6 +24,8 @@ import com.yeepay.g3.sdk.yop.utils.DigitalEnvelopeUtils;
 import com.yeepay.g3.sdk.yop.utils.InternalConfig;
 import com.zm.pay.pojo.YopConfigModel;
 import com.zm.pay.utils.JSONUtil;
+
+import sun.misc.BASE64Decoder;
 
 public class YeepayService {
 
@@ -120,22 +126,69 @@ public class YeepayService {
 	}
 
 	// 获取密钥P12
-	public static PrivateKey getSecretKey() {
-		PrivateKey isvPrivateKey = InternalConfig.getISVPrivateKey(CertTypeEnum.RSA2048);
-		return isvPrivateKey;
-	}
+	// public static PrivateKey getSecretKey() {
+	// PrivateKey isvPrivateKey =
+	// InternalConfig.getISVPrivateKey(CertTypeEnum.RSA2048);
+	// return isvPrivateKey;
+	// }
 
 	// 获取公钥
-	public static PublicKey getPublicKey() {
-		PublicKey isvPublicKey = InternalConfig.getYopPublicKey(CertTypeEnum.RSA2048);
-		return isvPublicKey;
+	// public static PublicKey getPublicKey() {
+	// PublicKey isvPublicKey =
+	// InternalConfig.getYopPublicKey(CertTypeEnum.RSA2048);
+	// return isvPublicKey;
+	// }
+
+	/**
+	 * 实例化公钥
+	 * 
+	 * @return
+	 */
+	public static PublicKey getPubKey(YopConfigModel config) {
+		PublicKey publicKey = null;
+		try {
+			// 自己的公钥(测试)
+			String publickey = config.getPublickey();
+			java.security.spec.X509EncodedKeySpec bobPubKeySpec = new java.security.spec.X509EncodedKeySpec(
+					new BASE64Decoder().decodeBuffer(publickey));
+			// RSA对称加密算法
+			java.security.KeyFactory keyFactory;
+			keyFactory = java.security.KeyFactory.getInstance("RSA");
+			// 取公钥匙对象
+			publicKey = keyFactory.generatePublic(bobPubKeySpec);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return publicKey;
+	}
+
+	public static PrivateKey getPrivateKey(YopConfigModel config) {
+		PrivateKey privateKey = null;
+		String priKey = config.getPrivatekey();
+		PKCS8EncodedKeySpec priPKCS8;
+		try {
+			priPKCS8 = new PKCS8EncodedKeySpec(new BASE64Decoder().decodeBuffer(priKey));
+			KeyFactory keyf = KeyFactory.getInstance("RSA");
+			privateKey = keyf.generatePrivate(priPKCS8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		}
+		return privateKey;
 	}
 
 	// 获取sign
 	public static String getSign(String stringBuilder, YopConfigModel config) {
 		String appKey = "OPR:" + config.getMerchantNo();
 
-		PrivateKey isvPrivateKey = getSecretKey();
+		PrivateKey isvPrivateKey = getPrivateKey(config);
 
 		DigitalSignatureDTO digitalSignatureDTO = new DigitalSignatureDTO();
 		digitalSignatureDTO.setAppKey(appKey);
@@ -212,7 +265,7 @@ public class YeepayService {
 		String s = "merchantNo=" + merchantNo + "&parentMerchantNo=" + parentMerchantNo + "&orderId=" + orderId;
 		System.out.println("s====" + s);
 		String appKey = "OPR:" + config.getMerchantNo();
-		PublicKey isvPublicKey = getPublicKey();
+		PublicKey isvPublicKey = getPubKey(config);
 		DigitalSignatureDTO digitalSignatureDTO = new DigitalSignatureDTO();
 		digitalSignatureDTO.setAppKey(appKey);
 		digitalSignatureDTO.setCertType(CertTypeEnum.RSA2048);
@@ -330,7 +383,9 @@ public class YeepayService {
 		/**
 		 * 第二种方式：只传appkey
 		 */
-		YopRequest request = new YopRequest("OPR:" + merchantNo);
+		// YopRequest request = new YopRequest("OPR:" + merchantNo);
+		String privateKey = config.getPrivatekey();
+		YopRequest request = new YopRequest("OPR:" + merchantNo, privateKey, getUrl("baseURL"));
 
 		for (int i = 0; i < paramSign.length; i++) {
 			String key = paramSign[i];
@@ -353,5 +408,4 @@ public class YeepayService {
 
 		return result;
 	}
-
 }
