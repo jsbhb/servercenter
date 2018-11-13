@@ -69,11 +69,31 @@ public class UserInfo extends Pagination {
 	private Address address;
 	
 	private String invitationCode;
+	
+	private Integer loginType;
+	
+	private String thirdAccount;
 
 	public boolean check() {
 		return (account != null || phone != null || email != null) && centerId != null;
 	}
 	
+	public Integer getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(Integer loginType) {
+		this.loginType = loginType;
+	}
+
+	public String getThirdAccount() {
+		return thirdAccount;
+	}
+
+	public void setThirdAccount(String thirdAccount) {
+		this.thirdAccount = thirdAccount;
+	}
+
 	public Address getAddress() {
 		return address;
 	}

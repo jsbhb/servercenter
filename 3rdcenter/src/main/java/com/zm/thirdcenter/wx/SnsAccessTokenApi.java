@@ -22,6 +22,8 @@ public class SnsAccessTokenApi {
 	//授权token的url
 	private static String auth_url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={appid}&secret={secret}&code={code}&grant_type=authorization_code";
 
+	private static String applet_auth_url = "https://api.weixin.qq.com/sns/jscode2session?appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code";
+	
 	//基础token的url
 	private static String AccessToken_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential";
 	
@@ -71,4 +73,29 @@ public class SnsAccessTokenApi {
 
         return result;
     }
+    
+    
+	/**
+	 * 通过code获取小程序openid
+	 *
+	 * @param code
+	 *            第一步获取的code参数
+	 * @param appId
+	 *            应用唯一标识
+	 * @param secret
+	 *            应用密钥AppSecret
+	 * @return AppletSession
+	 */
+	public static AppletSession getAppletSession(String appId, String secret, String code) {
+		final String accessTokenUrl = applet_auth_url.replace("{appid}", appId).replace("{secret}", secret).replace("{code}", code == null?"":code);
+
+		return RetryUtils.retryOnException(3, new Callable<AppletSession>() {
+
+			@Override
+			public AppletSession call() throws Exception {
+				String json = HttpClientUtil.get(accessTokenUrl,null);
+				return new AppletSession(json);
+			}
+		});
+	}
 }

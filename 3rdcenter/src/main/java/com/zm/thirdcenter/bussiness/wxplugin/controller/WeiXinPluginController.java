@@ -66,6 +66,20 @@ public class WeiXinPluginController {
 
 	}
 
+	@RequestMapping(value = "auth/{version}/user/3rdLogin/wxApplet", method = RequestMethod.GET)
+	@ApiIgnore
+	public ResultModel loginByWechatApplet(@PathVariable("version") Double version, HttpServletRequest req,
+			HttpServletResponse res, @RequestParam("code") String code, @RequestParam("userType") Integer userType,
+			@RequestParam("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return weiXinPluginService.loginByApplet(code, userType, centerId);
+		}
+
+		return new ResultModel(false, "版本错误");
+
+	}
+
 	@RequestMapping(value = "auth/{version}/wxshare/{centerId}", method = RequestMethod.GET)
 	public ResultModel shareUrl(@PathVariable("version") Double version, @RequestParam("url") String url,
 			@PathVariable("centerId") Integer centerId) {

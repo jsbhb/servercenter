@@ -31,8 +31,6 @@ public interface UserMapper {
 	
 	void removeAddress(Map<String,Object> param);
 	
-	Integer queryByWechatUnionid(String openId);
-	
 	void updateUserPwd(Map<String,Object> param);
 	
 	List<Address> listAddress(Integer userId);
@@ -63,7 +61,7 @@ public interface UserMapper {
 	
 	Integer countWechatBy3rdLogin(ThirdLogin info);
 	
-	void saveWechat(ThirdLogin info);
+	void saveThirdAccount(ThirdLogin info);
 	
 	void saveGrade(Grade grade);
 	

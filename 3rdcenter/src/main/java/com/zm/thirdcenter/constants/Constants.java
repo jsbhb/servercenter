@@ -32,6 +32,8 @@ public class Constants {
 	
 	public static final Integer SINABLOG_LOGIN = 3;
 	
+	public static final Integer WX_APPLET_LOGIN = 5;//微信小程序登录
+	
 	public static final String CARRIER = "carrier";//快递公司对应的编码
 
 	// *********************卖家云配置信息******************************/

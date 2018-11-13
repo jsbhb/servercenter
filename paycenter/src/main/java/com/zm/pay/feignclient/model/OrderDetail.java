@@ -50,6 +50,16 @@ public class OrderDetail {
 	private String receiveZipCode;
 
 	private String remark;
+	
+	private Double rebateFee;
+
+	public Double getRebateFee() {
+		return rebateFee;
+	}
+
+	public void setRebateFee(Double rebateFee) {
+		this.rebateFee = rebateFee;
+	}
 
 	public String getReturnPayNo() {
 		return returnPayNo;

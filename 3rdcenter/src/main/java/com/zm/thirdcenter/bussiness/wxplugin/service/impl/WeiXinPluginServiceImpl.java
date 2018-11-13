@@ -18,22 +18,22 @@ import com.zm.thirdcenter.feignclient.UserFeignClient;
 import com.zm.thirdcenter.feignclient.model.ThirdLogin;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
-import com.zm.thirdcenter.utils.LogUtil;
 import com.zm.thirdcenter.utils.SignUtil;
 import com.zm.thirdcenter.wx.ApiResult;
+import com.zm.thirdcenter.wx.AppletSession;
 import com.zm.thirdcenter.wx.JsTicket;
 import com.zm.thirdcenter.wx.JsTicketApi;
+import com.zm.thirdcenter.wx.JsTicketApi.JsApiType;
 import com.zm.thirdcenter.wx.SnsAccessToken;
 import com.zm.thirdcenter.wx.SnsAccessTokenApi;
 import com.zm.thirdcenter.wx.SnsApi;
-import com.zm.thirdcenter.wx.JsTicketApi.JsApiType;
 
 @Service
 public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 
 	@Resource
 	RedisTemplate<String, Object> redisTemplate;
-	
+
 	@Resource
 	RedisTemplate<String, Object> template;
 
@@ -51,7 +51,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 		if (config == null) {
 			return "error";
 		}
-		
+
 		StringBuffer sb = new StringBuffer();
 		sb.append("?appid=" + config.getAppId());
 		sb.append("&redirect_uri=" + param.getRedirectUrl());
@@ -84,16 +84,15 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			config = (WXLoginConfig) template.opsForValue().get(Constants.LOGIN + stateArr[1] + "" + stateArr[2]);
 		}
 		SnsAccessToken token = SnsAccessTokenApi.getSnsAccessToken(config.getAppId(), config.getSecret(), code);
-
+		Map<String, Object> resultMap = new HashMap<String, Object>();
 		if (!snsapiBase) {
 			ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
-
+			
 			if (apiResult.isSucceed()) {
 				redisTemplate.opsForValue().set(
 						apiResult.getStr("unionid") == null ? token.getOpenid() : apiResult.getStr("unionid"),
 						apiResult.getJson(), 30L, TimeUnit.MINUTES);
 
-				Map<String, Object> resultMap = new HashMap<String, Object>();
 				resultMap.put("openid", token.getOpenid());
 				resultMap.put("unionid", apiResult.getStr("unionid"));
 
@@ -108,8 +107,12 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			}
 
 		} else {
+			boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
+					new ThirdLogin(Integer.parseInt(stateArr[1]), token.getOpenid(), Constants.WX_LOGIN));
 			result.setSuccess(true);
-			result.setObj(token.getOpenid());
+			resultMap.put("isFirst", flag);
+			resultMap.put("openid", token.getOpenid());
+			result.setObj(resultMap);
 		}
 
 		return result;
@@ -121,7 +124,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 	@Override
 	public ResultModel shareUrl(WXLoginConfig param, String url) {
 		WXLoginConfig config = getWeiXinConfig(param);
-		if(config == null){
+		if (config == null) {
 			return null;
 		}
 		Map<String, String> resp = new HashMap<String, String>();
@@ -130,8 +133,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			String token = getAccessToken(config);
 			JsTicket JsTicket = JsTicketApi.getTicket(JsApiType.jsapi, token);
 			if (JsTicket != null) {
-				template.opsForValue().set(config.getAppId() + JSTICKET, JsTicket.getTicket(), 7000,
-						TimeUnit.SECONDS);// 7000秒后过期
+				template.opsForValue().set(config.getAppId() + JSTICKET, JsTicket.getTicket(), 7000, TimeUnit.SECONDS);// 7000秒后过期
 			}
 			ticket = JsTicket.getTicket();
 		}
@@ -175,5 +177,25 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			template.opsForValue().set(Constants.LOGIN + param.getCenterId() + "" + param.getLoginType(), config);
 		}
 		return config;
+	}
+
+	@Override
+	public ResultModel loginByApplet(String code, Integer userType, Integer centerId) {
+		ResultModel result = new ResultModel();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+
+		WXLoginConfig config = (WXLoginConfig) template.opsForValue()
+				.get(Constants.LOGIN + centerId + Constants.WX_APPLET_LOGIN);
+		// 获取小程序登录权限
+		AppletSession session = SnsAccessTokenApi.getAppletSession(config.getAppId(), config.getSecret(), code);
+		boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION, new ThirdLogin(userType,
+				session.getUnionid() == null ? session.getOpenid() : session.getUnionid(), Constants.WX_APPLET_LOGIN));
+
+		resultMap.put("openid", session.getOpenid());
+		resultMap.put("unionid", session.getUnionid());
+		resultMap.put("isFirst", flag);
+		result.setSuccess(true);
+		result.setObj(resultMap);
+		return result;
 	}
 }

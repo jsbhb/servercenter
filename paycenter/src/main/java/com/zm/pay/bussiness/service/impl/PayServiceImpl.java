@@ -337,7 +337,9 @@ public class PayServiceImpl implements PayService {
 		PayModel model = new PayModel();
 		model.setBody("购物订单");
 		model.setOrderId(info.getOrderId());
-		model.setTotalAmount((int) CalculationUtils.mul(info.getOrderDetail().getPayment(), 100) + "");
+		double needToPay = CalculationUtils.sub(info.getOrderDetail().getPayment(),
+				info.getOrderDetail().getRebateFee() == null ? 0 : info.getOrderDetail().getRebateFee());
+		model.setTotalAmount((int) CalculationUtils.mul(needToPay, 100) + "");
 		StringBuilder sb = new StringBuilder();
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			sb.append(goods.getItemName() + "*" + goods.getItemQuantity() + ";");
@@ -408,7 +410,7 @@ public class PayServiceImpl implements PayService {
 		}
 		return null;
 	}
-	
+
 	public static void main(String[] args) {
 		Integer i = 0;
 		System.out.println("0".equals(i));

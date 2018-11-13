@@ -289,18 +289,13 @@
 		#{emailValidate},#{centerId},#{shopId},#{guideId},now())
 	</insert>
 
-	<insert id="saveWechat" parameterType="Object">
+	<insert id="saveThirdAccount" parameterType="Object">
 		insert IGNORE into
-		user_wechat(user_id,user_type,wechat,create_time)
+		user_wechat(user_id,user_type,wechat,login_type,create_time)
 		values
-		(#{userId},#{userType},#{wechat},now())
+		(#{userId},#{userType},#{thirdAccount},#{loginType},now())
 	</insert>
 
-
-	<select id="queryByWechatUnionid" parameterType="Object">
-		select count(*)
-		from user where wechat = #{openId}
-	</select>
 
 	<update id="updateUserPwd" parameterType="Object">
 		update user set pwd =
@@ -363,9 +358,9 @@
 	<select id="countWechatBy3rdLogin" parameterType="Object"
 		resultType="java.lang.Integer">
 
-		select count(*) from user_wechat where wechat = #{wechat}
+		select count(*) from user_wechat where wechat = #{thirdAccount} and login_type = #{loginType}
 	</select>
-
+	
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
 		create_time,opt,company,redirect_url,mobile_url,type,appKey,appSecret)

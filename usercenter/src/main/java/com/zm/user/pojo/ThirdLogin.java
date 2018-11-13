@@ -1,36 +1,27 @@
 package com.zm.user.pojo;
 
-import com.zm.user.constants.Constants;
-
 public class ThirdLogin {
-	
+
 	private Integer userId;
 
 	private Integer userType;
 
-	private String wechat;
+	private Integer type;
 
-	private String qq;
+	private String thirdAccount;
 
-	private String sinaBlog;
-	
-	public ThirdLogin(){}
-	
-	public ThirdLogin(Integer userId, String thirdAccount, Integer type){
+	public ThirdLogin() {
+	}
+
+	public ThirdLogin(Integer userId, String thirdAccount, Integer type, Integer userType) {
 		this.userId = userId;
-		if(Constants.WX_LOGIN.equals(type)){
-			this.wechat = thirdAccount;
-		}
-		if(Constants.QQ_LOGIN.equals(type)){
-			this.qq = thirdAccount;
-		}
-		if(Constants.SINABLOG_LOGIN.equals(type)){
-			this.sinaBlog = thirdAccount;
-		}
+		this.thirdAccount = thirdAccount;
+		this.type = type;
+		this.userType = userType;
 	}
 
 	public boolean check() {
-		return (wechat != null || qq != null || sinaBlog != null);
+		return thirdAccount != null && type != null && userType != null;
 	}
 
 	public Integer getUserId() {
@@ -41,7 +32,6 @@ public class ThirdLogin {
 		this.userId = userId;
 	}
 
-
 	public Integer getUserType() {
 		return userType;
 	}
@@ -50,34 +40,26 @@ public class ThirdLogin {
 		this.userType = userType;
 	}
 
-	public String getWechat() {
-		return wechat;
+	public Integer getType() {
+		return type;
 	}
 
-	public void setWechat(String wechat) {
-		this.wechat = wechat;
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
-	public String getQq() {
-		return qq;
+	public String getThirdAccount() {
+		return thirdAccount;
 	}
 
-	public void setQq(String qq) {
-		this.qq = qq;
-	}
-
-	public String getSinaBlog() {
-		return sinaBlog;
-	}
-
-	public void setSinaBlog(String sinaBlog) {
-		this.sinaBlog = sinaBlog;
+	public void setThirdAccount(String thirdAccount) {
+		this.thirdAccount = thirdAccount;
 	}
 
 	@Override
 	public String toString() {
-		return "ThirdLogin [userId=" + userId + ", userType=" + userType + ", wechat=" + wechat + ", qq=" + qq
-				+ ", sinaBlog=" + sinaBlog + "]";
+		return "ThirdLogin [userId=" + userId + ", userType=" + userType + ", type=" + type + ", thirdAccount="
+				+ thirdAccount + "]";
 	}
 
 }

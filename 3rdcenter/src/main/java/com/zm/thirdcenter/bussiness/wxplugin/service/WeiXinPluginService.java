@@ -10,4 +10,6 @@ public interface WeiXinPluginService {
 	ResultModel loginByWechat(String code, String state);
 
 	ResultModel shareUrl(WXLoginConfig param, String url);
+
+	ResultModel loginByApplet(String code, Integer userType, Integer centerId);
 }

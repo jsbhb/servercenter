@@ -139,11 +139,7 @@ public class OrderComponentUtil {
 		amount = CalculationUtils.round(2, amount);
 		int totalAmount = (int) CalculationUtils.mul(amount, 100);
 		int localAmount = (int) (info.getOrderDetail().getPayment() * 100);
-		int rebateFee = (int) ((info.getOrderDetail().getRebateFee() == null ? 0 : info.getOrderDetail().getRebateFee())
-				* 100);
-		localAmount += rebateFee;
-		LogUtil.writeLog("amount:" + amount + ",totalAmount:" + totalAmount + ",localAmount:" + localAmount
-				+ ",rebateFee:" + rebateFee);
+		LogUtil.writeLog("amount:" + amount + ",totalAmount:" + totalAmount + ",localAmount:" + localAmount);
 		if (totalAmount - localAmount > Constants.DEVIATION || totalAmount - localAmount < -Constants.DEVIATION) {// 价格区间定义在正负5分
 			return false;
 		}
@@ -324,7 +320,7 @@ public class OrderComponentUtil {
 	 * @throws Exception
 	 */
 	public void getPayInfo(String payType, String type, HttpServletRequest req, ResultModel result, String openId,
-			OrderInfo info, StringBuilder detail, int totalAmount) throws Exception {
+			OrderInfo info, StringBuilder detail) throws Exception {
 		Double rebateFee = info.getOrderDetail().getRebateFee();
 		if (rebateFee != null && rebateFee > 0) {// 如果有返佣抵扣，先进行扣减
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
@@ -338,10 +334,15 @@ public class OrderComponentUtil {
 				return;
 			}
 		}
+		Double needToPayAmount = CalculationUtils.sub(info.getOrderDetail().getPayment(),
+				rebateFee == null ? 0 : rebateFee);
+		
+		int needToPayTotalAmount = (int) CalculationUtils.mul(needToPayAmount, 100);
+		
 		PayModel payModel = new PayModel();
 		payModel.setBody("购物订单");
 		payModel.setOrderId(info.getOrderId());
-		payModel.setTotalAmount(totalAmount + "");
+		payModel.setTotalAmount(needToPayTotalAmount + "");
 		payModel.setPhone(info.getOrderDetail().getReceivePhone());
 		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
 		if (detailStr.length() > 60) {// 支付宝描述过长会报错

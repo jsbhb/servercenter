@@ -21,11 +21,13 @@ public class Constants {
 
 	// *********************第三方登录类型******************************/
 
-	public static final Integer WX_LOGIN = 1;
+	public static final int WX_LOGIN = 1;
 
-	public static final Integer QQ_LOGIN = 2;
+	public static final int QQ_LOGIN = 2;
 
-	public static final Integer SINABLOG_LOGIN = 3;
+	public static final int SINABLOG_LOGIN = 3;
+	
+	public static final int WX_APPLET_LOGIN = 5;
 	
 	// *********************区域中心ID,O2O=1;大贸=2******************************/
 

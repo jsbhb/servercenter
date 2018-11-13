@@ -197,10 +197,8 @@ public class OrderServiceImpl implements OrderService {
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		int totalAmount = (int) CalculationUtils.mul(info.getOrderDetail().getPayment(), 100);
-
 		// 调用支付信息
-		orderComponentUtil.getPayInfo(payType, type, req, result, openId, info, detail, totalAmount);
+		orderComponentUtil.getPayInfo(payType, type, req, result, openId, info, detail);
 		if (!result.isSuccess()) {
 			return result;
 		}

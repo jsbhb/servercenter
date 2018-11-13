@@ -136,8 +136,9 @@ public class UserServiceImpl implements UserService {
 
 		userId = userMapper.getUserIdByUserInfo(info);
 		if (userId != null) {
-			if (info.getWechat() != null) {
-				userMapper.saveWechat(new ThirdLogin(userId, info.getWechat(), Constants.WX_LOGIN));
+			if (info.getLoginType() != null) {
+				userMapper.saveThirdAccount(
+						new ThirdLogin(userId, info.getThirdAccount(), info.getLoginType(), info.getUserType()));
 			}
 
 			info.setId(userId);
@@ -153,10 +154,13 @@ public class UserServiceImpl implements UserService {
 
 		userMapper.saveUser(info);
 
-		if (info.getWechat() != null && !"".equals(info.getWechat())) {
-			ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
-			packageUser(apiResult, info, "wechat");
-			userMapper.saveWechat(new ThirdLogin(info.getId(), info.getWechat(), Constants.WX_LOGIN));
+		if (info.getLoginType() != null) {
+			if (Constants.WX_LOGIN == info.getLoginType()) {
+				ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
+				packageUser(apiResult, info, "wechat");
+			}
+			userMapper.saveThirdAccount(
+					new ThirdLogin(info.getId(), info.getThirdAccount(), info.getLoginType(), info.getUserType()));
 		}
 
 		if (info.getUserDetail() != null) {
@@ -355,14 +359,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean verifyIsFirst(ThirdLogin info) {
-		if (info.getWechat() != null) {
-			Integer count = userMapper.countWechatBy3rdLogin(info);
-			if (count == 0) {
-				return true;
-			}
-			return false;
-		}
-		return false;
+		return userMapper.countWechatBy3rdLogin(info) == 0 ? true : false;
 	}
 
 	@Override
@@ -374,7 +371,7 @@ public class UserServiceImpl implements UserService {
 		}
 		userMapper.saveGrade(grade);// 保存完后需要主键ID
 
-		//生成普通用户的userId
+		// 生成普通用户的userId
 		UserInfo user = new UserInfo();
 		Integer mallId = userComponent.getMallId(grade.getId());
 		user.setShopId(grade.getId());
@@ -392,18 +389,18 @@ public class UserServiceImpl implements UserService {
 			detail.setName(grade.getPersonInCharge());
 			userMapper.saveUserDetail(detail);
 		}
-		
-		//生成后台账号统一的userId
+
+		// 生成后台账号统一的userId
 		UserInfo backUser = new UserInfo();
 		backUser.setShopId(grade.getId());
 		backUser.setCenterId(mallId);
 
-		backUser.setPhone(grade.getId()+"");
+		backUser.setPhone(grade.getId() + "");
 		Integer backUserId = userMapper.getUserIdByUserInfo(user);
 		if (backUserId == null) {
 			backUser.setPhoneValidate(VALIDATE);
 			backUser.setStatus(1);
-			backUser.setUserType(1);//代表后台账号
+			backUser.setUserType(1);// 代表后台账号
 			userMapper.saveUser(backUser);
 			UserDetail detail = new UserDetail();
 			detail.setUserId(backUser.getId());
@@ -425,9 +422,10 @@ public class UserServiceImpl implements UserService {
 		// 将图片地址内的临时路径替换成gradeid
 		ParamReplaceUtil pru = new ParamReplaceUtil(grade);
 		String tmpPicPath = grade.getPicPath1();
-		String oldStr = tmpPicPath.substring(tmpPicPath.indexOf("tmp"),tmpPicPath.indexOf("/", tmpPicPath.indexOf("tmp")));
-		pru.paramReplace("picPath", oldStr, grade.getId()+"");
-		
+		String oldStr = tmpPicPath.substring(tmpPicPath.indexOf("tmp"),
+				tmpPicPath.indexOf("/", tmpPicPath.indexOf("tmp")));
+		pru.paramReplace("picPath", oldStr, grade.getId() + "");
+
 		// 添加注册信息存储
 		userMapper.saveGradeData(grade);
 
