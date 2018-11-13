@@ -87,7 +87,7 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		if (!snsapiBase) {
 			ApiResult apiResult = SnsApi.getUserInfo(token.getAccessToken(), token.getOpenid());
-			
+
 			if (apiResult.isSucceed()) {
 				redisTemplate.opsForValue().set(
 						apiResult.getStr("unionid") == null ? token.getOpenid() : apiResult.getStr("unionid"),
@@ -188,6 +188,9 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 				.get(Constants.LOGIN + centerId + Constants.WX_APPLET_LOGIN);
 		// 获取小程序登录权限
 		AppletSession session = SnsAccessTokenApi.getAppletSession(config.getAppId(), config.getSecret(), code);
+		if (!session.isAvailable()) {
+			return new ResultModel(false, session.getErrMsg() == null ? session.getErrcode() : session.getErrMsg());
+		}
 		boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION, new ThirdLogin(userType,
 				session.getUnionid() == null ? session.getOpenid() : session.getUnionid(), Constants.WX_APPLET_LOGIN));
 

@@ -88,14 +88,7 @@ public class SnsAccessTokenApi {
 	 */
 	public static AppletSession getAppletSession(String appId, String secret, String code) {
 		final String accessTokenUrl = applet_auth_url.replace("{appid}", appId).replace("{secret}", secret).replace("{code}", code == null?"":code);
-
-		return RetryUtils.retryOnException(3, new Callable<AppletSession>() {
-
-			@Override
-			public AppletSession call() throws Exception {
-				String json = HttpClientUtil.get(accessTokenUrl,null);
-				return new AppletSession(json);
-			}
-		});
+		String json = HttpClientUtil.get(accessTokenUrl, null);
+		return new AppletSession(json);
 	}
 }

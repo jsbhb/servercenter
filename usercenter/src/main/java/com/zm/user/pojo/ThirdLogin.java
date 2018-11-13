@@ -6,22 +6,22 @@ public class ThirdLogin {
 
 	private Integer userType;
 
-	private Integer type;
+	private Integer loginType;
 
 	private String thirdAccount;
 
 	public ThirdLogin() {
 	}
 
-	public ThirdLogin(Integer userId, String thirdAccount, Integer type, Integer userType) {
+	public ThirdLogin(Integer userId, String thirdAccount, Integer loginType, Integer userType) {
 		this.userId = userId;
 		this.thirdAccount = thirdAccount;
-		this.type = type;
+		this.loginType = loginType;
 		this.userType = userType;
 	}
 
 	public boolean check() {
-		return thirdAccount != null && type != null && userType != null;
+		return thirdAccount != null && loginType != null && userType != null;
 	}
 
 	public Integer getUserId() {
@@ -40,12 +40,12 @@ public class ThirdLogin {
 		this.userType = userType;
 	}
 
-	public Integer getType() {
-		return type;
+	public Integer getLoginType() {
+		return loginType;
 	}
 
-	public void setType(Integer type) {
-		this.type = type;
+	public void setLoginType(Integer loginType) {
+		this.loginType = loginType;
 	}
 
 	public String getThirdAccount() {
@@ -58,7 +58,7 @@ public class ThirdLogin {
 
 	@Override
 	public String toString() {
-		return "ThirdLogin [userId=" + userId + ", userType=" + userType + ", type=" + type + ", thirdAccount="
+		return "ThirdLogin [userId=" + userId + ", userType=" + userType + ", loginType=" + loginType + ", thirdAccount="
 				+ thirdAccount + "]";
 	}
 

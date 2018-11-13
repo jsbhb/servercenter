@@ -1,16 +1,17 @@
 package com.zm.thirdcenter.wx;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.zm.thirdcenter.utils.JSONUtil;
-import com.zm.thirdcenter.utils.RetryUtils.ResultCheck;
 
-public class AppletSession implements ResultCheck, Serializable{
+public class AppletSession implements Serializable {
 
-	/**  
+	/**
 	 * serialVersionUID:
-	 * @since JDK 1.7  
+	 * 
+	 * @since JDK 1.7
 	 */
 	private static final long serialVersionUID = 1L;
 	private String json;
@@ -18,25 +19,38 @@ public class AppletSession implements ResultCheck, Serializable{
 	private String session_key;
 	private String unionid;
 	private String errcode;
+	@SuppressWarnings("unused")
 	private String errMsg;
-	
-	public AppletSession(String json){
+	private Map<String, String> errMsgMap = new HashMap<String, String>() {
+		/**
+		 * @since JDK 1.7
+		 */
+		private static final long serialVersionUID = 1L;
+
+		{
+			put("-1", "系统繁忙，此时请开发者稍候再试");
+			put("40029", "code 无效");
+			put("45011", "频率限制，每个用户每分钟100次");
+		}
+	};
+
+	public AppletSession(String json) {
 		this.json = json;
 		@SuppressWarnings("unchecked")
-		Map<String, String> temp = JSONUtil.parse(json, Map.class);
-		this.openid = temp.get("openid");
-		this.unionid = temp.get("unionid");
-		this.session_key = temp.get("session_key");
-		this.errcode = temp.get("errcode");
-		this.errMsg = temp.get("errMsg");
+		Map<String, Object> temp = JSONUtil.parse(json, Map.class);
+		this.openid = temp.get("openid") + "";
+		this.unionid = temp.get("unionid") + "";
+		this.session_key = temp.get("session_key") + "";
+		this.errcode = temp.get("errcode") + "";
+		this.errMsg = temp.get("errMsg") + "";
 	}
-	
+
 	public boolean isAvailable() {
-		if (!"0".equals(errcode))
+		if (openid == null && unionid == null)
 			return false;
-		return openid != null;
+		return true;
 	}
-	
+
 	public String getOpenid() {
 		return openid;
 	}
@@ -70,7 +84,7 @@ public class AppletSession implements ResultCheck, Serializable{
 	}
 
 	public String getErrMsg() {
-		return errMsg;
+		return errMsgMap.get(errcode);
 	}
 
 	public void setErrMsg(String errMsg) {
@@ -81,12 +95,6 @@ public class AppletSession implements ResultCheck, Serializable{
 		this.json = json;
 	}
 
-	@Override
-	public boolean matching() {
-		return isAvailable();
-	}
-
-	@Override
 	public String getJson() {
 		return json;
 	}

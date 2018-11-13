@@ -4,16 +4,16 @@ public class ThirdLogin {
 
 	private Integer userType;
 
-	private Integer type;
+	private Integer loginType;
 
 	private String thirdAccount;
 
 	public ThirdLogin() {
 	}
 
-	public ThirdLogin(Integer userType, String thirdAccount, Integer type) {
+	public ThirdLogin(Integer userType, String thirdAccount, Integer loginType) {
 		this.userType = userType;
-		this.type = type;
+		this.loginType = loginType;
 		this.thirdAccount = thirdAccount;
 	}
 
@@ -25,12 +25,12 @@ public class ThirdLogin {
 		this.userType = userType;
 	}
 
-	public Integer getType() {
-		return type;
+	public Integer getLoginType() {
+		return loginType;
 	}
 
-	public void setType(Integer type) {
-		this.type = type;
+	public void setLoginType(Integer loginType) {
+		this.loginType = loginType;
 	}
 
 	public String getThirdAccount() {
@@ -43,7 +43,7 @@ public class ThirdLogin {
 
 	@Override
 	public String toString() {
-		return "ThirdLogin [userType=" + userType + ", type=" + type + ", thirdAccount=" + thirdAccount + "]";
+		return "ThirdLogin [userType=" + userType + ", loginType=" + loginType + ", thirdAccount=" + thirdAccount + "]";
 	}
 
 }
