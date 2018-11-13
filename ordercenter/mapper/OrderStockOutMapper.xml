@@ -48,6 +48,7 @@
 				jdbcType="VARCHAR" />
 			<result column="receive_zip_code" property="receiveZipCode"
 				jdbcType="VARCHAR" />
+			<result column="rebate_fee" property="rebateFee" jdbcType="DECIMAL" />
 		</association>
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
@@ -163,7 +164,7 @@
 		o.*,
 		oe.id as orderExpress_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus,
 		od.id as detail_id,od.payment,od.post_fee,od.tax_fee,od.carry_address,od.receive_zip_code,od.receive_address,
-		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.pay_type 
+		od.pay_time,od.pay_no,od.receive_area,od.receive_city,od.receive_province,od.receive_phone,od.receive_name,od.rebate_fee,od.pay_type 
 		from 
 		(select ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,
 		ob.guide_id,ob.push_user_id,ob.user_id ,ob.combination_id,ob.order_source,ob.order_flag,ob.remark,ob.is_eshop_in
@@ -353,7 +354,7 @@
 		o.id,o.order_id,o.status,o.weight,o.supplier_id,o.create_time,o.user_id,o.create_type,o.push_user_id,
 		o.remark,od.id as
 		detail_id,od.payment,od.pay_time,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.grade_id,
-		od.pay_type,od.pay_no,o.mall_id,og.id as
+		od.pay_type,od.pay_no,od.rebate_fee,o.mall_id,og.id as
 		goods_id,og.goods_id as goodsId,og.item_id,og.item_name,og.item_quantity,og.item_code,o.order_source,
 		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
 		od.receive_city,od.receive_area,od.receive_address
