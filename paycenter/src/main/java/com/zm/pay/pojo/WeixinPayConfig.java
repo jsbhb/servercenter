@@ -29,6 +29,18 @@ public class WeixinPayConfig implements WXPayConfig,Serializable {
 	private Integer httpReadTimeoutMs;
 	
 	private Integer centerId;
+	
+	private String appletAppId;
+
+	public String getAppletAppId() {
+		return appletAppId;
+	}
+
+
+	public void setAppletAppId(String appletAppId) {
+		this.appletAppId = appletAppId;
+	}
+
 
 	public Integer getId() {
 		return id;

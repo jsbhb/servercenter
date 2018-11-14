@@ -20,26 +20,31 @@
 		<result column="cert_path" property="certPath" jdbcType="VARCHAR" />
 		<result column="mch_id" property="mchID" jdbcType="VARCHAR" />
 		<result column="app_id" property="appID" jdbcType="VARCHAR" />
-		<result column="api_key" property="key"
-			jdbcType="VARCHAR" />
+		<result column="applet_appId" property="appletAppId" jdbcType="VARCHAR" />
+		<result column="api_key" property="key" jdbcType="VARCHAR" />
 	</resultMap>
-	
+
 	<resultMap type="com.zm.pay.pojo.UnionPayConfig" id="upconfig">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
 		<result column="mer_id" property="merId" jdbcType="VARCHAR" />
 		<result column="tr_id" property="trId" jdbcType="VARCHAR" />
-		<result column="signCert_path" property="signCertPath" jdbcType="VARCHAR" />
+		<result column="signCert_path" property="signCertPath"
+			jdbcType="VARCHAR" />
 		<result column="signCert_pwd" property="signCertPwd" jdbcType="VARCHAR" />
-		<result column="encryptCert_path" property="encryptCertPath" jdbcType="VARCHAR" />
-		<result column="middleCert_path" property="middleCertPath" jdbcType="VARCHAR" />
-		<result column="rootCert_path" property="rootCertPath" jdbcType="VARCHAR" />
+		<result column="encryptCert_path" property="encryptCertPath"
+			jdbcType="VARCHAR" />
+		<result column="middleCert_path" property="middleCertPath"
+			jdbcType="VARCHAR" />
+		<result column="rootCert_path" property="rootCertPath"
+			jdbcType="VARCHAR" />
 	</resultMap>
-	
+
 	<resultMap type="com.zm.pay.pojo.YopConfigModel" id="yopconfig">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="center_id" property="centerId" jdbcType="INTEGER" />
-		<result column="parentMerchantNo" property="parentMerchantNo" jdbcType="VARCHAR" />
+		<result column="parentMerchantNo" property="parentMerchantNo"
+			jdbcType="VARCHAR" />
 		<result column="merchantNo" property="merchantNo" jdbcType="VARCHAR" />
 		<result column="privatekey" property="privatekey" jdbcType="VARCHAR" />
 		<result column="publickey" property="publickey" jdbcType="VARCHAR" />
@@ -55,30 +60,31 @@
 		select * from
 		wxpay_config;
 	</select>
-	
+
 	<select id="listYopPayConfig" resultMap="yopconfig">
 		select * from yop_config
 	</select>
-	
+
 	<select id="getYopPayConfig" parameterType="Object" resultMap="yopconfig">
 		select * from yop_config where center_id = #{centerId}
 	</select>
-	
+
 	<select id="getAliPayConfig" parameterType="Object" resultMap="aliconfig">
 		select * from
 		alipay_config where center_id = #{centerId};
 	</select>
 
-	<select id="getWeixinPayConfig" parameterType="Object" resultMap="wxconfig">
+	<select id="getWeixinPayConfig" parameterType="Object"
+		resultMap="wxconfig">
 		select * from
 		wxpay_config where center_id = #{centerId};
 	</select>
-	
+
 	<select id="listUnionPayConfig" resultMap="upconfig">
 		select * from
 		unionpay_config;
 	</select>
-	
+
 	<select id="getUnionPayConfig" parameterType="Object" resultMap="upconfig">
 		select * from
 		unionpay_config where center_id = #{centerId};

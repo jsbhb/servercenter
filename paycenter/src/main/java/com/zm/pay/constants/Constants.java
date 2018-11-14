@@ -13,6 +13,8 @@ public class Constants {
 	public static final String WX_NOTIFY_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/wxPayReturn";//测试
 
 	public static final String JSAPI = "JSAPI";
+	
+	public static final String JSAPI_WX_APPLET = "JSAPI_WX_APPLET";
 
 	public static final String MWEB = "MWEB";
 

@@ -31,6 +31,11 @@ public class WxPayUtils {
 	public static Map<String, String> unifiedOrder(String type, WeixinPayConfig config, PayModel model)
 			throws Exception {
 
+		if(Constants.JSAPI_WX_APPLET.equalsIgnoreCase(type)){
+			config.setAppID(config.getAppletAppId());
+			type = type.split("_")[0];
+		}
+		
 		WXPay wxpay = new WXPay(config);
 
 		Map<String, String> data = new HashMap<String, String>();

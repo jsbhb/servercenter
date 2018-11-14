@@ -10,3 +10,7 @@ CREATE TABLE `zm_payment`.`yop_config` (
   PRIMARY KEY (`id`)
   )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '易宝支付信息';
+
+
+
+alter table wxpay_config add column applet_appId varchar(200) default null comment '小程序appId';
