@@ -55,6 +55,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.UserInfo;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
@@ -136,7 +137,8 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 获取该用户是否是VIP
-		vip = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
+		UserInfo user = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
+		vip = user.isVip();
 
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		StringBuilder detail = new StringBuilder();
@@ -198,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// 调用支付信息
-		orderComponentUtil.getPayInfo(payType, type, req, result, openId, info, detail);
+		orderComponentUtil.getPayInfo(payType, type, req, result, openId, info, detail, user);
 		if (!result.isSuccess()) {
 			return result;
 		}
@@ -327,7 +329,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Integer getClientIdByOrderId(String orderId) {
+	public OrderInfo getClientIdByOrderId(String orderId) {
 
 		return orderMapper.getClientIdByOrderId(orderId);
 	}

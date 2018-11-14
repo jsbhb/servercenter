@@ -179,7 +179,29 @@ public class AuthServiceImpl implements AuthService {
 
 			claim.put(JWTUtil.OPEN_ID, userDetail.getOpenId());
 
-		} else {
+		} else if(loginType == Constants.LOGIN_WX_APPLET){
+			if (userInfo.getOpenId() == null || "".equals(userInfo.getOpenId())) {
+				throw new SecurityException("未传递openId给后台！");
+			}
+
+			userDetail = userMapper.queryByAppletOpenId(userInfo);
+
+			if (userDetail == null) {
+				String userId = userMapper.getUserIdByAppletOpenId(userInfo.getOpenId());
+				if(userId == null){
+					userMapper.insertForApplet(userInfo);
+					userId = userInfo.getUserId();
+				}
+				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(),userInfo.getPlatUserType());
+				Set<PlatformUser> set = new HashSet<PlatformUser>();
+				set.add(platformUser);
+				userMapper.insertPlatformUser(set);
+				userDetail = userInfo;
+				userInfo = null;
+			}
+
+			claim.put(JWTUtil.APPLET_OPEN_ID, userDetail.getOpenId());
+		}else {
 			if (loginType == Constants.LOGIN_PHONE) {
 				claim.put(JWTUtil.USER_NAME, userInfo.getPhone());
 				userInfo.setUserName(userInfo.getPhone());

@@ -54,6 +54,16 @@ public class OrderInfo {
 	private String startTime;
 	
 	private String endTime;
+	
+	private Integer orderSource;
+
+	public Integer getOrderSource() {
+		return orderSource;
+	}
+
+	public void setOrderSource(Integer orderSource) {
+		this.orderSource = orderSource;
+	}
 
 	public Integer getGuideId() {
 		return guideId;

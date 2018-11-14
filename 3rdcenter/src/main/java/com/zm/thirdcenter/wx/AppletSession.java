@@ -38,11 +38,11 @@ public class AppletSession implements Serializable {
 		this.json = json;
 		@SuppressWarnings("unchecked")
 		Map<String, Object> temp = JSONUtil.parse(json, Map.class);
-		this.openid = temp.get("openid") + "";
-		this.unionid = temp.get("unionid") + "";
-		this.session_key = temp.get("session_key") + "";
-		this.errcode = temp.get("errcode") + "";
-		this.errMsg = temp.get("errMsg") + "";
+		this.openid = temp.get("openid") == null ? null : temp.get("openid") + "";
+		this.unionid = temp.get("unionid") == null ? null : temp.get("unionid") + "";
+		this.session_key = temp.get("session_key") == null ? null : temp.get("session_key") + "";
+		this.errcode = temp.get("errcode") == null ? null : temp.get("errcode") + "";
+		this.errMsg = temp.get("errMsg") == null ? null : temp.get("errMsg") + "";
 	}
 
 	public boolean isAvailable() {

@@ -292,8 +292,8 @@
 	</update>
 
 	<select id="getClientIdByOrderId" parameterType="Object"
-		resultType="java.lang.Integer">
-		select mall_id from order_base where order_id =
+		resultMap="orderBase">
+		select mall_id,order_source from order_base where order_id =
 		#{orderId}
 	</select>
 

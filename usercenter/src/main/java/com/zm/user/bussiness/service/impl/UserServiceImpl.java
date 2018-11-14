@@ -267,14 +267,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean getVipUser(Map<String, Object> param) {
+	public UserInfo getVipUser(Integer userId, Integer centerId) {
+		Map<String, Object> param = new HashMap<String, Object>();
 
+		param.put("userId", userId);
+		param.put("centerId", centerId);
 		UserVip vipUser = userMapper.getVipUser(param);
+		
+		UserInfo info = userMapper.getUserInfo(userId);
 		if (vipUser == null) {
-			return false;
+			info.setVip(false);
+		} else {
+			info.setVip(true);
 		}
 
-		return true;
+		return info;
 	}
 
 	@Override

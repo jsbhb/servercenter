@@ -73,6 +73,16 @@ public class UserInfo extends Pagination {
 	private Integer loginType;
 	
 	private String thirdAccount;
+	
+	private boolean vip;
+
+	public boolean isVip() {
+		return vip;
+	}
+
+	public void setVip(boolean vip) {
+		this.vip = vip;
+	}
 
 	public boolean check() {
 		return (account != null || phone != null || email != null) && centerId != null;

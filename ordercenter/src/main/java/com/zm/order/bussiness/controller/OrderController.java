@@ -225,13 +225,13 @@ public class OrderController {
 
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
 	@ApiIgnore
-	public Integer getClientIdByOrderId(@PathVariable("orderId") String orderId,
+	public OrderInfo getClientIdByOrderId(@PathVariable("orderId") String orderId,
 			@PathVariable("version") Double version) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Integer clientId = orderService.getClientIdByOrderId(orderId);
+			OrderInfo info = orderService.getClientIdByOrderId(orderId);
 
-			return clientId;
+			return info;
 		}
 		return null;
 	}

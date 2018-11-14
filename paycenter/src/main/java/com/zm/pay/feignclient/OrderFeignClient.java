@@ -21,7 +21,7 @@ public interface OrderFeignClient {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/order/getClientId/{orderId}", method = RequestMethod.GET)
-	Integer getClientIdByOrderId(@PathVariable("orderId") String orderId, @PathVariable("version") Double version);
+	OrderInfo getClientIdByOrderId(@PathVariable("orderId") String orderId, @PathVariable("version") Double version);
 
 	/**
 	 * @fun 支付成功后更新订单

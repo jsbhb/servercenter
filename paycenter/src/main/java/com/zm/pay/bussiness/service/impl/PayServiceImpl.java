@@ -494,7 +494,7 @@ public class PayServiceImpl implements PayService {
 		// timeoutExpress);//单位：分钟，默认24小时，最小1分钟，最大180天
 		// params.put("requestDate", requestDate);//请求时间，用于计算订单有效期，格式 yyyy-MM-dd
 		// HH:mm:ss，不传默认为易宝接收到请求的时间
-		// params.put("redirectUrl", Constants.YOP_RETURN_URL);//默认停留在易宝支付完成页面
+		params.put("redirectUrl", Constants.YOP_RETURN_URL);//默认停留在易宝支付完成页面
 		params.put("notifyUrl", Constants.YOP_NOTIFY_URL);
 		params.put("goodsParamExt", goodsParamExt);
 		params.put("paymentParamExt", "");// 支付扩展信息当需要限制交易所使用的卡的时候，可以使用本参数来对支付的卡号，姓名，身份证进行限制，仅对快捷支付有效

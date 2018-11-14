@@ -93,7 +93,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Integer getClientIdByOrderId(String orderId);
+	OrderInfo getClientIdByOrderId(String orderId);
 
 	/**
 	 * saveShoppingCart:保存购物车. <br/>

@@ -16,7 +16,7 @@ import com.zm.order.pojo.bo.GradeBO;
 public interface UserFeignClient {
 
 	@RequestMapping(value = "{version}/user/vip/{centerId}/{userId}", method = RequestMethod.GET)
-	public boolean getVipUser(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+	public UserInfo getVipUser(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("centerId") Integer centerId);
 
 	@RequestMapping(value = "{version}/user/identity/{userId}", method = RequestMethod.GET)

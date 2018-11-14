@@ -355,19 +355,15 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "{version}/user/vip/{centerId}/{userId}", method = RequestMethod.GET)
-	public boolean getVipUser(@PathVariable("version") Double version, HttpServletResponse res,
+	public UserInfo getVipUser(@PathVariable("version") Double version, HttpServletResponse res,
 			@PathVariable("userId") Integer userId, @PathVariable("centerId") Integer centerId,
 			HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> param = new HashMap<String, Object>();
-
-			param.put("userId", userId);
-			param.put("centerId", centerId);
-			return userService.getVipUser(param);
+			return userService.getVipUser(userId, centerId);
 		}
 
-		return false;
+		return null;
 	}
 
 	@RequestMapping(value = "{version}/user/vip-order", method = RequestMethod.POST)

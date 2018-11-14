@@ -49,7 +49,7 @@ public interface OrderMapper {
 	
 	int updateOrderPayStatusByOrderId(String orderId);
 	
-	Integer getClientIdByOrderId(String orderId);
+	OrderInfo getClientIdByOrderId(String orderId);
 	
 	void saveShoppingCart(ShoppingCart cart);
 	

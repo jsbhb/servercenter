@@ -26,6 +26,7 @@ public class Constants {
 	public final static int LOGIN_WX = 2;
 	public final static int LOGIN_USER_NAME = 3;
 	public final static int LOGIN_PLATID = 4;
+	public final static int LOGIN_WX_APPLET = 5;
 	
 	//******************版本控制*****************
 	public final static Double FIRST_VERSION = 1.0;

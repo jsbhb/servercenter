@@ -191,8 +191,9 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 		if (!session.isAvailable()) {
 			return new ResultModel(false, session.getErrMsg() == null ? session.getErrcode() : session.getErrMsg());
 		}
-		boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION, new ThirdLogin(userType,
-				session.getUnionid() == null ? session.getOpenid() : session.getUnionid(), Constants.WX_APPLET_LOGIN));
+		String thirdAccount = session.getUnionid() == null ? session.getOpenid() : session.getUnionid();
+		boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
+				new ThirdLogin(userType, thirdAccount, Constants.WX_APPLET_LOGIN));
 
 		resultMap.put("openid", session.getOpenid());
 		resultMap.put("unionid", session.getUnionid());

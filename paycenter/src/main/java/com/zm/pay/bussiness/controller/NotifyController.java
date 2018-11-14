@@ -36,6 +36,7 @@ import com.yeepay.g3.sdk.yop.utils.DigitalEnvelopeUtils;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
+import com.zm.pay.feignclient.model.OrderInfo;
 import com.zm.pay.feignclient.model.UserVip;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.ResultModel;
@@ -89,8 +90,10 @@ public class NotifyController {
 
 		Integer clientId = null;
 		UserVip user = null;
+		OrderInfo info = null;
 		if (orderId != null && orderId.startsWith("GX")) {
-			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			info = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = info.getCenterId();
 		}
 		if (orderId != null && orderId.startsWith("VIP")) {
 			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
@@ -189,8 +192,10 @@ public class NotifyController {
 
 			Integer clientId = null;
 			UserVip user = null;
+			OrderInfo info = null;
 			if (orderId != null && orderId.startsWith("GX")) {
-				clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+				info = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+				clientId = info.getCenterId();
 			}
 			if (orderId != null && orderId.startsWith("VIP")) {
 				user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
@@ -210,6 +215,16 @@ public class NotifyController {
 					if (orderId.startsWith("GX")) {
 						String payNo = params.get("trade_no");
 						orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
+						if (Constants.BACK_MANAGER_WEBSITE == info.getOrderSource()) {
+							String url = config.getUrl();
+							if (url.startsWith("test")) {
+								url = "testerp" + url.substring(url.indexOf("."));
+							} else if (url.startsWith("www")) {
+								url = "zserp" + url.substring(url.indexOf("."));
+							}
+							res.sendRedirect(url + "/admin/customer/purchaseMng/orderList.shtml");
+							return;
+						}
 						res.sendRedirect(config.getUrl() + "/personal.html?child=order");
 						return;
 					}
@@ -270,8 +285,10 @@ public class NotifyController {
 
 			Integer clientId = null;
 			UserVip user = null;
+			OrderInfo info = null;
 			if (orderId != null && orderId.startsWith("GX")) {
-				clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+				info = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+				clientId = info.getCenterId();
 			}
 			if (orderId != null && orderId.startsWith("VIP")) {
 				user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
@@ -345,8 +362,10 @@ public class NotifyController {
 		String orderId = valideData.get("orderId");
 		Integer clientId = null;
 		UserVip user = null;
+		OrderInfo info = null;
 		if (orderId != null && orderId.startsWith("GX")) {
-			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			info = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = info.getCenterId();
 		}
 		if (orderId != null && orderId.startsWith("VIP")) {
 			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
@@ -420,8 +439,10 @@ public class NotifyController {
 		String orderId = valideData.get("orderId");
 		Integer clientId = null;
 		UserVip user = null;
+		OrderInfo info = null;
 		if (orderId != null && orderId.startsWith("GX")) {
-			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			info = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = info.getCenterId();
 		}
 		if (orderId != null && orderId.startsWith("VIP")) {
 			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
@@ -539,8 +560,10 @@ public class NotifyController {
 		responseMap.put("sign", sign);
 		Integer clientId = null;
 		UserVip user = null;
+		OrderInfo info = null;
 		if (orderId != null && orderId.startsWith("GX")) {
-			clientId = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			info = orderFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
+			clientId = info.getCenterId();
 		}
 		if (orderId != null && orderId.startsWith("VIP")) {
 			user = userFeignClient.getClientIdByOrderId(orderId, Constants.FIRST_VERSION);
@@ -548,12 +571,27 @@ public class NotifyController {
 		}
 		YopConfigModel config = (YopConfigModel) template.opsForValue()
 				.get(Constants.PAY + clientId + Constants.YOP_PAY);
-
-		if (YeepayService.verifyCallback(responseMap, config)) {
-
-		} else {
-			logger.info("易宝支付验签出错");
+		try {
+			if (YeepayService.verifyCallback(responseMap, config)) {
+				if (Constants.BACK_MANAGER_WEBSITE == info.getOrderSource()) {
+					String url = config.getUrl();
+					if (url.startsWith("test")) {
+						url = "testerp" + url.substring(url.indexOf("."));
+					} else if (url.startsWith("www")) {
+						url = "zserp" + url.substring(url.indexOf("."));
+					}
+					res.sendRedirect(url + "/admin/customer/purchaseMng/orderList.shtml");
+					return;
+				}
+				res.sendRedirect(config.getUrl() + "/personal.html?child=order");
+				return;
+			} else {
+				logger.info("易宝支付验签出错");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	@RequestMapping(value = "auth/payMng/yop-payNotify")

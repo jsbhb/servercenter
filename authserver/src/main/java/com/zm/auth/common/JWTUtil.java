@@ -31,6 +31,8 @@ public class JWTUtil {
 	public final static String PLATUSERTYPE="platUserType";
 	
 	public final static String OPEN_ID = "openid";
+	
+	public final static String APPLET_OPEN_ID = "appletOpenid";
 
 	public final static String PLATFORM_ID = "platid";
 

@@ -1,0 +1,1 @@
+alter table zm_auth.user add column applet_openid varchar(200) default null comment '微信小程序openid';

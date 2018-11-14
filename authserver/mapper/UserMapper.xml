@@ -41,6 +41,24 @@
           AND U.OPENID = #{openId} AND pu.PLATFORM = #{platUserType}
     </select>
     
+    <select id="queryByAppletOpenId" parameterType="Object" resultType="userInfo">
+          SELECT
+              U.USER_ID USERID,
+              pu.STATUS STATUS,
+              U.CREATION_DATE CREATIONDATE,
+              U.CREATED_BY CREATEDBY,
+              U.applet_openid OPENID,
+              U.LAST_UPDATE_DATE LASTUPDATE,
+              U.LAST_UPDATED_BY LASTUPDATEDBY,
+              pu.PLATFORM PLATUSERTYPE,
+              U.USERCENTERID userCenterId
+          FROM
+              USER U left join platform_user pu on u.user_id = pu.user_id
+          WHERE
+              pu.STATUS = 1
+          AND U.applet_openid = #{openId} AND pu.PLATFORM = #{platUserType}
+    </select>
+    
     <select id="getUserByPlatId" parameterType="userInfo" resultType="userInfo">
           SELECT
               U.USER_ID USERID,
@@ -121,6 +139,11 @@
               USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,OPENID,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
     </insert>
     
+    <insert id="insertForApplet"  useGeneratedKeys="true"  keyProperty="userId" parameterType="object">
+         INSERT INTO USER (
+              USER_NAME,PASSWORD,STATUS ,PHONE,EMAIL,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY,applet_openid,PLATFORM,USERCENTERID) VALUE (#{userName},#{password},1,#{phone},#{email},now(),1,now(),1,#{openId},#{platUserType},#{userCenterId})
+    </insert>
+    
     <insert id="insertPlatformUser" parameterType="object">
          INSERT ignore INTO platform_user (
               USER_ID,STATUS ,PLATFORM,REMARK,CREATION_DATE,LAST_UPDATE_DATE) VALUE 
@@ -135,6 +158,10 @@
     
     <select id="getUserIdByOpenId" parameterType="object" resultType="java.lang.String">
     	select user_id from USER where OPENID = #{openId}
+    </select>
+    
+    <select id="getUserIdByAppletOpenId" parameterType="object" resultType="java.lang.String">
+    	select user_id from USER where applet_openid = #{openId}
     </select>
     
     <update id="modifyPwd" parameterType="object">

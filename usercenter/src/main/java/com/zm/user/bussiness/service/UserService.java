@@ -118,13 +118,13 @@ public interface UserService {
 	void modifyPwd(Map<String, Object> param, String phone);
 
 	/**
-	 * getVipUser:判断是否会员. <br/>
+	 * getVipUser:获取用户信息,包含是否会员. <br/>
 	 * 
 	 * @author wqy
 	 * @param param
 	 * @since JDK 1.7
 	 */
-	boolean getVipUser(Map<String, Object> param);
+	UserInfo getVipUser(Integer userId, Integer centerId);
 
 	/**
 	 * saveVipOrder:保存订单并且调用支付. <br/>

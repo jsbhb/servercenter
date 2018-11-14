@@ -103,7 +103,22 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 							return;
 						}
 						
-					} else if (claims.containsKey(JWTUtil.APPKEY)) {
+					} else if(claims.containsKey(JWTUtil.APPLET_OPEN_ID)){
+						user.setUserName((String) claims.get(JWTUtil.APPLET_OPEN_ID) + ",wxApplet");
+						userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
+
+						if (userDetails != null) {
+							UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+									userDetails, null, userDetails.getAuthorities());
+							authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+							logger.info("authenticated applet openId " + claims.get(JWTUtil.APPLET_OPEN_ID)
+									+ ", setting security context");
+							SecurityContextHolder.getContext().setAuthentication(authentication);
+						}
+						if(request.getRequestURI().contains("authentication")){
+							return;
+						}
+					}else if (claims.containsKey(JWTUtil.APPKEY)) {
 						user.setUserName((String) claims.get(JWTUtil.APPKEY));
 						userDetails = (SecurityUserDetail) this.userService.loadUserByUsername(user);
 						if (userDetails != null) {

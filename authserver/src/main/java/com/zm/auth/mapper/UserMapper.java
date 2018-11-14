@@ -107,5 +107,11 @@ public interface UserMapper {
 	String getUserIdByUserName(String userName);
 	
 	String getUserIdByOpenId(String openId);
+
+	public UserInfo queryByAppletOpenId(UserInfo userInfo);
+
+	public String getUserIdByAppletOpenId(String openId);
+
+	public void insertForApplet(UserInfo userInfo);
 	
 }

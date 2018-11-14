@@ -64,9 +64,19 @@ public class UserInfo {
 	private UserDetail userDetail;
 
 	private Integer vipLevel;
+	
+	private boolean vip;
 
 	public boolean check() {
 		return platUserType != null && (account != null || phone != null || email != null) && centerId != null;
+	}
+
+	public boolean isVip() {
+		return vip;
+	}
+
+	public void setVip(boolean vip) {
+		this.vip = vip;
 	}
 
 	public Integer getGuideId() {

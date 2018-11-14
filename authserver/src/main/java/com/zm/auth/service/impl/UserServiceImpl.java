@@ -43,7 +43,10 @@ public class UserServiceImpl implements UserService {
 		if (userName.endsWith(WX_OPENID_SECRET)) {
 			user.setOpenId((userName.split(",")[0]));
 			userInfo = getUserByOpenId(user);
-		} else {
+		} else if(userName.endsWith("wxApplet")){
+			user.setOpenId((userName.split(",")[0]));
+			userInfo = userMapper.queryByAppletOpenId(user);
+		}else{
 			userInfo = getUserByName(user);
 		}
 

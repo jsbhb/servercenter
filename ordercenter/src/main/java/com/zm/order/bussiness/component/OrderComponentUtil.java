@@ -28,6 +28,7 @@ import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.Tax;
+import com.zm.order.pojo.UserInfo;
 import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
@@ -320,7 +321,7 @@ public class OrderComponentUtil {
 	 * @throws Exception
 	 */
 	public void getPayInfo(String payType, String type, HttpServletRequest req, ResultModel result, String openId,
-			OrderInfo info, StringBuilder detail) throws Exception {
+			OrderInfo info, StringBuilder detail, UserInfo user) throws Exception {
 		Double rebateFee = info.getOrderDetail().getRebateFee();
 		if (rebateFee != null && rebateFee > 0) {// 如果有返佣抵扣，先进行扣减
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
@@ -336,14 +337,14 @@ public class OrderComponentUtil {
 		}
 		Double needToPayAmount = CalculationUtils.sub(info.getOrderDetail().getPayment(),
 				rebateFee == null ? 0 : rebateFee);
-		
+
 		int needToPayTotalAmount = (int) CalculationUtils.mul(needToPayAmount, 100);
-		
+
 		PayModel payModel = new PayModel();
 		payModel.setBody("购物订单");
 		payModel.setOrderId(info.getOrderId());
 		payModel.setTotalAmount(needToPayTotalAmount + "");
-		payModel.setPhone(info.getOrderDetail().getReceivePhone());
+		payModel.setPhone(user.getPhone());
 		String detailStr = detail.toString().substring(0, detail.toString().length() - 1);
 		if (detailStr.length() > 60) {// 支付宝描述过长会报错
 			detailStr = detailStr.substring(0, 60) + "...";
