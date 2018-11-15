@@ -112,7 +112,7 @@ public class WxPayUtils {
 		if (Constants.NATIVE.equals(type)) {
 			String urlCode = (String) resp.get("code_url");
 			result.put("urlCode", urlCode);
-		} else if (Constants.JSAPI.equals(type)) {
+		} else if (Constants.JSAPI.equals(type) || Constants.JSAPI_WX_APPLET.equalsIgnoreCase(type)) {
 			result.put("timeStamp", System.currentTimeMillis() / 1000 + "");
 			result.put("package", "prepay_id=" + resp.get("prepay_id"));
 			result.put("appId", config.getAppID());

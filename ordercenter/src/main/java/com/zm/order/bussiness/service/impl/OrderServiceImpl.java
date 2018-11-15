@@ -316,8 +316,8 @@ public class OrderServiceImpl implements OrderService {
 
 		int count = orderMapper.updateOrderPayStatusByOrderId(orderId);
 
-		orderMapper.updateOrderDetailPayTime(param);
 		if (count > 0) {// 有更新结果后插入状态记录表
+			orderMapper.updateOrderDetailPayTime(param);
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
 			threadPoolComponent.rebate4Order(orderId);

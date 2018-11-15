@@ -13,6 +13,7 @@ import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
+import com.zm.pay.pojo.YopConfigModel;
 
 @Component
 public class SysInit {
@@ -31,8 +32,17 @@ public class SysInit {
 		loadWeixinPayConfig();
 		
 		loadUnionPayConfig();
+		
+		loadYopPayConfig();
 	}
 	
+	private void loadYopPayConfig() {
+		List<YopConfigModel> list = payMapper.listYopPayConfig();
+		for(YopConfigModel model : list){
+			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.YOP_PAY, model);
+		}
+	}
+
 	private void loadAliPayConfig(){
 		List<AliPayConfigModel> list = payMapper.listAliPayConfig();
 		for(AliPayConfigModel model : list){

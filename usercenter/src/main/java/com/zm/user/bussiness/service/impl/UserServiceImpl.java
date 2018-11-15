@@ -407,7 +407,7 @@ public class UserServiceImpl implements UserService {
 		if (backUserId == null) {
 			backUser.setPhoneValidate(VALIDATE);
 			backUser.setStatus(1);
-			backUser.setUserType(1);// 代表后台账号
+			backUser.setUserType(99);// 代表后台账号
 			userMapper.saveUser(backUser);
 			UserDetail detail = new UserDetail();
 			detail.setUserId(backUser.getId());

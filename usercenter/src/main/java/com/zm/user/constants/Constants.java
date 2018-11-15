@@ -45,6 +45,10 @@ public class Constants {
 	
 	public static final Integer SHOPPING_GUIDE = 4;
 	
+	public static final Integer CONSUMER = 5;
+	
+	public static final Integer BACK_GRADE = 99;
+	
 	
 	// *********************推手状态******************************/
 	

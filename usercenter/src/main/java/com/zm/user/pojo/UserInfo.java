@@ -14,7 +14,7 @@ public class UserInfo extends Pagination {
 
 	private Integer id;
 
-	private Integer userType;
+	private Integer userType;//5：消费者，99，后台分级的信息
 
 	private String account;
 
