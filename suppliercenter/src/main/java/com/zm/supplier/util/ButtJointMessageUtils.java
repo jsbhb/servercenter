@@ -110,7 +110,7 @@ public class ButtJointMessageUtils {
 			sb.append(goods.getItemQuantity()); // 数量
 			sb.append("</qty>\n");
 			sb.append("<price>");
-			sb.append(goods.getItemPrice()); // 商品单价
+			sb.append(goods.getActualPrice()); // 商品单价
 			sb.append("</price>\n");
 			sb.append("<amount>");
 			sb.append(CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity())); // 商品金额
