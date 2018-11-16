@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
 
 		if (info.getLoginType() != null) {
 			if (Constants.WX_LOGIN == info.getLoginType()) {
-				ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getWechat()));
+				ApiResult apiResult = new ApiResult(redisTemplate.opsForValue().get(info.getThirdAccount()));
 				packageUser(apiResult, info, "wechat");
 			}
 			userMapper.saveThirdAccount(
