@@ -48,8 +48,8 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-		// sb.append("17000"); // 店铺代码正式
-		sb.append("11612"); // 店铺代码测试
+		 sb.append("17000"); // 店铺代码正式
+//		sb.append("11612"); // 店铺代码测试
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
 		sb.append(3105); // 海关关区北仑保税区
@@ -94,11 +94,23 @@ public class ButtJointMessageUtils {
 		sb.append(info.getCreateTime()); // 下单时间
 		sb.append("</dealDate>\n");
 		sb.append("<promotions>\n");
-		sb.append("<promotion>\n");
-		sb.append("<proAmount>");
-		sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额
-		sb.append("</proAmount>\n");
-		sb.append("</promotion>\n");
+		if(info.getOrderDetail().getDisAmount() > 0){
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				double proAmount = CalculationUtils.sub(goods.getItemPrice(), goods.getActualPrice());
+				proAmount = CalculationUtils.mul(proAmount, goods.getItemQuantity());
+				sb.append("<promotion>\n");
+				sb.append("<proAmount>");
+				sb.append(proAmount); // 优惠金额
+				sb.append("</proAmount>\n");
+				sb.append("</promotion>\n");
+			}
+		} else {
+			sb.append("<promotion>\n");
+			sb.append("<proAmount>");
+			sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额
+			sb.append("</proAmount>\n");
+			sb.append("</promotion>\n");
+		}
 		sb.append("</promotions>\n");
 		sb.append("<goods>\n");
 		for (OrderGoods goods : info.getOrderGoodsList()) {
@@ -113,7 +125,7 @@ public class ButtJointMessageUtils {
 			sb.append(goods.getItemPrice()); // 商品单价
 			sb.append("</price>\n");
 			sb.append("<amount>");
-			sb.append(CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity())); // 商品金额
+			sb.append(CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity())); // 商品金额
 			sb.append("</amount>\n");
 			sb.append("</detail>\n");
 		}

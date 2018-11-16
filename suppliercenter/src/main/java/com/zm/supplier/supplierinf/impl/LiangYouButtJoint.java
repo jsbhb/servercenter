@@ -1,8 +1,6 @@
 package com.zm.supplier.supplierinf.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,18 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dom4j.DocumentException;
 import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
-import com.zm.supplier.pojo.OrderDetail;
-import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserDetail;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.supplierinf.AccessTokenCacheMap;
@@ -29,12 +23,10 @@ import com.zm.supplier.supplierinf.model.AccessToken;
 import com.zm.supplier.supplierinf.model.LiangYouOrderStatusTemp;
 import com.zm.supplier.supplierinf.model.TokenResult;
 import com.zm.supplier.util.ButtJointMessageUtils;
-import com.zm.supplier.util.ConfUtils;
 import com.zm.supplier.util.EncryptUtil;
 import com.zm.supplier.util.HttpClientUtil;
 import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.SignUtil;
-import com.zm.supplier.util.XmlUtil;
 
 @Component
 public class LiangYouButtJoint extends AbstractSupplierButtJoint {
