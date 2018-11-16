@@ -26,12 +26,12 @@ public class SysInit {
 
 	@Resource
 	LoginPluginMapper loginPluginMapper;
-	
+
 	@PostConstruct
-	public void init(){
-		
+	public void init() {
+
 		loadWXLoginConfig();
-		
+
 		try {
 			loadXls();
 		} catch (IOException e) {
@@ -39,25 +39,26 @@ public class SysInit {
 			e.printStackTrace();
 		}
 	}
-	
-	private void loadWXLoginConfig(){
+
+	private void loadWXLoginConfig() {
 		List<WXLoginConfig> list = loginPluginMapper.listWXLoginConfig();
-		for(WXLoginConfig model : list){
-			template.opsForValue().set(Constants.LOGIN+model.getCenterId()+""+model.getLoginType(), model);
+		for (WXLoginConfig model : list) {
+			template.opsForValue().set(Constants.LOGIN + model.getCenterId() + "" + model.getLoginType(), model);
 		}
 	}
-	
+
 	/**
 	 * 加载物流公司
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	private void loadXls() throws IOException {
-			Map<String,String> carrierMap = new HashMap<String,String>();
-			List<CarrierModel> list = ExcelUtil.instance().getCache("/ExpressCode.xls");
-			for(CarrierModel model : list){
-				carrierMap.put(model.getCarrierName(), model.getCarrierID());
-			}
-			CacheMap.getCache().put(Constants.CARRIER, carrierMap);
-		
+		Map<String, String> carrierMap = new HashMap<String, String>();
+		List<CarrierModel> list = ExcelUtil.instance().getCache("/ExpressCode.xls");
+		for (CarrierModel model : list) {
+			carrierMap.put(model.getCarrierName(), model.getCarrierID());
+		}
+		CacheMap.getCache().put(Constants.CARRIER, carrierMap);
+
 	}
 }
