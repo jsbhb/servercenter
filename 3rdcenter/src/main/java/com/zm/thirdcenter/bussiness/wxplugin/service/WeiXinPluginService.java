@@ -1,5 +1,6 @@
 package com.zm.thirdcenter.bussiness.wxplugin.service;
 
+import com.zm.thirdcenter.bussiness.wxplugin.model.AppletCodeParameter;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
 
@@ -12,4 +13,6 @@ public interface WeiXinPluginService {
 	ResultModel shareUrl(WXLoginConfig param, String url);
 
 	ResultModel loginByApplet(String code, Integer userType, Integer centerId);
+
+	ResultModel getAppletCode(AppletCodeParameter param);
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zm.thirdcenter.bussiness.wxplugin.model.AppletCodeParameter;
 import com.zm.thirdcenter.bussiness.wxplugin.service.WeiXinPluginService;
 import com.zm.thirdcenter.constants.Constants;
 import com.zm.thirdcenter.pojo.ResultModel;
@@ -90,6 +91,14 @@ public class WeiXinPluginController {
 			param.setCenterId(centerId);
 			param.setLoginType(1);
 			return weiXinPluginService.shareUrl(param, url);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	public ResultModel getAppletCode(@PathVariable("version") Double version, @RequestBody AppletCodeParameter param) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			// 获取小程序二维码
+			return weiXinPluginService.getAppletCode(param);
 		}
 		return new ResultModel(false, "版本错误");
 	}

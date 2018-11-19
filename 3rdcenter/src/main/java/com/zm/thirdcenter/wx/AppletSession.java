@@ -1,7 +1,6 @@
 package com.zm.thirdcenter.wx;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.zm.thirdcenter.utils.JSONUtil;
@@ -19,20 +18,7 @@ public class AppletSession implements Serializable {
 	private String session_key;
 	private String unionid;
 	private String errcode;
-	@SuppressWarnings("unused")
-	private String errMsg;
-	private Map<String, String> errMsgMap = new HashMap<String, String>() {
-		/**
-		 * @since JDK 1.7
-		 */
-		private static final long serialVersionUID = 1L;
-
-		{
-			put("-1", "系统繁忙，此时请开发者稍候再试");
-			put("40029", "code 无效");
-			put("45011", "频率限制，每个用户每分钟100次");
-		}
-	};
+	private String errmsg;
 
 	public AppletSession(String json) {
 		this.json = json;
@@ -42,7 +28,7 @@ public class AppletSession implements Serializable {
 		this.unionid = temp.get("unionid") == null ? null : temp.get("unionid") + "";
 		this.session_key = temp.get("session_key") == null ? null : temp.get("session_key") + "";
 		this.errcode = temp.get("errcode") == null ? null : temp.get("errcode") + "";
-		this.errMsg = temp.get("errMsg") == null ? null : temp.get("errMsg") + "";
+		this.errmsg = temp.get("errmsg") == null ? null : temp.get("errmsg") + "";
 	}
 
 	public boolean isAvailable() {
@@ -84,11 +70,11 @@ public class AppletSession implements Serializable {
 	}
 
 	public String getErrMsg() {
-		return errMsgMap.get(errcode);
+		return errmsg;
 	}
 
 	public void setErrMsg(String errMsg) {
-		this.errMsg = errMsg;
+		this.errmsg = errMsg;
 	}
 
 	public void setJson(String json) {

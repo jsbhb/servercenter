@@ -12,12 +12,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.zm.thirdcenter.bussiness.dao.LoginPluginMapper;
+import com.zm.thirdcenter.bussiness.wxplugin.model.AppletCodeParameter;
 import com.zm.thirdcenter.bussiness.wxplugin.service.WeiXinPluginService;
 import com.zm.thirdcenter.constants.Constants;
 import com.zm.thirdcenter.feignclient.UserFeignClient;
 import com.zm.thirdcenter.feignclient.model.ThirdLogin;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
+import com.zm.thirdcenter.utils.JSONUtil;
 import com.zm.thirdcenter.utils.SignUtil;
 import com.zm.thirdcenter.wx.ApiResult;
 import com.zm.thirdcenter.wx.AppletSession;
@@ -183,13 +185,14 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 	public ResultModel loginByApplet(String code, Integer userType, Integer centerId) {
 		ResultModel result = new ResultModel();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-
-		WXLoginConfig config = (WXLoginConfig) template.opsForValue()
-				.get(Constants.LOGIN + centerId + Constants.WX_APPLET_LOGIN);
+		WXLoginConfig temp = new WXLoginConfig();
+		temp.setCenterId(2);
+		temp.setLoginType(Constants.WX_APPLET_LOGIN);
+		WXLoginConfig config = getWeiXinConfig(temp);
 		// 获取小程序登录权限
 		AppletSession session = SnsAccessTokenApi.getAppletSession(config.getAppId(), config.getSecret(), code);
 		if (!session.isAvailable()) {
-			return new ResultModel(false, session.getErrMsg() == null ? session.getErrcode() : session.getErrMsg());
+			return new ResultModel(false, session.getErrMsg(), session.getErrcode());
 		}
 		String thirdAccount = session.getUnionid() == null ? session.getOpenid() : session.getUnionid();
 		boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
@@ -201,5 +204,23 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 		result.setSuccess(true);
 		result.setObj(resultMap);
 		return result;
+	}
+
+	@Override
+	public ResultModel getAppletCode(AppletCodeParameter param) {
+		WXLoginConfig temp = new WXLoginConfig();
+		temp.setCenterId(2);
+		temp.setLoginType(Constants.WX_APPLET_LOGIN);
+		WXLoginConfig config = getWeiXinConfig(temp);// 获取小程序配置信息
+		String token = getAccessToken(config);// 获取token;
+		String result = SnsAccessTokenApi.getAppletCode(token, param);
+		try {
+			//错误返回的是json串
+			AppletSession error = JSONUtil.parse(result, AppletSession.class);
+			return new ResultModel(false, error.getErrMsg(), error.getErrcode());
+		} catch (Exception e) {
+			//不是json串则是正确的图片二进制
+			return new ResultModel(result);
+		}
 	}
 }
