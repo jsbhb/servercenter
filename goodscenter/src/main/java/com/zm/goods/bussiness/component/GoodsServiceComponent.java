@@ -415,7 +415,9 @@ public class GoodsServiceComponent {
 
 	public void packDetailPath(List<GoodsItem> itemList) {
 		for (GoodsItem item : itemList) {
-			item.setDetailList(getPicPath(HttpClientUtil.get(item.getDetailPath())));
+			if(item.getDetailPath() != null){
+				item.setDetailList(getPicPath(HttpClientUtil.get(item.getDetailPath())));
+			}
 		}
 	}
 
