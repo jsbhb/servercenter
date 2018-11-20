@@ -1,5 +1,6 @@
 package com.zm.thirdcenter.utils;
 
+import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.zm.thirdcenter.exception.WxCodeException;
 
 /**
  * ClassName: HttpClientUtil <br/>
@@ -199,9 +202,11 @@ public class HttpClientUtil {
 	 * @param url
 	 * @param jsonStr
 	 * @return
+	 * @throws WxCodeException 
+	 * @throws  
 	 */
-	public static String post(String url, String jsonStr) {
-		String resultStr = "";
+	public static byte[] postForWxCode(String url, String jsonStr) throws WxCodeException {
+		byte[] resultStr = null;
 		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
 				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
 
@@ -226,11 +231,16 @@ public class HttpClientUtil {
 			}
 			entity = response.getEntity();
 			if (entity != null) {
-				resultStr = EntityUtils.toString(entity, "UTF-8");
-				logger.info(" httpClient response string " + resultStr);
+				if (entity.getContentType().getValue().contains("image")) {
+					resultStr = EntityUtils.toByteArray(entity);
+				} else {
+					throw new WxCodeException(1, EntityUtils.toString(entity));
+				}
+			} else {
+				throw new WxCodeException(0, "访问异常");
 			}
 
-		} catch (Exception e) {
+		} catch (IOException e) {
 			httpPost.abort();
 			logger.error("http post error " + e.getMessage());
 			return null;
@@ -342,7 +352,7 @@ public class HttpClientUtil {
 			httpPost.addHeader("Accept-Language", "zh-cn");
 			httpPost.addHeader("Content-Type", "application/json");
 			logger.info("executing request uri：" + httpPost.getURI());
-			//URL中存在https
+			// URL中存在https
 			if (url.indexOf("https") != -1) {
 				response = httpsclient.execute(httpPost);
 			} else {
@@ -363,7 +373,7 @@ public class HttpClientUtil {
 
 		} catch (Exception e) {
 			httpPost.abort();
-			logger.error("http post error ",e);
+			logger.error("http post error ", e);
 			return null;
 			// 关闭连接,释放资源
 		} finally {

@@ -15,11 +15,11 @@ import com.zm.thirdcenter.bussiness.dao.LoginPluginMapper;
 import com.zm.thirdcenter.bussiness.wxplugin.model.AppletCodeParameter;
 import com.zm.thirdcenter.bussiness.wxplugin.service.WeiXinPluginService;
 import com.zm.thirdcenter.constants.Constants;
+import com.zm.thirdcenter.exception.WxCodeException;
 import com.zm.thirdcenter.feignclient.UserFeignClient;
 import com.zm.thirdcenter.feignclient.model.ThirdLogin;
 import com.zm.thirdcenter.pojo.ResultModel;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
-import com.zm.thirdcenter.utils.JSONUtil;
 import com.zm.thirdcenter.utils.SignUtil;
 import com.zm.thirdcenter.wx.ApiResult;
 import com.zm.thirdcenter.wx.AppletSession;
@@ -213,14 +213,19 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 		temp.setLoginType(Constants.WX_APPLET_LOGIN);
 		WXLoginConfig config = getWeiXinConfig(temp);// 获取小程序配置信息
 		String token = getAccessToken(config);// 获取token;
-		String result = SnsAccessTokenApi.getAppletCode(token, param);
+		byte[] result = null;
 		try {
-			//错误返回的是json串
-			AppletSession error = JSONUtil.parse(result, AppletSession.class);
-			return new ResultModel(false, error.getErrMsg(), error.getErrcode());
-		} catch (Exception e) {
-			//不是json串则是正确的图片二进制
-			return new ResultModel(result);
+			result = SnsAccessTokenApi.getAppletCode(token, param);
+		} catch (WxCodeException e) {
+			if (e.getCode() == 1) {
+				AppletSession session = new AppletSession(e.getMessage());
+				return new ResultModel(false, session.getErrMsg(), session.getErrcode());
+			} else {
+				return new ResultModel(false, e.getMessage());
+			}
 		}
+		// 正确的图片二进制,图片类byte转string需要base64编码
+		// Base64 encoder = new Base64 ();
+		return new ResultModel(result);
 	}
 }

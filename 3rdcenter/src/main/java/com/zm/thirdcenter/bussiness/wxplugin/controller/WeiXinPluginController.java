@@ -95,6 +95,7 @@ public class WeiXinPluginController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	@RequestMapping(value = "{version}/getwxacodeunlimit", method = RequestMethod.POST)
 	public ResultModel getAppletCode(@PathVariable("version") Double version, @RequestBody AppletCodeParameter param) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			// 获取小程序二维码

@@ -217,12 +217,12 @@ public class NotifyController {
 						orderFeignClient.updateOrderPayStatusByOrderId(Constants.FIRST_VERSION, orderId, payNo);
 						if (Constants.BACK_MANAGER_WEBSITE == info.getOrderSource()) {
 							String url = config.getUrl();
-							if (url.startsWith("test")) {
-								url = "testerp" + url.substring(url.indexOf("."));
-							} else if (url.startsWith("www")) {
-								url = "zserp" + url.substring(url.indexOf("."));
+							if (url.startsWith("https://test")) {
+								url = "https://testerp" + url.substring(url.indexOf("."));
+							} else if (url.startsWith("https://www")) {
+								url = "https://zserp" + url.substring(url.indexOf("."));
 							}
-							res.sendRedirect(url + "/admin/customer/purchaseMng/orderList.shtml");
+							res.sendRedirect(url + "/cardmanager/admin/main.shtml?id=51");
 							return;
 						}
 						res.sendRedirect(config.getUrl() + "/personal.html?child=order");

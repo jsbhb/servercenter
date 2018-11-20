@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import com.zm.thirdcenter.bussiness.wxplugin.model.AppletCodeParameter;
+import com.zm.thirdcenter.exception.WxCodeException;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
 import com.zm.thirdcenter.utils.HttpClientUtil;
 import com.zm.thirdcenter.utils.JSONUtil;
@@ -97,10 +98,9 @@ public class SnsAccessTokenApi {
 		return new AppletSession(json);
 	}
 
-	public static String getAppletCode(String token, AppletCodeParameter param) {
+	public static byte[] getAppletCode(String token, AppletCodeParameter param) throws WxCodeException {
 		final String codeUrl = applet_code_url + token;
-		String result = HttpClientUtil.post(codeUrl, JSONUtil.toJson(param));
-		return result;
+		return HttpClientUtil.postForWxCode(codeUrl, JSONUtil.toJson(param));
 	}
 
 }

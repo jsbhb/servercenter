@@ -395,6 +395,7 @@ public class UserServiceImpl implements UserService {
 			detail.setUserId(user.getId());
 			detail.setName(grade.getPersonInCharge());
 			userMapper.saveUserDetail(detail);
+			userId = user.getId();
 		}
 
 		// 生成后台账号统一的userId
@@ -403,7 +404,7 @@ public class UserServiceImpl implements UserService {
 		backUser.setCenterId(mallId);
 
 		backUser.setPhone(grade.getId() + "");
-		Integer backUserId = userMapper.getUserIdByUserInfo(user);
+		Integer backUserId = userMapper.getUserIdByUserInfo(backUser);
 		if (backUserId == null) {
 			backUser.setPhoneValidate(VALIDATE);
 			backUser.setStatus(1);

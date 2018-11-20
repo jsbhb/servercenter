@@ -224,15 +224,7 @@ public class OrderComponentUtil {
 				result.setErrorMsg("权限错误，不能使用返佣支付");
 				return;
 			}
-		} else {
-			if (Constants.REBATE_PAY.equals(payType)) {
-				if (info.getOrderDetail().getPayment() > 0) {
-					result.setSuccess(false);
-					result.setErrorMsg("还有余额需要支付，请选择其他支付方式");
-					return;
-				}
-			}
-		}
+		} 
 	}
 
 	/**

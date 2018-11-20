@@ -506,7 +506,7 @@ public class UserController {
 			try {
 				return userService.saveGrade(grade);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.writeErrorLog("新增分级出错：", e);
 				return new ResultModel(false, e.getMessage());
 			}
 		}
