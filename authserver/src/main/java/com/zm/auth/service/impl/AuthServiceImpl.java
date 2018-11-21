@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
 		this.userMapper = userMapper;
 	}
 
-	@Transactional(isolation=Isolation.READ_COMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	@Override
 	public SecurityUserDetail register(UserInfo userInfo) {
 
@@ -105,23 +105,24 @@ public class AuthServiceImpl implements AuthService {
 		userInfo.setAuthorities(asList("ROLE_USER"));
 		Set<PlatformUser> set = new HashSet<PlatformUser>();
 		String userId = null;
-		if(PlatUserType.CROSS_BORDER.getIndex() == userInfo.getPlatUserType()){
+		if (PlatUserType.CROSS_BORDER.getIndex() == userInfo.getPlatUserType()) {
 			userMapper.insert(userInfo);
 			userId = userInfo.getUserId();
-		}else{
+		} else {
 			userId = userMapper.getUserIdByUserName(userName);
-			if(userId == null){
+			if (userId == null) {
 				userMapper.insert(userInfo);
 				userId = userInfo.getUserId();
 			}
-			//插入平台用户
-			PlatformUser consumerPlat = new PlatformUser(userId,PlatUserType.CONSUMER.getIndex());
-//			PlatformUser pushUserPlat = new PlatformUser(userId,PlatUserType.PUSH_USER.getIndex());
-//			set.add(pushUserPlat);
+			// 插入平台用户
+			PlatformUser consumerPlat = new PlatformUser(userId, PlatUserType.CONSUMER.getIndex());
+			// PlatformUser pushUserPlat = new
+			// PlatformUser(userId,PlatUserType.PUSH_USER.getIndex());
+			// set.add(pushUserPlat);
 			set.add(consumerPlat);
-			//end
+			// end
 		}
-		PlatformUser platformUser = new PlatformUser(userId,userInfo.getPlatUserType());
+		PlatformUser platformUser = new PlatformUser(userId, userInfo.getPlatUserType());
 		set.add(platformUser);
 		userMapper.insertPlatformUser(set);
 
@@ -165,11 +166,11 @@ public class AuthServiceImpl implements AuthService {
 
 			if (userDetail == null) {
 				String userId = userMapper.getUserIdByOpenId(userInfo.getOpenId());
-				if(userId == null){
+				if (userId == null) {
 					userMapper.insert(userInfo);
 					userId = userInfo.getUserId();
 				}
-				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(),userInfo.getPlatUserType());
+				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(), userInfo.getPlatUserType());
 				Set<PlatformUser> set = new HashSet<PlatformUser>();
 				set.add(platformUser);
 				userMapper.insertPlatformUser(set);
@@ -179,7 +180,7 @@ public class AuthServiceImpl implements AuthService {
 
 			claim.put(JWTUtil.OPEN_ID, userDetail.getOpenId());
 
-		} else if(loginType == Constants.LOGIN_WX_APPLET){
+		} else if (loginType == Constants.LOGIN_WX_APPLET) {
 			if (userInfo.getOpenId() == null || "".equals(userInfo.getOpenId())) {
 				throw new SecurityException("未传递openId给后台！");
 			}
@@ -188,11 +189,11 @@ public class AuthServiceImpl implements AuthService {
 
 			if (userDetail == null) {
 				String userId = userMapper.getUserIdByAppletOpenId(userInfo.getOpenId());
-				if(userId == null){
+				if (userId == null) {
 					userMapper.insertForApplet(userInfo);
 					userId = userInfo.getUserId();
 				}
-				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(),userInfo.getPlatUserType());
+				PlatformUser platformUser = new PlatformUser(userInfo.getUserId(), userInfo.getPlatUserType());
 				Set<PlatformUser> set = new HashSet<PlatformUser>();
 				set.add(platformUser);
 				userMapper.insertPlatformUser(set);
@@ -201,7 +202,7 @@ public class AuthServiceImpl implements AuthService {
 			}
 
 			claim.put(JWTUtil.APPLET_OPEN_ID, userDetail.getOpenId());
-		}else {
+		} else {
 			if (loginType == Constants.LOGIN_PHONE) {
 				claim.put(JWTUtil.USER_NAME, userInfo.getPhone());
 				userInfo.setUserName(userInfo.getPhone());
@@ -291,40 +292,27 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public boolean createAccount(Integer userId, Integer platUserType) {
-		String phone = userCenterFeignClient.getPhoneByUserId(Constants.FIRST_VERSION, userId);
-		if (phone == null) {
-			return false;
-		}
+	public boolean createAccount(Integer userId, Integer platUserType, String account) {
 
-		UserInfo tempUser = new UserInfo();
-		tempUser.setUserName(phone);
-		tempUser.setPlatUserType(platUserType);
-		UserInfo userInfo = userMapper.getUserByName(tempUser);
-		if (userInfo == null) {
-			String authUserId = userMapper.getUserIdByUserName(phone);
-			PlatformUser consumerPlat = null;
-//			PlatformUser pushUserPlat = null;
-			PlatformUser platformUser = null;
-			Set<PlatformUser> set = new HashSet<PlatformUser>();
-			if(authUserId == null){
-				userInfo = new UserInfo();
-				userInfo.setUserName(phone);
-				userInfo.setUserCenterId(userId);
-				userInfo.setPlatUserType(platUserType);
-				userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
-				userInfo.setPhone(phone);
-				userMapper.insert(userInfo);
-				authUserId = userInfo.getUserId();
-				consumerPlat = new PlatformUser(authUserId,PlatUserType.CONSUMER.getIndex());
-//				pushUserPlat = new PlatformUser(authUserId,PlatUserType.PUSH_USER.getIndex());
-//				set.add(pushUserPlat);
-				set.add(consumerPlat);
-			}
-			platformUser = new PlatformUser(authUserId,platUserType);
-			set.add(platformUser);
-			userMapper.insertPlatformUser(set);
+		String authUserId = userMapper.getUserIdByUserName(account);
+		PlatformUser consumerPlat = null;
+		PlatformUser platformUser = null;
+		Set<PlatformUser> set = new HashSet<PlatformUser>();
+		if (authUserId == null) {
+			UserInfo userInfo = new UserInfo();
+			userInfo.setUserName(account);
+			userInfo.setUserCenterId(userId);
+			userInfo.setPlatUserType(PlatUserType.CROSS_BORDER.getIndex());
+			userInfo.setPassword(MethodUtil.MD5("000000"));// 密码默认6个0
+			userInfo.setPhone(account);
+			userMapper.insert(userInfo);
+			authUserId = userInfo.getUserId();
+			consumerPlat = new PlatformUser(authUserId, PlatUserType.CONSUMER.getIndex());
+			set.add(consumerPlat);
 		}
+		platformUser = new PlatformUser(authUserId, platUserType);
+		set.add(platformUser);
+		userMapper.insertPlatformUser(set);
 
 		return true;
 	}
@@ -359,9 +347,9 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public boolean createBackAccount(String account,Integer userId) {
+	public boolean createBackAccount(String account, Integer userId) {
 		String authUserId = userMapper.getUserIdByUserName(account);
-		if(authUserId == null){
+		if (authUserId == null) {
 			Set<PlatformUser> set = new HashSet<PlatformUser>();
 			UserInfo tempUser = new UserInfo();
 			tempUser.setUserName(account);
@@ -371,7 +359,7 @@ public class AuthServiceImpl implements AuthService {
 			tempUser.setPhone(account);
 			userMapper.insert(tempUser);
 			authUserId = tempUser.getUserId();
-			PlatformUser consumerPlat = new PlatformUser(authUserId,PlatUserType.CONSUMER.getIndex());
+			PlatformUser consumerPlat = new PlatformUser(authUserId, PlatUserType.CONSUMER.getIndex());
 			set.add(consumerPlat);
 			userMapper.insertPlatformUser(set);
 			return true;

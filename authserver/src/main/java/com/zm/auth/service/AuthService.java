@@ -18,57 +18,52 @@ import com.zm.auth.model.UserInfo;
 public interface AuthService {
 	/**
 	 * 
-	 * register:用户注册. <br/>  
-	 *  
-	 * @author hebin  
+	 * register:用户注册. <br/>
+	 * 
+	 * @author hebin
 	 * @param userInfo
-	 * @return  
+	 * @return
 	 * @since JDK 1.7
 	 */
 	SecurityUserDetail register(UserInfo userInfo);
-	
-	
+
 	/**
 	 * 
-	 * login:用户登录. <br/>  
-	 *  
-	 * @author hebin  
+	 * login:用户登录. <br/>
+	 * 
+	 * @author hebin
 	 * @param username
 	 * @param password
-	 * @return  
+	 * @return
 	 * @since JDK 1.7
 	 */
 	SecurityUserDetail login(UserInfo userInfo);
-	
-	
+
 	/**
 	 * 
-	 * refresh:用户刷新. <br/>  
-	 *  
-	 * @author hebin  
+	 * refresh:用户刷新. <br/>
+	 * 
+	 * @author hebin
 	 * @param oldToken
-	 * @return  
+	 * @return
 	 * @since JDK 1.7
 	 */
 	String refresh(String oldToken);
-	
+
 	/**
 	 * 
-	 * check:检验用户名. <br/>  
-	 *  
-	 * @author hebin  
+	 * check:检验用户名. <br/>
+	 * 
+	 * @author hebin
 	 * @param oldToken
-	 * @return  
+	 * @return
 	 * @since JDK 1.7
 	 */
 	boolean checkAccount(UserInfo userInfo);
 
-
 	boolean modifyPwd(UserInfo userInfo);
 
-
-	boolean createAccount(Integer userId, Integer platUserType);
-
+	boolean createAccount(Integer userId, Integer platUserType, String account);
 
 	/**
 	 * @fun 对接用户获取token
@@ -77,7 +72,6 @@ public interface AuthService {
 	 */
 	ResultPojo getToken(GetTokenParam param);
 
+	boolean createBackAccount(String account, Integer userId);
 
-	boolean createBackAccount(String account,Integer userId);
-	
 }

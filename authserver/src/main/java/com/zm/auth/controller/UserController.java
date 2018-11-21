@@ -116,11 +116,12 @@ public class UserController {
 
 	@RequestMapping(value = "platform/register", method = RequestMethod.POST)
 	public ResultPojo createAccount(@RequestParam("userId") Integer userId,
-			@RequestParam("platUserType") Integer platUserType) throws AuthenticationException {
+			@RequestParam("platUserType") Integer platUserType, @RequestParam("account") String account)
+					throws AuthenticationException {
 		try {
-			return new ResultPojo(authService.createAccount(userId, platUserType));
+			return new ResultPojo(authService.createAccount(userId, platUserType, account));
 		} catch (Exception e) {
-			logger.info(e.getMessage());
+			logger.error("创建失败：", e);
 			return new ResultPojo("401", e.getMessage());
 		}
 	}
@@ -129,7 +130,7 @@ public class UserController {
 	public ResultPojo createBackAccount(@RequestParam("userId") Integer userId, @RequestParam("account") String account)
 			throws AuthenticationException {
 		try {
-			return new ResultPojo(authService.createBackAccount(account,userId));
+			return new ResultPojo(authService.createBackAccount(account, userId));
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 			return new ResultPojo("401", e.getMessage());
