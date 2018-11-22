@@ -235,7 +235,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 				if (Constants.ORDER_SOURCE_EXHIBITION.equals(info.getOrderSource())
 						|| Constants.ORDER_SOURCE_YOUZAN.equals(info.getOrderSource())
 						|| Constants.ORDER_SOURCE_BIG_CUSTOMER.equals(info.getOrderSource())
-						|| Constants.TAIPING_HUIHUI.equals(info.getOrderSource())) {
+						|| Constants.TAIPING_HUIHUI.equals(info.getOrderSource())
+						|| Constants.JU_MING_HUI.equals(info.getOrderSource())) {
 
 					// 增加当天销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
