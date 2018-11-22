@@ -126,6 +126,7 @@ public class Constants {
 	public static final Integer WX_APPLET = 10;//微信小程序
 	public static final Integer JU_MING_HUI = 11;//聚民惠
 	
+	
 	//*******************订单创建类型**********************
 	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
 	
