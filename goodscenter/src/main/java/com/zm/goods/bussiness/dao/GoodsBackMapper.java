@@ -328,4 +328,6 @@ public interface GoodsBackMapper {
 	void updateGoodsTagRatioByList(List<GoodsEntity> goodsList);
 	
 	GoodsEntity selectGoodsInfoByGoodsId(GoodsEntity entity);
+
+	List<String> getGoodsPicPath(String goodsId);
 }

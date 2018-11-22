@@ -80,7 +80,7 @@ public class GoodsServiceComponent {
 
 		}
 		if (!calculation) {
-			return null;
+			throw new OriginalPriceUnEqual("购买数量不在指定范围内");
 		}
 
 		return CalculationUtils.mul(totalAmount, discount);
@@ -322,15 +322,21 @@ public class GoodsServiceComponent {
 	private Double getBackManagerWebsitePrice(int gradeId, boolean vip, OrderBussinessModel model, GoodsPrice price) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + model.getItemId());
-		GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
-		int gradeType = gradeBO.getGradeType();
-		// 获取该类型的返佣的比例
-		double proportion = Double
-				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
-		double amount = CalculationUtils.mul(model.getQuantity(),
-				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
-		amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, proportion));// 扣除返佣后的价格
-		return amount;
+		try {
+			GradeBO gradeBO = JSONUtil.parse(hashOperations.get(Constants.GRADEBO_INFO, gradeId + ""), GradeBO.class);
+			int gradeType = gradeBO.getGradeType();
+			// 获取该类型的返佣的比例
+			double proportion = Double
+					.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
+			double amount = CalculationUtils.mul(model.getQuantity(),
+					(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
+			amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, proportion));// 扣除返佣后的价格
+			return amount;
+		} catch (Exception e) {
+			double amount = CalculationUtils.mul(model.getQuantity(),
+					(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
+			return amount;
+		}
 	}
 
 	private Double getDefaultPrice(boolean vip, OrderBussinessModel model, GoodsPrice price) {
@@ -403,7 +409,13 @@ public class GoodsServiceComponent {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
 		String json = hashOperations.get(Constants.GRADEBO_INFO, gradeId + "");
-		GradeBO gradeBO = JSONUtil.parse(json, GradeBO.class);
+		GradeBO gradeBO;
+		try {
+			gradeBO = JSONUtil.parse(json, GradeBO.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
 		int gradeType = gradeBO.getGradeType();
 		// 获取该类型的返佣的比例
 		double proportion = Double

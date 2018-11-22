@@ -709,4 +709,8 @@
 	<select id="selectGoodsInfoByGoodsId" parameterType="Object" resultMap="entity">
 		SELECT * FROM goods where goods_id = #{goodsId}
 	</select>
+	
+	<select id = "getGoodsPicPath" parameterType="Object" resultType="java.lang.String">
+		select path from goods_file where goods_id = #{goodsId}
+	</select>
 </mapper>

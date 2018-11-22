@@ -882,4 +882,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public List<String> getGoodsIdByItemCode(String itemCode) {
 		return goodsBackMapper.listGoodsIdsByItemCode(itemCode);
 	}
+
+	@Override
+	public List<String> getGoodsPicPath(String goodsId) {
+		
+		return goodsBackMapper.getGoodsPicPath(goodsId);
+	}
 }

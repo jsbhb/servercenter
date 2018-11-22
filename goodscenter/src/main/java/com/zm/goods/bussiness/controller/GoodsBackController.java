@@ -527,4 +527,21 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+	
+	
+	@RequestMapping(value = "{version}/goods/pic/{goodsId}", method = RequestMethod.GET)
+	public ResultModel getGoodsPicPath(HttpServletRequest request, @PathVariable("version") Double version,
+			@PathVariable("goodsId") String goodsId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<String> picList = goodsBackService.getGoodsPicPath(goodsId);
+				return new ResultModel(true, picList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
 }

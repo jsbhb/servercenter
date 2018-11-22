@@ -277,4 +277,6 @@ public interface GoodsBackService {
 
 	List<String> getGoodsIdByItemCode(String itemCode);
 
+	List<String> getGoodsPicPath(String goodsId);
+
 }
