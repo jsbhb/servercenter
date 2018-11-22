@@ -307,9 +307,7 @@
 
 	<select id="listShoppingCart" parameterType="Object" resultMap="shoppingCart">
 		select * from order_shopping_cart where user_id = #{userId} and
-		grade_id = #{gradeId} and platform_type = #{platformSource} order by create_time
-<!-- 		limit 
- 		#{pagination.startRow},#{pagination.numPerPage} -->
+		grade_id = #{gradeId} and platform_type = #{platformSource} order by supplier_id
 	</select>
 
 	<update id="updateOrderDetailPayTime" parameterType="Object">
