@@ -147,15 +147,24 @@ public class RebateServiceImpl implements RebateService {
 
 	@Override
 	public ResultModel saveRebate4order(Rebate4Order rebate4Order) {
+		orderConsumAdd(rebate4Order);
 		rebateConsumeMapper.insertRebateConsume(rebate4Order);
 		return new ResultModel(true);
 	}
 
 	@Override
 	public void rebate4orderBatch(List<Rebate4Order> rebate4OrderList) {
-		if(rebate4OrderList != null && rebate4OrderList.size() > 0){
+		if (rebate4OrderList != null && rebate4OrderList.size() > 0){
+			for (Rebate4Order rebate4Order : rebate4OrderList) {
+				orderConsumAdd(rebate4Order);
+			}
 			rebateConsumeMapper.insertRebateConsumeBatch(rebate4OrderList);
 		}
+	}
+
+	private void orderConsumAdd(Rebate4Order rebate4Order) {
+		template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + rebate4Order.getGradeId(),
+				Constants.ORDER_CONSUME, rebate4Order.getMoney());// 增加订单消费金额
 	}
 
 }

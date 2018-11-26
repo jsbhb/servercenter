@@ -280,10 +280,10 @@ public class CacheServiceImpl extends CacheAbstractService {
 			double canBePresented = 0.0;
 			double alreadyPresented = 0.0;
 			for (Integer temGradeId : list) {
-				String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId, "canBePresented");
+				String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId, Constants.ALREADY_CHECK);
 				canBePresented = CalculationUtils.add(canBePresented,
 						Double.valueOf(tempCanBePresented == null ? "0" : tempCanBePresented));
-				String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId, "alreadyPresented");
+				String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId, Constants.ALREADY_PRESENTED);
 				alreadyPresented = CalculationUtils.add(alreadyPresented,
 						Double.valueOf(tempAlreadyPresented == null ? "0" : tempAlreadyPresented));
 			}
@@ -301,8 +301,8 @@ public class CacheServiceImpl extends CacheAbstractService {
 			// }
 			// return JSONUtil.toJson(diagramBOList);
 		} else {
-			String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, "canBePresented");
-			String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, "alreadyPresented");
+			String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, Constants.ALREADY_CHECK);
+			String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + gradeId, Constants.ALREADY_PRESENTED);
 			result.put("可提现", tempCanBePresented == null ? "0" : tempCanBePresented);
 			result.put("已提现", tempAlreadyPresented == null ? "0" : tempAlreadyPresented);
 		}

@@ -10,9 +10,9 @@ public class Constants {
 	public static final String ALI_PAY = "2";
 
 	public static final String UNION_PAY = "3";
-	
+
 	public static final String REBATE_PAY = "4";
-	
+
 	public static final String YOP_PAY = "5";
 
 	public static final String JSAPI = "JSAPI";
@@ -106,40 +106,49 @@ public class Constants {
 
 	// **********************销售额当天统计前缀***********************
 	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";
-	
-	//*********************包邮包税redis前缀***************************
+
+	// *********************包邮包税redis前缀***************************
 	public static final String POST_TAX = "post_tax:";
-	
-	//*********************包邮包税***************************
+
+	// *********************包邮包税***************************
 	public static final String FREE_POST = "1";
 	public static final String ARRIVE_POST = "2";
 	public static final String FREE_TAX = "1";
-	
-	
-	//*******************订单来源**********************
-	public static final Integer ORDER_SOURCE_YOUZAN = 3;//有赞
-	public static final Integer ORDER_SOURCE_EXHIBITION = 5;//展厅
-	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;//大客户
-	public static final Integer WELFARE_WEBSITE = 7;//福利网站
-	public static final int BACK_MANAGER_WEBSITE = 8;//后台来源
-	public static final Integer TAIPING_HUIHUI = 9;//太平慧慧
-	public static final Integer WX_APPLET = 10;//微信小程序
-	public static final Integer JU_MING_HUI = 11;//聚民惠
-	
-	
-	//*******************订单创建类型**********************
-	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
-	
-	//*******************一般贸易仓金额**********************
+
+	// *******************订单来源**********************
+	public static final Integer ORDER_SOURCE_YOUZAN = 3;// 有赞
+	public static final Integer ORDER_SOURCE_EXHIBITION = 5;// 展厅
+	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;// 大客户
+	public static final Integer WELFARE_WEBSITE = 7;// 福利网站
+	public static final int BACK_MANAGER_WEBSITE = 8;// 后台来源
+	public static final Integer TAIPING_HUIHUI = 9;// 太平慧慧
+	public static final Integer WX_APPLET = 10;// 微信小程序
+	public static final Integer JU_MING_HUI = 11;// 聚民惠
+
+	// *******************订单创建类型**********************
+	public static final Integer OPEN_INTERFACE_TYPE = 5;// 对接订单
+
+	// *******************一般贸易仓金额**********************
 	public static final Integer GENERAL_TRADE_FEE = 500;
-	
-	//*******************一般贸易仓ID**********************
+
+	// *******************一般贸易仓ID**********************
 	public static final Integer GENERAL_WAREHOUSE_ID = 6;
-	
-	//*******************金额允许偏离范围**********************
+
+	// *******************金额允许偏离范围**********************
 	public static final Integer DEVIATION = 5;
-	
-	//*******************海关税率折扣**********************
+
+	// *******************海关税率折扣**********************
 	public static final double TAX_DISCOUNT = 0.7;
+
+	// **********************************************************************//
+	public static final String CAN_BE_PRESENTED = "canBePresented";// 待对账
+	public static final String ALREADY_CHECK = "alreadyCheck";// 已对账，可使用
+	public static final String ALREADY_PRESENTED = "alreadyPresented";// 已提现
+	public static final String FROZEN_REBATE = "frozenRebate";// 冻结
+	public static final String STAY_TO_ACCOUNT = "stayToAccount";//待到账
+	public static final String ORDER_CONSUME = "orderConsume";//订单消费
+	public static final String CAPITAL_MONEY = "money";
+	public static final String CAPITAL_FROZEN_MONEY = "frozenMoney";
+	public static final String CAPITAL_USE_MONEY = "useMoney";
 
 }

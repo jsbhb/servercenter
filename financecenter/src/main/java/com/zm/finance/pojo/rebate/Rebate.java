@@ -9,10 +9,24 @@ public class Rebate {
 	private Double alreadyPresented;//已提现
 	private Double stayToAccount;//待到账
 	private Double refilling;//已反充
+	private Double orderConsume;//订单消费金额
+	private Double frozenRebate;//订单冻结金额（没支付）
 	private String remark;
 	private String createTime;
 	private String updateTime;
 	private String opt;
+	public Double getOrderConsume() {
+		return orderConsume;
+	}
+	public void setOrderConsume(Double orderConsume) {
+		this.orderConsume = orderConsume;
+	}
+	public Double getFrozenRebate() {
+		return frozenRebate;
+	}
+	public void setFrozenRebate(Double frozenRebate) {
+		this.frozenRebate = frozenRebate;
+	}
 	public Double getAlreadyCheck() {
 		return alreadyCheck;
 	}

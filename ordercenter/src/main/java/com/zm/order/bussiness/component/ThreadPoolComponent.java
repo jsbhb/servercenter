@@ -41,8 +41,7 @@ public class ThreadPoolComponent {
 	}
 	
 	@Async("myAsync")
-	public void rebate4Order(String orderId){
-		OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+	public void rebate4Order(OrderInfo info){
 		Double rebateFee = info.getOrderDetail().getRebateFee();
 		if(rebateFee != null && rebateFee > 0){
 			Rebate4Order rebate4Order = new Rebate4Order();

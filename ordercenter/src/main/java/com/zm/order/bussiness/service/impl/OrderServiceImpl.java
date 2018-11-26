@@ -225,9 +225,10 @@ public class OrderServiceImpl implements OrderService {
 		} catch (Exception e) {// 如果出错，需要对返佣回滚，TODO 还需要对库存回滚
 			Double rebateFee = info.getOrderDetail().getRebateFee();
 			if (rebateFee != null && rebateFee > 0) {
-				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck", rebateFee);// 增加返佣
+				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
+						rebateFee);// 增加返佣
 			}
-			throw new RuntimeException(e);// 处理完后往外抛异常，使事务回滚
+			throw new Exception(e);// 处理完后往外抛异常，使事务回滚
 		}
 
 		result.setSuccess(true);
@@ -320,7 +321,10 @@ public class OrderServiceImpl implements OrderService {
 			orderMapper.updateOrderDetailPayTime(param);
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
-			threadPoolComponent.rebate4Order(orderId);
+			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+			threadPoolComponent.rebate4Order(info);
+			template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
+					CalculationUtils.sub(0, info.getOrderDetail().getRebateFee()));// 冻结金额扣除
 			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
 
@@ -526,8 +530,10 @@ public class OrderServiceImpl implements OrderService {
 			orderMapper.addOrderStatusRecord(param);
 			Double rebateFee = info.getOrderDetail().getRebateFee();
 			if (rebateFee != null && rebateFee > 0) {
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck",
-						rebateFee);// 返佣返回
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.ALREADY_CHECK, rebateFee);// 返佣返回
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 冻结金额返回
 			}
 		}
 		stockBack(info);

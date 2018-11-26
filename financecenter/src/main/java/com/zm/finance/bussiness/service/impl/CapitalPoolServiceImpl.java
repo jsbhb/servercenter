@@ -83,8 +83,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 
 	private void capitalPoolCharge(String payNo, double money, Integer centerId, Integer bussinessType, String remark,
 			Integer payType) {
-		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "money", money);// 增加余额
-		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, "countMoney", money);// 增加累计金额
+		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, Constants.CAPITAL_MONEY, money);// 增加余额
+		template.opsForHash().increment(Constants.CAPITAL_PERFIX + centerId, Constants.CAPITAL_COUNT_MONEY, money);// 增加累计金额
 		CapitalPoolDetail detail = new CapitalPoolDetail();
 		detail.setBussinessType(bussinessType);
 		detail.setCenterId(centerId);
@@ -160,7 +160,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 		}
 		refilling.setStartMoney(Double.valueOf(canBePresentedStr == null ? "0" : canBePresentedStr));
 		// 获取资金池余额
-		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + refilling.getCenterId(), "money");
+		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + refilling.getCenterId(),
+				Constants.CAPITAL_MONEY);
 		capitalMoney = capitalMoney == null ? "0" : capitalMoney;
 		refilling.setPoolMoney(Double.valueOf(capitalMoney));
 		capitalPoolMapper.insertRefillingDetail(refilling);
@@ -214,7 +215,7 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 	public ResultModel liquidation(Integer centerId, Double money) {
 		Double liquidationMoney = CalculationUtils.sub("0", money + "");
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + centerId, "money");
+		String capitalMoney = hashOperations.get(Constants.CAPITAL_PERFIX + centerId, Constants.CAPITAL_MONEY);
 		double balance = 0;
 		balance = CalculationUtils.sub((capitalMoney == null ? "0" : capitalMoney), money + "");
 		if (balance < 0) {
@@ -285,8 +286,8 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 					hashOperations.put(key, "status", "1");
 					hashOperations.put(key, "level", "0");
 				}
-				template.opsForHash().increment(key, "money", detail.getMoney());// 增加余额
-				template.opsForHash().increment(key, "countMoney", detail.getMoney());// 增加累计金额
+				template.opsForHash().increment(key, Constants.CAPITAL_MONEY, detail.getMoney());// 增加余额
+				template.opsForHash().increment(key, Constants.CAPITAL_COUNT_MONEY, detail.getMoney());// 增加累计金额
 			}
 		}
 		if (Constants.EXPENDITURE.equals(detail.getPayType())) {
@@ -295,15 +296,15 @@ public class CapitalPoolServiceImpl implements CapitalPoolService {
 			}
 			Double liquidationMoney = CalculationUtils.sub("0", detail.getMoney() + "");
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
-			double balance = hashOperations.increment(key, "money", liquidationMoney);// 扣除资金池
+			double balance = hashOperations.increment(key, Constants.CAPITAL_MONEY, liquidationMoney);// 扣除资金池
 			if (balance < 0) {
-				hashOperations.increment(key, "money", detail.getMoney());
+				hashOperations.increment(key, Constants.CAPITAL_MONEY, detail.getMoney());
 				return new ResultModel(false, "资金池不足以清算");
 			}
 			try {
 				capitalPoolMapper.insertCapitalPoolDetail(detailList);
 			} catch (Exception e) {
-				hashOperations.increment(key, "money", detail.getMoney());
+				hashOperations.increment(key, Constants.CAPITAL_MONEY, detail.getMoney());
 				return new ResultModel(false, "资金池清算出错");
 			}
 		}

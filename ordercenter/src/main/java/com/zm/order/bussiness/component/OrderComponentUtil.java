@@ -326,6 +326,8 @@ public class OrderComponentUtil {
 				result.setErrorMsg("返佣使用金额超过可以使用金额");
 				return;
 			}
+			hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
+					rebateFee);// 增加冻结金额
 		}
 		Double needToPayAmount = CalculationUtils.sub(info.getOrderDetail().getPayment(),
 				rebateFee == null ? 0 : rebateFee);

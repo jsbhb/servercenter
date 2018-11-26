@@ -74,15 +74,22 @@ public class RebateCheckServiceImpl implements RebateCheckService {
 			if (ctemp != null) {
 				ctempMoney = ctemp.getTotalConsume();
 			}
+			String perfix = Constants.GRADE_ORDER_REBATE + comeIn.getGradeId();
+			// 获取冻结金额
+			String frozenRebate = hashOperations.get(perfix, Constants.FROZEN_REBATE);
+			// 总进-总消费（包括提现中，提现成功，订单支付成功）-冻结金额
 			double rebate = CalculationUtils.sub(comeIn.getTotalRebate() == null ? "0" : comeIn.getTotalRebate() + "",
 					wtempMoney + "", ctempMoney + "");
-			String perfix = Constants.GRADE_ORDER_REBATE + comeIn.getGradeId();
+			rebate = CalculationUtils.sub(rebate + "", frozenRebate == null ? "0" : frozenRebate);
+			
+			// 获取redis内待对账和已对账的和
 			double redisRebate = CalculationUtils.add(
 					hashOperations.get(perfix, Constants.CAN_BE_PRESENTED) == null ? "0"
 							: hashOperations.get(perfix, Constants.CAN_BE_PRESENTED),
 					hashOperations.get(perfix, Constants.ALREADY_CHECK) == null ? "0"
 							: hashOperations.get(perfix, Constants.ALREADY_CHECK));
 			if (CalculationUtils.round(2, rebate + "") == CalculationUtils.round(2, redisRebate + "")) {
+				//TODO 如果这时候刚好订单超时关闭，返佣返回，这里的rebate是已经扣除冻结的金额，会有问题，需要和订单中心做同步
 				hashOperations.put(perfix, Constants.ALREADY_CHECK, rebate + "");
 				hashOperations.put(perfix, Constants.CAN_BE_PRESENTED, "0");
 			} else {
