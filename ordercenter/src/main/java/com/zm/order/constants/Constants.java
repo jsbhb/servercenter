@@ -120,7 +120,7 @@ public class Constants {
 	public static final Integer ORDER_SOURCE_EXHIBITION = 5;// 展厅
 	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;// 大客户
 	public static final Integer WELFARE_WEBSITE = 7;// 福利网站
-	public static final int BACK_MANAGER_WEBSITE = 8;// 后台来源
+	public static final Integer BACK_MANAGER_WEBSITE = 8;// 后台来源
 	public static final Integer TAIPING_HUIHUI = 9;// 太平慧慧
 	public static final Integer WX_APPLET = 10;// 微信小程序
 	public static final Integer JU_MING_HUI = 11;// 聚民惠

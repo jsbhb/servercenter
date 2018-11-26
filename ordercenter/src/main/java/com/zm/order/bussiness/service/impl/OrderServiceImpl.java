@@ -208,6 +208,13 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(),
 				info.getOrderFlag());
 		if (!temp.isSuccess()) {
+			Double rebateFee = info.getOrderDetail().getRebateFee();
+			if (rebateFee != null && rebateFee > 0) {
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
+						rebateFee);// 增加返佣
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
+						CalculationUtils.sub(0, rebateFee));// 减少冻结金额
+			}
 			return temp;
 		}
 
@@ -227,6 +234,8 @@ public class OrderServiceImpl implements OrderService {
 			if (rebateFee != null && rebateFee > 0) {
 				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
 						rebateFee);// 增加返佣
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
+						CalculationUtils.sub(0, rebateFee));// 减少冻结金额
 			}
 			throw new Exception(e);// 处理完后往外抛异常，使事务回滚
 		}
@@ -322,9 +331,12 @@ public class OrderServiceImpl implements OrderService {
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
 			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-			threadPoolComponent.rebate4Order(info);
-			template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
-					CalculationUtils.sub(0, info.getOrderDetail().getRebateFee()));// 冻结金额扣除
+			Double rebateFee = info.getOrderDetail().getRebateFee();
+			if(rebateFee != null && rebateFee > 0){
+				threadPoolComponent.rebate4Order(info);
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
+						CalculationUtils.sub(0, rebateFee));// 冻结金额扣除
+			}
 			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
 

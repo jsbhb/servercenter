@@ -224,7 +224,7 @@ public class OrderComponentUtil {
 				result.setErrorMsg("权限错误，不能使用返佣支付");
 				return;
 			}
-		} 
+		}
 	}
 
 	/**
@@ -273,8 +273,12 @@ public class OrderComponentUtil {
 			// 获取父级的时候已经按照先进先出排完续
 			while (!superNodeList.isEmpty()) {
 				grade = superNodeList.poll();
-				// 如果是海外购，则不进行返佣
-				if (grade.getId().equals(Constants.CNCOOPBUY)) {
+				// 判断是否需要返佣
+				if (notNeedToRebate(grade, info)) {
+					if (isBackManagerOrder(grade, info)) {// 如果是后台订单不计算本级返佣，但要记录本级的返佣比例
+						nextProportion = Double.valueOf(goodsRebate.get(grade.getGradeType() + "") == null ? "0"
+								: goodsRebate.get(grade.getGradeType() + ""));
+					}
 					continue;
 				}
 				if (isWelfareWebsite) {// 如果是福利网站
@@ -287,16 +291,46 @@ public class OrderComponentUtil {
 				// 获取该类型的返佣的比例
 				double tempProportion = Double.valueOf(goodsRebate.get(grade.getGradeType() + "") == null ? "0"
 						: goodsRebate.get(grade.getGradeType() + ""));
-				// 真实的返佣
-				double proportion = CalculationUtils.mul(welfareWebsiteRebate,
-						CalculationUtils.sub(tempProportion, nextProportion));
-				nextProportion = proportion;// 记录下一级的返佣比例
+				double currentProprtion = CalculationUtils.sub(tempProportion, nextProportion);
+				// 真实的返佣,记录的下一级返佣应该是原来的
+				double proportion = CalculationUtils.mul(welfareWebsiteRebate, currentProprtion);
+				nextProportion = currentProprtion;// 记录下一级的返佣比例
 				sb.append("\"" + grade.getId() + "\":" + "\"" + proportion + "\",");
 			}
 			if (sb.lastIndexOf(",") > 0) {
 				goods.setRebate(sb.substring(0, sb.length() - 1) + "}");// 设置每个商品每个分级的返佣
 			}
 		}
+	}
+
+	/**
+	 * @fun 如果是后台订单
+	 * @param grade
+	 * @param info
+	 * @return
+	 */
+	private boolean isBackManagerOrder(GradeBO grade, OrderInfo info) {
+		if (grade.getId().equals(info.getShopId()) && Constants.BACK_MANAGER_WEBSITE.equals(info.getOrderSource())) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @fun 不需要返佣的返回ture
+	 * @param grade
+	 * @param info
+	 * @return
+	 */
+	private boolean notNeedToRebate(GradeBO grade, OrderInfo info) {
+		if (grade.getId().equals(Constants.CNCOOPBUY)) {// 如果是海外购，不需要返佣
+			return true;
+		}
+		// 如果是后台订单，并且是本级的，不进行返佣
+		if (grade.getId().equals(info.getShopId()) && Constants.BACK_MANAGER_WEBSITE.equals(info.getOrderSource())) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -317,10 +351,10 @@ public class OrderComponentUtil {
 		Double rebateFee = info.getOrderDetail().getRebateFee();
 		if (rebateFee != null && rebateFee > 0) {// 如果有返佣抵扣，先进行扣减
 			HashOperations<String, String, String> hashOperations = template.opsForHash();
-			double balance = hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck",
-					CalculationUtils.sub(0, info.getOrderDetail().getRebateFee()));// 扣除返佣
+			double balance = hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+					Constants.ALREADY_CHECK, CalculationUtils.sub(0, info.getOrderDetail().getRebateFee()));// 扣除返佣
 			if (balance < 0) {
-				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck",
+				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
 						info.getOrderDetail().getRebateFee());// 增加返佣
 				result.setSuccess(false);
 				result.setErrorMsg("返佣使用金额超过可以使用金额");
@@ -375,14 +409,16 @@ public class OrderComponentUtil {
 				exceptionHandle(result, info, rebateFee);
 			}
 		} else {
-			result.setSuccess(false);
-			result.setErrorMsg("请指定正确的支付方式");
+			exceptionHandle(result, info, rebateFee);
 		}
 	}
 
 	private void exceptionHandle(ResultModel result, OrderInfo info, Double rebateFee) {
 		if (rebateFee != null && rebateFee > 0) {
-			template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), "alreadyCheck", rebateFee);// 增加返佣
+			template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
+					rebateFee);// 增加返佣
+			template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
+					CalculationUtils.sub(0, rebateFee));// 减少冻结金额
 		}
 		result.setSuccess(false);
 		result.setErrorMsg("调用支付信息失败");

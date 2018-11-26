@@ -337,7 +337,9 @@ public class ShareProfitComponent {
 		result.put("orderId", orderInfo.getOrderId());
 		result.put("orderFlag", orderInfo.getOrderFlag() + "");
 		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
-			result.put(entry.getKey().toString(), entry.getValue().toString());
+			if(entry.getValue() > 0){
+				result.put(entry.getKey().toString(), entry.getValue().toString());
+			}
 		}
 		return result;
 	}

@@ -328,9 +328,11 @@ public class GoodsServiceComponent {
 			// 获取该类型的返佣的比例
 			double proportion = Double
 					.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
-			double amount = CalculationUtils.mul(model.getQuantity(),
-					(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
-			amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, proportion));// 扣除返佣后的价格
+			double amount = CalculationUtils.mul(
+					(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()),
+					CalculationUtils.sub(1, proportion));// 扣除返佣后的单价
+			amount = CalculationUtils.round(2, amount); // 保留2为小数
+			amount = CalculationUtils.mul(model.getQuantity(), amount);// 单价乘以数量
 			return amount;
 		} catch (Exception e) {
 			double amount = CalculationUtils.mul(model.getQuantity(),
@@ -359,10 +361,12 @@ public class GoodsServiceComponent {
 		// 获取该类型的返佣的比例
 		double proportion = Double
 				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
-		double amount = CalculationUtils.mul(model.getQuantity(),
-				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()));
 		double temp = CalculationUtils.mul(proportion, CalculationUtils.sub(1, welfareRebate));// 扣除福利网站自己的返佣后
-		amount = CalculationUtils.mul(amount, CalculationUtils.sub(1, temp));
+		double amount = CalculationUtils.mul(
+				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()),
+				CalculationUtils.sub(1, temp));// 商品单价
+		amount = CalculationUtils.round(2, amount);//保留2位小数
+		amount = CalculationUtils.mul(amount, model.getQuantity());//单价乘以数量
 		return amount;
 	}
 
@@ -427,7 +431,7 @@ public class GoodsServiceComponent {
 
 	public void packDetailPath(List<GoodsItem> itemList) {
 		for (GoodsItem item : itemList) {
-			if(item.getDetailPath() != null){
+			if (item.getDetailPath() != null) {
 				item.setDetailList(getPicPath(HttpClientUtil.get(item.getDetailPath())));
 			}
 		}

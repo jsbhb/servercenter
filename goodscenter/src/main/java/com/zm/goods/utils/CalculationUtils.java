@@ -1,6 +1,7 @@
 package com.zm.goods.utils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CalculationUtils {
 	/**
@@ -83,5 +84,10 @@ public class CalculationUtils {
 		BigDecimal b1 = new BigDecimal(String.valueOf(value1));
 		BigDecimal b2 = new BigDecimal(String.valueOf(value2));
 		return b1.divide(b2).doubleValue();
+	}
+	
+	public static double round(int scale, double value) {
+		BigDecimal b = new BigDecimal(String.valueOf(value));
+		return b.setScale(scale, RoundingMode.HALF_UP).doubleValue();
 	}
 }
