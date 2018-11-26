@@ -37,6 +37,8 @@
 		<result column="opt" property="opt"/>
 		<result column="is_delete" property="isDelete"/>
 		<result column="supplier_code" property="supplierCode"/>
+		<result column="contract_type" property="contractType"/>
+		<result column="pay_type" property="payType"/>
 	</resultMap>
 
 	<select id="listExpressBySupplierId" parameterType="Object"
@@ -58,6 +60,18 @@
 		<if test="supplierName!=null and supplierName!=''">
 			and supplier_name like concat('%',#{supplierName},'%') 
 		</if>
+		<if test="supplierCode!=null and supplierCode!=''">
+			and supplier_code = #{supplierCode}
+		</if>
+		<if test="country!=null and country!=''">
+			and country = #{country}
+		</if>
+		<if test="contractType > 0">
+			and contract_type = #{contractType} 
+		</if>
+		<if test="payType > 0">
+			and pay_type = #{payType} 
+		</if>
 		<if test="id > 0">
 			and id = #{id} 
 		</if>
@@ -73,14 +87,14 @@
 		(#{id},0,#{supplierName},0,
 		#{country},#{province},#{city},#{area},#{address},
 		#{operator},#{phone},#{mobile},#{fax},#{email},#{qq},
-		now(),now(),#{opt},0,#{mode},#{supplierCode})
+		now(),now(),#{opt},0,#{mode},#{supplierCode},#{contractType},#{payType})
 	</insert>
 	
 	<select id="getSupplierInterface" parameterType="Object" resultMap="supplierinf">
 		select * from supplier_interface where supplier_id = #{supplierId}
 	</select>
 	
-	<insert id="update" parameterType="Object">
+	<update id="update" parameterType="Object">
 		update supplier_base set 
 		update_time = now()
 		<if test="supplierName!=null and supplierName!=''">
@@ -119,7 +133,13 @@
 		<if test="qq!=null and qq!=''">
 			,qq = #{qq}
 		</if>
+		<if test="contractType > 0">
+			,contract_type = #{contractType} 
+		</if>
+		<if test="payType > 0">
+			,pay_type = #{payType} 
+		</if>
 		where id = #{id}
-	</insert>
+	</update>
 	
 </mapper>
