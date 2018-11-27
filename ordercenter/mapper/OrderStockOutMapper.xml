@@ -390,7 +390,7 @@
 	</update>
 	
 	<select id="queryForRebate" parameterType="Object" resultType="com.zm.order.pojo.bo.RebateDownload">
-		select ob.order_id as orderId,ob.order_flag as orderFlag,og.item_id as itemId,og.item_price as itemPrice,
+		select ob.order_id as orderId,ob.order_flag as orderFlag,ob.order_source as orderSource, og.item_id as itemId,og.item_price as itemPrice,
 		og.item_code as itemCode,og.item_quantity as quantity,og.rebate,og.item_info as info, og.item_name as goodsName  
 		from order_base ob left join 
 		order_goods og on ob.order_id = og.order_id where 1=1
