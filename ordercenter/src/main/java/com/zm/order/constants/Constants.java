@@ -119,6 +119,7 @@ public class Constants {
 	public static final Integer WELFARE_WEBSITE = 7;//福利网站
 	public static final Integer TAIPING_HUIHUI = 9;//太平慧慧
 	public static final Integer JU_MING_HUI = 11;//聚民惠
+	public static final Integer PING_DUO_DUO = 12;//聚民惠
 	
 	//*******************订单创建类型**********************
 	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
