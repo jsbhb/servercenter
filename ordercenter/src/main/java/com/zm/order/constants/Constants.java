@@ -115,20 +115,21 @@ public class Constants {
 	public static final String ARRIVE_POST = "2";
 	public static final String FREE_TAX = "1";
 
-	// *******************订单来源**********************
-	public static final Integer ORDER_SOURCE_YOUZAN = 3;// 有赞
-	public static final Integer ORDER_SOURCE_EXHIBITION = 5;// 展厅
-	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;// 大客户
-	public static final Integer WELFARE_WEBSITE = 7;// 福利网站
+	//*******************订单来源**********************
+	public static final Integer ORDER_SOURCE_YOUZAN = 3;//有赞
+	public static final Integer ORDER_SOURCE_EXHIBITION = 5;//展厅
+	public static final Integer ORDER_SOURCE_BIG_CUSTOMER = 6;//大客户
+	public static final Integer WELFARE_WEBSITE = 7;//福利网站
+	public static final Integer TAIPING_HUIHUI = 9;//太平慧慧
 	public static final Integer BACK_MANAGER_WEBSITE = 8;// 后台来源
-	public static final Integer TAIPING_HUIHUI = 9;// 太平慧慧
 	public static final Integer WX_APPLET = 10;// 微信小程序
-	public static final Integer JU_MING_HUI = 11;// 聚民惠
-
-	// *******************订单创建类型**********************
-	public static final Integer OPEN_INTERFACE_TYPE = 5;// 对接订单
-
-	// *******************一般贸易仓金额**********************
+	public static final Integer JU_MING_HUI = 11;//聚民惠
+	public static final Integer PING_DUO_DUO = 12;//聚民惠
+	
+	//*******************订单创建类型**********************
+	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
+	
+	//*******************一般贸易仓金额**********************
 	public static final Integer GENERAL_TRADE_FEE = 500;
 
 	// *******************一般贸易仓ID**********************

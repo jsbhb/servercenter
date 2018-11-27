@@ -39,6 +39,8 @@ public class SupplierEntity extends Pagination {
 	private String opt;
 	private boolean isDelete;
 	private String supplierCode;
+	private int contractType;
+	private int payType;
 
 	public SupplierEntity() {
 		super();
@@ -202,6 +204,22 @@ public class SupplierEntity extends Pagination {
 
 	public void setSupplierCode(String supplierCode) {
 		this.supplierCode = supplierCode;
+	}
+
+	public int getContractType() {
+		return contractType;
+	}
+
+	public void setContractType(int contractType) {
+		this.contractType = contractType;
+	}
+
+	public int getPayType() {
+		return payType;
+	}
+
+	public void setPayType(int payType) {
+		this.payType = payType;
 	}
 
 }
