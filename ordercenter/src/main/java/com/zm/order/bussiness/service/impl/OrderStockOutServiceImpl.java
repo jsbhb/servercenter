@@ -545,6 +545,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					rebateDownload.setStatus(rebate.getStatus());
 					rebateDownload.setRebate(calSingleRebate(order, rebate.getGradeId()));
 					rebateDownload.setGoodsName(order.getGoodsName());
+					rebateDownload.setOrderSource(order.getOrderSource());
 					result.add(rebateDownload);
 				}
 			}
