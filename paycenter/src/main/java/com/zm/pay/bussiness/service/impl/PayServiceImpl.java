@@ -33,6 +33,7 @@ import com.zm.pay.feignclient.model.OrderBussinessModel;
 import com.zm.pay.feignclient.model.OrderDetail;
 import com.zm.pay.feignclient.model.OrderGoods;
 import com.zm.pay.feignclient.model.OrderInfo;
+import com.zm.pay.feignclient.model.UserInfo;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
@@ -93,7 +94,6 @@ public class PayServiceImpl implements PayService {
 			}
 			template.opsForValue().set(Constants.PAY + clientId + Constants.WX_PAY, config);
 		}
-
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);
 		Map<String, String> result = new HashMap<String, String>();
@@ -405,7 +405,8 @@ public class PayServiceImpl implements PayService {
 				detail.setOrderId(info.getOrderId());
 				orderFeignClient.updateOrderPayType(version, detail);
 			}
-			model.setPhone(info.getOrderDetail().getReceivePhone());
+			UserInfo user = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
+			model.setPhone(user.getPhone());
 			return new ResultModel(yopPay(info.getCenterId(), model));
 		}
 		return null;

@@ -282,7 +282,7 @@ public class OrderComponentUtil {
 					continue;
 				}
 				if (isWelfareWebsite) {// 如果是福利网站
-					if (info.getShopId() == grade.getId()) {
+					if (info.getShopId().equals(grade.getId())) {
 						welfareWebsiteRebate = grade.getWelfareRebate() == null ? 0 : grade.getWelfareRebate();
 					} else {
 						welfareWebsiteRebate = 1;

@@ -37,6 +37,7 @@ import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
 import com.zm.pay.feignclient.model.OrderInfo;
+import com.zm.pay.feignclient.model.UserInfo;
 import com.zm.pay.feignclient.model.UserVip;
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.ResultModel;
@@ -125,8 +126,9 @@ public class NotifyController {
 				if (orderId.startsWith("VIP")) {
 					if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
 						userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
-						boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
-						if (flag) {
+						UserInfo userVip = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(),
+								clientId);
+						if (userVip.isVip()) {
 							userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
 						} else {
 							userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
@@ -231,9 +233,9 @@ public class NotifyController {
 					if (orderId.startsWith("VIP")) {
 						if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
 							userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
-							boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(),
+							UserInfo userVip = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(),
 									clientId);
-							if (flag) {
+							if (userVip.isVip()) {
 								userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
 							} else {
 								userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
@@ -310,9 +312,9 @@ public class NotifyController {
 					if (orderId.startsWith("VIP")) {
 						if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
 							userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
-							boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(),
+							UserInfo userVip = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(),
 									clientId);
-							if (flag) {
+							if (userVip.isVip()) {
 								ResultModel result = userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
 								returnAli(pw, result);
 							} else {
@@ -389,8 +391,8 @@ public class NotifyController {
 			if (orderId.startsWith("VIP")) {
 				if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
 					userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
-					boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
-					if (flag) {
+					UserInfo userVip = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
+					if (userVip.isVip()) {
 						userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
 					} else {
 						userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
@@ -469,8 +471,8 @@ public class NotifyController {
 			if (orderId.startsWith("VIP")) {
 				if (!userFeignClient.isAlreadyPay(Constants.FIRST_VERSION, orderId)) {
 					userFeignClient.updateVipOrder(Constants.FIRST_VERSION, orderId);
-					boolean flag = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
-					if (flag) {
+					UserInfo userVip = userFeignClient.getVipUser(Constants.FIRST_VERSION, user.getUserId(), clientId);
+					if (userVip.isVip()) {
 						userFeignClient.updateUserVip(Constants.FIRST_VERSION, user);
 					} else {
 						userFeignClient.saveUserVip(Constants.FIRST_VERSION, user);
@@ -575,12 +577,12 @@ public class NotifyController {
 			if (YeepayService.verifyCallback(responseMap, config)) {
 				if (Constants.BACK_MANAGER_WEBSITE == info.getOrderSource()) {
 					String url = config.getUrl();
-					if (url.startsWith("test")) {
-						url = "testerp" + url.substring(url.indexOf("."));
-					} else if (url.startsWith("www")) {
-						url = "zserp" + url.substring(url.indexOf("."));
+					if (url.startsWith("https://test")) {
+						url = "https://testerp" + url.substring(url.indexOf("."));
+					} else if (url.startsWith("https://www")) {
+						url = "https://zserp" + url.substring(url.indexOf("."));
 					}
-					res.sendRedirect(url + "/admin/customer/purchaseMng/orderList.shtml");
+					res.sendRedirect(url + "/cardmanager/admin/main.shtml?id=51");
 					return;
 				}
 				res.sendRedirect(config.getUrl() + "/personal.html?child=order");

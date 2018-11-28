@@ -109,12 +109,8 @@ public class WeiXinPluginServiceImpl implements WeiXinPluginService {
 			}
 
 		} else {
-			boolean flag = userFeignClient.get3rdLoginUser(Constants.FIRST_VERSION,
-					new ThirdLogin(Integer.parseInt(stateArr[1]), token.getOpenid(), Constants.WX_LOGIN));
 			result.setSuccess(true);
-			resultMap.put("isFirst", flag);
-			resultMap.put("openid", token.getOpenid());
-			result.setObj(resultMap);
+			result.setObj(token.getOpenid());
 		}
 
 		return result;

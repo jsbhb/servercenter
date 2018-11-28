@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.zm.pay.feignclient.model.UserInfo;
 import com.zm.pay.feignclient.model.UserVip;
 import com.zm.pay.pojo.ResultModel;
 
@@ -48,7 +49,7 @@ public interface UserFeignClient {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/user/vip/{centerId}/{userId}", method = RequestMethod.GET)
-	public boolean getVipUser(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+	public UserInfo getVipUser(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
 			@PathVariable("centerId") Integer centerId);
 
 	/**
