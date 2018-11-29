@@ -30,7 +30,7 @@ public class ExpressController {
 	// 电商加密私钥，快递鸟提供，注意保管，不要泄漏
 	private String AppKey = "178dbf0c-1d20-450d-9abc-b2cc7c6974a8";
 	// 请求url
-	private String ReqURL = "http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx";
+	private String ReqURL = "http://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "{version}/express/getRoute", method = RequestMethod.GET)
