@@ -2,6 +2,7 @@ package com.zm.goods.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -38,5 +39,25 @@ public class DateUtil {
 			date = new Date();
 		}
 		return date;
+	}
+	
+	/**
+	 * @fun 返回现在是不是在指定时间之前
+	 * @param startTime
+	 * @param duration
+	 * @return
+	 * @throws ParseException
+	 */
+	public static boolean isBefore(String startTime, int duration) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Calendar appointTime = Calendar.getInstance();
+		appointTime.setTime(sdf.parse(startTime));
+		appointTime.add(Calendar.HOUR_OF_DAY, duration);//获取指定时间
+		Calendar now = Calendar.getInstance();
+		return now.before(appointTime);
+	}
+	
+	public static void main(String[] args) throws ParseException {
+		System.out.println(isBefore("2018-11-29 14:52:00", 25));
 	}
 }
