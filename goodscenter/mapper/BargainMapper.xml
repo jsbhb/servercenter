@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.activity.front.dao.BargainMapper">
+
+	
+	<resultMap type="com.zm.goods.activity.model.bargain.po.UserBargainPO" id="userBargain">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="goods_role_id" property="goodsRoleId" jdbcType="INTEGER"/>
+		<result column="status" property="start" jdbcType="BOOLEAN"/>
+		<result column="init_price" property="initPrice" jdbcType = "DOUBLE"/>
+		<result column="floor_price" property="floorPrice" jdbcType = "DOUBLE"/>
+		<result column="user_id" property="userId" jdbcType="INTEGER"/>
+		<result column="duration" property="duration" jdbcType="INTEGER"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+		<collection property="bargainList"
+			ofType="com.zm.goods.activity.model.bargain.po.BargainRecordPO">
+			<id column="recordId" property="id" jdbcType="INTEGER"/>
+			<result column="id" property="goodsRecordId" jdbcType="INTEGER"/>
+			<result column="sub_create_time" property="createTime" jdbcType="VARCHAR"/>
+			<result column="sub_user_id" property="userId" jdbcType="INTEGER"/>
+			<result column="bargain_price" property="bargainPrice" jdbcType="INTEGER"/>
+			<result column="buy" property="buy" jdbcType="BOOLEAN"/>
+		</collection>
+	</resultMap>
+	
+	<select id="listBargainByUserId" parameterType="Object" resultMap="userBargain">
+		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
+		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
+		agp.buy, agro.duration,  agro.item_id from 
+		activity_goods_record agr left join 
+		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
+		activity_goods_role agro on agr.goods_role_id = agro.id 
+		where agr.user_id = #{userId}
+	</select>
+
+	
+</mapper>

@@ -4,13 +4,13 @@ import java.text.ParseException;
 import java.util.Random;
 
 import com.zm.goods.activity.inf.ActiveRule;
+import com.zm.goods.activity.model.bargain.base.IUserBargain;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.DateUtil;
 
-public class BargainRule implements ActiveRule<BargainGoodsEntity> {
+public class BargainRule implements ActiveRule<IUserBargain> {
 
-	private int id;
 	private String itemId;// 商品itemId
 	private double initPrice;// 初始价格
 	private double floorPrice;// 底价
@@ -26,14 +26,15 @@ public class BargainRule implements ActiveRule<BargainGoodsEntity> {
 	private Random firstRatio;// 第一刀随机比例
 
 	@Override
-	public void ruleInit() {
+	public final void ruleInit() {
 		// 生成随机数random初始化
 		ratio = new Random(maxRatio - minRatio);
 		firstRatio = new Random(firstMaxRatio - firstMinRatio);
 	}
 
 	@Override
-	public void processRuleJudge(BargainGoodsEntity entity) throws ActiviteyException {
+	public final void processRuleJudge(IUserBargain ientity) throws ActiviteyException {
+		UserBargainEntity entity = (UserBargainEntity) ientity;
 		if (maxCount > 0) {// 是否规定了刀数
 			int currentCount = entity.getRecordList() == null ? 0 : entity.getRecordList().size();
 			if (currentCount >= maxCount) {
@@ -54,14 +55,14 @@ public class BargainRule implements ActiveRule<BargainGoodsEntity> {
 		}
 	}
 
-	private boolean isRepeatBargain(BargainGoodsEntity entity) {
+	private final boolean isRepeatBargain(UserBargainEntity entity) {
 		if (entity.getRecordList() == null || entity.getRecordList().size() == 0)
 			return false;
 		return entity.getRecordList().stream().anyMatch(record -> record.getUserId() == entity.getUserId());
 	}
 
-	private boolean isOverTime(BargainGoodsEntity entity) throws ActiviteyException {
-
+	private final boolean isOverTime(UserBargainEntity entity) throws ActiviteyException {
+		
 		try {
 			return DateUtil.isBefore(entity.getCreateTime(), duration);
 		} catch (ParseException e) {
@@ -69,7 +70,7 @@ public class BargainRule implements ActiveRule<BargainGoodsEntity> {
 		}
 	}
 
-	private boolean isReachFloorPrice(BargainGoodsEntity entity) {
+	private final boolean isReachFloorPrice(UserBargainEntity entity) {
 		if (entity.getRecordList() == null || entity.getRecordList().size() == 0)
 			return false;
 		double bargainPrice = entity.getRecordList().stream().mapToDouble(BargainRecord::getBargainPrice).sum();
@@ -79,7 +80,7 @@ public class BargainRule implements ActiveRule<BargainGoodsEntity> {
 	}
 
 	@Override
-	public void finalRuleJudge(BargainGoodsEntity entity) throws ActiviteyException {
+	public final void finalRuleJudge(IUserBargain ientity) throws ActiviteyException {
 		// TODO Auto-generated method stub
 
 	}
@@ -162,14 +163,6 @@ public class BargainRule implements ActiveRule<BargainGoodsEntity> {
 
 	public void setType(int type) {
 		this.type = type;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public int getDuration() {

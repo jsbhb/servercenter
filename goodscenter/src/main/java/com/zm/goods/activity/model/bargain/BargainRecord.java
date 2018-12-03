@@ -5,6 +5,13 @@ public class BargainRecord {
 	private int userId;//砍价user
 	private double bargainPrice;//砍价金额
 	private boolean buy;//接龙模式下是否已经购买
+	private String createTime;//砍价时间
+	public String getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
 	public int getUserId() {
 		return userId;
 	}

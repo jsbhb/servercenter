@@ -7,15 +7,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.zm.goods.activity.inf.AbstractActive;
 import com.zm.goods.activity.inf.ActiveRule;
-import com.zm.goods.activity.model.bargain.BargainGoodsEntity;
 import com.zm.goods.activity.model.bargain.BargainRecord;
 import com.zm.goods.activity.model.bargain.BargainRule;
+import com.zm.goods.activity.model.bargain.UserBargainEntity;
+import com.zm.goods.activity.model.bargain.base.IUserBargain;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.Number;
 import com.zm.goods.utils.SpringContextUtil;
 
-public class BargainActiveComponent extends AbstractActive<BargainRecord, BargainGoodsEntity> {
+public class BargainActiveComponent extends AbstractActive<BargainRecord, IUserBargain> {
 
 	private String id;// 每一个团的唯一ID
 
@@ -24,18 +25,19 @@ public class BargainActiveComponent extends AbstractActive<BargainRecord, Bargai
 	private RedisTemplate<String, String> template;
 
 	@SuppressWarnings("unchecked")
-	public BargainActiveComponent(ActiveRule<BargainGoodsEntity> rule, String lock, boolean start) {
+	public BargainActiveComponent(ActiveRule<IUserBargain> rule, String lock, boolean start) {
 		super(start, rule);
 		this.id = lock;
 		template = (RedisTemplate<String, String>) SpringContextUtil.getBean("template");
 	}
 
 	@Override
-	public BargainRecord processHandle(BargainGoodsEntity entity) throws ActiviteyException {
+	public BargainRecord processHandle(IUserBargain ientity) throws ActiviteyException {
+		UserBargainEntity entity = (UserBargainEntity) ientity;
 		synchronized (id) {// 第一次判断根据初始传进来的值进行判断，通过后进入同步状态，根据每一个开团的ID进行同步
 			String json = template.opsForValue().get(BARGAIN_ACTIVE_PER + id);// 获取最新的砍价记录
 			if (json != null) {// 如果有，不是第一次
-				entity = JSONUtil.parse(json, BargainGoodsEntity.class);// 获取最新数据
+				entity = JSONUtil.parse(json, UserBargainEntity.class);// 获取最新数据
 				activeRule.processRuleJudge(entity);// 拿最新的数据进行规则判断，双重检验
 			}
 			BargainRule rule = (BargainRule) activeRule;
@@ -83,7 +85,7 @@ public class BargainActiveComponent extends AbstractActive<BargainRecord, Bargai
 	}
 
 	@Override
-	public BargainRecord finalHandle(BargainGoodsEntity entity) throws ActiviteyException {
+	public BargainRecord finalHandle(IUserBargain entity) throws ActiviteyException {
 
 		return null;
 	}

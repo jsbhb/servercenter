@@ -3,7 +3,9 @@ package com.zm.goods.activity.model.bargain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BargainGoodsEntity {
+import com.zm.goods.activity.model.bargain.base.IUserBargain;
+
+public class UserBargainEntity implements IUserBargain{
 
 	private int id;
 	private String itemId;
@@ -14,7 +16,7 @@ public class BargainGoodsEntity {
 	private List<BargainRecord> recordList;
 	private int userId;
 
-	public void setBargainRecord(BargainRecord record) {
+	public final void setBargainRecord(BargainRecord record) {
 		if (recordList == null) {
 			recordList = new ArrayList<BargainRecord>();
 		}
