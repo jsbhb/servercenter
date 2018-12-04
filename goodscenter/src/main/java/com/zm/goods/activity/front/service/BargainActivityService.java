@@ -20,4 +20,6 @@ public interface BargainActivityService {
 
 	Integer startBargain(Integer userId, Integer goodsRoleId) throws ActiviteyException;
 
+	double bargain(Integer userId, Integer id) throws ActiviteyException;
+
 }

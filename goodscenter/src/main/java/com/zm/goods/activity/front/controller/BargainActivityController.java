@@ -45,11 +45,11 @@ public class BargainActivityController {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/active/bargain/over/{userId}/{id}", method = RequestMethod.PUT)
-	public ResultModel userBargainOver(@PathVariable("version") Double version,
-			@PathVariable("userId") Integer userId, @PathVariable("id") Integer id) {
+	public ResultModel userBargainOver(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+			@PathVariable("id") Integer id) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			boolean flag = bargainActivityService.userBargainOver(userId, id);
-			return new ResultModel(flag,null);
+			return new ResultModel(flag, null);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
@@ -96,15 +96,15 @@ public class BargainActivityController {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/active/bargain/start/{userId}/{goodsRoleId}", method = RequestMethod.POST)
-	public ResultModel startBargain(@PathVariable("version") Double version,
-			@PathVariable("userId") Integer userId, @PathVariable("goodsRoleId") Integer goodsRoleId) {
-		
+	public ResultModel startBargain(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+			@PathVariable("goodsRoleId") Integer goodsRoleId) {
+
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				Integer id = bargainActivityService.startBargain(userId,goodsRoleId);
+				Integer id = bargainActivityService.startBargain(userId, goodsRoleId);
 				return new ResultModel(true, id);
 			} catch (ActiviteyException e) {
-				return new ResultModel(false, e.getErrorCode()+"", e.getMessage());
+				return new ResultModel(false, e.getErrorCode() + "", e.getMessage());
 			}
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -115,9 +115,16 @@ public class BargainActivityController {
 	 * @fun 砍价
 	 * @return
 	 */
-	public ResultModel bargain(@PathVariable("version") Double version) {
+	@RequestMapping(value = "{version}/active/bargain/{userId}/{id}", method = RequestMethod.POST)
+	public ResultModel bargain(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+			@PathVariable("id") Integer id) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			
+			try {
+				double bargainPrice = bargainActivityService.bargain(userId, id);
+				return new ResultModel(true, bargainPrice);
+			} catch (ActiviteyException e) {
+				return new ResultModel(false, e.getErrorCode() + "", e.getMessage());
+			}
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());

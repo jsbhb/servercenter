@@ -68,10 +68,10 @@ public class BargainActiveComponent extends AbstractActive<BargainRecord, IUserB
 				//剩余金额
 				double residue = new Number(entity.getInitPrice() + "").sub(entity.getFloorPrice() + "")
 						.sub(bargainTotalPrice + "").round(2).parseToDouble();
-				if(residue <= rule.getLessMinPrice()){
+				if(residue <= rule.getLessMinPrice()){//剩余金额小于设置的金额时，直接砍到0
 					record.setBargainPrice(residue);
 					entity.setBargainRecord(record);
-				} else {
+				} else {//否则按随机砍价金额计算
 					double bargainPrice = new Number(residue+ "")
 							.mul(rule.getRatio() + "").round(2).parseToDouble();
 					record.setBargainPrice(bargainPrice);

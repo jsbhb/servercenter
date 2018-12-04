@@ -188,15 +188,25 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(userId, rulePO);
 		bargainMapper.saveUserBargain(userBargainPO);
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
-		//创建砍价核心逻辑组件
+		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
 				userBargainPO.isStart());
+		// 实现砍价
+		doBargain(userId, convert, userBargainPO, bargainComponent);
+		return userBargainPO.getId();
+	}
+
+	private BargainRecord doBargain(Integer userId, BargainEntityConverter convert, UserBargainPO userBargainPO,
+			BargainActiveComponent bargainComponent) throws ActiviteyException {
 		try {
+			//砍价
 			BargainRecord record = bargainComponent.doProcess(userBargainPO);
+			//保存砍价记录
 			BargainRecordPO po = convert.BargainRecord2BargainRecordPO(userBargainPO.getId(), record);
 			bargainMapper.saveBargainRecord(po);
+			return record;
 		} catch (ActiviteyException e) {
-			if(e.getErrorCode() == 2){//时间超时前端没有掉接口，需要主动将该记录状态改变
+			if (e.getErrorCode() == 2) {// 时间超时前端没有掉接口，需要主动将该记录状态改变
 				Map<String, Object> param = new HashMap<String, Object>();
 				param.put("userId", userId);
 				param.put("id", userBargainPO.getId());
@@ -204,7 +214,24 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			}
 			throw e;
 		}
-		return userBargainPO.getId();
+	}
+
+	@Override
+	public double bargain(Integer userId, Integer id) throws ActiviteyException {
+		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(id);
+		userBargainPO.setUserId(userId);
+		BargainRulePO rulePO = bargainMapper.getBargainRuleById(userBargainPO.getGoodsRoleId());
+		// 创建砍价活动转换器
+		BargainEntityConverter convert = new BargainEntityConverter();
+		// 获取规则类
+		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
+		// 创建砍价核心逻辑组件
+		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
+				userBargainPO.isStart());
+
+		// 实现砍价
+		BargainRecord record = doBargain(userId, convert, userBargainPO, bargainComponent);
+		return record.getBargainPrice();
 	}
 
 }
