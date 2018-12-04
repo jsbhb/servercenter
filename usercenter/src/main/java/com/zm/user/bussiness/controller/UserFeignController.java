@@ -56,4 +56,12 @@ public class UserFeignController {
 		}
 		return null;
 	}
+	
+	@RequestMapping(value = "{version}/user/feign/verify/{userId}", method = RequestMethod.GET)
+	public boolean verifyUserId(@PathVariable("version") Double version, @PathVariable("userId") Integer userId){
+		if(Constants.FIRST_VERSION.equals(version)){
+			return userFeignService.verifyUserId(userId);
+		}
+		return false;
+	}
 }

@@ -80,4 +80,13 @@ public class UserFeignServiceImpl implements UserFeignService {
 		List<UserBO> list = userMapper.listUserByUserId(userIdList);
 		return list;
 	}
+
+	@Override
+	public boolean verifyUserId(Integer userId) {
+		int count = userMapper.verifyUserId(userId);
+		if(count == 0){
+			return false;
+		}
+		return true;
+	}
 }

@@ -94,4 +94,6 @@ public interface UserMapper {
 	List<UserInfo> getAllUserInfoForShopByDownload(UserInfo info);
 
 	List<UserBO> listUserByUserId(List<Integer> userIdList);
+
+	int verifyUserId(Integer userId);
 }

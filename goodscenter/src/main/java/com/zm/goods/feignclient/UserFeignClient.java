@@ -27,4 +27,7 @@ public interface UserFeignClient {
 	public List<UserBO> listUserByUserId(@PathVariable("version") Double version,
 			@RequestBody List<Integer> userIdList);
 
+	@RequestMapping(value = "{version}/user/feign/verify/{userId}", method = RequestMethod.GET)
+	public boolean verifyUserId(@PathVariable("version") Double version, @PathVariable("userId") Integer userId);
+
 }

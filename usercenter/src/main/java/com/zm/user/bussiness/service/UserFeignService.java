@@ -14,4 +14,6 @@ public interface UserFeignService {
 	boolean initButtjoint();
 
 	List<UserBO> listUserByUserId(List<Integer> userIdList);
+
+	boolean verifyUserId(Integer userId);
 }

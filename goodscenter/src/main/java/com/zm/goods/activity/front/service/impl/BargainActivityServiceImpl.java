@@ -232,6 +232,10 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	@Override
 	public double bargain(Integer userId, Integer id) throws ActiviteyException {
+		boolean effective = userFeignClient.verifyUserId(Constants.FIRST_VERSION, userId);
+		if(!effective){
+			throw new ActiviteyException("你这个沙雕，想作弊",7);
+		}
 		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(id);
 		if(userBargainPO == null){
 			throw new ActiviteyException("没有该类的砍价活动",6);
