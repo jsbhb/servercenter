@@ -17,14 +17,43 @@ public class MyBargain {
 	private double bargainPrice;// 已砍价格
 	private double lowPrice;// 底价
 	private int stock;
+	private String description;
 	private String goodsImg;
 	private int duration;
 	private String userImg;
 	private String originCountry;
 	private List<MyBargainRecord> bargainList;
+	private boolean start;
 	// 只是业务中间需要用到，传到前端不需要
 	@JsonIgnore
 	private String itemId;
+	// 只是业务中间需要用到，传到前端不需要
+	@JsonIgnore
+	private int userId;
+
+	public boolean isStart() {
+		return start;
+	}
+
+	public void setStart(boolean start) {
+		this.start = start;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	public String getItemId() {
 		return itemId;

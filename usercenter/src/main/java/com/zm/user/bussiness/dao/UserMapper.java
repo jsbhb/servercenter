@@ -12,6 +12,7 @@ import com.zm.user.pojo.UserInfo;
 import com.zm.user.pojo.UserVip;
 import com.zm.user.pojo.VipOrder;
 import com.zm.user.pojo.VipPrice;
+import com.zm.user.pojo.bo.UserBO;
 
 public interface UserMapper {
 
@@ -91,4 +92,6 @@ public interface UserMapper {
 	Page<UserInfo> getAllUserInfoForShopByPageShow(UserInfo info);
 	
 	List<UserInfo> getAllUserInfoForShopByDownload(UserInfo info);
+
+	List<UserBO> listUserByUserId(List<Integer> userIdList);
 }

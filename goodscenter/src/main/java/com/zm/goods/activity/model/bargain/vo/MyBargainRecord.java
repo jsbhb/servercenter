@@ -1,7 +1,11 @@
 package com.zm.goods.activity.model.bargain.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+/**
+ * @fun 前端用户砍价记录
+ * @author user
+ *
+ */
 public class MyBargainRecord {
 
 	private int id;

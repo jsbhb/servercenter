@@ -427,5 +427,13 @@
 		left join user_detail ud on u.id = ud.user_id
 		where u.grade_id = #{shopId}
 	</select>
+	
+	<select id="listUserByUserId" parameterType="Object" resultType="com.zm.user.pojo.bo.UserBO">
+		select u.id as userId, ud.nick_name as userName, ud.head_img as headImg from user u 
+		left join user_detail ud on u.id = ud.user_id where u.id in 
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach> 
+	</select>
 
 </mapper>

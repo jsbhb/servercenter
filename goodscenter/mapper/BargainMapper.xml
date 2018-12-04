@@ -26,15 +26,115 @@
 		</collection>
 	</resultMap>
 	
-	<select id="listBargainByUserId" parameterType="Object" resultMap="userBargain">
+	<resultMap type="com.zm.goods.activity.model.ActiveGoods" id="activeGoods">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+		<result column="path" property="path" jdbcType = "VARCHAR"/>
+		<result column="description" property="description" jdbcType = "VARCHAR"/>
+		<result column="origin" property="origin" jdbcType="VARCHAR"/>
+		<result column="stock" property="stock" jdbcType="INTEGER"/>
+		<result column="init_price" property="initPrice" jdbcType = "DOUBLE"/>
+		<result column="floor_price" property="floorPrice" jdbcType = "DOUBLE"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.activity.model.bargain.po.BargainRulePO" id="bargainRule">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="activity_id" property="activityId" jdbcType="INTEGER"/>
+		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+		<result column="path" property="path" jdbcType = "VARCHAR"/>
+		<result column="description" property="description" jdbcType = "VARCHAR"/>
+		<result column="end_time" property="endTime" jdbcType="VARCHAR"/>
+		<result column="start_time" property="startTime" jdbcType="VARCHAR"/>
+		<result column="init_price" property="initPrice" jdbcType = "DOUBLE"/>
+		<result column="floor_price" property="floorPrice" jdbcType = "DOUBLE"/>
+		<result column="min_ratio" property="minRatio" jdbcType = "INTEGER"/>
+		<result column="max_ratio" property="maxRatio" jdbcType = "INTEGER"/>
+		<result column="max_count" property="maxCount" jdbcType = "INTEGER"/>
+		<result column="first_min_ratio" property="firstMinRatio" jdbcType = "INTEGER"/>
+		<result column="first_max_ratio" property="firstMaxRatio" jdbcType = "INTEGER"/>
+		<result column="type" property="type" jdbcType = "INTEGER"/>
+		<result column="duration" property="duration" jdbcType = "INTEGER"/>
+		<result column="less_min_price" property="lessMinPrice" jdbcType = "DOUBLE"/>
+	</resultMap>
+	
+	<select id="listBargainNormalByUserId" parameterType="Object" resultMap="userBargain">
 		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
 		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
 		agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
-		where agr.user_id = #{userId}
+		where agro.type = 1 and agp.user_id = #{userId}
+	</select>
+	
+	<select id="listBargainChainsByUserId" parameterType="Object" resultMap="userBargain">
+		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
+		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
+		agp.buy, agro.duration,  agro.item_id from 
+		activity_goods_record agr left join 
+		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
+		activity_goods_role agro on agr.goods_role_id = agro.id 
+		where agro.type = 2 and agr.user_id = #{userId}
+	</select>
+	
+	<select id="getRuleTypeByUserBargainId" parameterType="Object" resultType="java.lang.Integer">
+		select agro.type from activity_goods_record agr left join activity_goods_role agro on agr.goods_role_id = agro.id 
+		where agr.id = #{id}
+	</select>
+	
+	<select id="listActiceGoods" parameterType="Object" resultMap="activeGoods">
+		select g.id, g.goods_name, g.description, g.origin, gs.fxqty as stock, gf.path 
+		from goods g left join goods_item gi on g.goods_id = gi.goods_id 
+		left join goods_stock gs on gs.item_id = gi.item_id 
+		left join goods_file gf on g.goods_id = gf.goods_id 
+		where gi.item_id in 
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+		group by g.goods_id,gi.item_id
+	</select>
+	
+	<select id="getBargainDetailByParam" parameterType="Object" resultMap="userBargain">
+		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
+		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
+		agp.buy, agro.duration,  agro.item_id from 
+		activity_goods_record agr left join 
+		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
+		activity_goods_role agro on agr.goods_role_id = agro.id 
+		where agr.id = #{id}
+		<if test="type == 1">
+			and agr.user_id = #{userId}
+		</if>
+		<if test="type == 2">
+			and agp.user_id = #{userId}
+		</if>
 	</select>
 
+	<select id="listBargainGoodsForPage" parameterType="Object" resultMap="bargainRule">
+		select * from activity_goods_role
+	</select>
+	
+	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.boBargainCountBO">
+		select goods_role_id as id ,count(*) as count from activity_goods_record where goods_role_id in 
+		<foreach collection="list" open="(" close=")" item="item">
+			#{item}
+		</foreach>
+		group by goods_role_id
+	</select>
+	
+	<update id="updateUserBargainOver" parameterType="Object">
+		update activity_goods_record set status = 0 where user_id = #{userId} and id = #{id}
+	</update>
+	
+	<select id="getBargainRuleById" parameterType="Object" resultMap="bargainRule">
+		select * from activity_goods_role where id = #{id}
+	</select>
+	
+	<insert id="saveUserBargain" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
+		insert into activity_goods_record (goods_role_id,user_id,init_price,floor_price,status,create_time) values
+		(#{goodsRoleId},#{userId},#{initPrice},#{floorPrice},#{start},now())
+	</insert>
 	
 </mapper>

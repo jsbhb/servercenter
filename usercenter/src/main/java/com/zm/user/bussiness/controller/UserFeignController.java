@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.user.bussiness.service.UserFeignService;
 import com.zm.user.constants.Constants;
 import com.zm.user.pojo.bo.GradeBO;
+import com.zm.user.pojo.bo.UserBO;
 /**
  * @fun 用户中心控制器类，供feign内部调用
  * @author user
@@ -45,5 +47,13 @@ public class UserFeignController {
 			return userFeignService.initButtjoint();
 		}
 		return false;
+	}
+	
+	@RequestMapping(value = "{version}/user/feign/user/bo", method = RequestMethod.POST)
+	public List<UserBO> listUserByUserId(@PathVariable("version") Double version, @RequestBody List<Integer> userIdList){
+		if(Constants.FIRST_VERSION.equals(version)){
+			return userFeignService.listUserByUserId(userIdList);
+		}
+		return null;
 	}
 }

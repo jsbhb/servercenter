@@ -9,11 +9,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.zm.user.bussiness.dao.GradeMapper;
+import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.UserFeignService;
 import com.zm.user.constants.Constants;
 import com.zm.user.log.LogUtil;
 import com.zm.user.pojo.Grade;
 import com.zm.user.pojo.bo.GradeBO;
+import com.zm.user.pojo.bo.UserBO;
 import com.zm.user.utils.ConvertUtil;
 import com.zm.user.utils.JSONUtil;
 
@@ -25,6 +27,9 @@ public class UserFeignServiceImpl implements UserFeignService {
 	
 	@Resource
 	RedisTemplate<String, String> template;
+	
+	@Resource
+	UserMapper userMapper;
 
 	@Override
 	public List<GradeBO> listGradeBO() {
@@ -68,5 +73,11 @@ public class UserFeignServiceImpl implements UserFeignService {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public List<UserBO> listUserByUserId(List<Integer> userIdList) {
+		List<UserBO> list = userMapper.listUserByUserId(userIdList);
+		return list;
 	}
 }
