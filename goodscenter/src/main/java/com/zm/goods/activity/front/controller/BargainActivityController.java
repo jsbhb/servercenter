@@ -92,7 +92,7 @@ public class BargainActivityController {
 	}
 
 	/**
-	 * @fun 开始一个砍价团
+	 * @fun 开始一个砍价团,并砍第一刀
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/active/bargain/start/{userId}/{goodsRoleId}", method = RequestMethod.POST)
