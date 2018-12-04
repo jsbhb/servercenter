@@ -1,5 +1,10 @@
 package com.zm.goods.activity.model.po;
 
+/**
+ * @fun 活动类公用
+ * @author user
+ *
+ */
 public class ActivityModelPO {
 
 	private int id;
