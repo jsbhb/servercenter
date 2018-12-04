@@ -137,4 +137,9 @@
 		(#{goodsRoleId},#{userId},#{initPrice},#{floorPrice},#{start},now())
 	</insert>
 	
+	<insert id="saveBargainRecord" parameterType="Object">
+		insert into activity_goods_participant(goods_record_id,user_id,bargain_price,buy,create_time) values
+		(#{goodsRecordId},#{userId},#{bargainPrice},#{buy},now())
+	</insert>
+	
 </mapper>

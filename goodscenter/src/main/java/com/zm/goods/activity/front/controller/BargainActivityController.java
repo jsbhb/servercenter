@@ -100,8 +100,12 @@ public class BargainActivityController {
 			@PathVariable("userId") Integer userId, @PathVariable("goodsRoleId") Integer goodsRoleId) {
 		
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Integer id = bargainActivityService.startBargain(userId,goodsRoleId);
-			return new ResultModel(true, id);
+			try {
+				Integer id = bargainActivityService.startBargain(userId,goodsRoleId);
+				return new ResultModel(true, id);
+			} catch (ActiviteyException e) {
+				return new ResultModel(false, e.getErrorCode()+"", e.getMessage());
+			}
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
@@ -111,7 +115,11 @@ public class BargainActivityController {
 	 * @fun 砍价
 	 * @return
 	 */
-	public ResultModel bargain() {
-
+	public ResultModel bargain(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 }

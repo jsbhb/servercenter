@@ -3,7 +3,7 @@ package com.zm.goods.activity.model.po;
 public class ActivityModelPO {
 
 	private int id;
-	private String activeName;
+	private String name;
 	private String description;
 	private String startTime;
 	private String endTime;
@@ -18,11 +18,11 @@ public class ActivityModelPO {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getActiveName() {
-		return activeName;
+	public String getName() {
+		return name;
 	}
-	public void setActiveName(String activeName) {
-		this.activeName = activeName;
+	public void setName(String name) {
+		this.name = name;
 	}
 	public String getDescription() {
 		return description;
