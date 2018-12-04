@@ -23,13 +23,11 @@ public class BargainRule implements ActiveRule<IUserBargain> {
 	private int duration;// 持续时间（小时）
 	private double lessMinPrice;// 砍价时，现价和底价小于该值时直接砍到底价
 	private Random ratio;// 砍价时的随机比例
-	private Random firstRatio;// 第一刀随机比例
 
 	@Override
 	public final void ruleInit() {
 		// 生成随机数random初始化
-		ratio = new Random(maxRatio - minRatio);
-		firstRatio = new Random(firstMaxRatio - firstMinRatio);
+		ratio = new Random();
 	}
 
 	@Override
@@ -62,9 +60,10 @@ public class BargainRule implements ActiveRule<IUserBargain> {
 	}
 
 	private final boolean isOverTime(UserBargainEntity entity) throws ActiviteyException {
-		
+		if (entity.getRecordList() == null || entity.getRecordList().size() == 0)
+			return false;
 		try {
-			return DateUtil.isBefore(entity.getCreateTime(), duration);
+			return DateUtil.isAfter(entity.getCreateTime(), duration);
 		} catch (ParseException e) {
 			throw new ActiviteyException("你的开团时间程序员小哥哥忘记记录啦", 5);
 		}
@@ -86,11 +85,11 @@ public class BargainRule implements ActiveRule<IUserBargain> {
 	}
 
 	public double getRatio() {
-		return CalculationUtils.div(ratio.nextInt() + minRatio, 100);
+		return CalculationUtils.div(ratio.nextInt(maxRatio - minRatio) + minRatio, 100);
 	}
 
 	public double getFirstRatio() {
-		return CalculationUtils.div(firstRatio.nextInt() + firstMinRatio, 100);
+		return CalculationUtils.div(ratio.nextInt(firstMaxRatio - firstMinRatio) + firstMinRatio, 100);
 	}
 
 	public String getItemId() {

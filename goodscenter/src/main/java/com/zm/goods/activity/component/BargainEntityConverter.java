@@ -55,6 +55,7 @@ public class BargainEntityConverter {
 				record.setBargainPrice(recordPO.getBargainPrice());//每次砍价金额记录
 				record.setId(recordPO.getId());
 				record.setUserId(recordPO.getUserId());//用户ID，用于中间件获取用户信息
+				record.setBuy(recordPO.isBuy());
 				temp.add(record);
 				bargainPrice = CalculationUtils.add(bargainPrice, recordPO.getBargainPrice());//计算已经砍价的金额
 			}

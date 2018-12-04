@@ -12,9 +12,16 @@ public class MyBargainRecord {
 	private String userName;
 	private String userImg;
 	private double bargainPrice;
+	private boolean buy;
 	//只是业务中间需要用到，传到前端不需要
 	@JsonIgnore
 	private int userId;
+	public boolean isBuy() {
+		return buy;
+	}
+	public void setBuy(boolean buy) {
+		this.buy = buy;
+	}
 	public int getUserId() {
 		return userId;
 	}

@@ -13,10 +13,10 @@ import com.github.pagehelper.Page;
  * @since JDK 1.7
  */
 public class Pagination {
-	private int numPerPage;
+	private int numPerPage = 10;
 	private long totalRows;
 	private int totalPages;
-	private int currentPage;
+	private int currentPage = 1;
 	private int startIndex;
 	private int lastIndex;
 	

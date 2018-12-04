@@ -60,7 +60,7 @@
 	</resultMap>
 	
 	<select id="listBargainNormalByUserId" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
+		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
 		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
 		agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
@@ -70,7 +70,7 @@
 	</select>
 	
 	<select id="listBargainChainsByUserId" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
+		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
 		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
 		agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
@@ -85,7 +85,7 @@
 	</select>
 	
 	<select id="listActiceGoods" parameterType="Object" resultMap="activeGoods">
-		select g.id, g.goods_name, g.description, g.origin, gs.fxqty as stock, gf.path 
+		select g.id, g.goods_name, g.description, g.origin, gs.fxqty as stock, gf.path, gi.item_id   
 		from goods g left join goods_item gi on g.goods_id = gi.goods_id 
 		left join goods_stock gs on gs.item_id = gi.item_id 
 		left join goods_file gf on g.goods_id = gf.goods_id 
@@ -97,7 +97,7 @@
 	</select>
 	
 	<select id="getBargainDetailByParam" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id 
+		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
 		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
 		agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
@@ -116,7 +116,7 @@
 		select * from activity_goods_role
 	</select>
 	
-	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.boBargainCountBO">
+	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.bo.BargainCountBO">
 		select goods_role_id as id ,count(*) as count from activity_goods_record where goods_role_id in 
 		<foreach collection="list" open="(" close=")" item="item">
 			#{item}
@@ -125,7 +125,7 @@
 	</select>
 	
 	<update id="updateUserBargainOver" parameterType="Object">
-		update activity_goods_record set status = 0 where user_id = #{userId} and id = #{id}
+		update activity_goods_record set status = 0, update_time = now() where user_id = #{userId} and id = #{id}
 	</update>
 	
 	<select id="getBargainRuleById" parameterType="Object" resultMap="bargainRule">
@@ -144,7 +144,7 @@
 	
 	<select id="getUserBargainById" parameterType="Object" resultMap="userBargain">
 		select agr.id, agr.goods_role_id, agr.status, agr.init_price, agr.floor_price, agr.create_time,
-		agp.id as recordId, agp.user_id as sub_user_id, agp.bargain_price, 
+		agp.id as recordId, agp.user_id as sub_user_id, agp.bargain_price, agr.user_id,
 		agp.buy from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id

@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.feignclient.model.UserBO;
 import com.zm.goods.log.LogUtil;
+import com.zm.goods.utils.DateUtil;
 
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -45,6 +47,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	@Resource
 	UserFeignClient userFeignClient;
+
+	@Resource
+	RedisTemplate<String, String> template;
 
 	@Override
 	public List<MyBargain> listMyBargain(Integer userId) {
@@ -164,6 +169,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			goods.setDescription(activeGoods.getDescription());
 		});
 		Page<BargainGoods> resultPage = new Page<>(page.getPageNum(), page.getPageSize(), (int) page.getTotal());
+		resultPage.setPages(page.getPages());
 		resultPage.addAll(bargainGoodsList);
 		return resultPage;
 	}
@@ -180,6 +186,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	@Override
 	public Integer startBargain(Integer userId, Integer goodsRoleId) throws ActiviteyException {
 		BargainRulePO rulePO = bargainMapper.getBargainRuleById(goodsRoleId);
+		if(rulePO == null){
+			throw new ActiviteyException("没有该类的砍价活动",6);
+		}
 		// 创建砍价活动转换器
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取规则类
@@ -187,10 +196,11 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 生成用户砍价记录类
 		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(userId, rulePO);
 		bargainMapper.saveUserBargain(userBargainPO);
+		userBargainPO.setCreateTime(DateUtil.getNowTimeStr("yyyy-MM-dd HH:mm:ss"));
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
-				userBargainPO.isStart());
+				template);
 		// 实现砍价
 		doBargain(userId, convert, userBargainPO, bargainComponent);
 		return userBargainPO.getId();
@@ -198,17 +208,21 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	private BargainRecord doBargain(Integer userId, BargainEntityConverter convert, UserBargainPO userBargainPO,
 			BargainActiveComponent bargainComponent) throws ActiviteyException {
+		
+		//获取砍价发起人的userId，将帮砍人的userId赋值进去，进行判断
+		int bargainOwnUserId = userBargainPO.getUserId();
+		userBargainPO.setUserId(userId);
 		try {
-			//砍价
+			// 砍价
 			BargainRecord record = bargainComponent.doProcess(userBargainPO);
-			//保存砍价记录
+			// 保存砍价记录
 			BargainRecordPO po = convert.BargainRecord2BargainRecordPO(userBargainPO.getId(), record);
 			bargainMapper.saveBargainRecord(po);
 			return record;
 		} catch (ActiviteyException e) {
 			if (e.getErrorCode() == 2) {// 时间超时前端没有掉接口，需要主动将该记录状态改变
 				Map<String, Object> param = new HashMap<String, Object>();
-				param.put("userId", userId);
+				param.put("userId", bargainOwnUserId);
 				param.put("id", userBargainPO.getId());
 				bargainMapper.updateUserBargainOver(param);
 			}
@@ -219,7 +233,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	@Override
 	public double bargain(Integer userId, Integer id) throws ActiviteyException {
 		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(id);
-		userBargainPO.setUserId(userId);
+		if(userBargainPO == null){
+			throw new ActiviteyException("没有该类的砍价活动",6);
+		}
 		BargainRulePO rulePO = bargainMapper.getBargainRuleById(userBargainPO.getGoodsRoleId());
 		// 创建砍价活动转换器
 		BargainEntityConverter convert = new BargainEntityConverter();
@@ -227,7 +243,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
-				userBargainPO.isStart());
+				template);
 
 		// 实现砍价
 		BargainRecord record = doBargain(userId, convert, userBargainPO, bargainComponent);

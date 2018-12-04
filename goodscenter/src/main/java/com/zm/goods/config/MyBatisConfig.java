@@ -25,7 +25,7 @@ import com.github.pagehelper.PageHelper;
 *  
 */
 @Configuration
-@MapperScan(basePackages="com.zm.goods.bussiness.dao")
+@MapperScan(basePackages={"com.zm.goods.bussiness.dao","com.zm.goods.activity.*.dao"})
 public class MyBatisConfig {
 
     @Autowired
