@@ -80,7 +80,7 @@ public class BargainActivityController {
 	 * @fun 获取砍价商品列表
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/active/bargain/goods/list", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/active/bargain/goods/list", method = RequestMethod.GET)
 	public ResultModel listBargainGoods(@PathVariable("version") Double version,
 			@ModelAttribute Pagination pagination) {
 		if (Constants.FIRST_VERSION.equals(version)) {
