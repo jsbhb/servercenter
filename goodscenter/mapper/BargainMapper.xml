@@ -118,7 +118,7 @@
 	
 	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.bo.BargainCountBO">
 		select goods_role_id as id ,count(*) as count from activity_goods_record where goods_role_id in 
-		<foreach collection="list" open="(" close=")" item="item">
+		<foreach collection="list" open="(" close=")" item="item" separator=",">
 			#{item}
 		</foreach>
 		group by goods_role_id

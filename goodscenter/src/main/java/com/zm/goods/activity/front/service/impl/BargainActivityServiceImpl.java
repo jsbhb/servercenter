@@ -64,8 +64,10 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取前端展示需要的对象
 		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList);
-		// 完善砍价数据
-		renderBargain(myBargainList, false);
+		if(myBargainList != null && myBargainList.size() > 0){
+			// 完善砍价数据
+			renderBargain(myBargainList, false);
+		}
 		return myBargainList;
 	}
 
@@ -186,8 +188,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	@Override
 	public Integer startBargain(Integer userId, Integer goodsRoleId) throws ActiviteyException {
 		BargainRulePO rulePO = bargainMapper.getBargainRuleById(goodsRoleId);
-		if(rulePO == null){
-			throw new ActiviteyException("没有该类的砍价活动",6);
+		if (rulePO == null) {
+			throw new ActiviteyException("没有该类的砍价活动", 6);
 		}
 		// 创建砍价活动转换器
 		BargainEntityConverter convert = new BargainEntityConverter();
@@ -195,7 +197,15 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
 		// 生成用户砍价记录类
 		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(userId, rulePO);
-		bargainMapper.saveUserBargain(userBargainPO);
+		try {
+			bargainMapper.saveUserBargain(userBargainPO);
+		} catch (Exception e) {
+			if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
+				throw new ActiviteyException("你已经参加过该商品的砍价", 8);
+			} else {
+				throw new ActiviteyException("创建砍价信息失败，去砍程序员小哥哥吧", 9);
+			}
+		}
 		userBargainPO.setCreateTime(DateUtil.getNowTimeStr("yyyy-MM-dd HH:mm:ss"));
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
 		// 创建砍价核心逻辑组件
@@ -208,8 +218,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	private BargainRecord doBargain(Integer userId, BargainEntityConverter convert, UserBargainPO userBargainPO,
 			BargainActiveComponent bargainComponent) throws ActiviteyException {
-		
-		//获取砍价发起人的userId，将帮砍人的userId赋值进去，进行判断
+
+		// 获取砍价发起人的userId，将帮砍人的userId赋值进去，进行判断
 		int bargainOwnUserId = userBargainPO.getUserId();
 		userBargainPO.setUserId(userId);
 		try {
@@ -233,12 +243,12 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	@Override
 	public double bargain(Integer userId, Integer id) throws ActiviteyException {
 		boolean effective = userFeignClient.verifyUserId(Constants.FIRST_VERSION, userId);
-		if(!effective){
-			throw new ActiviteyException("你这个沙雕，想作弊",7);
+		if (!effective) {
+			throw new ActiviteyException("你这个沙雕，想作弊", 7);
 		}
 		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(id);
-		if(userBargainPO == null){
-			throw new ActiviteyException("没有该类的砍价活动",6);
+		if (userBargainPO == null) {
+			throw new ActiviteyException("没有该类的砍价活动", 6);
 		}
 		BargainRulePO rulePO = bargainMapper.getBargainRuleById(userBargainPO.getGoodsRoleId());
 		// 创建砍价活动转换器

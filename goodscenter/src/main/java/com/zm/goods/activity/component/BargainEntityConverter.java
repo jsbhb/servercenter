@@ -21,10 +21,10 @@ import com.zm.goods.utils.CalculationUtils;
 public class BargainEntityConverter {
 
 	public final List<MyBargain> userBargainPO2MyBargain(List<UserBargainPO> list){
-		if(list == null || list.size() == 0){
-			return null;
-		}
 		List<MyBargain> result = new ArrayList<MyBargain>();
+		if(list == null || list.size() == 0){
+			return result;
+		}
 		for(UserBargainPO po : list){
 			result.add(setMyBargain(po));
 		}
