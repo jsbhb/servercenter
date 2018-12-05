@@ -16,9 +16,16 @@ public class BargainGoods {
 	private double goodsPrice;
 	private String goodsImg;
 	private int bargainCount;//有几人开团
+	private double lowPrice;
 	private int stock;
 	@JsonIgnore
 	private String itemId;//业务转换需要，前端不需要
+	public double getLowPrice() {
+		return lowPrice;
+	}
+	public void setLowPrice(double lowPrice) {
+		this.lowPrice = lowPrice;
+	}
 	public int getGoodsRoleId() {
 		return goodsRoleId;
 	}

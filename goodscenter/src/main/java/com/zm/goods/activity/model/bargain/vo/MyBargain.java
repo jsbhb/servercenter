@@ -21,6 +21,7 @@ public class MyBargain {
 	private String goodsImg;
 	private int duration;
 	private String userImg;
+	private String userName;
 	private String originCountry;
 	private List<MyBargainRecord> bargainList;
 	private boolean start;
@@ -28,6 +29,14 @@ public class MyBargain {
 	// 只是业务中间需要用到，传到前端不需要
 	@JsonIgnore
 	private int userId;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	public boolean isStart() {
 		return start;

@@ -30,12 +30,19 @@ import com.zm.goods.activity.model.bargain.po.BargainRulePO;
 import com.zm.goods.activity.model.bargain.po.UserBargainPO;
 import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
+import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.feignclient.model.UserBO;
 import com.zm.goods.log.LogUtil;
+import com.zm.goods.pojo.GoodsSpecs;
+import com.zm.goods.pojo.OrderBussinessModel;
+import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.Tax;
+import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.DateUtil;
 
 @Service
@@ -51,6 +58,9 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	@Resource
 	RedisTemplate<String, String> template;
 
+	@Resource
+	GoodsMapper goodsMapper;
+
 	@Override
 	public List<MyBargain> listMyBargain(Integer userId) {
 		// 获取普通的砍价活动
@@ -64,7 +74,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取前端展示需要的对象
 		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList);
-		if(myBargainList != null && myBargainList.size() > 0){
+		if (myBargainList != null && myBargainList.size() > 0) {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
 		}
@@ -127,6 +137,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 				myBargainList.forEach(myBargain -> {
 					UserBO bo = userMap.get(myBargain.getUserId());
 					myBargain.setUserImg(bo.getHeadImg());
+					myBargain.setUserName(bo.getUserName());
 					myBargain.getBargainList().forEach(record -> {
 						UserBO userBo = userMap.get(myBargain.getUserId());
 						record.setUserImg(userBo.getHeadImg());
@@ -262,6 +273,51 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 实现砍价
 		BargainRecord record = doBargain(userId, convert, userBargainPO, bargainComponent);
 		return record.getBargainPrice();
+	}
+
+
+	@Override
+	public ResultModel getBargainGoodsInfo(List<OrderBussinessModel> list, Integer userId, Integer id) {
+		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();// 税费temp
+		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();// 税费map
+		ResultModel result = new ResultModel(true, "");
+		Map<String, Object> map = new HashMap<String, Object>();// 返回结果的map
+		List<String> itemIds = list.stream().map(OrderBussinessModel::getItemId).collect(Collectors.toList());
+		// 获取所有税率信息
+		List<Tax> taxList = goodsMapper.getTax(itemIds);
+		for (Tax tax : taxList) {
+			tempTaxMap.put(tax.getItemId(), tax);
+		}
+		Map<String, Object> param = new HashMap<String, Object>();// 参数map
+		param.put("list", itemIds);
+		List<GoodsSpecs> specsList = goodsMapper.getGoodsSpecsForOrder(param);
+		if (specsList == null || specsList.size() == 0) {
+			return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
+					"所有商品" + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
+		}
+		int weight = 0;
+		for(GoodsSpecs specs : specsList){
+			weight += specs.getWeight() * list.get(0).getQuantity();
+		}
+		int type = bargainMapper.getRuleTypeByUserBargainId(id);// 获取该砍价记录的模式
+		param.put("userId", userId);
+		param.put("id", id);
+		param.put("type", type);
+		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
+		if (userBargainPO == null) {
+			return new ResultModel(false, "没有该活动订单");
+		}
+		taxMap.put(tempTaxMap.get(list.get(0).getItemId()), userBargainPO.getInitPrice());//税率对应的总金额
+		double alreadyBargainPrice = userBargainPO.getBargainList().stream().mapToDouble(BargainRecordPO :: getBargainPrice).sum();
+		double totalAmount = CalculationUtils.sub(userBargainPO.getInitPrice(), alreadyBargainPrice);
+		totalAmount = CalculationUtils.round(2, totalAmount);
+		map.put("tax", taxMap);
+		map.put("originalPrice", userBargainPO.getInitPrice());
+		map.put("weight", weight);
+		map.put("totalAmount", totalAmount);
+		result.setSuccess(true);
+		result.setObj(map);
+		return result;
 	}
 
 }

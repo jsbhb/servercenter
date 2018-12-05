@@ -35,7 +35,6 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.UserInfo;
 import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.TaxFeeBO;
-import com.zm.order.utils.DateUtils;
 import com.zm.order.utils.JSONUtil;
 
 @Service
@@ -183,12 +182,6 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 
 		// 保存订单
 		orderComponentUtil.saveOrder(orderInfo);
-
-		// 增加缓存订单数量
-		cacheAbstractService.addOrderCountCache(orderInfo.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
-		// 增加月订单数
-		String time = DateUtils.getTimeString("yyyyMM");
-		cacheAbstractService.addOrderCountCache(orderInfo.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
 		shareProfitComponent.calShareProfitStayToAccount(orderInfo.getOrderId());// 计算资金池和返佣
 		return new ResultModel(true, null);

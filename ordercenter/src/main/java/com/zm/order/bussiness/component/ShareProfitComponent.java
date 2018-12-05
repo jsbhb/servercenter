@@ -115,7 +115,14 @@ public class ShareProfitComponent {
 			// 增加月销售额
 			cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
 					info.getOrderDetail().getPayment());
+			// 增加缓存订单数量
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+			// 增加月订单数
+			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
+			if(Constants.BARGAIN_ORDER == info.getCreateType()){//砍价订单不计算返佣
+				return;
+			}
 			if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {
 				predetermineOrderProfitStayToAccount(info);
 			} else {

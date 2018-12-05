@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
+import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.common.Pagination;
 
@@ -125,6 +127,19 @@ public class BargainActivityController {
 			} catch (ActiviteyException e) {
 				return new ResultModel(false, e.getErrorCode() + "", e.getMessage());
 			}
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
+	/**
+	 * @fun 砍价订单获取商品价格等信息
+	 */
+	@RequestMapping(value = "{version}/active/bargain/{userId}/{id}", method = RequestMethod.POST)
+	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
+			@RequestBody List<OrderBussinessModel> list, Integer userId, Integer id) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return bargainActivityService.getBargainGoodsInfo(list, userId, id);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());

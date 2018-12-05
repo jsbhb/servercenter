@@ -77,6 +77,7 @@ public class BargainEntityConverter {
 			goods.setGoodsPrice(po.getInitPrice());
 			goods.setBargainCount(po.getCount());
 			goods.setGoodsRoleId(po.getId());
+			goods.setLowPrice(po.getFloorPrice());
 			result.add(goods);
 		});
 		return result;

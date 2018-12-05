@@ -127,7 +127,10 @@ public class Constants {
 	public static final Integer PING_DUO_DUO = 12;//聚民惠
 	
 	//*******************订单创建类型**********************
-	public static final Integer OPEN_INTERFACE_TYPE = 5;//对接订单
+	public static final int NORMAL_ORDER = 0;//普通订单
+	public static final int BARGAIN_ORDER = 1;//砍价活动订单
+	public static final int TO_B_ORDER = 4;//2b订单
+	public static final int OPEN_INTERFACE_TYPE = 5;//对接订单
 	
 	//*******************一般贸易仓金额**********************
 	public static final Integer GENERAL_TRADE_FEE = 500;

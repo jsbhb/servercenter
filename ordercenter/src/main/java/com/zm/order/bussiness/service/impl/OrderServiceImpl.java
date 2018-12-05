@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.order.bussiness.component.OrderComponentUtil;
+import com.zm.order.bussiness.component.OrderGoodsDealByCreateType;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.component.ThreadPoolComponent;
 import com.zm.order.bussiness.convertor.OrderConvertUtil;
@@ -129,12 +130,6 @@ public class OrderServiceImpl implements OrderService {
 		Map<String, Object> priceAndWeightMap = null;
 		Double amount = 0.0;
 		boolean vip = false;
-		Integer centerId = null;
-		if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {// 如果是订货平台订单，默认centerId
-			centerId = -1;
-		} else {
-			centerId = info.getCenterId();
-		}
 
 		// 获取该用户是否是VIP
 		UserInfo user = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
@@ -143,9 +138,10 @@ public class OrderServiceImpl implements OrderService {
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		StringBuilder detail = new StringBuilder();
 		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(info, detail);
-		result = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, info.getSupplierId(), vip,
-				centerId, info.getOrderFlag(), info.getCouponIds(), info.getUserId(), false, info.getOrderSource(),
-				info.getShopId());
+		// 创建订单商品信息获取组件
+		OrderGoodsDealByCreateType deal = new OrderGoodsDealByCreateType(goodsFeignClient);
+		// 获取订单商品信息
+		result = deal.doOrderGoodsDeal(info, list, vip, false);
 		if (!result.isSuccess()) {
 			return result;
 		}
@@ -210,10 +206,10 @@ public class OrderServiceImpl implements OrderService {
 		if (!temp.isSuccess()) {
 			Double rebateFee = info.getOrderDetail().getRebateFee();
 			if (rebateFee != null && rebateFee > 0) {
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
-						rebateFee);// 增加返佣
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
-						CalculationUtils.sub(0, rebateFee));// 减少冻结金额
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.ALREADY_CHECK, rebateFee);// 增加返佣
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 减少冻结金额
 			}
 			return temp;
 		}
@@ -224,18 +220,13 @@ public class OrderServiceImpl implements OrderService {
 			// 保存订单
 			orderComponentUtil.saveOrder(info);
 
-			// 增加缓存订单数量
-			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
-			// 增加月订单数
-			String time = DateUtils.getTimeString("yyyyMM");
-			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 		} catch (Exception e) {// 如果出错，需要对返佣回滚，TODO 还需要对库存回滚
 			Double rebateFee = info.getOrderDetail().getRebateFee();
 			if (rebateFee != null && rebateFee > 0) {
 				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
 						rebateFee);// 增加返佣
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
-						CalculationUtils.sub(0, rebateFee));// 减少冻结金额
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 减少冻结金额
 			}
 			throw new Exception(e);// 处理完后往外抛异常，使事务回滚
 		}
@@ -332,10 +323,10 @@ public class OrderServiceImpl implements OrderService {
 			orderMapper.addOrderStatusRecord(param);
 			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
 			Double rebateFee = info.getOrderDetail().getRebateFee();
-			if(rebateFee != null && rebateFee > 0){
+			if (rebateFee != null && rebateFee > 0) {
 				threadPoolComponent.rebate4Order(info);
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.FROZEN_REBATE,
-						CalculationUtils.sub(0, rebateFee));// 冻结金额扣除
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 冻结金额扣除
 			}
 			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}

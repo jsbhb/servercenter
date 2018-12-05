@@ -225,11 +225,6 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			orderBackMapper.insertOrderDetailBatch(detailList);
 			// 统计
 			for (OrderInfo info : list) {
-				// 增加缓存订单数量
-				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
-				// 增加月订单数
-				String time = DateUtils.getTimeString("yyyyMM");
-				cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
 				// 特定来源不进行返佣计算
 				if (Constants.ORDER_SOURCE_EXHIBITION.equals(info.getOrderSource())
@@ -238,7 +233,12 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 						|| Constants.TAIPING_HUIHUI.equals(info.getOrderSource())
 						|| Constants.JU_MING_HUI.equals(info.getOrderSource())
 						|| Constants.PING_DUO_DUO.equals(info.getOrderSource())) {
-
+					
+					// 增加缓存订单数量
+					cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+					// 增加月订单数
+					String time = DateUtils.getTimeString("yyyyMM");
+					cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 					// 增加当天销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_DAY, "sales",
 							info.getOrderDetail().getPayment());

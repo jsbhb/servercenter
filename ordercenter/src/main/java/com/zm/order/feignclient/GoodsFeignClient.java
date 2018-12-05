@@ -101,4 +101,17 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/queryGoodsItemInfoByGoodsIdForEshop", method = RequestMethod.POST)
 	public List<GoodsItemEntity> queryGoodsItemInfoByGoodsIdForEshop(@PathVariable("version") Double version,
 			@RequestBody List<String> goodsIds);
+
+	/**
+	 * @fun 获取砍价订单的商品信息
+	 * @param version
+	 * @param list
+	 * @param couponIds
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/active/bargain/{userId}/{id}", method = RequestMethod.POST)
+	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
+			@RequestBody List<OrderBussinessModel> list, @RequestParam(value = "id") Integer id,
+			@RequestParam(value = "userId") Integer userId);
 }
