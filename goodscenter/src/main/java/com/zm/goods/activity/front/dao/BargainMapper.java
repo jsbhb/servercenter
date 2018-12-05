@@ -35,4 +35,6 @@ public interface BargainMapper {
 	void saveBargainRecord(BargainRecordPO po);
 
 	UserBargainPO getUserBargainById(Integer id);
+
+	void updateBargainGoodsBuy(Integer id);
 }

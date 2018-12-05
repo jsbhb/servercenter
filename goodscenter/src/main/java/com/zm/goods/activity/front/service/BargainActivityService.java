@@ -26,4 +26,6 @@ public interface BargainActivityService {
 
 	ResultModel getBargainGoodsInfo(List<OrderBussinessModel> list, Integer userId, Integer id);
 
+	boolean updateBargainGoodsBuy(Integer userId, Integer id);
+
 }

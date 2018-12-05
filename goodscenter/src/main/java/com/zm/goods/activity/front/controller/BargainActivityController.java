@@ -144,4 +144,16 @@ public class BargainActivityController {
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+	
+	/**
+	 * @fun 订单生成后，该用户置为已购买
+	 */
+	@RequestMapping(value = "{version}/active/bargain/goods/buy", method = RequestMethod.POST)
+	public boolean updateBargainGoodsBuy(@PathVariable("version") Double version,
+			Integer userId, Integer id) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return bargainActivityService.updateBargainGoodsBuy(userId, id);
+		}
+		return false;
+	}
 }

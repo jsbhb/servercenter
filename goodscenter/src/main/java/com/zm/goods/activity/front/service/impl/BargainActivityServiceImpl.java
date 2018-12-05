@@ -275,7 +275,6 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		return record.getBargainPrice();
 	}
 
-
 	@Override
 	public ResultModel getBargainGoodsInfo(List<OrderBussinessModel> list, Integer userId, Integer id) {
 		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();// 税费temp
@@ -296,7 +295,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 					"所有商品" + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
 		}
 		int weight = 0;
-		for(GoodsSpecs specs : specsList){
+		for (GoodsSpecs specs : specsList) {
 			weight += specs.getWeight() * list.get(0).getQuantity();
 		}
 		int type = bargainMapper.getRuleTypeByUserBargainId(id);// 获取该砍价记录的模式
@@ -307,8 +306,14 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		if (userBargainPO == null) {
 			return new ResultModel(false, "没有该活动订单");
 		}
-		taxMap.put(tempTaxMap.get(list.get(0).getItemId()), userBargainPO.getInitPrice());//税率对应的总金额
-		double alreadyBargainPrice = userBargainPO.getBargainList().stream().mapToDouble(BargainRecordPO :: getBargainPrice).sum();
+		boolean buy = userBargainPO.getBargainList().stream().filter(record -> record.getUserId() == userId).findAny()
+				.get().isBuy();
+		if (buy) {
+			return new ResultModel(false, "你已经买过该商品");
+		}
+		taxMap.put(tempTaxMap.get(list.get(0).getItemId()), userBargainPO.getInitPrice());// 税率对应的总金额
+		double alreadyBargainPrice = userBargainPO.getBargainList().stream()
+				.mapToDouble(BargainRecordPO::getBargainPrice).sum();
 		double totalAmount = CalculationUtils.sub(userBargainPO.getInitPrice(), alreadyBargainPrice);
 		totalAmount = CalculationUtils.round(2, totalAmount);
 		map.put("tax", taxMap);
@@ -318,6 +323,23 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		result.setSuccess(true);
 		result.setObj(map);
 		return result;
+	}
+
+	@Override
+	public boolean updateBargainGoodsBuy(Integer userId, Integer id) {
+		Map<String,Object> param = new HashMap<String,Object>();
+		int type = bargainMapper.getRuleTypeByUserBargainId(id);// 获取该砍价记录的模式
+		param.put("userId", userId);
+		param.put("id", id);
+		param.put("type", type);
+		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
+		if (userBargainPO == null) {
+			return false;
+		}
+		int recordId = userBargainPO.getBargainList().stream().filter(record -> record.getUserId() == userId).findAny()
+				.get().getId();
+		bargainMapper.updateBargainGoodsBuy(recordId);
+		return true;
 	}
 
 }

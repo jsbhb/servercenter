@@ -114,4 +114,15 @@ public interface GoodsFeignClient {
 	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
 			@RequestBody List<OrderBussinessModel> list, @RequestParam(value = "id") Integer id,
 			@RequestParam(value = "userId") Integer userId);
+
+	/**
+	 * @fun 下单后更新对应的记录为已购买
+	 * @param version
+	 * @param id
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/active/bargain/goods/buy", method = RequestMethod.POST)
+	public boolean updateBargainGoodsBuy(@PathVariable("version") Double version,
+			@RequestParam(value = "id") Integer id, @RequestParam(value = "userId") Integer userId);
 }

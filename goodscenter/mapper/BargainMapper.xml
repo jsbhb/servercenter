@@ -151,4 +151,8 @@
 		where agr.id = #{id}
 	</select>
 	
+	<update id="updateBargainGoodsBuy" parameterType="Object" >
+		update activity_goods_participant set buy = true where id = #{id}
+	</update>
+	
 </mapper>

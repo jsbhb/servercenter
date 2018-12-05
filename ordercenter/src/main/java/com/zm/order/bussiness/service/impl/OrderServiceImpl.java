@@ -219,6 +219,13 @@ public class OrderServiceImpl implements OrderService {
 			orderComponentUtil.renderOrderInfo(info, postFee, weight, taxFee, disAmount, true);
 			// 保存订单
 			orderComponentUtil.saveOrder(info);
+			if(Constants.BARGAIN_ORDER == info.getCreateType()){//如果是砍价订单，下单后更新对应用户已经购买
+				int id = Integer.valueOf(info.getCouponIds().split(",")[0]);
+				boolean success = goodsFeignClient.updateBargainGoodsBuy(Constants.FIRST_VERSION, id, info.getUserId());
+				if(!success){
+					throw new Exception("更新用户购买信息出错");
+				}
+			}
 
 		} catch (Exception e) {// 如果出错，需要对返佣回滚，TODO 还需要对库存回滚
 			Double rebateFee = info.getOrderDetail().getRebateFee();
