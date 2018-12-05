@@ -24,6 +24,7 @@ import com.zm.goods.activity.front.service.BargainActivityService;
 import com.zm.goods.activity.model.ActiveGoods;
 import com.zm.goods.activity.model.bargain.BargainRecord;
 import com.zm.goods.activity.model.bargain.BargainRule;
+import com.zm.goods.activity.model.bargain.UserBargainEntity;
 import com.zm.goods.activity.model.bargain.bo.BargainCountBO;
 import com.zm.goods.activity.model.bargain.po.BargainRecordPO;
 import com.zm.goods.activity.model.bargain.po.BargainRulePO;
@@ -219,32 +220,33 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		}
 		userBargainPO.setCreateTime(DateUtil.getNowTimeStr("yyyy-MM-dd HH:mm:ss"));
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
+		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(userBargainPO);
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
 				template);
 		// 实现砍价
-		doBargain(userId, convert, userBargainPO, bargainComponent);
+		doBargain(userId, convert, entity, bargainComponent);
 		return userBargainPO.getId();
 	}
 
-	private BargainRecord doBargain(Integer userId, BargainEntityConverter convert, UserBargainPO userBargainPO,
+	private BargainRecord doBargain(Integer userId, BargainEntityConverter convert, UserBargainEntity entity,
 			BargainActiveComponent bargainComponent) throws ActiviteyException {
 
 		// 获取砍价发起人的userId，将帮砍人的userId赋值进去，进行判断
-		int bargainOwnUserId = userBargainPO.getUserId();
-		userBargainPO.setUserId(userId);
+		int bargainOwnUserId = entity.getUserId();
+		entity.setUserId(userId);
 		try {
 			// 砍价
-			BargainRecord record = bargainComponent.doProcess(userBargainPO);
+			BargainRecord record = bargainComponent.doProcess(entity);
 			// 保存砍价记录
-			BargainRecordPO po = convert.BargainRecord2BargainRecordPO(userBargainPO.getId(), record);
+			BargainRecordPO po = convert.BargainRecord2BargainRecordPO(entity.getId(), record);
 			bargainMapper.saveBargainRecord(po);
 			return record;
 		} catch (ActiviteyException e) {
 			if (e.getErrorCode() == 2) {// 时间超时前端没有掉接口，需要主动将该记录状态改变
 				Map<String, Object> param = new HashMap<String, Object>();
 				param.put("userId", bargainOwnUserId);
-				param.put("id", userBargainPO.getId());
+				param.put("id", entity.getId());
 				bargainMapper.updateUserBargainOver(param);
 			}
 			throw e;
@@ -266,12 +268,14 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取规则类
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
+		//生成用户砍价类
+		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(userBargainPO);
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
 				template);
 
 		// 实现砍价
-		BargainRecord record = doBargain(userId, convert, userBargainPO, bargainComponent);
+		BargainRecord record = doBargain(userId, convert, entity, bargainComponent);
 		return record.getBargainPrice();
 	}
 

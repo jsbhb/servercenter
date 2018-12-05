@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.zm.goods.activity.model.bargain.BargainRecord;
 import com.zm.goods.activity.model.bargain.BargainRule;
+import com.zm.goods.activity.model.bargain.UserBargainEntity;
 import com.zm.goods.activity.model.bargain.po.BargainRecordPO;
 import com.zm.goods.activity.model.bargain.po.BargainRulePO;
 import com.zm.goods.activity.model.bargain.po.UserBargainPO;
@@ -116,5 +117,29 @@ public class BargainEntityConverter {
 		po.setBuy(record.isBuy());
 		po.setUserId(record.getUserId());
 		return po;
+	}
+
+	public final UserBargainEntity UserBargainPO2UserBargainEntity(UserBargainPO po) {
+		UserBargainEntity entity = new UserBargainEntity();
+		entity.setCreateTime(po.getCreateTime());
+		entity.setFloorPrice(po.getFloorPrice());
+		entity.setId(po.getId());
+		entity.setInitPrice(po.getInitPrice());
+		entity.setItemId(po.getItemId());
+		entity.setStart(po.isStart());
+		entity.setUserId(po.getUserId());
+		if(po.getBargainList() != null){
+			List<BargainRecord> recordList = new ArrayList<BargainRecord>();
+			po.getBargainList().forEach(recordPO ->{
+				BargainRecord record = new BargainRecord();
+				record.setBargainPrice(recordPO.getBargainPrice());
+				record.setBuy(recordPO.isBuy());
+				record.setCreateTime(recordPO.getCreateTime());
+				record.setUserId(recordPO.getUserId());
+				recordList.add(record);
+			});
+			entity.setRecordList(recordList);
+		}
+		return null;
 	}
 }
