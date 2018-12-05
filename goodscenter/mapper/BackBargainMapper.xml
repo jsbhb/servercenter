@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.activity.backmanger.dao.BackBargainMapper">
+	
+	<resultMap type="com.zm.goods.activity.backmanger.model.BaseActivityModel" id="baseActivityInfo">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="type" property="type" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+		<result column="goodsCount" property="goodsCount" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.activity.backmanger.model.BargainActivityModel" id="bargainActivityInfo">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="type" property="type" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+		<result column="goodsCount" property="goodsCount" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<collection property="itemList"
+			ofType="com.zm.goods.activity.backmanger.model.BargainActivityGoodsModel">
+			<id column="goodsRoleId" property="id" jdbcType="INTEGER"/>
+			<result column="activity_id" property="activityId" jdbcType="INTEGER"/>
+			<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+			<result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+			<result column="init_price" property="initPrice" jdbcType="DOUBLE"/>
+			<result column="floor_price" property="floorPrice" jdbcType="DOUBLE"/>
+			<result column="less_min_price" property="lessMinPrice" jdbcType="DOUBLE"/>
+			<result column="max_count" property="maxCount" jdbcType="INTEGER"/>
+			<result column="first_min_ratio" property="firstMinRatio" jdbcType="INTEGER"/>
+			<result column="first_max_ratio" property="firstMaxRatio" jdbcType="INTEGER"/>
+			<result column="min_ratio" property="minRatio" jdbcType="INTEGER"/>
+			<result column="max_ratio" property="maxRatio" jdbcType="INTEGER"/>
+			<result column="type" property="type" jdbcType="INTEGER"/>
+			<result column="duration" property="duration" jdbcType="INTEGER"/>
+			<result column="goodsRoleStatus" property="status" jdbcType="INTEGER"/>
+		</collection>
+	</resultMap>
+	
+	<select id="selectActivityForPage" parameterType="Object" resultMap="baseActivityInfo">
+		select a.id,a.type,a.name,a.description,count(b.id) goodsCount,a.status
+		from activity_info a
+		left join activity_goods_role b on a.id = b.activity_id
+		where 1=1
+		<if test="name!=null and name!=''">
+			and a.name like concat('%',#{name},'%') 
+		</if>
+		<if test="type!=null and type!='' and type!=0">
+			and a.type = #{type}
+		</if>
+		<if test="status!=null and status!=''">
+			and a.status = #{status}
+		</if>
+		group by a.id
+		order by a.status,a.update_time desc
+	</select>
+	
+	<insert id="insertBargainActivityInfo" useGeneratedKeys="true" keyProperty="id" parameterType="object">
+		INSERT INTO activity_info 
+		(name,type,description,status,start_time,end_time,create_time,update_time,opt) 
+		VALUES (#{name},#{type},#{description},#{status},#{activityStartTime},#{activityEndTime},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertBargainActivityGoodsInfo" parameterType="object">
+		INSERT INTO activity_goods_role 
+		(activity_id,item_id,init_price,floor_price,max_count,
+		first_min_ratio,first_max_ratio,min_ratio,max_ratio,
+		type,duration,less_min_price,status,start_time,end_time,
+		create_time,update_time,opt) 
+		VALUES
+		<foreach collection="itemList" item="item" separator=",">
+			(#{id},#{item.itemId},#{item.initPrice},#{item.floorPrice},#{item.maxCount},
+			#{item.firstMinRatio},#{item.firstMaxRatio},#{item.minRatio},#{item.maxRatio},
+			#{item.type},#{item.duration},#{item.lessMinPrice},#{item.status},
+			#{item.startTime},#{item.endTime},now(),now(),#{opt})
+		</foreach>
+	</insert>
+	
+	<select id="selectBargainActivityByParam" parameterType="Object" resultMap="bargainActivityInfo">
+		select a.id,a.type,a.name,a.description,a.status,
+		b.id goodsRoleId,b.activity_id,b.item_id,b.init_price,
+		b.floor_price,b.max_count,b.first_min_ratio,b.first_max_ratio,
+		b.min_ratio,b.max_ratio,b.type,b.duration,b.less_min_price,
+		b.status goodsRoleStatus,d.goods_name
+		from activity_info a
+		left join activity_goods_role b on a.id = b.activity_id
+		left join goods_item c on b.item_id = c.item_id
+		left join goods d on c.goods_id = d.goods_id
+		where 1=1 and a.id = #{id}
+		order by b.id
+	</select>
+	
+	<update id="updateBargainActivityInfo" parameterType="Object">
+		update activity_info set 
+		name = #{name},type = #{type},
+		description = #{description},
+		status = #{status},update_time = now(),
+		opt = #{opt}
+		where id = #{id}
+	</update>
+	
+	<update id="updateBargainActivityGoodsInfo" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			UPDATE activity_goods_role
+	        SET
+		        init_price = #{item.initPrice},
+		        floor_price = #{item.floorPrice},
+		        max_count = #{item.maxCount},
+		        first_min_ratio = #{item.firstMinRatio},
+		        first_max_ratio = #{item.firstMaxRatio},
+		        min_ratio = #{item.minRatio},
+		        max_ratio = #{item.maxRatio},
+		        type = #{item.type},
+		        duration = #{item.duration},
+		        less_min_price = #{item.lessMinPrice},
+		        status = #{item.status},
+		        update_time = now(),
+		        opt = #{item.opt}
+	        WHERE
+	        	id=#{item.id}
+		</foreach>
+	</update>
+	
+	<delete id="deleteBargainActivityGoodsInfo" parameterType="Object">
+		delete from activity_goods_role where id in 
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.id}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,5 +1,6 @@
 use zm_goods;
 
+drop table if exists  `activity_info`;
 CREATE TABLE `zm_goods`.`activity_info` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `name` VARCHAR(50) NOT NULL COMMENT '活动名称', 
@@ -22,6 +23,8 @@ CREATE TABLE `zm_goods`.`activity_info` (
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '活动信息记录表';
 
+
+drop table if exists  `activity_goods_role`;
 CREATE TABLE `zm_goods`.`activity_goods_role` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `activity_id` INT UNSIGNED NOT NULL COMMENT '活动ID',
@@ -55,6 +58,7 @@ CREATE TABLE `zm_goods`.`activity_goods_role` (
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '活动商品规则记录表';
 
+drop table if exists  `activity_goods_record`;
 CREATE TABLE `zm_goods`.`activity_goods_record` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `goods_role_id` INT UNSIGNED NOT NULL COMMENT '规则ID',
@@ -75,6 +79,7 @@ CREATE TABLE `zm_goods`.`activity_goods_record` (
   ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 
 COMMENT = '活动商品发起者记录表';
 
+drop table if exists  `activity_goods_participant`;
 CREATE TABLE `zm_goods`.`activity_goods_participant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `goods_record_id` INT UNSIGNED NOT NULL COMMENT '发起ID',
