@@ -135,7 +135,7 @@ public class BargainActivityController {
 	/**
 	 * @fun 砍价订单获取商品价格等信息
 	 */
-	@RequestMapping(value = "{version}/active/bargain/{userId}/{id}", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/active/bargain/goods/info", method = RequestMethod.POST)
 	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
 			@RequestBody List<OrderBussinessModel> list, Integer userId, Integer id) {
 		if (Constants.FIRST_VERSION.equals(version)) {

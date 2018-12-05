@@ -110,7 +110,7 @@ public interface GoodsFeignClient {
 	 * @param userId
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/active/bargain/{userId}/{id}", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/active/bargain/goods/info", method = RequestMethod.POST)
 	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
 			@RequestBody List<OrderBussinessModel> list, @RequestParam(value = "id") Integer id,
 			@RequestParam(value = "userId") Integer userId);
