@@ -24,8 +24,6 @@ public class MyBargain {
 	private String originCountry;
 	private List<MyBargainRecord> bargainList;
 	private boolean start;
-	// 只是业务中间需要用到，传到前端不需要
-	@JsonIgnore
 	private String itemId;
 	// 只是业务中间需要用到，传到前端不需要
 	@JsonIgnore

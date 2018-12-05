@@ -46,6 +46,7 @@ public class BargainEntityConverter {
 		my.setItemId(po.getItemId());//商品itemId，用于中间件获取商品属性
 		my.setUserId(po.getUserId());//userId，用于中间件获取用户头像
 		my.setStart(po.isStart());
+		my.setCreateTime(po.getCreateTime());
 		if(po.getBargainList() != null){
 			temp = new ArrayList<MyBargainRecord>();
 			MyBargainRecord record = null;
