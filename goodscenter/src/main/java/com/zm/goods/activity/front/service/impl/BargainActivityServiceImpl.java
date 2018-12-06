@@ -22,10 +22,11 @@ import com.zm.goods.activity.component.BargainEntityConverter;
 import com.zm.goods.activity.front.dao.BargainMapper;
 import com.zm.goods.activity.front.service.BargainActivityService;
 import com.zm.goods.activity.model.ActiveGoods;
-import com.zm.goods.activity.model.bargain.BargainRecord;
-import com.zm.goods.activity.model.bargain.BargainRule;
-import com.zm.goods.activity.model.bargain.UserBargainEntity;
 import com.zm.goods.activity.model.bargain.bo.BargainCountBO;
+import com.zm.goods.activity.model.bargain.bo.BargainRecord;
+import com.zm.goods.activity.model.bargain.bo.BargainRule;
+import com.zm.goods.activity.model.bargain.bo.UserBargainEntity;
+import com.zm.goods.activity.model.bargain.dto.BargainInfoDTO;
 import com.zm.goods.activity.model.bargain.po.BargainRecordPO;
 import com.zm.goods.activity.model.bargain.po.BargainRulePO;
 import com.zm.goods.activity.model.bargain.po.UserBargainPO;
@@ -37,7 +38,6 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.feignclient.UserFeignClient;
-import com.zm.goods.feignclient.model.UserBO;
 import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -128,64 +128,48 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 				myBargain.setUserImg(null);// 设为null不传给前端
 			}
 		});
-		if (isDetail) {// 详情页需要每个砍价用户的头像和名称
-			List<Integer> userIdList = myBargainList.get(0).getBargainList().stream().map(record -> record.getUserId())
-					.collect(Collectors.toList());
-			List<UserBO> userList = userFeignClient.listUserByUserId(Constants.FIRST_VERSION, userIdList);
-			if (userList != null) {
-				Map<Integer, UserBO> userMap = userList.stream()
-						.collect(Collectors.toMap(UserBO::getUserId, UserBO -> UserBO));
-				myBargainList.forEach(myBargain -> {
-					UserBO bo = userMap.get(myBargain.getUserId());
-					myBargain.setUserImg(bo.getHeadImg());
-					myBargain.setUserName(bo.getUserName());
-					myBargain.getBargainList().forEach(record -> {
-						UserBO userBo = userMap.get(myBargain.getUserId());
-						record.setUserImg(userBo.getHeadImg());
-						record.setUserName(userBo.getUserName());
-					});
-				});
-			}
-		}
 	}
 
 	@Override
 	public Page<BargainGoods> listBargainGoods(Pagination pagination, Integer userId) {
 		List<Integer> goodsRoleIdList = null;
-		if(userId != null){
+		if (userId != null) {
 			goodsRoleIdList = bargainMapper.listGoodsRoleIdsByUserId(userId);
 		}
 		PageHelper.startPage(pagination.getCurrentPage(), pagination.getNumPerPage(), true);
 		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage(goodsRoleIdList);
-		// 获取开团数量
-		List<Integer> idList = page.stream().map(rule -> rule.getId()).collect(Collectors.toList());
-		List<BargainCountBO> bargainCountList = bargainMapper.listBargainCount(idList);
-		// 补全page的开团数量
-		Map<Integer, Integer> countMap = bargainCountList.stream()
-				.collect(Collectors.toMap(BargainCountBO::getId, BargainCountBO::getCount));
-		page.forEach(po -> {
-			Integer count = countMap.get(po.getId()) == null ? 0 : countMap.get(po.getId());
-			po.setCount(count);
-		});
-		// 创建砍价活动转换器
-		BargainEntityConverter convert = new BargainEntityConverter();
-		// 获取前端展示需要的对象
-		List<BargainGoods> bargainGoodsList = convert.BargainRulePO2BargainGoods(page);
-		// 获取商品信息
-		List<String> itemIdList = bargainGoodsList.stream().map(goods -> goods.getItemId())
-				.collect(Collectors.toList());
-		List<ActiveGoods> goodsList = bargainMapper.listActiceGoods(itemIdList);
-		// 完善商品数据
-		Map<String, ActiveGoods> map = goodsList.stream()
-				.collect(Collectors.toMap(ActiveGoods::getItemId, ActiveGoods -> ActiveGoods));
-		bargainGoodsList.forEach(goods -> {
-			ActiveGoods activeGoods = map.get(goods.getItemId());
-			goods.setGoodsImg(activeGoods.getPath());
-			goods.setGoodsName(activeGoods.getGoodsName());
-			goods.setStock(activeGoods.getStock());
-			goods.setOriginCountry(activeGoods.getOrigin());
-			goods.setDescription(activeGoods.getDescription());
-		});
+		List<BargainGoods> bargainGoodsList = new ArrayList<BargainGoods>();
+		if(page.size() > 0){
+			// 获取开团数量
+			List<Integer> idList = page.stream().map(rule -> rule.getId()).collect(Collectors.toList());
+			List<BargainCountBO> bargainCountList = bargainMapper.listBargainCount(idList);
+			// 补全page的开团数量
+			Map<Integer, Integer> countMap = bargainCountList.stream()
+					.collect(Collectors.toMap(BargainCountBO::getId, BargainCountBO::getCount));
+			page.forEach(po -> {
+				Integer count = countMap.get(po.getId()) == null ? 0 : countMap.get(po.getId());
+				po.setCount(count);
+			});
+			// 创建砍价活动转换器
+			BargainEntityConverter convert = new BargainEntityConverter();
+			// 获取前端展示需要的对象
+			bargainGoodsList = convert.BargainRulePO2BargainGoods(page);
+			// 获取商品信息
+			List<String> itemIdList = bargainGoodsList.stream().map(goods -> goods.getItemId())
+					.collect(Collectors.toList());
+			List<ActiveGoods> goodsList = bargainMapper.listActiceGoods(itemIdList);
+			// 完善商品数据
+			Map<String, ActiveGoods> map = goodsList.stream()
+					.collect(Collectors.toMap(ActiveGoods::getItemId, ActiveGoods -> ActiveGoods));
+			bargainGoodsList.forEach(goods -> {
+				ActiveGoods activeGoods = map.get(goods.getItemId());
+				goods.setGoodsImg(activeGoods.getPath());
+				goods.setGoodsName(activeGoods.getGoodsName());
+				goods.setStock(activeGoods.getStock());
+				goods.setOriginCountry(activeGoods.getOrigin());
+				goods.setDescription(activeGoods.getDescription());
+			});
+		}
 		Page<BargainGoods> resultPage = new Page<>(page.getPageNum(), page.getPageSize(), (int) page.getTotal());
 		resultPage.setPages(page.getPages());
 		resultPage.addAll(bargainGoodsList);
@@ -202,7 +186,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	}
 
 	@Override
-	public Integer startBargain(Integer userId, Integer goodsRoleId) throws ActiviteyException {
+	public Integer startBargain(BargainInfoDTO dto) throws ActiviteyException {
+		Integer goodsRoleId = dto.getId();
 		BargainRulePO rulePO = bargainMapper.getBargainRuleById(goodsRoleId);
 		if (rulePO == null) {
 			throw new ActiviteyException("没有该类的砍价活动", 6);
@@ -212,7 +197,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 获取规则类
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
 		// 生成用户砍价记录类
-		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(userId, rulePO);
+		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(dto.getUserId(), rulePO);
 		try {
 			bargainMapper.saveUserBargain(userBargainPO);
 		} catch (Exception e) {
@@ -224,12 +209,12 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		}
 		userBargainPO.setCreateTime(DateUtil.getNowTimeStr("yyyy-MM-dd HH:mm:ss"));
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
-		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(userBargainPO);
+		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(dto, userBargainPO);
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
 				template);
 		// 实现砍价
-		doBargain(userId, convert, entity, bargainComponent);
+		doBargain(dto.getUserId(), convert, entity, bargainComponent);
 		return userBargainPO.getId();
 	}
 
@@ -258,12 +243,12 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	}
 
 	@Override
-	public double bargain(Integer userId, Integer id) throws ActiviteyException {
-		boolean effective = userFeignClient.verifyUserId(Constants.FIRST_VERSION, userId);
+	public double bargain(BargainInfoDTO dto) throws ActiviteyException {
+		boolean effective = userFeignClient.verifyUserId(Constants.FIRST_VERSION, dto.getUserId());
 		if (!effective) {
 			throw new ActiviteyException("你这个沙雕，想作弊", 7);
 		}
-		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(id);
+		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(dto.getId());
 		if (userBargainPO == null) {
 			throw new ActiviteyException("没有该类的砍价活动", 6);
 		}
@@ -273,13 +258,13 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 获取规则类
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
 		// 生成用户砍价类
-		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(userBargainPO);
+		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(dto, userBargainPO);
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
 				template);
 
 		// 实现砍价
-		BargainRecord record = doBargain(userId, convert, entity, bargainComponent);
+		BargainRecord record = doBargain(dto.getUserId(), convert, entity, bargainComponent);
 		return record.getBargainPrice();
 	}
 

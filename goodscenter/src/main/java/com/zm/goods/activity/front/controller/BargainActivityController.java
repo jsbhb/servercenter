@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.activity.front.service.BargainActivityService;
+import com.zm.goods.activity.model.bargain.dto.BargainInfoDTO;
 import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.constants.Constants;
@@ -87,7 +88,7 @@ public class BargainActivityController {
 	public ResultModel listBargainGoods(@PathVariable("version") Double version, @ModelAttribute Pagination pagination,
 			@RequestParam(value = "userId", required = false) Integer userId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Page<BargainGoods> page = bargainActivityService.listBargainGoods(pagination,userId);
+			Page<BargainGoods> page = bargainActivityService.listBargainGoods(pagination, userId);
 			return new ResultModel(true, page, new Pagination(page));
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -98,13 +99,12 @@ public class BargainActivityController {
 	 * @fun 开始一个砍价团,并砍第一刀
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/active/bargain/start/{userId}/{goodsRoleId}", method = RequestMethod.POST)
-	public ResultModel startBargain(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
-			@PathVariable("goodsRoleId") Integer goodsRoleId) {
+	@RequestMapping(value = "{version}/active/bargain/start", method = RequestMethod.POST)
+	public ResultModel startBargain(@PathVariable("version") Double version, @RequestBody BargainInfoDTO dto) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				Integer id = bargainActivityService.startBargain(userId, goodsRoleId);
+				Integer id = bargainActivityService.startBargain(dto);
 				return new ResultModel(true, id);
 			} catch (ActiviteyException e) {
 				return new ResultModel(false, e.getErrorCode() + "", e.getMessage());
@@ -118,12 +118,11 @@ public class BargainActivityController {
 	 * @fun 砍价
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/active/bargain/{userId}/{id}", method = RequestMethod.POST)
-	public ResultModel bargain(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
-			@PathVariable("id") Integer id) {
+	@RequestMapping(value = "{version}/active/bargain", method = RequestMethod.POST)
+	public ResultModel bargain(@PathVariable("version") Double version, @RequestBody BargainInfoDTO dto) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				double bargainPrice = bargainActivityService.bargain(userId, id);
+				double bargainPrice = bargainActivityService.bargain(dto);
 				return new ResultModel(true, bargainPrice);
 			} catch (ActiviteyException e) {
 				return new ResultModel(false, e.getErrorCode() + "", e.getMessage());

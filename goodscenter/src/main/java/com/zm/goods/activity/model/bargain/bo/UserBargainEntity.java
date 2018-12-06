@@ -1,4 +1,4 @@
-package com.zm.goods.activity.model.bargain;
+package com.zm.goods.activity.model.bargain.bo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +15,30 @@ public class UserBargainEntity implements IUserBargain{
 	private double floorPrice;
 	private List<BargainRecord> recordList;
 	private int userId;
+	private String userName;
+	private String userImg;
 
 	public final void setBargainRecord(BargainRecord record) {
 		if (recordList == null) {
 			recordList = new ArrayList<BargainRecord>();
 		}
 		recordList.add(record);
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getUserImg() {
+		return userImg;
+	}
+
+	public void setUserImg(String userImg) {
+		this.userImg = userImg;
 	}
 
 	public int getId() {

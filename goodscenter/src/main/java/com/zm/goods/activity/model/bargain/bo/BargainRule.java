@@ -1,4 +1,4 @@
-package com.zm.goods.activity.model.bargain;
+package com.zm.goods.activity.model.bargain.bo;
 
 import java.text.ParseException;
 import java.util.Random;

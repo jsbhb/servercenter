@@ -23,6 +23,8 @@
 			<result column="sub_user_id" property="userId" jdbcType="INTEGER"/>
 			<result column="bargain_price" property="bargainPrice" jdbcType="INTEGER"/>
 			<result column="buy" property="buy" jdbcType="BOOLEAN"/>
+			<result column="user_name" property="userName" jdbcType="VARCHAR"/>
+			<result column="user_img" property="userImg" jdbcType="VARCHAR"/>
 		</collection>
 	</resultMap>
 	
@@ -98,8 +100,8 @@
 	
 	<select id="getBargainDetailByParam" parameterType="Object" resultMap="userBargain">
 		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
-		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
-		agp.buy, agro.duration,  agro.item_id from 
+		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.user_name, 
+		agp.user_img, agp.bargain_price, agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
@@ -144,8 +146,9 @@
 	</insert>
 	
 	<insert id="saveBargainRecord" parameterType="Object">
-		insert into activity_goods_participant(goods_record_id,user_id,bargain_price,buy,create_time) values
-		(#{goodsRecordId},#{userId},#{bargainPrice},#{buy},now())
+		insert into activity_goods_participant(goods_record_id,user_id,bargain_price,buy,create_time,user_name,user_img) 
+		values
+		(#{goodsRecordId},#{userId},#{bargainPrice},#{buy},now(),#{userName},#{userImg})
 	</insert>
 	
 	<select id="getUserBargainById" parameterType="Object" resultMap="userBargain">

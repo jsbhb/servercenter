@@ -86,6 +86,8 @@ CREATE TABLE `zm_goods`.`activity_goods_participant` (
   `user_id` INT UNSIGNED NOT NULL COMMENT '用户编号', 
   `bargain_price` DECIMAL(10,2) NOT NULL DEFAULT 0.0 COMMENT '砍价金额', 
   `buy` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '接龙模式下是否已经购买， 0：未购买，1：已购买', 
+  `user_name` VARCHAR(200) NULL COMMENT '用户名称', 
+  `user_img` VARCHAR(200) NULL COMMENT '用户头像', 
   `create_time` DATETIME NULL COMMENT '创建时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',

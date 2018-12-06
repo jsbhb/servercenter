@@ -10,7 +10,21 @@ public class BargainRecordPO{
 	private double bargainPrice;//砍价金额
 	private boolean buy;//接龙模式下是否已经购买
 	private String createTime;//砍价时间
+	private String userName;
+	private String userImg;
 
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getUserImg() {
+		return userImg;
+	}
+	public void setUserImg(String userImg) {
+		this.userImg = userImg;
+	}
 	public int getUserId() {
 		return userId;
 	}

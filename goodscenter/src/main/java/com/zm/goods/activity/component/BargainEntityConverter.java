@@ -3,9 +3,10 @@ package com.zm.goods.activity.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zm.goods.activity.model.bargain.BargainRecord;
-import com.zm.goods.activity.model.bargain.BargainRule;
-import com.zm.goods.activity.model.bargain.UserBargainEntity;
+import com.zm.goods.activity.model.bargain.bo.BargainRecord;
+import com.zm.goods.activity.model.bargain.bo.BargainRule;
+import com.zm.goods.activity.model.bargain.bo.UserBargainEntity;
+import com.zm.goods.activity.model.bargain.dto.BargainInfoDTO;
 import com.zm.goods.activity.model.bargain.po.BargainRecordPO;
 import com.zm.goods.activity.model.bargain.po.BargainRulePO;
 import com.zm.goods.activity.model.bargain.po.UserBargainPO;
@@ -21,19 +22,19 @@ import com.zm.goods.utils.CalculationUtils;
  */
 public class BargainEntityConverter {
 
-	public final List<MyBargain> userBargainPO2MyBargain(List<UserBargainPO> list){
+	public final List<MyBargain> userBargainPO2MyBargain(List<UserBargainPO> list) {
 		List<MyBargain> result = new ArrayList<MyBargain>();
-		if(list == null || list.size() == 0){
+		if (list == null || list.size() == 0) {
 			return result;
 		}
-		for(UserBargainPO po : list){
+		for (UserBargainPO po : list) {
 			result.add(setMyBargain(po));
 		}
 		return result;
 	}
-	
-	public final MyBargain userBargainPO2MyBargain(UserBargainPO po){
-		
+
+	public final MyBargain userBargainPO2MyBargain(UserBargainPO po) {
+
 		return setMyBargain(po);
 	}
 
@@ -41,38 +42,40 @@ public class BargainEntityConverter {
 		MyBargain my = new MyBargain();
 		List<MyBargainRecord> temp;
 		my.setId(po.getId());
-		my.setGoodsPrice(po.getInitPrice());//商品原价
-		my.setLowPrice(po.getFloorPrice());//商品底价
-		my.setDuration(po.getDuration());//砍价持续时间
-		my.setItemId(po.getItemId());//商品itemId，用于中间件获取商品属性
-		my.setUserId(po.getUserId());//userId，用于中间件获取用户头像
+		my.setGoodsPrice(po.getInitPrice());// 商品原价
+		my.setLowPrice(po.getFloorPrice());// 商品底价
+		my.setDuration(po.getDuration());// 砍价持续时间
+		my.setItemId(po.getItemId());// 商品itemId，用于中间件获取商品属性
+		my.setUserId(po.getUserId());// userId，用于中间件获取用户头像
 		my.setStart(po.isStart());
 		my.setCreateTime(po.getCreateTime());
-		if(po.getBargainList() != null){
+		if (po.getBargainList() != null) {
 			temp = new ArrayList<MyBargainRecord>();
 			MyBargainRecord record = null;
 			double bargainPrice = 0.0;
-			for(BargainRecordPO recordPO : po.getBargainList()){
+			for (BargainRecordPO recordPO : po.getBargainList()) {
 				record = new MyBargainRecord();
-				record.setBargainPrice(recordPO.getBargainPrice());//每次砍价金额记录
+				record.setBargainPrice(recordPO.getBargainPrice());// 每次砍价金额记录
 				record.setId(recordPO.getId());
-				record.setUserId(recordPO.getUserId());//用户ID，用于中间件获取用户信息
+				record.setUserId(recordPO.getUserId());// 用户ID，用于中间件获取用户信息
 				record.setBuy(recordPO.isBuy());
+				record.setUserImg(recordPO.getUserImg());
+				record.setUserName(recordPO.getUserName());
 				temp.add(record);
-				bargainPrice = CalculationUtils.add(bargainPrice, recordPO.getBargainPrice());//计算已经砍价的金额
+				bargainPrice = CalculationUtils.add(bargainPrice, recordPO.getBargainPrice());// 计算已经砍价的金额
 			}
-			my.setBargainList(temp);//设置砍价记录
-			my.setBargainPrice(bargainPrice);//设置已经砍价金额
+			my.setBargainList(temp);// 设置砍价记录
+			my.setBargainPrice(bargainPrice);// 设置已经砍价金额
 		}
 		return my;
 	}
-	
-	public final List<BargainGoods> BargainRulePO2BargainGoods(List<BargainRulePO> list){
-		if(list == null){
-			return null;
-		}
+
+	public final List<BargainGoods> BargainRulePO2BargainGoods(List<BargainRulePO> list) {
 		List<BargainGoods> result = new ArrayList<BargainGoods>();
-		list.forEach(po ->{
+		if (list == null) {
+			return result;
+		}
+		list.forEach(po -> {
 			BargainGoods goods = new BargainGoods();
 			goods.setItemId(po.getItemId());
 			goods.setGoodsPrice(po.getInitPrice());
@@ -83,8 +86,8 @@ public class BargainEntityConverter {
 		});
 		return result;
 	}
-	
-	public final BargainRule BargainRulePO2BargainRule(BargainRulePO po){
+
+	public final BargainRule BargainRulePO2BargainRule(BargainRulePO po) {
 		BargainRule rule = new BargainRule();
 		rule.setDuration(po.getDuration());
 		rule.setFirstMaxRatio(po.getFirstMaxRatio());
@@ -99,8 +102,8 @@ public class BargainEntityConverter {
 		rule.setType(po.getType());
 		return rule;
 	}
-	
-	public final UserBargainPO BargainRulePO2UserBargainPO(Integer userId, BargainRulePO po){
+
+	public final UserBargainPO BargainRulePO2UserBargainPO(Integer userId, BargainRulePO po) {
 		UserBargainPO userBargainPO = new UserBargainPO();
 		userBargainPO.setFloorPrice(po.getFloorPrice());
 		userBargainPO.setGoodsRoleId(po.getId());
@@ -109,17 +112,19 @@ public class BargainEntityConverter {
 		userBargainPO.setStart(true);
 		return userBargainPO;
 	}
-	
-	public final BargainRecordPO BargainRecord2BargainRecordPO(int id, BargainRecord record){
+
+	public final BargainRecordPO BargainRecord2BargainRecordPO(int id, BargainRecord record) {
 		BargainRecordPO po = new BargainRecordPO();
 		po.setGoodsRecordId(id);
 		po.setBargainPrice(record.getBargainPrice());
 		po.setBuy(record.isBuy());
 		po.setUserId(record.getUserId());
+		po.setUserName(record.getUserName());
+		po.setUserImg(record.getUserImg());
 		return po;
 	}
 
-	public final UserBargainEntity UserBargainPO2UserBargainEntity(UserBargainPO po) {
+	public final UserBargainEntity UserBargainPO2UserBargainEntity(BargainInfoDTO dto, UserBargainPO po) {
 		UserBargainEntity entity = new UserBargainEntity();
 		entity.setCreateTime(po.getCreateTime());
 		entity.setFloorPrice(po.getFloorPrice());
@@ -128,9 +133,11 @@ public class BargainEntityConverter {
 		entity.setItemId(po.getItemId());
 		entity.setStart(po.isStart());
 		entity.setUserId(po.getUserId());
-		if(po.getBargainList() != null){
+		entity.setUserName(dto.getUserName());
+		entity.setUserImg(dto.getUserImg());
+		if (po.getBargainList() != null) {
 			List<BargainRecord> recordList = new ArrayList<BargainRecord>();
-			po.getBargainList().forEach(recordPO ->{
+			po.getBargainList().forEach(recordPO -> {
 				BargainRecord record = new BargainRecord();
 				record.setBargainPrice(recordPO.getBargainPrice());
 				record.setBuy(recordPO.isBuy());
@@ -140,6 +147,6 @@ public class BargainEntityConverter {
 			});
 			entity.setRecordList(recordList);
 		}
-		return null;
+		return entity;
 	}
 }

@@ -7,10 +7,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.zm.goods.activity.inf.AbstractActive;
 import com.zm.goods.activity.inf.ActiveRule;
-import com.zm.goods.activity.model.bargain.BargainRecord;
-import com.zm.goods.activity.model.bargain.BargainRule;
-import com.zm.goods.activity.model.bargain.UserBargainEntity;
 import com.zm.goods.activity.model.bargain.base.IUserBargain;
+import com.zm.goods.activity.model.bargain.bo.BargainRecord;
+import com.zm.goods.activity.model.bargain.bo.BargainRule;
+import com.zm.goods.activity.model.bargain.bo.UserBargainEntity;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.Number;
@@ -32,6 +32,8 @@ public class BargainActiveComponent extends AbstractActive<BargainRecord, IUserB
 	@Override
 	public BargainRecord processHandle(IUserBargain ientity) throws ActiviteyException {
 		UserBargainEntity entity = (UserBargainEntity) ientity;
+		String userName = entity.getUserName();//帮砍人的名称
+		String userImg = entity.getUserImg();//帮砍人的头像
 		synchronized (id) {// 第一次判断根据初始传进来的值进行判断，通过后进入同步状态，根据每一个开团的ID进行同步
 			String json = template.opsForValue().get(BARGAIN_ACTIVE_PER + id);// 获取最新的砍价记录
 			if (json != null) {// 如果有，不是第一次
@@ -44,6 +46,8 @@ public class BargainActiveComponent extends AbstractActive<BargainRecord, IUserB
 			BargainRecord record = new BargainRecord();
 			record.setBuy(false);
 			record.setUserId(entity.getUserId());
+			record.setUserName(userName);
+			record.setUserImg(userImg);
 			if (entity.getRecordList() == null || entity.getRecordList().size() == 0) {// 第一刀
 				double bargainPrice = new Number(entity.getInitPrice() + "").sub(entity.getFloorPrice() + "")
 						.mul(rule.getFirstRatio() + "").round(2).parseToDouble();
