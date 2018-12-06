@@ -116,7 +116,7 @@
 		        less_min_price = #{item.lessMinPrice},
 		        status = #{item.status},
 		        update_time = now(),
-		        opt = #{opt}
+		        opt = #{item.opt}
 	        WHERE
 	        	id=#{item.id}
 		</foreach>

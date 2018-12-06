@@ -55,6 +55,7 @@ public class BackBargainActivityServiceImpl implements BackBargainActivityServic
 				if (oldBAG.getActivityId().equals(newBag.getActivityId()) && oldBAG.getItemId().equals(newBag.getItemId())) {
 					newBag.setId(oldBAG.getId());
 					newBag.setActivityId(oldBAG.getActivityId());
+					newBag.setOpt(model.getOpt());
 					updList.add(newBag);
 					bargainInfo.getItemList().remove(oldBAG);
 					isNew = false;
@@ -68,11 +69,17 @@ public class BackBargainActivityServiceImpl implements BackBargainActivityServic
 		model.setItemList(insList);
 		//更新活动信息
 		backBargainMapper.updateBargainActivityInfo(model);
-		//插入新增商品
-		backBargainMapper.insertBargainActivityGoodsInfo(model);
-		//更新已有商品
-		backBargainMapper.updateBargainActivityGoodsInfo(updList);
-		//删除移除商品
-		backBargainMapper.deleteBargainActivityGoodsInfo(bargainInfo.getItemList());
+		if (insList.size() > 0) {
+			//插入新增商品
+			backBargainMapper.insertBargainActivityGoodsInfo(model);
+		}
+		if (updList.size() > 0) {
+			//更新已有商品
+			backBargainMapper.updateBargainActivityGoodsInfo(updList);
+		}
+		if (bargainInfo.getItemList().size() > 0) {
+			//删除移除商品
+			backBargainMapper.deleteBargainActivityGoodsInfo(bargainInfo.getItemList());
+		}
 	}
 }
