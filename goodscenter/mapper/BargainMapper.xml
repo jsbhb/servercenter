@@ -62,8 +62,9 @@
 	</resultMap>
 	
 	<select id="listBargainNormalByUserId" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
-		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
+		select agr.id, agr.status, agr.init_price, agr.floor_price, 
+		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time, agr.update_time, agr.user_id, 
+		agp.id as recordId, DATE_FORMAT(agp.create_time,'%Y-%m-%d %H:%i:%s') as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
 		agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
@@ -72,8 +73,9 @@
 	</select>
 	
 	<select id="listBargainChainsByUserId" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
-		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
+		select agr.id, agr.status, agr.init_price, agr.floor_price, 
+		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time, agr.update_time, agr.user_id, 
+		agp.id as recordId, DATE_FORMAT(agp.create_time ,'%Y-%m-%d %H:%i:%s') as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
 		agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
@@ -99,8 +101,10 @@
 	</select>
 	
 	<select id="getBargainDetailByParam" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.status, agr.init_price, agr.floor_price, agr.create_time, agr.update_time, agr.user_id, 
-		agp.id as recordId, agp.create_time as sub_create_time, agp.user_id as sub_user_id, agp.user_name, 
+		select agr.id, agr.status, agr.init_price, agr.floor_price, 
+		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time, 
+		agr.update_time, agr.user_id, 
+		agp.id as recordId, DATE_FORMAT(agp.create_time,'%Y-%m-%d %H:%i:%s') as sub_create_time, agp.user_id as sub_user_id, agp.user_name, 
 		agp.user_img, agp.bargain_price, agp.buy, agro.duration,  agro.item_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
@@ -154,7 +158,8 @@
 	</insert>
 	
 	<select id="getUserBargainById" parameterType="Object" resultMap="userBargain">
-		select agr.id, agr.goods_role_id, agr.status, agr.init_price, agr.floor_price, agr.create_time,
+		select agr.id, agr.goods_role_id, agr.status, agr.init_price, agr.floor_price, 
+		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
 		agp.id as recordId, agp.user_id as sub_user_id, agp.bargain_price, agr.user_id,
 		agp.buy from 
 		activity_goods_record agr left join 
