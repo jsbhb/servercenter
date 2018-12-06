@@ -68,7 +68,7 @@
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
-		where agro.type = 1 and agp.user_id = #{userId}
+		where agro.type = 1 and agr.user_id = #{userId}
 	</select>
 	
 	<select id="listBargainChainsByUserId" parameterType="Object" resultMap="userBargain">
@@ -78,7 +78,7 @@
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
-		where agro.type = 2 and agr.user_id = #{userId}
+		where agro.type = 2 and agp.user_id = #{userId}
 	</select>
 	
 	<select id="getRuleTypeByUserBargainId" parameterType="Object" resultType="java.lang.Integer">
@@ -106,11 +106,13 @@
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
 		where agr.id = #{id}
-		<if test="type == 1">
-			and agr.user_id = #{userId}
-		</if>
-		<if test="type == 2">
-			and agp.user_id = #{userId}
+		<if test="accurate == yes">
+			<if test="type == 1">
+				and agr.user_id = #{userId}
+			</if>
+			<if test="type == 2">
+				and agp.user_id = #{userId}
+			</if>
 		</if>
 	</select>
 

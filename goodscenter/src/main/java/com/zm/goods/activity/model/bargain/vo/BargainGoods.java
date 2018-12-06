@@ -1,12 +1,15 @@
 package com.zm.goods.activity.model.bargain.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * @fun 前端砍价商品
  * @author user
  *
  */
+@JsonInclude(Include.NON_NULL)
 public class BargainGoods {
 
 	private int goodsRoleId;

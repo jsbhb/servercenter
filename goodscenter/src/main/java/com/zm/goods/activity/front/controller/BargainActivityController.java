@@ -63,7 +63,7 @@ public class BargainActivityController {
 	 * @fun 获取单个商品的砍价详情
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/active/bargain/mine/{userId}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/active/bargain/mine/{userId}/{id}", method = RequestMethod.GET)
 	public ResultModel getMySingleBargainDetail(@PathVariable("version") Double version,
 			@PathVariable("userId") Integer userId, @PathVariable("id") Integer id) {
 

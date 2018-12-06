@@ -2,6 +2,7 @@ package com.zm.goods.activity.front.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import com.zm.goods.activity.model.bargain.po.BargainRulePO;
 import com.zm.goods.activity.model.bargain.po.UserBargainPO;
 import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
+import com.zm.goods.activity.model.bargain.vo.MyBargainRecord;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
@@ -79,16 +81,14 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
 		}
-		return myBargainList;
+		return myBargainList.stream().sorted(Comparator.comparing(MyBargain::isStart)).collect(Collectors.toList());
 	}
 
 	@Override
 	public MyBargain getMyBargainDetail(Integer userId, int id) throws ActiviteyException {
-		int type = bargainMapper.getRuleTypeByUserBargainId(id);// 获取该砍价记录的模式
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("userId", userId);
 		param.put("id", id);
-		param.put("type", type);
+		param.put("accurate", "no");//如果是订单作用的，需要根据userId等信息精确查询,分享砍价的不需要
 		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
 		if (userBargainPO == null) {
 			throw new ActiviteyException("没有获取对应的详情，是不是数据迷路了", 5);
@@ -126,8 +126,16 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			if (!isDetail) {
 				myBargain.setBargainList(null);// 设为null不传给前端
 				myBargain.setUserImg(null);// 设为null不传给前端
+				myBargain.setUserName(null);// 设为null不传给前端
 			}
 		});
+		if (isDetail) {
+			MyBargainRecord record = myBargainList.get(0).getBargainList().stream()
+					.filter(temp -> temp.getUserId() == myBargainList.get(0).getUserId()).findAny().get();
+			myBargainList.get(0).setUserImg(record.getUserImg());
+			myBargainList.get(0).setUserName(record.getUserName());
+
+		}
 	}
 
 	@Override
@@ -139,7 +147,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		PageHelper.startPage(pagination.getCurrentPage(), pagination.getNumPerPage(), true);
 		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage(goodsRoleIdList);
 		List<BargainGoods> bargainGoodsList = new ArrayList<BargainGoods>();
-		if(page.size() > 0){
+		if (page.size() > 0) {
 			// 获取开团数量
 			List<Integer> idList = page.stream().map(rule -> rule.getId()).collect(Collectors.toList());
 			List<BargainCountBO> bargainCountList = bargainMapper.listBargainCount(idList);
@@ -295,6 +303,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		param.put("userId", userId);
 		param.put("id", id);
 		param.put("type", type);
+		param.put("accurate", "yes");//如果是订单作用的，需要根据userId等信息精确查询
 		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
 		if (userBargainPO == null) {
 			return new ResultModel(false, "没有该活动订单");
@@ -325,6 +334,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		param.put("userId", userId);
 		param.put("id", id);
 		param.put("type", type);
+		param.put("accurate", "yes");//如果是订单作用的，需要根据userId等信息精确查询
 		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
 		if (userBargainPO == null) {
 			return false;

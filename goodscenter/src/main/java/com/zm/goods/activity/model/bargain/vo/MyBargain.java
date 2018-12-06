@@ -3,13 +3,16 @@ package com.zm.goods.activity.model.bargain.vo;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * @fun 前端我的砍价实体类
  * @author user
  *
  */
-public class MyBargain {
+@JsonInclude(Include.NON_NULL)
+public class MyBargain implements Comparable<MyBargain>{
 	private int id;
 	private String goodsName;
 	private double goodsPrice;// 原价
@@ -164,5 +167,14 @@ public class MyBargain {
 
 	public void setBargainList(List<MyBargainRecord> bargainList) {
 		this.bargainList = bargainList;
+	}
+
+	@Override
+	public int compareTo(MyBargain o) {
+		if (start ^ o.isStart()) {
+            return start ? -1 : 1;
+        } else {
+            return 0;
+        }
 	}
 }
