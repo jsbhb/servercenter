@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.pagehelper.Page;
@@ -83,10 +84,10 @@ public class BargainActivityController {
 	 * @return
 	 */
 	@RequestMapping(value = "auth/{version}/active/bargain/goods/list", method = RequestMethod.GET)
-	public ResultModel listBargainGoods(@PathVariable("version") Double version,
-			@ModelAttribute Pagination pagination) {
+	public ResultModel listBargainGoods(@PathVariable("version") Double version, @ModelAttribute Pagination pagination,
+			@RequestParam(value = "userId", required = false) Integer userId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Page<BargainGoods> page = bargainActivityService.listBargainGoods(pagination);
+			Page<BargainGoods> page = bargainActivityService.listBargainGoods(pagination,userId);
 			return new ResultModel(true, page, new Pagination(page));
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -144,13 +145,12 @@ public class BargainActivityController {
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
-	
+
 	/**
 	 * @fun 订单生成后，该用户置为已购买
 	 */
 	@RequestMapping(value = "{version}/active/bargain/goods/buy", method = RequestMethod.POST)
-	public boolean updateBargainGoodsBuy(@PathVariable("version") Double version,
-			Integer userId, Integer id) {
+	public boolean updateBargainGoodsBuy(@PathVariable("version") Double version, Integer userId, Integer id) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return bargainActivityService.updateBargainGoodsBuy(userId, id);
 		}

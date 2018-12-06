@@ -150,9 +150,13 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	}
 
 	@Override
-	public Page<BargainGoods> listBargainGoods(Pagination pagination) {
+	public Page<BargainGoods> listBargainGoods(Pagination pagination, Integer userId) {
+		List<Integer> goodsRoleIdList = null;
+		if(userId != null){
+			goodsRoleIdList = bargainMapper.listGoodsRoleIdsByUserId(userId);
+		}
 		PageHelper.startPage(pagination.getCurrentPage(), pagination.getNumPerPage(), true);
-		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage();
+		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage(goodsRoleIdList);
 		// 获取开团数量
 		List<Integer> idList = page.stream().map(rule -> rule.getId()).collect(Collectors.toList());
 		List<BargainCountBO> bargainCountList = bargainMapper.listBargainCount(idList);
@@ -268,7 +272,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取规则类
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
-		//生成用户砍价类
+		// 生成用户砍价类
 		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(userBargainPO);
 		// 创建砍价核心逻辑组件
 		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
@@ -331,7 +335,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	@Override
 	public boolean updateBargainGoodsBuy(Integer userId, Integer id) {
-		Map<String,Object> param = new HashMap<String,Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		int type = bargainMapper.getRuleTypeByUserBargainId(id);// 获取该砍价记录的模式
 		param.put("userId", userId);
 		param.put("id", id);

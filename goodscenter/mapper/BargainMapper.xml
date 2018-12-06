@@ -113,7 +113,13 @@
 	</select>
 
 	<select id="listBargainGoodsForPage" parameterType="Object" resultMap="bargainRule">
-		select * from activity_goods_role
+		select * from activity_goods_role 
+		<if test="list != null and list.size > 0">
+			where id not in 
+			<foreach collection="list" open="(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+		</if>
 	</select>
 	
 	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.bo.BargainCountBO">
@@ -154,5 +160,9 @@
 	<update id="updateBargainGoodsBuy" parameterType="Object" >
 		update activity_goods_participant set buy = true where id = #{id}
 	</update>
+	
+	<select id="listGoodsRoleIdsByUserId" parameterType="Object" resultType="java.lang.Integer">
+		select goods_role_id from activity_goods_record where user_id = #{userId}
+	</select>
 	
 </mapper>
