@@ -128,6 +128,7 @@
 				#{item}
 			</foreach>
 		</if>
+		order by floor_price asc
 	</select>
 	
 	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.bo.BargainCountBO">

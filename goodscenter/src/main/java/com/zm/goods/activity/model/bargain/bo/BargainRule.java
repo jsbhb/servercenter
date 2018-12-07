@@ -33,11 +33,8 @@ public class BargainRule implements ActiveRule<IUserBargain> {
 	@Override
 	public final void processRuleJudge(IUserBargain ientity) throws ActiviteyException {
 		UserBargainEntity entity = (UserBargainEntity) ientity;
-		if (maxCount > 0) {// 是否规定了刀数
-			int currentCount = entity.getRecordList() == null ? 0 : entity.getRecordList().size();
-			if (currentCount >= maxCount) {
-				throw new ActiviteyException("砍价次数已经达到最大", 0);
-			}
+		if (isRepeatBargain(entity)) {// 如果该userId已经砍过
+			throw new ActiviteyException("你已经帮好友砍过价", 4);
 		}
 		if (isReachFloorPrice(entity)) {// 是否达到底价
 			throw new ActiviteyException("该砍价商品已达底价，请尽快购买", 1);
@@ -48,8 +45,11 @@ public class BargainRule implements ActiveRule<IUserBargain> {
 		if (!entity.isStart()) {
 			throw new ActiviteyException("该砍价商品已经结束，请尽快购买", 3);
 		}
-		if (isRepeatBargain(entity)) {// 如果该userId已经砍过
-			throw new ActiviteyException("你已经帮好友砍过价", 4);
+		if (maxCount > 0) {// 是否规定了刀数
+			int currentCount = entity.getRecordList() == null ? 0 : entity.getRecordList().size();
+			if (currentCount >= maxCount) {
+				throw new ActiviteyException("砍价次数已经达到最大", 0);
+			}
 		}
 	}
 

@@ -2,7 +2,6 @@ package com.zm.goods.activity.front.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,9 @@ import com.zm.goods.activity.component.BargainActiveComponent;
 import com.zm.goods.activity.component.BargainEntityConverter;
 import com.zm.goods.activity.front.dao.BargainMapper;
 import com.zm.goods.activity.front.service.BargainActivityService;
+import com.zm.goods.activity.inf.AbstractActive;
 import com.zm.goods.activity.model.ActiveGoods;
+import com.zm.goods.activity.model.bargain.base.IUserBargain;
 import com.zm.goods.activity.model.bargain.bo.BargainCountBO;
 import com.zm.goods.activity.model.bargain.bo.BargainRecord;
 import com.zm.goods.activity.model.bargain.bo.BargainRule;
@@ -81,14 +82,14 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
 		}
-		return myBargainList.stream().sorted(Comparator.comparing(MyBargain::isStart)).collect(Collectors.toList());
+		return myBargainList;
 	}
 
 	@Override
 	public MyBargain getMyBargainDetail(Integer userId, int id) throws ActiviteyException {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("id", id);
-		param.put("accurate", "no");//如果是订单作用的，需要根据userId等信息精确查询,分享砍价的不需要
+		param.put("accurate", "no");// 如果是订单作用的，需要根据userId等信息精确查询,分享砍价的不需要
 		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
 		if (userBargainPO == null) {
 			throw new ActiviteyException("没有获取对应的详情，是不是数据迷路了", 5);
@@ -219,15 +220,15 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
 		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(dto, userBargainPO);
 		// 创建砍价核心逻辑组件
-		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
-				template);
+		AbstractActive<BargainRecord, IUserBargain> bargainComponent = new BargainActiveComponent(rule,
+				userBargainPO.getId() + "", template);
 		// 实现砍价
 		doBargain(dto.getUserId(), convert, entity, bargainComponent);
 		return userBargainPO.getId();
 	}
 
 	private BargainRecord doBargain(Integer userId, BargainEntityConverter convert, UserBargainEntity entity,
-			BargainActiveComponent bargainComponent) throws ActiviteyException {
+			AbstractActive<BargainRecord, IUserBargain> bargainComponent) throws ActiviteyException {
 
 		// 获取砍价发起人的userId，将帮砍人的userId赋值进去，进行判断
 		int bargainOwnUserId = entity.getUserId();
@@ -268,8 +269,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 生成用户砍价类
 		UserBargainEntity entity = convert.UserBargainPO2UserBargainEntity(dto, userBargainPO);
 		// 创建砍价核心逻辑组件
-		BargainActiveComponent bargainComponent = new BargainActiveComponent(rule, userBargainPO.getId() + "",
-				template);
+		AbstractActive<BargainRecord, IUserBargain> bargainComponent = new BargainActiveComponent(rule,
+				userBargainPO.getId() + "", template);
 
 		// 实现砍价
 		BargainRecord record = doBargain(dto.getUserId(), convert, entity, bargainComponent);
@@ -303,7 +304,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		param.put("userId", userId);
 		param.put("id", id);
 		param.put("type", type);
-		param.put("accurate", "yes");//如果是订单作用的，需要根据userId等信息精确查询
+		param.put("accurate", "yes");// 如果是订单作用的，需要根据userId等信息精确查询
 		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
 		if (userBargainPO == null) {
 			return new ResultModel(false, "没有该活动订单");
@@ -334,7 +335,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		param.put("userId", userId);
 		param.put("id", id);
 		param.put("type", type);
-		param.put("accurate", "yes");//如果是订单作用的，需要根据userId等信息精确查询
+		param.put("accurate", "yes");// 如果是订单作用的，需要根据userId等信息精确查询
 		UserBargainPO userBargainPO = bargainMapper.getBargainDetailByParam(param);
 		if (userBargainPO == null) {
 			return false;
