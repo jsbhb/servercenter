@@ -78,10 +78,16 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取前端展示需要的对象
 		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList);
+		// 把已经购买的列表去掉
+		myBargainList = myBargainList.stream()
+				.filter(myBargain -> !myBargain.getBargainList().stream()
+						.filter(record -> record.getUserId() == myBargain.getUserId()).findAny().get().isBuy())
+				.collect(Collectors.toList());
 		if (myBargainList != null && myBargainList.size() > 0) {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
 		}
+
 		return myBargainList;
 	}
 
