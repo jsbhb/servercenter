@@ -92,7 +92,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	}
 
 	@Override
-	public MyBargain getMyBargainDetail(Integer userId, int id) throws ActiviteyException {
+	public MyBargain getMyBargainDetail(int id) throws ActiviteyException {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("id", id);
 		param.put("accurate", "no");// 如果是订单作用的，需要根据userId等信息精确查询,分享砍价的不需要

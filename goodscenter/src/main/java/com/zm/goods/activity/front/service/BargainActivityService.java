@@ -15,7 +15,7 @@ public interface BargainActivityService {
 
 	List<MyBargain> listMyBargain(Integer userId);
 
-	MyBargain getMyBargainDetail(Integer userId, int id) throws ActiviteyException;
+	MyBargain getMyBargainDetail(int id) throws ActiviteyException;
 
 	Page<BargainGoods> listBargainGoods(Pagination pagination,Integer userId);
 

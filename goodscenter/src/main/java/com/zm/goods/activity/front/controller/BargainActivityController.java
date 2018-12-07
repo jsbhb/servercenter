@@ -63,14 +63,14 @@ public class BargainActivityController {
 	 * @fun 获取单个商品的砍价详情
 	 * @return
 	 */
-	@RequestMapping(value = "auth/{version}/active/bargain/mine/{userId}/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/active/bargain/mine/{id}", method = RequestMethod.GET)
 	public ResultModel getMySingleBargainDetail(@PathVariable("version") Double version,
-			@PathVariable("userId") Integer userId, @PathVariable("id") Integer id) {
+			 @PathVariable("id") Integer id) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			MyBargain myBargain;
 			try {
-				myBargain = bargainActivityService.getMyBargainDetail(userId, id);
+				myBargain = bargainActivityService.getMyBargainDetail(id);
 				return new ResultModel(true, myBargain);
 			} catch (ActiviteyException e) {
 				return new ResultModel(false, e.getErrorCode() + "", e.getMessage());
