@@ -31,8 +31,10 @@ public class SEODetail extends SEOBase {
 			break;
 		case FMPMALL:
 			initData(item, pageList,SystemEnum.FMPMALL.getName());
+			break;
 		case APPLET:
 			initData(item,pageList,SystemEnum.APPLET.getName());
+			break;
 		}
 
 	}
