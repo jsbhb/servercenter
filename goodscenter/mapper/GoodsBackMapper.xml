@@ -711,6 +711,6 @@
 	</select>
 	
 	<select id = "getGoodsPicPath" parameterType="Object" resultType="java.lang.String">
-		select path from goods_file where goods_id = #{goodsId}
+		select path from goods_file where goods_id = #{goodsId} order by id asc
 	</select>
 </mapper>
