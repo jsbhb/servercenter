@@ -35,9 +35,10 @@ public class BargainActivityController {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/active/bargain/mine/{userId}", method = RequestMethod.GET)
-	public ResultModel listMyBargain(@PathVariable("version") Double version, @PathVariable("userId") Integer userId) {
+	public ResultModel listMyBargain(@PathVariable("version") Double version, @PathVariable("userId") Integer userId,
+			@RequestParam(value = "start", required = false) Integer start) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			List<MyBargain> myBargainList = bargainActivityService.listMyBargain(userId);
+			List<MyBargain> myBargainList = bargainActivityService.listMyBargain(userId, start);
 			return new ResultModel(true, myBargainList);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -65,7 +66,7 @@ public class BargainActivityController {
 	 */
 	@RequestMapping(value = "auth/{version}/active/bargain/mine/{id}", method = RequestMethod.GET)
 	public ResultModel getMySingleBargainDetail(@PathVariable("version") Double version,
-			 @PathVariable("id") Integer id) {
+			@PathVariable("id") Integer id) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			MyBargain myBargain;

@@ -13,11 +13,11 @@ import com.zm.goods.common.Pagination;
 
 public interface BargainActivityService {
 
-	List<MyBargain> listMyBargain(Integer userId);
+	List<MyBargain> listMyBargain(Integer userId, Integer start);
 
 	MyBargain getMyBargainDetail(int id) throws ActiviteyException;
 
-	Page<BargainGoods> listBargainGoods(Pagination pagination,Integer userId);
+	Page<BargainGoods> listBargainGoods(Pagination pagination, Integer userId);
 
 	boolean userBargainOver(Integer userId, Integer id);
 

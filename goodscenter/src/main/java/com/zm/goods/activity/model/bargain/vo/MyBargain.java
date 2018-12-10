@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(Include.NON_NULL)
-public class MyBargain{
+public class MyBargain implements Comparable<MyBargain>{
 	private int id;
 	private String goodsName;
 	private double goodsPrice;// 原价
@@ -167,6 +167,20 @@ public class MyBargain{
 
 	public void setBargainList(List<MyBargainRecord> bargainList) {
 		this.bargainList = bargainList;
+	}
+
+	@Override
+	public String toString() {
+		return "MyBargain [start=" + start + "]";
+	}
+
+	@Override
+	public int compareTo(MyBargain o) {
+		if (start ^ o.isStart()) {
+            return start ? -1 : 1;
+        } else {
+            return 0;
+        }
 	}
 
 }

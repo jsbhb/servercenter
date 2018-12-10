@@ -12,9 +12,9 @@ import com.zm.goods.activity.model.bargain.po.UserBargainPO;
 
 public interface BargainMapper {
 
-	List<UserBargainPO> listBargainNormalByUserId(Integer userId);
+	List<UserBargainPO> listBargainNormalByUserId(Map<String,Object> param);
 	
-	List<UserBargainPO> listBargainChainsByUserId(Integer userId);
+	List<UserBargainPO> listBargainChainsByUserId(Map<String,Object> param);
 	
 	UserBargainPO getBargainDetailByParam(Map<String,Object> param);
 

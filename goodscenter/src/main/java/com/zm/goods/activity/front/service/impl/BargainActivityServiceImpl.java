@@ -2,6 +2,7 @@ package com.zm.goods.activity.front.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +67,14 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	GoodsMapper goodsMapper;
 
 	@Override
-	public List<MyBargain> listMyBargain(Integer userId) {
+	public List<MyBargain> listMyBargain(Integer userId, Integer start) {
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("userId", userId);
+		param.put("start", start);
 		// 获取普通的砍价活动
-		List<UserBargainPO> normalList = bargainMapper.listBargainNormalByUserId(userId);
+		List<UserBargainPO> normalList = bargainMapper.listBargainNormalByUserId(param);
 		// 获取接龙形式的砍价活动
-		List<UserBargainPO> chainList = bargainMapper.listBargainChainsByUserId(userId);
+		List<UserBargainPO> chainList = bargainMapper.listBargainChainsByUserId(param);
 		// 合并List
 		List<UserBargainPO> bargainList = Stream.of(normalList, chainList).flatMap(Collection::stream)
 				.collect(Collectors.toList());
@@ -87,10 +91,12 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
 		}
+		//根据是否开始排序
+		Collections.sort(myBargainList);
 
 		return myBargainList;
 	}
-
+	
 	@Override
 	public MyBargain getMyBargainDetail(int id) throws ActiviteyException {
 		Map<String, Object> param = new HashMap<String, Object>();
