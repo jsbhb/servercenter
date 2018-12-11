@@ -43,7 +43,8 @@ public class WelfareServiceImpl implements WelfareService {
 	@Override
 	public ResultModel ImportInviterList(List<InviterEntity> importList) {
 		for (InviterEntity ie : importList) {
-			ie.setInvitationCode(EncryptionUtil.toSerialCode(Long.parseLong(ie.getPhone())));
+			ie.setInvitationCode(ie.getPhone());
+//			ie.setInvitationCode(EncryptionUtil.toSerialCode(Long.parseLong(ie.getPhone())));
 			ie.setStatus(1);
 		}
 		welfareMapper.insertInviterInfo(importList);
@@ -78,8 +79,9 @@ public class WelfareServiceImpl implements WelfareService {
 		if (list != null && list.size() > 0) {
 			for (InviterEntity ie : list) {
 				ie.setName(null);
+				ie.setInvitationCode(ie.getPhone());
 				ie.setPhone(null);
-				ie.setInvitationCode(EncryptionUtil.toSerialCode(ie.getId()));
+//				ie.setInvitationCode(EncryptionUtil.toSerialCode(ie.getId()));
 				ie.setStatus(1);
 				ie.setOpt(entity.getOpt());
 			}
@@ -164,7 +166,8 @@ public class WelfareServiceImpl implements WelfareService {
 				entity.setGradeId(gradeId);
 				entity.setPhone(phone);
 				entity.setName(phone);
-				entity.setInvitationCode(EncryptionUtil.toSerialCode(Long.parseLong(phone)));
+				entity.setInvitationCode(phone);
+//				entity.setInvitationCode(EncryptionUtil.toSerialCode(Long.parseLong(phone)));
 				entity.setStatus(1);
 				welfareMapper.insertInviterInfoSingle(entity);
 				inviterList.add(entity);
