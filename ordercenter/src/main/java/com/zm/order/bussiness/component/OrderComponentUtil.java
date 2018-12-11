@@ -166,6 +166,13 @@ public class OrderComponentUtil {
 			result.setSuccess(false);
 			return;
 		}
+		if (info.getCreateType() == Constants.BARGAIN_ORDER) {
+			if (info.getOrderGoodsList().size() != 1) {
+				result.setErrorMsg("砍价订单商品数量只能为1个");
+				result.setSuccess(false);
+				return;
+			}
+		}
 		// TODO 天天仓规则
 		if (info.getSupplierId() == 1) {
 			int totalQuantity = 0;
@@ -422,6 +429,161 @@ public class OrderComponentUtil {
 		}
 		result.setSuccess(false);
 		result.setErrorMsg("调用支付信息失败");
+	}
+
+	// ****************************临时加的逻辑，砍价天天仓商品特殊处理***********************
+	private final String SPECIAL_ITEM_ID = "100001207";
+
+	/**
+	 * @fun 判断是否砍价特殊订单，砍价七天面膜的订单特殊处理
+	 * @param info
+	 * @return
+	 */
+	public boolean judgeIsSpecialOrder(OrderInfo info) {
+		if (info.getCreateType() == Constants.BARGAIN_ORDER) {
+			if (SPECIAL_ITEM_ID.equals(info.getOrderGoodsList().get(0).getItemId())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void splitGoods(OrderInfo info, boolean isSpecial) {
+		if (isSpecial) {
+			info.setTdq(7);
+			OrderGoods originalGoods = info.getOrderGoodsList().get(0);
+			try {
+				double goodsPrice = CalculationUtils.div(originalGoods.getActualPrice(), 1.112, 2);// 商品价格
+				double goodsSinglePrice = CalculationUtils.div(goodsPrice, 7, 2);
+				double taxFee = CalculationUtils.sub(originalGoods.getActualPrice(), goodsPrice);// 税费
+				info.getOrderDetail().setTaxFee(taxFee);
+				info.getOrderDetail().setIncrementTax(taxFee);
+				info.getOrderDetail().setPostFee(0.0);
+				List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, originalGoods.getItemQuantity());
+				info.setOrderGoodsList(list);
+				info.setWeight(3500);
+				info.setStatus(0);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		} else {
+			OrderGoods goods = info.getOrderGoodsList().stream()
+					.filter(orderGoods -> orderGoods.getItemId().equals(SPECIAL_ITEM_ID)).findAny().orElse(null);
+			if (goods != null) {
+				try {
+					double goodsSinglePrice = CalculationUtils.div(goods.getActualPrice(), 7, 2);
+					List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, goods.getItemQuantity());
+					info.getOrderGoodsList().addAll(list);
+					info.getOrderGoodsList().remove(goods);
+					info.setTdq(info.getOrderGoodsList().size());
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private List<OrderGoods> buildGoodsList(OrderInfo info, double goodsSinglePrice, int quantity) {
+		List<OrderGoods> list = new ArrayList<OrderGoods>();
+		// ******写死商品七天面膜*********1
+		OrderGoods goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001208");
+		goods.setItemCode("310517622300000300");
+		goods.setSku("310517622300000300");
+		goods.setItemName("韩国Forencos芙恋可姿星期一 七天面膜10片装(效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000913/master/images/8f8f9297-2173-4104-92e2-a4b4e5d201a8.jpg");
+		goods.setGoodsId("100000913");
+		list.add(goods);
+		// ******写死商品七天面膜*********2
+		goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001209");
+		goods.setItemCode("310517622300000301");
+		goods.setSku("310517622300000301");
+		goods.setItemName("韩国Forencos芙恋可姿星期二 七天面膜10片装（效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000914/master/images/35b484f2-9899-432d-9eef-5269b67314ef.jpg");
+		goods.setGoodsId("100000914");
+		list.add(goods);
+		// ******写死商品七天面膜*********3
+		goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001210");
+		goods.setItemCode("310517622300000302");
+		goods.setSku("310517622300000302");
+		goods.setItemName("韩国Forencos芙恋可姿星期三 七天面膜10片装(效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000915/master/images/843ff607-e028-4692-9b6f-b2b6cee3fc20.jpg");
+		goods.setGoodsId("100000915");
+		list.add(goods);
+		// ******写死商品七天面膜*********4
+		goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001211");
+		goods.setItemCode("310517622300000303");
+		goods.setSku("310517622300000303");
+		goods.setItemName("韩国Forencos芙恋可姿星期四 七天面膜10片装(效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000916/master/images/0384110b-9dbd-40db-82cb-4f057520f39a.jpg");
+		goods.setGoodsId("100000916");
+		list.add(goods);
+		// ******写死商品七天面膜*********5
+		goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001212");
+		goods.setItemCode("310517622300000304");
+		goods.setSku("310517622300000304");
+		goods.setItemName("韩国Forencos芙恋可姿星期五 七天面膜10片装(效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000917/master/images/9df73ee5-271c-443e-aa40-98c170f61a4c.jpg");
+		goods.setGoodsId("100000917");
+		list.add(goods);
+		// ******写死商品七天面膜*********6
+		goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001213");
+		goods.setItemCode("310517622300000305");
+		goods.setSku("310517622300000305");
+		goods.setItemName("韩国Forencos芙恋可姿星期六 七天面膜10片装(效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000918/master/images/b285c36c-5f8d-4ef7-acd3-01c02e1fc59d.jpg");
+		goods.setGoodsId("100000918");
+		list.add(goods);
+		// ******写死商品七天面膜*********7
+		goods = new OrderGoods();
+		goods.setActualPrice(goodsSinglePrice);
+		goods.setItemPrice(goodsSinglePrice);
+		goods.setItemQuantity(quantity);
+		goods.setOrderId(info.getOrderId());
+		goods.setItemId("100001214");
+		goods.setItemCode("310517622300000306");
+		goods.setSku("310517622300000306");
+		goods.setItemName("韩国Forencos芙恋可姿星期日 七天面膜10片装(效期:19年6月）");
+		goods.setItemImg(
+				"https://static.cncoopbuy.com:8080/goods/100000919/master/images/9ea72a8a-bfdd-4f9f-8af0-0377c0ee37b2.jpg");
+		goods.setGoodsId("100000919");
+		list.add(goods);
+		return list;
 	}
 
 }

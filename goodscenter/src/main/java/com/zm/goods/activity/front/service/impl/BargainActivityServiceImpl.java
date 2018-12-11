@@ -68,7 +68,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	@Override
 	public List<MyBargain> listMyBargain(Integer userId, Integer start) {
-		Map<String,Object> param = new HashMap<String,Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("userId", userId);
 		param.put("start", start);
 		// 获取普通的砍价活动
@@ -85,18 +85,19 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 把已经购买的列表去掉
 		myBargainList = myBargainList.stream()
 				.filter(myBargain -> !myBargain.getBargainList().stream()
-						.filter(record -> record.getUserId() == myBargain.getUserId()).findAny().get().isBuy())
+						.filter(record -> record.getUserId() == myBargain.getUserId()).findAny()
+						.orElse(new MyBargainRecord()).isBuy())
 				.collect(Collectors.toList());
 		if (myBargainList != null && myBargainList.size() > 0) {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
 		}
-		//根据是否开始排序
+		// 根据是否开始排序
 		Collections.sort(myBargainList);
 
 		return myBargainList;
 	}
-	
+
 	@Override
 	public MyBargain getMyBargainDetail(int id) throws ActiviteyException {
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -144,9 +145,11 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		});
 		if (isDetail) {
 			MyBargainRecord record = myBargainList.get(0).getBargainList().stream()
-					.filter(temp -> temp.getUserId() == myBargainList.get(0).getUserId()).findAny().get();
-			myBargainList.get(0).setUserImg(record.getUserImg());
-			myBargainList.get(0).setUserName(record.getUserName());
+					.filter(temp -> temp.getUserId() == myBargainList.get(0).getUserId()).findAny().orElse(null);
+			if (record != null) {
+				myBargainList.get(0).setUserImg(record.getUserImg());
+				myBargainList.get(0).setUserName(record.getUserName());
+			}
 
 		}
 	}

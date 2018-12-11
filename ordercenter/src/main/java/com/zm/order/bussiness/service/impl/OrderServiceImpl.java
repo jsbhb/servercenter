@@ -131,6 +131,10 @@ public class OrderServiceImpl implements OrderService {
 		Double amount = 0.0;
 		boolean vip = false;
 
+		// ************************* 临时加的判断，砍价特殊处理 商品拆开*********************
+		boolean isSpecial = orderComponentUtil.judgeIsSpecialOrder(info);
+		// ***************************end****************************************
+
 		// 获取该用户是否是VIP
 		UserInfo user = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
 		vip = user.isVip();
@@ -183,16 +187,18 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 
-		// 计算优惠金额
 		Double disAmount = 0.0;
-		if (unDiscountAmount > 0) {
-			disAmount = CalculationUtils.sub(unDiscountAmount, amount);
-		}
+		if (!isSpecial) {// 临时加的，如果不是特定的砍价订单
+			// 计算优惠金额
+			if (unDiscountAmount > 0) {
+				disAmount = CalculationUtils.sub(unDiscountAmount, amount);
+			}
 
-		// 判断价格是否一致
-		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info)) {
-			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
-					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
+			// 判断价格是否一致
+			if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info)) {
+				return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
+						ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
+			}
 		}
 
 		// 调用支付信息
@@ -213,16 +219,22 @@ public class OrderServiceImpl implements OrderService {
 			}
 			return temp;
 		}
+		
+		//***************************临时针对天天仓的商品进行拆分***************************
+		orderComponentUtil.splitGoods(info, isSpecial);
+		//*****************************end****************************************
 
 		try {
-			// 完善订单信息
-			orderComponentUtil.renderOrderInfo(info, postFee, weight, taxFee, disAmount, true);
+			if (!isSpecial) {
+				// 完善订单信息
+				orderComponentUtil.renderOrderInfo(info, postFee, weight, taxFee, disAmount, true);
+			}
 			// 保存订单
 			orderComponentUtil.saveOrder(info);
-			if(Constants.BARGAIN_ORDER == info.getCreateType()){//如果是砍价订单，下单后更新对应用户已经购买
+			if (Constants.BARGAIN_ORDER == info.getCreateType()) {// 如果是砍价订单，下单后更新对应用户已经购买
 				int id = Integer.valueOf(info.getCouponIds().split(",")[0]);
 				boolean success = goodsFeignClient.updateBargainGoodsBuy(Constants.FIRST_VERSION, id, info.getUserId());
-				if(!success){
+				if (!success) {
 					throw new Exception("更新用户购买信息出错");
 				}
 			}

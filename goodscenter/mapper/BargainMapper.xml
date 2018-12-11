@@ -124,6 +124,7 @@
 				and agp.user_id = #{userId}
 			</if>
 		</if>
+		order by agp.create_time desc
 	</select>
 
 	<select id="listBargainGoodsForPage" parameterType="Object" resultMap="bargainRule">

@@ -2,7 +2,6 @@ package com.zm.goods.activity.model.bargain.vo;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -29,8 +28,6 @@ public class MyBargain implements Comparable<MyBargain>{
 	private List<MyBargainRecord> bargainList;
 	private boolean start;
 	private String itemId;
-	// 只是业务中间需要用到，传到前端不需要
-	@JsonIgnore
 	private int userId;
 
 	public String getUserName() {

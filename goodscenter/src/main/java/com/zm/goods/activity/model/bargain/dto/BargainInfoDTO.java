@@ -1,5 +1,7 @@
 package com.zm.goods.activity.model.bargain.dto;
 
+import com.zm.goods.utils.EmojiFilter;
+
 /**
  * @fun 接收前端砍价参数
  * @author user
@@ -21,6 +23,7 @@ public class BargainInfoDTO {
 		return userName;
 	}
 	public void setUserName(String userName) {
+		userName = EmojiFilter.emojiChange(userName);
 		this.userName = userName;
 	}
 	public String getUserImg() {
