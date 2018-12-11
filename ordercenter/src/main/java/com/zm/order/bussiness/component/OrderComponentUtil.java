@@ -459,6 +459,9 @@ public class OrderComponentUtil {
 				info.getOrderDetail().setTaxFee(taxFee);
 				info.getOrderDetail().setIncrementTax(taxFee);
 				info.getOrderDetail().setPostFee(0.0);
+				info.getOrderDetail().setDisAmount(0.0);
+				info.getOrderDetail().setTariffTax(0.0);
+				info.getOrderDetail().setExciseTax(0.0);
 				List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, originalGoods.getItemQuantity());
 				info.setOrderGoodsList(list);
 				info.setWeight(3500);
