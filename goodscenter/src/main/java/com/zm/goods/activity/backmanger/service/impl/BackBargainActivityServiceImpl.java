@@ -85,7 +85,7 @@ public class BackBargainActivityServiceImpl implements BackBargainActivityServic
 	}
 	
 	@Override
-	public BargainActivityShowPageModel queryBargainActivityShowPageInfo(BargainActivityModel model) {
+	public List<BargainActivityShowPageModel> queryBargainActivityShowPageInfo(BargainActivityModel model) {
 		return backBargainMapper.selectBargainActivityShowPageInfo(model);
 	}
 }

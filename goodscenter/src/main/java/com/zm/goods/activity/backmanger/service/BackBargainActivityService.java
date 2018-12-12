@@ -1,5 +1,7 @@
 package com.zm.goods.activity.backmanger.service;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
 import com.zm.goods.activity.backmanger.model.BargainActivityModel;
 import com.zm.goods.activity.backmanger.model.BargainActivityShowPageModel;
@@ -15,5 +17,5 @@ public interface BackBargainActivityService {
 	
 	void modifyBargainActivityInfo(BargainActivityModel model);
 	
-	BargainActivityShowPageModel queryBargainActivityShowPageInfo(BargainActivityModel model);
+	List<BargainActivityShowPageModel> queryBargainActivityShowPageInfo(BargainActivityModel model);
 }

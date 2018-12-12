@@ -24,5 +24,5 @@ public interface BackBargainMapper {
 	
 	void deleteBargainActivityGoodsInfo(List<BargainActivityGoodsModel> list);
 	
-	BargainActivityShowPageModel selectBargainActivityShowPageInfo(BargainActivityModel model);
+	List<BargainActivityShowPageModel> selectBargainActivityShowPageInfo(BargainActivityModel model);
 }
