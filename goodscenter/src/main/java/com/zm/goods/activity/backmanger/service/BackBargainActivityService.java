@@ -2,6 +2,7 @@ package com.zm.goods.activity.backmanger.service;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.activity.backmanger.model.BargainActivityModel;
+import com.zm.goods.activity.backmanger.model.BargainActivityShowPageModel;
 import com.zm.goods.activity.backmanger.model.BaseActivityModel;
 
 public interface BackBargainActivityService {
@@ -13,4 +14,6 @@ public interface BackBargainActivityService {
 	BargainActivityModel queryBargainActivityByParam(BargainActivityModel model);
 	
 	void modifyBargainActivityInfo(BargainActivityModel model);
+	
+	BargainActivityShowPageModel queryBargainActivityShowPageInfo(BargainActivityModel model);
 }

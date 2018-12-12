@@ -38,6 +38,24 @@
 		</collection>
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.activity.backmanger.model.BargainActivityShowPageModel" id="bargainActivityShowPageInfo">
+		<id column="goods_role_id" property="goodsRoleId" jdbcType="INTEGER"/>
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+		<result column="init_price" property="initPrice" jdbcType="DOUBLE"/>
+		<result column="floor_price" property="floorPrice" jdbcType="DOUBLE"/>
+		<collection property="recordList"
+			ofType="com.zm.goods.activity.backmanger.model.BargainActivityShowPageRecordModel">
+			<id column="id" property="id" jdbcType="INTEGER"/>
+			<result column="user_id" property="userId" jdbcType="VARCHAR"/>
+			<result column="name" property="name" jdbcType="VARCHAR"/>
+			<result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+			<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+			<result column="person" property="person" jdbcType="INTEGER"/>
+			<result column="discount" property="disCount" jdbcType="DOUBLE"/>
+			<result column="buy" property="buy" jdbcType="BOOLEAN"/>
+		</collection>
+	</resultMap>
+	
 	<select id="selectActivityForPage" parameterType="Object" resultMap="baseActivityInfo">
 		select a.id,a.type,a.name,a.description,count(b.id) goodsCount,a.status
 		from activity_info a
@@ -129,4 +147,19 @@
 			#{item.id}
 		</foreach>
 	</delete>
+	
+	<select id="selectBargainActivityShowPageInfo" parameterType="Object" resultMap="bargainActivityShowPageInfo">
+		SELECT a.id,a.goods_role_id,f.goods_name,a.init_price,a.floor_price,c.discount,g.buy,c.person,
+		a.create_time,a.user_id,b.name,b.nick_name
+		FROM zm_goods.activity_goods_record a
+		left join zm_goods.activity_goods_role d on a.goods_role_id = d.id
+		left join zm_goods.goods_item e on d.item_id = e.item_id
+		left join zm_goods.goods f on e.goods_id = f.goods_id
+		left join zm_user.user_detail b on a.user_id = b.user_id
+		left join (SELECT goods_record_id,sum(bargain_price) discount,count(*) person 
+		FROM zm_goods.activity_goods_participant group by goods_record_id) c on a.id = c.goods_record_id
+		left join (SELECT goods_record_id,user_id,buy FROM zm_goods.activity_goods_participant where buy = '1') g on a.id = g.goods_record_id and a.user_id = g.user_id
+		group by a.user_id,a.goods_role_id 
+		order by a.goods_role_id,a.create_time
+	</select>
 </mapper>

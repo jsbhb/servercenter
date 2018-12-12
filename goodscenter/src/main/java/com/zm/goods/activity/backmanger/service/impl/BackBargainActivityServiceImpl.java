@@ -14,6 +14,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.activity.backmanger.dao.BackBargainMapper;
 import com.zm.goods.activity.backmanger.model.BargainActivityGoodsModel;
 import com.zm.goods.activity.backmanger.model.BargainActivityModel;
+import com.zm.goods.activity.backmanger.model.BargainActivityShowPageModel;
 import com.zm.goods.activity.backmanger.model.BaseActivityModel;
 import com.zm.goods.activity.backmanger.service.BackBargainActivityService;
 
@@ -81,5 +82,10 @@ public class BackBargainActivityServiceImpl implements BackBargainActivityServic
 			//删除移除商品
 			backBargainMapper.deleteBargainActivityGoodsInfo(bargainInfo.getItemList());
 		}
+	}
+	
+	@Override
+	public BargainActivityShowPageModel queryBargainActivityShowPageInfo(BargainActivityModel model) {
+		return backBargainMapper.selectBargainActivityShowPageInfo(model);
 	}
 }

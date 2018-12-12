@@ -5,6 +5,7 @@ import java.util.List;
 import com.github.pagehelper.Page;
 import com.zm.goods.activity.backmanger.model.BargainActivityGoodsModel;
 import com.zm.goods.activity.backmanger.model.BargainActivityModel;
+import com.zm.goods.activity.backmanger.model.BargainActivityShowPageModel;
 import com.zm.goods.activity.backmanger.model.BaseActivityModel;
 
 public interface BackBargainMapper {
@@ -22,4 +23,6 @@ public interface BackBargainMapper {
 	void updateBargainActivityGoodsInfo(List<BargainActivityGoodsModel> list);
 	
 	void deleteBargainActivityGoodsInfo(List<BargainActivityGoodsModel> list);
+	
+	BargainActivityShowPageModel selectBargainActivityShowPageInfo(BargainActivityModel model);
 }

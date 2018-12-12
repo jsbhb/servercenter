@@ -73,4 +73,16 @@ public class ActivityBackManagerController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/activity/backManager/queryBargainActivityShowPageInfo", method = RequestMethod.POST)
+	public ResultModel queryBargainActivityShowPageInfo(@PathVariable("version") Double version, @RequestBody BargainActivityModel model) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, backBargainActivityService.queryBargainActivityShowPageInfo(model));
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }
