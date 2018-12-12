@@ -22,7 +22,7 @@ public interface BargainMapper {
 	
 	int getRuleTypeByUserBargainId(Integer id);
 
-	Page<BargainRulePO> listBargainGoodsForPage(List<Integer> list);
+	Page<BargainRulePO> listBargainGoodsForPage();
 
 	List<BargainCountBO> listBargainCount(List<Integer> idList);
 
@@ -39,4 +39,6 @@ public interface BargainMapper {
 	void updateBargainGoodsBuy(Integer id);
 
 	List<Integer> listGoodsRoleIdsByUserId(Integer userId);
+
+	void updateUserBargainOverByIds(List<Integer> overList);
 }

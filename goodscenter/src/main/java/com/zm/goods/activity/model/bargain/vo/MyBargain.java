@@ -29,6 +29,15 @@ public class MyBargain implements Comparable<MyBargain>{
 	private boolean start;
 	private String itemId;
 	private int userId;
+	private boolean buy;
+
+	public boolean isBuy() {
+		return buy;
+	}
+
+	public void setBuy(boolean buy) {
+		this.buy = buy;
+	}
 
 	public String getUserName() {
 		return userName;
@@ -174,7 +183,7 @@ public class MyBargain implements Comparable<MyBargain>{
 	@Override
 	public int compareTo(MyBargain o) {
 		if (start ^ o.isStart()) {
-            return start ? -1 : 1;
+            return !start ? -1 : 1;
         } else {
             return 0;
         }

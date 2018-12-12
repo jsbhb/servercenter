@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,16 +79,34 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 合并List
 		List<UserBargainPO> bargainList = Stream.of(normalList, chainList).flatMap(Collection::stream)
 				.collect(Collectors.toList());
+		// 获取时间到，但没有结束的记录，并更新状态
+		List<Integer> overList = new ArrayList<Integer>();
+		bargainList.stream().forEach(bargain -> {
+			try {
+				if (DateUtil.isAfter(bargain.getCreateTime(), bargain.getDuration()) && bargain.isStart()) {
+					overList.add(bargain.getId());
+					bargain.setStart(false);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		if (overList.size() > 0) {
+			bargainMapper.updateUserBargainOverByIds(overList);
+		}
+		if (start == 1) {// 如果获取的是开始的，把结束的过滤掉
+			bargainList = bargainList.stream().filter(bargain -> bargain.isStart()).collect(Collectors.toList());
+		}
+		if (start == 0) {// 如果是结束的，把已购买没结束的状态改为false
+			bargainList.stream().forEach(bargain -> {
+				bargain.setStart(false);
+			});
+		}
+
 		// 创建砍价活动转换器
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取前端展示需要的对象
-		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList);
-		// 把已经购买的列表去掉
-		myBargainList = myBargainList.stream()
-				.filter(myBargain -> !myBargain.getBargainList().stream()
-						.filter(record -> record.getUserId() == myBargain.getUserId()).findAny()
-						.orElse(new MyBargainRecord()).isBuy())
-				.collect(Collectors.toList());
+		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList, userId);
 		if (myBargainList != null && myBargainList.size() > 0) {
 			// 完善砍价数据
 			renderBargain(myBargainList, false);
@@ -110,7 +129,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 创建砍价活动转换器
 		BargainEntityConverter convert = new BargainEntityConverter();
 		// 获取前端展示需要的对象
-		MyBargain myBargain = convert.userBargainPO2MyBargain(userBargainPO);
+		MyBargain myBargain = convert.userBargainPO2MyBargain(userBargainPO, userBargainPO.getUserId());
 		List<MyBargain> myBargainList = new ArrayList<MyBargain>();
 		myBargainList.add(myBargain);
 		// 完善砍价数据
@@ -161,9 +180,23 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			goodsRoleIdList = bargainMapper.listGoodsRoleIdsByUserId(userId);
 		}
 		PageHelper.startPage(pagination.getCurrentPage(), pagination.getNumPerPage(), true);
-		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage(goodsRoleIdList);
+		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage();
 		List<BargainGoods> bargainGoodsList = new ArrayList<BargainGoods>();
 		if (page.size() > 0) {
+			if (goodsRoleIdList != null && goodsRoleIdList.size() > 0) {
+				List<BargainRulePO> temp = new ArrayList<BargainRulePO>();
+				Iterator<BargainRulePO> it = page.iterator();
+				while (it.hasNext()) {
+					BargainRulePO po = it.next();
+					if (goodsRoleIdList.contains(po.getId())) {
+						it.remove();// 移除
+						temp.add(po);
+					}
+				}
+				temp.stream().forEach(tem -> {
+					page.add(tem);
+				});
+			}
 			// 获取开团数量
 			List<Integer> idList = page.stream().map(rule -> rule.getId()).collect(Collectors.toList());
 			List<BargainCountBO> bargainCountList = bargainMapper.listBargainCount(idList);

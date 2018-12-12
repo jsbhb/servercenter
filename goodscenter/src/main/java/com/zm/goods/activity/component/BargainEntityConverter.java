@@ -22,23 +22,23 @@ import com.zm.goods.utils.CalculationUtils;
  */
 public class BargainEntityConverter {
 
-	public final List<MyBargain> userBargainPO2MyBargain(List<UserBargainPO> list) {
+	public final List<MyBargain> userBargainPO2MyBargain(List<UserBargainPO> list, int userId) {
 		List<MyBargain> result = new ArrayList<MyBargain>();
 		if (list == null || list.size() == 0) {
 			return result;
 		}
 		for (UserBargainPO po : list) {
-			result.add(setMyBargain(po));
+			result.add(setMyBargain(po, userId));
 		}
 		return result;
 	}
 
-	public final MyBargain userBargainPO2MyBargain(UserBargainPO po) {
+	public final MyBargain userBargainPO2MyBargain(UserBargainPO po, int userId) {
 
-		return setMyBargain(po);
+		return setMyBargain(po, userId);
 	}
 
-	private MyBargain setMyBargain(UserBargainPO po) {
+	private MyBargain setMyBargain(UserBargainPO po, int userId) {
 		MyBargain my = new MyBargain();
 		List<MyBargainRecord> temp;
 		my.setId(po.getId());
@@ -61,6 +61,9 @@ public class BargainEntityConverter {
 				record.setBuy(recordPO.isBuy());
 				record.setUserImg(recordPO.getUserImg());
 				record.setUserName(recordPO.getUserName());
+				if (recordPO.getUserId() == userId) {
+					my.setBuy(recordPO.isBuy());
+				}
 				temp.add(record);
 				bargainPrice = CalculationUtils.add(bargainPrice, recordPO.getBargainPrice());// 计算已经砍价的金额
 			}

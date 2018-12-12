@@ -71,7 +71,12 @@
 		activity_goods_role agro on agr.goods_role_id = agro.id 
 		where agro.type = 1 and agr.user_id = #{userId}
 		<if test="(start != null and start != '') or start == 0">
-			and agr.status = #{start}
+			<if test="start == 1">
+				and agr.status = 1 and (agp.buy = 0 and agp.user_id=#{userId})
+			</if>
+			<if test="start == 0">
+				and agr.status = 0 or (agp.buy = 1 and agp.user_id=#{userId})
+			</if>
 		</if>
 	</select>
 	
@@ -85,7 +90,12 @@
 		activity_goods_role agro on agr.goods_role_id = agro.id 
 		where agro.type = 2 and agp.user_id = #{userId}
 		<if test="(start != null and start != '') or start == 0">
-			and agr.status = #{start}
+			<if test="start == 1">
+				and agr.status = 1 and (agp.buy = 0 and agp.user_id=#{userId})
+			</if>
+			<if test="start == 0">
+				and agr.status = 0 or (agp.buy = 1 and agp.user_id=#{userId})
+			</if>
 		</if>
 	</select>
 	
@@ -128,14 +138,7 @@
 	</select>
 
 	<select id="listBargainGoodsForPage" parameterType="Object" resultMap="bargainRule">
-		select * from activity_goods_role 
-		<if test="list != null and list.size > 0">
-			where id not in 
-			<foreach collection="list" open="(" close=")" separator="," item="item">
-				#{item}
-			</foreach>
-		</if>
-		order by floor_price asc
+		select * from activity_goods_role order by floor_price asc
 	</select>
 	
 	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.bo.BargainCountBO">
@@ -149,6 +152,15 @@
 	<update id="updateUserBargainOver" parameterType="Object">
 		update activity_goods_record set status = 0, update_time = now() where user_id = #{userId} and id = #{id}
 	</update>
+	
+	
+	<update id="updateUserBargainOverByIds" parameterType="Object">
+		update activity_goods_record set status = 0, update_time = now() where id in 
+		<foreach collection="list" open="(" close=")" separator="," item=",">
+			#{item}
+		</foreach>
+	</update>
+	
 	
 	<select id="getBargainRuleById" parameterType="Object" resultMap="bargainRule">
 		select * from activity_goods_role where id = #{id}

@@ -21,10 +21,17 @@ public class BargainGoods {
 	private int bargainCount;//有几人开团
 	private double lowPrice;
 	private int stock;
+	private boolean bargain;//是否参加过砍价
 	@JsonIgnore
 	private String itemId;//业务转换需要，前端不需要
 	public double getLowPrice() {
 		return lowPrice;
+	}
+	public boolean isBargain() {
+		return bargain;
+	}
+	public void setBargain(boolean bargain) {
+		this.bargain = bargain;
 	}
 	public void setLowPrice(double lowPrice) {
 		this.lowPrice = lowPrice;
