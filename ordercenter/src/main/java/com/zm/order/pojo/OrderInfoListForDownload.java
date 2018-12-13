@@ -10,6 +10,7 @@ public class OrderInfoListForDownload {
 	private String gradeName;
 	private Integer supplierId;
 	private String supplierName;
+	private String itemId;
 	private String sku;
 	private String itemName;
 	private Double proxyPrice;
@@ -298,5 +299,11 @@ public class OrderInfoListForDownload {
 	}
 	public void setDeliveryTime(String deliveryTime) {
 		this.deliveryTime = deliveryTime;
+	}
+	public String getItemId() {
+		return itemId;
+	}
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
 	}
 }

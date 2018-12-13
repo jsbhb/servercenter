@@ -30,6 +30,7 @@ import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
+import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -540,6 +541,17 @@ public class GoodsBackController {
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/goods/queryItemTaxInfoByList", method = RequestMethod.POST)
+	public ResultModel queryItemTaxInfoByList(@PathVariable("version") Double version, @RequestBody List<String> itemIds) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			List<Tax> taxList = goodsBackService.getTaxInfoByItemIds(itemIds);
+			return new ResultModel(true, taxList);
 		}
 
 		return new ResultModel(false, "版本错误");

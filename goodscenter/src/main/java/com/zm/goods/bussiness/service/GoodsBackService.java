@@ -22,6 +22,7 @@ import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
+import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -278,5 +279,7 @@ public interface GoodsBackService {
 	List<String> getGoodsIdByItemCode(String itemCode);
 
 	List<String> getGoodsPicPath(String goodsId);
+
+	List<Tax> getTaxInfoByItemIds(List<String> itemIds);
 
 }

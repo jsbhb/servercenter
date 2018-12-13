@@ -25,6 +25,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
+import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.constants.Constants;
@@ -45,6 +46,7 @@ import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
+import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 
 /**
@@ -73,6 +75,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Resource
 	RedisTemplate<String, Object> template;
+	
+	@Resource
+	GoodsMapper goodsMapper;
 
 	@Override
 	public Page<GoodsEntity> queryByPage(GoodsEntity entity) {
@@ -887,5 +892,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public List<String> getGoodsPicPath(String goodsId) {
 		
 		return goodsBackMapper.getGoodsPicPath(goodsId);
+	}
+
+	@Override
+	public List<Tax> getTaxInfoByItemIds(List<String> itemIds) {
+		return goodsMapper.getTax(itemIds);
 	}
 }

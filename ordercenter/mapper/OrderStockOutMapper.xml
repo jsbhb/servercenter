@@ -83,6 +83,7 @@
 		<result column="grade_name" property="gradeName" jdbcType="VARCHAR" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
 		<result column="rebate" property="rebate" jdbcType="VARCHAR" />
 		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
@@ -283,7 +284,7 @@
 	
 	
 	<select id="selectOrdreListForDownload" resultMap="orderInfoListForDownload" parameterType="Object">
-		select ob.order_id,ob.status,ob.grade_id,ug.grade_name,ob.supplier_id,sb.supplier_name,
+		select ob.order_id,ob.status,ob.grade_id,ug.grade_name,ob.supplier_id,sb.supplier_name,og.item_id,
 		og.sku,og.item_name,gp.proxy_price,gp.retail_price,og.item_info,og.rebate,og.item_quantity,gfc.first_id,
 		gfc.name as first_name,gsc.second_id,gsc.name as second_name,gtc.third_id,gtc.name as third_name,
 		od.payment,od.pay_type,od.pay_no,od.pay_time,od.receive_name,od.receive_province,i.conversion,
