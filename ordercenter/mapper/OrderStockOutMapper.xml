@@ -171,7 +171,12 @@
 		from order_base ob where
 		1 = 1
 		<if test="entity.status != null">
-			and ob.status = #{entity.status,jdbcType = INTEGER}
+			<if test="entity.status != -1">
+				and ob.status = #{entity.status,jdbcType = INTEGER}
+			</if>
+			<if test="entity.status == -1">
+				and ob.status != 9
+			</if>
 		</if>
 		<if test="entity.userId != null and entity.userId != ''">
 			and ob.user_id = #{entity.userId}

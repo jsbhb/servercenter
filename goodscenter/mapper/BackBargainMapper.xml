@@ -160,6 +160,6 @@
 		FROM zm_goods.activity_goods_participant group by goods_record_id) c on a.id = c.goods_record_id
 		left join (SELECT goods_record_id,user_id,buy FROM zm_goods.activity_goods_participant where buy = '1') g on a.id = g.goods_record_id and a.user_id = g.user_id
 		group by a.user_id,a.goods_role_id 
-		order by a.goods_role_id,a.create_time
+		order by a.goods_role_id,a.create_time desc
 	</select>
 </mapper>

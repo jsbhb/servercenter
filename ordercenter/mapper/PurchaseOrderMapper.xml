@@ -117,7 +117,12 @@
 		from order_base ob where
 		1 = 1 and ob.order_source = '2'
 		<if test="status != null">
-			and ob.status = #{status,jdbcType = INTEGER}
+			<if test="status != -1">
+				and ob.status = #{status,jdbcType = INTEGER}
+			</if>
+			<if test="status == -1">
+				and ob.status != 9
+			</if>
 		</if>
 		<if test="orderId != null and orderId != ''">
 			and ob.order_id = #{orderId}

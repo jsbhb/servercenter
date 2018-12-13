@@ -102,7 +102,12 @@
 		from order_base ob where
 		1 = 1 and tag_fun = #{tagFun} and status in (1,2,12)
 		<if test="status != null">
-			and ob.status = #{status,jdbcType = INTEGER}
+			<if test="status != -1">
+				and ob.status = #{status,jdbcType = INTEGER}
+			</if>
+			<if test="status == -1">
+				and ob.status != 9
+			</if>
 		</if>
 		<if test="userId != null and userId != ''">
 			and ob.user_id = #{userId}
