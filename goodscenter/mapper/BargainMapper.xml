@@ -94,7 +94,7 @@
 				and agr.status = 1 and (agp.buy = 0 and agp.user_id=#{userId})
 			</if>
 			<if test="start == 0">
-				and agr.status = 0 or (agp.buy = 1 and agp.user_id=#{userId})
+				and (agr.status = 0 or (agp.buy = 1 and agp.user_id=#{userId}))
 			</if>
 		</if>
 	</select>
@@ -156,7 +156,7 @@
 	
 	<update id="updateUserBargainOverByIds" parameterType="Object">
 		update activity_goods_record set status = 0, update_time = now() where id in 
-		<foreach collection="list" open="(" close=")" separator="," item=",">
+		<foreach collection="list" open="(" close=")" separator="," item="item">
 			#{item}
 		</foreach>
 	</update>

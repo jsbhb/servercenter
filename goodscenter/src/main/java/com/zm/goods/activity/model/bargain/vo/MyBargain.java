@@ -182,8 +182,8 @@ public class MyBargain implements Comparable<MyBargain>{
 
 	@Override
 	public int compareTo(MyBargain o) {
-		if (start ^ o.isStart()) {
-            return !start ? -1 : 1;
+		if (buy ^ o.isBuy()) {
+            return !buy ? -1 : 1;
         } else {
             return 0;
         }
