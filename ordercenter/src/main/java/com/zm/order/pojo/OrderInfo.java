@@ -27,6 +27,8 @@ public class OrderInfo extends Pagination{
 	protected Integer centerId;
 
 	protected Integer shopId;
+	
+	protected String shopName;
 
 	protected Integer guideId;
 
@@ -84,6 +86,14 @@ public class OrderInfo extends Pagination{
 			return false;
 		}
 		return true;
+	}
+
+	public String getShopName() {
+		return shopName;
+	}
+
+	public void setShopName(String shopName) {
+		this.shopName = shopName;
 	}
 
 	public Integer getPurchasingOrder() {

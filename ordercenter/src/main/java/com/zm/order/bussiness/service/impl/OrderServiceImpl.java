@@ -57,6 +57,7 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
@@ -219,10 +220,10 @@ public class OrderServiceImpl implements OrderService {
 			}
 			return temp;
 		}
-		
-		//***************************临时针对天天仓的商品进行拆分***************************
+
+		// ***************************临时针对天天仓的商品进行拆分***************************
 		orderComponentUtil.splitGoods(info, isSpecial);
-		//*****************************end****************************************
+		// *****************************end****************************************
 
 		try {
 			if (!isSpecial) {
@@ -285,8 +286,17 @@ public class OrderServiceImpl implements OrderService {
 		pagination.setTotalRows(count.longValue());
 		pagination.webListConverter();
 		List<OrderInfo> list = orderMapper.listOrderByParam(param);
+		HashOperations<String, String, String> hashOpt = template.opsForHash();
+		GradeBO bo = null;
 		if (list != null && list.size() > 0) {
 			for (OrderInfo order : list) {
+				String json = hashOpt.get(Constants.GRADEBO_INFO, order.getShopId() + "");
+				if(json == null){
+					order.setShopName("中国供销海外购");
+				} else {
+					bo = JSONUtil.parse(json, GradeBO.class);
+					order.setShopName(bo.getName());
+				}
 				for (OrderGoods goods : order.getOrderGoodsList()) {
 					Object obj = template.opsForValue().get("href:" + goods.getGoodsId());
 					goods.setHref(obj == null ? "" : obj.toString());

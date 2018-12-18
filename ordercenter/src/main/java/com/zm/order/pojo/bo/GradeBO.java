@@ -10,6 +10,13 @@ public class GradeBO{
 	private List<GradeBO> children;
 	private Integer type;
 	private Double welfareRebate;
+	private String name;
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public Integer getType() {
 		return type;
 	}

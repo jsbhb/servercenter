@@ -157,7 +157,7 @@
 		ob.id,ob.order_id,ob.status,ob.express_type,ob.supplier_id,ob.create_time,ob.mall_id,ob.grade_id,ob.create_type,
 		ob.guide_id,ob.user_id ,ob.combination_id,ob.order_flag,ob.remark, ob.order_source 
 		from order_base ob where
-		is_del = 0
+		is_del = 0 and order_source in (0,1,4,5,7,8,10) 
 		<if test="info.status != null">
 			and ob.status = #{info.status,jdbcType = INTEGER}
 		</if>
@@ -174,12 +174,12 @@
 		<if test="info.centerId != null and info.centerId != ''">
 			and ob.mall_id = #{info.centerId}
 		</if>
-		<if test="info.shopId != null and info.shopId != ''">
-			and ob.grade_id = #{info.shopId}
-		</if>
-		<if test="info.guideId != null and info.guideId != ''">
-			and ob.guide_id = #{info.guideId}
-		</if>
+<!-- 		<if test="info.shopId != null and info.shopId != ''"> -->
+<!-- 			and ob.grade_id = #{info.shopId} -->
+<!-- 		</if> -->
+<!-- 		<if test="info.guideId != null and info.guideId != ''"> -->
+<!-- 			and ob.guide_id = #{info.guideId} -->
+<!-- 		</if> -->
 		<if test="info.combinationId != null and info.combinationId != ''">
 			and ob.combination_id = #{info.combinationId}
 		</if>
@@ -228,12 +228,12 @@
 		<if test="info.centerId != null and info.centerId != ''">
 			and o.mall_id = #{info.centerId}
 		</if>
-		<if test="info.shopId != null and info.shopId != ''">
-			and o.grade_id = #{info.shopId}
-		</if>
-		<if test="info.guideId != null and info.guideId != ''">
-			and o.guide_id = #{info.guideId}
-		</if>
+<!-- 		<if test="info.shopId != null and info.shopId != ''"> -->
+<!-- 			and o.grade_id = #{info.shopId} -->
+<!-- 		</if> -->
+<!-- 		<if test="info.guideId != null and info.guideId != ''"> -->
+<!-- 			and o.guide_id = #{info.guideId} -->
+<!-- 		</if> -->
 		<if test="info.combinationId != null and info.combinationId != ''">
 			and o.combination_id = #{info.combinationId}
 		</if>

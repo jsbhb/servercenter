@@ -57,6 +57,10 @@ public class Constants {
 
 	// ************************分润前缀**********************
 	public static final String PROFIT = "profit";
+	
+	// *********************异常分润订单***********************
+	
+	public static final String GRADEBO_INFO = "gradeBO:";//每个ID的gradeBO信息
 
 	// *********************异常分润订单***********************
 	public static final String EXCEPTION_PROFIT = "EXCEPTION_PROFIT";
