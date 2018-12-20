@@ -433,13 +433,14 @@ public class OrderComponentUtil {
 
 	// ****************************临时加的逻辑，砍价天天仓商品特殊处理***********************
 	private final String SPECIAL_ITEM_ID = "100001207";
+	private final String[] specialArr = {"1011","1008","1013","1012","1014","1010","1009"};
 
 	/**
 	 * @fun 判断是否砍价特殊订单，砍价七天面膜的订单特殊处理
 	 * @param info
 	 * @return
 	 */
-	public boolean judgeIsSpecialOrder(OrderInfo info) {
+	public boolean judgeIsBargainOrder(OrderInfo info) {
 		if (info.getCreateType() == Constants.BARGAIN_ORDER) {
 			if (SPECIAL_ITEM_ID.equals(info.getOrderGoodsList().get(0).getItemId())) {
 				return true;
@@ -447,6 +448,24 @@ public class OrderComponentUtil {
 		}
 		return false;
 	}
+	
+	/**
+	 * @fun 判断是否特殊
+	 * @param info
+	 * @return
+	 */
+	public boolean judgeIsSpecial(OrderInfo info){
+		if(info.getOrderGoodsList().size() > 1 || !info.getOrderSource().equals(0)){
+			return false;
+		}
+		for(String s : specialArr){
+			if(s.equals(info.getOrderGoodsList().get(0).getItemId())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 
 	public void splitGoods(OrderInfo info, boolean isSpecial) {
 		if (isSpecial) {
@@ -587,6 +606,25 @@ public class OrderComponentUtil {
 		goods.setGoodsId("100000919");
 		list.add(goods);
 		return list;
+	}
+
+	public void splitTax(OrderInfo info) {
+		try {
+			OrderGoods originalGoods = info.getOrderGoodsList().get(0);
+			double goodsPrice = CalculationUtils.div(originalGoods.getActualPrice(), 1.112, 2);// 商品价格
+			double taxFee = CalculationUtils.sub(originalGoods.getActualPrice(), goodsPrice);// 税费
+			originalGoods.setActualPrice(goodsPrice);
+			originalGoods.setItemPrice(goodsPrice);
+			info.getOrderDetail().setTaxFee(taxFee);
+			info.getOrderDetail().setIncrementTax(taxFee);
+			info.getOrderDetail().setPostFee(0.0);
+			info.getOrderDetail().setDisAmount(0.0);
+			info.getOrderDetail().setTariffTax(0.0);
+			info.getOrderDetail().setExciseTax(0.0);
+			info.setWeight(5000);
+			info.setStatus(0);
+		} catch (Exception e) {
+		}
 	}
 
 }

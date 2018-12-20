@@ -132,8 +132,9 @@ public class OrderServiceImpl implements OrderService {
 		Double amount = 0.0;
 		boolean vip = false;
 
-		// ************************* 临时加的判断，砍价特殊处理 商品拆开*********************
-		boolean isSpecial = orderComponentUtil.judgeIsSpecialOrder(info);
+		// ************************* 临时加的判断，砍价特殊处理 商品拆开，代码还原删掉该模块以及涉及的其他地方*********************
+		boolean isBargain = orderComponentUtil.judgeIsBargainOrder(info);
+		boolean isSpecial = orderComponentUtil.judgeIsSpecial(info);
 		// ***************************end****************************************
 
 		// 获取该用户是否是VIP
@@ -169,6 +170,10 @@ public class OrderServiceImpl implements OrderService {
 					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
 			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
 		}
+		if(isSpecial){//特殊包邮包税
+			freeTax = true;
+			freePost = true;
+		}
 		if (!freePost) {
 			// 计算邮费(自提不算邮费)
 			if (Constants.EXPRESS.equals(info.getExpressType())) {
@@ -189,7 +194,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		Double disAmount = 0.0;
-		if (!isSpecial) {// 临时加的，如果不是特定的砍价订单
+		if (!isBargain) {// 临时加的，如果不是砍价订单
 			// 计算优惠金额
 			if (unDiscountAmount > 0) {
 				disAmount = CalculationUtils.sub(unDiscountAmount, amount);
@@ -222,11 +227,14 @@ public class OrderServiceImpl implements OrderService {
 		}
 
 		// ***************************临时针对天天仓的商品进行拆分***************************
-		orderComponentUtil.splitGoods(info, isSpecial);
+		orderComponentUtil.splitGoods(info, isBargain);
+		if(isSpecial){//拆税
+			orderComponentUtil.splitTax(info);
+		}
 		// *****************************end****************************************
 
 		try {
-			if (!isSpecial) {
+			if (!isBargain && !isSpecial) {
 				// 完善订单信息
 				orderComponentUtil.renderOrderInfo(info, postFee, weight, taxFee, disAmount, true);
 			}
