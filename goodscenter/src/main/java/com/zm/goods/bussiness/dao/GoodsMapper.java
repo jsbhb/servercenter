@@ -159,4 +159,6 @@ public interface GoodsMapper {
 
 	void insertGoodsLifeCycleBatch(List<GoodsLifeCycleModel> modelList);
 
+	GoodsItem getGoodsItemByGoodsIdForGoodsBillboard(String goodsId);
+
 }

@@ -62,4 +62,11 @@ public class Constants {
 	public static final int GOODS_SHELVE_TYPE_DOWN = 1;
 	public static final int GOODS_SHELVE_MODE_AUTO = 0;
 	
+	//*********************商品类型**************************************
+	
+	public static final Integer O2O_TYPE = 0;// 跨境
+
+	public static final Integer GENERAL_TRADE = 2;// 一般贸易
+
+	
 }

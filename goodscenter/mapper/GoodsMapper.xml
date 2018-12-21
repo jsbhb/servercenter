@@ -802,4 +802,13 @@
 		</foreach>
 	</insert>
 	
+	<select id="getGoodsItemByGoodsIdForGoodsBillboard" parameterType="Object" resultMap="goodsItem">
+		select g.id,g.goods_id,g.goods_name as customGoodsName, g.type, min(bgp.retail_price) as price, 
+		i.id as specs_id,bgp.id as price_id 
+		from goods g 
+		left join goods_item i on g.goods_id = i.goods_id 
+		left join goods_price bgp on i.item_id = bgp.item_id 
+		where g.goods_id = #{goodsId}
+	</select>
+	
 </mapper>

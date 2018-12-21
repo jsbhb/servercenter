@@ -251,6 +251,62 @@ public class HttpClientUtil {
 		}
 		return resultStr;
 	}
+	
+	public static byte[] getByteArr(String url) {
+		byte[] result = null;
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+
+		HttpGet httpGet = null;
+		HttpEntity entity = null;
+		CloseableHttpResponse response = null;
+
+		try {
+			// 创建get请求
+			httpGet = new HttpGet(url);
+
+			httpGet.setConfig(requestConfig);
+
+			logger.info("executing request uri：" + httpGet.getURI());
+
+			response = httpsclient.execute(httpGet);
+
+			// 如果连接状态异常，则直接关闭
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logger.info("httpclient 访问异常 ");
+				httpGet.abort();
+				return null;
+			}
+			entity = response.getEntity();
+			if (entity != null) {
+				result = EntityUtils.toByteArray(entity);
+			}
+
+		} catch (Exception e) {
+			httpGet.abort();
+			logger.error("http get error ", e);
+			return null;
+			// 关闭连接,释放资源
+		} finally {
+			try {
+				if (entity != null) {
+					EntityUtils.consume(entity);// 关闭
+				}
+				if (response != null) {
+					response.close();
+				}
+				if (httpGet != null) {
+					// 关闭连接,释放资源
+					httpGet.releaseConnection();
+				}
+
+			} catch (Exception e) {
+				logger.error("http get error " + e.getMessage());
+			}
+
+		}
+		return result;
+	}
 
 	private static CloseableHttpClient wrapClient(HttpClient base) {
 		try {
