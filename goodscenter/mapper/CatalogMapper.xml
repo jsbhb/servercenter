@@ -117,7 +117,7 @@
 		<if test="tagPath != null and tagPath != ''">
 			tag_path = #{tagPath},
 		</if>
-		update_time = now() where first_id = #{firstId}
+		update_time = now(),opt = #{opt} where first_id = #{firstId}
 	</insert>
 
 	<insert id="updateSecondCatalog" parameterType="Object">
@@ -137,7 +137,7 @@
 		<if test="tagPath != null and tagPath != ''">
 			tag_path = #{tagPath},
 		</if>
-		update_time = now() where second_id = #{secondId}
+		update_time = now(),opt = #{opt} where second_id = #{secondId}
 	</insert>
 	
 	<insert id="updateThirdCatalog" parameterType="Object">
@@ -157,7 +157,7 @@
 		<if test="tagPath != null and tagPath != ''">
 			tag_path = #{tagPath},
 		</if>
-		update_time = now() where third_id = #{thirdId}
+		update_time = now(),opt = #{opt} where third_id = #{thirdId}
 	</insert>
 	
 		
