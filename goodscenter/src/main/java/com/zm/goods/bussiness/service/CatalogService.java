@@ -149,5 +149,7 @@ public interface CatalogService {
 	void updateSecondByParam(SecondCatalogEntity entity);
 
 	void updateThirdByParam(ThirdCatalogEntity entity);
+	
+	SecondCatalogEntity queryFirstBySecond(SecondCatalogEntity entity);
 
 }

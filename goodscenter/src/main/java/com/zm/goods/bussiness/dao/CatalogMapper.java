@@ -170,4 +170,5 @@ public interface CatalogMapper {
 
 	void updateThirdCatalogByParam(ThirdCatalogEntity entity);
 
+	SecondCatalogEntity selectFirstBySecond(SecondCatalogEntity entity);
 }

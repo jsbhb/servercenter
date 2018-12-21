@@ -31,6 +31,7 @@ public class SecondCatalogEntity {
 	private Integer status;
 	private List<ThirdCatalogEntity> thirds;
 	private String accessPath;
+	private String tagPath;
 
 	public SecondCatalogEntity() {
 
@@ -122,6 +123,14 @@ public class SecondCatalogEntity {
 
 	public void setAccessPath(String accessPath) {
 		this.accessPath = accessPath;
+	}
+
+	public String getTagPath() {
+		return tagPath;
+	}
+
+	public void setTagPath(String tagPath) {
+		this.tagPath = tagPath;
 	}
 	
 }

@@ -309,4 +309,21 @@ public class CatalogController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
+
+	@RequestMapping(value = "{version}/goods/catalog/queryFirstBySecondId", method = RequestMethod.POST)
+	public ResultModel queryFirstBySecondId(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody SecondCatalogEntity entity) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				SecondCatalogEntity result = catalogService.queryFirstBySecond(entity);
+				return new ResultModel(true, result);
+			}
+
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
 }

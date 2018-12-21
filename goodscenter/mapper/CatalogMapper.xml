@@ -20,6 +20,7 @@
 			<result column="ssort" property="sort" jdbcType="INTEGER"/>
 			<result column="sstatus" property="status" jdbcType="INTEGER"/>
 			<result column="saccess_path" property="accessPath" jdbcType="VARCHAR"/>
+			<result column="stag_path" property="tagPath" jdbcType="VARCHAR"/>
 			<collection property="thirds"
 				ofType="com.zm.goods.pojo.ThirdCatalogEntity">
 				<id column="thirdId" property="id" jdbcType="INTEGER"/>
@@ -30,6 +31,7 @@
 				<result column="tstatus" property="status" jdbcType="INTEGER"/>
 				<result column="taccess_path" property="accessPath" jdbcType="VARCHAR"/>
 				<result column="is_popular" property="isPopular" jdbcType="INTEGER"/>
+				<result column="ttag_path" property="tagPath" jdbcType="VARCHAR"/>
 			</collection>
 		</collection>
 	</resultMap>
@@ -75,8 +77,8 @@
 	<select id="selectAll" resultMap="entity">
 		select
 		f.id,f.first_id,f.name,f.sort,f.status,f.tag_path,f.access_path,
-		s.id as secondId,s.second_id,s.name as secondName,s.sort as ssort,s.status as sstatus,s.access_path as saccess_path,
-		t.id as thirdId,t.third_id,t.name as thirdName,t.sort as tsort,t.status as tstatus,t.access_path as taccess_path,t.is_popular  
+		s.id as secondId,s.second_id,s.name as secondName,s.sort as ssort,s.status as sstatus,s.access_path as saccess_path,s.tag_path stag_path,
+		t.id as thirdId,t.third_id,t.name as thirdName,t.sort as tsort,t.status as tstatus,t.access_path as taccess_path,t.is_popular,t.tag_path ttag_path  
 		from goods_first_category f
 		left join goods_second_category s on f.first_id = s.first_id
 		left join goods_third_category t on t.second_id = s.second_id
@@ -89,13 +91,13 @@
 	</insert>
 
 	<insert id="insertSecondCatalog" parameterType="Object">
-		insert into goods_second_category(id,first_id,second_id,name,create_time,update_time,opt,sort,status,access_path) 
-		value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt},#{sort},#{status},#{accessPath});
+		insert into goods_second_category(id,first_id,second_id,name,create_time,update_time,opt,sort,status,access_path,tag_path) 
+		value (#{id},#{firstId},#{secondId},#{name},now(),now(),#{opt},#{sort},#{status},#{accessPath},#{tagPath});
 	</insert>
 	
 	<insert id="insertThirdCatalog" parameterType="Object">
-		insert into goods_third_category(id,second_id,third_id,name,create_time,update_time,opt,sort,status,access_path) 
-		value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt},#{sort},#{status},#{accessPath});
+		insert into goods_third_category(id,second_id,third_id,name,create_time,update_time,opt,sort,status,access_path,tag_path) 
+		value (#{id},#{secondId},#{thirdId},#{name},now(),now(),#{opt},#{sort},#{status},#{accessPath},#{tagPath});
 	</insert>
 	
 	<insert id="updateFirstCatalog" parameterType="Object">
@@ -132,6 +134,9 @@
 		<if test="accessPath != null and accessPath != ''">
 			access_path = #{accessPath},
 		</if>
+		<if test="tagPath != null and tagPath != ''">
+			tag_path = #{tagPath},
+		</if>
 		update_time = now() where second_id = #{secondId}
 	</insert>
 	
@@ -148,6 +153,9 @@
 		</if>
 		<if test="accessPath != null and accessPath != ''">
 			access_path = #{accessPath},
+		</if>
+		<if test="tagPath != null and tagPath != ''">
+			tag_path = #{tagPath},
 		</if>
 		update_time = now() where third_id = #{thirdId}
 	</insert>
@@ -228,4 +236,8 @@
 			and sort > 0
 		</if>
 	</update>
+	
+	<select id="selectFirstBySecond" resultMap="second">
+		select * from goods_second_category where second_id = #{secondId}
+	</select>
 </mapper>
