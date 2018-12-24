@@ -158,7 +158,20 @@
 		left join zm_user.user_detail b on a.user_id = b.user_id
 		left join (SELECT goods_record_id,sum(bargain_price) discount,count(*) person 
 		FROM zm_goods.activity_goods_participant group by goods_record_id) c on a.id = c.goods_record_id
-		left join (SELECT goods_record_id,user_id,buy FROM zm_goods.activity_goods_participant where buy = '1') g on a.id = g.goods_record_id and a.user_id = g.user_id
+		left join (SELECT goods_record_id,user_id,buy FROM zm_goods.activity_goods_participant) g on a.id = g.goods_record_id and a.user_id = g.user_id
+		where 1=1
+		<if test="activityStartTime!=null and activityStartTime!=''">
+			and a.create_time &gt;= #{activityStartTime}
+		</if>
+		<if test="activityEndTime!=null and activityEndTime!=''">
+			and a.create_time &lt;= #{activityEndTime}
+		</if>
+		<if test="buyFlg!=null and buyFlg!=''">
+			and ifnull(g.buy,0) = #{buyFlg}
+		</if>
+		<if test="joinPerson!=null and joinPerson!=0">
+			and c.person &gt;= #{joinPerson}
+		</if>
 		group by a.user_id,a.goods_role_id 
 		order by a.goods_role_id,a.create_time desc
 	</select>
