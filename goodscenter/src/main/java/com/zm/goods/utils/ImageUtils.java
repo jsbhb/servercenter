@@ -48,15 +48,15 @@ public class ImageUtils {
 			g.drawImage(qrcode, board.getCode_X_Coordinates(), board.getCode_Y_Coordinates(), board.getCodeWidth(),
 					board.getCodeHeight(), null);
 			// 获取商品类型标签图片
-			BufferedImage typeTag = null;
-			if (Constants.O2O_TYPE.equals(item.getType())) {
-				typeTag = ImageIO.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl + crossImg)));
-			}
-			if (Constants.GENERAL_TRADE.equals(item.getType())) {
-				typeTag = ImageIO.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl + generalTrade)));
-			}
-			// 画标签
-			g.drawImage(typeTag, board.getType_X_Coordinates(), board.getType_Y_Coordinates(), null);
+//			BufferedImage typeTag = null;
+//			if (Constants.O2O_TYPE.equals(item.getType())) {
+//				typeTag = ImageIO.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl + crossImg)));
+//			}
+//			if (Constants.GENERAL_TRADE.equals(item.getType())) {
+//				typeTag = ImageIO.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl + generalTrade)));
+//			}
+//			// 画标签
+//			g.drawImage(typeTag, board.getType_X_Coordinates(), board.getType_Y_Coordinates(), null);
 
 			//消除字体锯齿
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
