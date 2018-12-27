@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.zm.goods.feignclient.model.RebateFormula;
 import com.zm.goods.feignclient.model.UserBO;
 import com.zm.goods.pojo.ResultModel;
 
@@ -30,4 +31,7 @@ public interface UserFeignClient {
 	@RequestMapping(value = "{version}/user/feign/verify/{userId}", method = RequestMethod.GET)
 	public boolean verifyUserId(@PathVariable("version") Double version, @PathVariable("userId") Integer userId);
 
+	@RequestMapping(value = "{version}/grade/rebate/formula/{needPaging}", method = RequestMethod.POST)
+	public ResultModel listGradeTypeRebateFormula(@PathVariable("version") Double version,
+			@PathVariable("needPaging") boolean needPaging, @RequestBody RebateFormula rebateFormula);
 }

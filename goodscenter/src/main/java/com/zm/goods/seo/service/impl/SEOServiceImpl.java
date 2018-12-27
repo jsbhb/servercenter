@@ -27,6 +27,8 @@ import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
+import com.zm.goods.pojo.po.BigSalesGoodsRecord;
+import com.zm.goods.pojo.po.ComponentDataPO;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.seo.model.CategoryPath;
@@ -93,12 +95,18 @@ public class SEOServiceImpl implements SEOService {
 		return temp.isSuccess();
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<GoodsItem> getGoods(List<String> goodsIdList) {
 		List<GoodsItem> goodsItemList = seoMapper.listGoods(goodsIdList);
 		if (goodsItemList == null) {
 			return null;
 		}
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
+		String bigsaleJson = (String) template.opsForValue().get(Constants.BIG_SALES_PRE);
+		List<String> bigSaleList = new ArrayList<>();
+		if(bigsaleJson != null){
+			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
+		}
 		for (GoodsItem goodsItem : goodsItemList) {
 			if (goodsItem.getGoodsSpecsList() != null) {
 				for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
@@ -118,7 +126,13 @@ public class SEOServiceImpl implements SEOService {
 					LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
 				}
 			}
-
+			if(goodsItem.getGoodsSpecsList() != null){
+				for(GoodsSpecs specs : goodsItem.getGoodsSpecsList()){
+					if(bigSaleList.contains(specs.getItemId())){
+						specs.setBigSale(1);
+					}
+				}
+			}
 		}
 
 		return goodsItemList;
@@ -434,6 +448,21 @@ public class SEOServiceImpl implements SEOService {
 			PublishComponent.publish(JSONUtil.toJson(param), type);
 		}
 		return new ResultModel(true, "");
+	}
+
+	@Override
+	public void insertComponentDataBatch(List<ComponentDataPO> dataList) {
+		seoMapper.insertComponentDataBatch(dataList);
+	}
+
+	@Override
+	public void deleteByIdList(List<Integer> idList) {
+		seoMapper.deleteByIdList(idList);
+	}
+
+	@Override
+	public List<BigSalesGoodsRecord> listRecord(Map<String, Integer> param) {
+		return seoMapper.listRecord(param);
 	}
 
 }

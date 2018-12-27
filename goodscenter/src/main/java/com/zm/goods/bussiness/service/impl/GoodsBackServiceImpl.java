@@ -898,4 +898,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public List<Tax> getTaxInfoByItemIds(List<String> itemIds) {
 		return goodsMapper.getTax(itemIds);
 	}
+
+	@Override
+	public void updateRetailPrice(Map<String, Object> param) {
+		goodsBackMapper.updateRetailPrice(param);
+	}
 }

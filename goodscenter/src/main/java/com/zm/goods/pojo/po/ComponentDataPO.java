@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ComponentDataPO {
 
 	private Integer id;
+	private Integer cpId;
 	private Integer sort;
 	private String title;
 	private String href;
@@ -32,6 +33,14 @@ public class ComponentDataPO {
 		this.freeTax = this.freeTax == 0 ? null : this.freeTax;
 		this.promotion = this.promotion == 0 ? null : this.promotion;
 		this.popular = this.popular == 0 ? null : this.popular;
+	}
+
+	public Integer getCpId() {
+		return cpId;
+	}
+
+	public void setCpId(Integer cpId) {
+		this.cpId = cpId;
 	}
 
 	public Integer getType() {

@@ -84,6 +84,16 @@ public class GoodsSpecs implements Serializable {
 	private double welfarePrice;//福利价格
 	
 	private int fx;//是否分销，0否，1是
+	
+	private Integer bigSale;
+
+	public Integer getBigSale() {
+		return bigSale;
+	}
+
+	public void setBigSale(Integer bigSale) {
+		this.bigSale = bigSale;
+	}
 
 	public int getFx() {
 		return fx;

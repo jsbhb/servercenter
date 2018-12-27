@@ -75,6 +75,7 @@
 		<result column="description" property="description" jdbcType="VARCHAR" />
 		<collection property="module" ofType="com.zm.goods.pojo.po.ComponentPagePO">
 			<id column="cpid" property="id" jdbcType="INTEGER" />
+			<result column="id" property="pageId" jdbcType="INTEGER" />
 			<result column="key" property="key" jdbcType="VARCHAR" />
 			<result column="area" property="area" jdbcType="VARCHAR" />
 			<result column="sort" property="sort" jdbcType="INTEGER" />
@@ -99,6 +100,22 @@
 				<result column="ctype" property="type" jdbcType="INTEGER" />
 			</collection>
 		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.po.BigSalesGoodsRecord" id="record">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="year" property="year" jdbcType="INTEGER" />
+		<result column="week" property="week" jdbcType="INTEGER" />
+		<result column="sort" property="sort" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="new_rebate" property="newRebate" jdbcType="NUMERIC" />
+		<result column="new_retail_price" property="newRetailPrice" jdbcType="NUMERIC" />
+		<result column="old_rebate" property="oldRebate" jdbcType="NUMERIC" />
+		<result column="old_retail_price" property="oldRetailPrice" jdbcType="NUMERIC" />
+		<result column="line_price" property="linePrice" jdbcType="NUMERIC" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="pic_path" property="picPath" jdbcType="VARCHAR" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
@@ -157,6 +174,15 @@
 	
 	<select id="getGoodsAccessPath" parameterType="Object" resultType="java.lang.String">
 		select access_path from goods where goods_id = #{goodsId}
+	</select>
+	
+	<select id="listPublishedIndexPageDetail" parameterType="Object" resultMap="page">
+		select p.id,p.name,p.type,p.status,p.client,p.grade_id,p.path,p.page,p.file,p.description,
+		cp.id as cpid,cp.key,cp.sort,cd.tag_path,cd.enname,c.area,
+		cd.id as cdid,cd.picPath,cd.origin,cd.goods_id,cd.sort as csort,cd.title,cd.specs,cd.href,cd.price,
+		cd.description as cdescription,cd.goods_type,cd.popular,cd.free_post,cd.free_tax,cd.promotion,cd.type as ctype from page p 
+		left join component_page cp on p.id = cp.page_id left join component_data cd on cp.id = cd.cp_id left join 
+		component c on cp.key = c.key where p.type = 1 and status = 2 order by p.id,cp.sort,cd.type,cd.sort
 	</select>
 	
 	<select id="getPageById" parameterType="Object" resultMap="page">
@@ -219,5 +245,25 @@
 				#{item}
 		</foreach>
 	</update>
+	
+	<select id="listRecord" parameterType="Object" resultMap="record">
+		select * from big_sale_record where week = #{week} and year = #{year} order by sort
+	</select>
+	
+	<delete id="deleteByIdList" parameterType="Object">
+		delete from component_data where id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<insert id="insertComponentDataBatch" parameterType="Object">
+		insert into component_data (cp_id,type,picPath,title,origin,price,href,goods_type,goods_id,sort,enname,create_time)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.cpId},#{item.type},#{item.picPath},#{item.title},#{item.origin},#{item.price},#{item.href},
+			#{item.goodsType},#{item.goodsId},#{item.sort},#{item.enname},now())
+		</foreach>
+	</insert>
 	
 </mapper>

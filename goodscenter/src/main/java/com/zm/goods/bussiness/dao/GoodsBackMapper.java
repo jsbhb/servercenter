@@ -10,6 +10,8 @@ package com.zm.goods.bussiness.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
 import com.zm.goods.pojo.ERPGoodsTagEntity;
@@ -330,4 +332,6 @@ public interface GoodsBackMapper {
 	GoodsEntity selectGoodsInfoByGoodsId(GoodsEntity entity);
 
 	List<String> getGoodsPicPath(String goodsId);
+
+	void updateRetailPrice(@Param("param")Map<String, Object> param);
 }

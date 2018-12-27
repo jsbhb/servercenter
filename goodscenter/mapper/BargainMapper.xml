@@ -69,7 +69,7 @@
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
-		where agro.type = 1 and agr.user_id = #{userId}
+		where agro.type = 1 and agr.is_del = 0 and agr.user_id = #{userId}
 		<if test="(start != null and start != '') or start == 0">
 			<if test="start == 1">
 				and agr.status = 1 and (agp.buy = 0 and agp.user_id=#{userId})
@@ -88,7 +88,7 @@
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
-		where agro.type = 2 and agp.user_id = #{userId}
+		where agro.type = 2 and agr.is_del = 0 and agp.user_id = #{userId}
 		<if test="(start != null and start != '') or start == 0">
 			<if test="start == 1">
 				and agr.status = 1 and (agp.buy = 0 and agp.user_id=#{userId})
@@ -125,7 +125,7 @@
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
-		where agr.id = #{id}
+		where agr.id = #{id} and agr.is_del = 0 
 		<if test="accurate == yes">
 			<if test="type == 1">
 				and agr.user_id = #{userId}
@@ -138,7 +138,14 @@
 	</select>
 
 	<select id="listBargainGoodsForPage" parameterType="Object" resultMap="bargainRule">
-		select * from activity_goods_role order by floor_price asc
+		select * from activity_goods_role 
+		<if test="list != null and list.size > 0">
+			where id not in 
+			<foreach collection="list" open="(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+		</if>
+		order by floor_price asc
 	</select>
 	
 	<select id="listBargainCount" parameterType="Object" resultType="com.zm.goods.activity.model.bargain.bo.BargainCountBO">
@@ -167,8 +174,9 @@
 	</select>
 	
 	<insert id="saveUserBargain" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
-		insert into activity_goods_record (goods_role_id,user_id,init_price,floor_price,status,create_time) values
-		(#{goodsRoleId},#{userId},#{initPrice},#{floorPrice},#{start},now())
+		insert into activity_goods_record (goods_role_id,user_id,init_price,floor_price,status,create_time)
+		select #{goodsRoleId},#{userId},#{initPrice},#{floorPrice},#{start},now() from DUAL 
+		where not exists (select user_id from activity_goods_record where goods_role_id=#{goodsRoleId} and user_id=#{userId} and is_del = 0);
 	</insert>
 	
 	<insert id="saveBargainRecord" parameterType="Object">
@@ -184,7 +192,7 @@
 		agp.buy from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id
-		where agr.id = #{id}
+		where agr.id = #{id} and agr.is_del = 0
 	</select>
 	
 	<update id="updateBargainGoodsBuy" parameterType="Object" >
@@ -194,5 +202,9 @@
 	<select id="listGoodsRoleIdsByUserId" parameterType="Object" resultType="java.lang.Integer">
 		select goods_role_id from activity_goods_record where user_id = #{userId}
 	</select>
+	
+	<update id="updateUserBargainDel" parameterType="Object">
+		update activity_goods_record set is_del = 1,status = 0 where id = #{id} and user_id = #{userId}
+	</update>
 	
 </mapper>

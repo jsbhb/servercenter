@@ -161,4 +161,6 @@ public interface GoodsMapper {
 
 	GoodsItem getGoodsItemByGoodsIdForGoodsBillboard(String goodsId);
 
+	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
+
 }

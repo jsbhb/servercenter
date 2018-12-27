@@ -92,6 +92,7 @@ public class GoodsServiceImpl implements GoodsService {
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion,
 			boolean isApplet) {
@@ -138,6 +139,11 @@ public class GoodsServiceImpl implements GoodsService {
 				tempMap.get(item.getSupplierId()).add(item);
 			}
 		}
+		String bigsaleJson = (String) template.opsForValue().get(Constants.BIG_SALES_PRE);
+		List<String> bigSaleList = new ArrayList<>();
+		if(bigsaleJson != null){
+			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
+		}
 		for (Map.Entry<Integer, List<GoodsItem>> entry : tempMap.entrySet()) {
 			Map<String, String> map = hashOperations.entries(Constants.POST_TAX + entry.getKey());
 			if (map != null) {
@@ -149,6 +155,13 @@ public class GoodsServiceImpl implements GoodsService {
 						item.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
 					} catch (Exception e) {
 						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
+					}
+					if(item.getGoodsSpecsList() != null){//增加每周特卖标签
+						for(GoodsSpecs specs : item.getGoodsSpecsList()){
+							if(bigSaleList.contains(specs.getItemId())){
+								specs.setBigSale(1);
+							}
+						}
 					}
 				}
 			}
@@ -1039,6 +1052,12 @@ public class GoodsServiceImpl implements GoodsService {
 		supplierFeignClient.checkStock(Constants.FIRST_VERSION, supplierId, list);
 
 		return processWarehouse.processWarehouse(orderFlag, list);
+	}
+
+	@Override
+	public List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList) {
+		
+		return goodsMapper.listGoodsByGoodsIds(goodsIdList);
 	}
 
 }

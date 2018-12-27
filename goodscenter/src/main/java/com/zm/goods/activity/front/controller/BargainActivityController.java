@@ -1,10 +1,10 @@
 package com.zm.goods.activity.front.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,17 +12,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.pagehelper.Page;
 import com.zm.goods.activity.front.service.BargainActivityService;
 import com.zm.goods.activity.model.bargain.dto.BargainInfoDTO;
-import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.common.Pagination;
 
 @RestController
 public class BargainActivityController {
@@ -86,11 +83,11 @@ public class BargainActivityController {
 	 * @return
 	 */
 	@RequestMapping(value = "auth/{version}/active/bargain/goods/list", method = RequestMethod.GET)
-	public ResultModel listBargainGoods(@PathVariable("version") Double version, @ModelAttribute Pagination pagination,
+	public ResultModel listBargainGoods(@PathVariable("version") Double version,
 			@RequestParam(value = "userId", required = false) Integer userId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Page<BargainGoods> page = bargainActivityService.listBargainGoods(pagination, userId);
-			return new ResultModel(true, page, new Pagination(page));
+			Map<String, Object> result = bargainActivityService.listBargainGoods(userId);
+			return new ResultModel(true, result);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
@@ -156,4 +153,24 @@ public class BargainActivityController {
 		}
 		return false;
 	}
+
+	/**
+	 * @fun 重新开始砍价
+	 * @param version
+	 * @param dto
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/active/bargain/retry", method = RequestMethod.POST)
+	public ResultModel bargainRetry(@PathVariable("version") Double version, @RequestBody BargainInfoDTO dto) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return bargainActivityService.bargainRetry(dto);
+			} catch (ActiviteyException e) {
+				return new ResultModel(false, e.getErrorCode()+"", e.getMessage());
+			}
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
 }

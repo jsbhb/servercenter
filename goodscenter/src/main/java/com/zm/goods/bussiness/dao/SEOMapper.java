@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 
 import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.bo.ItemStockBO;
+import com.zm.goods.pojo.po.BigSalesGoodsRecord;
+import com.zm.goods.pojo.po.ComponentDataPO;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.seo.model.CategoryPath;
 import com.zm.goods.seo.model.GoodsTempModel;
@@ -47,5 +49,13 @@ public interface SEOMapper {
 	void updateGoodsRePublishByGoodsId(List<String> goodsIdList);
 	
 	List<GoodsTempModel> getDownShelvesGoodsIdByGoodsId(List<String> goodsIdList);
+
+	List<PagePO> listPublishedIndexPageDetail();
+
+	List<BigSalesGoodsRecord> listRecord(Map<String, Integer> param);
+
+	void deleteByIdList(List<Integer> idList);
+
+	void insertComponentDataBatch(List<ComponentDataPO> dataList);
 
 }

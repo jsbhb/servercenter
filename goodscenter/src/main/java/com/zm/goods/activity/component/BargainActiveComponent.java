@@ -19,7 +19,7 @@ public class BargainActiveComponent extends AbstractActive<BargainRecord, IUserB
 
 	private String id;// 每一个团的唯一ID
 
-	private final String BARGAIN_ACTIVE_PER = "bargain_active:";// 存入redis的前缀
+	public static final String BARGAIN_ACTIVE_PER = "bargain_active:";// 存入redis的前缀
 
 	private RedisTemplate<String, String> template;
 

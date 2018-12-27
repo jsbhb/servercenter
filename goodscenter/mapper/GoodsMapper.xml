@@ -350,6 +350,7 @@
 			separator=",">
 			#{item,jdbcType = VARCHAR}
 		</foreach>
+		order by gi.conversion
 	</select>
 	
 	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
@@ -809,6 +810,13 @@
 		left join goods_item i on g.goods_id = i.goods_id 
 		left join goods_price bgp on i.item_id = bgp.item_id 
 		where g.goods_id = #{goodsId}
+	</select>
+	
+	<select id="listGoodsByGoodsIds" parameterType="Object" resultMap="goodsItem">
+		select id,goods_id,goods_name as customGoodsName, type, access_path, origin from goods where goods_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
 	</select>
 	
 </mapper>

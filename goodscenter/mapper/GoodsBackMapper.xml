@@ -713,4 +713,10 @@
 	<select id = "getGoodsPicPath" parameterType="Object" resultType="java.lang.String">
 		select path from goods_file where goods_id = #{goodsId} order by id asc
 	</select>
+	
+	<update id="updateRetailPrice" parameterType="java.util.HashMap">
+		<foreach item="value" index="key" collection="param.entrySet()" separator=";">
+			update goods_price set retail_price = #{value} where item_id =  #{key} limit 1
+		</foreach>
+	</update>
 </mapper>

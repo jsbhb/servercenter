@@ -3,9 +3,9 @@ package com.zm.goods.activity.front.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.github.pagehelper.Page;
 import com.zm.goods.activity.model.ActiveGoods;
 import com.zm.goods.activity.model.bargain.bo.BargainCountBO;
+import com.zm.goods.activity.model.bargain.dto.BargainInfoDTO;
 import com.zm.goods.activity.model.bargain.po.BargainRecordPO;
 import com.zm.goods.activity.model.bargain.po.BargainRulePO;
 import com.zm.goods.activity.model.bargain.po.UserBargainPO;
@@ -22,7 +22,7 @@ public interface BargainMapper {
 	
 	int getRuleTypeByUserBargainId(Integer id);
 
-	Page<BargainRulePO> listBargainGoodsForPage();
+	List<BargainRulePO> listBargainGoodsForPage(List<Integer> list);
 
 	List<BargainCountBO> listBargainCount(List<Integer> idList);
 
@@ -30,7 +30,7 @@ public interface BargainMapper {
 
 	BargainRulePO getBargainRuleById(Integer goodsRoleId);
 
-	void saveUserBargain(UserBargainPO userBargainPO);
+	int saveUserBargain(UserBargainPO userBargainPO);
 
 	void saveBargainRecord(BargainRecordPO po);
 
@@ -41,4 +41,7 @@ public interface BargainMapper {
 	List<Integer> listGoodsRoleIdsByUserId(Integer userId);
 
 	void updateUserBargainOverByIds(List<Integer> overList);
+
+	int updateUserBargainDel(BargainInfoDTO dto);
+
 }

@@ -1,9 +1,12 @@
 package com.zm.goods.seo.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
+import com.zm.goods.pojo.po.BigSalesGoodsRecord;
+import com.zm.goods.pojo.po.ComponentDataPO;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.seo.model.SEODetail;
 
@@ -54,4 +57,10 @@ public interface SEOService {
 	 * @return
 	 */
 	ResultModel delsitemap(List<String> domains);
+
+	void insertComponentDataBatch(List<ComponentDataPO> dataList);
+
+	void deleteByIdList(List<Integer> idList);
+
+	List<BigSalesGoodsRecord> listRecord(Map<String, Integer> param);
 }

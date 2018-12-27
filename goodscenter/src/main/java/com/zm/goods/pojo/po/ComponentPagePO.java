@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ComponentPagePO {
 
 	private Integer id;
+	private Integer pageId;
 	private String key;
 	private String area;
 	private Integer sort;
@@ -20,6 +21,12 @@ public class ComponentPagePO {
 				tem.handleData();
 			}
 		}
+	}
+	public Integer getPageId() {
+		return pageId;
+	}
+	public void setPageId(Integer pageId) {
+		this.pageId = pageId;
 	}
 	public Integer getId() {
 		return id;

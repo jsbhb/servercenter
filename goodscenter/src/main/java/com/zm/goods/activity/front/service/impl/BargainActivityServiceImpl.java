@@ -1,10 +1,10 @@
 package com.zm.goods.activity.front.service.impl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.zm.goods.activity.component.BargainActiveComponent;
 import com.zm.goods.activity.component.BargainEntityConverter;
 import com.zm.goods.activity.front.dao.BargainMapper;
@@ -38,7 +36,6 @@ import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.activity.model.bargain.vo.MyBargainRecord;
 import com.zm.goods.bussiness.dao.GoodsMapper;
-import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
@@ -69,6 +66,37 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 
 	@Override
 	public List<MyBargain> listMyBargain(Integer userId, Integer start) {
+		// 准备用户数据
+		List<UserBargainPO> bargainList = dataReady(userId, start);
+		if (start == 1) {// 如果获取的是开始的，把结束的过滤掉
+			bargainList = bargainList.stream().filter(bargain -> bargain.isStart()).collect(Collectors.toList());
+		}
+		if (start == 0) {// 如果是结束的，把已购买没结束的状态改为false
+			bargainList.stream().forEach(bargain -> {
+				bargain.setStart(false);
+			});
+		}
+		// 创建砍价活动转换器
+		BargainEntityConverter convert = new BargainEntityConverter();
+		// 获取前端展示需要的对象
+		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList, userId);
+		if (myBargainList != null && myBargainList.size() > 0) {
+			// 完善砍价数据
+			renderBargain(myBargainList, false);
+		}
+		// 根据是否开始排序
+		Collections.sort(myBargainList);
+
+		return myBargainList;
+	}
+
+	/**
+	 * @fun 准备用户的砍价信息
+	 * @param userId
+	 * @param start
+	 * @return
+	 */
+	private List<UserBargainPO> dataReady(Integer userId, Integer start) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("userId", userId);
 		param.put("start", start);
@@ -94,27 +122,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		if (overList.size() > 0) {
 			bargainMapper.updateUserBargainOverByIds(overList);
 		}
-		if (start == 1) {// 如果获取的是开始的，把结束的过滤掉
-			bargainList = bargainList.stream().filter(bargain -> bargain.isStart()).collect(Collectors.toList());
-		}
-		if (start == 0) {// 如果是结束的，把已购买没结束的状态改为false
-			bargainList.stream().forEach(bargain -> {
-				bargain.setStart(false);
-			});
-		}
-
-		// 创建砍价活动转换器
-		BargainEntityConverter convert = new BargainEntityConverter();
-		// 获取前端展示需要的对象
-		List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList, userId);
-		if (myBargainList != null && myBargainList.size() > 0) {
-			// 完善砍价数据
-			renderBargain(myBargainList, false);
-		}
-		// 根据是否开始排序
-		Collections.sort(myBargainList);
-
-		return myBargainList;
+		return bargainList;
 	}
 
 	@Override
@@ -173,30 +181,33 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		}
 	}
 
+	private final String ONGOING = "ongoing";// 正在进行的
+	private final String LIST = "list";// 砍价列表
+
 	@Override
-	public Page<BargainGoods> listBargainGoods(Pagination pagination, Integer userId) {
+	public Map<String, Object> listBargainGoods(Integer userId) {
 		List<Integer> goodsRoleIdList = null;
+		Map<String, Object> result = new HashMap<>();// 定义返回数据
 		if (userId != null) {
+			// 获取所有的已参加砍价的商品ID
 			goodsRoleIdList = bargainMapper.listGoodsRoleIdsByUserId(userId);
+			// 准备用户数据 选择正在进行的
+			List<UserBargainPO> bargainList = dataReady(userId, 1);
+			// 把结束的过滤掉
+			bargainList = bargainList.stream().filter(bargain -> bargain.isStart()).collect(Collectors.toList());
+			// 创建砍价活动转换器
+			BargainEntityConverter convert = new BargainEntityConverter();
+			// 获取前端展示需要的对象
+			List<MyBargain> myBargainList = convert.userBargainPO2MyBargain(bargainList, userId);
+			if (myBargainList != null && myBargainList.size() > 0) {
+				// 完善砍价数据
+				renderBargain(myBargainList, false);
+			}
+			result.put(ONGOING, myBargainList);// 正在进行的数据
 		}
-		PageHelper.startPage(pagination.getCurrentPage(), pagination.getNumPerPage(), true);
-		Page<BargainRulePO> page = bargainMapper.listBargainGoodsForPage();
+		List<BargainRulePO> page = bargainMapper.listBargainGoodsForPage(goodsRoleIdList);
 		List<BargainGoods> bargainGoodsList = new ArrayList<BargainGoods>();
 		if (page.size() > 0) {
-			if (goodsRoleIdList != null && goodsRoleIdList.size() > 0) {
-				List<BargainRulePO> temp = new ArrayList<BargainRulePO>();
-				Iterator<BargainRulePO> it = page.iterator();
-				while (it.hasNext()) {
-					BargainRulePO po = it.next();
-					if (goodsRoleIdList.contains(po.getId())) {
-						it.remove();// 移除
-						temp.add(po);
-					}
-				}
-				temp.stream().forEach(tem -> {
-					page.add(tem);
-				});
-			}
 			// 获取开团数量
 			List<Integer> idList = page.stream().map(rule -> rule.getId()).collect(Collectors.toList());
 			List<BargainCountBO> bargainCountList = bargainMapper.listBargainCount(idList);
@@ -227,10 +238,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 				goods.setDescription(activeGoods.getDescription());
 			});
 		}
-		Page<BargainGoods> resultPage = new Page<>(page.getPageNum(), page.getPageSize(), (int) page.getTotal());
-		resultPage.setPages(page.getPages());
-		resultPage.addAll(bargainGoodsList);
-		return resultPage;
+		result.put(LIST, bargainGoodsList);// 放入砍价商品列表
+		return result;
 	}
 
 	@Override
@@ -256,13 +265,12 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		// 生成用户砍价记录类
 		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(dto.getUserId(), rulePO);
 		try {
-			bargainMapper.saveUserBargain(userBargainPO);
-		} catch (Exception e) {
-			if (e.getMessage() != null && e.getMessage().contains("Duplicate entry")) {
-				throw new ActiviteyException("你已经参加过该商品的砍价", 8);
-			} else {
-				throw new ActiviteyException("创建砍价信息失败，去砍程序员小哥哥吧", 9);
+			int i = bargainMapper.saveUserBargain(userBargainPO);
+			if (i == 0) {
+				throw new ActiviteyException("你已经参加过该砍价活动", 8);
 			}
+		} catch (Exception e) {
+			throw new ActiviteyException("创建砍价信息失败，去砍程序员小哥哥吧", 9);
 		}
 		userBargainPO.setCreateTime(DateUtil.getNowTimeStr("yyyy-MM-dd HH:mm:ss"));
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
@@ -392,6 +400,38 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 				.get().getId();
 		bargainMapper.updateBargainGoodsBuy(recordId);
 		return true;
+	}
+
+	private final int CHAIN_TYPE = 2;// 接龙模式不允许重新开始
+
+	@Override
+	public ResultModel bargainRetry(BargainInfoDTO dto) throws ActiviteyException {
+		int type = bargainMapper.getRuleTypeByUserBargainId(dto.getId());
+		if (type == CHAIN_TYPE) {
+			return new ResultModel(false, "", "该砍价为接龙模式，所有砍价用户都能购买，不能单独重新发起");
+		}
+		UserBargainPO userBargainPO = bargainMapper.getUserBargainById(dto.getId());
+		BargainRulePO rulePO = bargainMapper.getBargainRuleById(userBargainPO.getGoodsRoleId());
+		try {
+			if (!DateUtil.isAfter(userBargainPO.getCreateTime(), rulePO.getDuration())) {
+				return new ResultModel(false, "", "该砍价还没有结束，还不能发起重新砍价");
+			}
+			BargainRecordPO record = userBargainPO.getBargainList().stream()
+					.filter(r -> dto.getUserId().equals(r.getUserId())).findAny().get();
+			if(record.isBuy()){
+				return new ResultModel(false, "", "你已经购买过该商品，不能重新发起砍价");
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return new ResultModel(false, "", "重新砍价发起失败，要拿程序员祭天了");
+		}
+		int num = bargainMapper.updateUserBargainDel(dto);
+		if (num == 0) {
+			return new ResultModel(false, "", "没有满足条件的砍价记录可以发起重新砍价");
+		}
+		template.delete(BargainActiveComponent.BARGAIN_ACTIVE_PER+dto.getId());//删除redis数据
+		int id = startBargain(dto);// 开始砍价
+		return new ResultModel(true, id);
 	}
 
 }

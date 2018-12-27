@@ -134,6 +134,7 @@ public class Constants {
 	//*******************订单创建类型**********************
 	public static final int NORMAL_ORDER = 0;//普通订单
 	public static final int BARGAIN_ORDER = 1;//砍价活动订单
+	public static final int BIG_SALE = 2;//特卖商品
 	public static final int TO_B_ORDER = 4;//2b订单
 	public static final int OPEN_INTERFACE_TYPE = 5;//对接订单
 	

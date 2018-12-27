@@ -68,5 +68,6 @@ public class Constants {
 
 	public static final Integer GENERAL_TRADE = 2;// 一般贸易
 
-	
+	//***************************************************************
+	public static final String BIG_SALES_PRE = "bigsales:";
 }

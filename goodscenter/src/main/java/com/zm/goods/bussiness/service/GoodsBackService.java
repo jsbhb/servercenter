@@ -8,6 +8,7 @@
 package com.zm.goods.bussiness.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.github.pagehelper.Page;
 import com.zm.goods.pojo.ERPGoodsTagBindEntity;
@@ -281,5 +282,7 @@ public interface GoodsBackService {
 	List<String> getGoodsPicPath(String goodsId);
 
 	List<Tax> getTaxInfoByItemIds(List<String> itemIds);
+	
+	void updateRetailPrice(Map<String,Object> param);
 
 }

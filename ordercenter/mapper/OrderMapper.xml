@@ -432,7 +432,7 @@
 		update
 		order_base
 		set status = 1, update_time=now() where order_id = #{orderId,jdbcType =
-		VARCHAR} and status = 0
+		VARCHAR} and status in (0,9)
 	</update>
 
 	<update id="confirmUserOrder" parameterType="Object">

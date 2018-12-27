@@ -8,6 +8,7 @@ import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.pojo.Activity;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
+import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
@@ -214,5 +215,7 @@ public interface GoodsService {
 	 * @param centerId
 	 */
 	void updateLuceneIndex(List<String> updateTagList, Integer centerId);
+
+	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
 
 }
