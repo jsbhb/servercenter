@@ -15,6 +15,7 @@ import com.zm.goods.pojo.ComponentPage;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
+import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 
 /**
  * ClassName: MallService <br/>
@@ -128,5 +129,9 @@ public interface MallService {
 	List<ComponentData> queryComponentDataByPageId(String pageId);
 	
 	void updateComponentData(ComponentData data);
+	
+	void mergeBigSaleData(List<BigSalesGoodsRecord> list);
+	
+	List<BigSalesGoodsRecord> queryBigSaleData();
 
 }

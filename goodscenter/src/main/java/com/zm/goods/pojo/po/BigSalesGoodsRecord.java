@@ -19,6 +19,8 @@ public class BigSalesGoodsRecord {
 	private int week;//第几周
 	private int sort;
 	private String goodsId;
+	private String goodsName;
+	private String startTime;
 	public String getGoodsId() {
 		return goodsId;
 	}
@@ -98,5 +100,16 @@ public class BigSalesGoodsRecord {
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
-	
+	public String getGoodsName() {
+		return goodsName;
+	}
+	public void setGoodsName(String goodsName) {
+		this.goodsName = goodsName;
+	}
+	public String getStartTime() {
+		return startTime;
+	}
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
 }
