@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.ComponentData;
+import com.zm.goods.pojo.ComponentPage;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
@@ -134,4 +136,10 @@ public interface MallMapper {
 	 * @since JDK 1.7  
 	 */
 	void updateLayout(Layout layout);
+	
+	Page<ComponentPage> selectComponentForPage(ComponentPage entity);
+	
+	List<ComponentData> selectComponentDataByPageId(String pageId);
+	
+	void updateComponentData(ComponentData data);
 }

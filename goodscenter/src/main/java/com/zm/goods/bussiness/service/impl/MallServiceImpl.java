@@ -22,6 +22,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.MallMapper;
 import com.zm.goods.bussiness.service.MallService;
+import com.zm.goods.pojo.ComponentData;
+import com.zm.goods.pojo.ComponentPage;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
@@ -138,5 +140,21 @@ public class MallServiceImpl implements MallService {
 			entity.getLayout().setOpt(entity.getOpt());
 			mallMapper.updateLayout(entity.getLayout());
 		}
+	}
+
+	@Override
+	public Page<ComponentPage> queryComponentByPage(ComponentPage entity) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return mallMapper.selectComponentForPage(entity);
+	}
+
+	@Override
+	public List<ComponentData> queryComponentDataByPageId(String pageId) {
+		return mallMapper.selectComponentDataByPageId(pageId);
+	}
+
+	@Override
+	public void updateComponentData(ComponentData data) {
+		mallMapper.updateComponentData(data);
 	}
 }

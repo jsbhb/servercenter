@@ -40,6 +40,37 @@
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
 	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ComponentPage" id="component">
+		<id column="id" property="id"/>
+		<result column="page_id" property="pageId"/>
+		<result column="key" property="key"/>
+		<result column="name" property="name"/>
+		<result column="sort" property="sort"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.ComponentData" id="componentData">
+		<id column="id" property="id"/>
+		<result column="cp_id" property="cpId"/>
+		<result column="type" property="type"/>
+		<result column="picPath" property="picPath"/>
+		<result column="description" property="description"/>
+		<result column="origin" property="origin"/>
+		<result column="price" property="price"/>
+		<result column="href" property="href"/>
+		<result column="specs" property="specs"/>
+		<result column="goods_type" property="goodsType"/>
+		<result column="free_post" property="freePost"/>
+		<result column="free_tax" property="freeTax"/>
+		<result column="popular" property="popular"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="sort" property="sort"/>
+		<result column="tag_path" property="tagPath"/>
+		<result column="enname" property="enname"/>
+	</resultMap>
 
 	
 	<select id="selectDictById" parameterType="Object" resultMap="dict">
@@ -154,6 +185,49 @@
 		,sort = #{sort}
 		</if>
 		 where id = #{id} 
+	</update>
+	
+	<select id="selectComponentForPage" parameterType="Object" resultMap="component">
+		SELECT * FROM component_page where page_id = #{pageId} order by sort  
+	</select>
+	
+	<select id="selectComponentDataByPageId" parameterType="Object" resultMap="componentData">
+		SELECT * FROM component_data where cp_id = #{pageId} order by cp_id,type,sort  
+	</select>
+	
+	<update id="updateComponentData" parameterType="Object" >
+		update Component_data set update_time = now()
+		<if test="picPath!=null and picPath!=''">
+		,picPath = #{picPath}
+		</if>
+		<if test="title!=null and title!=''">
+		,title = #{title}
+		</if>
+		<if test="description!=null and description!=''">
+		,description = #{description}
+		</if>
+		<if test="origin!=null and origin!=''">
+		,origin = #{origin}
+		</if>
+		<if test="price!=null and price!=''">
+		,price = #{price}
+		</if>
+		<if test="href!=null and href!=''">
+		,href = #{href}
+		</if>
+		<if test="goodsId!=null and goodsId!=''">
+		,goods_id = #{goodsId}
+		</if>
+		<if test="sort!=null and sort!=''">
+		,sort = #{sort}
+		</if>
+		<if test="tagPath!=null and tagPath!=''">
+		,tag_path = #{tagPath}
+		</if>
+		<if test="enname!=null and enname!=''">
+		,enname = #{enname}
+		</if>
+		where id = #{id} 
 	</update>
 	
 </mapper>

@@ -10,6 +10,8 @@ package com.zm.goods.bussiness.service;
 import java.util.List;
 
 import com.github.pagehelper.Page;
+import com.zm.goods.pojo.ComponentData;
+import com.zm.goods.pojo.ComponentPage;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
@@ -120,5 +122,11 @@ public interface MallService {
 	 * @since JDK 1.7  
 	 */
 	void updateDict(PopularizeDict entity);
+	
+	Page<ComponentPage> queryComponentByPage(ComponentPage entity);
+	
+	List<ComponentData> queryComponentDataByPageId(String pageId);
+	
+	void updateComponentData(ComponentData data);
 
 }

@@ -15,6 +15,8 @@ import com.github.pagehelper.Page;
 import com.zm.goods.bussiness.service.MallService;
 import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.pojo.ComponentData;
+import com.zm.goods.pojo.ComponentPage;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
@@ -199,5 +201,43 @@ public class MallController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/mall/index/model/queryComponentForPage", method = RequestMethod.POST)
+	public ResultModel queryComponentForPage(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody ComponentPage entity) {
 
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<ComponentPage> page = mallService.queryComponentByPage(entity);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/mall/index/model/queryComponentDataByPageId", method = RequestMethod.POST)
+	public ResultModel queryComponentDataByPageId(HttpServletRequest request, @PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String pageId = request.getParameter("pageId");
+			List<ComponentData> dataList = mallService.queryComponentDataByPageId(pageId);
+			return new ResultModel(true, dataList);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/mall/index/model/updateComponentData", method = RequestMethod.POST)
+	public ResultModel updateComponentData(@PathVariable("version") Double version, @RequestBody ComponentData data) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				mallService.updateComponentData(data);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }
