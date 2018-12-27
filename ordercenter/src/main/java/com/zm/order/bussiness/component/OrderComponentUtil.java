@@ -627,4 +627,12 @@ public class OrderComponentUtil {
 		}
 	}
 
+	//北京环卫福利商城
+	public boolean judgeIsBJWelfare(OrderInfo info) {
+		if(info.getShopId().equals(124) && info.getOrderSource() == Constants.WELFARE_WEBSITE){
+			return true;
+		}
+		return false;
+	}
+
 }
