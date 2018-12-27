@@ -67,4 +67,12 @@ public interface GoodsFeignClient {
 	 */
 	@RequestMapping(value = "{version}/goods/item/timeTaskQueryStockQtyEnoughList", method = RequestMethod.POST)
 	public ResultModel stockQtyEnoughList(@PathVariable("version") Double version);
+	
+	/**
+	 * @fun 更新每周特卖商品
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/index/auto/config", method = RequestMethod.POST)
+	public boolean indexAutoConfig(@PathVariable("version") Double version);
 }

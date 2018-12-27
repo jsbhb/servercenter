@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,8 @@ public class GoodsBillboardController {
 			OutputStream stream;
 			try {
 				stream = res.getOutputStream();
-				stream.write(data);
+				Base64 encoder = new Base64 ();
+				stream.write(encoder.encode(data));
 		        stream.flush();
 		        stream.close();
 			} catch (IOException e) {
