@@ -71,6 +71,23 @@
 		<result column="tag_path" property="tagPath"/>
 		<result column="enname" property="enname"/>
 	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.po.BigSalesGoodsRecord" id="bigSaleRecord">
+		<id column="id" property="id"/>
+		<result column="item_id" property="itemId"/>
+		<result column="new_rebate" property="newRebate"/>
+		<result column="new_retail_price" property="newRetailPrice"/>
+		<result column="old_rebate" property="oldRebate"/>
+		<result column="old_retail_price" property="oldRetailPrice"/>
+		<result column="line_price" property="linePrice"/>
+		<result column="pic_path" property="picPath"/>
+		<result column="year" property="year"/>
+		<result column="week" property="week"/>
+		<result column="sort" property="sort"/>
+		<result column="goods_id" property="goodsId"/>
+		<result column="goods_name" property="goodsName"/>
+		<result column="start_time" property="startTime"/>
+	</resultMap>
 
 	
 	<select id="selectDictById" parameterType="Object" resultMap="dict">
@@ -228,6 +245,51 @@
 		,enname = #{enname}
 		</if>
 		where id = #{id} 
+	</update>
+	
+	<select id="selectBigSaleData" parameterType="Object" resultMap="bigSaleRecord">
+		SELECT a.*,b.goods_name FROM big_sale_record a left join goods b on a.goods_id= b.goods_id 
+		where start_time &gt; CURDATE() order by start_time,sort
+	</select>
+	
+	<insert id="insertBigSaleDataa" parameterType="Object" >
+		insert into big_sale_record (item_id, new_rebate, new_retail_price, old_rebate, old_retail_price, 
+		line_price, pic_path, year, week, sort, goods_id, start_time, create_time) VALUES 
+		<foreach collection="list" item="item" separator=",">
+		(#{item.itemId},#{item.newRebate},#{item.newRetailPrice},#{item.oldRebate},#{item.oldRetailPrice},
+		#{item.linePrice},#{item.picPath},#{item.year},#{item.week},#{item.sort},#{item.goodsId},#{item.startTime},now())
+		</foreach>
+	</insert>
+	
+	<update id="updateBigSaleData" parameterType="Object" >
+		<foreach collection="list" item="item" separator=";">
+			update big_sale_record 
+			<set>
+				update_time = now()
+				<if test="item.startTime!=null and item.startTime!=''">
+				,start_time = #{item.startTime}
+				</if>
+				<if test="item.newRetailPrice!=null and item.newRetailPrice!=''">
+				,new_retail_price = #{item.newRetailPrice}
+				</if>
+				<if test="item.newRebate!=null and item.newRebate!=''">
+				,new_rebate = #{item.newRebate}
+				</if>
+				<if test="item.linePrice!=null and item.linePrice!=''">
+				,line_price = #{item.linePrice}
+				</if>
+				<if test="item.sort!=null and item.sort!=''">
+				,sort = #{item.sort}
+				</if>
+				<if test="item.week!=null and item.week!=''">
+				,week = #{item.week}
+				</if>
+				<if test="item.year!=null and item.year!=''">
+				,year = #{item.year}
+				</if>
+			</set>
+			where id = #{item.id}
+		</foreach>
 	</update>
 	
 </mapper>

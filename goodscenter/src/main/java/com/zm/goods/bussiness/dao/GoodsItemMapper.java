@@ -284,4 +284,6 @@ public interface GoodsItemMapper {
 	void updateGoodsItemForStockEnough(List<String> list);
 
 	void insertGoodsShelveRecord(GoodsShelveRecordEntity entity);
+
+	void updateGoodsItemPrice(List<GoodsPrice> list);
 }

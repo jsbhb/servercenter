@@ -21,6 +21,7 @@ import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 
 /**
  * ClassName: MallController <br/>
@@ -233,6 +234,35 @@ public class MallController {
 			try {
 				mallService.updateComponentData(data);
 				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/mall/index/model/mergeBigSaleData", method = RequestMethod.POST)
+	public ResultModel mergeBigSaleData(@PathVariable("version") Double version, @RequestBody List<BigSalesGoodsRecord> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				mallService.mergeBigSaleData(list);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/mall/index/model/queryBigSaleData", method = RequestMethod.POST)
+	public ResultModel queryBigSaleData(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				return new ResultModel(true, mallService.queryBigSaleData());
 			} catch (Exception e) {
 				e.printStackTrace();
 				return new ResultModel(false, e.getMessage());

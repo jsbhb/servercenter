@@ -20,6 +20,7 @@ CREATE TABLE `zm_goods`.`big_sale_record` (
   `week` int(11) DEFAULT NULL COMMENT '周期',
   `sort` tinyint(5) DEFAULT NULL COMMENT '顺序',
   `goods_id` varchar(50) NOT NULL COMMENT '商品id',
+  `start_time` DATETIME NULL COMMENT '启用时间',
   `create_time` DATETIME NULL COMMENT '注册时间',
   `update_time` DATETIME NULL COMMENT '更新时间',
   `opt` VARCHAR(20) NULL COMMENT '操作人',

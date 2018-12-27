@@ -888,4 +888,14 @@
 		(create_time,shelve_type,shelve_mode,number,detail) 
 		VALUES (now(),#{shelveType},#{shelveMode},#{number},#{detail})
 	</insert>
+	
+	<update id="updateGoodsItemPrice" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update goods_price 
+			<set>
+				line_price = #{item.linePrice},update_time=now() 
+			</set>
+			where item_id =#{item.itemId}
+		</foreach>
+	</update>
 </mapper>

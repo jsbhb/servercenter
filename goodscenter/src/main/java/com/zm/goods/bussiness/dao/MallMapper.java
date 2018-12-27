@@ -9,6 +9,7 @@ import com.zm.goods.pojo.ComponentPage;
 import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.PopularizeDict;
+import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 
 public interface MallMapper {
 
@@ -142,4 +143,10 @@ public interface MallMapper {
 	List<ComponentData> selectComponentDataByPageId(String pageId);
 	
 	void updateComponentData(ComponentData data);
+	
+	void insertBigSaleDataa(List<BigSalesGoodsRecord> list);
+	
+	void updateBigSaleData(List<BigSalesGoodsRecord> list);
+	
+	List<BigSalesGoodsRecord> selectBigSaleData();
 }
