@@ -264,13 +264,15 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		BargainRule rule = convert.BargainRulePO2BargainRule(rulePO);
 		// 生成用户砍价记录类
 		UserBargainPO userBargainPO = convert.BargainRulePO2UserBargainPO(dto.getUserId(), rulePO);
+		int result = 0;
 		try {
-			int i = bargainMapper.saveUserBargain(userBargainPO);
-			if (i == 0) {
-				throw new ActiviteyException("你已经参加过该砍价活动", 8);
-			}
+			result = bargainMapper.saveUserBargain(userBargainPO);
 		} catch (Exception e) {
+			LogUtil.writeErrorLog("创建砍价失败:", e);
 			throw new ActiviteyException("创建砍价信息失败，去砍程序员小哥哥吧", 9);
+		}
+		if (result == 0) {
+			throw new ActiviteyException("你已经参加过该砍价活动", 8);
 		}
 		userBargainPO.setCreateTime(DateUtil.getNowTimeStr("yyyy-MM-dd HH:mm:ss"));
 		LogUtil.writeLog("用户开团记录ID为=====" + userBargainPO.getId());
@@ -430,6 +432,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			return new ResultModel(false, "", "没有满足条件的砍价记录可以发起重新砍价");
 		}
 		template.delete(BargainActiveComponent.BARGAIN_ACTIVE_PER+dto.getId());//删除redis数据
+		dto.setId(userBargainPO.getGoodsRoleId());//设置roleId
 		int id = startBargain(dto);// 开始砍价
 		return new ResultModel(true, id);
 	}

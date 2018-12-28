@@ -63,7 +63,7 @@ public class GoodsBillboard {
 		templatePath = prePath + "/images/template/default.jpg";
 		templateWidth = 455;
 		templateHeight = 880;
-		nameSpacing = 25;
+		nameSpacing = 35;
 		nameRows = 2;
 	}
 
