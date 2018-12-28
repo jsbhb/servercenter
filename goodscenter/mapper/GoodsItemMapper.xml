@@ -64,6 +64,7 @@
 		<result column="delivery_Place" property="deliveryPlace"/>
 		<result column="discount" property="discount"/>
 		<result column="retail_price" property="retailPrice"/>
+		<result column="line_price" property="linePrice"/>
 		<result column="info" property="info"/>
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
@@ -114,6 +115,7 @@
 			<result column="fxprice" property="fxPrice"/>
 			<result column="delivery_Place" property="deliveryPlace"/>
 			<result column="retail_price" property="retailPrice"/>
+			<result column="line_price" property="linePrice"/>
 		</association>
 		<association property="stock" javaType="com.zm.goods.pojo.GoodsStockEntity">
 			<result column="qpQty" property="qpQty"/>
@@ -209,7 +211,7 @@
 	
 	<select id="selectForPage" parameterType="Object" resultMap="itemEntity">
 		select i.*,g.supplier_id,g.supplier_name,g.goods_name,g.id g_id,g.origin,g.specs_template_id,g.type,
-		g.detail_path,p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,
+		g.detail_path,p.min,p.max,p.proxy_price,p.fxprice,p.delivery_place,p.retail_price,p.line_price,
 		s.qpQty,s.fxqty,s.defqty,s.lockedqty,s.frozenqty,b.id as base_id,b.brand_id,
 		b.brand,b.increment_tax,b.tariff,b.unit,b.hscode,b.encode b_encode,b.first_category,
 		b.second_category,b.third_category,b.center_id
@@ -386,10 +388,10 @@
 	
 	<insert id="insertPriceBatch" parameterType="Object">
 		insert into goods_price 
-		(item_id,min,max,proxy_price,fxprice,retail_price,create_time,update_time,opt)
+		(item_id,min,max,proxy_price,fxprice,retail_price,create_time,update_time,opt,line_price)
 		value
 		<foreach collection="list" item="item" separator=",">
-			(#{item.itemId},#{item.min},#{item.max},#{item.proxyPrice},#{item.fxPrice},#{item.retailPrice},now(),now(),#{item.opt})
+			(#{item.itemId},#{item.min},#{item.max},#{item.proxyPrice},#{item.fxPrice},#{item.retailPrice},now(),now(),#{item.opt},#{item.linePrice})
 		</foreach>
 	</insert>
 	
@@ -680,6 +682,7 @@
 				<if test="item.proxyPrice != null and item.proxyPrice != ''">proxy_price = #{item.proxyPrice}, </if>
 				<if test="item.fxPrice != null and item.fxPrice != ''">fxprice = #{item.fxPrice}, </if>
 				<if test="item.retailPrice != null and item.retailPrice != ''">retail_price = #{item.retailPrice}, </if>
+				<if test="item.linePrice != null and item.linePrice != ''">line_price = #{item.linePrice}, </if>
 				<if test="item.min != null and item.min != ''">min = #{item.min}, </if>
 				<if test="item.max != null and item.max != ''">max = #{item.max}, </if>
 				update_time = now(),opt = #{item.opt}
