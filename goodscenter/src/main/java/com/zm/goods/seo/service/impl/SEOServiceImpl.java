@@ -101,10 +101,12 @@ public class SEOServiceImpl implements SEOService {
 		if (goodsItemList == null) {
 			return null;
 		}
+		goodsItemList.stream().forEach(
+				item -> item.getGoodsSpecsList().stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum() * 10)));
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		String bigsaleJson = (String) template.opsForValue().get(Constants.BIG_SALES_PRE);
 		List<String> bigSaleList = new ArrayList<>();
-		if(bigsaleJson != null){
+		if (bigsaleJson != null) {
 			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
 		}
 		for (GoodsItem goodsItem : goodsItemList) {
@@ -126,9 +128,9 @@ public class SEOServiceImpl implements SEOService {
 					LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
 				}
 			}
-			if(goodsItem.getGoodsSpecsList() != null){
-				for(GoodsSpecs specs : goodsItem.getGoodsSpecsList()){
-					if(bigSaleList.contains(specs.getItemId())){
+			if (goodsItem.getGoodsSpecsList() != null) {
+				for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
+					if (bigSaleList.contains(specs.getItemId())) {
 						specs.setBigSale(1);
 					}
 				}

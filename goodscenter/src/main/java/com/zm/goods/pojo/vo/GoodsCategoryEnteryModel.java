@@ -15,6 +15,16 @@ public class GoodsCategoryEnteryModel {
 	
 	private Integer popular;
 	
+	private String thirdPicPath;
+	
+	public String getThirdPicPath() {
+		return thirdPicPath;
+	}
+
+	public void setThirdPicPath(String thirdPicPath) {
+		this.thirdPicPath = thirdPicPath;
+	}
+
 	public Integer getPopular() {
 		return popular;
 	}

@@ -86,6 +86,16 @@ public class GoodsSpecs implements Serializable {
 	private int fx;//是否分销，0否，1是
 	
 	private Integer bigSale;
+	
+	private Integer saleNum;
+
+	public Integer getSaleNum() {
+		return saleNum;
+	}
+
+	public void setSaleNum(Integer saleNum) {
+		this.saleNum = saleNum;
+	}
 
 	public Integer getBigSale() {
 		return bigSale;

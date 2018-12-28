@@ -86,6 +86,7 @@
 		<result column="carton" property="carton" jdbcType="VARCHAR" />
 		<result column="qpqty" property="stock" jdbcType="INTEGER" />
 		<result column="is_fx" property="fx" jdbcType="INTEGER" />
+		<result column="sale_num" property="saleNum" jdbcType="INTEGER" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
@@ -98,6 +99,7 @@
 			<result column="delivery_place" property="deliveryPlace"
 				jdbcType="VARCHAR" />
 			<result column="vip_price" property="vipPrice" jdbcType="NUMERIC" />
+			<result column="line_price" property="linePrice" jdbcType="NUMERIC" />
 			<result column="sub_create_time" property="createTime"
 				jdbcType="VARCHAR" />
 			<result column="sub_update_time" property="updateTime"
@@ -223,6 +225,7 @@
 				<result column="third_id" property="id" jdbcType="VARCHAR" />
 				<result column="entryName" property="entryName" jdbcType="VARCHAR" />
 				<result column="is_popular" property="popular" jdbcType="INTEGER" />
+				<result column="ttag_path" property="thirdPicPath" jdbcType="VARCHAR" />
 			</collection>
 		</collection>
 	</resultMap>
@@ -269,7 +272,7 @@
 	
 	<select id = "queryGoodsCategory" parameterType="Object" resultMap = "goodsIndustry">
 		select gfc.id,gfc.first_id,gfc.name as industryName,gfc.tag_path,gsc.id as dictid,gsc.second_id,gsc.name as dictName,
-		gtc.id as entryId,gtc.name as entryName,gtc.third_id,gtc.is_popular   
+		gtc.id as entryId,gtc.name as entryName,gtc.third_id,gtc.is_popular,gtc.tag_path as ttag_path    
 		from goods_first_category gfc left join goods_second_category gsc on gfc.first_id = gsc.first_id 
 		left join goods_third_category gtc on gsc.second_id = gtc.second_id 
 		where gfc.status = 1 and gsc.status =1 and gtc.status =1 order by gfc.sort ,gsc.sort ,gtc.sort
@@ -335,8 +338,8 @@
 	
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select gi.id,gi.item_id,gi.goods_id,gi.info,gi.item_code,gi.sku,gi.is_promotion,gi.conversion,gi.carton,
-		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gi.discount,
-		gi.status as specsStatus,gi.excise_tax,gi.weight,stock.fxqty as qpqty,bgp.delivery_place
+		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gi.discount,bgp.line_price,
+		gi.status as specsStatus,gi.excise_tax,gi.weight,stock.fxqty as qpqty,bgp.delivery_place,gi.sale_num 
 		from goods_item gi
 		left join goods_stock stock on gi.item_id = stock.item_id 
 		left join goods g on gi.goods_id = g.goods_id 
