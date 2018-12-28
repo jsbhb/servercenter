@@ -1,6 +1,5 @@
 package com.zm.goods.bussiness.service.impl;
 
-import java.util.Calendar;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -27,15 +26,12 @@ public class IndexAutoConfigServiceImpl implements IndexAutoConfigService {
 			LogUtil.writeLog("没有已经发布的模板");
 			return false;
 		}
-		Calendar calendar = Calendar.getInstance();
-		calendar.setFirstDayOfWeek(Calendar.MONDAY);
-		int week = calendar.get(Calendar.WEEK_OF_YEAR);
 		pageList.stream().forEach(po -> {
 			if (po.getModule() != null) {
 				po.getModule().stream().forEach(module -> {
 					IindexAutoConfig auto = IndexAutoConfigFactory.get(module.getKey());
 					if(auto != null){
-						auto.autoConfig(module, week, po.getClient());
+						auto.autoConfig(module, po.getClient());
 					}
 				});
 			}

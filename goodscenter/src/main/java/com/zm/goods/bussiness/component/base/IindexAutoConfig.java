@@ -4,5 +4,5 @@ import com.zm.goods.pojo.po.ComponentPagePO;
 
 public interface IindexAutoConfig {
 
-	public boolean autoConfig(ComponentPagePO cp, int week, String client);
+	public boolean autoConfig(ComponentPagePO cp, String client);
 }

@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +35,24 @@ import com.zm.goods.utils.SpringContextUtil;
 public class BigSalesPerWeekModule implements IindexAutoConfig {
 
 	@Override
-	public boolean autoConfig(ComponentPagePO cp, int week, String client) {
+	public boolean autoConfig(ComponentPagePO cp, String client) {
 		SEOService seoService = (SEOService) SpringContextUtil.getBean("seoService");
+		//获取现在的年和周、上一周的年和周
+		Calendar cl = Calendar.getInstance();
+		cl.setFirstDayOfWeek(Calendar.MONDAY);//获取周的第一天为星期一
+		int week = cl.get(Calendar.WEEK_OF_YEAR);//当前周
+		cl.add(Calendar.DAY_OF_MONTH, -7);// 往前推7天
+		int year = cl.get(Calendar.YEAR);// 获取年
+		int oldYear = year;// 上一周的是几几年
+		int oldWeek = 0;//上一周是第几周
+		if (week < cl.get(Calendar.WEEK_OF_YEAR)) {// 如果week小于往前推7天后的周，那么说明是年的交界
+			year += 1;
+			oldWeek = cl.get(Calendar.WEEK_OF_YEAR);
+		} else {
+			oldWeek = week - 1;
+		}
+		//end
 		// 获取本周特卖商品
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
-		int year = Integer.valueOf(sdf.format(new Date()));
 		Map<String, Integer> param = new HashMap<>();
 		param.put("year", year);
 		param.put("week", week);
@@ -52,25 +64,8 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		// 更新本周价格、返佣比例、首页数据、上下架/根据client发布首页
 		updateNewDate(newRecordList, client, cp, seoService);
 		// 获取上一周的
-		if (week == 1) {// 第一周
-			sdf = new SimpleDateFormat("yyyy-MM-dd");
-			int oldYear = year - 1;
-			Date date = null;
-			try {
-				date = sdf.parse(oldYear + "-12-31");
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			Calendar c = Calendar.getInstance();
-			c.setFirstDayOfWeek(Calendar.MONDAY);
-			c.setTime(date);
-			int oldWeek = c.get(Calendar.WEEK_OF_YEAR);
-			param.put("year", oldYear);
-			param.put("week", oldWeek);
-		} else {
-			param.put("year", year);
-			param.put("week", week - 1);
-		}
+		param.put("year", oldYear);
+		param.put("week", oldWeek);
 		List<BigSalesGoodsRecord> oldRecordList = seoService.listRecord(param);
 		if (oldRecordList != null && oldRecordList.size() > 0) {
 			// 更新上周价格、返佣比例、上下架
@@ -213,5 +208,24 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		entity.setProportion(isNew ? record.getNewRebate() : record.getOldRebate());
 		entity.setGradeType(2);// 区域中心
 		entityList.add(entity);
+	}
+	
+	public static void main(String[] args) throws ParseException {
+		Calendar cl = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		cl.setTime(sdf.parse("2019-01-06"));
+		cl.setFirstDayOfWeek(Calendar.MONDAY);
+		int week = cl.get(Calendar.WEEK_OF_YEAR);
+		cl.add(Calendar.DAY_OF_MONTH, -7);// 往前推7天
+		int year = cl.get(Calendar.YEAR);// 获取年
+		int oldYear = year;// 上一周的是几几年
+		int oldWeek = 0;
+		if (week < cl.get(Calendar.WEEK_OF_YEAR)) {// 如果week小于往前推7天后的周，那么说明是年的交界
+			year += 1;
+			oldWeek = cl.get(Calendar.WEEK_OF_YEAR);
+		} else {
+			oldWeek = week - 1;
+		}
+		System.out.println(year+","+week+","+oldYear+","+oldWeek);
 	}
 }
