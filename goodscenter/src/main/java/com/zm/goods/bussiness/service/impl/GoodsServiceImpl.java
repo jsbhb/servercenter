@@ -119,7 +119,7 @@ public class GoodsServiceImpl implements GoodsService {
 		parameter.put("type", PICTURE_TYPE);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
-		specsList.stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum()*10));
+		specsList.stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum()*11));
 		goodsServiceComponent.packageGoodsItem(goodsList, fileList, specsList, true);
 		// if (param.get("goodsId") != null && Constants.PREDETERMINE_PLAT_TYPE
 		// != centerId) {

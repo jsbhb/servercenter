@@ -102,7 +102,7 @@ public class SEOServiceImpl implements SEOService {
 			return null;
 		}
 		goodsItemList.stream().forEach(
-				item -> item.getGoodsSpecsList().stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum() * 10)));
+				item -> item.getGoodsSpecsList().stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum() * 11)));
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		String bigsaleJson = (String) template.opsForValue().get(Constants.BIG_SALES_PRE);
 		List<String> bigSaleList = new ArrayList<>();
