@@ -3,7 +3,7 @@ alter table goods_second_category add column tag_path varchar(200) null comment 
 alter table goods_third_category add column tag_path varchar(200) null comment '图标路径';
 alter table component_page add column name varchar(200) NULL comment '模块别名';
 
-alter table goods_price add column line_price DECIMAL(10,2) NOT NULL DEFAULT 0.0 comment '商品划线价';
+alter table goods_price add column line_price DECIMAL(10,2) NULL DEFAULT 0.0 comment '商品划线价';
 alter table goods_item add column sale_num int(11) DEFAULT 0 comment '商品销量';
 
 drop table if exists  `big_sale_record`;

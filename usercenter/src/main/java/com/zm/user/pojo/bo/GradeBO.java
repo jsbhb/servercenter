@@ -1,5 +1,8 @@
 package com.zm.user.pojo.bo;
 
+import java.util.List;
+
+
 public class GradeBO {
 
 	private Integer id;
@@ -11,6 +14,7 @@ public class GradeBO {
 	private Integer type;
 	private Integer welfareType;
 	private Double welfareRebate;
+	private List<GradeBO> children;
 	
 	public Integer getWelfareType() {
 		return welfareType;
@@ -65,6 +69,12 @@ public class GradeBO {
 	}
 	public void setType(Integer type) {
 		this.type = type;
+	}
+	public List<GradeBO> getChildren() {
+		return children;
+	}
+	public void setChildren(List<GradeBO> children) {
+		this.children = children;
 	}
 	
 }
