@@ -130,6 +130,7 @@ public class Constants {
 	public static final Integer JU_MING_HUI = 11;//聚民惠
 	public static final Integer PING_DUO_DUO = 12;//拼多多
 	public static final Integer YI_JIE_BJ = 13;//易捷北京
+	public static final Integer OWNER = 14;//自营
 	
 	//*******************订单创建类型**********************
 	public static final int NORMAL_ORDER = 0;//普通订单
