@@ -304,7 +304,8 @@
 		left join zm_goods.goods_second_category gsc on b.first_category = gsc.first_id and b.second_category = gsc.second_id
 		left join zm_goods.goods_third_category gtc on b.second_category = gtc.second_id and b.third_category = gtc.third_id
 		left join zm_order.order_detail od on ob.order_id = od.order_id
-		left join zm_order.third_order_info toi on ob.order_id = toi.order_id and ob.supplier_id = toi.supplier_id
+		left join zm_order.third_order_info toi on ob.order_id = toi.order_id 
+		#and ob.supplier_id = toi.supplier_id
 		left join zm_goods.goods_item i on og.item_id=i.item_id 
 		left join order_status_record osr on osr.order_id = ob.order_id and osr.status = '7'
 		where 1=1 
