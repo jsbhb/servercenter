@@ -135,7 +135,6 @@ public class OrderServiceImpl implements OrderService {
 		// ************************* 临时加的判断，砍价特殊处理 商品拆开，代码还原删掉该模块以及涉及的其他地方*********************
 		boolean isBargain = orderComponentUtil.judgeIsBargainOrder(info);
 		boolean isSpecial = orderComponentUtil.judgeIsSpecial(info);
-		boolean isBJWelfare = orderComponentUtil.judgeIsBJWelfare(info);
 		// ***************************end****************************************
 
 		// 获取该用户是否是VIP
@@ -192,9 +191,6 @@ public class OrderServiceImpl implements OrderService {
 					return result;
 				}
 			}
-		}
-		if(isBJWelfare){//北京环卫固定优惠5块
-			amount = CalculationUtils.sub(amount, 5);
 		}
 		Double disAmount = 0.0;
 		if (!isBargain) {// 临时加的，如果不是砍价订单

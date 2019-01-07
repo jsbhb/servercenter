@@ -1,0 +1,1 @@
+alter table zm_order.order_goods add unit varchar(10) default null comment '计量单位';
