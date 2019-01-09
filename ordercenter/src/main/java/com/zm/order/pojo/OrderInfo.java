@@ -79,6 +79,8 @@ public class OrderInfo extends Pagination{
 	private Integer purchasingOrder;//采购订单0：否，1是
 	
 	private String deliveryTime;
+	
+	private String opt;
 
 	public boolean check() {
 		if (orderDetail == null || orderGoodsList == null || orderFlag == null || createType == null || userId == null
@@ -358,6 +360,14 @@ public class OrderInfo extends Pagination{
 
 	public void setDeliveryTime(String deliveryTime) {
 		this.deliveryTime = deliveryTime;
+	}
+
+	public String getOpt() {
+		return opt;
+	}
+
+	public void setOpt(String opt) {
+		this.opt = opt;
 	}
 
 	@Override

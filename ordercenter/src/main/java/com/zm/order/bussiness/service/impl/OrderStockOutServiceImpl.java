@@ -234,7 +234,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 						|| Constants.JU_MING_HUI.equals(info.getOrderSource())
 						|| Constants.PING_DUO_DUO.equals(info.getOrderSource())
 						|| Constants.YI_JIE_BJ.equals(info.getOrderSource())
-						|| Constants.OWNER.equals(info.getOrderSource())) {
+						|| Constants.OWNER.equals(info.getOrderSource())
+						|| Constants.JIN_RONG_GONG_CHANG.equals(info.getOrderSource())) {
 					
 					// 增加缓存订单数量
 					cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");

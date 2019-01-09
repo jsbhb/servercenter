@@ -47,6 +47,7 @@ public class OrderInfoListForDownload {
 	private Double taxFee;
 	private String deliveryTime;
 	private String rebate;
+	private String opt;
 	
 	public String getRebate() {
 		return rebate;
@@ -305,5 +306,11 @@ public class OrderInfoListForDownload {
 	}
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
+	}
+	public String getOpt() {
+		return opt;
+	}
+	public void setOpt(String opt) {
+		this.opt = opt;
 	}
 }

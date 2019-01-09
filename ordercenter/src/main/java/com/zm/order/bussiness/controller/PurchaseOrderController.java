@@ -16,7 +16,6 @@ import com.zm.order.common.Pagination;
 import com.zm.order.common.ResultModel;
 import com.zm.order.constants.Constants;
 import com.zm.order.pojo.OrderInfo;
-import com.zm.order.pojo.PurchaseOrderInfo;
 
 /**
  * ClassName: OrderBackController <br/>
