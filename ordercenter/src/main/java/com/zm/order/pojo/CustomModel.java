@@ -3,6 +3,8 @@ package com.zm.order.pojo;
 public class CustomModel {
 	
 	private Integer id;
+	
+	private Integer supplierId;
 
 	private String outRequestNo;// 报关流水号,订单号
 
@@ -21,6 +23,14 @@ public class CustomModel {
 	private String buyerName;// 订购人姓名，可空
 
 	private String buyerIdNo;// 订购人身份证信息,可空
+
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
 
 	public Integer getCenterId() {
 		return centerId;

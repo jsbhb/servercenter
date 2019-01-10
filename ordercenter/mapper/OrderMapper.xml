@@ -85,6 +85,7 @@
 		<result column="pay_type" property="payType" jdbcType="INTEGER" />
 		<result column="pay_no" property="payNo" jdbcType="VARCHAR" />
 		<result column="payment" property="amount" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 	</resultMap>
 
 	<resultMap type="com.zm.order.pojo.ShoppingCart" id="shoppingCart">
@@ -136,7 +137,7 @@
 
 	<select id="listPayCustomOrder" resultMap="customModel">
 		select
-		o.id,o.order_id,od.pay_no,od.payment,o.mall_id,od.pay_type from
+		o.id,o.order_id,o.supplier_id,od.pay_no,od.payment,o.mall_id,od.pay_type from
 		order_base o left join order_detail od on o.order_id =
 		od.order_id
 		where o.status = 12 and o.order_flag = 0 and is_manual = 0 and supplier_id != 5 and o.create_type != 5
@@ -672,6 +673,16 @@
 	<!-- 根据订单Id查询物流信息 -->
 	<select id="getThirdInfo" parameterType="Object" resultMap="expressList">
 		select * from third_order_info where order_id = #{orderId} and express_id is not null
+	</select>
+	
+	<!-- 根据订单ID获取供应商的订单ID -->
+	<select id="getThirdOrderId" parameterType="Object" resultType="java.lang.String">
+		select third_order_id from third_order_info where order_id = #{orderId}
+	</select>
+	
+	<!-- 根据供应商订单ID获取系统订单ID -->
+	<select id="getOrderIdFromThirdOrderId" parameterType="Object" resultType="java.lang.String">
+		select order_id from third_order_info where third_order_id = #{orderId}
 	</select>
 	
 	<select id="getGradeId" parameterType="Object" resultType="java.lang.Integer">

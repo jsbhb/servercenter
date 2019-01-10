@@ -32,6 +32,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.OrderStatusCallBack;
 import com.zm.order.utils.JSONUtil;
 
 import io.swagger.annotations.Api;
@@ -693,6 +694,22 @@ public class OrderController {
 
 		return false;
 
+	}
+
+	/**
+	 * @fun 供应商订单状态回传
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/status/call-back", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel orderStatusCallBack(@PathVariable("version") Double version,
+			@RequestBody OrderStatusCallBack callBack) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			return orderService.orderStatusCallBack(callBack);
+		}
+
+		return null;
 	}
 
 }

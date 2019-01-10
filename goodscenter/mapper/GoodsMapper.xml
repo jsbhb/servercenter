@@ -40,6 +40,7 @@
 		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
 			<id column="specs_id" property="id" jdbcType="INTEGER" />
 			<result column="info" property="info" jdbcType="VARCHAR" />
+			<result column="unit" property="unit" jdbcType="VARCHAR" />
 			<result column="is_fx" property="fx" jdbcType="INTEGER" />
 			<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
 				<id column="price_id" property="id" jdbcType="INTEGER" />
@@ -77,6 +78,7 @@
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
 		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
 		<result column="specsStatus" property="status" jdbcType="INTEGER" />
 		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
@@ -339,11 +341,12 @@
 	<select id="listGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
 		select gi.id,gi.item_id,gi.goods_id,gi.info,gi.item_code,gi.sku,gi.is_promotion,gi.conversion,gi.carton,
 		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price ,bgp.vip_price,gi.discount,bgp.line_price,
-		gi.status as specsStatus,gi.excise_tax,gi.weight,stock.fxqty as qpqty,bgp.delivery_place,gi.sale_num 
+		gi.status as specsStatus,gi.excise_tax,gi.weight,stock.fxqty as qpqty,bgp.delivery_place,gi.sale_num,b.unit  
 		from goods_item gi
 		left join goods_stock stock on gi.item_id = stock.item_id 
 		left join goods g on gi.goods_id = g.goods_id 
 		left join goods_price bgp on gi.item_id = bgp.item_id 
+		left join base b on g.base_id = b.id
 		where gi.status = 1 and gi.is_del = 0 
 		<if test="isFx != null">
 			and gi.is_fx = #{isFx} 

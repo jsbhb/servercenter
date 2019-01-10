@@ -19,6 +19,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.OrderStatusCallBack;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 
 /**
@@ -319,4 +320,11 @@ public interface OrderService {
 	 * @return
 	 */
 	boolean capitalPoolRecount();
+	
+	/**
+	 * @fun 供应商订单状态回传
+	 * @param callBack
+	 * @return
+	 */
+	ResultModel orderStatusCallBack(OrderStatusCallBack callBack);
 }

@@ -169,5 +169,9 @@ public interface OrderMapper {
 	List<Rebate4Order> listRebate4Order();
 
 	void deleteRebate4Order(List<Rebate4Order> list);
+
+	List<String> getThirdOrderId(String orderId);
+
+	String getOrderIdFromThirdOrderId(String orderId);
 	
 }

@@ -88,6 +88,16 @@ public class GoodsSpecs implements Serializable {
 	private Integer bigSale;
 	
 	private Integer saleNum;
+	
+	private String unit;
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
 
 	public Integer getSaleNum() {
 		return saleNum;

@@ -51,6 +51,7 @@
 			<result column="weight" property="weight" jdbcType="INTEGER" />
 			<result column="info" property="info" jdbcType="VARCHAR" />
 			<result column="carton" property="carton" jdbcType="VARCHAR" />
+			<result column="unit" property="unit" jdbcType="VARCHAR" />
 			<result column="is_fx" property="fx" jdbcType="INTEGER" />
 			<result column="sale_num" property="saleNum" jdbcType="INTEGER" />
 			<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
@@ -123,7 +124,7 @@
 	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
 		select g.id,g.goods_id ,g.goods_name as customGoodsName, g.description,g.detail_path,gf.id as file_id,gf.path,
 		gi.excise_tax,gi.info,gi.conversion,gi.item_id,gi.item_code,gi.sku,gi.weight,gi.carton,gp.min,gp.max,gp.retail_price,
-		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,gi.is_fx,gp.line_price,
+		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,gi.is_fx,gp.line_price,gb.unit,
 		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gi.id as specs_id,gp.id as price_id,gi.sale_num 
 		from goods g 
 		left join base gb on g.base_id = gb.id 

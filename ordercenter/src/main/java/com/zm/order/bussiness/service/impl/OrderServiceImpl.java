@@ -58,6 +58,7 @@ import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.UserInfo;
 import com.zm.order.pojo.bo.GradeBO;
+import com.zm.order.pojo.bo.OrderStatusCallBack;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
@@ -170,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
 					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
 			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
 		}
-		if(isSpecial){//特殊包邮包税
+		if (isSpecial) {// 特殊包邮包税
 			freeTax = true;
 			freePost = true;
 		}
@@ -227,7 +228,7 @@ public class OrderServiceImpl implements OrderService {
 
 		// ***************************临时针对天天仓的商品进行拆分***************************
 		orderComponentUtil.splitGoods(info, isBargain);
-		if(isSpecial){//拆税
+		if (isSpecial) {// 拆税
 			orderComponentUtil.splitTax(info);
 		}
 		// *****************************end****************************************
@@ -298,7 +299,7 @@ public class OrderServiceImpl implements OrderService {
 		if (list != null && list.size() > 0) {
 			for (OrderInfo order : list) {
 				String json = hashOpt.get(Constants.GRADEBO_INFO, order.getShopId() + "");
-				if(json == null){
+				if (json == null) {
 					order.setShopName("中国供销海外购");
 				} else {
 					bo = JSONUtil.parse(json, GradeBO.class);
@@ -952,5 +953,64 @@ public class OrderServiceImpl implements OrderService {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public ResultModel orderStatusCallBack(OrderStatusCallBack callBack) {
+		ThirdOrderInfo thirdOrderInfo = null;
+		List<ThirdOrderInfo> list = new ArrayList<>();
+		if (callBack.getType() == 1) {
+			List<String> thirdOrderIds = orderMapper.getThirdOrderId(callBack.getOrderId());
+			if (thirdOrderIds == null || thirdOrderIds.size() == 0) {
+				return new ResultModel(false, "没有该订单");
+			}
+			for (String thirdOrderId : thirdOrderIds) {
+				thirdOrderInfo = buildThirdOrderInfo(callBack, thirdOrderId, true);
+				list.add(thirdOrderInfo);
+			}
+		}
+		if (callBack.getType() == 2) {
+			String orderId = null;
+			try {
+				orderId = orderMapper.getOrderIdFromThirdOrderId(callBack.getOrderId());
+			} catch (Exception e) {
+				return new ResultModel(false, "该供应商订单号对应多个系统订单，请确认");
+			}
+			if (orderId == null) {
+				return new ResultModel(false, "没有该订单");
+			}
+			thirdOrderInfo = buildThirdOrderInfo(callBack, orderId, false);
+			list.add(thirdOrderInfo);
+		}
+		changeOrderStatusByThirdWarehouse(list);
+		return new ResultModel(true, null);
+	}
+
+	private ThirdOrderInfo buildThirdOrderInfo(OrderStatusCallBack callBack, String orderId, boolean isThird) {
+		ThirdOrderInfo thirdOrderInfo = new ThirdOrderInfo();
+		if (isThird) {
+			thirdOrderInfo.setOrderId(callBack.getOrderId());
+			thirdOrderInfo.setThirdOrderId(orderId);
+		} else {
+			thirdOrderInfo.setOrderId(orderId);
+			thirdOrderInfo.setThirdOrderId(callBack.getOrderId());
+		}
+		thirdOrderInfo.setOrderStatus(callBack.getStatus());
+		thirdOrderInfo.setStatus(subString(callBack.getErrorMsg(), 40));
+		thirdOrderInfo.setExpressId(callBack.getExpressId());
+		thirdOrderInfo.setExpressKey(callBack.getExpressKey());
+		thirdOrderInfo.setExpressName(callBack.getExpressName());
+		return thirdOrderInfo;
+	}
+
+	private String subString(String msg, int length) {
+		if (msg == null) {
+			return msg;
+		}
+		if (msg.length() > length) {
+			return msg.substring(0, length);
+		} else {
+			return msg;
+		}
 	}
 }
