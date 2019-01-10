@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.zm.pay.pojo.AliPayConfigModel;
+import com.zm.pay.pojo.CustomConfig;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.pojo.YopConfigModel;
@@ -26,4 +27,8 @@ public interface PayMapper {
 	List<YopConfigModel> listYopPayConfig();
 
 	YopConfigModel getYopPayConfig(@Param("centerId") Integer clientId);
+	
+	List<CustomConfig> listCustomConfig();
+	
+	CustomConfig getCustomConfig(@Param("supplierId") Integer supplierId);
 }

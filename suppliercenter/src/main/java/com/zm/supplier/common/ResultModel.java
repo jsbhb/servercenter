@@ -1,5 +1,8 @@
 package com.zm.supplier.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * ClassName: ResultPojo <br/>
  * Function: 返回统一对象. <br/>
@@ -9,6 +12,7 @@ package com.zm.supplier.common;
  * @version
  * @since JDK 1.7
  */
+@JsonInclude(Include.NON_NULL)
 public class ResultModel {
 
 	private String errorCode;
@@ -25,11 +29,11 @@ public class ResultModel {
 		this.obj = obj;
 	}
 
-	public ResultModel(boolean success, String errorMsg) {
+	public ResultModel(boolean success, String errorCode, String errorMsg) {
 		this.success = success;
 		this.errorMsg = errorMsg;
+		this.errorCode = errorCode;
 	}
-	
 
 	public ResultModel(boolean flag, Object obj, Pagination pagination) {
 		this.success = flag;

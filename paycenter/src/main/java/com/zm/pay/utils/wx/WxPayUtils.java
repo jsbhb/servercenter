@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.constants.Constants;
+import com.zm.pay.pojo.CustomConfig;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
@@ -31,11 +32,11 @@ public class WxPayUtils {
 	public static Map<String, String> unifiedOrder(String type, WeixinPayConfig config, PayModel model)
 			throws Exception {
 
-		if(Constants.JSAPI_WX_APPLET.equalsIgnoreCase(type)){
+		if (Constants.JSAPI_WX_APPLET.equalsIgnoreCase(type)) {
 			config.setAppID(config.getAppletAppId());
 			type = type.split("_")[0];
 		}
-		
+
 		WXPay wxpay = new WXPay(config);
 
 		Map<String, String> data = new HashMap<String, String>();
@@ -87,15 +88,16 @@ public class WxPayUtils {
 	}
 
 	// 报关接口
-	public static Map<String, String> acquireCustom(WeixinPayConfig config, CustomModel custom) throws Exception {
+	public static Map<String, String> acquireCustom(WeixinPayConfig config, CustomModel custom, CustomConfig customCfg)
+			throws Exception {
 
 		WXPay wxpay = new WXPay(config);
 
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("out_trade_no", custom.getOutRequestNo());
 		data.put("transaction_id", custom.getPayNo());
-		data.put("customs", Constants.CUSTOMS_PLACE);
-		data.put("mch_customs_no", Constants.MERCHANT_CUSTOMS_CODE);
+		data.put("customs", customCfg.getCustomsPlace());
+		data.put("mch_customs_no", customCfg.getMerchantCustomsCode());
 
 		data = fillRequestData(data, config);
 		String res = wxpay.requestWithoutCert(CUSTOM_URL, data, CONNECT_TIMEOUTMS, READ_TIMEOUTMS);

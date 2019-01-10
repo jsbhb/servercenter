@@ -21,6 +21,16 @@ public class CustomModel {
 	private String buyerName;// 订购人姓名，可空
 
 	private String buyerIdNo;// 订购人身份证信息,可空
+	
+	private Integer supplierId;//供应商ID
+
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
 
 	public Integer getCenterId() {
 		return centerId;

@@ -34,6 +34,26 @@ public class OrderGoods {
 	private Double actualPrice;
 	
 	private String remark;
+	
+	private int conversion;
+	
+	private String unit;
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	public int getConversion() {
+		return conversion;
+	}
+
+	public void setConversion(int conversion) {
+		this.conversion = conversion;
+	}
 
 	public String getItemImg() {
 		return itemImg;

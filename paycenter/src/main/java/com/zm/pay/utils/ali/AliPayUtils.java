@@ -12,6 +12,7 @@ import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
+import com.zm.pay.pojo.CustomConfig;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
@@ -22,7 +23,7 @@ import com.zm.pay.utils.ali.util.AlipaySubmit;
 public class AliPayUtils {
 
 	// 支付宝报关接口
-	public static Map<String, String> acquireCustom(AliPayConfigModel config, CustomModel custom)
+	public static Map<String, String> acquireCustom(AliPayConfigModel config, CustomModel custom, CustomConfig cfg)
 			throws Exception {
 		config.initParameter();
 		// 把请求参数打包成数组
@@ -32,10 +33,10 @@ public class AliPayUtils {
 		sParaTemp.put("_input_charset", config.getCharset());
 		sParaTemp.put("out_request_no", custom.getOutRequestNo());
 		sParaTemp.put("trade_no", custom.getPayNo());
-		sParaTemp.put("merchant_customs_code", Constants.MERCHANT_CUSTOMS_CODE);
-		sParaTemp.put("merchant_customs_name", Constants.MERCHANT_CUSTOMS_NAME);
+		sParaTemp.put("merchant_customs_code", cfg.getMerchantCustomsCode());
+		sParaTemp.put("merchant_customs_name", cfg.getMerchantCustomsName());
 		sParaTemp.put("amount", custom.getAmount());
-		sParaTemp.put("customs_place", Constants.CUSTOMS_PLACE);
+		sParaTemp.put("customs_place", cfg.getCustomsPlace());
 
 		// 建立请求
 		String sHtmlText = AlipaySubmit.buildRequest(config, "", "", sParaTemp);
@@ -55,7 +56,7 @@ public class AliPayUtils {
 		}
 
 		Double totalFee = CalculationUtils.div(Double.valueOf(model.getTotalAmount()), 100);
-		
+
 		sParaTemp.put("partner", config.getPid());
 		sParaTemp.put("seller_id", config.getPid());
 		sParaTemp.put("_input_charset", config.getCharset());
@@ -85,7 +86,8 @@ public class AliPayUtils {
 
 	}
 
-	public static AlipayTradePrecreateResponse precreate(AliPayConfigModel config, PayModel model) throws AlipayApiException {
+	public static AlipayTradePrecreateResponse precreate(AliPayConfigModel config, PayModel model)
+			throws AlipayApiException {
 		AlipayClient alipayClient = new DefaultAlipayClient(ALI_API_GATEWAY, config.getAppId(),
 				config.getRsaPrivateKey(), "json", "utf-8", config.getRsaPublicKey(), "RSA2");
 		AlipayTradePrecreateRequest request = new AlipayTradePrecreateRequest();

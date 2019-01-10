@@ -31,29 +31,29 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 
-	private static String BASE_URL = "http://www.cnbuyers.cn/index.php?app=webService";
+//	private static String BASE_URL = "http://www.cnbuyers.cn/index.php?app=webService";
 
-	private static String NEED_APP_ID_URL = BASE_URL + "&act={action}&app_id={appKey}&v=2.0&format=json";
+	private String NEED_APP_ID_URL = url + "&act={action}&app_id={appKey}&v=2.0&format=json";
 
-	private static String NEED_ACCESS_TOKEN_URL = BASE_URL + "&act={action}&access_token={token}&v=2.0&format=json";
+	private String NEED_ACCESS_TOKEN_URL = url + "&act={action}&access_token={token}&v=2.0&format=json";
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 		String msg = ButtJointMessageUtils.getLiangYouOrderMsg(info, user, info.getSupplierId());
 		msg = EncryptUtil.encrypt(msg, appSecret);
-		String url = NEED_APP_ID_URL.replace("{action}", "addOutOrder").replace("{appKey}", appKey);
+		String targetUrl = NEED_APP_ID_URL.replace("{action}", "addOutOrder").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("paramjson", msg);
-		return sendLiangYouWarehouse(url, params, SendOrderResult.class, false, info.getOrderId());
+		return sendLiangYouWarehouse(targetUrl, params, SendOrderResult.class, false, info.getOrderId());
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = EncryptUtil.encrypt(orderIds.get(0), appSecret);
-		String url = NEED_APP_ID_URL.replace("{action}", "getOrderStatus").replace("{appKey}", appKey);
+		String targetUrl = NEED_APP_ID_URL.replace("{action}", "getOrderStatus").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("order_sn", msg);
-		Set<OrderStatus> set = sendLiangYouWarehouse(url, params, OrderStatus.class, true, orderIds.get(0));
+		Set<OrderStatus> set = sendLiangYouWarehouse(targetUrl, params, OrderStatus.class, true, orderIds.get(0));
 		if (set != null) {
 			for (OrderStatus o : set) {
 				o.setThirdOrderId(orderIds.get(0));
@@ -64,11 +64,11 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 
 	@Override
 	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
-		String token = getAccessToken(BASE_URL).getAccessToken();
-		String url = NEED_ACCESS_TOKEN_URL.replace("{action}", "checkStock").replace("{token}", token);
+		String token = getAccessToken(url).getAccessToken();
+		String targetUrl = NEED_ACCESS_TOKEN_URL.replace("{action}", "checkStock").replace("{token}", token);
 		String msg = ButtJointMessageUtils.getLiangYouStock(list);
-		url += "&sku=" + msg;
-		Set<CheckStockModel> set = sendLiangYouWarehouse(url, CheckStockModel.class, list.get(0).getSku());
+		targetUrl += "&sku=" + msg;
+		Set<CheckStockModel> set = sendLiangYouWarehouse(targetUrl, CheckStockModel.class, list.get(0).getSku());
 		if (set == null || set.size() == 0) {
 			Set<CheckStockModel> result = new HashSet<CheckStockModel>();
 			CheckStockModel model = new CheckStockModel();

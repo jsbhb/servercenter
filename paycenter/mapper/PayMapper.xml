@@ -49,6 +49,14 @@
 		<result column="privatekey" property="privatekey" jdbcType="VARCHAR" />
 		<result column="publickey" property="publickey" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.pay.pojo.CustomConfig" id="customCfg">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="merchant_customs_code" property="merchantCustomsCode" jdbcType="VARCHAR" />
+		<result column="merchant_customs_name" property="merchantCustomsName" jdbcType="VARCHAR" />
+		<result column="customs_place" property="customsPlace" jdbcType="VARCHAR" />
+	</resultMap>
 
 
 	<select id="listAliPayConfig" resultMap="aliconfig">
@@ -88,6 +96,14 @@
 	<select id="getUnionPayConfig" parameterType="Object" resultMap="upconfig">
 		select * from
 		unionpay_config where center_id = #{centerId};
+	</select>
+	
+	<select id="listCustomConfig" parameterType="Object" resultMap="customCfg">
+		select * from custom_config
+	</select>
+	
+	<select id="getCustomConfig" parameterType="Object" resultMap="customCfg">
+		select * from custom_config where supplier_id = #{supplierId}
 	</select>
 
 </mapper>

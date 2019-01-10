@@ -4,11 +4,14 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.seatent.opensdk.input.hdServiceProvider.CreateOrderInputDto;
+import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
+import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
@@ -22,7 +25,8 @@ import com.zm.supplier.supplierinf.model.XinYunOrder;
 
 public class ButtJointMessageUtils {
 
-	public static String getTianTianOrderMsg(OrderInfo info, UserInfo user, String customer, String unionPayMerId) {
+	public static String getTianTianOrderMsg(OrderInfo info, UserInfo user, String customer, String unionPayMerId,
+			String shopId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -48,8 +52,8 @@ public class ButtJointMessageUtils {
 		sb.append("<body>\n");
 		sb.append("<order>\n");
 		sb.append("<orderShop>");
-		 sb.append("17000"); // 店铺代码正式
-//		sb.append("11612"); // 店铺代码测试
+		sb.append(shopId); // 店铺代码正式
+		// sb.append("11612"); // 店铺代码测试
 		sb.append("</orderShop>\n");
 		sb.append("<hgArea>");
 		sb.append(3105); // 海关关区北仑保税区
@@ -94,7 +98,7 @@ public class ButtJointMessageUtils {
 		sb.append(info.getCreateTime()); // 下单时间
 		sb.append("</dealDate>\n");
 		sb.append("<promotions>\n");
-		if(info.getOrderDetail().getDisAmount() > 0){
+		if (info.getOrderDetail().getDisAmount() > 0) {
 			for (OrderGoods goods : info.getOrderGoodsList()) {
 				double proAmount = CalculationUtils.sub(goods.getItemPrice(), goods.getActualPrice());
 				proAmount = CalculationUtils.mul(proAmount, goods.getItemQuantity());
@@ -433,6 +437,9 @@ public class ButtJointMessageUtils {
 			sb.append("<Qty>");
 			sb.append(goods.getItemQuantity()); // 数量
 			sb.append("</Qty>\n");
+			sb.append("<Unit>");
+			sb.append(goods.getUnit()); // 计量单位
+			sb.append("</Unit>\n");
 			sb.append("<Price>");
 			sb.append(goods.getItemPrice()); // 商品单价
 			sb.append("</Price>\n");
@@ -503,7 +510,212 @@ public class ButtJointMessageUtils {
 		sb.append("<corpcode>" + customer + "</corpcode>\n");
 		sb.append("<orderno>" + orderIds.get(0) + "</orderno>\n");
 		sb.append("</orderRequest>\n");
-		
+
 		return sb.toString();
 	}
+
+	public static CreateOrderInputDto getHaiDaiOrderDto(OrderInfo info, UserInfo user, HaiDaiButtjoint joint) {
+		CreateOrderInputDto dto = new CreateOrderInputDto();
+		dto.setAccountId(joint.getAccountId());
+		dto.setAddress(info.getOrderDetail().getReceiveProvince() + info.getOrderDetail().getReceiveCity()
+				+ info.getOrderDetail().getReceiveArea() + info.getOrderDetail().getReceiveAddress()
+				+ info.getOrderDetail().getReceiveName());
+		dto.setAppkey(joint.getAppKey());
+		dto.setIdentification(user.getUserDetail().getIdNum());
+		dto.setName(user.getUserDetail().getName());
+		dto.setCustomOrder(info.getOrderId());
+		dto.setMemberId(joint.getMemberId());
+		dto.setUrl(joint.getUrl());
+		dto.setSecret(joint.getAppSecret());
+		dto.setMobile(info.getOrderDetail().getReceivePhone());
+		StringBuilder goodsBuilder = new StringBuilder();
+		StringBuilder numsBuilder = new StringBuilder();
+		StringBuilder productBuilder = new StringBuilder();
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			goodsBuilder.append(goods.getItemCode() + ",");
+			numsBuilder.append(goods.getItemQuantity() + ",");
+			productBuilder.append(goods.getConversion() + ",");
+		}
+		dto.setGoodsIds(goodsBuilder.substring(0, goodsBuilder.length() - 1));
+		dto.setNums(numsBuilder.substring(0, numsBuilder.length() - 1));
+		dto.setProductNums(productBuilder.substring(0, productBuilder.length() - 1));
+		return dto;
+	}
+
+	public static GetGoodsInfoApiInputDto getHaiDaiGoodsInfoDto(String itemCode, HaiDaiButtjoint joint) {
+		GetGoodsInfoApiInputDto dto = new GetGoodsInfoApiInputDto();
+		dto.setAccountId(joint.getAccountId());
+		dto.setAppkey(joint.getAppKey());
+		dto.setSecret(joint.getAppSecret());
+		dto.setUrl(joint.getUrl());
+		dto.setGoodsId(itemCode);
+		dto.setMemberId(joint.getMemberId());
+		dto.setNeedSEO(0);
+		return dto;
+	}
+
+	public static String getKJB2COrderMsg(OrderInfo info, UserInfo user, String unionPayMerId) {
+		StringBuilder sb = new StringBuilder();
+		String source = "";
+		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
+			source = "02";
+		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+			source = "13";
+		} else if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
+			source = "01";
+		}
+		sb.append("<?xml version='1.0' encoding='UTF-8'?>\n");
+		sb.append("<request>\n");
+		sb.append("<head>\n");
+		sb.append("<CustomsCode>");
+		sb.append("3302462230 "); // 电商企业代码
+		sb.append("</CustomsCode>\n");
+		sb.append("<OrgName>");
+		sb.append("宁波鑫海通达贸易有限公司"); // 电商企业名称
+		sb.append("</OrgName>\n");
+		sb.append("<CreateTime>");
+		sb.append(info.getCreateTime()); // 订单创建时间
+		sb.append("</CreateTime>\n");
+		sb.append("</head>\n");
+		sb.append("<body>\n");
+		sb.append("<order>\n");
+		sb.append("<Operation>");
+		sb.append("0");
+		sb.append("</Operation>\n");
+//		sb.append("<orderShop>");
+//		sb.append("17000"); // 店铺代码正式
+//		sb.append("</orderShop>\n");
+		sb.append("<orderFrom>");
+		sb.append("0000"); // 购物网站代码
+		sb.append("</orderFrom>\n");
+		sb.append("<OrderNo>");
+		sb.append(info.getOrderId()); // 订单号
+		sb.append("</OrderNo>\n");
+		sb.append("<postFee>");
+		sb.append(info.getOrderDetail().getPostFee()); // 运费
+		sb.append("</postFee>\n");
+		sb.append("<amount>");
+		sb.append(info.getOrderDetail().getPayment()); // 买家实付金额
+		sb.append("</amount>\n");
+		sb.append("<buyerAccount>");
+		sb.append(user.getPhone()); // 购物网站买家账号
+		sb.append("</buyerAccount>\n");
+		sb.append("<phone>");
+		sb.append(user.getPhone()); // 手机号
+		sb.append("</phone>\n");
+		sb.append("<taxAmount>");
+		sb.append(info.getOrderDetail().getTaxFee()); // 税额
+		sb.append("</taxAmount>\n");
+		sb.append("<tariffAmount>");
+		sb.append(info.getOrderDetail().getTariffTax()); // 关税额
+		sb.append("</tariffAmount>\n");
+		sb.append("<addedValueTaxAmount>");
+		sb.append(info.getOrderDetail().getIncrementTax()); // 增值税额
+		sb.append("</addedValueTaxAmount>\n");
+		sb.append("<consumptionDutyAmount>");
+		sb.append(info.getOrderDetail().getExciseTax()); // 消费税额
+		sb.append("</consumptionDutyAmount>\n");
+		sb.append("<grossWeight>");
+		sb.append(CalculationUtils.div(info.getWeight(), 1000)); // 毛重
+		sb.append("</grossWeight>\n");
+		sb.append("<disAmount>");
+		sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额合计
+		sb.append("</disAmount>\n");
+		sb.append("<dealDate>");
+		sb.append(info.getCreateTime()); // 下单时间
+		sb.append("</dealDate>\n");
+		sb.append("<promotions>\n");
+		if (info.getOrderDetail().getDisAmount() > 0) {
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				double proAmount = CalculationUtils.sub(goods.getItemPrice(), goods.getActualPrice());
+				proAmount = CalculationUtils.mul(proAmount, goods.getItemQuantity());
+				sb.append("<promotion>\n");
+				sb.append("<proAmount>");
+				sb.append(proAmount); // 优惠金额
+				sb.append("</proAmount>\n");
+				sb.append("</promotion>\n");
+			}
+		} else {
+			sb.append("<promotion>\n");
+			sb.append("<proAmount>");
+			sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额
+			sb.append("</proAmount>\n");
+			sb.append("</promotion>\n");
+		}
+		sb.append("</promotions>\n");
+		sb.append("<goods>\n");
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			sb.append("<detail>\n");
+			sb.append("<productId>");
+			sb.append(goods.getItemCode()); // 货号'3105166008N0000002'
+			sb.append("</productId>\n");
+			sb.append("<qty>");
+			sb.append(goods.getItemQuantity()); // 数量
+			sb.append("</qty>\n");
+			sb.append("<price>");
+			sb.append(goods.getItemPrice()); // 商品单价
+			sb.append("</price>\n");
+			sb.append("<amount>");
+			sb.append(CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity())); // 商品金额
+			sb.append("</amount>\n");
+			sb.append("</detail>\n");
+		}
+		sb.append("</goods>\n");
+		sb.append("<pay>\n");
+		sb.append("<paytime>");
+		sb.append(info.getOrderDetail().getPayTime()); // 支付时间
+		sb.append("</paytime>\n");
+		sb.append("<paymentNo>");
+		sb.append(info.getOrderDetail().getPayNo()); // 支付单号
+		sb.append("</paymentNo>\n");
+		sb.append("<orderSeqNo>");
+		sb.append(info.getOrderDetail().getPayNo()); // 商家送支付机构订单交易号,如无，请与支付单号一致
+		sb.append("</orderSeqNo>\n");
+		sb.append("<source>");
+		sb.append(source); // 支付方式代码
+		sb.append("</source>\n");
+		sb.append("<idnum>");
+		sb.append(user.getUserDetail().getIdNum()); // 身份证
+		sb.append("</idnum>\n");
+		sb.append("<name>");
+		sb.append(user.getUserDetail().getName()); // 真实姓名
+		sb.append("</name>\n");
+		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
+			sb.append("<merId>");
+			sb.append(unionPayMerId);
+			sb.append("</merId>\n");
+		}
+		sb.append("</pay>\n");
+		sb.append("<logistics>");
+		sb.append("<logisticsCode>");
+		sb.append("YUNDA"); // 快递公司代码
+							// SF=顺丰速EMS=邮政速递POSTAM=邮政小包ZTO=中通速递STO=申通快递YTO=圆通速递JD=京东快递BEST=百世物流YUNDA=韵达速递TTKDEX=天天快递
+		sb.append("</logisticsCode>\n");
+		sb.append("<consignee>");
+		sb.append(info.getOrderDetail().getReceiveName()); // 收货人名称
+		sb.append("</consignee>\n");
+		sb.append("<province>");
+		sb.append(info.getOrderDetail().getReceiveProvince()); // 省
+		sb.append("</province>\n");
+		sb.append("<city>");
+		sb.append(info.getOrderDetail().getReceiveCity()); // 市
+		sb.append("</city>\n");
+		sb.append("<district>");
+		sb.append(info.getOrderDetail().getReceiveArea()); // 区
+		sb.append("</district>\n");
+		sb.append("<consigneeAddr>");
+		sb.append(info.getOrderDetail().getReceiveProvince() + info.getOrderDetail().getReceiveCity()
+				+ info.getOrderDetail().getReceiveArea() + info.getOrderDetail().getReceiveAddress()); // 收货地址
+		sb.append("</consigneeAddr>\n");
+		sb.append("<consigneeTel>");
+		sb.append(info.getOrderDetail().getReceivePhone()); // 收货电话
+		sb.append("</consigneeTel>\n");
+		sb.append("</logistics>\n");
+		sb.append("</order>\n");
+		sb.append("</body>\n");
+		sb.append("</request>\n");
+
+		return sb.toString();
+	}
+
 }

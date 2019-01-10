@@ -262,8 +262,7 @@ public class WarehouseThreadPool {
 		if (buttJoint == null) {
 			return null;
 		}
-		buttJoint.setAppKey(inf.getAppKey());
-		buttJoint.setAppSecret(inf.getAppSecret());
+		buttJoint.init(inf);
 		return buttJoint;
 	}
 }

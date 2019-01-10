@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.pojo.AliPayConfigModel;
+import com.zm.pay.pojo.CustomConfig;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.pojo.YopConfigModel;
@@ -23,45 +24,55 @@ public class SysInit {
 
 	@Resource
 	PayMapper payMapper;
-	
+
 	@PostConstruct
-	public void init(){
+	public void init() {
+
+		loadAliPayConfig();//加载阿里支付配置
+
+		loadWeixinPayConfig();//加载微信支付配置
+
+		loadUnionPayConfig();//加载银联支付配置
+
+		loadYopPayConfig();//加载易宝支付配置
 		
-		loadAliPayConfig();
-		
-		loadWeixinPayConfig();
-		
-		loadUnionPayConfig();
-		
-		loadYopPayConfig();
+		loadCustomConfig();//加载报关信息配置
 	}
-	
+
 	private void loadYopPayConfig() {
 		List<YopConfigModel> list = payMapper.listYopPayConfig();
-		for(YopConfigModel model : list){
-			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.YOP_PAY, model);
+		for (YopConfigModel model : list) {
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.YOP_PAY, model);
 		}
 	}
 
-	private void loadAliPayConfig(){
+	private void loadAliPayConfig() {
 		List<AliPayConfigModel> list = payMapper.listAliPayConfig();
-		for(AliPayConfigModel model : list){
-			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.ALI_PAY, model);
+		for (AliPayConfigModel model : list) {
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.ALI_PAY, model);
 		}
 	}
-	
-	private void loadWeixinPayConfig(){
+
+	private void loadWeixinPayConfig() {
 		List<WeixinPayConfig> list = payMapper.listWeixinPayConfig();
-		for(WeixinPayConfig model : list){
-			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.WX_PAY, model);
+		for (WeixinPayConfig model : list) {
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, model);
 		}
 	}
-	
-	private void loadUnionPayConfig(){
+
+	private void loadUnionPayConfig() {
 		List<UnionPayConfig> list = payMapper.listUnionPayConfig();
-		for(UnionPayConfig model : list){
-			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY, model);
-			template.opsForValue().set(Constants.PAY+model.getCenterId()+Constants.UNION_PAY_MER_ID, model.getMerId());
+		for (UnionPayConfig model : list) {
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.UNION_PAY, model);
+			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.UNION_PAY_MER_ID,
+					model.getMerId());
+		}
+	}
+
+	private void loadCustomConfig() {
+		List<CustomConfig> list = payMapper.listCustomConfig();
+		for (CustomConfig model : list) {
+			template.opsForValue().set(Constants.CUSTOM_CONFIG + model.getSupplierId(), model);
 		}
 	}
 }

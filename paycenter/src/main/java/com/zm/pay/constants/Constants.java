@@ -31,6 +31,8 @@ public class Constants {
 	// *********************各支付类型******************************/
 
 	public static final String PAY = "PAY";// 前缀，和登录config分开
+	
+	public static final String CUSTOM_CONFIG = "custom_pay:";// 报关前缀
 
 	public static final Integer WX_PAY = 1;
 

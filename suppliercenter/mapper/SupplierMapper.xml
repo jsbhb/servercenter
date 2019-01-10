@@ -14,6 +14,9 @@
 		<result column="target_object" property="targetObject" jdbcType="VARCHAR" />
 		<result column="pid" property="appKey" jdbcType="VARCHAR" />
 		<result column="key" property="appSecret" jdbcType="VARCHAR" />
+		<result column="account_id" property="accountId" jdbcType="VARCHAR" />
+		<result column="member_id" property="memberId" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<resultMap type="com.zm.supplier.pojo.SupplierEntity" id="supplier">

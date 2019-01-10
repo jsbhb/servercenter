@@ -27,21 +27,12 @@ import com.zm.supplier.util.DateUtil;
 import com.zm.supplier.util.HttpClientUtil;
 import com.zm.supplier.util.SignUtil;
 
-@Component
-public class TianTianButtJoint extends AbstractSupplierButtJoint {
-
-	// private static final String CUSTOMER = "ZGGXHWG";// 正式
-	// private static final String CUSTOMER = "aa001";// 测试
-	// 正式店铺代码17000，测试店铺代码11612
-
-	// private static String base_url =
-	// "http://114.55.149.118:8181/nredi/base/api/service?method={action}";// 正式
-	// private static String base_url =
-	// "http://121.196.224.76:8081/nredi/base/api/service?method={action}";// 测试
+@Component("kjb2cButtJoint")
+public class KJB2CButtJoint extends AbstractSupplierButtJoint{
 
 	@Resource
 	RedisTemplate<String, Object> template;
-
+	
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 		String unionPayMerId = "";
@@ -49,20 +40,19 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, memberId, unionPayMerId, accountId);// 报文
-		String targetUrl = url.replace("{action}", "order.create");
-		return (Set<SendOrderResult>) sendTianTianWarehouse(targetUrl, msg, SendOrderResult.class, info.getOrderId());
+		String msg = ButtJointMessageUtils.getKJB2COrderMsg(info, user, unionPayMerId);// 报文
+		return (Set<SendOrderResult>) sendKJB2C(url, msg, SendOrderResult.class, info.getOrderId());
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
-		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, memberId);// 报文
-		String targetUrl = url.replace("{action}", "order.query");
-		return (Set<OrderStatus>) sendTianTianWarehouse(targetUrl, msg, OrderStatus.class, orderIds.get(0));
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -71,8 +61,9 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	private <T> Set<T> sendTianTianWarehouse(String url, String msg, Class<T> clazz, String param) {
+	
+	
+	private <T> Set<T> sendKJB2C(String url, String msg, Class<T> clazz, String param) {
 		String date = DateUtil.getDateString(new Date(), "yyyy-MM-dd HH:mm:ss");
 		String sign = SignUtil.TianTianSign(msg, appSecret, date);// 签名
 		Map<String, String> paramMap = new HashMap<String, String>();

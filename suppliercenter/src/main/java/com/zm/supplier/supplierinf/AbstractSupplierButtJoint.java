@@ -11,6 +11,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
+import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.util.JSONUtil;
@@ -21,6 +22,12 @@ public abstract class AbstractSupplierButtJoint {
 	protected String appKey;
 	
 	protected String appSecret;
+	
+	protected String url;
+	
+	protected String accountId;
+	
+	protected String memberId;
 	
 	private static final String XML = "XML";
 	private static final String JSON = "JSON";
@@ -48,6 +55,14 @@ public abstract class AbstractSupplierButtJoint {
 			//失败后处理
 		}
 		return set;
+	}
+	
+	public void init(SupplierInterface inf){
+		this.appKey = inf.getAppKey();
+		this.appSecret = inf.getAppSecret();
+		this.url = inf.getUrl();
+		this.accountId = inf.getAccountId();
+		this.memberId = inf.getMemberId();
 	}
 	
 	
@@ -95,6 +110,36 @@ public abstract class AbstractSupplierButtJoint {
 
 	public void setAppSecret(String appSecret) {
 		this.appSecret = appSecret;
+	}
+
+
+	public String getUrl() {
+		return url;
+	}
+
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+
+	public String getAccountId() {
+		return accountId;
+	}
+
+
+	public void setAccountId(String accountId) {
+		this.accountId = accountId;
+	}
+
+
+	public String getMemberId() {
+		return memberId;
+	}
+
+
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
 	}
 	
 	

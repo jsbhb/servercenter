@@ -14,6 +14,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.util.StringUtils;
 
+import com.zm.supplier.pojo.callback.base.CallBackBase;
+
 public class SignUtil {
 
 	public static String TianTianSign(String msg, String appSecret, String date) {
@@ -25,6 +27,16 @@ public class SignUtil {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static String callBackSign(CallBackBase base, String appSecret){
+		Map<String,Object> param = JSONUtil.parse(JSONUtil.toJson(base), Map.class);
+		param.put("appSecret", appSecret);
+		String s = sort(param);
+		String str = s.substring(0, s.length() - 1);
+
+		return DigestUtils.md5Hex(str);
 	}
 
 	public static String liangYouSign(Map<String, Object> param) {

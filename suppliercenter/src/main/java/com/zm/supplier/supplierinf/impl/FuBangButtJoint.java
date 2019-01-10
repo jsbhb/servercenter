@@ -22,38 +22,38 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class FuBangButtJoint extends AbstractSupplierButtJoint {
 
-	private static String base_url = "http://erp.ikjtao.com/api/v4/{action}";
+//	private static String base_url = "http://erp.ikjtao.com/api/v4/{action}";
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
 		String msg = ButtJointMessageUtils.getFuBangOrderMsg(info, user);
 		String sign = SignUtil.fuBangSign(msg, appSecret);
-		String url = base_url.replace("{action}", "disOrder");
-		return sendFuBangWarehouse(url, msg, sign, SendOrderResult.class, info.getOrderId());
+		String targetUrl = url.replace("{action}", "disOrder");
+		return sendFuBangWarehouse(targetUrl, msg, sign, SendOrderResult.class, info.getOrderId());
 	}
 
 	@Override
 	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
 		String msg = ButtJointMessageUtils.getFuBangOrderStatusMsg(orderIds);
 		String sign = SignUtil.fuBangSign(msg, appSecret);
-		String url = base_url.replace("{action}", "logistics");
-		return sendFuBangWarehouse(url, msg, sign, OrderStatus.class, orderIds.get(0));
+		String targetUrl = url.replace("{action}", "logistics");
+		return sendFuBangWarehouse(targetUrl, msg, sign, OrderStatus.class, orderIds.get(0));
 	}
 
 	@Override
 	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
 		String msg = ButtJointMessageUtils.getFuBangStock(list);
 		String sign = SignUtil.fuBangSign(msg, appSecret);
-		String url = base_url.replace("{action}", "product");
-		return sendFuBangWarehouse(url, msg, sign, CheckStockModel.class, list.get(0).getItemCode());
+		String targetUrl = url.replace("{action}", "product");
+		return sendFuBangWarehouse(targetUrl, msg, sign, CheckStockModel.class, list.get(0).getItemCode());
 	}
 
 	@Override
 	public Set<ThirdWarehouseGoods> getGoods(String itemCode) {
 		String msg = ButtJointMessageUtils.getFuBangGoodsDetail(itemCode);
 		String sign = SignUtil.fuBangSign(msg, appSecret);
-		String url = base_url.replace("{action}", "product");
-		Set<ThirdWarehouseGoods> set = sendFuBangWarehouse(url, msg, sign, ThirdWarehouseGoods.class, itemCode);
+		String targetUrl = url.replace("{action}", "product");
+		Set<ThirdWarehouseGoods> set = sendFuBangWarehouse(targetUrl, msg, sign, ThirdWarehouseGoods.class, itemCode);
 		for (ThirdWarehouseGoods model : set) {
 			if (model.getRoughWeight() != null) {
 				model.setWeight((int) (Double.valueOf(model.getRoughWeight()) * 1000));

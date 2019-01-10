@@ -35,6 +35,7 @@ import com.zm.pay.feignclient.model.OrderGoods;
 import com.zm.pay.feignclient.model.OrderInfo;
 import com.zm.pay.feignclient.model.UserInfo;
 import com.zm.pay.pojo.AliPayConfigModel;
+import com.zm.pay.pojo.CustomConfig;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
@@ -142,10 +143,10 @@ public class PayServiceImpl implements PayService {
 			}
 			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
 		}
-
+		CustomConfig CustomCfg = getCustomConfig(model.getSupplierId());
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);
-		Map<String, String> result = WxPayUtils.acquireCustom(config, model);
+		Map<String, String> result = WxPayUtils.acquireCustom(config, model, CustomCfg);
 		logger.info("微信支付报关:" + model.getOutRequestNo() + "====" + result);
 		if ("SUCCESS".equals(result.get("return_code")) && "SUCCESS".equals(result.get("result_code"))) {
 			String status = result.get("state");
@@ -154,6 +155,14 @@ public class PayServiceImpl implements PayService {
 			}
 		}
 		return false;
+	}
+
+	private CustomConfig getCustomConfig(Integer supplierId) {
+		CustomConfig cfg = (CustomConfig) template.opsForValue().get(Constants.CUSTOM_CONFIG + supplierId);
+		if (cfg == null) {
+			cfg = payMapper.getCustomConfig(supplierId);
+		}
+		return cfg;
 	}
 
 	private boolean aliPayCustom(CustomModel model) throws Exception {
@@ -168,7 +177,9 @@ public class PayServiceImpl implements PayService {
 			template.opsForValue().set(Constants.PAY + model.getCenterId() + Constants.WX_PAY, config);
 		}
 
-		Map<String, String> result = AliPayUtils.acquireCustom(config, model);
+		CustomConfig cfg = getCustomConfig(model.getSupplierId());
+
+		Map<String, String> result = AliPayUtils.acquireCustom(config, model, cfg);
 		logger.info("支付宝报关：" + model.getOutRequestNo() + "====" + result);
 		if ("T".equals(result.get("is_success")) && "SUCCESS".equals(result.get("result_code"))) {
 			return true;

@@ -19,6 +19,12 @@ public class SupplierInterface implements Serializable{
 	private String appKey;
 	
 	private String appSecret;
+	
+	private String accountId;
+	
+	private String memberId;
+	
+	private String url;
 
 	public Integer getSupplierId() {
 		return supplierId;
@@ -58,6 +64,30 @@ public class SupplierInterface implements Serializable{
 
 	public void setAppSecret(String appSecret) {
 		this.appSecret = appSecret;
+	}
+
+	public String getAccountId() {
+		return accountId;
+	}
+
+	public void setAccountId(String accountId) {
+		this.accountId = accountId;
+	}
+
+	public String getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 }
