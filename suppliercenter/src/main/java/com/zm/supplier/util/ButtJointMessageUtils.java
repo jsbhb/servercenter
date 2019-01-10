@@ -12,6 +12,8 @@ import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
+import com.zm.supplier.supplierinf.model.AiJiaBeiTeOrder;
+import com.zm.supplier.supplierinf.model.AiJiaBeiTeOrderGoods;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
@@ -718,4 +720,58 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
+	public static String getAiJiaBeiTeOrderMsg(OrderInfo info, UserInfo user) {
+		//佳贝艾特订单状态: 1>等待买家付款  2>等待卖家发货 3>卖家部分发货 4>等待买家确认收货 
+		//5>买家已签收确认收货 6>交易成功 7>交易自动关闭 8>交易主动关闭 9>退款中
+		//目前暂时只使用: 2>等待卖家发货 9>退款中
+		AiJiaBeiTeOrder order = new AiJiaBeiTeOrder();
+		order.setTrade_no(info.getOrderId());
+		if (Constants.ORDER_PAY.equals(info.getStatus())) {// 海外购系统状态
+			order.setTrade_status("2");// 佳贝艾特系统状态
+		} else if (Constants.REFUNDS.equals(info.getStatus())) {
+			order.setTrade_status("9");
+		}
+		order.setTotal_fee(info.getOrderDetail().getPayment()+"");
+		order.setPayment(info.getOrderDetail().getPayment()+"");
+		order.setPost_fee(info.getOrderDetail().getPostFee()+"");
+		order.setDiscount_fee(info.getOrderDetail().getDisAmount()+"");
+		order.setModify_time(info.getUpdateTime());
+		order.setCreate_time(info.getCreateTime());
+		order.setPay_time(info.getOrderDetail().getPayTime());
+		order.setConsign_time("");
+		order.setBuyer_message(info.getRemark().trim());
+		order.setReceiver_name(info.getOrderDetail().getReceiveName());
+		order.setReceiver_mobile(info.getOrderDetail().getReceivePhone());
+		order.setReceiver_phone(info.getOrderDetail().getReceivePhone());
+		order.setReceiver_zip(info.getOrderDetail().getReceiveZipCode());
+		order.setReceiver_email(user.getEmail());
+		order.setReceiver_province_code("");
+		order.setReceiver_state(info.getOrderDetail().getReceiveProvince());
+		order.setReceiver_city_code("");
+		order.setReceiver_city(info.getOrderDetail().getReceiveCity());
+		order.setReceiver_district_code("");
+		order.setReceiver_district(info.getOrderDetail().getReceiveArea());
+		order.setReceiver_address(info.getOrderDetail().getReceiveAddress());
+		order.setLogistics_code("");
+		order.setLogistics_company("");
+		order.setWaybill_no("");
+		order.setInvoice_title("");
+		order.setInvoice_content("");
+		order.setSeller_memo(info.getRemark().trim());
+		List<AiJiaBeiTeOrderGoods> orderGoodsList = new ArrayList<AiJiaBeiTeOrderGoods>();
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			AiJiaBeiTeOrderGoods orderGoods = new AiJiaBeiTeOrderGoods();
+			orderGoods.setPop_sku_code(goods.getItemId());
+			orderGoods.setItem_sku_id(goods.getItemCode());
+			orderGoods.setPop_item_title(goods.getItemName());
+			orderGoods.setItem_title(goods.getItemName());
+			orderGoods.setNum(goods.getItemQuantity()+"");
+			orderGoods.setItem_price(goods.getActualPrice()+"");
+			orderGoods.setTrade_total_payment(CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity())+"");
+			orderGoods.setTrade_coupon_payment("0");
+			orderGoodsList.add(orderGoods);
+		}
+		order.setItemList(orderGoodsList);
+		return JSONUtil.toJson(order);
+	}
 }
