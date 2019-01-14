@@ -406,7 +406,7 @@
 		gi.item_code,gi.sku,gi.is_promotion,gb.first_category,gb.second_category,gb.third_category,
 		gi.opt,bgp.id as
 		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gi.discount, gi.excise_tax,gi.weight,
-		bgp.delivery_place,gb.increment_tax
+		bgp.delivery_place,gb.increment_tax,gb.unit 
 		from goods_item gi
 		left join goods g on gi.goods_id=g.goods_id 
 		left join base gb on g.base_id = gb.id 

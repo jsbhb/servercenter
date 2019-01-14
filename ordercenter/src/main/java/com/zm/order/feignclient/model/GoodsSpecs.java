@@ -80,6 +80,16 @@ public class GoodsSpecs implements Serializable {
 	private String carton;
 	
 	private double welfarePrice;//福利价格
+	
+	private String unit;
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
 
 	public double getWelfarePrice() {
 		return welfarePrice;
