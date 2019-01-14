@@ -236,9 +236,10 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 						|| Constants.YI_JIE_BJ.equals(info.getOrderSource())
 						|| Constants.OWNER.equals(info.getOrderSource())
 						|| Constants.JIN_RONG_GONG_CHANG.equals(info.getOrderSource())) {
-					
+
 					// 增加缓存订单数量
-					cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY, "produce");
+					cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_DAY,
+							"produce");
 					// 增加月订单数
 					String time = DateUtils.getTimeString("yyyyMM");
 					cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
@@ -323,6 +324,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 			}
 			info.setOrderFlag(orderFlag);
 			info.setSupplierId(supplierId);
+			amount = CalculationUtils.add(amount, info.getOrderDetail().getPostFee(),
+					info.getOrderDetail().getTaxFee());
 			info.getOrderDetail().setPayment(CalculationUtils.round(2, amount));
 		}
 	}
