@@ -12,8 +12,8 @@ import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
-import com.zm.supplier.supplierinf.model.AiJiaBeiTeOrder;
-import com.zm.supplier.supplierinf.model.AiJiaBeiTeOrderGoods;
+import com.zm.supplier.supplierinf.model.JiaBeiAiTeOrder;
+import com.zm.supplier.supplierinf.model.JiaBeiAiTeOrderGoods;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
@@ -720,11 +720,11 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
-	public static String getAiJiaBeiTeOrderMsg(OrderInfo info, UserInfo user) {
+	public static String getJiaBeiAiTeOrderMsg(OrderInfo info, UserInfo user) {
 		//佳贝艾特订单状态: 1>等待买家付款  2>等待卖家发货 3>卖家部分发货 4>等待买家确认收货 
 		//5>买家已签收确认收货 6>交易成功 7>交易自动关闭 8>交易主动关闭 9>退款中
 		//目前暂时只使用: 2>等待卖家发货 9>退款中
-		AiJiaBeiTeOrder order = new AiJiaBeiTeOrder();
+		JiaBeiAiTeOrder order = new JiaBeiAiTeOrder();
 		order.setTrade_no(info.getOrderId());
 		if (Constants.ORDER_PAY.equals(info.getStatus())) {// 海外购系统状态
 			order.setTrade_status("2");// 佳贝艾特系统状态
@@ -758,9 +758,9 @@ public class ButtJointMessageUtils {
 		order.setInvoice_title("");
 		order.setInvoice_content("");
 		order.setSeller_memo(info.getRemark().trim());
-		List<AiJiaBeiTeOrderGoods> orderGoodsList = new ArrayList<AiJiaBeiTeOrderGoods>();
+		List<JiaBeiAiTeOrderGoods> orderGoodsList = new ArrayList<JiaBeiAiTeOrderGoods>();
 		for (OrderGoods goods : info.getOrderGoodsList()) {
-			AiJiaBeiTeOrderGoods orderGoods = new AiJiaBeiTeOrderGoods();
+			JiaBeiAiTeOrderGoods orderGoods = new JiaBeiAiTeOrderGoods();
 			orderGoods.setPop_sku_code(goods.getItemId());
 			orderGoods.setItem_sku_id(goods.getItemCode());
 			orderGoods.setPop_item_title(goods.getItemName());

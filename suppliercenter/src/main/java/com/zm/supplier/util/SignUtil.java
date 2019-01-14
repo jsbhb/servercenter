@@ -166,4 +166,25 @@ public class SignUtil {
 		}
 	};
 
+	public static String JiaBeiAiTeSign(String appKey, String appSecret, String nonce_str) {
+		String toSignStr = "appKey="+appKey+"&nonce_str="+nonce_str+"&"+appSecret;
+		// 拼接要签名的字符串
+		StringBuilder builder = new StringBuilder(toSignStr);
+		System.out.println("签名明文:" + builder);
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] bytes = md.digest(builder.toString().getBytes("utf-8"));
+			builder.setLength(0);
+			for (byte b : bytes) {
+				String hx = Integer.toHexString(b & 0XFF);
+				builder.append(hx.length() == 1 ? "0" + hx : hx);
+			}
+			System.out.println("签名MD5加密:" + builder.toString().toUpperCase());
+			String resultSignStr = new String(Base64.encodeBase64(builder.toString().toUpperCase().getBytes("utf-8")), "utf-8");
+			System.out.println("签名BASE64加密:" + resultSignStr);
+			return resultSignStr;
+		} catch (Exception e) {
+			return "签名异常";
+		}
+	}
 }
