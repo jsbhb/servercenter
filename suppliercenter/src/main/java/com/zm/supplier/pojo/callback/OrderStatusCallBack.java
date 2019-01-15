@@ -29,6 +29,14 @@ public class OrderStatusCallBack extends CallBackBase {
 		return true;
 	}
 
+	public boolean checkOrderStatus() {
+		if (Constants.ORDER_CUSTOMS.equals(status) || Constants.ORDER_DZFX.equals(status)
+				|| Constants.ORDER_DELIVER.equals(status) || Constants.ORDER_EXCEPTION.equals(status)) {
+			return false;
+		}
+		return false;
+	}
+
 	public String getOrderId() {
 		return orderId;
 	}
@@ -83,5 +91,12 @@ public class OrderStatusCallBack extends CallBackBase {
 
 	public void setErrorMsg(String errorMsg) {
 		this.errorMsg = errorMsg;
+	}
+
+	@Override
+	public String toString() {
+		return "OrderStatusCallBack [orderId=" + orderId + ", type=" + type + ", status=" + status + ", expressName="
+				+ expressName + ", expressKey=" + expressKey + ", expressId=" + expressId + ", errorMsg=" + errorMsg
+				+ "]";
 	}
 }

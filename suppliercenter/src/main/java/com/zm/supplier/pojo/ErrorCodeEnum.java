@@ -28,7 +28,8 @@ public enum ErrorCodeEnum {
 	TAX_SET_ERROR("10023","后台税率设置有问题"),
 	TIME_FORMATE_ERROR("10024","时间格式错误，请使用yyyy-MM-dd HH:mm:ss"),
 	EXCEED_MAX_SIZE("10025","批量获取最大限制100个"),
-	TYPE_ERROR("10026","订单属性和订单商品属性不同，或订单商品里含有跨境和一般贸易商品");
+	TYPE_ERROR("10026","订单属性和订单商品属性不同，或订单商品里含有跨境和一般贸易商品"),
+	ORDER_STATUS_ERROR("10027","回传的订单状态不匹配");
 
 	private String errorCode;
 	private String errorMsg;

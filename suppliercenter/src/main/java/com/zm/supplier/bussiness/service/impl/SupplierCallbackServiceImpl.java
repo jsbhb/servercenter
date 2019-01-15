@@ -27,9 +27,14 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 
 	@Override
 	public ResultModel orderStatusCallBack(OrderStatusCallBack statusCallBack) {
+		System.out.println("订单状态回调参数输出："+statusCallBack.toString());
 		if (!statusCallBack.checkParam()) {// 判断参数全不全
 			return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
 					ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+		}
+		if (!statusCallBack.checkOrderStatus()) {
+			return new ResultModel(false, ErrorCodeEnum.ORDER_STATUS_ERROR.getErrorCode(),
+					ErrorCodeEnum.ORDER_STATUS_ERROR.getErrorMsg());
 		}
 		// 获取对应的appKey和appSecret
 		Set<String> keys = template.keys(Constants.SUPPLIER_INTERFACE + "*");

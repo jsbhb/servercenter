@@ -728,10 +728,10 @@ public class ButtJointMessageUtils {
 		//目前暂时只使用: 2>等待卖家发货 9>退款中
 		JiaBeiAiTeOrder order = new JiaBeiAiTeOrder();
 		order.setTrade_no(info.getOrderId());
-		if (Constants.ORDER_PAY.equals(info.getStatus())) {// 海外购系统状态
-			order.setTrade_status("2");// 佳贝艾特系统状态
-		} else if (Constants.REFUNDS.equals(info.getStatus())) {
-			order.setTrade_status("9");
+		if (Constants.REFUNDS.equals(info.getStatus())) {// 海外购系统状态
+			order.setTrade_status("9");// 佳贝艾特系统状态
+		} else {
+			order.setTrade_status("2");
 		}
 		order.setTotal_fee(info.getOrderDetail().getPayment()+"");
 		order.setPayment(info.getOrderDetail().getPayment()+"");
