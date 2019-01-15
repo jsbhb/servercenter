@@ -225,6 +225,7 @@ public class HttpClientUtil {
 		HttpPost httpPost = new HttpPost(url);
 
 		StringEntity stringEntity = new StringEntity(jsonStr, Charsets.UTF_8);
+		logger.info("executing request json：" + jsonStr);
 		if(ContentType == null){
 			stringEntity.setContentType("text/plain; charset=UTF-8");
 		} else {

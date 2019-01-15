@@ -2,7 +2,9 @@ package com.zm.supplier.util;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.seatent.opensdk.input.hdServiceProvider.CreateOrderInputDto;
 import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
@@ -773,5 +775,54 @@ public class ButtJointMessageUtils {
 		}
 		order.setItemList(orderGoodsList);
 		return JSONUtil.toJson(order);
+	}
+	
+	public static String getZhengZhengOrderMsg(OrderInfo info, UserInfo user,String accountId,String memberId) {
+		String payMentName = "";
+		String payCode = "";
+		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
+			payMentName = "支付宝";
+			payCode = "02";
+		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+			payMentName = "财付通";
+			payCode = "13";
+		}
+		Map<String, Object> orderMap = new HashMap<String, Object>();
+		orderMap.put("StoreOrderNo", info.getOrderId());
+		orderMap.put("ExpressAmount", info.getOrderDetail().getPostFee());
+		orderMap.put("TotalAmount", info.getOrderDetail().getPayment());
+		orderMap.put("DiscountsAmount", info.getOrderDetail().getDisAmount());
+		orderMap.put("TaxAmount", info.getOrderDetail().getTaxFee());
+		orderMap.put("CreateTime", info.getCreateTime());
+		orderMap.put("PayTime", info.getOrderDetail().getPayTime());
+		orderMap.put("PaymentName", payMentName);
+		orderMap.put("Payment", payCode);
+		orderMap.put("PaySerialsNo", info.getOrderDetail().getPayNo());
+		orderMap.put("CustomerIDCard", user.getUserDetail().getIdNum());
+		orderMap.put("CustomerName", user.getUserDetail().getName());
+		orderMap.put("CustomerPhone", user.getPhone());
+		orderMap.put("Province", info.getOrderDetail().getReceiveProvince());
+		orderMap.put("City", info.getOrderDetail().getReceiveCity());
+		orderMap.put("Area", info.getOrderDetail().getReceiveArea());
+		orderMap.put("Address", info.getOrderDetail().getReceiveAddress());
+		orderMap.put("ConsigneePhone", info.getOrderDetail().getReceivePhone());
+		orderMap.put("ConsigneeName", info.getOrderDetail().getReceiveName());
+		Map<String,Object> goodsMap = null;
+		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		double goodsAmount = 0;
+		for(OrderGoods goods : info.getOrderGoodsList()){
+			goodsAmount = CalculationUtils.add(goodsAmount, CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity()));
+			goodsMap = new HashMap<String, Object>();
+			goodsMap.put("StoreItemNumber", goods.getItemCode());
+			goodsMap.put("StoreItemName", goods.getItemName());
+			goodsMap.put("Quantity", goods.getItemQuantity());
+			goodsMap.put("UnitSellPrice", goods.getActualPrice());
+			list.add(goodsMap);
+		}
+		orderMap.put("Goods_infos", list);
+		orderMap.put("GoodsAmount", goodsAmount);
+		orderMap.put("StoreID", accountId);
+		orderMap.put("StoreName", memberId);
+		return JSONUtil.toJson(orderMap);
 	}
 }
