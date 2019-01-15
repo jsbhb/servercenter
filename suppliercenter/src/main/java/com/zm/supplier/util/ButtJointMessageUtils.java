@@ -807,6 +807,7 @@ public class ButtJointMessageUtils {
 		orderMap.put("Address", info.getOrderDetail().getReceiveAddress());
 		orderMap.put("ConsigneePhone", info.getOrderDetail().getReceivePhone());
 		orderMap.put("ConsigneeName", info.getOrderDetail().getReceiveName());
+		orderMap.put("CustomerAccount", user.getPhone());
 		Map<String,Object> goodsMap = null;
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		double goodsAmount = 0;

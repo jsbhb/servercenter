@@ -56,7 +56,7 @@ public class XmlUtil {
 			String value = node.getTextTrim();
 			String localValue = confMap.get(nodeName) == null ? "" : confMap.get(nodeName);
 			String[] strs = localValue.split(",");
-			for(String s : strs){
+			for (String s : strs) {
 				if (value.equals(s)) {
 					return true;
 				}
@@ -111,7 +111,8 @@ public class XmlUtil {
 
 					if (o != null) {
 						obj = clazz.newInstance();
-						String uniquId = UUID.randomUUID().toString().replaceAll("-", "");;
+						String uniquId = UUID.randomUUID().toString().replaceAll("-", "");
+						;
 						Method method = clazz.getMethod("setUniquId", String.class);
 						method.invoke(obj, uniquId);
 					}

@@ -228,8 +228,10 @@ public class HttpClientUtil {
 		logger.info("executing request json：" + jsonStr);
 		if(ContentType == null){
 			stringEntity.setContentType("text/plain; charset=UTF-8");
+			httpPost.addHeader("Content-Type", "text/plain; charset=UTF-8");
 		} else {
 			stringEntity.setContentType(ContentType);
+			httpPost.addHeader("Content-Type", ContentType);
 		}
 		HttpEntity entity = null;
 		CloseableHttpResponse response = null;
