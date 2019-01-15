@@ -32,7 +32,7 @@ public class OrderStatusCallBack extends CallBackBase {
 	public boolean checkOrderStatus() {
 		if (Constants.ORDER_CUSTOMS.equals(status) || Constants.ORDER_DZFX.equals(status)
 				|| Constants.ORDER_DELIVER.equals(status) || Constants.ORDER_EXCEPTION.equals(status)) {
-			return false;
+			return true;
 		}
 		return false;
 	}

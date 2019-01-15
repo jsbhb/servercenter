@@ -33,9 +33,10 @@ public class SignUtil {
 	public static String callBackSign(CallBackBase base, String appSecret){
 		Map<String,Object> param = JSONUtil.parse(JSONUtil.toJson(base), Map.class);
 		param.put("appSecret", appSecret);
+		System.out.println("param:"+param);
 		String s = sort(param);
 		String str = s.substring(0, s.length() - 1);
-
+		System.out.println("str:"+str);
 		return DigestUtils.md5Hex(str);
 	}
 
