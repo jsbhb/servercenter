@@ -45,7 +45,7 @@ public class ZhengZhengButtjoint extends AbstractSupplierButtJoint {
 	
 	private <T> Set<T> sendZhengZhengWarehouse(String url, String msg, Class<T> clazz) {
 
-		String result = HttpClientUtil.post(url, msg,"application/json");
+		String result = HttpClientUtil.post(url, msg,"application/x-www-form-urlencoded");
 		logger.info("返回：===" + result);
 
 		try {
