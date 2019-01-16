@@ -714,10 +714,6 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<OrderInfo> listOrderForSendToWarehouse() {
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
-		Set<String> set = new HashSet<String>();
-		List<OrderGoods> goodsList = null;
-		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
-		OrderGoods temp = null;
 		// list.addAll(orderMapper.listOrderForSendToTTWarehouse());
 		// list.addAll(orderMapper.listOrderForSendToOtherWarehouse());
 		List<OrderInfo> tempList = orderMapper.listOrderForSendToWarehouse();
@@ -740,42 +736,51 @@ public class OrderServiceImpl implements OrderService {
 		list.addAll(tempList);
 		list.addAll(orderMapper.listOrderForSendToWarehouseGeneralTrade());
 		if (list.size() > 0) {
-			for (OrderInfo info : list) {// 找出所有的itemId
-				for (OrderGoods goods : info.getOrderGoodsList()) {
-					set.add(goods.getItemId());
-				}
+			packageOrderInfoByList(list);
+		}
+		return list;
+	}
+	
+	private List<OrderInfo> packageOrderInfoByList(List<OrderInfo> list) {
+		Set<String> set = new HashSet<String>();
+		List<OrderGoods> goodsList = null;
+		Map<String, OrderGoods> tempMap = new HashMap<String, OrderGoods>();
+		OrderGoods temp = null;
+		for (OrderInfo info : list) {// 找出所有的itemId
+			for (OrderGoods goods : info.getOrderGoodsList()) {
+				set.add(goods.getItemId());
 			}
-			Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION,
-					set);
-			if (result != null) {// 对每个商品进行换算和补全sku并合并
-				for (OrderInfo info : list) {
-					tempMap.clear();
-					goodsList = info.getOrderGoodsList();
-					Iterator<OrderGoods> it = goodsList.iterator();
-					while (it.hasNext()) {
-						temp = it.next();
-						convert(temp, result);// 补全sku和比例换算
-						if (tempMap.containsKey(temp.getSku().trim())) {
-							OrderGoods model = tempMap.get(temp.getSku().trim());
-							double actualprice = CalculationUtils.mul(model.getActualPrice(), model.getItemQuantity());
-							double itemprice = CalculationUtils.mul(model.getItemPrice(), model.getItemQuantity());
-							double temactualprice = CalculationUtils.mul(temp.getActualPrice(), temp.getItemQuantity());
-							double temitemprice = CalculationUtils.mul(temp.getItemPrice(), temp.getItemQuantity());
-							model.setItemQuantity(model.getItemQuantity() + temp.getItemQuantity());
-							try {
-								model.setActualPrice(CalculationUtils.div(
-										CalculationUtils.add(temactualprice, actualprice), model.getItemQuantity(), 2));
-								model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
-										model.getItemQuantity(), 2));
-								it.remove();// 合并后删除该商品
-							} catch (IllegalAccessException e) {
-								e.printStackTrace();
-							}
-						} else {
-							tempMap.put(temp.getSku().trim(), temp);
+		}
+		Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION,
+				set);
+		if (result != null) {// 对每个商品进行换算和补全sku并合并
+			for (OrderInfo info : list) {
+				tempMap.clear();
+				goodsList = info.getOrderGoodsList();
+				Iterator<OrderGoods> it = goodsList.iterator();
+				while (it.hasNext()) {
+					temp = it.next();
+					convert(temp, result);// 补全sku和比例换算
+					if (tempMap.containsKey(temp.getSku().trim())) {
+						OrderGoods model = tempMap.get(temp.getSku().trim());
+						double actualprice = CalculationUtils.mul(model.getActualPrice(), model.getItemQuantity());
+						double itemprice = CalculationUtils.mul(model.getItemPrice(), model.getItemQuantity());
+						double temactualprice = CalculationUtils.mul(temp.getActualPrice(), temp.getItemQuantity());
+						double temitemprice = CalculationUtils.mul(temp.getItemPrice(), temp.getItemQuantity());
+						model.setItemQuantity(model.getItemQuantity() + temp.getItemQuantity());
+						try {
+							model.setActualPrice(CalculationUtils.div(
+									CalculationUtils.add(temactualprice, actualprice), model.getItemQuantity(), 2));
+							model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
+									model.getItemQuantity(), 2));
+							it.remove();// 合并后删除该商品
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
 						}
-
+					} else {
+						tempMap.put(temp.getSku().trim(), temp);
 					}
+
 				}
 			}
 		}
@@ -1012,5 +1017,25 @@ public class OrderServiceImpl implements OrderService {
 		} else {
 			return msg;
 		}
+	}
+
+	@Override
+	public ResultModel refundsWithSendOrder(String orderId) {
+		ResultModel result = null;
+
+		orderMapper.updateOrderRefunds(orderId);
+		
+		List<OrderInfo> list = new ArrayList<OrderInfo>();
+		list.addAll(orderMapper.listOrderForSendByOrderId(orderId));
+		if (list.size() > 0) {
+			packageOrderInfoByList(list);
+			result = supplierFeignClient.sendOrder(Constants.FIRST_VERSION, list);
+		}
+		
+		if (result == null) {
+			result = new ResultModel(true, "");
+		}
+		
+		return result;
 	}
 }

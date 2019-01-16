@@ -711,5 +711,21 @@ public class OrderController {
 
 		return null;
 	}
+	
+	/**
+	 * @fun 退款中
+	 * @param version
+	 * @param orderId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/refundsWithSendOrder/{orderId}", method = RequestMethod.POST)
+	@ApiIgnore
+	public ResultModel refundsWithSendOrder(@PathVariable("version") Double version, @PathVariable("orderId") String orderId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return orderService.refundsWithSendOrder(orderId);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
 
 }
