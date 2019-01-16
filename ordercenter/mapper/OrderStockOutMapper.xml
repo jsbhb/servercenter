@@ -121,6 +121,7 @@
 		<result column="tax_fee" property="taxFee" jdbcType="DECIMAL" />
 		<result column="delivery_time" property="deliveryTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="rebate_fee" property="rebateFee" jdbcType="DECIMAL" />
 		<collection ofType="com.zm.order.pojo.ThirdOrderInfo"
 			property="orderExpressList">
 			<id column="orderExpress_id" property="id" jdbcType="INTEGER" />
@@ -293,7 +294,7 @@
 		od.receive_city,od.receive_area,od.receive_address,od.create_time,od.receive_phone,
 		toi.id as orderExpress_id,toi.express_key,toi.express_name,toi.express_id,ob.order_source,
 		u.idnum,u.name order_name,og.item_quantity*i.conversion packing,og.actual_price,og.item_code,
-		ob.order_flag,od.tax_fee,od.post_fee,osr.create_time delivery_time,ob.opt
+		ob.order_flag,od.tax_fee,od.post_fee,osr.create_time delivery_time,ob.opt,ifnull(od.rebate_fee,0) rebate_fee
 		from zm_order.order_base ob
 		left join zm_user.user_detail u on ob.user_id=u.user_id 
 		left join zm_user.grade ug on ob.grade_id = ug.id

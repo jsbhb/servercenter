@@ -48,6 +48,7 @@ public class OrderInfoListForDownload {
 	private String deliveryTime;
 	private String rebate;
 	private String opt;
+	private Double rebateFee;
 	
 	public String getRebate() {
 		return rebate;
@@ -312,5 +313,11 @@ public class OrderInfoListForDownload {
 	}
 	public void setOpt(String opt) {
 		this.opt = opt;
+	}
+	public Double getRebateFee() {
+		return rebateFee;
+	}
+	public void setRebateFee(Double rebateFee) {
+		this.rebateFee = rebateFee;
 	}
 }
