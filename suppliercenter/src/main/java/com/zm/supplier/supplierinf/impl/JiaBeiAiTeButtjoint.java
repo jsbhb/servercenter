@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderDetail;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
@@ -27,7 +27,6 @@ import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.SignUtil;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @Component
 public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
@@ -70,7 +69,12 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@Override
+	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private <T> Set<T> sendJiaBeiAiTeOrderPool(String url,String jsonStr, Class<T> clazz, String parem) {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("jsonStr", jsonStr);
@@ -79,18 +83,7 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		logger.info("返回：" + parem + "===" + result);
 
 		try {
-			JSONObject json = JSONObject.fromObject(result);
-			if (!"200".equals(json.getString("errorCode"))) {
-				logger.info("订单:"+parem+"发送失败===errorCode:"+json.getString("errorCode")+"===codeMsg:"+json.getString("codeMsg"));
-				return null;
-			} else {
-				String TempThirdOrderId = System.currentTimeMillis()+"";
-				Set<T> orderResultSet = new HashSet<T>();
-				SendOrderResult orderResult = new SendOrderResult();
-				orderResult.setThirdOrderId(TempThirdOrderId);
-				orderResultSet.add((T) orderResult);
-				return orderResultSet;
-			}
+			return renderResult(result, "JSON", clazz);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

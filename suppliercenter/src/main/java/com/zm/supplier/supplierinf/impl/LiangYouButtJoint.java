@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -78,6 +79,12 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		}
 
 		return set;
+	}
+	
+	@Override
+	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private AccessToken getAccessToken(String url) {

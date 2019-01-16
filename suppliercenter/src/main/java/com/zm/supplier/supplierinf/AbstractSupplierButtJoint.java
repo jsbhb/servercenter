@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.XmlUtil;
 
@@ -95,6 +95,13 @@ public abstract class AbstractSupplierButtJoint {
 	 * @return
 	 */
 	public abstract Set<ThirdWarehouseGoods> getGoods(String itemCode);
+	
+	/**
+	 * @fun 退单
+	 * @param info
+	 * @return
+	 */
+	public abstract Set<OrderCancelResult> orderCancel(OrderInfo info);
 
 	public String getAppKey() {
 		return appKey;

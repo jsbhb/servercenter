@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderDetail;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
@@ -87,6 +88,12 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 			}
 		}
 		return set;
+	}
+	
+	@Override
+	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private <T> Set<T> sendXinYunWarehouse(String url, String msg, Class<T> clazz, String param) {

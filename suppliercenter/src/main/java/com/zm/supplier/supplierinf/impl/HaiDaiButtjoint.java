@@ -10,6 +10,7 @@ import com.seatent.opensdk.input.hdServiceProvider.CreateOrderInputDto;
 import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -43,6 +44,12 @@ public class HaiDaiButtjoint extends AbstractSupplierButtJoint {
 	@Override
 	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
 		
+		return null;
+	}
+	
+	@Override
+	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

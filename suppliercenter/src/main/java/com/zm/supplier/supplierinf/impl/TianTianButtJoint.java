@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -67,6 +68,12 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 
 	@Override
 	public Set<ThirdWarehouseGoods> getGoods(String itemCode) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub
 		return null;
 	}
