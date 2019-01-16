@@ -34,6 +34,7 @@ import com.zm.order.feignclient.FinanceFeignClient;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.ThirdPartFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
+import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.GoodsItemEntity;
 import com.zm.order.pojo.OrderDetail;
@@ -134,7 +135,21 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 	@Override
 	public Page<OrderGoods> queryByPageForGoods(OrderGoods entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		return orderBackMapper.selectOrderGoodsForPage(entity);
+		Page<OrderGoods> page = orderBackMapper.selectOrderGoodsForPage(entity);
+		List<OrderGoods> list = (List<OrderGoods>) page.getResult();
+		Set<String> set = new HashSet<String>();
+		for (OrderGoods og : list) {
+			set.add(og.getItemId());
+		}
+		Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION, set);
+		if (result != null) {
+			GoodsConvert tmpConvert = new GoodsConvert();
+			for (OrderGoods og : list) {
+				tmpConvert = result.get(og.getItemId());
+				og.setCarton(tmpConvert.getCarton());
+			}
+		}
+		return page;
 	}
 
 	@Override

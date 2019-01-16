@@ -84,8 +84,10 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 				logger.info("订单:"+parem+"发送失败===errorCode:"+json.getString("errorCode")+"===codeMsg:"+json.getString("codeMsg"));
 				return null;
 			} else {
+				String TempThirdOrderId = System.currentTimeMillis()+"";
 				Set<T> orderResultSet = new HashSet<T>();
 				SendOrderResult orderResult = new SendOrderResult();
+				orderResult.setThirdOrderId(TempThirdOrderId);
 				orderResultSet.add((T) orderResult);
 				return orderResultSet;
 			}

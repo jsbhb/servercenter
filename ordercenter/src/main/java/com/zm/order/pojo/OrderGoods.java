@@ -50,6 +50,8 @@ public class OrderGoods extends Pagination {
 	
 	private String unit;
 	
+	private String carton;
+	
 	public String getUnit() {
 		return unit;
 	}
@@ -191,6 +193,14 @@ public class OrderGoods extends Pagination {
 
 	public void setItemInfo(String itemInfo) {
 		this.itemInfo = itemInfo;
+	}
+	
+	public String getCarton() {
+		return carton;
+	}
+
+	public void setCarton(String carton) {
+		this.carton = carton;
 	}
 
 	@Override

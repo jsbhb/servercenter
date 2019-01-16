@@ -1,5 +1,8 @@
 package com.zm.supplier.pojo.callback;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.callback.base.CallBackBase;
 
@@ -35,6 +38,16 @@ public class OrderStatusCallBack extends CallBackBase {
 			return true;
 		}
 		return false;
+	}
+	
+	public void decodeExpressName() {
+		if (expressName != null && !"".equals(expressName)) {
+			try {
+				expressName = URLDecoder.decode(expressName, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public String getOrderId() {
@@ -97,6 +110,6 @@ public class OrderStatusCallBack extends CallBackBase {
 	public String toString() {
 		return "OrderStatusCallBack [orderId=" + orderId + ", type=" + type + ", status=" + status + ", expressName="
 				+ expressName + ", expressKey=" + expressKey + ", expressId=" + expressId + ", errorMsg=" + errorMsg
-				+ "]";
+				+ ", appKey=" + appKey + ", nonceStr=" + nonceStr + ", sign=" + sign + "]";
 	}
 }

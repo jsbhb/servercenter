@@ -327,4 +327,11 @@ public interface OrderService {
 	 * @return
 	 */
 	ResultModel orderStatusCallBack(OrderStatusCallBack callBack);
+
+	/**
+	 * @fun 退款中并通知供应商不发货
+	 * @param orderId
+	 * @return
+	 */
+	ResultModel refundsWithSendOrder(String orderId);
 }

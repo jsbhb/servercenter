@@ -728,7 +728,7 @@ public class ButtJointMessageUtils {
 		JiaBeiAiTeOrder order = new JiaBeiAiTeOrder();
 		order.setTrade_no(info.getOrderId());
 		if (Constants.REFUNDS.equals(info.getStatus())) {// 海外购系统状态
-			order.setTrade_status("9");// 佳贝艾特系统状态
+			order.setTrade_status("8");// 佳贝艾特系统状态
 		} else {
 			order.setTrade_status("2");
 		}
@@ -740,7 +740,7 @@ public class ButtJointMessageUtils {
 		order.setCreate_time(info.getCreateTime());
 		order.setPay_time(info.getOrderDetail().getPayTime());
 		order.setConsign_time("");
-		order.setBuyer_message(info.getRemark().trim());
+		order.setBuyer_message(info.getRemark());
 		order.setReceiver_name(info.getOrderDetail().getReceiveName());
 		order.setReceiver_mobile(info.getOrderDetail().getReceivePhone());
 		order.setReceiver_phone(info.getOrderDetail().getReceivePhone());
@@ -758,7 +758,7 @@ public class ButtJointMessageUtils {
 		order.setWaybill_no("");
 		order.setInvoice_title("");
 		order.setInvoice_content("");
-		order.setSeller_memo(info.getRemark().trim());
+		order.setSeller_memo(info.getRemark());
 		List<JiaBeiAiTeOrderGoods> orderGoodsList = new ArrayList<JiaBeiAiTeOrderGoods>();
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			JiaBeiAiTeOrderGoods orderGoods = new JiaBeiAiTeOrderGoods();

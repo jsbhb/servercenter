@@ -719,10 +719,11 @@
 		<result column="item_id" property="itemId"/>
 		<result column="sku" property="sku"/>
 		<result column="conversion" property="conversion"/>
+		<result column="carton" property="carton"/>
 	</resultMap>
 	
 	<select id="listSkuAndConversionByItemId" parameterType="Object" resultMap="convert">
-		select item_id, sku,conversion from goods_item where item_id in
+		select item_id, sku,conversion,carton from goods_item where item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}

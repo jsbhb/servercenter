@@ -5,6 +5,7 @@ public class GoodsConvert {
 	private Integer conversion;
 	private String sku;
 	private String itemId;
+	private String carton;
 	public Integer getConversion() {
 		return conversion;
 	}
@@ -22,6 +23,12 @@ public class GoodsConvert {
 	}
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
+	}
+	public String getCarton() {
+		return carton;
+	}
+	public void setCarton(String carton) {
+		this.carton = carton;
 	}
 	
 }

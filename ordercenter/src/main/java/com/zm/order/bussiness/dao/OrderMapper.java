@@ -174,4 +174,10 @@ public interface OrderMapper {
 
 	String getOrderIdFromThirdOrderId(String orderId);
 	
+	/**
+	 * @fun 根据订单号获取推送信息
+	 * @return
+	 */
+	List<OrderInfo> listOrderForSendByOrderId(String orderId);
+	
 }
