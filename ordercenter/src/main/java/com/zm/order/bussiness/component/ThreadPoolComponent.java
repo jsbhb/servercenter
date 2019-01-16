@@ -32,6 +32,11 @@ public class ThreadPoolComponent {
 	}
 	
 	@Async("myAsync")
+	public void capitalPool(String orderId){
+		shareProfitComponent.calcapitalpool(orderId);
+	}
+	
+	@Async("myAsync")
 	public void capitalPoolRecount(List<OrderInfo> list){
 		if(list != null && list.size() > 0){
 			for(OrderInfo info : list){

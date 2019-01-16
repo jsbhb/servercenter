@@ -264,6 +264,8 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					// 增加月销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
 							info.getOrderDetail().getPayment());
+					//计算资金池（主要目的：将订单状态改为统一的资金池已扣款）
+					threadPoolComponent.capitalPool(info.getOrderId());
 				} else {// 其他来源的计算返佣，统计在计算时一起加上
 					threadPoolComponent.calShareProfitStayToAccount(info.getOrderId());
 				}
