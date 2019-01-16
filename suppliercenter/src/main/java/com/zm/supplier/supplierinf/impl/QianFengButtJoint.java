@@ -14,14 +14,10 @@ import org.springframework.stereotype.Component;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
-import com.zm.supplier.pojo.OrderDetail;
-import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserDetail;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ButtJointMessageUtils;
 import com.zm.supplier.util.HttpClientUtil;
@@ -42,13 +38,13 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 	RedisTemplate<String, Object> template;
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
 		String unionPayMerId = "";
 		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getQianFengOrderMsg(info, user, CUSTOMER, unionPayMerId);// 报文
+		String msg = ButtJointMessageUtils.getQianFengOrderMsg(info, CUSTOMER, unionPayMerId);// 报文
 		return (Set<SendOrderResult>) sendQianFengWarehouse(base_url, msg, "cnec_order", SendOrderResult.class, true,
 				info.getOrderId());
 	}

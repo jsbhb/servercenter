@@ -12,13 +12,12 @@ import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderInfo;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
-import com.zm.supplier.supplierinf.model.JiaBeiAiTeOrder;
-import com.zm.supplier.supplierinf.model.JiaBeiAiTeOrderGoods;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
+import com.zm.supplier.supplierinf.model.JiaBeiAiTeOrder;
+import com.zm.supplier.supplierinf.model.JiaBeiAiTeOrderGoods;
 import com.zm.supplier.supplierinf.model.LianYouOrder;
 import com.zm.supplier.supplierinf.model.LianYouOrder.ShipType;
 import com.zm.supplier.supplierinf.model.OutOrderGoods;
@@ -29,7 +28,7 @@ import com.zm.supplier.supplierinf.model.XinYunOrder;
 
 public class ButtJointMessageUtils {
 
-	public static String getTianTianOrderMsg(OrderInfo info, UserInfo user, String customer, String unionPayMerId,
+	public static String getTianTianOrderMsg(OrderInfo info, String customer, String unionPayMerId,
 			String shopId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
@@ -75,10 +74,10 @@ public class ButtJointMessageUtils {
 		sb.append(info.getOrderDetail().getPayment()); // 买家实付金额
 		sb.append("</amount>\n");
 		sb.append("<buyerAccount>");
-		sb.append(user.getPhone()); // 购物网站买家账号
+		sb.append(info.getOrderDetail().getCustomerPhone()); // 购物网站买家账号
 		sb.append("</buyerAccount>\n");
 		sb.append("<phone>");
-		sb.append(user.getPhone()); // 手机号
+		sb.append(info.getOrderDetail().getCustomerPhone()); // 手机号
 		sb.append("</phone>\n");
 		sb.append("<taxAmount>");
 		sb.append(info.getOrderDetail().getTaxFee()); // 税额
@@ -152,10 +151,10 @@ public class ButtJointMessageUtils {
 		sb.append(source); // 支付方式代码
 		sb.append("</source>\n");
 		sb.append("<idnum>");
-		sb.append(user.getUserDetail().getIdNum()); // 身份证
+		sb.append(info.getOrderDetail().getCustomerIdNum()); // 身份证
 		sb.append("</idnum>\n");
 		sb.append("<name>");
-		sb.append(user.getUserDetail().getName()); // 真实姓名
+		sb.append(info.getOrderDetail().getCustomerName()); // 真实姓名
 		sb.append("</name>\n");
 		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
 			sb.append("<merId>");
@@ -221,7 +220,7 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
-	public static String getLiangYouOrderMsg(OrderInfo info, UserInfo user, Integer supplierId) {
+	public static String getLiangYouOrderMsg(OrderInfo info, Integer supplierId) {
 		try {
 
 			LianYouOrder order = new LianYouOrder();
@@ -232,12 +231,12 @@ public class ButtJointMessageUtils {
 			order.setCity(URLEncoder.encode(info.getOrderDetail().getReceiveCity(), "utf-8"));
 			order.setConsignee(URLEncoder.encode(info.getOrderDetail().getReceiveName(), "utf-8"));
 			order.setCounty(URLEncoder.encode(info.getOrderDetail().getReceiveArea(), "utf-8"));
-			order.setImId(URLEncoder.encode(user.getUserDetail().getIdNum(), "utf-8"));
+			order.setImId(URLEncoder.encode(info.getOrderDetail().getCustomerIdNum(), "utf-8"));
 			order.setOrder_sn(URLEncoder.encode(info.getOrderId(), "utf-8"));
 			order.setOut_order_sn(URLEncoder.encode(info.getOrderId(), "utf-8"));
 			order.setPhoneMob(URLEncoder.encode(info.getOrderDetail().getReceivePhone(), "utf-8"));
 			order.setProvince(URLEncoder.encode(info.getOrderDetail().getReceiveProvince(), "utf-8"));
-			order.setRealName(URLEncoder.encode(user.getUserDetail().getName(), "utf-8"));
+			order.setRealName(URLEncoder.encode(info.getOrderDetail().getCustomerName(), "utf-8"));
 			List<OutOrderGoods> list = new ArrayList<OutOrderGoods>();
 			OutOrderGoods outOrderGoods = null;
 			for (OrderGoods goods : info.getOrderGoodsList()) {
@@ -266,14 +265,14 @@ public class ButtJointMessageUtils {
 		return sb.toString().substring(0, sb.length() - 1);
 	}
 
-	public static String getXinYunOrderMsg(OrderInfo info, UserInfo user, String appKey, String secret) {
+	public static String getXinYunOrderMsg(OrderInfo info, String appKey, String secret) {
 
 		XinYunOrder order = new XinYunOrder();
 		order.setMerchant_id(appKey);
-		order.setAccept_name(user.getUserDetail().getName());
+		order.setAccept_name(info.getOrderDetail().getCustomerName());
 		order.setAddress(info.getOrderDetail().getReceiveAddress());
 		order.setArea(info.getOrderDetail().getReceiveArea());
-		order.setCard_id(user.getUserDetail().getIdNum());
+		order.setCard_id(info.getOrderDetail().getCustomerIdNum());
 		order.setCity(info.getOrderDetail().getReceiveCity());
 		order.setMerchant_order_no(info.getOrderId());
 		order.setMessage(info.getRemark());
@@ -326,7 +325,7 @@ public class ButtJointMessageUtils {
 
 	}
 
-	public static String getFuBangOrderMsg(OrderInfo info, UserInfo user) {
+	public static String getFuBangOrderMsg(OrderInfo info) {
 		FuBangOrder order = new FuBangOrder();
 		order.setCity(info.getOrderDetail().getReceiveCity());
 		order.setConsignee(info.getOrderDetail().getReceiveName());
@@ -335,8 +334,8 @@ public class ButtJointMessageUtils {
 		order.setDistrict(info.getOrderDetail().getReceiveArea());
 		order.setOrder_no(info.getOrderId());
 		order.setProvince(info.getOrderDetail().getReceiveProvince());
-		order.setName(user.getUserDetail().getName());
-		order.setId_num(user.getUserDetail().getIdNum());
+		order.setName(info.getOrderDetail().getCustomerName());
+		order.setId_num(info.getOrderDetail().getCustomerIdNum());
 		order.setLogistics_name("中通速递");
 		FuBangOrderGoods goods = null;
 		List<FuBangOrderGoods> list = new ArrayList<FuBangOrderGoods>();
@@ -378,7 +377,7 @@ public class ButtJointMessageUtils {
 
 	}
 
-	public static String getQianFengOrderMsg(OrderInfo info, UserInfo user, String customer, String unionPayMerId) {
+	public static String getQianFengOrderMsg(OrderInfo info, String customer, String unionPayMerId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -406,8 +405,8 @@ public class ButtJointMessageUtils {
 		sb.append("<PostFee>" + info.getOrderDetail().getPostFee() + "</PostFee>\n");
 		sb.append("<InsuranceFee>0</InsuranceFee>\n");
 		sb.append("<Amount>" + info.getOrderDetail().getPayment() + "</Amount>\n");
-		sb.append("<BuyerAccount>" + user.getPhone() + "</BuyerAccount>\n");
-		sb.append("<Phone>" + user.getPhone() + "</Phone>\n");
+		sb.append("<BuyerAccount>" + info.getOrderDetail().getCustomerPhone() + "</BuyerAccount>\n");
+		sb.append("<Phone>" + info.getOrderDetail().getCustomerPhone() + "</Phone>\n");
 		sb.append("<TaxAmount>" + info.getOrderDetail().getTaxFee() + "</TaxAmount>\n");
 		sb.append("<TariffAmount>0</TariffAmount>\n");
 		sb.append("<AddedValueTaxAmount>" + info.getOrderDetail().getIncrementTax() + "</AddedValueTaxAmount>\n");
@@ -418,8 +417,8 @@ public class ButtJointMessageUtils {
 		sb.append("<DisAmount>");
 		sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额合计
 		sb.append("</DisAmount>\n");
-		sb.append("<BuyerIdnum>" + user.getUserDetail().getIdNum() + "</BuyerIdnum>\n");
-		sb.append("<BuyerName>" + user.getUserDetail().getName() + "</BuyerName>\n");
+		sb.append("<BuyerIdnum>" + info.getOrderDetail().getCustomerIdNum() + "</BuyerIdnum>\n");
+		sb.append("<BuyerName>" + info.getOrderDetail().getCustomerName() + "</BuyerName>\n");
 		sb.append("<BuyerIsPayer>1</BuyerIsPayer>\n");
 		sb.append("<WarehouseCode>2345678910</WarehouseCode>\n");
 		sb.append("<LogisticsNo></LogisticsNo>\n");
@@ -468,10 +467,10 @@ public class ButtJointMessageUtils {
 		sb.append(source); // 支付方式代码
 		sb.append("</Source>\n");
 		sb.append("<Idnum>");
-		sb.append(user.getUserDetail().getIdNum()); // 身份证
+		sb.append(info.getOrderDetail().getCustomerIdNum()); // 身份证
 		sb.append("</Idnum>\n");
 		sb.append("<Name>");
-		sb.append(user.getUserDetail().getName()); // 真实姓名
+		sb.append(info.getOrderDetail().getCustomerName()); // 真实姓名
 		sb.append("</Name>\n");
 		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
 			sb.append("<MerId>");
@@ -518,15 +517,15 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
-	public static CreateOrderInputDto getHaiDaiOrderDto(OrderInfo info, UserInfo user, HaiDaiButtjoint joint) {
+	public static CreateOrderInputDto getHaiDaiOrderDto(OrderInfo info, HaiDaiButtjoint joint) {
 		CreateOrderInputDto dto = new CreateOrderInputDto();
 		dto.setAccountId(joint.getAccountId());
 		dto.setAddress(info.getOrderDetail().getReceiveProvince() + info.getOrderDetail().getReceiveCity()
 				+ info.getOrderDetail().getReceiveArea() + info.getOrderDetail().getReceiveAddress()
 				+ info.getOrderDetail().getReceiveName());
 		dto.setAppkey(joint.getAppKey());
-		dto.setIdentification(user.getUserDetail().getIdNum());
-		dto.setName(user.getUserDetail().getName());
+		dto.setIdentification(info.getOrderDetail().getCustomerIdNum());
+		dto.setName(info.getOrderDetail().getCustomerName());
 		dto.setCustomOrder(info.getOrderId());
 		dto.setMemberId(joint.getMemberId());
 		dto.setUrl(joint.getUrl());
@@ -558,7 +557,7 @@ public class ButtJointMessageUtils {
 		return dto;
 	}
 
-	public static String getKJB2COrderMsg(OrderInfo info, UserInfo user, String unionPayMerId) {
+	public static String getKJB2COrderMsg(OrderInfo info, String unionPayMerId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -602,10 +601,10 @@ public class ButtJointMessageUtils {
 		sb.append(info.getOrderDetail().getPayment()); // 买家实付金额
 		sb.append("</amount>\n");
 		sb.append("<buyerAccount>");
-		sb.append(user.getPhone()); // 购物网站买家账号
+		sb.append(info.getOrderDetail().getCustomerPhone()); // 购物网站买家账号
 		sb.append("</buyerAccount>\n");
 		sb.append("<phone>");
-		sb.append(user.getPhone()); // 手机号
+		sb.append(info.getOrderDetail().getCustomerPhone()); // 手机号
 		sb.append("</phone>\n");
 		sb.append("<taxAmount>");
 		sb.append(info.getOrderDetail().getTaxFee()); // 税额
@@ -679,10 +678,10 @@ public class ButtJointMessageUtils {
 		sb.append(source); // 支付方式代码
 		sb.append("</source>\n");
 		sb.append("<idnum>");
-		sb.append(user.getUserDetail().getIdNum()); // 身份证
+		sb.append(info.getOrderDetail().getCustomerIdNum()); // 身份证
 		sb.append("</idnum>\n");
 		sb.append("<name>");
-		sb.append(user.getUserDetail().getName()); // 真实姓名
+		sb.append(info.getOrderDetail().getCustomerName()); // 真实姓名
 		sb.append("</name>\n");
 		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
 			sb.append("<merId>");
@@ -722,7 +721,7 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
-	public static String getJiaBeiAiTeOrderMsg(OrderInfo info, UserInfo user) {
+	public static String getJiaBeiAiTeOrderMsg(OrderInfo info) {
 		//佳贝艾特订单状态: 1>等待买家付款  2>等待卖家发货 3>卖家部分发货 4>等待买家确认收货 
 		//5>买家已签收确认收货 6>交易成功 7>交易自动关闭 8>交易主动关闭 9>退款中
 		//目前暂时只使用: 2>等待卖家发货 9>退款中
@@ -746,7 +745,7 @@ public class ButtJointMessageUtils {
 		order.setReceiver_mobile(info.getOrderDetail().getReceivePhone());
 		order.setReceiver_phone(info.getOrderDetail().getReceivePhone());
 		order.setReceiver_zip(info.getOrderDetail().getReceiveZipCode());
-		order.setReceiver_email(user.getEmail());
+		order.setReceiver_email("");
 		order.setReceiver_province_code("");
 		order.setReceiver_state(info.getOrderDetail().getReceiveProvince());
 		order.setReceiver_city_code("");
@@ -777,7 +776,7 @@ public class ButtJointMessageUtils {
 		return JSONUtil.toJson(order);
 	}
 	
-	public static String getZhengZhengOrderMsg(OrderInfo info, UserInfo user,String accountId,String memberId) {
+	public static String getZhengZhengOrderMsg(OrderInfo info,String accountId,String memberId) {
 		String payMentName = "";
 		String payCode = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -798,16 +797,16 @@ public class ButtJointMessageUtils {
 		orderMap.put("PaymentName", payMentName);
 		orderMap.put("Payment", payCode);
 		orderMap.put("PaySerialsNo", info.getOrderDetail().getPayNo());
-		orderMap.put("CustomerIDCard", user.getUserDetail().getIdNum());
-		orderMap.put("CustomerName", user.getUserDetail().getName());
-		orderMap.put("CustomerPhone", user.getPhone());
+		orderMap.put("CustomerIDCard", info.getOrderDetail().getCustomerIdNum());
+		orderMap.put("CustomerName", info.getOrderDetail().getCustomerName());
+		orderMap.put("CustomerPhone", info.getOrderDetail().getCustomerPhone());
 		orderMap.put("Province", info.getOrderDetail().getReceiveProvince());
 		orderMap.put("City", info.getOrderDetail().getReceiveCity());
 		orderMap.put("Area", info.getOrderDetail().getReceiveArea());
 		orderMap.put("Address", info.getOrderDetail().getReceiveAddress());
 		orderMap.put("ConsigneePhone", info.getOrderDetail().getReceivePhone());
 		orderMap.put("ConsigneeName", info.getOrderDetail().getReceiveName());
-		orderMap.put("CustomerAccount", user.getPhone());
+		orderMap.put("CustomerAccount", info.getOrderDetail().getCustomerPhone());
 		Map<String,Object> goodsMap = null;
 		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		double goodsAmount = 0;
@@ -825,5 +824,10 @@ public class ButtJointMessageUtils {
 		orderMap.put("StoreID", accountId);
 		orderMap.put("StoreName", memberId);
 		return JSONUtil.toJson(orderMap);
+	}
+
+	public static Map<String, String> getYouStongOrder(OrderInfo info) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

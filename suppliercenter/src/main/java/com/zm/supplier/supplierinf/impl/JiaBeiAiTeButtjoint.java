@@ -33,8 +33,8 @@ import net.sf.json.JSONObject;
 public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info, user);
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info);
 		String nonce_str = System.currentTimeMillis()+"";
 		String sign = SignUtil.JiaBeiAiTeSign(appKey, appSecret, nonce_str);
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -127,7 +127,7 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		UserInfo user = new UserInfo();
 		user.setEmail("test@163.com.cn");
 		
-		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info, user);
+		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info);
 		String appKey = "kabrita_gongxiaohaiwaigou";
 		String appSecret = "A255BE77577E49CABC357C76D6AB9BC789YYE5WWK7PP";
 		String url = "http://115.28.238.213:30002/huanovo-sync/dingdan/saveOrderByTerrace.ac";

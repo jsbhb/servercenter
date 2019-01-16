@@ -14,7 +14,6 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ButtJointMessageUtils;
 import com.zm.supplier.util.HttpClientUtil;
@@ -24,8 +23,8 @@ import com.zm.supplier.util.JSONUtil;
 public class ZhengZhengButtjoint extends AbstractSupplierButtJoint {
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		String msg = ButtJointMessageUtils.getZhengZhengOrderMsg(info, user, accountId, memberId);
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+		String msg = ButtJointMessageUtils.getZhengZhengOrderMsg(info, accountId, memberId);
 		return sendZhengZhengWarehouse(url, msg, SendOrderResult.class);
 	}
 

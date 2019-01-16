@@ -20,7 +20,6 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ButtJointMessageUtils;
 import com.zm.supplier.util.DateUtil;
@@ -43,13 +42,13 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 	RedisTemplate<String, Object> template;
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
 		String unionPayMerId = "";
 		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, user, memberId, unionPayMerId, accountId);// 报文
+		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, memberId, unionPayMerId, accountId);// 报文
 		String targetUrl = url.replace("{action}", "order.create");
 		return (Set<SendOrderResult>) sendTianTianWarehouse(targetUrl, msg, SendOrderResult.class, info.getOrderId());
 	}

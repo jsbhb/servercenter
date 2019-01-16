@@ -13,7 +13,6 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ButtJointMessageUtils;
 import com.zm.supplier.util.HttpClientUtil;
@@ -25,8 +24,8 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 //	private static String base_url = "http://erp.ikjtao.com/api/v4/{action}";
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		String msg = ButtJointMessageUtils.getFuBangOrderMsg(info, user);
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+		String msg = ButtJointMessageUtils.getFuBangOrderMsg(info);
 		String sign = SignUtil.fuBangSign(msg, appSecret);
 		String targetUrl = url.replace("{action}", "disOrder");
 		return sendFuBangWarehouse(targetUrl, msg, sign, SendOrderResult.class, info.getOrderId());

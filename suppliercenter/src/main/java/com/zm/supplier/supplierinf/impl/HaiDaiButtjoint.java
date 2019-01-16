@@ -8,18 +8,14 @@ import org.springframework.stereotype.Component;
 import com.seatent.opensdk.api.HDServiceProvider;
 import com.seatent.opensdk.input.hdServiceProvider.CreateOrderInputDto;
 import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
-import com.seatent.opensdk.input.hdServiceProvider.GetGoodsListBySolrInputDto;
-import com.seatent.opensdk.input.hdServiceProvider.GetTopCategoryApiInputDto;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ButtJointMessageUtils;
-import com.zm.supplier.util.HttpClientUtil;
 
 @Component
 public class HaiDaiButtjoint extends AbstractSupplierButtJoint {
@@ -27,8 +23,8 @@ public class HaiDaiButtjoint extends AbstractSupplierButtJoint {
 	private HDServiceProvider hd = new HDServiceProvider();
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		CreateOrderInputDto dto = ButtJointMessageUtils.getHaiDaiOrderDto(info, user, this);
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+		CreateOrderInputDto dto = ButtJointMessageUtils.getHaiDaiOrderDto(info, this);
 		String result = hd.createOrders(dto);
 		try {
 			return renderResult(result, "JSON", SendOrderResult.class);

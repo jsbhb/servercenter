@@ -16,7 +16,6 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.supplierinf.AccessTokenCacheMap;
 import com.zm.supplier.supplierinf.model.AccessToken;
@@ -38,8 +37,8 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 	private String NEED_ACCESS_TOKEN_URL = url + "&act={action}&access_token={token}&v=2.0&format=json";
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		String msg = ButtJointMessageUtils.getLiangYouOrderMsg(info, user, info.getSupplierId());
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+		String msg = ButtJointMessageUtils.getLiangYouOrderMsg(info, info.getSupplierId());
 		msg = EncryptUtil.encrypt(msg, appSecret);
 		String targetUrl = NEED_APP_ID_URL.replace("{action}", "addOutOrder").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();

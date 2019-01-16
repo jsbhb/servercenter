@@ -19,11 +19,9 @@ import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.supplierinf.model.EdbGoodsInfoList;
 import com.zm.supplier.supplierinf.model.EdbStockList;
-import com.zm.supplier.supplierinf.model.EdbStockModel;
 import com.zm.supplier.util.ConvertUtil;
 import com.zm.supplier.util.HttpClientUtil;
 import com.zm.supplier.util.JaxbUtil;
@@ -40,7 +38,7 @@ public class EdbButtjoint extends AbstractSupplierButtJoint {
 	private int pageSize = 100;
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
 		// TODO Auto-generated method stub
 		return null;
 	}

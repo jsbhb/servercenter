@@ -72,7 +72,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param user
 	 * @return
 	 */
-	public abstract Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user);
+	public abstract Set<SendOrderResult> sendOrder(OrderInfo info);
 	
 
 	/**

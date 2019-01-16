@@ -16,7 +16,6 @@ import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.feignclient.GoodsFeignClient;
 import com.zm.supplier.feignclient.OrderFeignClient;
-import com.zm.supplier.feignclient.UserFeignClient;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
@@ -27,7 +26,6 @@ import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.pojo.ThirdOrderInfo;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
-import com.zm.supplier.pojo.UserInfo;
 import com.zm.supplier.pojo.WarehouseStock;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
 import com.zm.supplier.util.ExpressContrast;
@@ -40,9 +38,6 @@ public class WarehouseThreadPool {
 
 	@Resource
 	RedisTemplate<String, Object> template;
-
-	@Resource
-	UserFeignClient userFeignClient;
 
 	@Resource
 	OrderFeignClient orderFeignClient;
@@ -63,8 +58,7 @@ public class WarehouseThreadPool {
 		if (buttJoint == null) {
 			return;
 		}
-		UserInfo user = userFeignClient.getUser(Constants.FIRST_VERSION, info.getUserId());
-		Set<SendOrderResult> set = buttJoint.sendOrder(info, user);
+		Set<SendOrderResult> set = buttJoint.sendOrder(info);
 		if (set == null || set.size() == 0) {
 			return;
 		}

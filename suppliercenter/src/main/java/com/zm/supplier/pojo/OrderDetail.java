@@ -61,6 +61,35 @@ public class OrderDetail {
 
 	private String remark;
 
+	private String customerIdNum;
+	
+	private String customerName;
+	
+	private String customerPhone;
+	
+	public String getCustomerIdNum() {
+		return customerIdNum;
+	}
+
+	public void setCustomerIdNum(String customerIdNum) {
+		this.customerIdNum = customerIdNum;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getCustomerPhone() {
+		return customerPhone;
+	}
+
+	public void setCustomerPhone(String customerPhone) {
+		this.customerPhone = customerPhone;
+	}
 
 	public Double getDisAmount() {
 		return disAmount;

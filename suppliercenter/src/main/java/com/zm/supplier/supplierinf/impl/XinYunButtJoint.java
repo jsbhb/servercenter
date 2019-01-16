@@ -31,8 +31,8 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 	// "http://apiserv.xyb2b.com/api/service/business";//正式
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info, UserInfo user) {
-		String msg = ButtJointMessageUtils.getXinYunOrderMsg(info, user, appKey, appSecret);
+	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+		String msg = ButtJointMessageUtils.getXinYunOrderMsg(info, appKey, appSecret);
 		return sendXinYunWarehouse(url, msg, SendOrderResult.class, info.getOrderId());
 	}
 
@@ -141,7 +141,7 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 		d.setIdNum("530121197008214197");
 		d.setName("李政");
 		user.setUserDetail(d);
-		System.out.println(joint.sendOrder(info, user));
+		System.out.println(joint.sendOrder(info));
 		// 查询订单状态
 		// List<String> list = new ArrayList<String>();
 		// list.add("OA35125413030078985");
