@@ -66,11 +66,41 @@ public class OrderDetail {
 	
 	private Double rebateFee;
 	
+	private String customerIdNum;
+	
+	private String customerName;
+	
+	private String customerPhone;
+	
 	public boolean validate() {
 		return (payType != null && payment != null && postFee != null && taxFee != null
 				&& tariffTax != null && incrementTax != null && exciseTax != null && disAmount != null
 				&& receiveName != null && receivePhone != null && receiveProvince != null && receiveCity != null
 				&& receiveArea != null && receiveAddress != null);
+	}
+
+	public String getCustomerIdNum() {
+		return customerIdNum;
+	}
+
+	public void setCustomerIdNum(String customerIdNum) {
+		this.customerIdNum = customerIdNum;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getCustomerPhone() {
+		return customerPhone;
+	}
+
+	public void setCustomerPhone(String customerPhone) {
+		this.customerPhone = customerPhone;
 	}
 
 	public Double getRebateFee() {
