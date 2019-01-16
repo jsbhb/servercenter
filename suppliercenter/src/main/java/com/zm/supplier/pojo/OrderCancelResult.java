@@ -7,6 +7,8 @@ public class OrderCancelResult {
 	private String msg;
 	
 	private Integer status;
+	
+	private boolean success;
 
 	public String getOrderId() {
 		return orderId;
@@ -30,6 +32,14 @@ public class OrderCancelResult {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public boolean isSuccess() {
+		return success;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
 	}
 	
 }

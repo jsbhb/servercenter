@@ -1022,20 +1022,18 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public ResultModel refundsWithSendOrder(String orderId) {
 		ResultModel result = null;
-
-		orderMapper.updateOrderRefunds(orderId);
-		
 		List<OrderInfo> list = new ArrayList<OrderInfo>();
 		list.addAll(orderMapper.listOrderForSendByOrderId(orderId));
 		if (list.size() > 0) {
 			packageOrderInfoByList(list);
-			result = supplierFeignClient.sendOrder(Constants.FIRST_VERSION, list);
+			result = supplierFeignClient.sendOrderCancel(Constants.FIRST_VERSION, list);
+			if (result.isSuccess()) {
+				orderMapper.updateOrderRefunds(orderId);
+			}
 		}
-		
 		if (result == null) {
-			result = new ResultModel(true, "");
+			result = new ResultModel(false, "订单取消失败，请重试");
 		}
-		
 		return result;
 	}
 }

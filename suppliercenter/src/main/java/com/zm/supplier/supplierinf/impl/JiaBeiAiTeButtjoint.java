@@ -33,23 +33,7 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 
 	@Override
 	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info);
-		String nonce_str = System.currentTimeMillis()+"";
-		String sign = SignUtil.JiaBeiAiTeSign(appKey, appSecret, nonce_str);
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("appKey", appKey);
-		params.put("data", JSONArray.fromObject("["+msg+"]"));
-		params.put("nonce_str", nonce_str);
-		params.put("sign", sign);
-		String jsonStr = JSONUtil.toJson(params);
-		System.out.println("jsonStr:" + jsonStr);
-		try {
-			jsonStr = URLEncoder.encode(jsonStr, "utf-8");
-			System.out.println("encode_jsonStr:" + jsonStr);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return sendJiaBeiAiTeOrderPool(url, jsonStr, SendOrderResult.class, info.getOrderId());
+		return packageOrderInfoToSend(info, SendOrderResult.class);
 	}
 
 	@Override
@@ -71,8 +55,27 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 	
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return packageOrderInfoToSend(info, OrderCancelResult.class);
+	}
+	
+	private <T> Set<T> packageOrderInfoToSend(OrderInfo info, Class<T> clazz) {
+		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info);
+		String nonce_str = System.currentTimeMillis()+"";
+		String sign = SignUtil.JiaBeiAiTeSign(appKey, appSecret, nonce_str);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("appKey", appKey);
+		params.put("data", JSONArray.fromObject("["+msg+"]"));
+		params.put("nonce_str", nonce_str);
+		params.put("sign", sign);
+		String jsonStr = JSONUtil.toJson(params);
+		System.out.println("jsonStr:" + jsonStr);
+		try {
+			jsonStr = URLEncoder.encode(jsonStr, "utf-8");
+			System.out.println("encode_jsonStr:" + jsonStr);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return sendJiaBeiAiTeOrderPool(url, jsonStr, clazz, info.getOrderId());
 	}
 	
 	private <T> Set<T> sendJiaBeiAiTeOrderPool(String url,String jsonStr, Class<T> clazz, String parem) {

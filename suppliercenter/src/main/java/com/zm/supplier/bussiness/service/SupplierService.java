@@ -16,6 +16,8 @@ public interface SupplierService {
 
 	void sendOrder(List<OrderInfo> infoList);
 
+	ResultModel sendOrderCancel(OrderInfo info);
+
 	/**  
 	 * queryByPage:查询分页效果. <br/>  
 	 *  

@@ -113,6 +113,16 @@ public class SupplierController {
 		return new ResultModel(false, "版本错误");
 	}
 
+	@RequestMapping(value = "{version}/supplier/sendOrderCancel", method = RequestMethod.POST)
+	public ResultModel sendOrderCancel(@PathVariable("version") Double version, @RequestBody OrderInfo info) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return supplierService.sendOrderCancel(info);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
 	@RequestMapping(value = "{version}/supplier/checkOrderStatus", method = RequestMethod.POST)
 	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list) {

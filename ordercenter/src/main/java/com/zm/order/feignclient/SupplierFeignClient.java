@@ -19,6 +19,6 @@ public interface SupplierFeignClient {
 	public ResultModel checkOrderStatus(@PathVariable("version") Double version,
 			@RequestBody List<OrderIdAndSupplierId> list);
 
-	@RequestMapping(value = "{version}/supplier/sendOrder", method = RequestMethod.POST)
-	public ResultModel sendOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> infoList);
+	@RequestMapping(value = "{version}/supplier/sendOrderCancel", method = RequestMethod.POST)
+	public ResultModel sendOrderCancel(@PathVariable("version") Double version, @RequestBody List<OrderInfo> infoList);
 }

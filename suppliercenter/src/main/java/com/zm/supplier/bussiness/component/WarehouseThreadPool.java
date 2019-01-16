@@ -13,11 +13,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.zm.supplier.bussiness.dao.SupplierMapper;
+import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.feignclient.GoodsFeignClient;
 import com.zm.supplier.feignclient.OrderFeignClient;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
+import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
@@ -83,6 +85,23 @@ public class WarehouseThreadPool {
 		} else {
 			logger.info("订单号：" + info.getOrderId() + "===============发送成功，更新出错==============");
 		}
+	}
+	
+	public ResultModel sendOrderCancel(OrderInfo info) {
+		ResultModel result = null;
+		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
+		if (buttJoint == null) {
+			result = new ResultModel(false, "为查询到供应商的配置信息");
+		}
+		Set<OrderCancelResult> set = buttJoint.orderCancel(info);
+		if (set == null || set.size() == 0) {
+			logger.info("订单号：" + info.getOrderId() + "===============调用退款接口失败==============");
+			result = new ResultModel(false, "调用佳贝艾特退款接口失败");
+		} else {
+			logger.info("订单号：" + info.getOrderId() + "===============调用退款接口成功==============");
+			result = new ResultModel(true, "调用佳贝艾特退款接口成功");
+		}
+		return result;
 	}
 
 	@Async("myAsync")

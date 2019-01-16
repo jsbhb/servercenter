@@ -48,6 +48,11 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 
 	@Override
+	public ResultModel sendOrderCancel(OrderInfo info) {
+		return warehouseThreadPool.sendOrderCancel(info);
+	}
+
+	@Override
 	public Page<SupplierEntity> queryByPage(SupplierEntity supplier) {
 		PageHelper.startPage(supplier.getCurrentPage(), supplier.getNumPerPage(), true);
 		return supplierMapper.selectForPage(supplier);
