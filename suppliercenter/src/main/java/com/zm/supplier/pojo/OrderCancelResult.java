@@ -9,6 +9,8 @@ public class OrderCancelResult {
 	private Integer status;
 	
 	private boolean success;
+	
+	private String uniquId;
 
 	public String getOrderId() {
 		return orderId;
@@ -41,5 +43,12 @@ public class OrderCancelResult {
 	public void setSuccess(boolean success) {
 		this.success = success;
 	}
-	
+
+	public String getUniquId() {
+		return uniquId;
+	}
+
+	public void setUniquId(String uniquId) {
+		this.uniquId = uniquId;
+	}
 }

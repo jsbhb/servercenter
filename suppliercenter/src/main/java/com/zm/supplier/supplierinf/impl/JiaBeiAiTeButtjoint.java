@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.zm.supplier.log.LogUtil;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
@@ -84,11 +85,11 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 
 		String result = HttpClientUtil.post(url, param);
 		logger.info("返回：" + parem + "===" + result);
-
+		result = result.substring(result.indexOf("{"), result.lastIndexOf("}") + 1);
 		try {
 			return renderResult(result, "JSON", clazz);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.writeErrorLog("转换出错", e);
 		}
 		return null;
 	}

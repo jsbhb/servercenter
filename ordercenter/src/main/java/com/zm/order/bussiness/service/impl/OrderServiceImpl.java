@@ -1026,7 +1026,7 @@ public class OrderServiceImpl implements OrderService {
 		list.addAll(orderMapper.listOrderForSendByOrderId(orderId));
 		if (list.size() > 0) {
 			packageOrderInfoByList(list);
-			result = supplierFeignClient.sendOrderCancel(Constants.FIRST_VERSION, list);
+			result = supplierFeignClient.sendOrderCancel(Constants.FIRST_VERSION, list.get(0));
 			if (result.isSuccess()) {
 				orderMapper.updateOrderRefunds(orderId);
 			}
