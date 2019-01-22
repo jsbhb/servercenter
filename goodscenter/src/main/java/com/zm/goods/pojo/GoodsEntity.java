@@ -50,8 +50,8 @@ public class GoodsEntity extends Pagination {
 	private List<GoodsFile> files;
 	private ERPGoodsTagBindEntity goodsTagBind;
 	private List<ERPGoodsTagBindEntity> goodsTagBindList;
-	private Integer isPublish;
-	private Integer goodsTagRatio;
+	private int isPublish;
+	private int goodsTagRatio;
 	private GoodsBaseEntity baseEntity;
 
 	public int getId() {
