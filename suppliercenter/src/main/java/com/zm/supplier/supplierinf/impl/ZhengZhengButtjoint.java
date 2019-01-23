@@ -11,6 +11,7 @@ import com.zm.supplier.log.LogUtil;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -24,13 +25,13 @@ import com.zm.supplier.util.JSONUtil;
 public class ZhengZhengButtjoint extends AbstractSupplierButtJoint {
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		String msg = ButtJointMessageUtils.getZhengZhengOrderMsg(info, accountId, memberId);
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
+		String msg = ButtJointMessageUtils.getZhengZhengOrderMsg(infoList.get(0), accountId, memberId);
 		return sendZhengZhengWarehouse(url, msg, SendOrderResult.class);
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
 		// TODO Auto-generated method stub
 		return null;
 	}

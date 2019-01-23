@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -72,7 +73,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param user
 	 * @return
 	 */
-	public abstract Set<SendOrderResult> sendOrder(OrderInfo info);
+	public abstract Set<SendOrderResult> sendOrder(List<OrderInfo> info);
 	
 
 	/**
@@ -80,7 +81,7 @@ public abstract class AbstractSupplierButtJoint {
 	 * @param orderId
 	 * @return
 	 */
-	public abstract Set<OrderStatus> checkOrderStatus(List<String> orderIds);
+	public abstract Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList);
 	
 	/**
 	 * @fun 同步库存

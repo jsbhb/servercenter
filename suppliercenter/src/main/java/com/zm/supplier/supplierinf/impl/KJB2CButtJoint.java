@@ -17,6 +17,7 @@ import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -34,18 +35,19 @@ public class KJB2CButtJoint extends AbstractSupplierButtJoint{
 	RedisTemplate<String, Object> template;
 	
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
 		String unionPayMerId = "";
-		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
+		Object obj = template.opsForValue().get(Constants.PAY + infoList.get(0).getCenterId() + Constants.UNION_PAY_MER_ID);
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getKJB2COrderMsg(info, unionPayMerId);// 报文
-		return (Set<SendOrderResult>) sendKJB2C(url, msg, SendOrderResult.class, info.getOrderId());
+		String msg = ButtJointMessageUtils.getKJB2COrderMsg(infoList.get(0), unionPayMerId);// 报文
+		Set<SendOrderResult> set = sendKJB2C(url, msg, SendOrderResult.class, infoList.get(0).getOrderId());
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
 		// TODO Auto-generated method stub
 		return null;
 	}

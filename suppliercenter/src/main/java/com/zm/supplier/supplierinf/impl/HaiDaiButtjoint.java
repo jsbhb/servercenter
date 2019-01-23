@@ -11,6 +11,7 @@ import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -24,8 +25,8 @@ public class HaiDaiButtjoint extends AbstractSupplierButtJoint {
 	private HDServiceProvider hd = new HDServiceProvider();
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		CreateOrderInputDto dto = ButtJointMessageUtils.getHaiDaiOrderDto(info, this);
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
+		CreateOrderInputDto dto = ButtJointMessageUtils.getHaiDaiOrderDto(infoList.get(0), this);
 		String result = hd.createOrders(dto);
 		try {
 			return renderResult(result, "JSON", SendOrderResult.class);
@@ -36,7 +37,7 @@ public class HaiDaiButtjoint extends AbstractSupplierButtJoint {
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
 		// TODO Auto-generated method stub
 		return null;
 	}

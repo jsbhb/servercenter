@@ -20,7 +20,6 @@ import com.zm.supplier.feignclient.OrderFeignClient;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
-import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
@@ -52,39 +51,17 @@ public class WarehouseThreadPool {
 
 	Logger logger = LoggerFactory.getLogger(WarehouseThreadPool.class);
 	
-	private static final Integer XINYUN_WAREHOUSE = 3;
-
 	@Async("myAsync")
-	public void sendOrder(OrderInfo info) {
-		AbstractSupplierButtJoint buttJoint = getTargetInterface(info.getSupplierId());
+	public void sendOrder(List<OrderInfo> infoList, Integer supplierId) {
+		AbstractSupplierButtJoint buttJoint = getTargetInterface(supplierId);
 		if (buttJoint == null) {
 			return;
 		}
-		Set<SendOrderResult> set = buttJoint.sendOrder(info);
+		Set<SendOrderResult> set = buttJoint.sendOrder(infoList);
 		if (set == null || set.size() == 0) {
 			return;
 		}
-		for (SendOrderResult model : set) {
-			model.setSupplierId(info.getSupplierId());
-			model.setOrderId(info.getOrderId());
-			if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
-				model.setThirdOrderId(info.getOrderId());
-			}
-			if(XINYUN_WAREHOUSE.equals(info.getSupplierId())){
-				for(OrderGoods goods : info.getOrderGoodsList()){
-					if(goods.getItemCode().equals(model.getItemCode())){
-						model.setItemId(goods.getItemId());
-						model.setItemName(goods.getItemName());
-					}
-				}
-			}
-		}
-		boolean flag = orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);
-		if (flag) {
-			template.delete(info.getOrderId());
-		} else {
-			logger.info("订单号：" + info.getOrderId() + "===============发送成功，更新出错==============");
-		}
+		orderFeignClient.saveThirdOrder(Constants.FIRST_VERSION, set);
 	}
 	
 	public ResultModel sendOrderCancel(OrderInfo info) {
@@ -111,11 +88,7 @@ public class WarehouseThreadPool {
 			if (buttJoint == null) {
 				return;
 			}
-			List<String> orderIds = new ArrayList<String>();
-			for (OrderIdAndSupplierId model : orderList) {
-				orderIds.add(model.getThirdOrderId());
-			}
-			Set<OrderStatus> set = buttJoint.checkOrderStatus(orderIds);
+			Set<OrderStatus> set = buttJoint.checkOrderStatus(orderList);
 			if (set == null || set.size() == 0) {
 				return;
 			}
@@ -143,7 +116,7 @@ public class WarehouseThreadPool {
 			orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
 
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("获取订单状态", e);
 		}
 
 	}
@@ -246,6 +219,7 @@ public class WarehouseThreadPool {
 		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
 		thirdOrder.setExpressId(orderStatus.getExpressId());
 		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
+		thirdOrder.setSupplierId(orderStatus.getSupplierId());
 		if (orderStatus.getLogisticsCode() == null) {
 			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsName()));
 		} else {
@@ -257,6 +231,7 @@ public class WarehouseThreadPool {
 		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus()));
 		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
 		thirdOrder.setOrderId(orderStatus.getOrderId());
+		thirdOrder.setItemCode(orderStatus.getItemCode());
 		return thirdOrder;
 	}
 

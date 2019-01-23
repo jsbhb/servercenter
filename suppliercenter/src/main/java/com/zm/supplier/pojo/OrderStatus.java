@@ -24,6 +24,16 @@ public class OrderStatus {
 	
 	private String msg;
 	
+	private String itemCode;
+	
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
 	public String getMsg() {
 		return msg;
 	}

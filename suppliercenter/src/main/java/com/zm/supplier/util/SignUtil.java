@@ -188,4 +188,20 @@ public class SignUtil {
 			return "签名异常";
 		}
 	}
+
+	public static String youStongSign(String appKey, String appSecret, String timestamp, String requestId,
+			String msg) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("secret_key=");
+		sb.append(appSecret);
+		sb.append("&parter_id=");
+		sb.append(appKey);
+		sb.append("&request_id=");
+		sb.append(requestId);
+		sb.append("&timestamp=");
+		sb.append(timestamp);
+		sb.append("&data=");
+		sb.append(msg);
+		return DigestUtils.md5Hex(sb.toString()).toLowerCase();
+	}
 }

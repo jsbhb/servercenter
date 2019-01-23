@@ -23,6 +23,26 @@ public class ThirdOrderInfo {
 	private String remark;
 	
 	private String itemName;
+	
+	private String itemCode;
+	
+	private Integer supplierId;
+
+	public Integer getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Integer supplierId) {
+		this.supplierId = supplierId;
+	}
+
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
 
 	public String getItemName() {
 		return itemName;

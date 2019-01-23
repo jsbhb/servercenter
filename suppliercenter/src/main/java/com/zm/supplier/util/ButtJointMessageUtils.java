@@ -350,9 +350,9 @@ public class ButtJointMessageUtils {
 		return JSONUtil.toJson(order);
 	}
 
-	public static String getFuBangOrderStatusMsg(List<String> orderIds) {
+	public static String getFuBangOrderStatusMsg(String orderId) {
 
-		return "{\"order_no\":" + orderIds.get(0) + "}";
+		return "{\"order_no\":" + orderId + "}";
 	}
 
 	public static String getFuBangStock(List<OrderBussinessModel> list) {
@@ -506,12 +506,12 @@ public class ButtJointMessageUtils {
 		return sb.toString();
 	}
 
-	public static String getQianFengCheckOrderMsg(List<String> orderIds, String customer) {
+	public static String getQianFengCheckOrderMsg(String orderId, String customer) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<orderRequest>\n");
 		sb.append("<psno></psno>\n");
 		sb.append("<corpcode>" + customer + "</corpcode>\n");
-		sb.append("<orderno>" + orderIds.get(0) + "</orderno>\n");
+		sb.append("<orderno>" + orderId + "</orderno>\n");
 		sb.append("</orderRequest>\n");
 
 		return sb.toString();
@@ -792,6 +792,8 @@ public class ButtJointMessageUtils {
 		orderMap.put("TotalAmount", info.getOrderDetail().getPayment());
 		orderMap.put("DiscountsAmount", info.getOrderDetail().getDisAmount());
 		orderMap.put("TaxAmount", info.getOrderDetail().getTaxFee());
+		orderMap.put("AddedValueTaxAmount", info.getOrderDetail().getIncrementTax());
+		orderMap.put("ComsumptionTaxAmount", info.getOrderDetail().getExciseTax());
 		orderMap.put("CreateTime", info.getCreateTime());
 		orderMap.put("PayTime", info.getOrderDetail().getPayTime());
 		orderMap.put("PaymentName", payMentName);
@@ -826,8 +828,43 @@ public class ButtJointMessageUtils {
 		return JSONUtil.toJson(orderMap);
 	}
 
-	public static Map<String, String> getYouStongOrder(OrderInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getYouStongOrder(List<OrderInfo> infoList) {
+		List<Map<String, Object>> result = new ArrayList<Map<String,Object>>();
+		Map<String, Object> orderMap = null;
+		Map<String,Object> goodsMap = null;
+		List<Map<String,Object>> list = null;
+		for(OrderInfo info : infoList){
+			orderMap = new HashMap<String, Object>();
+			orderMap.put("ParterOrderNo", info.getOrderId());
+			orderMap.put("ContactName", info.getOrderDetail().getCustomerName());
+			orderMap.put("IdCardNo", info.getOrderDetail().getCustomerIdNum());
+			orderMap.put("Mobile", info.getOrderDetail().getReceivePhone());
+			orderMap.put("Province", info.getOrderDetail().getReceiveProvince());
+			orderMap.put("City", info.getOrderDetail().getReceiveCity());
+			orderMap.put("District", info.getOrderDetail().getReceiveArea());
+			orderMap.put("StreetAddress", info.getOrderDetail().getReceiveAddress());
+			orderMap.put("NotPayByBalance", false);
+			orderMap.put("NotUsePreOrderedInventory", false);
+			list = new ArrayList<Map<String,Object>>();
+			for(OrderGoods goods : info.getOrderGoodsList()){
+				goodsMap = new HashMap<String, Object>();
+				goodsMap.put("SKUNo", goods.getItemCode());
+				goodsMap.put("Qty", goods.getItemQuantity());
+				list.add(goodsMap);
+			}
+			orderMap.put("Items", list);
+			result.add(orderMap);
+		}
+		
+		return JSONUtil.toJson(result);
+	}
+
+	public static String getYouStongOrderStatus(List<String> orderIds) {
+		return JSONUtil.toJson(orderIds);
+	}
+
+	public static String getYouStongStock(List<String> itemCodeList) {
+		
+		return JSONUtil.toJson(itemCodeList);
 	}
 }

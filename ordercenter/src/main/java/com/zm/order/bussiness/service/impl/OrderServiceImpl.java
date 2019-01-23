@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -133,7 +134,8 @@ public class OrderServiceImpl implements OrderService {
 		Double amount = 0.0;
 		boolean vip = false;
 
-		// ************************* 临时加的判断，砍价特殊处理 商品拆开，代码还原删掉该模块以及涉及的其他地方*********************
+		// ************************* 临时加的判断，砍价特殊处理
+		// 商品拆开，代码还原删掉该模块以及涉及的其他地方*********************
 		boolean isBargain = orderComponentUtil.judgeIsBargainOrder(info);
 		boolean isSpecial = orderComponentUtil.judgeIsSpecial(info);
 		// ***************************end****************************************
@@ -740,7 +742,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 		return list;
 	}
-	
+
 	private List<OrderInfo> packageOrderInfoByList(List<OrderInfo> list) {
 		Set<String> set = new HashSet<String>();
 		List<OrderGoods> goodsList = null;
@@ -751,8 +753,7 @@ public class OrderServiceImpl implements OrderService {
 				set.add(goods.getItemId());
 			}
 		}
-		Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION,
-				set);
+		Map<String, GoodsConvert> result = goodsFeignClient.listSkuAndConversionByItemId(Constants.FIRST_VERSION, set);
 		if (result != null) {// 对每个商品进行换算和补全sku并合并
 			for (OrderInfo info : list) {
 				tempMap.clear();
@@ -769,8 +770,8 @@ public class OrderServiceImpl implements OrderService {
 						double temitemprice = CalculationUtils.mul(temp.getItemPrice(), temp.getItemQuantity());
 						model.setItemQuantity(model.getItemQuantity() + temp.getItemQuantity());
 						try {
-							model.setActualPrice(CalculationUtils.div(
-									CalculationUtils.add(temactualprice, actualprice), model.getItemQuantity(), 2));
+							model.setActualPrice(CalculationUtils.div(CalculationUtils.add(temactualprice, actualprice),
+									model.getItemQuantity(), 2));
 							model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
 									model.getItemQuantity(), 2));
 							it.remove();// 合并后删除该商品
@@ -808,12 +809,25 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public void saveThirdOrder(List<SendOrderResult> list) {
 		orderMapper.saveThirdOrder(list);
-		int count = orderMapper.updateOrderSendToWarehouse(list.get(0).getOrderId());
-		if (count > 0) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("status", Constants.ORDER_TO_WAREHOUSE);
-			param.put("orderId", list.get(0).getOrderId());
-			orderMapper.addOrderStatusRecord(param);
+		Map<String, List<SendOrderResult>> thirdMap = new HashMap<>();
+		List<SendOrderResult> tmp = null;
+		for (SendOrderResult info : list) {
+			if (thirdMap.get(info.getOrderId()) == null) {
+				tmp = new ArrayList<>();
+				tmp.add(info);
+				thirdMap.put(info.getOrderId(), tmp);
+			} else {
+				thirdMap.get(info.getOrderId()).add(info);
+			}
+		}
+		for (Map.Entry<String, List<SendOrderResult>> entry : thirdMap.entrySet()) {
+			int count = orderMapper.updateOrderSendToWarehouse(entry.getKey());
+			if (count > 0) {
+				Map<String, Object> param = new HashMap<String, Object>();
+				param.put("status", Constants.ORDER_TO_WAREHOUSE);
+				param.put("orderId", entry.getKey());
+				orderMapper.addOrderStatusRecord(param);
+			}
 		}
 	}
 
@@ -824,29 +838,63 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void changeOrderStatusByThirdWarehouse(List<ThirdOrderInfo> list) {
-		orderMapper.updateThirdOrderInfo(list);
-		List<Integer> statusList = orderMapper.listOrderStatus(list.get(0).getOrderId());
-		ThirdOrderInfo orderInfo = list.get(0);
-		if (statusList != null && statusList.size() > 1) {
-			Collections.sort(statusList);
-			// 有一个没发货订单状态就是单证放行
-			if (Constants.ORDER_DELIVER.equals(statusList.get(statusList.size() - 1))
-					&& !statusList.get(0).equals(Constants.ORDER_DELIVER)) {
-				orderInfo.setOrderStatus(Constants.ORDER_DZFX);
+		List<String> orderIds = new ArrayList<>();
+		Map<String, List<ThirdOrderInfo>> thirdMap = new HashMap<>();
+		List<ThirdOrderInfo> tmp = null;
+		for (ThirdOrderInfo info : list) {
+			if (info.getItemCode() != null) {
+				orderIds.add(info.getOrderId());
+			}
+			if (thirdMap.get(info.getOrderId()) == null) {
+				tmp = new ArrayList<>();
+				tmp.add(info);
+				thirdMap.put(info.getOrderId(), tmp);
+			} else {
+				thirdMap.get(info.getOrderId()).add(info);
 			}
 		}
-		int count = orderMapper.updateOrderStatusByThirdStatus(orderInfo);
-		if (count > 0) {
-			// 发货新增发货数量缓存
-			if (Constants.ORDER_DELIVER.equals(orderInfo.getOrderStatus())) {
-				// 增加发货数量缓存
-				Integer gradeId = orderMapper.getGradeId(orderInfo.getOrderId());
-				cacheAbstractService.addOrderCountCache(gradeId, Constants.ORDER_STATISTICS_DAY, "deliver");
+		if (orderIds.size() > 0) {// 根据itemCode 补全商品名称
+			List<OrderGoods> goodsList = orderMapper.listOrderGoodsNameByOrderId(orderIds);
+			Map<String, String> goodsMap = goodsList.stream()
+					.collect(Collectors.toMap(OrderGoods::getItemCode, goods -> goods.getItemName()));
+			StringBuilder sb = null;
+			for (ThirdOrderInfo third : list) {
+				if (third.getItemCode() != null) {
+					sb = new StringBuilder();
+					String[] itemCodeArr = third.getItemCode().split(",");
+					for (String itemCode : itemCodeArr) {
+						sb.append(goodsMap.get(itemCode) + ",");
+					}
+					third.setItemName(sb.toString().substring(0, sb.length() - 1));
+				}
 			}
-			Map<String, Object> param = new HashMap<String, Object>();
-			param.put("status", list.get(0).getOrderStatus());
-			param.put("orderId", list.get(0).getOrderId());
-			orderMapper.addOrderStatusRecord(param);
+		}
+		orderMapper.updateThirdOrderInfo(list);
+		ThirdOrderInfo orderInfo = null;
+		for (Map.Entry<String, List<ThirdOrderInfo>> entry : thirdMap.entrySet()) {
+			List<Integer> statusList = orderMapper.listOrderStatus(entry.getKey());
+			orderInfo = entry.getValue().get(0);
+			if (statusList != null && statusList.size() > 1) {
+				Collections.sort(statusList);
+				// 有一个没发货订单状态就是单证放行(主要是行云订单)
+				if (Constants.ORDER_DELIVER.equals(statusList.get(statusList.size() - 1))
+						&& !statusList.get(0).equals(Constants.ORDER_DELIVER)) {
+					orderInfo.setOrderStatus(Constants.ORDER_DZFX);
+				}
+			}
+			int count = orderMapper.updateOrderStatusByThirdStatus(orderInfo);
+			if (count > 0) {
+				// 发货新增发货数量缓存
+				if (Constants.ORDER_DELIVER.equals(orderInfo.getOrderStatus())) {
+					// 增加发货数量缓存
+					Integer gradeId = orderMapper.getGradeId(orderInfo.getOrderId());
+					cacheAbstractService.addOrderCountCache(gradeId, Constants.ORDER_STATISTICS_DAY, "deliver");
+				}
+				Map<String, Object> param = new HashMap<String, Object>();
+				param.put("status", entry.getValue().get(0).getOrderStatus());
+				param.put("orderId", entry.getValue().get(0).getOrderId());
+				orderMapper.addOrderStatusRecord(param);
+			}
 		}
 	}
 

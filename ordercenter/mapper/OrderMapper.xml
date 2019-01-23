@@ -83,6 +83,24 @@
 			<result column="oeorder_id" property="orderId" jdbcType="VARCHAR" />
 		</collection>
 	</resultMap>
+	
+	<resultMap type="com.zm.order.pojo.OrderGoods" id="orderGoods">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="item_name" property="itemName" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="item_img" property="itemImg" jdbcType="VARCHAR" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="goodsId" property="goodsId" jdbcType="VARCHAR" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="item_quantity" property="itemQuantity"
+			jdbcType="INTEGER" />
+		<result column="item_price" property="itemPrice" jdbcType="DECIMAL" />
+		<result column="actual_price" property="actualPrice" jdbcType="DECIMAL" />
+		<result column="item_info" property="itemInfo" jdbcType="VARCHAR" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<result column="rebate" property="rebate" jdbcType="VARCHAR" />
+	</resultMap>
 
 	<resultMap type="com.zm.order.pojo.CustomModel" id="customModel">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -610,19 +628,34 @@
 		</foreach>
 	</insert>
 
-	<update id="updateThirdOrderInfo" parameterType="Object">
-		<foreach collection="list" item="item" index="index" open=""
-			close="" separator=";">
-			update third_order_info
-			<set>
-				status = #{item.status}, express_key = #{item.expressKey},
-				express_name = #{item.expressName}, express_id = #{item.expressId}, order_status = #{item.orderStatus},
-				update_time = now()
-			</set>
-			where order_id = #{item.orderId} and third_order_id =
-			#{item.thirdOrderId}
+	<insert id="updateThirdOrderInfo" parameterType="Object">
+		INSERT INTO
+		third_order_info
+		(order_id,third_order_id,supplier_id,order_status,status,item_name,express_key,express_name,
+		express_id,item_code,create_time)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.orderId},#{item.thirdOrderId},#{item.supplierId},#{item.orderStatus},#{item.status},#{item.itemName},
+			#{item.expressKey},#{item.expressName},#{item.expressId},#{item.itemCode},now())
 		</foreach>
-	</update>
+		ON DUPLICATE KEY UPDATE order_status = values(order_status),status = values(status),item_name = values(item_name),
+		express_key = values(express_key), express_name = values(express_name), express_id = values(express_id), 
+		item_code = values(item_code), update_time = now()
+	</insert>
+
+<!-- 	<update id="updateThirdOrderInfo" parameterType="Object"> -->
+<!-- 		<foreach collection="list" item="item" index="index" open="" -->
+<!-- 			close="" separator=";"> -->
+<!-- 			update third_order_info -->
+<!-- 			<set> -->
+<!-- 				status = #{item.status}, express_key = #{item.expressKey}, -->
+<!-- 				express_name = #{item.expressName}, express_id = #{item.expressId}, order_status = #{item.orderStatus}, -->
+<!-- 				update_time = now() -->
+<!-- 			</set> -->
+<!-- 			where order_id = #{item.orderId} and third_order_id = -->
+<!-- 			#{item.thirdOrderId} -->
+<!-- 		</foreach> -->
+<!-- 	</update> -->
 	
 	<select id="listOrderStatus" parameterType="Object" resultType="java.lang.Integer">
 		select order_status from third_order_info where order_id = #{orderId}
@@ -741,5 +774,12 @@
 		left join order_detail od on o.order_id =od.order_id
 		left join order_goods og on o.order_id = og.order_id 
 		where o.order_id = #{orderId}
+	</select>
+	
+	<select id="listOrderGoodsNameByOrderId" parameterType="Object" resultMap="orderGoods">
+		select id,item_code,item_id,item_name from order_goods where order_id in
+		 <foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
 	</select>
 </mapper>

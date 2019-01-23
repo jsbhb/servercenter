@@ -2,6 +2,7 @@ package com.zm.supplier.supplierinf.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -43,19 +45,35 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 	RedisTemplate<String, Object> template;
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
 		String unionPayMerId = "";
-		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
+		Object obj = template.opsForValue()
+				.get(Constants.PAY + infoList.get(0).getCenterId() + Constants.UNION_PAY_MER_ID);
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getTianTianOrderMsg(info, memberId, unionPayMerId, accountId);// 报文
+		String msg = ButtJointMessageUtils.getTianTianOrderMsg(infoList.get(0), memberId, unionPayMerId, accountId);// 报文
 		String targetUrl = url.replace("{action}", "order.create");
-		return (Set<SendOrderResult>) sendTianTianWarehouse(targetUrl, msg, SendOrderResult.class, info.getOrderId());
+		Set<SendOrderResult> set = sendTianTianWarehouse(targetUrl, msg, SendOrderResult.class,
+				infoList.get(0).getOrderId());
+		if(set != null){
+			for (SendOrderResult model : set) {
+				model.setSupplierId(infoList.get(0).getSupplierId());
+				model.setOrderId(infoList.get(0).getOrderId());
+				if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+					model.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
+		List<String> orderIds = new ArrayList<String>();
+		for (OrderIdAndSupplierId model : orderList) {
+			orderIds.add(model.getThirdOrderId());
+		}
 		String msg = ButtJointMessageUtils.getTianTianCheckOrderMsg(orderIds, memberId);// 报文
 		String targetUrl = url.replace("{action}", "order.query");
 		return (Set<OrderStatus>) sendTianTianWarehouse(targetUrl, msg, OrderStatus.class, orderIds.get(0));
@@ -71,7 +89,7 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub

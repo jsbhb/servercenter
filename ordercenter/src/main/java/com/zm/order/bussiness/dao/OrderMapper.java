@@ -179,5 +179,7 @@ public interface OrderMapper {
 	 * @return
 	 */
 	List<OrderInfo> listOrderForSendByOrderId(String orderId);
+
+	List<OrderGoods> listOrderGoodsNameByOrderId(List<String> orderIds);
 	
 }

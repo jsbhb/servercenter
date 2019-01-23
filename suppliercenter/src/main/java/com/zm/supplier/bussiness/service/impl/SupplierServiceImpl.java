@@ -26,7 +26,7 @@ import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.util.ListUtil;
 
 @Service
-@Transactional(isolation=Isolation.READ_COMMITTED)
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class SupplierServiceImpl implements SupplierService {
 
 	@Resource
@@ -34,6 +34,10 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Resource
 	WarehouseThreadPool warehouseThreadPool;
+	
+	private final Integer FUBANG_WAREHOUSE = 4;
+	private final Integer LIANGYOU_WAREHOUSE = 2;
+	private final Integer YOU_SHI_TONG_WAREHOUSE = 38;
 
 	@Override
 	public List<Express> listExpressBySupplierId(Integer supplierId) {
@@ -42,8 +46,28 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Override
 	public void sendOrder(List<OrderInfo> infoList) {
+		Map<Integer, List<OrderInfo>> param = new HashMap<Integer, List<OrderInfo>>();
+		List<OrderInfo> tempList = null;
 		for (OrderInfo info : infoList) {
-			warehouseThreadPool.sendOrder(info);
+			if (param.get(info.getSupplierId()) == null) {
+				tempList = new ArrayList<OrderInfo>();
+				tempList.add(info);
+				param.put(info.getSupplierId(), tempList);
+			} else {
+				param.get(info.getSupplierId()).add(info);
+			}
+		}
+		for (Map.Entry<Integer, List<OrderInfo>> entry : param.entrySet()) {
+			if (YOU_SHI_TONG_WAREHOUSE.equals(entry.getKey())) {
+				warehouseThreadPool.sendOrder(entry.getValue(), entry.getKey());
+			} else {
+				List<OrderInfo> temp = null;
+				for (OrderInfo model : entry.getValue()) {
+					temp = new ArrayList<OrderInfo>();
+					temp.add(model);
+					warehouseThreadPool.sendOrder(temp, entry.getKey());
+				}
+			}
 		}
 	}
 
@@ -68,9 +92,6 @@ public class SupplierServiceImpl implements SupplierService {
 		return supplierMapper.selectById(id);
 	}
 
-	private static final Integer FUBANG_WAREHOUSE = 4;
-	private static final Integer LIANGYOU_WAREHOUSE = 2;
-
 	@Override
 	public ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list) {
 		Map<Integer, List<OrderIdAndSupplierId>> param = new HashMap<Integer, List<OrderIdAndSupplierId>>();
@@ -85,11 +106,15 @@ public class SupplierServiceImpl implements SupplierService {
 			}
 		}
 		for (Map.Entry<Integer, List<OrderIdAndSupplierId>> entry : param.entrySet()) {
-			List<OrderIdAndSupplierId> temp = null;
-			for (OrderIdAndSupplierId model : entry.getValue()) {
-				temp = new ArrayList<OrderIdAndSupplierId>();
-				temp.add(model);
-				warehouseThreadPool.checkOrderStatus(temp, entry.getKey());
+			if (YOU_SHI_TONG_WAREHOUSE.equals(entry.getKey())) {
+				warehouseThreadPool.checkOrderStatus(entry.getValue(), entry.getKey());
+			} else {
+				List<OrderIdAndSupplierId> temp = null;
+				for (OrderIdAndSupplierId model : entry.getValue()) {
+					temp = new ArrayList<OrderIdAndSupplierId>();
+					temp.add(model);
+					warehouseThreadPool.checkOrderStatus(temp, entry.getKey());
+				}
 			}
 		}
 		return new ResultModel(true, "正在同步状态");

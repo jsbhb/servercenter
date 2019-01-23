@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -22,22 +23,32 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class FuBangButtJoint extends AbstractSupplierButtJoint {
 
-//	private static String base_url = "http://erp.ikjtao.com/api/v4/{action}";
+	// private static String base_url = "http://erp.ikjtao.com/api/v4/{action}";
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		String msg = ButtJointMessageUtils.getFuBangOrderMsg(info);
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
+		String msg = ButtJointMessageUtils.getFuBangOrderMsg(infoList.get(0));
 		String sign = SignUtil.fuBangSign(msg, appSecret);
 		String targetUrl = url.replace("{action}", "disOrder");
-		return sendFuBangWarehouse(targetUrl, msg, sign, SendOrderResult.class, info.getOrderId());
+		Set<SendOrderResult> set = sendFuBangWarehouse(targetUrl, msg, sign, SendOrderResult.class, infoList.get(0).getOrderId());
+		if(set != null){
+			for (SendOrderResult model : set) {
+				model.setSupplierId(infoList.get(0).getSupplierId());
+				model.setOrderId(infoList.get(0).getOrderId());
+				if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+					model.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
-		String msg = ButtJointMessageUtils.getFuBangOrderStatusMsg(orderIds);
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
+		String msg = ButtJointMessageUtils.getFuBangOrderStatusMsg(orderList.get(0).getThirdOrderId());
 		String sign = SignUtil.fuBangSign(msg, appSecret);
 		String targetUrl = url.replace("{action}", "logistics");
-		return sendFuBangWarehouse(targetUrl, msg, sign, OrderStatus.class, orderIds.get(0));
+		return sendFuBangWarehouse(targetUrl, msg, sign, OrderStatus.class, orderList.get(0).getThirdOrderId());
 	}
 
 	@Override
@@ -61,7 +72,7 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 		}
 		return set;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub

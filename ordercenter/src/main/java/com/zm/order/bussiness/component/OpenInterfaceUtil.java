@@ -91,10 +91,10 @@ public class OpenInterfaceUtil {
 			return new ResultModel(false, ErrorCodeEnum.ORDER_MISS_GOODS.getErrorCode(),
 					ErrorCodeEnum.ORDER_MISS_GOODS.getErrorMsg());
 		}
-		// 如果是跨境订单并且商品不只一个或者一个商品买了多个，则判断金额是否大于2000
+		// 如果是跨境订单并且商品不只一个或者一个商品买了多个，则判断金额是否大于5000
 		if (orderInfo.getOrderFlag() == Constants.O2O_ORDER_TYPE && (orderInfo.getOrderGoodsList().size() > 1
 				|| orderInfo.getOrderGoodsList().get(0).getItemQuantity() > 1)) {
-			if (orderInfo.getOrderDetail().getPayment() > 2000) {
+			if (orderInfo.getOrderDetail().getPayment() > 5000) {
 				return new ResultModel(false, ErrorCodeEnum.OUT_OF_PRICE.getErrorCode(),
 						ErrorCodeEnum.OUT_OF_PRICE.getErrorMsg());
 			}

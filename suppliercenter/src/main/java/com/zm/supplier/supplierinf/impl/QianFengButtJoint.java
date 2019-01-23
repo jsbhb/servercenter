@@ -15,6 +15,7 @@ import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -39,22 +40,33 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 	RedisTemplate<String, Object> template;
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
 		String unionPayMerId = "";
-		Object obj = template.opsForValue().get(Constants.PAY + info.getCenterId() + Constants.UNION_PAY_MER_ID);
+		Object obj = template.opsForValue()
+				.get(Constants.PAY + infoList.get(0).getCenterId() + Constants.UNION_PAY_MER_ID);
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getQianFengOrderMsg(info, CUSTOMER, unionPayMerId);// 报文
-		return (Set<SendOrderResult>) sendQianFengWarehouse(base_url, msg, "cnec_order", SendOrderResult.class, true,
-				info.getOrderId());
+		String msg = ButtJointMessageUtils.getQianFengOrderMsg(infoList.get(0), CUSTOMER, unionPayMerId);// 报文
+		Set<SendOrderResult> set = sendQianFengWarehouse(base_url, msg, "cnec_order", SendOrderResult.class, true,
+				infoList.get(0).getOrderId());
+		if (set != null) {
+			for (SendOrderResult model : set) {
+				model.setSupplierId(infoList.get(0).getSupplierId());
+				model.setOrderId(infoList.get(0).getOrderId());
+				if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+					model.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
-		String msg = ButtJointMessageUtils.getQianFengCheckOrderMsg(orderIds, CUSTOMER);// 报文
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
+		String msg = ButtJointMessageUtils.getQianFengCheckOrderMsg(orderList.get(0).getThirdOrderId(), CUSTOMER);// 报文
 		return (Set<OrderStatus>) sendQianFengWarehouse(wms_url, msg, "GetOrderInfo", OrderStatus.class, false,
-				orderIds.get(0));
+				orderList.get(0).getThirdOrderId());
 	}
 
 	@Override
@@ -67,7 +79,7 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub
@@ -161,7 +173,7 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 		// 查询订单状态
 		List<String> list = new ArrayList<String>();
 		list.add("GX1001001212110412");
-		System.out.println(joint.checkOrderStatus(list));
+		// System.out.println(joint.checkOrderStatus(list));
 		// //查询库存
 		// OrderBussinessModel model = new OrderBussinessModel();
 		// model.setItemCode("KD000111");

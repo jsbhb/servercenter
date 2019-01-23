@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -39,13 +40,13 @@ public class EdbButtjoint extends AbstractSupplierButtJoint {
 	private int pageSize = 100;
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
 		// TODO Auto-generated method stub
 		return null;
 	}

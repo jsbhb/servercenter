@@ -14,6 +14,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderDetail;
 import com.zm.supplier.pojo.OrderGoods;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -27,20 +28,38 @@ import com.zm.supplier.util.HttpClientUtil;
 @Component
 public class XinYunButtJoint extends AbstractSupplierButtJoint {
 
-//	private final String url = "http://120.76.191.121/api/service/business";// 测试
+	// private final String url =
+	// "http://120.76.191.121/api/service/business";// 测试
 	// private final String url =
 	// "http://apiserv.xyb2b.com/api/service/business";//正式
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		String msg = ButtJointMessageUtils.getXinYunOrderMsg(info, appKey, appSecret);
-		return sendXinYunWarehouse(url, msg, SendOrderResult.class, info.getOrderId());
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
+		String msg = ButtJointMessageUtils.getXinYunOrderMsg(infoList.get(0), appKey, appSecret);
+		Set<SendOrderResult> set = sendXinYunWarehouse(url, msg, SendOrderResult.class, infoList.get(0).getOrderId());
+		if (set != null) {
+			for (SendOrderResult model : set) {
+				model.setSupplierId(infoList.get(0).getSupplierId());
+				model.setOrderId(infoList.get(0).getOrderId());
+				if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+					model.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+				for (OrderGoods goods : infoList.get(0).getOrderGoodsList()) {
+					if (goods.getItemCode().equals(model.getItemCode())) {
+						model.setItemId(goods.getItemId());
+						model.setItemName(goods.getItemName());
+					}
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
-		String msg = ButtJointMessageUtils.getXinYunOrderStatusMsg(orderIds.get(0), appKey, appSecret);
-		return sendXinYunWarehouse(url, msg, OrderStatus.class, orderIds.get(0));
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
+		String msg = ButtJointMessageUtils.getXinYunOrderStatusMsg(orderList.get(0).getThirdOrderId(), appKey,
+				appSecret);
+		return sendXinYunWarehouse(url, msg, OrderStatus.class, orderList.get(0).getThirdOrderId());
 	}
 
 	@Override
@@ -89,7 +108,7 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 		}
 		return set;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub
@@ -148,7 +167,7 @@ public class XinYunButtJoint extends AbstractSupplierButtJoint {
 		d.setIdNum("530121197008214197");
 		d.setName("李政");
 		user.setUserDetail(d);
-		System.out.println(joint.sendOrder(info));
+		// System.out.println(joint.sendOrder(info));
 		// 查询订单状态
 		// List<String> list = new ArrayList<String>();
 		// list.add("OA35125413030078985");

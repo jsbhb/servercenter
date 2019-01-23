@@ -16,6 +16,7 @@ public class ExpressContrast {
 			put("YTO", "圆通速递");
 			put("JD", "京东快递");
 			put("BEST", "百世快递");
+			put("百世快递", "百世快递");
 			put("YUNDA", "韵达快递");
 			put("TTKDEX", "天天快递");
 			put("zhongtong", "中通速递");
@@ -34,6 +35,11 @@ public class ExpressContrast {
 			put("中通速递", "中通速递");
 			put("北仑军通", "圆通速递");
 			put("youshuwuliu", "优速快递");
+			put("圆通快递", "圆通速递");
+			put("韵达快递", "韵达快递");
+			put("中通快递", "中通速递");
+			put("申通快递", "申通快递");
+			put("顺丰快递", "顺丰快递");
 		}
 	};
 

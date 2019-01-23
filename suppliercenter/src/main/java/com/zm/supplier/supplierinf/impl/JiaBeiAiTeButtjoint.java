@@ -16,6 +16,7 @@ import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
 import com.zm.supplier.pojo.OrderDetail;
 import com.zm.supplier.pojo.OrderGoods;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -33,39 +34,49 @@ import net.sf.json.JSONArray;
 public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		return packageOrderInfoToSend(info, SendOrderResult.class);
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
+		Set<SendOrderResult> set = packageOrderInfoToSend(infoList.get(0), SendOrderResult.class);
+		if (set != null) {
+			for (SendOrderResult model : set) {
+				model.setSupplierId(infoList.get(0).getSupplierId());
+				model.setOrderId(infoList.get(0).getOrderId());
+				if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+					model.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
 		return null;
 	}
 
 	@Override
 	public Set<CheckStockModel> checkStock(List<OrderBussinessModel> list) {
-		
+
 		return null;
 	}
 
 	@Override
 	public Set<ThirdWarehouseGoods> getGoods(String itemCode) {
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		return packageOrderInfoToSend(info, OrderCancelResult.class);
 	}
-	
+
 	private <T> Set<T> packageOrderInfoToSend(OrderInfo info, Class<T> clazz) {
 		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info);
-		String nonce_str = System.currentTimeMillis()+"";
+		String nonce_str = System.currentTimeMillis() + "";
 		String sign = SignUtil.JiaBeiAiTeSign(appKey, appSecret, nonce_str);
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("appKey", appKey);
-		params.put("data", JSONArray.fromObject("["+msg+"]"));
+		params.put("data", JSONArray.fromObject("[" + msg + "]"));
 		params.put("nonce_str", nonce_str);
 		params.put("sign", sign);
 		String jsonStr = JSONUtil.toJson(params);
@@ -78,8 +89,8 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		}
 		return sendJiaBeiAiTeOrderPool(url, jsonStr, clazz, info.getOrderId());
 	}
-	
-	private <T> Set<T> sendJiaBeiAiTeOrderPool(String url,String jsonStr, Class<T> clazz, String parem) {
+
+	private <T> Set<T> sendJiaBeiAiTeOrderPool(String url, String jsonStr, Class<T> clazz, String parem) {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("jsonStr", jsonStr);
 
@@ -125,16 +136,16 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		info.setOrderGoodsList(goodsList);
 		UserInfo user = new UserInfo();
 		user.setEmail("test@163.com.cn");
-		
+
 		String msg = ButtJointMessageUtils.getJiaBeiAiTeOrderMsg(info);
 		String appKey = "kabrita_gongxiaohaiwaigou";
 		String appSecret = "A255BE77577E49CABC357C76D6AB9BC789YYE5WWK7PP";
 		String url = "http://115.28.238.213:30002/huanovo-sync/dingdan/saveOrderByTerrace.ac";
-		String nonce_str = System.currentTimeMillis()+"";
+		String nonce_str = System.currentTimeMillis() + "";
 		String sign = SignUtil.JiaBeiAiTeSign(appKey, appSecret, nonce_str);
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("appKey", appKey);
-		params.put("data", JSONArray.fromObject("["+msg+"]"));
+		params.put("data", JSONArray.fromObject("[" + msg + "]"));
 		params.put("nonce_str", nonce_str);
 		params.put("sign", sign);
 		String jsonStr = JSONUtil.toJson(params);
@@ -145,11 +156,12 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		
+
 		JiaBeiAiTeButtjoint jiabei = new JiaBeiAiTeButtjoint();
-		
-		Set<SendOrderResult> set = jiabei.sendJiaBeiAiTeOrderPool(url, jsonStr, SendOrderResult.class, info.getOrderId());
-		
+
+		Set<SendOrderResult> set = jiabei.sendJiaBeiAiTeOrderPool(url, jsonStr, SendOrderResult.class,
+				info.getOrderId());
+
 		if (set == null || set.size() == 0) {
 			return;
 		}

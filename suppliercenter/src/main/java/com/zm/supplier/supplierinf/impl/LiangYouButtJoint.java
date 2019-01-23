@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
@@ -31,32 +32,44 @@ import com.zm.supplier.util.SignUtil;
 @Component
 public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 
-//	private static String BASE_URL = "http://www.cnbuyers.cn/index.php?app=webService";
+	// private static String BASE_URL =
+	// "http://www.cnbuyers.cn/index.php?app=webService";
 
 	private String NEED_APP_ID_URL = url + "&act={action}&app_id={appKey}&v=2.0&format=json";
 
 	private String NEED_ACCESS_TOKEN_URL = url + "&act={action}&access_token={token}&v=2.0&format=json";
 
 	@Override
-	public Set<SendOrderResult> sendOrder(OrderInfo info) {
-		String msg = ButtJointMessageUtils.getLiangYouOrderMsg(info, info.getSupplierId());
+	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
+		String msg = ButtJointMessageUtils.getLiangYouOrderMsg(infoList.get(0), infoList.get(0).getSupplierId());
 		msg = EncryptUtil.encrypt(msg, appSecret);
 		String targetUrl = NEED_APP_ID_URL.replace("{action}", "addOutOrder").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("paramjson", msg);
-		return sendLiangYouWarehouse(targetUrl, params, SendOrderResult.class, false, info.getOrderId());
+		Set<SendOrderResult> set = sendLiangYouWarehouse(targetUrl, params, SendOrderResult.class, false, infoList.get(0).getOrderId());
+		if(set != null){
+			for (SendOrderResult model : set) {
+				model.setSupplierId(infoList.get(0).getSupplierId());
+				model.setOrderId(infoList.get(0).getOrderId());
+				if (model.getThirdOrderId() == null || "".equals(model.getThirdOrderId())) {
+					model.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
-	public Set<OrderStatus> checkOrderStatus(List<String> orderIds) {
-		String msg = EncryptUtil.encrypt(orderIds.get(0), appSecret);
+	public Set<OrderStatus> checkOrderStatus(List<OrderIdAndSupplierId> orderList) {
+		String msg = EncryptUtil.encrypt(orderList.get(0).getThirdOrderId(), appSecret);
 		String targetUrl = NEED_APP_ID_URL.replace("{action}", "getOrderStatus").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("order_sn", msg);
-		Set<OrderStatus> set = sendLiangYouWarehouse(targetUrl, params, OrderStatus.class, true, orderIds.get(0));
+		Set<OrderStatus> set = sendLiangYouWarehouse(targetUrl, params, OrderStatus.class, true,
+				orderList.get(0).getThirdOrderId());
 		if (set != null) {
 			for (OrderStatus o : set) {
-				o.setThirdOrderId(orderIds.get(0));
+				o.setThirdOrderId(orderList.get(0).getThirdOrderId());
 			}
 		}
 		return set;
@@ -80,7 +93,7 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 
 		return set;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub
