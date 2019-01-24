@@ -557,7 +557,7 @@ public class ButtJointMessageUtils {
 		return dto;
 	}
 
-	public static String getKJB2COrderMsg(OrderInfo info, String unionPayMerId) {
+	public static String getKJB2COrderMsg(OrderInfo info, String unionPayMerId, String expressId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -568,10 +568,10 @@ public class ButtJointMessageUtils {
 			source = "01";
 		}
 		sb.append("<?xml version='1.0' encoding='UTF-8'?>\n");
-		sb.append("<request>\n");
-		sb.append("<head>\n");
+		sb.append("<Message>\n");
+		sb.append("<Header>\n");
 		sb.append("<CustomsCode>");
-		sb.append("3302462230 "); // 电商企业代码
+		sb.append("3302462230"); // 电商企业代码
 		sb.append("</CustomsCode>\n");
 		sb.append("<OrgName>");
 		sb.append("宁波鑫海通达贸易有限公司"); // 电商企业名称
@@ -579,144 +579,153 @@ public class ButtJointMessageUtils {
 		sb.append("<CreateTime>");
 		sb.append(info.getCreateTime()); // 订单创建时间
 		sb.append("</CreateTime>\n");
-		sb.append("</head>\n");
-		sb.append("<body>\n");
-		sb.append("<order>\n");
+		sb.append("</Header>\n");
+		sb.append("<Body>\n");
+		sb.append("<Order>\n");
 		sb.append("<Operation>");
 		sb.append("0");
 		sb.append("</Operation>\n");
 //		sb.append("<orderShop>");
 //		sb.append("17000"); // 店铺代码正式
 //		sb.append("</orderShop>\n");
-		sb.append("<orderFrom>");
+		sb.append("<OrderFrom>");
 		sb.append("0000"); // 购物网站代码
-		sb.append("</orderFrom>\n");
+		sb.append("</OrderFrom>\n");
 		sb.append("<OrderNo>");
 		sb.append(info.getOrderId()); // 订单号
 		sb.append("</OrderNo>\n");
-		sb.append("<postFee>");
+		sb.append("<PostFee>");
 		sb.append(info.getOrderDetail().getPostFee()); // 运费
-		sb.append("</postFee>\n");
-		sb.append("<amount>");
+		sb.append("</PostFee>\n");
+		sb.append("<Amount>");
 		sb.append(info.getOrderDetail().getPayment()); // 买家实付金额
-		sb.append("</amount>\n");
-		sb.append("<buyerAccount>");
+		sb.append("</Amount>\n");
+		sb.append("<BuyerAccount>");
 		sb.append(info.getOrderDetail().getCustomerPhone()); // 购物网站买家账号
-		sb.append("</buyerAccount>\n");
-		sb.append("<phone>");
+		sb.append("</BuyerAccount>\n");
+		sb.append("<Phone>");
 		sb.append(info.getOrderDetail().getCustomerPhone()); // 手机号
-		sb.append("</phone>\n");
-		sb.append("<taxAmount>");
+		sb.append("</Phone>\n");
+		sb.append("<TaxAmount>");
 		sb.append(info.getOrderDetail().getTaxFee()); // 税额
-		sb.append("</taxAmount>\n");
-		sb.append("<tariffAmount>");
+		sb.append("</TaxAmount>\n");
+		sb.append("<TariffAmount>");
 		sb.append(info.getOrderDetail().getTariffTax()); // 关税额
-		sb.append("</tariffAmount>\n");
-		sb.append("<addedValueTaxAmount>");
+		sb.append("</TariffAmount>\n");
+		sb.append("<AddedValueTaxAmount>");
 		sb.append(info.getOrderDetail().getIncrementTax()); // 增值税额
-		sb.append("</addedValueTaxAmount>\n");
-		sb.append("<consumptionDutyAmount>");
+		sb.append("</AddedValueTaxAmount>\n");
+		sb.append("<ConsumptionDutyAmount>");
 		sb.append(info.getOrderDetail().getExciseTax()); // 消费税额
-		sb.append("</consumptionDutyAmount>\n");
-		sb.append("<grossWeight>");
+		sb.append("</ConsumptionDutyAmount>\n");
+		sb.append("<GrossWeight>");
 		sb.append(CalculationUtils.div(info.getWeight(), 1000)); // 毛重
-		sb.append("</grossWeight>\n");
-		sb.append("<disAmount>");
+		sb.append("</GrossWeight>\n");
+		sb.append("<DisAmount>");
 		sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额合计
-		sb.append("</disAmount>\n");
-		sb.append("<dealDate>");
-		sb.append(info.getCreateTime()); // 下单时间
-		sb.append("</dealDate>\n");
-		sb.append("<promotions>\n");
+		sb.append("</DisAmount>\n");
+		sb.append("<BuyerIdnum>" + info.getOrderDetail().getCustomerIdNum() + "</BuyerIdnum>\n");
+		sb.append("<BuyerName>" + info.getOrderDetail().getCustomerName() + "</BuyerName>\n");
+		sb.append("<BuyerIsPayer>1</BuyerIsPayer>\n");
+		sb.append("<Promotions>\n");
 		if (info.getOrderDetail().getDisAmount() > 0) {
 			for (OrderGoods goods : info.getOrderGoodsList()) {
 				double proAmount = CalculationUtils.sub(goods.getItemPrice(), goods.getActualPrice());
 				proAmount = CalculationUtils.mul(proAmount, goods.getItemQuantity());
-				sb.append("<promotion>\n");
-				sb.append("<proAmount>");
+				sb.append("<Promotion>\n");
+				sb.append("<ProAmount>");
 				sb.append(proAmount); // 优惠金额
-				sb.append("</proAmount>\n");
-				sb.append("</promotion>\n");
+				sb.append("</ProAmount>\n");
+				sb.append("</Promotion>\n");
 			}
 		} else {
-			sb.append("<promotion>\n");
-			sb.append("<proAmount>");
+			sb.append("<Promotion>\n");
+			sb.append("<ProAmount>");
 			sb.append(info.getOrderDetail().getDisAmount()); // 优惠金额
-			sb.append("</proAmount>\n");
-			sb.append("</promotion>\n");
+			sb.append("</ProAmount>\n");
+			sb.append("</Promotion>\n");
 		}
-		sb.append("</promotions>\n");
-		sb.append("<goods>\n");
+		sb.append("</Promotions>\n");
+		sb.append("<Goods>\n");
 		for (OrderGoods goods : info.getOrderGoodsList()) {
-			sb.append("<detail>\n");
-			sb.append("<productId>");
+			sb.append("<Detail>\n");
+			sb.append("<ProductId>");
 			sb.append(goods.getItemCode()); // 货号'3105166008N0000002'
-			sb.append("</productId>\n");
-			sb.append("<qty>");
+			sb.append("</ProductId>\n");
+			sb.append("<GoodsName>");
+			sb.append(goods.getItemName()); // 商品名称
+			sb.append("</GoodsName>\n");
+			sb.append("<Qty>");
 			sb.append(goods.getItemQuantity()); // 数量
-			sb.append("</qty>\n");
-			sb.append("<price>");
+			sb.append("</Qty>\n");
+			sb.append("<Unit>");
+			sb.append(goods.getUnit()); // 单位
+			sb.append("</Unit>\n");
+			sb.append("<Price>");
 			sb.append(goods.getItemPrice()); // 商品单价
-			sb.append("</price>\n");
-			sb.append("<amount>");
+			sb.append("</Price>\n");
+			sb.append("<Amount>");
 			sb.append(CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity())); // 商品金额
-			sb.append("</amount>\n");
-			sb.append("</detail>\n");
+			sb.append("</Amount>\n");
+			sb.append("</Detail>\n");
 		}
-		sb.append("</goods>\n");
-		sb.append("<pay>\n");
-		sb.append("<paytime>");
+		sb.append("</Goods>\n");
+		sb.append("</Order>\n");
+		sb.append("<Pay>\n");
+		sb.append("<Paytime>");
 		sb.append(info.getOrderDetail().getPayTime()); // 支付时间
-		sb.append("</paytime>\n");
-		sb.append("<paymentNo>");
+		sb.append("</Paytime>\n");
+		sb.append("<PaymentNo>");
 		sb.append(info.getOrderDetail().getPayNo()); // 支付单号
-		sb.append("</paymentNo>\n");
-		sb.append("<orderSeqNo>");
+		sb.append("</PaymentNo>\n");
+		sb.append("<OrderSeqNo>");
 		sb.append(info.getOrderDetail().getPayNo()); // 商家送支付机构订单交易号,如无，请与支付单号一致
-		sb.append("</orderSeqNo>\n");
-		sb.append("<source>");
+		sb.append("</OrderSeqNo>\n");
+		sb.append("<Source>");
 		sb.append(source); // 支付方式代码
-		sb.append("</source>\n");
-		sb.append("<idnum>");
+		sb.append("</Source>\n");
+		sb.append("<Idnum>");
 		sb.append(info.getOrderDetail().getCustomerIdNum()); // 身份证
-		sb.append("</idnum>\n");
-		sb.append("<name>");
+		sb.append("</Idnum>\n");
+		sb.append("<Name>");
 		sb.append(info.getOrderDetail().getCustomerName()); // 真实姓名
-		sb.append("</name>\n");
+		sb.append("</Name>\n");
 		if (Constants.UNION_PAY.equals(info.getOrderDetail().getPayType())) {
-			sb.append("<merId>");
+			sb.append("<MerId>");
 			sb.append(unionPayMerId);
-			sb.append("</merId>\n");
+			sb.append("</MerId>\n");
 		}
-		sb.append("</pay>\n");
-		sb.append("<logistics>");
-		sb.append("<logisticsCode>");
-		sb.append("YUNDA"); // 快递公司代码
+		sb.append("</Pay>\n");
+		sb.append("<Logistics>");
+		sb.append("<LogisticsName>");
+		sb.append("韵达速递"); // 快递公司代码
 							// SF=顺丰速EMS=邮政速递POSTAM=邮政小包ZTO=中通速递STO=申通快递YTO=圆通速递JD=京东快递BEST=百世物流YUNDA=韵达速递TTKDEX=天天快递
-		sb.append("</logisticsCode>\n");
-		sb.append("<consignee>");
+		sb.append("</LogisticsName>\n");
+		sb.append("<LogisticsNo>");
+		sb.append(expressId);
+		sb.append("</LogisticsNo>\n");
+		sb.append("<Consignee>");
 		sb.append(info.getOrderDetail().getReceiveName()); // 收货人名称
-		sb.append("</consignee>\n");
-		sb.append("<province>");
+		sb.append("</Consignee>\n");
+		sb.append("<Province>");
 		sb.append(info.getOrderDetail().getReceiveProvince()); // 省
-		sb.append("</province>\n");
-		sb.append("<city>");
+		sb.append("</Province>\n");
+		sb.append("<City>");
 		sb.append(info.getOrderDetail().getReceiveCity()); // 市
-		sb.append("</city>\n");
-		sb.append("<district>");
+		sb.append("</City>\n");
+		sb.append("<District>");
 		sb.append(info.getOrderDetail().getReceiveArea()); // 区
-		sb.append("</district>\n");
-		sb.append("<consigneeAddr>");
+		sb.append("</District>\n");
+		sb.append("<ConsigneeAddr>");
 		sb.append(info.getOrderDetail().getReceiveProvince() + info.getOrderDetail().getReceiveCity()
 				+ info.getOrderDetail().getReceiveArea() + info.getOrderDetail().getReceiveAddress()); // 收货地址
-		sb.append("</consigneeAddr>\n");
-		sb.append("<consigneeTel>");
+		sb.append("</ConsigneeAddr>\n");
+		sb.append("<ConsigneeTel>");
 		sb.append(info.getOrderDetail().getReceivePhone()); // 收货电话
-		sb.append("</consigneeTel>\n");
-		sb.append("</logistics>\n");
-		sb.append("</order>\n");
-		sb.append("</body>\n");
-		sb.append("</request>\n");
+		sb.append("</ConsigneeTel>\n");
+		sb.append("</Logistics>\n");
+		sb.append("</Body>\n");
+		sb.append("</Message>\n");
 
 		return sb.toString();
 	}
