@@ -1,6 +1,7 @@
 package com.zm.thirdcenter.bussiness.express.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -22,11 +23,15 @@ public class ExpressInfoController {
 	ExpressInfoService expressInfoService;
 
 	@RequestMapping(value = "{version}/express/createExpressInfoByExpressCode/{expressCode}", method = RequestMethod.POST)
-	public ResultModel sendOrder(@PathVariable("version") Double version, @RequestBody List<OrderInfo> infoList,
+	public ResultModel createExpressInfoByExpressCode(@PathVariable("version") Double version, @RequestBody List<OrderInfo> infoList,
 			@PathVariable("expressCode") String expressCode) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(expressInfoService.createExpressInfoByExpressCode(infoList, expressCode));
+			Map<String, Object> result = expressInfoService.createExpressInfoByExpressCode(infoList, expressCode);
+			if(result == null){
+				return new ResultModel(false, "調用失敗");
+			}
+			return new ResultModel(result);
 		}
 
 		return new ResultModel(false, "版本错误");

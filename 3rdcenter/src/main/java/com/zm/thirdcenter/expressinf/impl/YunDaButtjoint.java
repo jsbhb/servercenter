@@ -15,6 +15,7 @@ import com.zm.thirdcenter.pojo.ExpressInfoResult;
 import com.zm.thirdcenter.pojo.OrderInfo;
 import com.zm.thirdcenter.utils.ButtJointMessageUtils;
 import com.zm.thirdcenter.utils.HttpClientUtil;
+import com.zm.thirdcenter.utils.LogUtil;
 import com.zm.thirdcenter.utils.SignUtil;
 
 @Component
@@ -22,26 +23,23 @@ public class YunDaButtjoint extends AbstractExpressButtJoint {
 
 	@Override
 	public Set<ExpressInfoResult> createExpressInfo(List<OrderInfo> infoList) {
-		Set<ExpressInfoResult> resultSet = new HashSet<ExpressInfoResult>();
+		Set<ExpressInfoResult> resultSet = null;
 		for (OrderInfo oi : infoList) {
 			String strXmlInfo = ButtJointMessageUtils.getYunDaCreateOrderMsg(oi);
 			String strPostParams = getPostParamStr(packageParams(strXmlInfo, "global_order_create"));
 			Map<String, String> postParam = new HashMap<String, String>();
 			try {
-				Set<YunDaResultModel> tmpSet = renderResult(HttpClientUtil.post(url + "?" + strPostParams, postParam),
-						"XML", YunDaResultModel.class);
+				String result = HttpClientUtil.post(url + "?" + strPostParams, postParam);
+				LogUtil.writeMessage("返回======" + result);
+				Set<YunDaResultModel> tmpSet = renderResult(result, "XML", YunDaResultModel.class);
 				if (tmpSet != null && tmpSet.size() > 0) {
+					resultSet = new HashSet<ExpressInfoResult>();
 					for (YunDaResultModel eir : tmpSet) {
 						ExpressInfoResult SuccessResult = new ExpressInfoResult();
 						SuccessResult.setOrderId(eir.getHawbno());
 						SuccessResult.setExpressNo(eir.getMail_no());
 						resultSet.add(SuccessResult);
 					}
-				} else {
-					ExpressInfoResult failedResult = new ExpressInfoResult();
-					failedResult.setOrderId(oi.getOrderId());
-					failedResult.setExpressNo("");
-					resultSet.add(failedResult);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
