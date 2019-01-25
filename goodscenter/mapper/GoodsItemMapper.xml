@@ -662,7 +662,7 @@
 				<if test="item.itemCode != null and item.itemCode != ''">item_code = #{item.itemCode}, </if>
 				<if test="item.sku != null and item.sku != ''">sku = #{item.sku}, </if>
 				<if test="item.weight != null and item.weight != ''">weight = #{item.weight}, </if>
-				<if test="item.exciseTax != null and item.exciseTax != ''">excise_tax = #{item.exciseTax}, </if>
+				excise_tax = #{item.exciseTax},
 				<if test="item.status != null and item.status != ''">status = #{item.status}, </if>
 				info = #{item.info},
 				<if test="item.conversion != null and item.conversion != ''">conversion = #{item.conversion}, </if>

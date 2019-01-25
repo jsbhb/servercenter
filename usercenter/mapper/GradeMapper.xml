@@ -46,6 +46,9 @@
 		<result column="gradeTypeName" property="gradeTypeName" jdbcType="VARCHAR" />
 		<result column="welfare_rebate" property="welfareRebate" jdbcType="DECIMAL" />
 		<result column="welfare_type" property="welfareType" jdbcType="INTEGER" />
+		<result column="calc_rebate_flg" property="calcRebateFlg" jdbcType="INTEGER" />
+		<result column="grade_inviter" property="gradeInviter" jdbcType="VARCHAR" />
+		<result column="profit_ratio" property="profitRatio" jdbcType="INTEGER" />
 	</resultMap>
 	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -109,6 +112,13 @@
 		<if test="welfareRebate!=null and welfareRebate>=0">
 			,welfare_rebate = #{welfareRebate}
 		</if>
+		<if test="calcRebateFlg!=null">
+			,calc_rebate_flg = #{calcRebateFlg}
+		</if>
+		<if test="profitRatio!=null">
+			,profit_ratio = #{profitRatio}
+		</if>
+		,grade_inviter = #{gradeInviter}
 		where id = #{id}
 	</update>
 

@@ -95,6 +95,12 @@ public class Grade extends Pagination{
 	
 	private Integer welfareType;//福利类型
 	
+	private Integer calcRebateFlg;
+	
+	private int profitRatio;
+	
+	private String gradeInviter;
+	
 	public boolean check(){
 		if(Constants.AREA_CENTER.equals(gradeType)){
 //			if(redirectUrl == null || mobileUrl == null){
@@ -433,6 +439,30 @@ public class Grade extends Pagination{
 
 	public void setWelfareType(Integer welfareType) {
 		this.welfareType = welfareType;
+	}
+
+	public Integer getCalcRebateFlg() {
+		return calcRebateFlg;
+	}
+
+	public void setCalcRebateFlg(Integer calcRebateFlg) {
+		this.calcRebateFlg = calcRebateFlg;
+	}
+
+	public int getProfitRatio() {
+		return profitRatio;
+	}
+
+	public void setProfitRatio(int profitRatio) {
+		this.profitRatio = profitRatio;
+	}
+
+	public String getGradeInviter() {
+		return gradeInviter;
+	}
+
+	public void setGradeInviter(String gradeInviter) {
+		this.gradeInviter = gradeInviter;
 	}
 	
 }
