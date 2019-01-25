@@ -28,15 +28,15 @@ public class SignUtil {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static String callBackSign(CallBackBase base, String appSecret){
-		Map<String,Object> param = JSONUtil.parse(JSONUtil.toJson(base), Map.class);
+	public static String callBackSign(CallBackBase base, String appSecret) {
+		Map<String, Object> param = JSONUtil.parse(JSONUtil.toJson(base), Map.class);
 		param.put("appSecret", appSecret);
-		System.out.println("param:"+param);
+		System.out.println("param:" + param);
 		String s = sort(param);
 		String str = s.substring(0, s.length() - 1);
-		System.out.println("str:"+str);
+		System.out.println("str:" + str);
 		return DigestUtils.md5Hex(str);
 	}
 
@@ -120,10 +120,10 @@ public class SignUtil {
 	}
 
 	public static String qianFengSign(String appKey, String appSecret) {
-		
-		return DigestUtils.md5Hex(appKey+appSecret);
+
+		return DigestUtils.md5Hex(appKey + appSecret);
 	}
-	
+
 	/**
 	 * 签名
 	 * 
@@ -131,7 +131,7 @@ public class SignUtil {
 	 *            参数
 	 * @return 签名结果
 	 */
-	public static String edbSignature(Map<String, String> params,String appScret,String token,String appKey) {
+	public static String edbSignature(Map<String, String> params, String appScret, String token, String appKey) {
 		Map<String, String> treeMap = new TreeMap<String, String>(comparator);
 		treeMap.putAll(params);
 		treeMap.put("appscret", appScret);
@@ -168,7 +168,7 @@ public class SignUtil {
 	};
 
 	public static String JiaBeiAiTeSign(String appKey, String appSecret, String nonce_str) {
-		String toSignStr = "appKey="+appKey+"&nonce_str="+nonce_str+"&"+appSecret;
+		String toSignStr = "appKey=" + appKey + "&nonce_str=" + nonce_str + "&" + appSecret;
 		// 拼接要签名的字符串
 		StringBuilder builder = new StringBuilder(toSignStr);
 		System.out.println("签名明文:" + builder);
@@ -181,7 +181,8 @@ public class SignUtil {
 				builder.append(hx.length() == 1 ? "0" + hx : hx);
 			}
 			System.out.println("签名MD5加密:" + builder.toString().toUpperCase());
-			String resultSignStr = new String(Base64.encodeBase64(builder.toString().toUpperCase().getBytes("utf-8")), "utf-8");
+			String resultSignStr = new String(Base64.encodeBase64(builder.toString().toUpperCase().getBytes("utf-8")),
+					"utf-8");
 			System.out.println("签名BASE64加密:" + resultSignStr);
 			return resultSignStr;
 		} catch (Exception e) {
@@ -189,8 +190,7 @@ public class SignUtil {
 		}
 	}
 
-	public static String youStongSign(String appKey, String appSecret, String timestamp, String requestId,
-			String msg) {
+	public static String youStongSign(String appKey, String appSecret, String timestamp, String requestId, String msg) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("secret_key=");
 		sb.append(appSecret);
@@ -203,5 +203,10 @@ public class SignUtil {
 		sb.append("&data=");
 		sb.append(msg);
 		return DigestUtils.md5Hex(sb.toString()).toLowerCase();
+	}
+
+	public static String getKjbSign(String appKey, String appSecret, String date) {
+		String str = appKey + appSecret + date;
+		return DigestUtils.md5Hex(str).toLowerCase();
 	}
 }

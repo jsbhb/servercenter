@@ -29,20 +29,24 @@ import com.zm.supplier.util.HttpClientUtil;
 import com.zm.supplier.util.SignUtil;
 
 @Component("kjb2cButtJoint")
-public class KJB2CButtJoint extends AbstractSupplierButtJoint{
+public class KJB2CButtJoint extends AbstractSupplierButtJoint {
 
 	@Resource
 	RedisTemplate<String, Object> template;
-	
+
+	private final String order = "cnec_jh_order";
+	private final String order_status = "cnec_jh_decl_byorder";
+
 	@Override
 	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
 		String unionPayMerId = "";
-		Object obj = template.opsForValue().get(Constants.PAY + infoList.get(0).getCenterId() + Constants.UNION_PAY_MER_ID);
+		Object obj = template.opsForValue()
+				.get(Constants.PAY + infoList.get(0).getCenterId() + Constants.UNION_PAY_MER_ID);
 		if (obj != null) {
 			unionPayMerId = obj.toString();
 		}
-		String msg = ButtJointMessageUtils.getKJB2COrderMsg(infoList.get(0), unionPayMerId);// 报文
-		Set<SendOrderResult> set = sendKJB2C(url, msg, SendOrderResult.class, infoList.get(0).getOrderId());
+		String msg = ButtJointMessageUtils.getKJB2COrderMsg(infoList.get(0), unionPayMerId, "201901231617");// 报文
+		Set<SendOrderResult> set = sendKJB2C(url, msg, SendOrderResult.class, infoList.get(0).getOrderId(), order);
 		return set;
 	}
 
@@ -63,30 +67,23 @@ public class KJB2CButtJoint extends AbstractSupplierButtJoint{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Set<OrderCancelResult> orderCancel(OrderInfo info) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	private <T> Set<T> sendKJB2C(String url, String msg, Class<T> clazz, String param) {
+
+	private <T> Set<T> sendKJB2C(String url, String msg, Class<T> clazz, String param, String msgType) {
 		String date = DateUtil.getDateString(new Date(), "yyyy-MM-dd HH:mm:ss");
-		String sign = SignUtil.TianTianSign(msg, appSecret, date);// 签名
+		String sign = SignUtil.getKjbSign(appKey, appSecret, date);// 签名
 		Map<String, String> paramMap = new HashMap<String, String>();
-		paramMap.put("datetime", date);
-		paramMap.put("msgtype", "xml");
-		paramMap.put("customer", memberId);
+		paramMap.put("timestamp", date);
+		paramMap.put("xmlstr", msg);
+		paramMap.put("userid", appKey);
 		paramMap.put("sign", sign);
-		paramMap.put("sign_method", "md5");
-		try {
-			paramMap.put("data", URLEncoder.encode(msg, "utf-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		paramMap.put("app_key", appKey);
-		paramMap.put("secretKey", appSecret);
+		paramMap.put("customs", "3105");
+		paramMap.put("msgtype", msgType);
 
 		logger.info("发送报文：" + msg + ",签名：" + sign);
 		String result = HttpClientUtil.post(url, paramMap);
