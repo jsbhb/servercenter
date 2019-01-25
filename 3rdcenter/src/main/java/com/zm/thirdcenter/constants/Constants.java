@@ -48,4 +48,6 @@ public class Constants {
 
 	public static final String MJY_METHOD_STORE_SOO_ADD = "maijiayun.warehouse.store.soo.add";
 
+	public static final String EXPRESS_INTERFACE = "EXPRESS_INF";
+
 }

@@ -1,12 +1,17 @@
 package com.zm.thirdcenter.utils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.util.StringUtils;
 
 public class SignUtil {
 
@@ -138,5 +143,80 @@ public class SignUtil {
 		Collections.sort(keyList);
 
 		return keyList;
+	}
+	
+	/**
+	 * @fun 排序后转为字符串
+	 * @param params
+	 * @return
+	 */
+	public static String sortAndConvertString(Map<String, ? extends Object> params, boolean needCharacterFlg, boolean valueEncodeFlg) {
+		if (params == null) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		List<String> keyList = new ArrayList<String>(params.keySet());
+		Collections.sort(keyList);
+		try {
+			for (String s : keyList) {
+				if (!"sign".equalsIgnoreCase(s) && !StringUtils.isEmpty(params.get(s))) {
+					if (needCharacterFlg) {
+						if (valueEncodeFlg) {
+							sb.append(s + "=" + URLEncoder.encode(String.valueOf(params.get(s)), "utf-8") + "&");
+						} else {
+							sb.append(s + "=" + String.valueOf(params.get(s)) + "&");
+						}
+					} else {
+						if (valueEncodeFlg) {
+							sb.append(s + URLEncoder.encode(String.valueOf(params.get(s)), "utf-8"));
+						} else {
+							sb.append(s + String.valueOf(params.get(s)));
+						}
+					}
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return sb.toString();
+		}
+
+		return sb.toString();
+	}
+	
+	public static String strToMD5Sign(String toSignStr, boolean toUpperFlg) {
+		// 拼接要签名的字符串
+		StringBuilder builder = new StringBuilder(toSignStr);
+		System.out.println("MD5转换前字符串:" + builder);
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] bytes = md.digest(builder.toString().getBytes("utf-8"));
+			builder.setLength(0);
+			for (byte b : bytes) {
+				String hx = Integer.toHexString(b & 0XFF);
+				builder.append(hx.length() == 1 ? "0" + hx : hx);
+			}
+			if (toUpperFlg) {
+				System.out.println("字符串MD5加密（大写）:" + builder.toString().toUpperCase());
+				return builder.toString().toUpperCase();
+			} else {
+				System.out.println("字符串MD5加密（小写）:" + builder.toString().toLowerCase());
+				return builder.toString().toLowerCase();
+			}
+		} catch (Exception e) {
+			return "字符串MD5加密异常";
+		}
+	}
+	
+	public static String strToBASE64Sign(String toSignStr) {
+		// 拼接要签名的字符串
+		StringBuilder builder = new StringBuilder(toSignStr);
+		System.out.println("BASE64转换前字符串:" + builder);
+		try {
+			String resultSignStr = new String(Base64.encodeBase64(builder.toString().getBytes("utf-8")), "utf-8");
+			System.out.println("字符串BASE64加密:" + resultSignStr);
+			return resultSignStr;
+		} catch (Exception e) {
+			return "字符串BASE64加密异常";
+		}
 	}
 }

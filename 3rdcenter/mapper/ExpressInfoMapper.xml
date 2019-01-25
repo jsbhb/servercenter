@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.thirdcenter.bussiness.dao.ExpressInfoMapper">
+
+	<resultMap type="com.zm.thirdcenter.pojo.ExpressInterface" id="expressinf">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="express_code" property="expressCode" jdbcType="VARCHAR" />
+		<result column="target_object" property="targetObject" jdbcType="VARCHAR" />
+		<result column="app_key" property="appKey" jdbcType="VARCHAR" />
+		<result column="app_secret" property="appSecret" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="trade_id" property="tradeId" jdbcType="VARCHAR" />
+		<result column="version" property="version" jdbcType="DOUBLE" />
+		<result column="buz_type" property="buzType" jdbcType="VARCHAR" />
+		<result column="format" property="format" jdbcType="VARCHAR" />
+		<result column="retry_limit" property="retryLimit" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<select id="getExpressInterface" parameterType="Object" resultMap="expressinf">
+		select * from express_interface where express_code = #{expressCode}
+	</select>
+	
+	<select id="getExpressList" parameterType="Object" resultMap="expressinf">
+		select * from express_interface
+	</select>
+</mapper>

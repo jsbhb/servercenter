@@ -11,10 +11,12 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.zm.thirdcenter.bussiness.dao.ExpressInfoMapper;
 import com.zm.thirdcenter.bussiness.dao.LoginPluginMapper;
 import com.zm.thirdcenter.cache.CacheMap;
 import com.zm.thirdcenter.constants.Constants;
 import com.zm.thirdcenter.pojo.CarrierModel;
+import com.zm.thirdcenter.pojo.ExpressInterface;
 import com.zm.thirdcenter.pojo.WXLoginConfig;
 import com.zm.thirdcenter.utils.ExcelUtil;
 
@@ -26,16 +28,20 @@ public class SysInit {
 
 	@Resource
 	LoginPluginMapper loginPluginMapper;
+	
+	@Resource
+	ExpressInfoMapper expressInfoMapper;
 
 	@PostConstruct
 	public void init() {
 
 		loadWXLoginConfig();
+		
+		loadExpressInfConfig();
 
 		try {
 			loadXls();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -60,5 +66,15 @@ public class SysInit {
 		}
 		CacheMap.getCache().put(Constants.CARRIER, carrierMap);
 
+	}
+	
+	private void loadExpressInfConfig() {
+		List<ExpressInterface> list = expressInfoMapper.getExpressList();
+		if (list == null) {
+			return;
+		}
+		for (ExpressInterface model : list) {
+			template.opsForValue().set(Constants.EXPRESS_INTERFACE + model.getExpressCode(), model);
+		}
 	}
 }
