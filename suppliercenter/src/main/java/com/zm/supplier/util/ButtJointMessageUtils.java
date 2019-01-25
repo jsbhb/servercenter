@@ -11,6 +11,7 @@ import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
 import com.zm.supplier.constants.Constants;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
+import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
@@ -875,5 +876,18 @@ public class ButtJointMessageUtils {
 	public static String getYouStongStock(List<String> itemCodeList) {
 		
 		return JSONUtil.toJson(itemCodeList);
+	}
+
+	public static String getKJB2COrderStatus(List<OrderIdAndSupplierId> orderList) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<?xml version='1.0' encoding='UTF-8'?>\n");
+		sb.append("<Message>\n");
+		sb.append("<Header>\n");
+		sb.append("<MftNo>");
+		sb.append(orderList.get(0).getThirdOrderId());
+		sb.append("</MftNo>\n");
+		sb.append("</Header>\n");
+		sb.append("</Message>\n");
+		return sb.toString();
 	}
 }

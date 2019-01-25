@@ -8,6 +8,20 @@ public class StatusContrast {
 	@SuppressWarnings("serial")
 	private static final Map<String, Integer> hgStatus = new HashMap<String, Integer>() {
 		{
+			put("1-00", 3);
+			put("1-01", 99);
+			put("1-02", 4);
+			put("1-03", 4);
+			put("1-11", 4);
+			put("1-12", 4);
+			put("1-13", 99);
+			put("1-14", 4);
+			put("1-21", 4);
+			put("1-22", 5);
+			put("1-23", 99);
+			put("1-24", 6);
+			put("1-25", 99);
+			put("1-99", 99);
 			put("1-订单新建", 4);
 			put("1-订单审核", 5);
 			put("1-订单待分配", 5);

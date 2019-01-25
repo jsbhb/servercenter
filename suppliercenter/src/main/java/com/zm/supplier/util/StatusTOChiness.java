@@ -7,6 +7,20 @@ public class StatusTOChiness {
 	@SuppressWarnings("serial")
 	private static final Map<String, String> status = new HashMap<String, String>() {
 		{
+			put("1-00", "未申报");
+			put("1-01", "库存不足");
+			put("1-02", "仓库配货");
+			put("1-03", "仓库配货完成");
+			put("1-11", "已报国检");
+			put("1-12", "国检放行");
+			put("1-13", "国检审核未过");
+			put("1-14", "国检抽检");
+			put("1-21", "已报海关");
+			put("1-22", "单证放行");
+			put("1-23", "单证审核未过");
+			put("1-24", "货物放行");
+			put("1-25", "海关查验未过");
+			put("1-99", "已关闭"); 
 			put("3-1", "待付款");
 			put("3-2", "待确认");
 			put("3-3", "通关中");

@@ -27,7 +27,17 @@ public class ZhengZhengButtjoint extends AbstractSupplierButtJoint {
 	@Override
 	public Set<SendOrderResult> sendOrder(List<OrderInfo> infoList) {
 		String msg = ButtJointMessageUtils.getZhengZhengOrderMsg(infoList.get(0), accountId, memberId);
-		return sendZhengZhengWarehouse(url, msg, SendOrderResult.class);
+		Set<SendOrderResult> set = sendZhengZhengWarehouse(url, msg, SendOrderResult.class);
+		if(set != null){
+			for (SendOrderResult order : set) {
+				order.setOrderId(infoList.get(0).getOrderId());
+				order.setSupplierId(infoList.get(0).getSupplierId());
+				if (order.getThirdOrderId() == null || "".equals(order.getThirdOrderId())) {
+					order.setThirdOrderId(infoList.get(0).getOrderId());
+				}
+			}
+		}
+		return set;
 	}
 
 	@Override
