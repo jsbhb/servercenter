@@ -738,9 +738,9 @@
 	<insert id="saveThirdOrderInfo" parameterType="Object">
 		INSERT INTO
 		third_order_info
-		(order_id,supplier_id,express_id,express_name,create_time)
+		(order_id,third_order_id,supplier_id,express_id,express_name,create_time)
 		VALUES
-		(#{orderId},#{supplierId},#{expressId},#{expressName},now())
+		(#{orderId},#{orderId},#{supplierId},#{expressId},#{expressName},now())
 	</insert>
 	<!-- 手动维护运单end -->
 	
