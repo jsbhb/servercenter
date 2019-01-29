@@ -81,7 +81,7 @@ public class SignUtil {
 		String s = new String(tempArr);
 		return s;
 	}
-	
+
 	public static String decrypt(String accessKey, String accessSecret, Map<String, Object> map) {
 		List<String> sortedKeyList = keySort(map);
 		StringBuilder builder = new StringBuilder();
@@ -94,7 +94,7 @@ public class SignUtil {
 				if (key.equalsIgnoreCase("stockOutVoucherSkus")) {
 					value = JSONUtil.toJson(map.get(key));
 				}
-				if (value != null && !"null".equals(value)){
+				if (value != null && !"null".equals(value)) {
 					builder.append(key);
 					builder.append(value);
 				}
@@ -106,29 +106,27 @@ public class SignUtil {
 	}
 
 	public static String sha1(String decrypt) throws IOException {
-		try { 
+		try {
 			// 指定 sha1算法
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
-			digest.update(decrypt.getBytes()); 
-			// 获取字节数组 
+			digest.update(decrypt.getBytes());
+			// 获取字节数组
 			byte messageDigest[] = digest.digest(); // Create Hex String
-			StringBuffer hexString = new StringBuffer(); // 字节数组转换为 十六进制数 
-			for (int i = 0; i < messageDigest.length; i++) { 
-				String shaHex = Integer.toHexString(messageDigest[i] & 0xFF); 
+			StringBuffer hexString = new StringBuffer(); // 字节数组转换为 十六进制数
+			for (int i = 0; i < messageDigest.length; i++) {
+				String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);
 				if (shaHex.length() < 2) {
-					hexString.append(0); 
+					hexString.append(0);
 				}
-				hexString.append(shaHex); 
+				hexString.append(shaHex);
 			}
-			System.out.println("原始字符串=====>"+decrypt);
-			System.out.println("生成token=====>"+(hexString.toString().toUpperCase()));
+			System.out.println("原始字符串=====>" + decrypt);
+			System.out.println("生成token=====>" + (hexString.toString().toUpperCase()));
 			return hexString.toString().toUpperCase();
 		} catch (NoSuchAlgorithmException e) {
 			throw new IOException(e.getMessage());
 		}
 	}
-	
-
 
 	/**
 	 * @fun 排序
@@ -144,13 +142,14 @@ public class SignUtil {
 
 		return keyList;
 	}
-	
+
 	/**
 	 * @fun 排序后转为字符串
 	 * @param params
 	 * @return
 	 */
-	public static String sortAndConvertString(Map<String, ? extends Object> params, boolean needCharacterFlg, boolean valueEncodeFlg) {
+	public static String sortAndConvertString(Map<String, ? extends Object> params, boolean needCharacterFlg,
+			boolean valueEncodeFlg) {
 		if (params == null) {
 			return null;
 		}
@@ -182,11 +181,11 @@ public class SignUtil {
 
 		return sb.toString();
 	}
-	
+
 	public static String strToMD5Sign(String toSignStr, boolean toUpperFlg) {
 		// 拼接要签名的字符串
 		StringBuilder builder = new StringBuilder(toSignStr);
-		System.out.println("MD5转换前字符串:" + builder);
+		LogUtil.writeMessage("MD5转换前字符串:" + builder);
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			byte[] bytes = md.digest(builder.toString().getBytes("utf-8"));
@@ -196,26 +195,28 @@ public class SignUtil {
 				builder.append(hx.length() == 1 ? "0" + hx : hx);
 			}
 			if (toUpperFlg) {
-				System.out.println("字符串MD5加密（大写）:" + builder.toString().toUpperCase());
+				LogUtil.writeMessage("字符串MD5加密（大写）:" + builder.toString().toUpperCase());
 				return builder.toString().toUpperCase();
 			} else {
-				System.out.println("字符串MD5加密（小写）:" + builder.toString().toLowerCase());
+				LogUtil.writeMessage("字符串MD5加密（小写）:" + builder.toString().toLowerCase());
 				return builder.toString().toLowerCase();
 			}
 		} catch (Exception e) {
+			LogUtil.writeMessage("字符串MD5加密异常:" + e);
 			return "字符串MD5加密异常";
 		}
 	}
-	
+
 	public static String strToBASE64Sign(String toSignStr) {
 		// 拼接要签名的字符串
 		StringBuilder builder = new StringBuilder(toSignStr);
-		System.out.println("BASE64转换前字符串:" + builder);
+		LogUtil.writeMessage("BASE64转换前字符串:" + builder);
 		try {
 			String resultSignStr = new String(Base64.encodeBase64(builder.toString().getBytes("utf-8")), "utf-8");
-			System.out.println("字符串BASE64加密:" + resultSignStr);
+			LogUtil.writeMessage("字符串BASE64加密:" + resultSignStr);
 			return resultSignStr;
 		} catch (Exception e) {
+			LogUtil.writeMessage("字符串BASE64加密异常:" + e);
 			return "字符串BASE64加密异常";
 		}
 	}

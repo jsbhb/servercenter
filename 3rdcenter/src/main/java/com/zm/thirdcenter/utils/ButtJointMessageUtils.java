@@ -169,7 +169,7 @@ public class ButtJointMessageUtils {
 		sb.append("</hawbs>\n");
 		sb.append("</beans>\n");
 
-		System.out.println("请求韵达单号报文:" + sb.toString());
+		LogUtil.writeMessage("请求韵达单号报文:" + sb.toString());
 		return sb.toString();
 	}
 }

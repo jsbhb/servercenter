@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LogUtil {
 
-	private final static Logger FINANCELOG = LoggerFactory.getLogger("FINANCE_LOG");
+	private final static Logger THIRDPLUGINLOG = LoggerFactory.getLogger("FINANCE_LOG");
 
 	final static String INFO_LOG = "============================== 【INFO_LOG】 ==============================";
 	final static String ERROR_LOG = "==============================  【ERROR_LOG】  ==============================";
@@ -31,7 +31,7 @@ public class LogUtil {
 	 * @param cont
 	 */
 	public static void writeLog(String cont) {
-		FINANCELOG.info(INFO_LOG + cont);
+		THIRDPLUGINLOG.info(INFO_LOG + cont);
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class LogUtil {
 	 * @param cont
 	 */
 	public static void writeErrorLog(String cont) {
-		FINANCELOG.error(ERROR_LOG + cont);
+		THIRDPLUGINLOG.error(ERROR_LOG + cont);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class LogUtil {
 	 * @param ex
 	 */
 	public static void writeErrorLog(String cont, Throwable ex) {
-		FINANCELOG.error(ERROR_LOG + cont, ex);
+		THIRDPLUGINLOG.error(ERROR_LOG + cont, ex);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class LogUtil {
 	 * @param msg
 	 */
 	public static void writeMessage(String msg) {
-		FINANCELOG.info(msg);
+		THIRDPLUGINLOG.info(msg);
 	}
 
 	/**
@@ -94,8 +94,8 @@ public class LogUtil {
 	 * @param cont
 	 */
 	public static void debug(String cont) {
-		if (FINANCELOG.isDebugEnabled()) {
-			FINANCELOG.debug(DEBUG_LOG + cont);
+		if (THIRDPLUGINLOG.isDebugEnabled()) {
+			THIRDPLUGINLOG.debug(DEBUG_LOG + cont);
 		}
 	}
 }

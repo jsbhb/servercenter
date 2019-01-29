@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import com.zm.thirdcenter.bussiness.express.model.YunDaResultModel;
@@ -33,16 +35,21 @@ public class YunDaButtjoint extends AbstractExpressButtJoint {
 				LogUtil.writeMessage("返回======" + result);
 				Set<YunDaResultModel> tmpSet = renderResult(result, "XML", YunDaResultModel.class);
 				if (tmpSet != null && tmpSet.size() > 0) {
-					resultSet = new HashSet<ExpressInfoResult>();
-					for (YunDaResultModel eir : tmpSet) {
-						ExpressInfoResult SuccessResult = new ExpressInfoResult();
-						SuccessResult.setOrderId(eir.getHawbno());
-						SuccessResult.setExpressNo(eir.getMail_no());
-						resultSet.add(SuccessResult);
+					//过滤掉失败的集合
+					Set<YunDaResultModel> set = tmpSet.stream().filter(model -> model.getMail_no() != null)
+							.collect(Collectors.toSet());
+					if (set != null && set.size() > 0) {
+						resultSet = new HashSet<ExpressInfoResult>();
+						for (YunDaResultModel eir : set) {
+							ExpressInfoResult SuccessResult = new ExpressInfoResult();
+							SuccessResult.setOrderId(eir.getHawbno());
+							SuccessResult.setExpressNo(eir.getMail_no());
+							resultSet.add(SuccessResult);
+						}
 					}
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.writeErrorLog("获取韵达单号出错：", e);
 			}
 		}
 		return resultSet;
@@ -85,7 +92,7 @@ public class YunDaButtjoint extends AbstractExpressButtJoint {
 			postParamsStr = SignUtil.sortAndConvertString(params, true, true);
 			postParamsStr += "sign=" + URLEncoder.encode(signStr, "utf-8");
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			LogUtil.writeErrorLog("获取发送参数字符串出错：", e);
 		}
 		return postParamsStr;
 	}

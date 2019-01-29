@@ -66,4 +66,9 @@ public class YunDaResultModel {
 			return false;
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "YunDaResultModel [hawbno=" + hawbno + ", mail_no=" + mail_no + ", pdf_info=" + pdf_info + ", code="
+				+ code + ", msg=" + msg + "]";
+	}
 }

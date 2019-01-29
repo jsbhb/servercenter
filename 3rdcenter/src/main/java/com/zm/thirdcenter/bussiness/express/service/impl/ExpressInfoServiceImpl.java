@@ -24,7 +24,7 @@ import com.zm.thirdcenter.utils.SpringContextUtil;
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class ExpressInfoServiceImpl implements ExpressInfoService {
-	
+
 	@Resource
 	RedisTemplate<String, Object> template;
 
@@ -47,7 +47,7 @@ public class ExpressInfoServiceImpl implements ExpressInfoService {
 		}
 		return resultMap;
 	}
-	
+
 	private AbstractExpressButtJoint getTargetInterface(String expressCode) {
 		ExpressInterface inf = (ExpressInterface) template.opsForValue().get(Constants.EXPRESS_INTERFACE + expressCode);
 		if (inf == null) {

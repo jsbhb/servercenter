@@ -29,7 +29,7 @@ public class ExpressInfoController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			Map<String, Object> result = expressInfoService.createExpressInfoByExpressCode(infoList, expressCode);
 			if(result == null){
-				return new ResultModel(false, "調用失敗");
+				return new ResultModel(false, "调用失败");
 			}
 			return new ResultModel(result);
 		}
