@@ -586,9 +586,9 @@ public class ButtJointMessageUtils {
 		sb.append("<Operation>");
 		sb.append("0");
 		sb.append("</Operation>\n");
-//		sb.append("<orderShop>");
-//		sb.append("17000"); // 店铺代码正式
-//		sb.append("</orderShop>\n");
+		sb.append("<OrderShop>");
+		sb.append("17000"); // 店铺代码正式
+		sb.append("</OrderShop>\n");
 		sb.append("<OrderFrom>");
 		sb.append("0000"); // 购物网站代码
 		sb.append("</OrderFrom>\n");

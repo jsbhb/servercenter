@@ -259,6 +259,8 @@ public class GoodsLucene extends AbstractLucene {
 		} else {
 			SortField sortField = new SortField("ratio", Type.INT, true);
 			sortFieldList.add(sortField);
+			SortField sortField_1 = new SortField("thirdCategory", Type.STRING_VAL, true);
+			sortFieldList.add(sortField_1);
 		}
 		sortFieldList.add(SortField.FIELD_SCORE);
 		Sort sort = new Sort(sortFieldList.toArray(new SortField[sortFieldList.size()]));
