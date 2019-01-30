@@ -89,6 +89,8 @@ public class NotifyController {
 
 		String orderId = notifyMap.get("out_trade_no").split("_")[0];
 
+		logger.info("微信回调订单号：====" + orderId);
+
 		Integer clientId = null;
 		UserVip user = null;
 		OrderInfo info = null;
@@ -146,6 +148,8 @@ public class NotifyController {
 
 			resXml = getWXCallBackMsg("FAIL", "验签失败");
 		}
+		
+		logger.info("微信回调回写：====" + resXml);
 
 		// ------------------------------
 		// 处理业务完毕
@@ -189,6 +193,8 @@ public class NotifyController {
 
 			String orderId = new String(req.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
 
+			logger.info("支付宝return回调订单号：====" + orderId);
+			
 			// 交易状态
 			String trade_status = new String(req.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
 
@@ -282,6 +288,8 @@ public class NotifyController {
 			// 商户订单号
 
 			String orderId = new String(req.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
+			
+			logger.info("支付宝notify回调订单号：====" + orderId);
 			// 交易状态
 			String trade_status = new String(req.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
 
@@ -362,6 +370,8 @@ public class NotifyController {
 		}
 		LogUtil.printRequestLog(respParam);
 		String orderId = valideData.get("orderId");
+		logger.info("银联后台回调订单号：====" + orderId);
+		
 		Integer clientId = null;
 		UserVip user = null;
 		OrderInfo info = null;
@@ -401,7 +411,7 @@ public class NotifyController {
 			}
 
 		}
-		LogUtil.writeLog("接收后台通知结束");
+		LogUtil.writeLog("银联接收后台通知结束");
 		// 返回给银联服务器http 200 状态码
 		try {
 			resp.getWriter().print("ok");
@@ -439,6 +449,7 @@ public class NotifyController {
 		}
 
 		String orderId = valideData.get("orderId");
+		logger.info("银联前台回调订单号：====" + orderId);
 		Integer clientId = null;
 		UserVip user = null;
 		OrderInfo info = null;
@@ -554,6 +565,7 @@ public class NotifyController {
 		String merchantNo = req.getParameter("merchantNo");
 		String parentMerchantNo = req.getParameter("parentMerchantNo");
 		String orderId = req.getParameter("orderId");
+		logger.info("易宝支付return回调订单号：====" + orderId);
 		String sign = req.getParameter("sign");
 		Map<String, String> responseMap = new HashMap<String, String>();
 		responseMap.put("merchantNo", merchantNo);
@@ -615,6 +627,7 @@ public class NotifyController {
 		jsonMap = JSONUtil.parse(dto.getPlainText(), new TypeReference<TreeMap<String, String>>() {
 		});
 		String orderId = jsonMap.get("orderId");
+		logger.info("易宝支付notify回调订单号：====" + orderId);
 		String payNo = jsonMap.get("uniqueOrderNo");
 		PrintWriter pw = res.getWriter();
 		if (orderId.startsWith("GX")) {
