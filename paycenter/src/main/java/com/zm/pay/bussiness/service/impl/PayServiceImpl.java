@@ -210,6 +210,7 @@ public class PayServiceImpl implements PayService {
 
 		if (Constants.SCAN_CODE.equals(type)) {
 			String htmlStr = AliPayUtils.aliPay(type, config, model);
+			LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + htmlStr);
 			// AlipayTradePrecreateResponse response =
 			// AliPayUtils.precreate(config, model);
 			// if (response.isSuccess()) {
@@ -452,6 +453,7 @@ public class PayServiceImpl implements PayService {
 
 		String str = UnionPayUtil.unionPay(config, model, type);
 		result.put("htmlStr", str);
+		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + str);
 		return result;
 	}
 
@@ -551,7 +553,7 @@ public class PayServiceImpl implements PayService {
 			e.printStackTrace();
 			throw new PayUtilException("获取易宝标准收银台出错");
 		}
-		LogUtil.writeLog(url);
+		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + url);
 		return url;
 	}
 }

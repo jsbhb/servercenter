@@ -18,6 +18,7 @@ import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CommonUtils;
+import com.zm.pay.utils.unionpay.sdk.LogUtil;
 
 public class WxPayUtils {
 
@@ -64,7 +65,7 @@ public class WxPayUtils {
 		}
 
 		Map<String, String> resp = wxpay.unifiedOrder(data);
-		logger.info(resp.toString());
+		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + resp.toString());
 		return resp;
 	}
 
