@@ -115,8 +115,7 @@ ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = 'kj_goods_specs_tr
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_property_name` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `category_id` VARCHAR(45) NOT NULL COMMENT '三级分类ID',
-  `type` TINYINT(3) NOT NULL COMMENT '属性类型:0:基本属性;1:导购属性;2:系列属性(规格)',
+  `type` TINYINT(3) NOT NULL COMMENT '属性类型:0:基本属性;1:系列属性(规格)',
   `name` VARCHAR(45) NULL COMMENT '属性名称',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
@@ -135,10 +134,43 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_property_value` (
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '属性值';
 
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_guide_property_name` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NULL COMMENT '属性名称',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '导购属性名';
+
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_guide_property_value` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `guide_name_id` VARCHAR(45) NOT NULL COMMENT '属性名ID',
+  `val` VARCHAR(45) NULL COMMENT '属性值',
+  `pic_path` VARCHAR(200) NULL COMMENT '属性图片',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '导购属性值';
+
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_property_bind` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `property_id` INT NOT NULL COMMENT '属性名ID',
+  `property_val_id` INT NOT NULL COMMENT '属性值ID',
+  `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
+  `type` TINYINT(3) NOT NULL COMMENT '分类类型:0:基本属性;1:系列属性(规格);2:导购属性',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目属性绑定表';
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_property_bind` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `property_id` INT NOT NULL COMMENT '属性名ID',
   `property_val_id` INT NOT NULL COMMENT '属性值ID',
+  `type` TINYINT(3) NOT NULL COMMENT '分类类型:0:基本属性;1:系列属性(规格);2:导购属性',
   `specs_tp_id` VARCHAR(45) NOT NULL COMMENT 'specs_tp_id',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
