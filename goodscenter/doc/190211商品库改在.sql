@@ -4,15 +4,17 @@
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `goods_id` VARCHAR(45) NULL COMMENT '商品ID',
+  `type` TINYINT(3) NOT NULL COMMENT '0:跨境,2:一般贸易',
   `goods_name` VARCHAR(300) NULL COMMENT '商品名称',
   `subtitle` VARCHAR(300) NULL COMMENT '商品副标题',
   `description` VARCHAR(450) NULL COMMENT '商品描述',
+  `brand_id` INT NOT NULL COMMENT '品牌ID',
   `detail_path` VARCHAR(300) NULL COMMENT '商详路径',
   `access_path` VARCHAR(50) NULL COMMENT '静态路径',
-  `brand_id` INT(11) NOT NULL COMMENT '品牌ID',
   `first_category` VARCHAR(45) NOT NULL COMMENT '一级分类',
   `second_category` VARCHAR(45) NOT NULL COMMENT '二级分类',
   `third_category` VARCHAR(45) NOT NULL COMMENT '三级分类',
+  `hscode` VARCHAR(45) NULL COMMENT '海关hscode',
   `display` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '展示方式，0：统一展示（1个goods多个规格）；1：分开展示（1个规格一个页面）',
   `is_del` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0未删除;1已删除',
   `create_time` DATETIME NULL,
@@ -25,7 +27,6 @@ ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品表';
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_specs_goods` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `goods_id` VARCHAR(45) NOT NULL,
   `specs_id` VARCHAR(45) NOT NULL,
   `encode` VARCHAR(45) NOT NULL COMMENT '条形码',
   `weight` INT NOT NULL DEFAULT 0 COMMENT '重量/克',
@@ -47,9 +48,9 @@ ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品规格表';
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `specs_tp_id` VARCHAR(45) NOT NULL,
+  `goods_id` VARCHAR(45) NOT NULL,
   `specs_id` VARCHAR(45) NOT NULL,
-  `type` TINYINT(3) NOT NULL COMMENT '0:跨境,2:一般贸易',
-  `status` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '0:初始,1：下架，2：上架',
+  `status` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '0:初始,1：下架，2：上架，3：售罄',
   `is_free_post` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '是否包邮;0:否,1:是',
   `is_free_tax` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '是否包税,0:否,1是',
   `tag_ratio` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '权重',
@@ -58,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `excise_tax` DECIMAL(12) NOT NULL DEFAULT 0 COMMENT '消费税',
   `is_promotion` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0:否;1是',
   `discount` DECIMAL(5) NOT NULL DEFAULT 0 COMMENT '促销折扣',
-  `is_fx` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否分销0:否;1:是',
+  `is_distribution` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否分销0:否;1:是',
   `is_welfare` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否在福利商城显示0:否;1:是',
   `is_combinedgoods` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否组合商品0:否;1:是',
   `combined_specs_tp_id` ARCHAR(100) DEFAULT NULL COMMENT '组合商品包含的specs_tp_id',
@@ -70,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `instant_ratio` int(11) NOT NULL DEFAULT '0' COMMENT '顺加比例',
   `sale_num` INT NOT NULL DEFAULT 0 COMMENT '销量',
   `item_id` VARCHAR(45) DEFAULT NULL COMMENT '跨境商品上架需绑定对应ItemId',
-  `is_new` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否是新品:0是，1：否',
+  `is_fresh` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否是新品:0是，1：否',
   `upshelf_time` DATETIME NULL COMMENT '上架时间',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
@@ -79,11 +80,12 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `is_del` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '是否删除0否;1是',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `specs_tp_id_uk` (`specs_tp_id` ASC),
+  UNIQUE INDEX `specsId_goodsId_uk` (`goods_id`,`specs_id` ASC),
   INDEX `specs_id_idx` (`specs_id` ASC),
   INDEX `type_idx` (`type` ASC),
   INDEX `status_idx` (`status` ASC),
   INDEX `del_idx` (`is_del` ASC))
-ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '规格表增加(一般贸易/跨境)属性后生成的唯一规格商品';
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '规格表和商品表绑定后生成的唯一规格商品';
 
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_item` (
@@ -191,3 +193,4 @@ alter table goods_category_brand add column brand_logo varchar(200) default null
 alter table goods_category_brand add column brand_synopsis varchar(500) default null comment '品牌简介';
 alter table goods_category_brand add column brand_name_cn varchar(20) default null comment '品牌中文名';
 alter table goods_category_brand add column brand_name_en varchar(20) default null comment '品牌英文名';
+alter table goods_category_brand add column country varchar(20) default null comment '国家';
