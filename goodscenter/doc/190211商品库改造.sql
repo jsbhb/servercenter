@@ -159,24 +159,47 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_property_bind` (
   `property_id` INT NOT NULL COMMENT '属性名ID',
   `property_val_id` INT NOT NULL COMMENT '属性值ID',
   `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
-  `type` TINYINT(3) NOT NULL COMMENT '分类类型:0:基本属性;1:系列属性(规格);2:导购属性',
+  `category_type` TINYINT(3) NOT NULL COMMENT '分类类型:1:一级分类;2:二级分类;3:三级分类;',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目属性绑定表';
 
+
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_guide_property_bind` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `property_id` INT NOT NULL COMMENT '属性名ID',
+  `property_val_id` INT NOT NULL COMMENT '属性值ID',
+  `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
+  `category_type` TINYINT(3) NOT NULL COMMENT '分类类型:1:一级分类;2:二级分类;3:三级分类;',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目导购绑定表';
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_property_bind` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `property_id` INT NOT NULL COMMENT '属性名ID',
   `property_val_id` INT NOT NULL COMMENT '属性值ID',
-  `type` TINYINT(3) NOT NULL COMMENT '分类类型:0:基本属性;1:系列属性(规格);2:导购属性',
   `specs_tp_id` VARCHAR(45) NOT NULL COMMENT 'specs_tp_id',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品属性绑定表';
+
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_guide_property_bind` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `property_id` INT NOT NULL COMMENT '导购属性名ID',
+  `property_val_id` INT NOT NULL COMMENT '导购属性值ID',
+  `specs_tp_id` VARCHAR(45) NOT NULL COMMENT 'specs_tp_id',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品导购绑定表';
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_price` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -227,3 +250,8 @@ alter table goods_category_brand add column brand_synopsis varchar(500) default 
 alter table goods_category_brand add column brand_name_cn varchar(20) default null comment '品牌中文名';
 alter table goods_category_brand add column brand_name_en varchar(20) default null comment '品牌英文名';
 alter table goods_category_brand add column country varchar(20) default null comment '国家';
+
+/**
+ *一级分类表
+ */ 
+alter table goods_first_category add column second_page_path varchar(300) default null comment '二级页面路径';
