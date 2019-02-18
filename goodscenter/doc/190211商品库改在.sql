@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods` (
   `subtitle` VARCHAR(300) NULL COMMENT '商品副标题',
   `description` VARCHAR(450) NULL COMMENT '商品描述',
   `brand_id` INT NOT NULL COMMENT '品牌ID',
+  `origin` VARCHAR(20) NULL COMMENT '产地',
   `detail_path` VARCHAR(300) NULL COMMENT '商详路径',
   `access_path` VARCHAR(50) NULL COMMENT '静态路径',
   `first_category` VARCHAR(45) NOT NULL COMMENT '一级分类',
