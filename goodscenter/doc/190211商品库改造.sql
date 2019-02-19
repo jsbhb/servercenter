@@ -1,6 +1,8 @@
 /**
  * 商品库改造
  */
+drop table if exists  `kj_goods`;
+ 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `goods_id` VARCHAR(45) NULL COMMENT '商品ID',
@@ -26,8 +28,11 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods` (
   UNIQUE INDEX `goods_id_uk` (`goods_id` ASC))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品表';
 
+drop table if exists  `kj_specs_goods`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_specs_goods` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `goods_id` VARCHAR(45) NOT NULL,
   `specs_id` VARCHAR(45) NOT NULL,
   `encode` VARCHAR(45) NOT NULL COMMENT '条形码',
   `weight` INT NOT NULL DEFAULT 0 COMMENT '重量/克',
@@ -46,6 +51,8 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_specs_goods` (
   INDEX `goods_id_idx` (`goods_id` ASC))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品规格表';
 
+drop table if exists  `kj_goods_specs_tradepattern`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `specs_tp_id` VARCHAR(45) NOT NULL,
@@ -63,12 +70,13 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `is_distribution` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否分销0:否;1:是',
   `is_welfare` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否在福利商城显示0:否;1:是',
   `is_combinedgoods` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否组合商品0:否;1:是',
-  `combined_specs_tp_id` ARCHAR(100) DEFAULT NULL COMMENT '组合商品包含的specs_tp_id',
+  `combined_specs_tp_id` VARCHAR(100) DEFAULT NULL COMMENT '组合商品包含的specs_tp_id',
   `display` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '显示(针对上架商品):0:不显示;1:前端显示;2:后台显示;3:前后台都显示',
   `distribution_price` decimal(10,2) DEFAULT '0.00' COMMENT '分销价格',
   `vip_price` decimal(10,2) DEFAULT '0.00' COMMENT '会员价格',
   `retail_price` decimal(10,2) DEFAULT '0.00' COMMENT '零售价格',
   `line_price` decimal(10,2) DEFAULT '0.00',
+  `department_profit` int(11) NOT NULL DEFAULT '0' COMMENT '部门利润',
   `instant_ratio` int(11) NOT NULL DEFAULT '0' COMMENT '顺加比例',
   `sale_num` INT NOT NULL DEFAULT 0 COMMENT '销量',
   `item_id` VARCHAR(45) DEFAULT NULL COMMENT '跨境商品上架需绑定对应ItemId',
@@ -83,11 +91,11 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   UNIQUE INDEX `specs_tp_id_uk` (`specs_tp_id` ASC),
   UNIQUE INDEX `specsId_goodsId_uk` (`goods_id`,`specs_id` ASC),
   INDEX `specs_id_idx` (`specs_id` ASC),
-  INDEX `type_idx` (`type` ASC),
   INDEX `status_idx` (`status` ASC),
   INDEX `del_idx` (`is_del` ASC))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '规格表和商品表绑定后生成的唯一规格商品';
 
+drop table if exists  `kj_goods_item`;
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_item` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -113,6 +121,8 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_item` (
   INDEX `del_idx` (`is_del` ASC))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = 'kj_goods_specs_tradepattern增加供应商等其他信息后的item表';
 
+drop table if exists  `kj_property_name`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_property_name` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` TINYINT(3) NOT NULL COMMENT '属性类型:0:基本属性;1:系列属性(规格)',
@@ -123,16 +133,22 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_property_name` (
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '属性名';
 
+drop table if exists  `kj_property_value`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_property_value` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name_id` VARCHAR(45) NOT NULL COMMENT '属性名ID',
   `val` VARCHAR(45) NULL COMMENT '属性值',
   `pic_path` VARCHAR(200) NULL COMMENT '属性图片',
+  `sort` tinyint(5) DEFAULT 0 COMMENT '顺序',
+  `count_num` int(11) DEFAULT 0 COMMENT '关联商品数统计',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '属性值';
+
+drop table if exists  `kj_guide_property_name`;
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_guide_property_name` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -143,40 +159,76 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_guide_property_name` (
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '导购属性名';
 
+drop table if exists  `kj_guide_property_value`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_guide_property_value` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `guide_name_id` VARCHAR(45) NOT NULL COMMENT '属性名ID',
   `val` VARCHAR(45) NULL COMMENT '属性值',
   `pic_path` VARCHAR(200) NULL COMMENT '属性图片',
+  `sort` tinyint(5) DEFAULT 0 COMMENT '顺序',
+  `count_num` int(11) DEFAULT 0 COMMENT '关联商品数统计',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '导购属性值';
 
+drop table if exists  `kj_category_property_bind`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_property_bind` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `property_id` INT NOT NULL COMMENT '属性名ID',
   `property_val_id` INT NOT NULL COMMENT '属性值ID',
   `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
-  `type` TINYINT(3) NOT NULL COMMENT '分类类型:0:基本属性;1:系列属性(规格);2:导购属性',
+  `category_type` TINYINT(3) NOT NULL COMMENT '分类类型:1:一级分类;2:二级分类;3:三级分类;',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目属性绑定表';
 
+drop table if exists  `kj_category_guide_property_bind`;
+
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_guide_property_bind` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `property_id` INT NOT NULL COMMENT '属性名ID',
+  `property_val_id` INT NOT NULL COMMENT '属性值ID',
+  `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
+  `category_type` TINYINT(3) NOT NULL COMMENT '分类类型:1:一级分类;2:二级分类;3:三级分类;',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目导购绑定表';
+
+drop table if exists  `kj_goods_property_bind`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_property_bind` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `property_id` INT NOT NULL COMMENT '属性名ID',
   `property_val_id` INT NOT NULL COMMENT '属性值ID',
-  `type` TINYINT(3) NOT NULL COMMENT '分类类型:0:基本属性;1:系列属性(规格);2:导购属性',
   `specs_tp_id` VARCHAR(45) NOT NULL COMMENT 'specs_tp_id',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品属性绑定表';
+
+drop table if exists  `kj_goods_guide_property_bind`;
+
+CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_guide_property_bind` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `property_id` INT NOT NULL COMMENT '导购属性名ID',
+  `property_val_id` INT NOT NULL COMMENT '导购属性值ID',
+  `specs_tp_id` VARCHAR(45) NOT NULL COMMENT 'specs_tp_id',
+  `create_time` DATETIME NULL,
+  `update_time` DATETIME NULL,
+  `opt` VARCHAR(30) NULL,
+  PRIMARY KEY (`id`))
+ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品导购绑定表';
+
+drop table if exists  `kj_goods_price`;
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_price` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -192,6 +244,8 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_price` (
   KEY `item_id_idx` (`item_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='商品价格表';
 
+drop table if exists  `kj_goods_tag_bind`;
+
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_tag_bind` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `specs_tp_id` varchar(100) NOT NULL COMMENT '商品编号',
@@ -204,6 +258,8 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_tag_bind` (
   KEY `tag_id_idx` (`tag_id`),
   KEY `specs_tp_id_idx` (`specs_tp_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='商品标签绑定表';
+
+drop table if exists  `kj_goods_rebate`;
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_rebate` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -227,3 +283,8 @@ alter table goods_category_brand add column brand_synopsis varchar(500) default 
 alter table goods_category_brand add column brand_name_cn varchar(20) default null comment '品牌中文名';
 alter table goods_category_brand add column brand_name_en varchar(20) default null comment '品牌英文名';
 alter table goods_category_brand add column country varchar(20) default null comment '国家';
+
+/**
+ *一级分类表
+ */ 
+alter table goods_first_category add column second_page_path varchar(300) default null comment '二级页面路径';
