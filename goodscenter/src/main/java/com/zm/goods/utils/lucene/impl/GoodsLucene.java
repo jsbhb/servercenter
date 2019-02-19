@@ -48,6 +48,7 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.base.SortModel;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.dto.GuideProperty;
 import com.zm.goods.utils.DateUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.SplitAnalyzer;
@@ -67,7 +68,7 @@ public class GoodsLucene extends AbstractLucene {
 
 	private static String decimalFormat = "000000000";
 
-	private SplitAnalyzer splitAnalyzer = new SplitAnalyzer(",");//按逗号分词
+	private SplitAnalyzer splitAnalyzer = new SplitAnalyzer(",");// 按逗号分词
 
 	@Override
 	public <T> void writerIndex(List<T> objList) {
@@ -94,41 +95,41 @@ public class GoodsLucene extends AbstractLucene {
 		Document doc;
 		long time = 0;
 		GoodsSearch model = (GoodsSearch) obj;
-
+		//初始化导购信息
+		model.initGuideProperty();
 		doc = new Document();
-		doc.add(new StringField("goodsId", model.getGoodsId(), Store.YES));
+		doc.add(new StringField("specsTpId", model.getSpecsTpId(), Store.YES));
 
 		// 商品名称设置权重
 		TextField commodityName = new TextField("goodsName", model.getGoodsName() == null ? "" : model.getGoodsName(),
 				Store.YES);
 		doc.add(commodityName);
 
-		doc.add(new TextField("specs", model.getSpecs() == null ? "" : model.getSpecs(), Store.YES));
-
-		doc.add(new StringField("brand", model.getBrand() == null ? "" : model.getBrand() + "", Store.YES));
-		doc.add(new StringField("popular", model.getPopular() == null ? "0" : model.getPopular() + "", Store.NO));
 		doc.add(new IntField("ratio", model.getRatio() == null ? 0 : model.getRatio(), Store.NO));
-		doc.add(new StringField("type", model.getType() == null ? "0" : model.getType() + "", Store.NO));
-		doc.add(new StringField("fx", model.getFx() == null ? "0" : model.getFx() + "", Store.NO));
+		doc.add(new IntField("welfare", model.getWelfare() == null ? 0 : model.getRatio(), Store.NO));
+		doc.add(new IntField("saleNum", model.getSaleNum() == null ? 0 : model.getSaleNum(), Store.NO));
 		doc.add(new StringField("upShelves", "1", Store.NO));
 		doc.add(new StringField("firstCategory", model.getFirstCategory().trim(), Store.NO));
 		doc.add(new StringField("secondCategory", model.getSecondCategory().trim(), Store.NO));
 		doc.add(new StringField("thirdCategory", model.getThirdCategory().trim(), Store.NO));
-		doc.add(new StringField("origin", model.getOrigin() == null ? "" : model.getOrigin(), Store.YES));
 		doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
 				Store.NO));
-		try {
-			doc.add(new TextField("tag",
-					splitAnalyzer.tokenStream("tag", new StringReader(model.getTag() == null ? "" : model.getTag()))));
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		if (model.getGuideList() != null) {
+			try {
+				for (GuideProperty property : model.getGuideList()) {
+					doc.add(new TextField(property.getName(), splitAnalyzer.tokenStream(property.getName(),
+							new StringReader(property.getValue() == null ? "" : property.getValue()))));
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 		try {
-			time = DateUtil.stringToLong(model.getCreateTime(), dateFormat);
+			time = DateUtil.stringToLong(model.getUpshelfTime(), dateFormat);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		doc.add(new LongField("createTime", time, Store.NO));
+		doc.add(new LongField("upshelfTime", time, Store.NO));
 		return doc;
 	}
 
@@ -143,10 +144,10 @@ public class GoodsLucene extends AbstractLucene {
 		df2.applyPattern(decimalFormat);
 		for (Object obj : objList) {
 			GoodsSearch model = (GoodsSearch) obj;
-			String goodsId = model.getGoodsId();
+			String specsTpId = model.getSpecsTpId();
 			doc = packDocument(df2, obj);
 			try {
-				indexWriter.updateDocument(new Term("goodsId", goodsId), doc);
+				indexWriter.updateDocument(new Term("specsTpId", specsTpId), doc);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -363,12 +364,12 @@ public class GoodsLucene extends AbstractLucene {
 
 	public static void main(String[] args) {
 
-		String str = "爆款";
+		String str = "爆款,ce,shi";
 		TokenStream stream = null;
 		@SuppressWarnings("resource")
 		SplitAnalyzer an = new SplitAnalyzer(",");
 		try {
-			stream = an.tokenStream("tag", new StringReader(str));
+			stream = an.tokenStream("测试", new StringReader(str));
 			CharTermAttribute attr = stream.addAttribute(CharTermAttribute.class);
 			stream.reset();
 			while (stream.incrementToken()) {

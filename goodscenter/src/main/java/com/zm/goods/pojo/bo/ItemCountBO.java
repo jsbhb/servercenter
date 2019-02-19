@@ -1,5 +1,10 @@
 package com.zm.goods.pojo.bo;
 
+/**
+ * @fun 商品是否全部上下架实体类
+ * @author user
+ *
+ */
 public class ItemCountBO {
 
 	private String itemId;

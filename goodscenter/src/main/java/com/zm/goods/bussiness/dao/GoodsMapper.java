@@ -5,33 +5,54 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.zm.goods.pojo.Activity;
-import com.zm.goods.pojo.ActivityData;
-import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsItem;
-import com.zm.goods.pojo.GoodsSpecs;
-import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
-import com.zm.goods.pojo.PopularizeDict;
-import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.bo.CategoryBO;
 import com.zm.goods.pojo.bo.GoodsLifeCycleModel;
 import com.zm.goods.pojo.bo.ItemCountBO;
+import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.po.GoodsSpecs;
+import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 public interface GoodsMapper {
 
-	List<GoodsItem> listGoods(Map<String,Object> param);
-	
+	/**
+	 * @fun 根据goodsId获取Goods对象
+	 * @param goodsId
+	 * @return
+	 */
+	GoodsItem getGoodsByGoodsId(String goodsId);
+	/**
+	 * @fun 根据goodsId 获取GoodsSpecsTradePattern对象
+	 * @param goodsId
+	 * @return
+	 */
+	List<GoodsSpecsTradePattern> listGoodsSpecsTpByGoodsId(String goodsId);
+	/**
+	 * @fun 根据specsId 获取GoodsSpecs对象
+	 * @param specsIdList
+	 * @return
+	 */
+	List<GoodsSpecs> listGoodsSpecsBySpecsIds(List<String> specsIdList);
+	/**
+	 * @fun 获取GoodsFile对象
+	 * @param param
+	 * @return
+	 */
 	List<GoodsFile> listGoodsFile(Map<String,Object> param);
-	
-	List<GoodsSpecs> listGoodsSpecs(Map<String,Object> param);
+	/**
+	 * @fun 根据specsId List 搜索GoodsspecsTp
+	 * @param list
+	 * @return
+	 */
+	List<GoodsSpecs> listGoodsSpecsTpBySpecsTpIds(List<String> list);
 	
 	GoodsSpecs getGoodsSpecs(String itemId);
 	
@@ -39,83 +60,50 @@ public interface GoodsMapper {
 	
 	GoodsSpecs getGoodsSpecsForButtJoinOrder(String itemId);
 	
-	List<GoodsSpecs> listGoodsSpecsByItemId(Map<String,Object> param);
-	
-	Activity getActivity(Map<String,Object> param);
-	
-	void createGoods(@Param("centerId")Integer centerId);
-	
-	void createGoodsFile(@Param("centerId")Integer centerId);
-	
-	void createFirstCategory(@Param("centerId")Integer centerId);
-	
-	void createSecondCategory(@Param("centerId")Integer centerId);
-	
-	void createThirdCategory(@Param("centerId")Integer centerId);
-	
-	void createGoodsItem(@Param("centerId")Integer centerId);
-	
-	void createGoodsPrice(@Param("centerId")Integer centerId);
-	
-	void createLayout(@Param("centerId")Integer centerId);
-	
-	void createPopularizeDict(@Param("centerId")Integer centerId);
-	
-	void createPopularizeData(@Param("centerId")Integer centerId);
-	
-	void createActivity(@Param("centerId")Integer centerId);
-	
-	void createActivityData(@Param("centerId")Integer centerId);
-	
-	void createPriceContrast(@Param("centerId")Integer centerId);
-	
-	List<Layout> listLayout(Map<String,Object> param);
-	
-	List<Activity> listActivityByLayoutId(Map<String,Object> param);
-	
-	List<ActivityData> listActiveData(Map<String,Object> param);
-	
-	PopularizeDict getDictByLayoutId(Map<String,Object> param);
-	
-	List<DictData> listDictData(Map<String,Object> param);
-	
-	void updateActivitiesStart(Map<String,Object> param);
-	
-	void updateActivitiesEnd(Map<String,Object> param);
-	
-	List<Integer> listEndActiveId(@Param("centerId")String centerId);
-	
-	List<GoodsItem> listGoodsForLucene(Map<String, Object> param);
-	
 	List<GoodsItem> listGoodsForLuceneUpdateTag(List<String> updateTagList);
 	
 	List<GoodsSpecs> listSpecsForLucene(Map<String,Object> param);
 	
 	List<GoodsSpecs> listItemTagForLuceneUpdate(List<String> itemIdList);
 	
-	void updateGoodsUpShelves(Map<String,Object> param);
-	
-	void updateGoodsItemUpShelves(List<String> itemIdList);
-
-	List<GoodsItem> queryGoodsItem(Map<String, Object> searchParm);
+	/**
+	 * @fun 前端搜索。根据Lucene搜索到的数据进行数据库查询详细信息
+	 * @param searchParm
+	 * @return
+	 */
+	List<GoodsSpecsTradePattern> listGoodsSpecsTpForFrontSearch(Map<String, Object> searchParm);
+	/**
+	 * @fun 前端搜索。根据goodsId搜索goods
+	 * @param goodsIds
+	 * @return
+	 */
+	List<GoodsItem> listGoodsItemByGoodsIds(List<String> goodsIds);
 	
 	List<GoodsIndustryModel> queryGoodsCategory();
 	
 	List<Tax> getTax(List<String> list);
-	
-	List<WarehouseModel> listWarehouse(Map<String,Object> param);
+	/**
+	 * @fun 根据itemids获取库存对象
+	 * @param itemIds
+	 * @return
+	 */
+	List<WarehouseModel> listWarehouse(List<String> itemIds);
+	/**
+	 * @fun 根据specsTpId获取该id下的总库存
+	 * @param specsTpIds
+	 * @return
+	 */
+	List<WarehouseModel> listWarehouseBySpecsTpIds(List<String> specsTpIds);
 	
 	void updateStock(Map<String,Object> param);
 	
 	void updateStockBack(Map<String,Object> param);
 	
-	List<String> getGoodsIdByItemId(List<String> itemIdList);
+	String getGoodsIdBySpecsTpId(String specsTpId);
 
 	void updateThirdWarehouseStock(List<WarehouseStock> list);
 
 	void saveThirdGoods(List<ThirdWarehouseGoods> list);
-
-	List<PriceModel> getCostPrice(List<OrderBussinessModel> list);
 
 	List<OrderBussinessModel> checkStock();
 
@@ -131,8 +119,6 @@ public interface GoodsMapper {
 	
 	List<String> listThirdCategory(List<String> goodsIdList);
 
-	void updateGoodsItemUnDistribution(List<String> list);
-	
 	List<OrderBussinessModel> checkStockByItemIds(List<String> itemIdList);
 
 	List<GoodsConvert> listSkuAndConversionByItemId(List<String> list);
@@ -162,5 +148,13 @@ public interface GoodsMapper {
 	GoodsItem getGoodsItemByGoodsIdForGoodsBillboard(String goodsId);
 
 	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
+
+	List<GoodsSearch> listSpecsNeedToCreateIndex(List<String> specsTpIdList);
+
+	/**
+	 * @fun 更新一般贸易商品为上架状态
+	 * @param specsTpIdList
+	 */
+	void updateTradeSpecsUpshelf(@Param("list")List<String> specsTpIdList, @Param("display")int display);
 
 }

@@ -57,20 +57,13 @@ public interface GoodsFeignClient {
 			@RequestParam("platformSource") int platformSource, @RequestParam("gradeId") int gradeId);
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
-	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("itemIds") String ids,
-			@RequestParam("source") String source, @RequestParam("platformSource") int platformSource,
+	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("specsTpIds") String ids,
+			@RequestParam("platformSource") int platformSource,
 			@RequestParam("gradeId") int gradeId);
-
-	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
-	public ResultModel getActivity(@PathVariable("version") Double version, @RequestParam("type") Integer type,
-			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId);
 
 	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
 	public ResultModel stockBack(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
 			@RequestParam("orderFlag") Integer orderFlag);
-
-	@RequestMapping(value = "{version}/goods/costPrice", method = RequestMethod.POST)
-	public Double getCostPrice(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list);
 
 	@RequestMapping(value = "{version}/goods/list-itemId", method = RequestMethod.POST)
 	public Map<String, GoodsConvert> listSkuAndConversionByItemId(@PathVariable("version") Double version,

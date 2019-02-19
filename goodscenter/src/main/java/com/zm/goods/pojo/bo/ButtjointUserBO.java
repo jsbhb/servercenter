@@ -1,5 +1,10 @@
 package com.zm.goods.pojo.bo;
 
+/**
+ * @fun 对接用户的基本信息
+ * @author user
+ *
+ */
 public class ButtjointUserBO {
 
 	private String url;

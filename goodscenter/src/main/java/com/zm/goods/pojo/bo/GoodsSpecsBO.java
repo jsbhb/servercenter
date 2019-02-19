@@ -1,5 +1,9 @@
 package com.zm.goods.pojo.bo;
-
+/**
+ * @fun 商品规格业务实体类
+ * @author user
+ *
+ */
 public class GoodsSpecsBO {
 	
 	private String specsName;

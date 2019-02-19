@@ -1,5 +1,9 @@
 package com.zm.goods.pojo.dto;
-
+/**
+ * @fun 生成分享图片数据传输实体类
+ * @author user
+ *
+ */
 public class GoodsBillboardDTO {
 
 	private String goodsId;

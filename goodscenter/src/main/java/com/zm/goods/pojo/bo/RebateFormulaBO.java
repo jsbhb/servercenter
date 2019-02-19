@@ -1,5 +1,9 @@
 package com.zm.goods.pojo.bo;
-
+/**
+ * @fun 返佣计算公式实体类
+ * @author user
+ *
+ */
 public class RebateFormulaBO {
 
 	private Integer gradeTypeId;

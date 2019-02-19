@@ -20,8 +20,8 @@ public class ThreadPoolComponent {
 	GoodsOpenInterfaceService goodsOpenInterfaceService;
 	
 	@Async("myAsync")
-	public void publish(List<String> itemIdList, Integer centerId){
-		seoService.publish(itemIdList, centerId, true);
+	public void publish(List<String> specsTpIdList, Integer centerId){
+		seoService.publish(specsTpIdList, centerId, true);
 	}
 
 	@Async("myAsync")

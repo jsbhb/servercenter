@@ -403,7 +403,7 @@ public class OrderServiceImpl implements OrderService {
 
 		String ids = sb.substring(0, sb.length() - 1);
 
-		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids, "feign",
+		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids,
 				shoppingCart.getPlatformSource(), shoppingCart.getGradeId());
 		if (result.isSuccess()) {
 			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();

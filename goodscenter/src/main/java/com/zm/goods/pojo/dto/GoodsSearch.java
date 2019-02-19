@@ -1,21 +1,24 @@
 package com.zm.goods.pojo.dto;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.zm.goods.annotation.SearchCondition;
 
+/**
+ * @fun 搜索条件实体类
+ * @author user
+ *
+ */
 public class GoodsSearch {
 
-	private String goodsId;
+	private String specsTpId;
 
 	private Integer centerId;
 
-	@SearchCondition(value = SearchCondition.FILTER)
-	private String specs;
-
 	@SearchCondition(value = SearchCondition.SEARCH)
 	private String goodsName;
-
-	@SearchCondition(value = SearchCondition.FILTER)
-	private String brand;
 
 	@SearchCondition(value = SearchCondition.SEARCH)
 	private String upShelves;
@@ -23,14 +26,7 @@ public class GoodsSearch {
 	private Double price;
 
 	@SearchCondition(value = SearchCondition.FILTER)
-	private String createTime;
-
-	@SearchCondition(value = SearchCondition.FILTER)
-	private String origin;
-
-	private Integer status;
-
-	private Integer popular;
+	private String upshelfTime;
 
 	@SearchCondition(value = SearchCondition.SEARCH)
 	private String thirdCategory;
@@ -47,23 +43,47 @@ public class GoodsSearch {
 	@SearchCondition(value = SearchCondition.FILTER)
 	private String priceMax;
 
-	@SearchCondition(value = SearchCondition.FILTER)
-	private Integer type;
-
-	@SearchCondition(value = SearchCondition.FILTER)
-	private String tag;
-
 	private Integer ratio;
-	
-	@SearchCondition(value = SearchCondition.FILTER)
-	private Integer fx;
 
-	public Integer getFx() {
-		return fx;
+	@SearchCondition(value = SearchCondition.FILTER)
+	private Integer welfare;
+
+	private Integer saleNum;
+
+	@SearchCondition(value = SearchCondition.FILTER)
+	private List<GuideProperty> guideList;
+
+	public Map<String, String> initGuideProperty() {
+		if (guideList != null) {
+			Map<String, String> tmp = new HashMap<>();
+			for (GuideProperty pr : guideList) {
+				if (tmp.get(pr.getName()) == null) {
+					tmp.put(pr.getName(), pr.getValue());
+				} else {
+					String str = tmp.get(pr.getName());
+					str = str + "," + pr.getValue();
+					tmp.put(pr.getName(), str);
+				}
+			}
+			return tmp;
+		}
+		return null;
 	}
 
-	public void setFx(Integer fx) {
-		this.fx = fx;
+	public Integer getSaleNum() {
+		return saleNum;
+	}
+
+	public void setSaleNum(Integer saleNum) {
+		this.saleNum = saleNum;
+	}
+
+	public List<GuideProperty> getGuideList() {
+		return guideList;
+	}
+
+	public void setGuideList(List<GuideProperty> guideList) {
+		this.guideList = guideList;
 	}
 
 	public Integer getRatio() {
@@ -72,22 +92,6 @@ public class GoodsSearch {
 
 	public void setRatio(Integer ratio) {
 		this.ratio = ratio;
-	}
-
-	public String getTag() {
-		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
-
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
 	}
 
 	public String getPriceMin() {
@@ -114,14 +118,6 @@ public class GoodsSearch {
 		this.upShelves = upShelves;
 	}
 
-	public Integer getPopular() {
-		return popular;
-	}
-
-	public void setPopular(Integer popular) {
-		this.popular = popular;
-	}
-
 	public String getThirdCategory() {
 		return thirdCategory;
 	}
@@ -146,30 +142,6 @@ public class GoodsSearch {
 		this.firstCategory = firstCategory;
 	}
 
-	public String getOrigin() {
-		return origin;
-	}
-
-	public void setOrigin(String origin) {
-		this.origin = origin;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	public String getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(String createTime) {
-		this.createTime = createTime;
-	}
-
 	public Double getPrice() {
 		return price;
 	}
@@ -178,12 +150,12 @@ public class GoodsSearch {
 		this.price = price;
 	}
 
-	public String getGoodsId() {
-		return goodsId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
 
-	public void setGoodsId(String goodsId) {
-		this.goodsId = goodsId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 
 	public Integer getCenterId() {
@@ -194,14 +166,6 @@ public class GoodsSearch {
 		this.centerId = centerId;
 	}
 
-	public String getSpecs() {
-		return specs;
-	}
-
-	public void setSpecs(String specs) {
-		this.specs = specs;
-	}
-
 	public String getGoodsName() {
 		return goodsName;
 	}
@@ -210,18 +174,19 @@ public class GoodsSearch {
 		this.goodsName = goodsName;
 	}
 
-	public String getBrand() {
-		return brand;
+	public String getUpshelfTime() {
+		return upshelfTime;
 	}
 
-	public void setBrand(String brand) {
-		this.brand = brand;
+	public void setUpshelfTime(String upshelfTime) {
+		this.upshelfTime = upshelfTime;
 	}
 
-	@Override
-	public String toString() {
-		return "GoodsSearch [goodsId=" + goodsId + ", price=" + price + ", priceMin=" + priceMin + ", priceMax="
-				+ priceMax + ", type=" + type + ", tag=" + tag + "]";
+	public Integer getWelfare() {
+		return welfare;
 	}
 
+	public void setWelfare(Integer welfare) {
+		this.welfare = welfare;
+	}
 }

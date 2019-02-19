@@ -22,7 +22,7 @@ public class GoodsTagEntity {
 
 	private Integer id;
 	@JsonIgnore
-	private String itemId;
+	private String specsTpId;
 	private String tagName;// 标签名称
 	private Integer tagFunId;//标签功能ID
 	@JsonIgnore
@@ -37,11 +37,11 @@ public class GoodsTagEntity {
 	public Integer getTagFunId() {
 		return tagFunId;
 	}
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 	public void setTagFunId(Integer tagFunId) {
 		this.tagFunId = tagFunId;

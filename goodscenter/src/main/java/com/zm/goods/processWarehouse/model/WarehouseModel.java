@@ -6,11 +6,21 @@ public class WarehouseModel {
 
 	private String itemId;
 	
+	private String specsTpId;
+	
 	private Integer fxqty;
 	
 	private Integer frozenqty;
 	
 	private Integer lockedqty;
+
+	public String getSpecsTpId() {
+		return specsTpId;
+	}
+
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
+	}
 
 	public Integer getId() {
 		return id;

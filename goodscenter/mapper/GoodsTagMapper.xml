@@ -6,7 +6,7 @@
 	<resultMap type="com.zm.goods.pojo.GoodsTagEntity" id="tag">
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="tag_name" property="tagName" jdbcType="VARCHAR"/>
-		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR"/>
 		<result column="tag_fun_id" property="tagFunId" jdbcType="INTEGER"/>
 		<result column="priority" property="priority" jdbcType="INTEGER"/>
 		<result column="description" property="description" jdbcType="VARCHAR"/>
@@ -38,8 +38,9 @@
 		</collection>
 	</resultMap>
 	
-	<select id="listGoodsTagByGoodsId" parameterType="Object" resultMap="tag">
-		select gt.*,gtb.item_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gtb.item_id in
+	<select id="listGoodsTagBySpecsTpIds" parameterType="Object" resultMap="tag">
+		select gt.*,gtb.specs_tp_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id 
+		where gtb.specs_tp_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>

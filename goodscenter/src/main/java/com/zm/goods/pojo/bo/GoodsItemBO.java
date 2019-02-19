@@ -1,5 +1,9 @@
 package com.zm.goods.pojo.bo;
-
+/**
+ * @fun 订单导入补全商品信息实体类
+ * @author user
+ *
+ */
 public class GoodsItemBO {
 
 	private Integer id;

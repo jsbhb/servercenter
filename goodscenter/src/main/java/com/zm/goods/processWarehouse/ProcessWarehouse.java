@@ -21,13 +21,11 @@ public class ProcessWarehouse {
 	GoodsMapper goodsMapper;
 
 	public synchronized ResultModel processWarehouse(Integer orderFlag, List<OrderBussinessModel> orderList) {
-		Map<String, Object> param = new HashMap<String, Object>();
 		List<String> itemIds = new ArrayList<String>();
 		for (OrderBussinessModel model : orderList) {
 			itemIds.add(model.getItemId());
 		}
-		param.put("list", itemIds);
-		List<WarehouseModel> stockList = goodsMapper.listWarehouse(param);
+		List<WarehouseModel> stockList = goodsMapper.listWarehouse(itemIds);
 		return process(stockList, orderList, orderFlag);
 	}
 

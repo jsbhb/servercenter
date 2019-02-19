@@ -1,5 +1,10 @@
 package com.zm.goods.pojo.bo;
 
+/**
+ * @fun 三级分类ID的业务实体类
+ * @author user
+ *
+ */
 public class CategoryBO {
 
 	private String id;

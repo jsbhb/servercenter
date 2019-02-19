@@ -2,10 +2,8 @@ package com.zm.goods.bussiness.component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,13 +17,13 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.exception.OriginalPriceUnEqual;
 import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.GoodsPrice;
-import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.GradeBO;
+import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.po.GoodsSpecs;
+import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.CommonUtils;
 import com.zm.goods.utils.HttpClientUtil;
@@ -59,7 +57,6 @@ public class GoodsServiceComponent {
 	public Double getAmount(boolean vip, GoodsSpecs specs, OrderBussinessModel model, Double promotion,
 			int platformSource, int gradeId) throws WrongPlatformSource, OriginalPriceUnEqual {
 		Double totalAmount = 0.0;
-		getPriceInterval(specs, promotion);
 		boolean calculation = false;
 		Double discount = 10.0;
 		if (promotion != null && promotion != 0.0) {
@@ -84,140 +81,6 @@ public class GoodsServiceComponent {
 		}
 
 		return CalculationUtils.mul(totalAmount, discount);
-	}
-
-	/**
-	 * @fun 封装商品图片和规格信息
-	 * @param goodsList
-	 *            商品列表
-	 * @param fileList
-	 *            图片列表
-	 * @param specsList
-	 *            规格列表
-	 * @param flag
-	 *            false--搜索界面把规格按字符串拼接，true--获取商品详情，封装规格详情
-	 */
-	@SuppressWarnings("unchecked")
-	public void packageGoodsItem(List<GoodsItem> goodsList, List<GoodsFile> fileList, List<GoodsSpecs> specsList,
-			boolean flag) {
-
-		Map<String, GoodsItem> goodsMap = new HashMap<String, GoodsItem>();
-		if (goodsList == null || goodsList.size() == 0) {
-			return;
-		}
-
-		for (GoodsItem item : goodsList) {
-			goodsMap.put(item.getGoodsId(), item);
-		}
-
-		GoodsItem item = null;
-		List<GoodsFile> tempFileList = null;
-		List<GoodsSpecs> tempSpecsList = null;
-		if (fileList != null && fileList.size() > 0) {
-			for (GoodsFile file : fileList) {
-				item = goodsMap.get(file.getGoodsId());
-				if (item == null) {
-					continue;
-				}
-				if (item.getGoodsFileList() == null) {
-					tempFileList = new ArrayList<GoodsFile>();
-					tempFileList.add(file);
-					item.setGoodsFileList(tempFileList);
-				} else {
-					item.getGoodsFileList().add(file);
-				}
-			}
-		}
-
-		if (specsList != null && specsList.size() > 0) {
-			Map<String, String> temp = null;
-			Set<String> tempSet = null;
-			Double discount = null;
-			for (GoodsSpecs specs : specsList) {
-				item = goodsMap.get(specs.getGoodsId());
-				if (item == null) {
-					continue;
-				}
-				discount = specs.getDiscount();
-				getPriceInterval(specs, discount);
-				if (flag) {
-					if (item.getGoodsSpecsList() == null) {
-						tempSpecsList = new ArrayList<GoodsSpecs>();
-						tempSpecsList.add(specs);
-						item.setGoodsSpecsList(tempSpecsList);
-					} else {
-						item.getGoodsSpecsList().add(specs);
-					}
-
-				} else {
-					if (specs.getInfo() != null && !"".equals(specs.getInfo().trim())) {
-						temp = JSONUtil.parse(specs.getInfo(), Map.class);
-						for (Map.Entry<String, String> entry : temp.entrySet()) {
-							if (item.getSpecsInfo() == null) {
-								tempSet = new HashSet<String>();
-								tempSet.add(entry.getValue());
-								item.setSpecsInfo(tempSet);
-							} else {
-								item.getSpecsInfo().add(entry.getKey());
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @fun 封装价格区间，获取规格的最大价格和最小价格
-	 * @param specs
-	 * @param discountParam
-	 *            折扣
-	 */
-	public void getPriceInterval(GoodsSpecs specs, Double discountParam) {
-		List<GoodsPrice> priceList = specs.getPriceList();
-		specs.infoFilter();
-		if (priceList == null) {
-			return;
-		}
-		Double discount = 10.0;
-		if (discountParam != null && discountParam != 0.0) {
-			discount = discountParam;
-		}
-		discount = CalculationUtils.div(discount, 10.0);
-		for (int i = 0; i < priceList.size(); i++) {
-			if (i == 0) {
-				specs.setMinPrice(priceList.get(i).getPrice());
-				specs.setMaxPrice(priceList.get(i).getPrice());
-				specs.setRealMinPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
-				specs.setRealMaxPrice(CalculationUtils.mul(priceList.get(i).getPrice(), discount));
-				if (priceList.get(i).getVipPrice() != null) {
-					specs.setVipMinPrice(priceList.get(i).getVipPrice());
-					specs.setVipMaxPrice(priceList.get(i).getVipPrice());
-					specs.setRealVipMinPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
-					specs.setRealVipMaxPrice(CalculationUtils.mul(priceList.get(i).getVipPrice(), discount));
-				}
-
-			} else {
-				specs.setRealMinPrice(CalculationUtils
-						.mul(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()), discount));
-				specs.setMinPrice(CommonUtils.getMinDouble(specs.getMinPrice(), priceList.get(i).getPrice()));
-				specs.setRealMaxPrice(CalculationUtils
-						.mul(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()), discount));
-				specs.setMaxPrice(CommonUtils.getMaxDouble(specs.getMaxPrice(), priceList.get(i).getPrice()));
-				if (priceList.get(i).getVipPrice() != null) {
-					specs.setRealVipMinPrice(CalculationUtils.mul(
-							CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()),
-							discount));
-					specs.setVipMinPrice(
-							CommonUtils.getMinDouble(specs.getVipMinPrice(), priceList.get(i).getVipPrice()));
-					specs.setRealVipMaxPrice(CalculationUtils.mul(
-							CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()),
-							discount));
-					specs.setVipMaxPrice(
-							CommonUtils.getMaxDouble(specs.getVipMaxPrice(), priceList.get(i).getVipPrice()));
-				}
-			}
-		}
 	}
 
 	public String judgeCenterId(Integer id) {
@@ -365,8 +228,8 @@ public class GoodsServiceComponent {
 		double amount = CalculationUtils.mul(
 				(vip ? (price.getVipPrice() == null ? 0 : price.getVipPrice()) : price.getPrice()),
 				CalculationUtils.sub(1, temp));// 商品单价
-		amount = CalculationUtils.round(2, amount);//保留2位小数
-		amount = CalculationUtils.mul(amount, model.getQuantity());//单价乘以数量
+		amount = CalculationUtils.round(2, amount);// 保留2位小数
+		amount = CalculationUtils.mul(amount, model.getQuantity());// 单价乘以数量
 		return amount;
 	}
 
@@ -377,11 +240,10 @@ public class GoodsServiceComponent {
 	 * @param gradeId
 	 * @throws WrongPlatformSource
 	 */
-	public void getWelfareWebsitePriceInterval(GoodsSpecs specs, Double discount, int gradeId)
+	public void getWelfareWebsitePriceInterval(GoodsSpecsTradePattern specs, Double discount, int gradeId)
 			throws WrongPlatformSource {
-		getPriceInterval(specs, discount);
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getItemId());
+		Map<String, String> goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + specs.getSpecsTpId());
 		String json = hashOperations.get(Constants.GRADEBO_INFO, gradeId + "");
 		if (json == null || "".equals(json)) {
 			throw new WrongPlatformSource("该分级已经不是福利网站类型");
@@ -396,9 +258,8 @@ public class GoodsServiceComponent {
 		double proportion = Double
 				.valueOf(goodsRebate.get(gradeType + "") == null ? "0" : goodsRebate.get(gradeType + ""));
 		double temp = CalculationUtils.mul(proportion, CalculationUtils.sub(1, welfareRebate));// 扣除福利网站自己的返佣后
-		double welfarePrice = CalculationUtils.mul(specs.getPriceList().get(0).getPrice(),
-				CalculationUtils.sub(1, temp));
-		specs.setWelfarePrice(welfarePrice);
+		double welfarePrice = CalculationUtils.mul(specs.getRetailPrice(), CalculationUtils.sub(1, temp));
+		specs.setRetailPrice(welfarePrice);
 	}
 
 	/**
@@ -429,11 +290,9 @@ public class GoodsServiceComponent {
 		specs.setWelfarePrice(backPrice);
 	}
 
-	public void packDetailPath(List<GoodsItem> itemList) {
-		for (GoodsItem item : itemList) {
-			if (item.getDetailPath() != null) {
-				item.setDetailList(getPicPath(HttpClientUtil.get(item.getDetailPath())));
-			}
+	public void packDetailPath(GoodsItem item) {
+		if (item.getDetailPath() != null) {
+			item.setDetailList(getPicPath(HttpClientUtil.get(item.getDetailPath())));
 		}
 	}
 

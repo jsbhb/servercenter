@@ -1,5 +1,10 @@
 package com.zm.goods.pojo.bo;
 
+/**
+ * @fun 分级实体类
+ * @author user
+ *
+ */
 public class GradeBO {
 
 	private Integer id;

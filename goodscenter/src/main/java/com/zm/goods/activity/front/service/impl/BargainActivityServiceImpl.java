@@ -41,10 +41,10 @@ import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.Tax;
+import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.DateUtil;
 

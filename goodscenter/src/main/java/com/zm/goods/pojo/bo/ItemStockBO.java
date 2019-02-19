@@ -1,5 +1,10 @@
 package com.zm.goods.pojo.bo;
 
+/**
+ * @fun 库存业务实体类
+ * @author user
+ *
+ */
 public class ItemStockBO {
 
 	private String itemId;

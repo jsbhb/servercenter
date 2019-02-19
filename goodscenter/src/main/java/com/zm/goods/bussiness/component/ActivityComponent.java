@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.zm.goods.constants.Constants;
 import com.zm.goods.feignclient.ActivityFeignClient;
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.po.GoodsItem;
 import com.zm.goods.pojo.vo.Coupon;
 
 @Component

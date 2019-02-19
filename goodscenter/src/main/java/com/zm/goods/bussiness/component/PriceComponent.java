@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 
 import com.zm.goods.exception.OriginalPriceUnEqual;
 import com.zm.goods.exception.WrongPlatformSource;
-import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.vo.Coupon;
 import com.zm.goods.pojo.vo.CouponGoodsbinding;
 import com.zm.goods.utils.JSONUtil;

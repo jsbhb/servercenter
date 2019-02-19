@@ -2,37 +2,26 @@ package com.zm.goods.bussiness.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.zm.goods.exception.WrongPlatformSource;
-import com.zm.goods.pojo.Activity;
-import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsItem;
-import com.zm.goods.pojo.Layout;
-import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.ThirdWarehouseGoods;
-import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.po.GoodsItem;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
-import com.zm.goods.pojo.vo.PageModule;
+import com.zm.goods.pojo.vo.GoodsVO;
 
 public interface GoodsService {
 
-
 	/**
 	 * @fun 获取商品
-	 * @param param
-	 * @param centerId
-	 * @param userId
-	 * @param proportion 是否推手
-	 * @param isApplet 是否是小程序端
+	 * @param isApplet
+	 *            是否是小程序端
 	 * @return
 	 */
-	Object listGoods(Map<String, Object> param, Integer centerId, Integer userId, boolean proportion, boolean isApplet);
+	GoodsVO listGoods(String goodsId, String specsTpId, boolean isApplet);
 
 	/**
 	 * listBigTradeGoods:获取大贸海蒸鲜商品菜谱. <br/>
@@ -45,97 +34,14 @@ public interface GoodsService {
 	List<GoodsFile> listGoodsCookFile(String goodsId);
 
 	/**
-	 * listBigTradeGoods:获取大贸海蒸鲜商品购买也信息. <br/>
-	 * 
-	 * @author wqy
-	 * @param itemId
-	 * @return
-	 * @since JDK 1.7
-	 */
-	Map<String, Object> tradeGoodsDetail(String itemId, Integer centerId);
-
-	/**
-	 * getPriceAndDelStock:处理订单信息. <br/>
-	 * 
-	 * @author wqy
-	 * @param list，delStock
-	 * @return
-	 * @since JDK 1.7
-	 */
-	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip, Integer centerId,
-			Integer orderFlag, String couponIds, Integer userId, boolean isFx, int platformSource, int gradeId);
-
-	/**
 	 * listGoodsSpecs:获取规格信息.
 	 * 
 	 * @param list
 	 * @param centerId
-	 * @param source
-	 *            feign：通过feign调用该函数，mall默认值，为商城端调用
 	 * @return
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId)
+	Map<String, Object> listGoodsSpecs(List<String> list, int platformSource, int gradeId)
 			throws WrongPlatformSource;
-
-	/**
-	 * getActivity:获取活动信息. <br/>
-	 * 
-	 * @author wqy
-	 * @param param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	Activity getActivity(Map<String, Object> param);
-
-	/**
-	 * getModular:获取模块数据. <br/>
-	 * 
-	 * @author wqy
-	 * @param centerID,page
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<Layout> getModular(String page, Integer centerId, Integer pageType);
-
-	/**
-	 * getModularData:获取模块数据. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<PageModule> getModularData(Integer pageType, String page, Layout layout, Integer centerId);
-
-	/**
-	 * updateActiveStart:开始活动. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	void updateActiveStart(Integer centerId, Integer activeId);
-
-	/**
-	 * updateActiveEnd:结束活动. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	void updateActiveEnd(Integer centerId, Integer activeId);
-
-	/**
-	 * getEndActive:获取已经结束的活动. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	Map<String, Object> getEndActive();
 
 	/**
 	 * queryMember:商城搜索lucene. <br/>
@@ -159,55 +65,18 @@ public interface GoodsService {
 	List<GoodsIndustryModel> loadIndexNavigation(Integer centerId);
 
 	/**
-	 * stockBack:库存回滚. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	void stockBack(List<OrderBussinessModel> list, Integer orderFlag);
-
-	/**
-	 * stockJudge:库存判断（支付时第三方仓库）. <br/>
-	 * 
-	 * @author wqy
-	 * @param
-	 * @return
-	 * @since JDK 1.7
-	 */
-	ResultModel stockJudge(List<OrderBussinessModel> list, Integer orderFlag, Integer supplierId);
-
-	/**
-	 * @fun 根据同步到的库存更新库存信息
-	 */
-	boolean updateThirdWarehouseStock(List<WarehouseStock> list);
-
-	/**
-	 * @fun 保存第三方商品
-	 */
-	boolean saveThirdGoods(List<ThirdWarehouseGoods> list);
-
-	/**
-	 * @fun 根据itemIDList 获取渠道价格总价
-	 * @param list
+	 * @fun 一般贸易商品上架
+	 * @param specsTpIdList
+	 * @param centerId
+	 * @param display
+	 *            0:不显示;1:前端显示;2:后台显示;3:前后台都显示
 	 * @return
 	 */
-	Double getCostPrice(List<OrderBussinessModel> list);
-
-	List<OrderBussinessModel> checkStock();
-
-	ResultModel upShelves(List<String> itemIdList, Integer centerId);
+	ResultModel tradeGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display);
 
 	ResultModel downShelves(List<String> itemIdList, Integer centerId);
 
-	ResultModel unDistribution(List<String> itemIdList);
-
 	ResultModel syncStock(List<String> itemIdList);
-
-	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
-
-	ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
 
 	/**
 	 * @fun 更新lucene索引

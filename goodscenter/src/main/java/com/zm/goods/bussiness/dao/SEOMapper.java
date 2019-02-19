@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 import com.zm.goods.pojo.po.ComponentDataPO;
+import com.zm.goods.pojo.po.GoodsItem;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.seo.model.CategoryPath;
 import com.zm.goods.seo.model.GoodsTempModel;

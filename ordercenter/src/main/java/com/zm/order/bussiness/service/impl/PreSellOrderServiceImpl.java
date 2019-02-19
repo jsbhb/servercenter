@@ -16,7 +16,6 @@ import com.zm.order.bussiness.dao.PreSellOrderMapper;
 import com.zm.order.bussiness.service.PreSellOrderService;
 import com.zm.order.constants.Constants;
 import com.zm.order.feignclient.GoodsFeignClient;
-import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 

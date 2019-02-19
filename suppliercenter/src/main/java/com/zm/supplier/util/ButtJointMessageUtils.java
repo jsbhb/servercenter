@@ -772,8 +772,8 @@ public class ButtJointMessageUtils {
 		List<JiaBeiAiTeOrderGoods> orderGoodsList = new ArrayList<JiaBeiAiTeOrderGoods>();
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			JiaBeiAiTeOrderGoods orderGoods = new JiaBeiAiTeOrderGoods();
-			orderGoods.setPop_sku_code(goods.getItemId());
-			orderGoods.setItem_sku_id(goods.getItemCode());
+			orderGoods.setPop_sku_code(goods.getItemCode());
+			orderGoods.setItem_sku_id(goods.getItemId());
 			orderGoods.setPop_item_title(goods.getItemName());
 			orderGoods.setItem_title(goods.getItemName());
 			orderGoods.setNum(goods.getItemQuantity()+"");

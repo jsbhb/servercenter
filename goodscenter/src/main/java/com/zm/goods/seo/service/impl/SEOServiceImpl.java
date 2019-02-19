@@ -22,13 +22,13 @@ import com.zm.goods.enummodel.PublishType;
 import com.zm.goods.enummodel.SystemEnum;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.GoodsItem;
-import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 import com.zm.goods.pojo.po.ComponentDataPO;
+import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.seo.model.CategoryPath;
@@ -74,8 +74,8 @@ public class SEOServiceImpl implements SEOService {
 	}
 
 	@Override
-	public ResultModel publish(List<String> itemIdList, Integer centerId, boolean isNewPublish) {
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
+	public ResultModel publish(List<String> specsTpIdList, Integer centerId, boolean isNewPublish) {
+		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(specsTpIdList);
 		if (goodsIdList == null || goodsIdList.size() == 0) {
 			return new ResultModel(false, "没有对应的商品GOODSID");
 		}

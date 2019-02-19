@@ -15,8 +15,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.zm.goods.constants.Constants;
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.bo.GoodsBillboard;
+import com.zm.goods.pojo.po.GoodsItem;
 
 public class ImageUtils {
 

@@ -1,5 +1,10 @@
 package com.zm.goods.pojo.bo;
 
+/**
+ * @fun 小程序分享图片生成业务实体类
+ * @author user
+ *
+ */
 public class GoodsBillboard {
 
 	private int pic_X_Coordinates;//主图X坐标

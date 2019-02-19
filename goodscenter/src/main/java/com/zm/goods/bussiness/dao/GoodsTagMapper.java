@@ -9,7 +9,7 @@ import com.zm.goods.pojo.GoodsTagEntity;
 
 public interface GoodsTagMapper {
 
-	List<GoodsTagEntity> listGoodsTagByGoodsId(List<String> list);
+	List<GoodsTagEntity> listGoodsTagBySpecsTpIds(List<String> list);
 	
 	/**
 	 * @fun获取卡单的所有itemid

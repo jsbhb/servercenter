@@ -19,10 +19,10 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.feignclient.ThirdFeignClient;
 import com.zm.goods.feignclient.model.AppletCodeParameter;
 import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsItem;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.GoodsBillboard;
 import com.zm.goods.pojo.dto.GoodsBillboardDTO;
+import com.zm.goods.pojo.po.GoodsItem;
 import com.zm.goods.utils.HttpClientUtil;
 import com.zm.goods.utils.ImageUtils;
 
