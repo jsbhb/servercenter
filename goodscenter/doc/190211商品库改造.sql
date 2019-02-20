@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `item_id` VARCHAR(45) DEFAULT NULL COMMENT '跨境商品上架需绑定对应ItemId',
   `is_fresh` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否是新品:0是，1：否',
   `upshelf_time` DATETIME NULL COMMENT '上架时间',
+  `downshelf_time` DATETIME NULL COMMENT '下架时间',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
