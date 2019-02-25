@@ -45,21 +45,21 @@ public class PreSellOrderServiceImpl implements PreSellOrderService {
 			for (OrderGoods goods : goodsList) {
 				if (param.get(goods.getOrderId()) == null) {
 					temp = new ArrayList<String>();
-					temp.add(goods.getItemId());
+					temp.add(goods.getSpecsTpId());
 					param.put(goods.getOrderId(), temp);
 				} else {
-					param.get(goods.getOrderId()).add(goods.getItemId());
+					param.get(goods.getOrderId()).add(goods.getSpecsTpId());
 				}
 			}
-			List<String> itemIdList = goodsFeignClient.listPreSellItemIds(Constants.FIRST_VERSION);
-			if(itemIdList != null && itemIdList.size() > 0){//有卡单的itemId判断哪些订单可以解除卡单
+			List<String> specsTpIds = goodsFeignClient.listPreSellItemIds(Constants.FIRST_VERSION);
+			if(specsTpIds != null && specsTpIds.size() > 0){//有卡单的specsTpId判断哪些订单可以解除卡单
 				for(Map.Entry<String, List<String>> entry : param.entrySet()){
-					boolean flag = Collections.disjoint(entry.getValue(), itemIdList);//判断两个list是否有相同的元素，没有返回true
+					boolean flag = Collections.disjoint(entry.getValue(), specsTpIds);//判断两个list是否有相同的元素，没有返回true
 					if(flag){
 						tempOrderMap.get(entry.getKey()).setTagFun(0);
 					}
 				}
-			} else {//没有卡单的itemId则所有预售订单都可解除
+			} else {//没有卡单的specsTpIds则所有预售订单都可解除
 				for(Map.Entry<String, OrderInfo> entry : tempOrderMap.entrySet()){
 					entry.getValue().setTagFun(0);
 				}

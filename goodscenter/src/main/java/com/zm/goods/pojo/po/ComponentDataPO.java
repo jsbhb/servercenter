@@ -186,5 +186,4 @@ public class ComponentDataPO {
 	public void setPopular(Integer popular) {
 		this.popular = popular;
 	}
-
 }

@@ -47,7 +47,8 @@
 	</select>
 	
 	<select id="listCutOrderItemIds" resultType="java.lang.String">
-		select gtb.item_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id where gt.tag_fun_id = 1
+		select gtb.specs_tp_id from goods_tag gt left join kj_goods_tag_bind gtb on gt.id = gtb.tag_id 
+		where gt.tag_fun_id = 1
 	</select>
 	
 	<insert id="batchInsert" parameterType="Object">

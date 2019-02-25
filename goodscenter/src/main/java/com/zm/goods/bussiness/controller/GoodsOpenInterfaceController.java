@@ -24,62 +24,70 @@ public class GoodsOpenInterfaceController {
 
 	@Resource
 	GoodsOpenInterfaceService goodsOpenInterfaceService;
-	
+
 	@RequestMapping(value = "{version}/goods_stock", method = RequestMethod.POST)
 	public ResultModel getGoodsStock(@PathVariable("version") Double version, HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String data = req.getParameter("data");
-			String appKey = req.getParameter("appKey");
-			if (data == null || appKey == null || "".equals(data) || "".equals(appKey)) {
-				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
-						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
-			}
-			try {
-				return goodsOpenInterfaceService.getGoodsStock(data);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
-						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
-			}
-			
+			return new ResultModel(false, "000", "系统升级中");
+			// String data = req.getParameter("data");
+			// String appKey = req.getParameter("appKey");
+			// if (data == null || appKey == null || "".equals(data) ||
+			// "".equals(appKey)) {
+			// return new ResultModel(false,
+			// ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+			// ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+			// }
+			// try {
+			// return goodsOpenInterfaceService.getGoodsStock(data);
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// return new ResultModel(false,
+			// ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+			// ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			// }
+			//
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
-	
+
 	@RequestMapping(value = "{version}/goods_detail", method = RequestMethod.POST)
 	public ResultModel getGoodsDetail(@PathVariable("version") Double version, HttpServletRequest req) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String data = req.getParameter("data");
-			String appKey = req.getParameter("appKey");
-			if (data == null || appKey == null || "".equals(data) || "".equals(appKey)) {
-				return new ResultModel(false, ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
-						ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
-			}
-			try {
-				return goodsOpenInterfaceService.getGoodsDetail(data);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
-						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
-			}
-			
+			return new ResultModel(false, "000", "系统升级中");
+			// String data = req.getParameter("data");
+			// String appKey = req.getParameter("appKey");
+			// if (data == null || appKey == null || "".equals(data) ||
+			// "".equals(appKey)) {
+			// return new ResultModel(false,
+			// ErrorCodeEnum.MISSING_PARAM.getErrorCode(),
+			// ErrorCodeEnum.MISSING_PARAM.getErrorMsg());
+			// }
+			// try {
+			// return goodsOpenInterfaceService.getGoodsDetail(data);
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// return new ResultModel(false,
+			// ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
+			// ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
+			// }
+
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
-	
+
 	@RequestMapping(value = "test", method = RequestMethod.POST)
-	public void test(HttpServletRequest req, HttpServletResponse res) throws Exception{
+	public void test(HttpServletRequest req, HttpServletResponse res) throws Exception {
 		InputStream in = req.getInputStream();
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, "utf-8"));
 		String s;
 		StringBuilder sb = new StringBuilder();
-		while((s = br.readLine()) != null){
+		while ((s = br.readLine()) != null) {
 			sb.append(s);
 		}
 		System.out.println(URLDecoder.decode(sb.toString(), "utf-8"));

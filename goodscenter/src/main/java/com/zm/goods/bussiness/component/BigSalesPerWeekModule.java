@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,21 +38,21 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 	@Override
 	public boolean autoConfig(ComponentPagePO cp, String client) {
 		SEOService seoService = (SEOService) SpringContextUtil.getBean("seoService");
-		//获取现在的年和周、上一周的年和周
+		// 获取现在的年和周、上一周的年和周
 		Calendar cl = Calendar.getInstance();
-		cl.setFirstDayOfWeek(Calendar.MONDAY);//获取周的第一天为星期一
-		int week = cl.get(Calendar.WEEK_OF_YEAR);//当前周
+		cl.setFirstDayOfWeek(Calendar.MONDAY);// 获取周的第一天为星期一
+		int week = cl.get(Calendar.WEEK_OF_YEAR);// 当前周
 		cl.add(Calendar.DAY_OF_MONTH, -7);// 往前推7天
 		int year = cl.get(Calendar.YEAR);// 获取年
 		int oldYear = year;// 上一周的是几几年
-		int oldWeek = 0;//上一周是第几周
+		int oldWeek = 0;// 上一周是第几周
 		if (week < cl.get(Calendar.WEEK_OF_YEAR)) {// 如果week小于往前推7天后的周，那么说明是年的交界
 			year += 1;
 			oldWeek = cl.get(Calendar.WEEK_OF_YEAR);
 		} else {
 			oldWeek = week - 1;
 		}
-		//end
+		// end
 		// 获取本周特卖商品
 		Map<String, Integer> param = new HashMap<>();
 		param.put("year", year);
@@ -80,9 +81,10 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		updateGoodsData(oldRecordList, false);
 		// 上下架
 		GoodsService goodsService = (GoodsService) SpringContextUtil.getBean("goodsService");
-		List<String> specsTpIds = oldRecordList.stream().map(record -> record.getSpecsTpId()).collect(Collectors.toList());
+		List<String> specsTpIds = oldRecordList.stream().map(record -> record.getSpecsTpId())
+				.collect(Collectors.toList());
 		goodsService.downShelves(specsTpIds, 2);
-		goodsService.batchKjGoodsUpShelves(specsTpIds, 2, 1);//只在前端显示
+		goodsService.batchKjGoodsUpShelves(specsTpIds, 2, 1);// 只在前端显示
 	}
 
 	@SuppressWarnings("unchecked")
@@ -133,6 +135,13 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 			}
 			dataList.add(data);
 		}
+		Map<String, List<ComponentDataPO>> map = dataList.stream()
+				.collect(Collectors.groupingBy(ComponentDataPO::getGoodsId));
+		dataList.clear();
+		for (Map.Entry<String, List<ComponentDataPO>> entry : map.entrySet()) {
+			dataList.add(entry.getValue().stream().sorted(Comparator.comparing(ComponentDataPO::getPrice)).findFirst()
+					.get());
+		}
 		seoService.insertComponentDataBatch(dataList);
 		// 根据client发布
 		switch (SystemEnum.getSystem(client)) {
@@ -146,14 +155,15 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 			break;
 		}
 		// 放入redis活动list
-		List<String> specsTpIds = newRecordList.stream().map(record -> record.getSpecsTpId()).collect(Collectors.toList());
+		List<String> specsTpIds = newRecordList.stream().map(record -> record.getSpecsTpId())
+				.collect(Collectors.toList());
 		RedisTemplate<String, String> template = (RedisTemplate<String, String>) SpringContextUtil
 				.getBean("stringRedisTemplate");
 		template.delete(Constants.BIG_SALES_PRE);
 		template.opsForValue().set(Constants.BIG_SALES_PRE, JSONUtil.toJson(specsTpIds));
 		// 上下架
 		goodsService.downShelves(specsTpIds, 2);
-		goodsService.batchKjGoodsUpShelves(specsTpIds, 2, 1);//只在前端显示
+		goodsService.batchKjGoodsUpShelves(specsTpIds, 2, 1);// 只在前端显示
 	}
 
 	private void updateGoodsData(List<BigSalesGoodsRecord> recordList, boolean isNew) {
@@ -209,7 +219,7 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		entity.setGradeType(2);// 区域中心
 		entityList.add(entity);
 	}
-	
+
 	public static void main(String[] args) throws ParseException {
 		Calendar cl = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -226,6 +236,6 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		} else {
 			oldWeek = week - 1;
 		}
-		System.out.println(year+","+week+","+oldYear+","+oldWeek);
+		System.out.println(year + "," + week + "," + oldYear + "," + oldWeek);
 	}
 }

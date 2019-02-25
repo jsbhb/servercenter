@@ -183,7 +183,7 @@ public class GoodsFeignController {
 	}
 
 	/**
-	 * @fun 获取预售商品的itemId
+	 * @fun 获取预售商品的specsTpId
 	 * @param version
 	 * @return
 	 */
