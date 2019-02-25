@@ -291,3 +291,7 @@ alter table goods_category_brand add column country varchar(20) default null com
  *一级分类表
  */ 
 alter table goods_first_category add column second_page_path varchar(300) default null comment '二级页面路径';
+
+alter table activity_goods_role change item_id specs_tp_id varchar(45);
+alter table big_sale_record change item_id specs_tp_id varchar(45);
+
