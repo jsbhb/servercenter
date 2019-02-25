@@ -180,13 +180,14 @@ drop table if exists  `kj_category_property_bind`;
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_property_bind` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `property_id` INT NOT NULL COMMENT '属性名ID',
-  `property_val_id` INT NOT NULL COMMENT '属性值ID',
+  `sort` tinyint(5) DEFAULT 0 COMMENT '顺序',
   `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
   `category_type` TINYINT(3) NOT NULL COMMENT '分类类型:1:一级分类;2:二级分类;3:三级分类;',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `categoryId_categoryType_propertyId_uk` (`category_id`,`category_type`,`property_id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目属性绑定表';
 
 drop table if exists  `kj_category_guide_property_bind`;
@@ -194,13 +195,14 @@ drop table if exists  `kj_category_guide_property_bind`;
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_guide_property_bind` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `property_id` INT NOT NULL COMMENT '属性名ID',
-  `property_val_id` INT NOT NULL COMMENT '属性值ID',
+  `sort` tinyint(5) DEFAULT 0 COMMENT '顺序',
   `category_id` VARCHAR(45) NOT NULL COMMENT '分类ID',
   `category_type` TINYINT(3) NOT NULL COMMENT '分类类型:1:一级分类;2:二级分类;3:三级分类;',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(30) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `categoryId_categoryType_propertyId_uk` (`category_id`,`category_type`,`property_id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目导购绑定表';
 
 drop table if exists  `kj_goods_property_bind`;
