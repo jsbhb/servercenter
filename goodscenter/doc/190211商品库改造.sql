@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_price` (
   `item_id` varchar(50) NOT NULL COMMENT 'itemID',
   `min` int(10) unsigned DEFAULT '0' COMMENT '最小数量',
   `max` int(10) unsigned DEFAULT NULL COMMENT '最大数量',
-  `cost _price` decimal(10,2) DEFAULT '0.00' COMMENT '成本价格',
+  `cost_price` decimal(10,2) DEFAULT '0.00' COMMENT '成本价格',
   `internal_price` decimal(10,2) DEFAULT NULL COMMENT '内供价',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
