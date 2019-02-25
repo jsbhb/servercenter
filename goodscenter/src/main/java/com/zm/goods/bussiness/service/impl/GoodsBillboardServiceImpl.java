@@ -2,10 +2,6 @@ package com.zm.goods.bussiness.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -15,14 +11,14 @@ import org.springframework.stereotype.Service;
 
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsBillboardService;
+import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.feignclient.ThirdFeignClient;
 import com.zm.goods.feignclient.model.AppletCodeParameter;
-import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.GoodsBillboard;
 import com.zm.goods.pojo.dto.GoodsBillboardDTO;
-import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.vo.GoodsVO;
 import com.zm.goods.utils.HttpClientUtil;
 import com.zm.goods.utils.ImageUtils;
 
@@ -34,6 +30,9 @@ public class GoodsBillboardServiceImpl implements GoodsBillboardService {
 
 	@Resource
 	ThirdFeignClient thirdFeignClient;
+	
+	@Resource
+	GoodsService goodsService;
 
 	@Resource
 	GoodsMapper goodsMapper;
@@ -46,7 +45,7 @@ public class GoodsBillboardServiceImpl implements GoodsBillboardService {
 			board.setDefault(staticUrl);// 使用默认模板
 		}
 		// 获取商品图片、名称、类型、价格
-		GoodsItem item = getGoods(dto.getGoodsId());
+		GoodsVO goodsVO = goodsService.listGoods(dto.getGoodsId(), null, false);
 		// 拼装url
 		String url = assemblingUrl(dto);
 		// 获取小程序二维码流
@@ -71,20 +70,8 @@ public class GoodsBillboardServiceImpl implements GoodsBillboardService {
 		}
 		// end
 		ImageUtils imageUtil = new ImageUtils();
-		byte[] result = imageUtil.drawGoodsBillboardDTO(item, board, in, staticUrl);
+		byte[] result = imageUtil.drawGoodsBillboardDTO(goodsVO, board, in, staticUrl);
 		return result;
-	}
-
-	private GoodsItem getGoods(String goodsId) {
-		GoodsItem item = goodsMapper.getGoodsItemByGoodsIdForGoodsBillboard(goodsId);
-		Map<String, Object> parameter = new HashMap<String, Object>();
-		List<String> idList = new ArrayList<>();
-		idList.add(goodsId);
-		parameter.put("list", idList);
-		parameter.put("type", 0);
-		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
-		item.setGoodsFileList(fileList);
-		return item;
 	}
 
 	private String assemblingUrl(GoodsBillboardDTO param) {

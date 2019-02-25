@@ -20,7 +20,7 @@ import com.zm.goods.common.Pagination;
  */
 public class GoodsRebateEntity extends Pagination {
 	private Integer id;
-	private String itemId;
+	private String specsTpId;
 	private Integer gradeType;// 客户类型
 	private double proportion;// 返佣比例
 	private String remark;// 备注
@@ -37,11 +37,11 @@ public class GoodsRebateEntity extends Pagination {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 	public Integer getGradeType() {
 		return gradeType;

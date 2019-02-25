@@ -26,7 +26,7 @@ import com.zm.goods.pojo.bo.RebateFormulaBO;
 import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 import com.zm.goods.pojo.po.ComponentDataPO;
 import com.zm.goods.pojo.po.ComponentPagePO;
-import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.seo.service.SEOService;
 import com.zm.goods.utils.FormulaUtil;
 import com.zm.goods.utils.JSONUtil;
@@ -80,9 +80,9 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		updateGoodsData(oldRecordList, false);
 		// 上下架
 		GoodsService goodsService = (GoodsService) SpringContextUtil.getBean("goodsService");
-		List<String> itemIdList = oldRecordList.stream().map(record -> record.getItemId()).collect(Collectors.toList());
-		goodsService.downShelves(itemIdList, 2);
-		goodsService.upShelves(itemIdList, 2);
+		List<String> specsTpIds = oldRecordList.stream().map(record -> record.getSpecsTpId()).collect(Collectors.toList());
+		goodsService.downShelves(specsTpIds, 2);
+		goodsService.batchKjGoodsUpShelves(specsTpIds, 2, 1);//只在前端显示
 	}
 
 	@SuppressWarnings("unchecked")
@@ -99,19 +99,19 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 		GoodsService goodsService = (GoodsService) SpringContextUtil.getBean("goodsService");
 		List<String> goodsIdList = newRecordList.stream().map(record -> record.getGoodsId())
 				.collect(Collectors.toList());
-		List<GoodsItem> goodsList = goodsService.listGoodsByGoodsIds(goodsIdList);
-		Map<String, GoodsItem> goodsMap = goodsList.stream()
-				.collect(Collectors.toMap(GoodsItem::getGoodsId, goodsItem -> goodsItem));
+		List<Goods> goodsList = goodsService.listGoodsByGoodsIds(goodsIdList);
+		Map<String, Goods> goodsMap = goodsList.stream()
+				.collect(Collectors.toMap(Goods::getGoodsId, goodsItem -> goodsItem));
 		ComponentDataPO data = null;
 		dataList = new ArrayList<>();
-		GoodsItem item = null;
+		Goods item = null;
 		for (BigSalesGoodsRecord record : newRecordList) {
 			item = goodsMap.get(record.getGoodsId());
 			data = new ComponentDataPO();
 			data.setCpId(cp.getId());
 			data.setEnname(record.getLinePrice() + "");
 			data.setGoodsId(record.getGoodsId());
-			data.setTitle(item.getCustomGoodsName());
+			data.setTitle(item.getGoodsName());
 			data.setGoodsType(item.getType());
 			data.setOrigin(item.getOrigin());
 			data.setPicPath(record.getPicPath());
@@ -146,20 +146,20 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 			break;
 		}
 		// 放入redis活动list
-		List<String> itemIdList = newRecordList.stream().map(record -> record.getItemId()).collect(Collectors.toList());
+		List<String> specsTpIds = newRecordList.stream().map(record -> record.getSpecsTpId()).collect(Collectors.toList());
 		RedisTemplate<String, String> template = (RedisTemplate<String, String>) SpringContextUtil
 				.getBean("stringRedisTemplate");
 		template.delete(Constants.BIG_SALES_PRE);
-		template.opsForValue().set(Constants.BIG_SALES_PRE, JSONUtil.toJson(itemIdList));
+		template.opsForValue().set(Constants.BIG_SALES_PRE, JSONUtil.toJson(specsTpIds));
 		// 上下架
-		goodsService.downShelves(itemIdList, 2);
-		goodsService.upShelves(itemIdList, 2);
+		goodsService.downShelves(specsTpIds, 2);
+		goodsService.batchKjGoodsUpShelves(specsTpIds, 2, 1);//只在前端显示
 	}
 
 	private void updateGoodsData(List<BigSalesGoodsRecord> recordList, boolean isNew) {
 		GoodsBackService goodsBackService = (GoodsBackService) SpringContextUtil.getBean("goodsBackServiceImpl");
 		// 更新零售价
-		Map<String, Object> param = recordList.stream().collect(Collectors.toMap(BigSalesGoodsRecord::getItemId,
+		Map<String, Object> param = recordList.stream().collect(Collectors.toMap(BigSalesGoodsRecord::getSpecsTpId,
 				record -> isNew ? record.getNewRetailPrice() : record.getOldRetailPrice()));
 		goodsBackService.updateRetailPrice(param);
 		// 更新返佣
@@ -184,7 +184,7 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 					configAreaCenterRebate(entityList, record, isNew);
 					for (RebateFormulaBO bo : list) {
 						entity = new GoodsRebateEntity();
-						entity.setItemId(record.getItemId());
+						entity.setSpecsTpId(record.getSpecsTpId());
 						entity.setProportion(FormulaUtil.calRebate(bo.getFormula(),
 								isNew ? record.getNewRebate() : record.getOldRebate()));
 						entity.setGradeType(bo.getGradeTypeId());
@@ -204,7 +204,7 @@ public class BigSalesPerWeekModule implements IindexAutoConfig {
 	private void configAreaCenterRebate(List<GoodsRebateEntity> entityList, BigSalesGoodsRecord record, boolean isNew) {
 		GoodsRebateEntity entity;
 		entity = new GoodsRebateEntity();
-		entity.setItemId(record.getItemId());
+		entity.setSpecsTpId(record.getSpecsTpId());
 		entity.setProportion(isNew ? record.getNewRebate() : record.getOldRebate());
 		entity.setGradeType(2);// 区域中心
 		entityList.add(entity);

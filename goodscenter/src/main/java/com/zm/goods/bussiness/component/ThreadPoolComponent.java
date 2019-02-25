@@ -21,12 +21,12 @@ public class ThreadPoolComponent {
 	
 	@Async("myAsync")
 	public void publish(List<String> specsTpIdList, Integer centerId){
-		seoService.publish(specsTpIdList, centerId, true);
+		seoService.publishGoods(specsTpIdList);
 	}
 
 	@Async("myAsync")
-	public void delPublish(List<String> itemIdList, Integer centerId) {
-		seoService.delPublish(itemIdList, centerId);
+	public void delPublish(List<String> specsTpIdList, Integer centerId) {
+		seoService.delPublishGoods(specsTpIdList);
 	}
 	
 	@Async("myAsync")

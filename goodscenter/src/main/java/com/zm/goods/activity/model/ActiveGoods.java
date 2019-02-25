@@ -3,7 +3,7 @@ package com.zm.goods.activity.model;
 public class ActiveGoods {
 
 	private int id;
-	private String itemId;
+	private String specsTpId;
 	private String path;
 	private String goodsName;
 	private String description;
@@ -15,11 +15,11 @@ public class ActiveGoods {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 	public String getPath() {
 		return path;

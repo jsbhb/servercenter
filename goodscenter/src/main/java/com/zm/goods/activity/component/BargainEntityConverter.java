@@ -2,7 +2,9 @@ package com.zm.goods.activity.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.zm.goods.activity.model.ActiveGoods;
 import com.zm.goods.activity.model.bargain.bo.BargainRecord;
 import com.zm.goods.activity.model.bargain.bo.BargainRule;
 import com.zm.goods.activity.model.bargain.bo.UserBargainEntity;
@@ -13,7 +15,9 @@ import com.zm.goods.activity.model.bargain.po.UserBargainPO;
 import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.activity.model.bargain.vo.MyBargainRecord;
+import com.zm.goods.pojo.vo.GoodsVO;
 import com.zm.goods.utils.CalculationUtils;
+import com.zm.goods.utils.JSONUtil;
 
 /**
  * @fun 砍价活动实体类互相转换工具类
@@ -45,7 +49,7 @@ public class BargainEntityConverter {
 		my.setGoodsPrice(po.getInitPrice());// 商品原价
 		my.setLowPrice(po.getFloorPrice());// 商品底价
 		my.setDuration(po.getDuration());// 砍价持续时间
-		my.setItemId(po.getItemId());// 商品itemId，用于中间件获取商品属性
+		my.setSpecsTpId(po.getSpecsTpId());// 商品specsTpId，用于中间件获取商品属性
 		my.setUserId(po.getUserId());// userId，用于中间件获取用户头像
 		my.setStart(po.isStart());
 		my.setCreateTime(po.getCreateTime());
@@ -80,7 +84,7 @@ public class BargainEntityConverter {
 		}
 		list.forEach(po -> {
 			BargainGoods goods = new BargainGoods();
-			goods.setItemId(po.getItemId());
+			goods.setSpecsTpId(po.getSpecsTpId());
 			goods.setGoodsPrice(po.getInitPrice());
 			goods.setBargainCount(po.getCount());
 			goods.setGoodsRoleId(po.getId());
@@ -97,7 +101,7 @@ public class BargainEntityConverter {
 		rule.setFirstMinRatio(po.getFirstMinRatio());
 		rule.setFloorPrice(po.getFloorPrice());
 		rule.setInitPrice(po.getInitPrice());
-		rule.setItemId(po.getItemId());
+		rule.setSpecsTpId(po.getSpecsTpId());
 		rule.setLessMinPrice(po.getLessMinPrice());
 		rule.setMaxCount(po.getMaxCount());
 		rule.setMaxRatio(po.getMaxRatio());
@@ -133,7 +137,7 @@ public class BargainEntityConverter {
 		entity.setFloorPrice(po.getFloorPrice());
 		entity.setId(po.getId());
 		entity.setInitPrice(po.getInitPrice());
-		entity.setItemId(po.getItemId());
+		entity.setSpecsTpId(po.getSpecsTpId());
 		entity.setStart(po.isStart());
 		entity.setUserId(po.getUserId());
 		entity.setUserName(dto.getUserName());
@@ -151,5 +155,22 @@ public class BargainEntityConverter {
 			entity.setRecordList(recordList);
 		}
 		return entity;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public final ActiveGoods GoodsVO2ActiveGoods(GoodsVO vo){
+		ActiveGoods goods = new ActiveGoods();
+		goods.setDescription(vo.getDescription());
+		Map<String,String> map = JSONUtil.parse(vo.getSpecsList().get(0).getInfo(), Map.class);
+		StringBuilder goodsNameSuffix = new StringBuilder();
+		for(Map.Entry<String, String> entry : map.entrySet()){
+			goodsNameSuffix.append(entry.getValue() + " ");
+		}
+		goods.setGoodsName(vo.getGoodsName() + goodsNameSuffix.toString());
+		goods.setOrigin(vo.getOrigin());
+		goods.setPath(vo.getGoodsFileList().get(0).getPath());
+		goods.setSpecsTpId(vo.getSpecsList().get(0).getSpecsTpId());
+		goods.setStock(vo.getSpecsList().get(0).getStock());
+		return goods;
 	}
 }

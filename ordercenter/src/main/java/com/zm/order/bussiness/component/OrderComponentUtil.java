@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -19,21 +20,23 @@ import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
 import com.zm.order.exception.ParameterException;
 import com.zm.order.exception.RuleCheckException;
+import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.model.PayModel;
 import com.zm.order.log.LogUtil;
-import com.zm.order.pojo.ErrorCodeEnum;
+import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
-import com.zm.order.pojo.Tax;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.pojo.bo.DealOrderDataBO;
 import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.GradeBO;
+import com.zm.order.pojo.bo.OrderGoodsCompleteBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.CalculationUtils;
-import com.zm.order.utils.JSONUtil;
+import com.zm.order.utils.CommonUtils;
 import com.zm.order.utils.TreeNodeUtil;
 
 @Component
@@ -50,6 +53,9 @@ public class OrderComponentUtil {
 
 	@Resource
 	RedisTemplate<String, Object> template;
+
+	@Resource
+	GoodsFeignClient goodsFeignClient;
 
 	/**
 	 * @fun 获取运费
@@ -77,36 +83,28 @@ public class OrderComponentUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public TaxFeeBO getTaxFee(Map<String, Double> map, Double unDiscountAmount, Double postFee, ResultModel result)
-			throws Exception {
+	public TaxFeeBO getTaxFee(List<OrderGoodsCompleteBO> boList, Double unDiscountAmount, Double postFee) {
 		Double taxFee = 0.0;// 总税费
 		Double totalExciseTax = 0.0;// 消费税
 		Double totalIncremTax = 0.0;// 增值税
-		for (Map.Entry<String, Double> entry : map.entrySet()) {
-			Tax tax = JSONUtil.parse(entry.getKey(), Tax.class);
-			Double fee = entry.getValue();
-			Double subPostFee = CalculationUtils.mul(CalculationUtils.div(fee, unDiscountAmount, 2), postFee);
-			if (tax.getExciseTax() != null) {
-				if (tax.getExciseTax() >= 1 || tax.getIncrementTax() >= 1) {
-					result.setSuccess(false);
-					result.setErrorCode(ErrorCodeEnum.TAX_SET_ERROR.getErrorCode());
-					result.setErrorMsg(ErrorCodeEnum.TAX_SET_ERROR.getErrorMsg());
-					return null;
-				}
-				Double temp = CalculationUtils.div(CalculationUtils.add(fee, subPostFee),
-						CalculationUtils.sub(1.0, tax.getExciseTax()), 2);
-				Double exciseTax = CalculationUtils.mul(temp, tax.getExciseTax());
+		for (OrderGoodsCompleteBO bo : boList) {
+			Double subPostFee = CalculationUtils.mul(CalculationUtils.div(bo.getItemPrice(), unDiscountAmount, 2),
+					postFee);
+			if (bo.getExciseTax() != 0) {
+				Double temp = CalculationUtils.div(CalculationUtils.add(bo.getItemPrice(), subPostFee),
+						CalculationUtils.sub(1.0, bo.getExciseTax()), 2);
+				Double exciseTax = CalculationUtils.mul(temp, bo.getExciseTax());
 				totalExciseTax += CalculationUtils.mul(exciseTax, Constants.TAX_DISCOUNT);
-				Double incremTax = CalculationUtils.mul(CalculationUtils.add(fee, subPostFee, exciseTax),
-						tax.getIncrementTax());
+				Double incremTax = CalculationUtils.mul(CalculationUtils.add(bo.getItemPrice(), subPostFee, exciseTax),
+						bo.getIncrementTax());
 				totalIncremTax += CalculationUtils.mul(incremTax, Constants.TAX_DISCOUNT);
 			} else {
 				totalIncremTax += CalculationUtils.mul(
-						CalculationUtils.mul(CalculationUtils.add(fee, subPostFee), tax.getIncrementTax()),
+						CalculationUtils.mul(CalculationUtils.add(bo.getItemPrice(), subPostFee), bo.getIncrementTax()),
 						Constants.TAX_DISCOUNT);
 			}
-			LogUtil.writeLog("totalIncremTax=====" + totalIncremTax + ",fee====" + fee + ",postFee======" + postFee
-					+ ",unDiscountAmount ======" + unDiscountAmount);
+			LogUtil.writeLog("totalIncremTax=====" + totalIncremTax + ",fee====" + bo.getItemPrice() + ",postFee======"
+					+ postFee + ",unDiscountAmount ======" + unDiscountAmount);
 		}
 		taxFee = CalculationUtils.add(totalExciseTax, totalIncremTax);
 
@@ -117,14 +115,16 @@ public class OrderComponentUtil {
 	 * @fun 保存订单信息
 	 * @param orderInfo
 	 */
-	public void saveOrder(OrderInfo orderInfo) {
-		orderMapper.saveOrder(orderInfo);
-		orderInfo.getOrderDetail().setOrderId(orderInfo.getOrderId());
-		orderMapper.saveOrderDetail(orderInfo.getOrderDetail());
-		for (OrderGoods goods : orderInfo.getOrderGoodsList()) {
-			goods.setOrderId(orderInfo.getOrderId());
+	public void saveOrder(List<OrderInfo> infoList) {
+		orderMapper.saveOrder(infoList);
+		List<OrderDetail> detailList = new ArrayList<>();
+		List<OrderGoods> goodsList = new ArrayList<>();
+		for(OrderInfo info : infoList){
+			detailList.add(info.getOrderDetail());
+			goodsList.addAll(info.getOrderGoodsList());
 		}
-		orderMapper.saveOrderGoods(orderInfo.getOrderGoodsList());
+		orderMapper.saveOrderDetail(detailList);
+		orderMapper.saveOrderGoods(goodsList);
 	}
 
 	/**
@@ -235,31 +235,10 @@ public class OrderComponentUtil {
 	}
 
 	/**
-	 * @fun 补全订单信息
+	 * @fun 封装该订单商品的每一级的返佣比例，返佣计算时可直接从这里拿
 	 * @param info
-	 * @param postFee
-	 * @param weight
-	 * @param amount
-	 * @param taxFee
-	 * @param disAmount
 	 */
-	public void renderOrderInfo(OrderInfo info, Double postFee, Integer weight, TaxFeeBO taxFee, Double disAmount,
-			boolean fromMall) {
-		if (fromMall) {
-			info.setWeight(weight);
-			info.setStatus(0);
-			info.getOrderDetail().setPostFee(postFee);
-			info.getOrderDetail().setTaxFee(taxFee.getTaxFee());
-			info.getOrderDetail().setIncrementTax(taxFee.getIncremTax());
-			info.getOrderDetail().setExciseTax(taxFee.getExciseTax());
-			info.getOrderDetail().setTariffTax(0.0);
-			info.getOrderDetail().setDisAmount(disAmount);
-		}
-		// 封装该订单商品的每一级的返佣比例，返佣计算时可直接从这里拿
-		packGoodsRebateByGrade(info);
-	}
-
-	private void packGoodsRebateByGrade(OrderInfo info) {
+	public void packGoodsRebateByGrade(OrderInfo info) {
 		List<OrderGoods> goodsList = info.getOrderGoodsList();
 		Map<String, String> goodsRebate = null;
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
@@ -270,7 +249,7 @@ public class OrderComponentUtil {
 			// 获取该订单所有的上级,包括推手
 			LinkedList<GradeBO> superNodeList = TreeNodeUtil.getSuperNode(CacheComponent.getInstance().getSet(),
 					info.getShopId());
-			goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + goods.getItemId());
+			goodsRebate = hashOperations.entries(Constants.GOODS_REBATE + goods.getSpecsTpId());
 			if (goodsRebate == null || superNodeList == null || goodsRebate.size() == 0) {
 				continue;
 			}
@@ -431,9 +410,120 @@ public class OrderComponentUtil {
 		result.setErrorMsg("调用支付信息失败");
 	}
 
+	/**
+	 * @fun 根据不同的创建类型获取订单商品的金额税费等信息
+	 * @param info
+	 * @param list
+	 * @param vip
+	 * @param fx
+	 * @return
+	 */
+	public ResultModel doOrderGoodsDeal(DealOrderDataBO bo, int type) {
+		switch (type) {
+		case Constants.TO_B_ORDER:
+			return getNormal(bo);
+		case Constants.NORMAL_ORDER:
+			return getNormal(bo);
+		case Constants.OPEN_INTERFACE_TYPE:
+			return getNormal(bo);
+		case Constants.BARGAIN_ORDER:
+			return getBargain(bo);
+		default:
+			return new ResultModel(false, "创建类型有误");
+		}
+	}
+
+	private ResultModel getNormal(DealOrderDataBO bo) {
+		return goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, bo);
+	}
+
+	private ResultModel getBargain(DealOrderDataBO bo) {
+		if (bo.getModelList().size() > 1) {
+			return new ResultModel(false, "砍价类订单，每个订单只能有一件商品");
+		}
+		int id;
+		try {
+			id = Integer.valueOf(bo.getCouponIds().split(",")[0]);
+		} catch (Exception e) {
+			return new ResultModel(false, "优惠列表参数有误");
+		}
+		return goodsFeignClient.getBargainGoodsInfo(Constants.FIRST_VERSION, bo, id);
+	}
+
+	/**
+	 * @fun 进行拆单
+	 * @param info
+	 * @param map
+	 * @return
+	 */
+	public List<OrderInfo> splitOrderInfo(OrderInfo info, Map<Integer, List<OrderGoodsCompleteBO>> map) {
+		List<OrderInfo> infoList = new ArrayList<>();
+		List<OrderGoods> goodsList = info.getOrderGoodsList();
+		Map<String, OrderGoods> tmp = goodsList.stream()
+				.collect(Collectors.toMap(OrderGoods::getSpecsTpId, o -> o));
+		if (map.size() == 0) {// 说明需要手动处理
+			info.setHandle(1);// 手动处理
+			infoList.add(info);
+		}
+		if (map.size() == 1) {// 不需要拆单,补全信息
+			for (Map.Entry<Integer, List<OrderGoodsCompleteBO>> entry : map.entrySet()) {
+				buildOrderInfo(info, null, tmp, entry, info.getOrderId());
+			}
+			infoList.add(info);
+		}
+		if (map.size() > 1) {// 需要拆单，并补全信息
+			String combinOrderId = CommonUtils.getOrderId(info.getOrderFlag() + "") + "_CB";
+			int i = 1;
+			for (Map.Entry<Integer, List<OrderGoodsCompleteBO>> entry : map.entrySet()) {
+				if (i == 1) {
+					buildOrderInfo(info, combinOrderId, tmp, entry, info.getOrderId());
+					infoList.add(info);
+				} else {
+					OrderInfo infoTmp = info.clone();
+					String orderId = CommonUtils.getOrderId(info.getOrderFlag() + "");
+					buildOrderInfo(infoTmp, combinOrderId, tmp, entry, orderId);
+					infoList.add(infoTmp);
+				}
+				i++;
+			}
+		}
+		return infoList;
+	}
+
+	private void buildOrderInfo(OrderInfo info, String combinOrderId, Map<String, OrderGoods> tmp,
+			Map.Entry<Integer, List<OrderGoodsCompleteBO>> entry, String orderId) {
+		List<OrderGoods> goodsListTmp = new ArrayList<>();
+		info.setSupplierId(entry.getKey());
+		info.setOrderId(orderId);
+		info.setWeight(entry.getValue().stream().mapToInt(bo -> bo.getWeight()).sum());
+		info.setTdq(entry.getValue().size());
+		info.setStatus(0);
+		info.setCombinationId(combinOrderId);
+		double amount = entry.getValue().stream().mapToDouble(bo -> bo.getItemPrice()).sum();
+		TaxFeeBO taxFee = getTaxFee(entry.getValue(), amount, 0.0);
+		info.getOrderDetail().setExciseTax(taxFee.getExciseTax());
+		info.getOrderDetail().setIncrementTax(taxFee.getIncremTax());
+		info.getOrderDetail().setPostFee(0.0);
+		info.getOrderDetail().setTariffTax(0.0);
+		info.getOrderDetail().setPayment(CalculationUtils.add(taxFee.getTaxFee(), amount));
+		info.getOrderDetail().setOrderId(orderId);
+		for (OrderGoodsCompleteBO b : entry.getValue()) {
+			OrderGoods goods = tmp.get(b.getSpecsTpId());
+			goods.setOrderId(orderId);
+			goods.setCarton(b.getCarton());
+			goods.setConversion(b.getConversion());
+			goods.setItemCode(b.getItemCode());
+			goods.setItemId(b.getItemId());
+			goods.setSku(b.getSku());
+			goods.setUnit(b.getUnit());
+			goodsListTmp.add(goods);
+		}
+		info.setOrderGoodsList(goodsListTmp);
+	}
+
 	// ****************************临时加的逻辑，砍价天天仓商品特殊处理***********************
 	private final String SPECIAL_ITEM_ID = "100001207";
-	private final String[] specialArr = {"1011","1008","1013","1012","1014","1010","1009"};
+	private final String[] specialArr = { "1011", "1008", "1013", "1012", "1014", "1010", "1009" };
 
 	/**
 	 * @fun 判断是否砍价特殊订单，砍价七天面膜的订单特殊处理
@@ -448,63 +538,54 @@ public class OrderComponentUtil {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @fun 判断是否特殊
 	 * @param info
 	 * @return
 	 */
-	public boolean judgeIsSpecial(OrderInfo info){
-		if(info.getOrderGoodsList().size() > 1 || !info.getOrderSource().equals(0)){
+	public boolean judgeIsSpecial(OrderInfo info) {
+		if (info.getOrderGoodsList().size() > 1 || !info.getOrderSource().equals(0)) {
 			return false;
 		}
-		for(String s : specialArr){
-			if(s.equals(info.getOrderGoodsList().get(0).getItemId())){
+		for (String s : specialArr) {
+			if (s.equals(info.getOrderGoodsList().get(0).getItemId())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
 
 	public void splitGoods(OrderInfo info, boolean isSpecial) {
 		if (isSpecial) {
 			info.setTdq(7);
 			OrderGoods originalGoods = info.getOrderGoodsList().get(0);
-			try {
-				double goodsPrice = CalculationUtils.div(originalGoods.getActualPrice(), 1.112, 2);// 商品价格
-				double goodsSinglePrice = CalculationUtils.div(goodsPrice, 7, 2);
-				double taxFee = CalculationUtils.sub(originalGoods.getActualPrice(), goodsPrice);// 税费
-				info.getOrderDetail().setTaxFee(taxFee);
-				info.getOrderDetail().setIncrementTax(taxFee);
-				info.getOrderDetail().setPostFee(0.0);
-				info.getOrderDetail().setDisAmount(0.0);
-				info.getOrderDetail().setTariffTax(0.0);
-				info.getOrderDetail().setExciseTax(0.0);
-				List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, originalGoods.getItemQuantity());
-				info.setOrderGoodsList(list);
-				info.setWeight(3500);
-				info.setStatus(0);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
+			double goodsPrice = CalculationUtils.div(originalGoods.getActualPrice(), 1.112, 2);// 商品价格
+			double goodsSinglePrice = CalculationUtils.div(goodsPrice, 7, 2);
+			double taxFee = CalculationUtils.sub(originalGoods.getActualPrice(), goodsPrice);// 税费
+			info.getOrderDetail().setTaxFee(taxFee);
+			info.getOrderDetail().setIncrementTax(taxFee);
+			info.getOrderDetail().setPostFee(0.0);
+			info.getOrderDetail().setDisAmount(0.0);
+			info.getOrderDetail().setTariffTax(0.0);
+			info.getOrderDetail().setExciseTax(0.0);
+			List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, originalGoods.getItemQuantity());
+			info.setOrderGoodsList(list);
+			info.setWeight(3500);
+			info.setStatus(0);
 		} else {
 			OrderGoods goods = info.getOrderGoodsList().stream()
 					.filter(orderGoods -> orderGoods.getItemId().equals(SPECIAL_ITEM_ID)).findAny().orElse(null);
 			if (goods != null) {
-				try {
-					double goodsSinglePrice = CalculationUtils.div(goods.getActualPrice(), 7, 2);
-					List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, goods.getItemQuantity());
-					info.getOrderGoodsList().addAll(list);
-					info.getOrderGoodsList().remove(goods);
-					info.setTdq(info.getOrderGoodsList().size());
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
+				double goodsSinglePrice = CalculationUtils.div(goods.getActualPrice(), 7, 2);
+				List<OrderGoods> list = buildGoodsList(info, goodsSinglePrice, goods.getItemQuantity());
+				info.getOrderGoodsList().addAll(list);
+				info.getOrderGoodsList().remove(goods);
+				info.setTdq(info.getOrderGoodsList().size());
 			}
 		}
 	}
-	
+
 	private List<OrderGoods> buildGoodsList(OrderInfo info, double goodsSinglePrice, int quantity) {
 		List<OrderGoods> list = new ArrayList<OrderGoods>();
 		// ******写死商品七天面膜*********1
@@ -627,12 +708,11 @@ public class OrderComponentUtil {
 		}
 	}
 
-	//北京环卫福利商城
+	// 北京环卫福利商城
 	public boolean judgeIsBJWelfare(OrderInfo info) {
-		if(info.getShopId().equals(124) && info.getOrderSource() == Constants.WELFARE_WEBSITE){
+		if (info.getShopId().equals(124) && info.getOrderSource() == Constants.WELFARE_WEBSITE) {
 			return true;
 		}
 		return false;
 	}
-
 }

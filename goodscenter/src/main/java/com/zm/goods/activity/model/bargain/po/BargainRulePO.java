@@ -9,7 +9,7 @@ public class BargainRulePO {
 	private String createTime;
 	private String updateTime;
 	private String opt;
-	private String itemId;// 商品itemId
+	private String specsTpId;// 商品itemId
 	private double initPrice;// 初始价格
 	private double floorPrice;// 底价
 	private int minRatio;// 每砍一刀最小比例
@@ -30,12 +30,12 @@ public class BargainRulePO {
 		this.count = count;
 	}
 
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
 
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 
 	public double getInitPrice() {

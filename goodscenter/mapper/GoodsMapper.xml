@@ -39,6 +39,25 @@
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.po.Items" id="items">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="reason" property="reason" jdbcType="VARCHAR" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<result column="shelf_life" property="shelfLife" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="internal_price" property="internalPrice" jdbcType="NUMERIC" />
+	</resultMap>
 
 	<resultMap type="com.zm.goods.pojo.po.GoodsSpecs" id="goodsSpecs">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -88,12 +107,17 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 
-	<resultMap type="com.zm.goods.pojo.PriceModel" id="priceModel">
+	<resultMap type="com.zm.goods.pojo.po.GoodsPricePO" id="goodsPrice">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR" />
 		<result column="min" property="min" jdbcType="INTEGER" />
 		<result column="max" property="max" jdbcType="INTEGER" />
-		<result column="fxprice" property="price" jdbcType="NUMERIC" />
+		<result column="cost_price" property="costPrice" jdbcType="NUMERIC" />
+		<result column="internal_price" property="internalPrice" jdbcType="NUMERIC" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.vo.GoodsIndustryModel" id="goodsIndustry">
@@ -138,13 +162,19 @@
 		<result column="carton" property="carton"/>
 	</resultMap>
 	
-	<select id="getTax" parameterType="Object" resultMap="tax">
-		select gs.id,gs.item_id,gs.excise_tax,gb.increment_tax from goods_item gs left join goods g on 
-		gs.goods_id = g.goods_id 
-		left join base gb on g.base_id = gb.id where gs.item_id in
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item,jdbcType = VARCHAR}
+	<select id="listGoodsPriceByItemIds" parameterType="Object" resultMap = "goodsPrice">
+		select * from kj_goods_price where item_id in
+		<foreach collection="list" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGoodsPriceBySpecsTpIds" parameterType="Object" resultMap = "goodsPrice">
+		select gp.*,gi.specs_tp_id from kj_goods_item gi 
+		left join kj_goods_price gp on gi.item_id = gp.item_id 
+		where gi.status = 2 and gi.specs_tp_id in
+		<foreach collection="list" open="(" close=")" item="item" separator=",">
+			#{item}
 		</foreach>
 	</select>
 	
@@ -194,45 +224,31 @@
 		order by id asc
 	</select>
 	
-	<select id="getGoodsSpecs" parameterType="Object" resultMap="goodsSpecs">
-		select gi.id,gi.info,gi.item_id,gi.goods_id,gi.carton,
-		gi.item_code,gi.sku,gi.is_promotion,gi.excise_tax,gi.weight,bgp.id as
-		price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gi.discount,
-		stock.fxqty as qpqty,
-		bgp.delivery_place,gi.status as specsStatus 
-		from goods_item gi
-		left join goods_stock stock on gi.item_id = stock.item_id 
-		left join goods g on gi.goods_id = g.goods_id 
-		left join goods_price bgp on gi.item_id = bgp.item_id 
-		where gi.status = 1 and gi.is_del = 0 and gi.item_id = #{itemId}
+	<select id="listItemsByItemIds" parameterType="Object" resultMap="items">
+		select * from kj_goods_item where item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
 	</select>
 	
-	<select id="getGoodsSpecsForOrder" parameterType="Object" resultMap="goodsSpecs">
-		select gi.id,gi.is_promotion,gi.weight,gi.item_id,gi.goods_id,gi.carton,
-		bgp.id as price_id,bgp.min,bgp.max,bgp.retail_price as price,bgp.vip_price,gi.discount,
-		bgp.delivery_place,b.first_category,b.second_category,b.third_category
-		from goods_item gi
-		left join goods g on gi.goods_id = g.goods_id 
-		left join base b on g.base_id=b.id 
-		left join goods_price bgp on gi.item_id = bgp.item_id 
-		where gi.status = 1 and gi.is_del = 0 and g.is_del = 0 and gi.item_id in 
+	<select id="listItemsBySpecsTpIds" parameterType="Object" resultMap="items">
+		select i.*,p.internal_price from kj_goods_item i 
+		left join kj_goods_price p on i.item_id = p.item_id
+		where i.specs_tp_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="getGoodsSpecsTpByParam" parameterType="Object" resultMap="goodsSpecsTp">
+		select gtp.* from kj_goods_specs_tradepattern gtp 
+		where gtp.status = 2 and gtp.specs_tp_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
 		<if test="isFx == 'fx'">
-			and gi.is_fx = 1
+			and gtp.is_distribution = 1
 		</if>
-	</select>
-	
-	<select id="getGoodsSpecsForButtJoinOrder" parameterType="Object" resultMap="goodsSpecs">
-		select gi.id,gi.weight,gi.item_id,gi.goods_id,bgp.retail_price as price,
-		bgp.id as price_id,bgp.min,bgp.max,gi.carton,
-		bgp.delivery_place,b.first_category,b.second_category,b.third_category
-		from goods_item gi 
-		left join goods g on gi.goods_id = g.goods_id 
-		left join base b on g.base_id=b.id 
-		left join goods_price bgp on 
-		gi.item_id = bgp.item_id where gi.item_id = #{itemId} and gi.status = 2 and gi.is_del = 0 and g.is_del = 0
 	</select>
 	
 	<select id="listGoodsSpecsTpBySpecsTpIds" parameterType="Object"
@@ -267,7 +283,31 @@
 	</resultMap>
 	
 	<update id="updateTradeSpecsUpshelf" parameterType="Object">
-		update kj_goods_specs_tradepattern set status = 2,display=#{display},upshelf_time = now() where specs_tp_id in 
+		update kj_goods_specs_tradepattern set status = 2,is_distribution = 1,is_welfare=1,display=#{display},
+		upshelf_time = now() where specs_tp_id in 
+		<foreach collection="list" open="(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</update>
+	
+	<update id="updateSignalKjGoodsUpShelves" parameterType="Object">
+		update kj_goods_specs_tradepattern set status = 2,is_distribution = 1,is_welfare=1,display=#{display},
+		upshelf_time = now(),item_id = #{bo.itemId}  
+		where specs_tp_id = #{bo.specsTpId}
+	</update>
+	
+	<update id="updateBatchKjGoodsUpShelves" parameterType="Object">
+		<foreach collection="list" item="item" index="index" open=""
+			close="" separator=";" >
+			update kj_goods_specs_tradepattern set status = 2,is_distribution = 1,is_welfare=1,display=#{display},
+			upshelf_time = now(),item_id = #{item.itemId} where specs_tp_id = #{item.specsTpId}
+		</foreach>
+	</update>
+	
+	<!-- 下架操作 -->
+	<update id="updateSpecsTpDownShelves" parameterType="Object">
+		update kj_goods_specs_tradepattern set status = 1,is_distribution = 0,display = 0,is_welfare=0,
+		downshelf_time = now(),item_id = null where specs_tp_id in 
 		<foreach collection="list" open="(" close=")" separator="," item="item">
 			#{item}
 		</foreach>
@@ -279,83 +319,14 @@
 		from kj_goods g 
 		left join kj_goods_specs_tradepattern gtp on g.goods_id = gtp.goods_id
 		left join kj_specs_goods ksg on gtp.specs_id = ksg.specs_id
-		left join kj_goods_property_bind kgpb on gtp.specs_tp_id = kgpb.specs_tp_id
-		left join kj_property_value pv on kgpb.property_val_id = pv.id
-		left join kj_property_name pn on kgpb.property_id = pn.id 
+		left join kj_goods_guide_property_bind kgpb on gtp.specs_tp_id = kgpb.specs_tp_id
+		left join kj_guide_property_value pv on kgpb.property_val_id = pv.id
+		left join kj_guide_property_name pn on kgpb.property_id = pn.id 
 		where gtp.specs_tp_id in 
 		<foreach collection="list" open="(" close=")" separator="," item="item">
 			#{item}
 		</foreach>
-		and pn.type = 1
 	</select>
-	<select id="listGoodsForLuceneUpdateTag" resultMap="goodsItem" parameterType="Object">
-		select g.id,g.goods_id,gi.id as specs_id, gt.id as tag_id,gt.tag_name,g.create_time, 
-		g.goods_name as customGoodsName ,g.is_popular, g.type,gi.info,bgp.id as price_id, 
-		bgp.retail_price as price, gi.discount,gi.is_fx,
-		gcb.brand ,g.origin, gb.third_category,gb.second_category,gb.first_category 
-		from goods g 
-		left join goods_item gi on g.goods_id = gi.goods_id 
-		left join goods_tag_bind gtb on gi.item_id = gtb.item_id left join goods_tag gt on gt.id = gtb.tag_id 
-		left join base gb on g.base_id=gb.id left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
-		left join goods_price bgp on gi.item_id = bgp.item_id 
-		where g.is_del = 0 and gi.status = 1 and g.index_status = 1 and g.goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</select>
-	
-	<select id="listItemTagForLuceneUpdate" resultMap="goodsSpecs" parameterType="Object">
-		select gi.id,gi.item_id,gi.goods_id,gt.id as tag_id,gt.tag_name 
-		from goods_item gi left join goods g on gi.goods_id = g.goods_id 
-		left join goods_tag_bind gtb on gi.item_id = gtb.item_id 
-		left join goods_tag gt on gt.id = gtb.tag_id 
-		where g.index_status = 1 and g.is_del = 0 and gi.item_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</select>
-	
-	<select id="listItemUpshelvTagForLuceneUpdate " resultMap="goodsSpecs" parameterType="Object">
-		select gi.id,gi.item_id,gi.goods_id,gt.id as tag_id,gt.tag_name 
-		from goods_item gi 
-		left join goods g on gi.goods_id = g.goods_id 
-		left join goods_tag_bind gtb on gi.item_id = gtb.item_id 
-		left join goods_tag gt on gt.id = gtb.tag_id 
-		where gi.status = 1 and gi.goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</select>
-	
-	<select id="listSpecsForLucene" resultMap = "goodsSpecs" parameterType="Object">
-		select gi.id,gi.goods_id,gi.is_fx,gi.info,bgp.id as price_id, bgp.retail_price as price, gi.discount,gt.id as tag_id,gt.tag_name 
-		from goods_item gi 
-		left join goods_price bgp on gi.item_id = bgp.item_id 
-		left join goods_tag_bind gtb on gi.item_id = gtb.item_id 
-		left join goods_tag gt on gt.id = gtb.tag_id 
-		where gi.is_del = 0 and gi.goods_id in
-		<foreach collection="goodsIds" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-		and gi.item_id in 
-		<foreach collection="itemIds" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</select>
-	
-	<update id="updateGoodsDownShelves" parameterType="Object">
-		update goods set status = 0, index_status = 0, update_time=now() where goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</update>
-	
-	<update id="updateGoodsItemDownShelves" parameterType="Object">
-		update goods_item set status = 0,is_fx = 0, update_time=now() where item_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</update>
 	
 	<!-- 前端搜索界面相关sql -->
 	<select id="listGoodsSpecsTpForFrontSearch" parameterType="Object" resultMap="goodsSpecsTp">
@@ -474,153 +445,55 @@
 		<result column="sku" property="sku" jdbcType="VARCHAR" />
 	</resultMap>
 	<select id="checkStock" parameterType="Object" resultMap="orderBussinessModel">
-		select i.id, i.item_id,i.sku,i.item_code,g.supplier_id from goods_item i left join goods g on i.goods_id = g.goods_id 
-		where g.supplier_id != 1 and i.status = 2
+		select i.id, i.item_id,i.sku,i.item_code,i.supplier_id from kj_goods_item i 
+		where i.supplier_id != 1 and i.status = 2
 	</select>
 	
 	<select id="checkStockByItemIds" parameterType="Object" resultMap="orderBussinessModel">
-		select i.id, i.item_id,i.sku,i.item_code,g.supplier_id from goods_item i left join goods g on i.goods_id = g.goods_id 
-		where i.item_id in
+		select i.id, i.item_id,i.sku,i.item_code,i.supplier_id 
+		from kj_goods_item i where i.item_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
-		</foreach>
-	</select>
-	
-	<select id="countUpShelvesStatus" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemCountBO">
-		select count(*) as count,goods_id as itemId from goods_item where status = 1 and goods_id in
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item,jdbcType = VARCHAR}
-		</foreach>
-		group by goods_id
-	</select>
-	
-	<select id="listFirstCategory" parameterType="Object" resultType = "java.lang.String">
-		select distinct b.first_category from goods g left join base b on g.base_id = b.id where g.goods_id in
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item,jdbcType = VARCHAR}
-		</foreach>
-	</select>
-	
-	<select id="listSecondCategory" parameterType="Object" resultType = "java.lang.String">
-		select distinct b.second_category from goods g left join base b on g.base_id = b.id where g.goods_id in
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item,jdbcType = VARCHAR}
-		</foreach>
-	</select>
-	
-	<select id="listThirdCategory" parameterType="Object" resultType = "java.lang.String">
-		select distinct b.third_category from goods g left join base b on g.base_id = b.id where g.goods_id in
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item,jdbcType = VARCHAR}
 		</foreach>
 	</select>
 	
 	<select id="listSkuAndConversionByItemId" parameterType="Object" resultMap="convert">
-		select item_id, sku,conversion,carton from goods_item where item_id in
+		select gi.item_id, gi.sku,gtp.conversion,gtp.carton from kj_goods_item gi 
+		left join kj_goods_specs_tradepattern gtp on gi.specs_tp_id = gtp.specs_tp_id 
+		where gi.item_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}
 		</foreach>
 	</select>
 	
-	<select id="listCategoryByGoodsIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.CategoryBO">
-		select b.id,b.first_category as firstId,b.second_category as secondId,b.third_category as thirdId from 
-		goods g left join base b on g.base_id = b.id where g.goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</select>
-	
-	<update id="updateFirstCategory" parameterType="Object">
-		update goods_first_category set status = #{status} where status = #{cstatus} and first_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</update>
-	
-	<update id="updateSecondCategory" parameterType="Object">
-		update goods_second_category set status = #{status} where status = #{cstatus} and second_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</update>
-	
-	<update id="updateThirdCategory" parameterType="Object">
-		update goods_third_category set status = #{status} where status = #{cstatus} and third_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</update>
-	
-	<select id="listHideFirstCategory" parameterType="Object" resultType="java.lang.String">
-		select distinct b.first_category from goods g 
-		left join base b on g.base_id = b.id 
-		where g.status = 1 and b.first_category in 
-		<foreach collection="set" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</select>
-	
-	<select id="listHideSecondCategory" parameterType="Object" resultType="java.lang.String">
-		select distinct b.second_category from goods g 
-		left join base b on g.base_id = b.id 
-		where g.status = 1 and b.second_category in 
-		<foreach collection="set" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</select>
-	
-	<select id="listHideThirdCategory" parameterType="Object" resultType="java.lang.String">
-		select distinct b.third_category 
-		from goods g 
-		left join base b on g.base_id = b.id 
-		where g.status = 1 and b.third_category in 
-		<foreach collection="set" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</select>
-	
 	<select id="countGoodsBySupplierIdAndItemId" parameterType="Object" resultType="java.lang.Integer">
-		select count(*) from goods g left join goods_item gi on g.goods_id = gi.goods_id 
-		where g.supplier_id = #{supplierId} and item_id in
+		select count(*) from kj_goods_item 
+		where supplier_id = #{supplierId} and item_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach> 
 	</select>
 	
 	<select id="getOrderGoodsType" parameterType="Object" resultType="java.lang.Integer">
-		select distinct g.type from goods g left join goods_item gi on g.goods_id = gi.goods_id 
-		where g.supplier_id = #{supplierId} and item_id in 
+		select distinct g.type from kj_goods g 
+		left join kj_goods_specs_tradepattern gtp on g.goods_id = gtp.goods_id
+		left join kj_goods_item gi on gtp.specs_tp_id = gi.specs_tp_id
+		where gi.supplier_id = #{supplierId} and gi.item_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach> 
 	</select>
 	
-	<insert id="insertGoodsLifeCycleBatch" parameterType="Object">
-		insert into goods_life_cycle(item_id,status,is_fx,remark,create_time,ip) values 
-		<foreach collection="list" item="item" separator="," >
-			(#{item.itemId},#{item.status},#{item.isFx},#{item.remark},now(),#{item.ip})
-		</foreach>
-	</insert>
-	
-	<select id="getGoodsItemByGoodsIdForGoodsBillboard" parameterType="Object" resultMap="goodsItem">
-		select g.id,g.goods_id,g.goods_name as customGoodsName, g.type, min(bgp.retail_price) as price, 
-		i.id as specs_id,bgp.id as price_id 
-		from goods g 
-		left join goods_item i on g.goods_id = i.goods_id 
-		left join goods_price bgp on i.item_id = bgp.item_id 
-		where g.goods_id = #{goodsId}
-	</select>
-	
 	<select id="listGoodsByGoodsIds" parameterType="Object" resultMap="goodsItem">
-		select id,goods_id,goods_name as customGoodsName, type, access_path, origin from goods where goods_id in
+		select id,goods_id,goods_name, type, access_path, origin from kj_goods where goods_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
+	</select>
+	
+	<select id="getGoodsTypeByGoodsId" parameterType="Object" resultType="java.lang.Integer">
+		select type from kj_goods where goods_id = #{goodsId}
 	</select>
 	
 </mapper>

@@ -18,8 +18,6 @@ import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
-import com.zm.goods.pojo.po.GoodsItem;
-import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.vo.GoodsSpecsVO;
 import com.zm.goods.pojo.vo.GoodsVO;
 
@@ -81,34 +79,13 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, String source, int platformSource, int gradeId)
+	public List<GoodsVO> listGoodsSpecs(List<String> list, int platformSource, int gradeId)
 			throws WrongPlatformSource {
-		Map<String, Object> result = goodsServiceImpl.listGoodsSpecs(list, source, platformSource, gradeId);
-		List<GoodsSpecs> specsList = (List<GoodsSpecs>) result.get("specsList");
-		List<String> itemIdList = new ArrayList<String>();
-		for (GoodsSpecs specs : specsList) {
-			itemIdList.add(specs.getGoodsId());
-		}
-		List<GoodsTagEntity> tagList = goodsTagMapper.listGoodsTagByGoodsId(itemIdList);
-		List<GoodsTagEntity> temp = null;
-		Map<String, List<GoodsTagEntity>> map = new HashMap<String, List<GoodsTagEntity>>();
-		if (tagList != null && tagList.size() > 0) {
-			for (GoodsTagEntity tag : tagList) {
-				if (map.get(tag.getItemId()) == null) {
-					temp = new ArrayList<GoodsTagEntity>();
-					temp.add(tag);
-					map.put(tag.getItemId(), temp);
-				} else {
-					map.get(tag.getItemId()).add(tag);
-				}
-			}
-			for (GoodsSpecs specs : specsList) {
-				specs.setTagList(map.get(specs.getItemId()));
-			}
-		}
-		return result;
+		List<GoodsVO> voList = goodsServiceImpl.listGoodsSpecs(list, platformSource, gradeId);
+		voList.stream().forEach(vo -> {
+			addItemGoodsTag(vo.getSpecsList());
+		});
+		return voList;
 	}
-
 }

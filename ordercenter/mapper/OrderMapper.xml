@@ -284,10 +284,14 @@
 	<insert id="saveOrder" parameterType="Object">
 		INSERT INTO order_base
 		(order_id,combination_id,order_flag,user_id,express_type,mall_id,grade_id,guide_id,supplier_id,tdq,
-		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status,tag_fun)
+		gtime,send_time,create_time,remark,weight,create_type,coupon_ids,push_user_id,order_source,status,tag_fun,handle)
 		VALUES
-		(#{orderId},#{combinationId},#{orderFlag},#{userId},#{expressType},#{centerId},#{shopId},#{guideId},#{supplierId},
-		#{tdq},#{gtime},#{sendTime},now(),#{remark},#{weight},#{createType},#{couponIds},#{pushUserId},#{orderSource},#{status},#{tagFun})
+		<foreach collection="list" item="item" separator=",">
+			(#{item.orderId},#{item.combinationId},#{item.orderFlag},#{item.userId},#{item.expressType},#{item.centerId},
+			#{item.shopId},#{item.guideId},#{item.supplierId},#{item.tdq},#{item.gtime},#{item.sendTime},now(),
+			#{item.remark},#{item.weight},#{item.createType},#{item.couponIds},#{item.pushUserId},#{item.orderSource},
+			#{item.status},#{item.tagFun},#{item.handle})
+		</foreach>
 	</insert>
 	
 	<insert id="saveOrderDetail" parameterType="Object">
@@ -297,19 +301,24 @@
 		receive_city,receive_area,receive_address,receive_zip_code,post_fee,tax_fee,tariff_tax,increment_tax,excise_tax,
 		create_time,remark,dis_amount,pay_time,rebate_fee,customer_idnum,customer_name,customer_phone)
 		VALUES
-		(#{orderId},#{payType},#{payment},#{payNo},#{deliveryPlace},#{carryAddress},#{receiveName},#{receivePhone},#{receiveProvince},
-		#{receiveCity},#{receiveArea},#{receiveAddress},#{receiveZipCode},#{postFee},#{taxFee},#{tariffTax},#{incrementTax},#{exciseTax},
-		now(),#{remark},#{disAmount},#{payTime},#{rebateFee},#{customerIdNum},#{customerName},#{customerPhone});
+		<foreach collection="list" item="item" separator=",">
+			(#{item.orderId},#{item.payType},#{item.payment},#{item.payNo},#{item.deliveryPlace},#{item.carryAddress},
+			#{item.receiveName},#{item.receivePhone},#{item.receiveProvince},#{item.receiveCity},#{item.receiveArea},
+			#{item.receiveAddress},#{item.receiveZipCode},#{item.postFee},#{item.taxFee},#{item.tariffTax},
+			#{item.incrementTax},#{item.exciseTax},now(),#{item.remark},#{item.disAmount},#{item.payTime},
+			#{item.rebateFee},#{item.customerIdNum},#{item.customerName},#{item.customerPhone});
+		</foreach>
 	</insert>
 
 	<insert id="saveOrderGoods" parameterType="Object">
 		INSERT INTO
 		order_goods
-		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,create_time,remark,rebate,unit)
+		(order_id,item_id,goods_id,sku,item_name,item_info,item_code,item_quantity,item_price,actual_price,item_img,
+		create_time,remark,rebate,unit,href,specs_tp_id)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
 			(#{item.orderId},#{item.itemId},#{item.goodsId},#{item.sku},#{item.itemName},#{item.itemInfo},#{item.itemCode},#{item.itemQuantity},#{item.itemPrice},#{item.actualPrice},#{item.itemImg},now(),
-			#{item.remark},#{item.rebate},#{item.unit})
+			#{item.remark},#{item.rebate},#{item.unit},#{item.href},#{item.specsTpId})
 		</foreach>
 	</insert>
 

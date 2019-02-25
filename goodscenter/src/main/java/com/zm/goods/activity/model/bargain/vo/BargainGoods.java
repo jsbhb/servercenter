@@ -23,7 +23,7 @@ public class BargainGoods {
 	private int stock;
 	private boolean bargain;//是否参加过砍价
 	@JsonIgnore
-	private String itemId;//业务转换需要，前端不需要
+	private String specsTpId;//业务转换需要，前端不需要
 	public double getLowPrice() {
 		return lowPrice;
 	}
@@ -42,11 +42,11 @@ public class BargainGoods {
 	public void setGoodsRoleId(int goodsRoleId) {
 		this.goodsRoleId = goodsRoleId;
 	}
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 	public int getStock() {
 		return stock;

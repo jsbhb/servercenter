@@ -36,7 +36,7 @@ public class OrderDetail {
 
 	private String payNo;
 
-	private Double disAmount;
+	private double disAmount;
 
 	private String returnPayNo;
 
@@ -63,20 +63,30 @@ public class OrderDetail {
 	private String receiveZipCode;
 
 	private String remark;
-	
+
 	private Double rebateFee;
-	
+
 	private String customerIdNum;
-	
+
 	private String customerName;
-	
+
 	private String customerPhone;
-	
+
+	public OrderDetail clone() {
+		OrderDetail o = null;
+		try {
+			o = (OrderDetail) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return o;
+	}
+
 	public boolean validate() {
-		return (payType != null && payment != null && postFee != null && taxFee != null
-				&& tariffTax != null && incrementTax != null && exciseTax != null && disAmount != null
-				&& receiveName != null && receivePhone != null && receiveProvince != null && receiveCity != null
-				&& receiveArea != null && receiveAddress != null);
+		return (payType != null && payment != null && postFee != null && taxFee != null && tariffTax != null
+				&& incrementTax != null && exciseTax != null && receiveName != null
+				&& receivePhone != null && receiveProvince != null && receiveCity != null && receiveArea != null
+				&& receiveAddress != null);
 	}
 
 	public String getCustomerIdNum() {
@@ -111,11 +121,11 @@ public class OrderDetail {
 		this.rebateFee = rebateFee;
 	}
 
-	public Double getDisAmount() {
+	public double getDisAmount() {
 		return disAmount;
 	}
 
-	public void setDisAmount(Double disAmount) {
+	public void setDisAmount(double disAmount) {
 		this.disAmount = disAmount;
 	}
 

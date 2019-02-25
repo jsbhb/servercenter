@@ -14,23 +14,22 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.bo.GoodsBillboard;
-import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.vo.GoodsVO;
 
 public class ImageUtils {
 
-	private String crossImg = "/images/template/crossImg.png";
-	private String generalTrade = "/images/template/generalTrade.png";
+//	private String crossImg = "/images/template/crossImg.png";
+//	private String generalTrade = "/images/template/generalTrade.png";
 
-	public byte[] drawGoodsBillboardDTO(GoodsItem item, GoodsBillboard board, InputStream in, String staticUrl) {
+	public byte[] drawGoodsBillboardDTO(GoodsVO item, GoodsBillboard board, InputStream in, String staticUrl) {
 		try {
 			// 获取模板
 			BufferedImage template = ImageIO
 					.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(board.getTemplatePath())));
 			// 创建画笔
 			Graphics2D g = template.createGraphics();
-			//消除画图锯齿
+			// 消除画图锯齿
 			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			// 获取商品图片
 			try {
@@ -47,19 +46,24 @@ public class ImageUtils {
 			// 画二维码
 			g.drawImage(qrcode, board.getCode_X_Coordinates(), board.getCode_Y_Coordinates(), board.getCodeWidth(),
 					board.getCodeHeight(), null);
-			// 获取商品类型标签图片
-//			BufferedImage typeTag = null;
-//			if (Constants.O2O_TYPE.equals(item.getType())) {
-//				typeTag = ImageIO.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl + crossImg)));
-//			}
-//			if (Constants.GENERAL_TRADE.equals(item.getType())) {
-//				typeTag = ImageIO.read(new ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl + generalTrade)));
-//			}
-//			// 画标签
-//			g.drawImage(typeTag, board.getType_X_Coordinates(), board.getType_Y_Coordinates(), null);
+					// 获取商品类型标签图片
+					// BufferedImage typeTag = null;
+					// if (Constants.O2O_TYPE.equals(item.getType())) {
+					// typeTag = ImageIO.read(new
+					// ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl
+					// + crossImg)));
+					// }
+					// if (Constants.GENERAL_TRADE.equals(item.getType())) {
+					// typeTag = ImageIO.read(new
+					// ByteArrayInputStream(HttpClientUtil.getByteArr(staticUrl
+					// + generalTrade)));
+					// }
+					// // 画标签
+					// g.drawImage(typeTag, board.getType_X_Coordinates(),
+					// board.getType_Y_Coordinates(), null);
 
-			//消除字体锯齿
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			// 消除字体锯齿
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			// 写商品名称
 			Font goodsNameFont = new Font(board.getNameFont(), Font.PLAIN, board.getNameFontSize());
 			String[] colorArr = board.getNameColor().split(",");
@@ -67,7 +71,7 @@ public class ImageUtils {
 					Integer.valueOf(colorArr[2]));
 			g.setFont(goodsNameFont);
 			g.setColor(goodsColor);
-			List<String> goodsNameList = spliteGoodsName(item.getCustomGoodsName(), board.getNameNumPerLine(),
+			List<String> goodsNameList = spliteGoodsName(item.getGoodsName(), board.getNameNumPerLine(),
 					board.getNameRows());
 			for (int i = 0; i < goodsNameList.size(); i++) {
 				if (i >= board.getNameRows()) {
@@ -84,9 +88,8 @@ public class ImageUtils {
 					Integer.valueOf(colorArr[2]));
 			g.setFont(priceFont);
 			g.setColor(priceColor);
-			g.drawString(item.getGoodsSpecsList().get(0).getPriceList().get(0).getPrice() + "",
-					board.getPrice_X_Coordinates(), board.getPrice_Y_Coordinates());
-			
+			g.drawString(item.getMinPrice() + "", board.getPrice_X_Coordinates(), board.getPrice_Y_Coordinates());
+
 			g.dispose();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			ImageIO.write(template, "png", out);

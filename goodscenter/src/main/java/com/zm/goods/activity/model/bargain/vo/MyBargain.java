@@ -27,7 +27,7 @@ public class MyBargain implements Comparable<MyBargain>{
 	private String originCountry;
 	private List<MyBargainRecord> bargainList;
 	private boolean start;
-	private String itemId;
+	private String specsTpId;
 	private int userId;
 	private boolean buy;
 
@@ -71,12 +71,12 @@ public class MyBargain implements Comparable<MyBargain>{
 		this.description = description;
 	}
 
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
 
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 
 	public int getDuration() {

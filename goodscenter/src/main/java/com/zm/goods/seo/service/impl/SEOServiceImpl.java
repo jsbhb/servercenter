@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -16,26 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.dao.SEOMapper;
+import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.enummodel.PublishType;
 import com.zm.goods.enummodel.SystemEnum;
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.feignclient.UserFeignClient;
-import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 import com.zm.goods.pojo.po.ComponentDataPO;
-import com.zm.goods.pojo.po.GoodsItem;
-import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.po.PagePO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
+import com.zm.goods.pojo.vo.GoodsVO;
 import com.zm.goods.seo.model.CategoryPath;
-import com.zm.goods.seo.model.GoodsTempModel;
 import com.zm.goods.seo.model.SEOBase;
 import com.zm.goods.seo.model.SEODetail;
-import com.zm.goods.seo.model.SEOGoodsDel;
 import com.zm.goods.seo.model.SEOModel;
 import com.zm.goods.seo.model.SEONavigation;
 import com.zm.goods.seo.publish.PublishComponent;
@@ -61,26 +57,11 @@ public class SEOServiceImpl implements SEOService {
 	@Resource
 	GoodsTagMapper goodsTagMapper;
 
+	@Resource
+	GoodsService goodsTagDecorator;
+
 	private static Integer CNCOOPBUY_ID = 2;
 	private static String HTTP_STR = "http";
-
-	@Override
-	public List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId) {
-		List<String> itemIds = seoMapper.listItemIdsByGoodsId(goodsId);
-		if (itemIds != null && itemIds.size() > 0) {
-			return seoMapper.listStockByItemIds(itemIds);
-		}
-		return null;
-	}
-
-	@Override
-	public ResultModel publish(List<String> specsTpIdList, Integer centerId, boolean isNewPublish) {
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(specsTpIdList);
-		if (goodsIdList == null || goodsIdList.size() == 0) {
-			return new ResultModel(false, "没有对应的商品GOODSID");
-		}
-		return publishByGoodsId(goodsIdList, centerId, isNewPublish);
-	}
 
 	private boolean publishAndHandle(StringBuilder sb, ResultModel result, SEOBase base, PublishType publishType) {
 		ResultModel temp = PublishComponent.publish(JSONUtil.toJson(base), publishType);
@@ -93,51 +74,6 @@ public class SEOServiceImpl implements SEOService {
 			sb.append(temp.getErrorMsg());
 		}
 		return temp.isSuccess();
-	}
-
-	@SuppressWarnings("unchecked")
-	private List<GoodsItem> getGoods(List<String> goodsIdList) {
-		List<GoodsItem> goodsItemList = seoMapper.listGoods(goodsIdList);
-		if (goodsItemList == null) {
-			return null;
-		}
-		goodsItemList.stream().forEach(
-				item -> item.getGoodsSpecsList().stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum() * 11)));
-		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		String bigsaleJson = (String) template.opsForValue().get(Constants.BIG_SALES_PRE);
-		List<String> bigSaleList = new ArrayList<>();
-		if (bigsaleJson != null) {
-			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
-		}
-		for (GoodsItem goodsItem : goodsItemList) {
-			if (goodsItem.getGoodsSpecsList() != null) {
-				for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
-					specs.infoFilter();
-				}
-			}
-			// 加标签
-			addItemGoodsTag(goodsItem);
-			Map<String, String> map = hashOperations.entries(Constants.POST_TAX + goodsItem.getSupplierId());
-			if (map != null) {
-				String post = map.get("post");
-				String tax = map.get("tax");
-				try {
-					goodsItem.setFreePost(Integer.valueOf(post == null ? "0" : post));
-					goodsItem.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
-				} catch (Exception e) {
-					LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
-				}
-			}
-			if (goodsItem.getGoodsSpecsList() != null) {
-				for (GoodsSpecs specs : goodsItem.getGoodsSpecsList()) {
-					if (bigSaleList.contains(specs.getItemId())) {
-						specs.setBigSale(1);
-					}
-				}
-			}
-		}
-
-		return goodsItemList;
 	}
 
 	@Override
@@ -154,15 +90,6 @@ public class SEOServiceImpl implements SEOService {
 			result.setErrorMsg(sb.toString());
 		}
 		return result;
-	}
-
-	@Override
-	public ResultModel delPublish(List<String> itemIdList, Integer centerId) {
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
-		if (goodsIdList == null || goodsIdList.size() == 0) {
-			return new ResultModel(false, "没有对应的商品GOODSID");
-		}
-		return delPublishByGoodsId(goodsIdList, centerId);
 	}
 
 	@Override
@@ -243,14 +170,14 @@ public class SEOServiceImpl implements SEOService {
 	}
 
 	@Override
-	public ResultModel getGoodsAccessPath(String goodsId, String itemId) {
+	public ResultModel getGoodsAccessPath(String goodsId, String specsTpId) {
 		ResultModel result = new ResultModel();
 		if (goodsId != null && !"".equals(goodsId)) {
 			String path = seoMapper.getGoodsAccessPath(goodsId);
 			result.setSuccess(true);
 			result.setObj(path);
-		} else if (itemId != null && !"".equals(itemId)) {
-			goodsId = seoMapper.getGoodsIdByItemId(itemId);
+		} else if (specsTpId != null && !"".equals(specsTpId)) {
+			goodsId = seoMapper.getGoodsIdByItemId(specsTpId);
 			String path = seoMapper.getGoodsAccessPath(goodsId);
 			result.setSuccess(true);
 			result.setObj(path);
@@ -262,7 +189,7 @@ public class SEOServiceImpl implements SEOService {
 	}
 
 	@Override
-	public ResultModel publishByGoodsId(List<String> goodsIdList, Integer centerId, boolean isNewPublish) {
+	public ResultModel publishGoods(List<String> specsTpIdList) {
 
 		// 检索手机端及商场的页面组建数据
 		List<PagePO> pageList = seoMapper.getGoodsDetailPageByPublish();
@@ -274,15 +201,15 @@ public class SEOServiceImpl implements SEOService {
 		StringBuilder sb = new StringBuilder();
 		ResultModel result = new ResultModel(true, "");
 		SEODetail seoGoodsDetail;
-		boolean success;
-		if (goodsIdList != null && goodsIdList.size() > 0) {
+		List<GoodsVO> voList = null;
+		try {
+			voList = goodsTagDecorator.listGoodsSpecs(specsTpIdList, 99, 0);
+		} catch (WrongPlatformSource e) {
+			e.printStackTrace();
+		}
+		if (voList != null && voList.size() > 0) {
 			Map<String, Object> param = new HashMap<String, Object>();
-			List<String> rePublishGoodsIdList = new ArrayList<String>();// 需要更新成发布失败的goodsId
-			List<String> successGoodsIdList = new ArrayList<String>();// 需要更新成正常状态的goodsId
-			List<GoodsItem> goodsItemList = getGoods(goodsIdList);
-			if (goodsItemList == null || goodsItemList.size() == 0) {
-				return result;
-			}
+			List<String> goodsIdList = voList.stream().map(vo -> vo.getGoodsId()).collect(Collectors.toList());
 			// 获取seo信息
 			List<SEOModel> seoModelList = seoMapper.listGoodsSEO(goodsIdList);
 			Map<String, SEOModel> seoParam = new HashMap<String, SEOModel>();
@@ -294,7 +221,7 @@ public class SEOServiceImpl implements SEOService {
 			// 获取商品路径
 			List<String> thirdIdList = new ArrayList<String>();
 			Map<String, String> pathParam = new HashMap<String, String>();
-			for (GoodsItem item : goodsItemList) {
+			for (GoodsVO item : voList) {
 				thirdIdList.add(item.getThirdCategory());
 			}
 			List<CategoryPath> pathList = seoMapper.queryGoodsCategoryPath(thirdIdList);
@@ -302,131 +229,53 @@ public class SEOServiceImpl implements SEOService {
 				pathParam.put(categoryPath.getThirdId(), categoryPath.getPath());
 			}
 			// 开始处理商品
-			for (GoodsItem goodsItem : goodsItemList) {
-				String goodsId = goodsItem.getGoodsId();
-				LogUtil.writeLog("SPECS-SIZE:" + goodsItem.getGoodsSpecsList().size());
-				String path = pathParam.get(goodsItem.getThirdCategory());
-				String href = "/" + path + "/" + goodsItem.getGoodsId() + ".html";
+			for (GoodsVO goods : voList) {
+				String goodsId = goods.getGoodsId();
+				String path = pathParam.get(goods.getThirdCategory());
+				String href = "/" + path + "/" + goods.getGoodsId() + ".html";
 				template.opsForValue().set("href:" + goodsId, href);
-				goodsItem.setHref(href);
+				goods.setHref(href);
 				SEOModel seoModel = seoParam.get(goodsId);
-				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.PCMALL,
-						pageList);
+				seoGoodsDetail = new SEODetail(goods, seoModel, goodsId + ".html", path, SystemEnum.PCMALL, pageList);
 
-				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
-				if (!success) {
-					if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
-						rePublishGoodsIdList.add(goodsId);
-					}
-					continue;
-				}
-				seoGoodsDetail = new SEODetail(goodsItem, seoModel, goodsId + ".html", path, SystemEnum.FMPMALL,
-						pageList);
-				success = publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
-				if (!success) {
-					if (!isNewPublish) {// 如果不是新发布，是重新发布的，先把发布标志置为未发布
-						rePublishGoodsIdList.add(goodsId);
-					}
-					continue;
-				}
+				publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
+				seoGoodsDetail = new SEODetail(goods, seoModel, goodsId + ".html", path, SystemEnum.FMPMALL, pageList);
+				publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_CREATE);
 				param.put(goodsId, path);
-				successGoodsIdList.add(goodsId);
 			}
 			if (param.size() > 0) {
 				seoMapper.updateGoodsAccessPath(param);
-			}
-			if (successGoodsIdList.size() > 0) {
-				seoMapper.updateGoodsPublishByGoodsId(successGoodsIdList);
-			}
-			if (rePublishGoodsIdList.size() > 0) {
-				seoMapper.updateGoodsRePublishByGoodsId(rePublishGoodsIdList);
-			}
-			if (sb.length() > 0) {
-				sb.append("发布失败");
-				result.setErrorMsg(sb.toString());
 			}
 		}
 		return result;
 	}
 
 	@Override
-	public ResultModel delPublishByGoodsId(List<String> goodsIdList, Integer centerId) {
+	public ResultModel delPublishGoods(List<String> specsTpIdList) {
 		ResultModel result = new ResultModel(true, "");
-		List<GoodsTempModel> tempList = seoMapper.getDownShelvesGoodsIdByGoodsId(goodsIdList);
-		if (tempList != null && tempList.size() > 0) {// 说明有商品所有规格都下架，需要删除已经发布的商详
-			List<String> needDelgoodsIdList = new ArrayList<String>();
-			List<String> needRePublishgoodsIdList = new ArrayList<String>();
-			for (GoodsTempModel model : tempList) {
-				if (model.getStatus() == 0) {
-					needDelgoodsIdList.add(model.getGoodsId());// 需要删除的
-				} else {
-					needRePublishgoodsIdList.add(model.getGoodsId());// 需要重新发布的
-				}
-			}
+		// 检索手机端及商场的页面组建数据
+		List<PagePO> pageList = seoMapper.getGoodsDetailPageByPublish();
+		if (pageList == null || pageList.size() != 2) {
+			return new ResultModel(false, "请确认手机和pc商详模板是否都存在");
+		}
+		List<GoodsVO> voList = null;
+		try {
+			voList = goodsTagDecorator.listGoodsSpecs(specsTpIdList, 99, 0);
+		} catch (WrongPlatformSource e) {
+			e.printStackTrace();
+		}
+		if (voList != null && voList.size() > 0) {
+			SEODetail seoGoodsDetail = null;
 			StringBuilder sb = new StringBuilder();
-			boolean success;
-			if (needDelgoodsIdList != null && needDelgoodsIdList.size() > 0) {
-				SEOGoodsDel seoGoodsDel = null;
-				for (String goodsId : needDelgoodsIdList) {
-					String path = seoMapper.getGoodsAccessPath(goodsId);
-					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.PCMALL, goodsId + ".html");
-					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.PAGE_DELETE);
-					if (!success) {
-						continue;
-					}
-					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.FMPMALL, goodsId + ".html");
-					success = publishAndHandle(sb, result, seoGoodsDel, PublishType.PAGE_DELETE);
-					if (!success) {
-						continue;
-					}
-					seoMapper.updateGoodsDelPublishByGoodsId(goodsId);
-				}
-			}
-			if (sb.length() > 0) {
-				sb.append("删除失败");
-				result.setErrorMsg(sb.toString());
-			}
-			if (needRePublishgoodsIdList.size() > 0) {// 需要重新发布的goods
-				ResultModel temp = publishByGoodsId(needRePublishgoodsIdList, centerId, false);
-				result.setSuccess(temp.isSuccess());
-				result.setErrorMsg(result.getErrorMsg() + temp.getErrorMsg());
+			for (GoodsVO vo : voList) {
+				String path = seoMapper.getGoodsAccessPath(vo.getGoodsId());
+				seoGoodsDetail = new SEODetail(vo, null, vo.getGoodsId() + ".html", path, SystemEnum.PCMALL, pageList);
+				publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_DELETE);
+				seoGoodsDetail = new SEODetail(vo, null, vo.getGoodsId() + ".html", path, SystemEnum.FMPMALL, pageList);
+				publishAndHandle(sb, result, seoGoodsDetail, PublishType.PAGE_DELETE);
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * @fun 加标签
-	 * @param goodsList
-	 */
-	private void addItemGoodsTag(GoodsItem goods) {
-		List<String> itemIdList = new ArrayList<String>();
-		if (goods != null) {
-			if (goods.getGoodsSpecsList() != null) {
-				for (GoodsSpecs specs : goods.getGoodsSpecsList()) {
-					itemIdList.add(specs.getItemId());
-				}
-			}
-			List<GoodsTagEntity> list = goodsTagMapper.listGoodsTagByGoodsId(itemIdList);
-			List<GoodsTagEntity> temp = null;
-			Map<String, List<GoodsTagEntity>> map = new HashMap<String, List<GoodsTagEntity>>();
-			if (list != null && list.size() > 0) {
-				for (GoodsTagEntity tag : list) {
-					if (map.get(tag.getItemId()) == null) {
-						temp = new ArrayList<GoodsTagEntity>();
-						temp.add(tag);
-						map.put(tag.getItemId(), temp);
-					} else {
-						map.get(tag.getItemId()).add(tag);
-					}
-				}
-			}
-			if (goods.getGoodsSpecsList() != null) {
-				for (GoodsSpecs specs : goods.getGoodsSpecsList()) {
-					specs.setTagList(map.get(specs.getItemId()));
-				}
-			}
-		}
 	}
 
 	@Override
@@ -466,5 +315,4 @@ public class SEOServiceImpl implements SEOService {
 	public List<BigSalesGoodsRecord> listRecord(Map<String, Integer> param) {
 		return seoMapper.listRecord(param);
 	}
-
 }

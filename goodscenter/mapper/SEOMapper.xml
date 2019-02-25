@@ -2,69 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zm.goods.bussiness.dao.SEOMapper">
 
-
-	<resultMap type="com.zm.goods.pojo.GoodsItem" id="goodsItem">
-		<result column="id" property="id" jdbcType="INTEGER" />
-		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
-		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
-		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
-		<result column="customGoodsName" property="customGoodsName"
-			jdbcType="VARCHAR" />
-		<result column="status" property="status" jdbcType="INTEGER" />
-		<result column="type" property="type" jdbcType="INTEGER" />
-		<result column="is_popular" property="popular" jdbcType="INTEGER" />
-		<result column="is_hot" property="hot" jdbcType="INTEGER" />
-		<result column="is_new" property="fresh" jdbcType="INTEGER" />
-		<result column="is_good" property="good" jdbcType="INTEGER" />
-		<result column="is_choice" property="choice" jdbcType="INTEGER" />
-		<result column="detail_path" property="detailPath" jdbcType="VARCHAR" />
-		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
-		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
-		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
-		<result column="index_status" property="indexStatus" jdbcType="INTEGER" />
-		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
-		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
-		<result column="opt" property="opt" jdbcType="VARCHAR" />
-		<result column="brand_id" property="brandId" jdbcType="VARCHAR" />
-		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
-		<result column="brand" property="brand" jdbcType="VARCHAR" />
-		<result column="origin" property="origin" jdbcType="VARCHAR" />
-		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
-		<result column="increment_tax" property="incrementTax"
-			jdbcType="NUMERIC" />
-		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
-		<result column="encode" property="encode" jdbcType="VARCHAR" />
-		<result column="unit" property="unit" jdbcType="VARCHAR" />
-		<collection property="goodsFileList" ofType="com.zm.goods.pojo.GoodsFile">
-			<id column="file_id" property="id" jdbcType="INTEGER" />
-			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
-			<result column="path" property="path" jdbcType="VARCHAR" />
-		</collection>
-		<collection property="goodsSpecsList" ofType="com.zm.goods.pojo.GoodsSpecs">
-			<id column="specs_id" property="id" jdbcType="INTEGER" />
-			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
-			<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
-			<result column="conversion" property="conversion" jdbcType="INTEGER" />
-			<result column="item_id" property="itemId" jdbcType="VARCHAR" />
-			<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
-			<result column="sku" property="sku" jdbcType="VARCHAR" />
-			<result column="weight" property="weight" jdbcType="INTEGER" />
-			<result column="info" property="info" jdbcType="VARCHAR" />
-			<result column="carton" property="carton" jdbcType="VARCHAR" />
-			<result column="unit" property="unit" jdbcType="VARCHAR" />
-			<result column="is_fx" property="fx" jdbcType="INTEGER" />
-			<result column="sale_num" property="saleNum" jdbcType="INTEGER" />
-			<collection property="priceList" ofType="com.zm.goods.pojo.GoodsPrice">
-				<id column="price_id" property="id" jdbcType="INTEGER" />
-				<result column="item_id" property="itemId" jdbcType="VARCHAR" />
-				<result column="min" property="min" jdbcType="INTEGER" />
-				<result column="max" property="max" jdbcType="INTEGER" />
-				<result column="retail_price" property="price" jdbcType="NUMERIC" />
-				<result column="line_price" property="linePrice" jdbcType="NUMERIC" />
-			</collection>
-		</collection>
-	</resultMap>
-	
 	<resultMap type="com.zm.goods.pojo.po.PagePO" id="page">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
@@ -121,38 +58,6 @@
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 	</resultMap>
 	
-	<select id="listGoods" parameterType="Object" resultMap="goodsItem">
-		select g.id,g.goods_id ,g.goods_name as customGoodsName, g.description,g.detail_path,gf.id as file_id,gf.path,
-		gi.excise_tax,gi.info,gi.conversion,gi.item_id,gi.item_code,gi.sku,gi.weight,gi.carton,gp.min,gp.max,gp.retail_price,
-		g.supplier_id,g.type,g.supplier_name,gb.third_category,gb.first_category,gb.second_category,gi.is_fx,gp.line_price,gb.unit,
-		gb.brand_id,gcb.brand,g.origin,gb.increment_tax,gb.tariff,gb.hscode,gi.id as specs_id,gp.id as price_id,gi.sale_num 
-		from goods g 
-		left join base gb on g.base_id = gb.id 
-		left join goods_category_brand gcb on gb.brand_id = gcb.brand_id 
-		left join goods_file gf on g.goods_id = gf.goods_id 
-		left join goods_item gi on g.goods_id = gi.goods_id 
-		left join goods_price gp on gp.item_id = gi.item_id 
-		where g.goods_id in
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-		and gi.status = 1 and g.is_del = 0 order by g.goods_id, file_id
-	</select>
-	
-	<select id="listItemIdsByGoodsId" parameterType="Object" resultType="java.lang.String">
-		select item_id from goods_item where goods_id = #{goodsId}
-	</select>
-	
-	<select id="listStockByItemIds" parameterType="Object" resultType="com.zm.goods.pojo.bo.ItemStockBO">
-		select gi.item_id as itemId,gs.fxqty as stock 
-		from goods_stock gs 
-		left join goods_item gi on gs.item_id = gi.item_id 
-		where gi.status = 1 and gi.item_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-			#{item}
-		</foreach> 
-	</select>
-	
 	<select id="queryGoodsCategoryPath" parameterType="Object" resultType="com.zm.goods.seo.model.CategoryPath">
 		select distinct gtc.third_id as thirdId,concat_ws('/',gfc.access_path,gsc.access_path,gtc.access_path) as path from goods_first_category gfc left join
 		goods_second_category gsc on gfc.first_id = gsc.first_id left join goods_third_category gtc 
@@ -176,7 +81,7 @@
 	</select>
 	
 	<select id="getGoodsAccessPath" parameterType="Object" resultType="java.lang.String">
-		select access_path from goods where goods_id = #{goodsId}
+		select access_path from kj_goods where goods_id = #{goodsId}
 	</select>
 	
 	<select id="listPublishedIndexPageDetail" parameterType="Object" resultMap="page">
@@ -219,35 +124,8 @@
 	</update>
 	
 	<select id="getGoodsIdByItemId" parameterType="Object" resultType="java.lang.String">
-		select goods_id from goods_item where item_id = #{itemId}
+		select goods_id from kj_goods_specs_tradepattern where specs_tp_id = #{specsTpId}
 	</select>
-	
-	<update id="updateGoodsPublishByGoodsId" parameterType="Object" >
-		update goods set is_publish = 1 where goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-		and status = 1
-	</update>
-	
-	<update id="updateGoodsDelPublishByGoodsId" parameterType="Object">
-		update goods set is_publish = 0 where goods_id = #{goodsId} and status = 0
-	</update>
-	
-	<select id="getDownShelvesGoodsIdByGoodsId" parameterType="Object" resultType="com.zm.goods.seo.model.GoodsTempModel">
-		select goods_id as goodsId, status from goods
-		where 1=1 and goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</select>
-		
-	<update id="updateGoodsRePublishByGoodsId" parameterType="Object">
-		update goods set is_publish = 0 where goods_id in 
-		<foreach collection="list" item="item" open="(" close=")" separator=",">
-				#{item}
-		</foreach>
-	</update>
 	
 	<select id="listRecord" parameterType="Object" resultMap="record">
 		select * from big_sale_record where week = #{week} and year = #{year} order by sort

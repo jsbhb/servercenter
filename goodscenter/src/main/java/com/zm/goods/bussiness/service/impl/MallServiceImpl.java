@@ -23,8 +23,8 @@ import com.zm.goods.bussiness.dao.MallMapper;
 import com.zm.goods.bussiness.service.MallService;
 import com.zm.goods.pojo.ComponentData;
 import com.zm.goods.pojo.ComponentPage;
-import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.po.BigSalesGoodsRecord;
+import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: MallServiceImpl <br/>

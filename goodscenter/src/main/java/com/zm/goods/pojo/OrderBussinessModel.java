@@ -12,15 +12,31 @@ public class OrderBussinessModel {
 	
 	private Integer supplierId;
 	
+	private String specsTpId;
+	
 	private String itemId;
 	
 	private Integer quantity;
 	
-	private String deliveryPlace;
-	
 	private Double itemPrice;
 
 	private Double actualPrice;
+
+	public String getSpecsTpId() {
+		return specsTpId;
+	}
+
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
+	}
+
+	public String getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
 
 	public Double getItemPrice() {
 		return itemPrice;
@@ -78,14 +94,6 @@ public class OrderBussinessModel {
 		this.orderId = orderId;
 	}
 
-	public String getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
-	}
-
 	public Integer getQuantity() {
 		return quantity;
 	}
@@ -93,19 +101,4 @@ public class OrderBussinessModel {
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
-
-	public String getDeliveryPlace() {
-		return deliveryPlace;
-	}
-
-	public void setDeliveryPlace(String deliveryPlace) {
-		this.deliveryPlace = deliveryPlace;
-	}
-
-	@Override
-	public String toString() {
-		return "OrderBussinessModel [orderId=" + orderId + ", sku=" + sku + ", itemCode=" + itemCode + ", itemId="
-				+ itemId + ", quantity=" + quantity + ", deliveryPlace=" + deliveryPlace + "]";
-	}
-	
 }

@@ -10,6 +10,7 @@ package com.zm.goods.pojo;
 import java.util.List;
 
 import com.zm.goods.common.Pagination;
+import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: GoodsEntity <br/>

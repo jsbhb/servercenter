@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.bo.ItemStockBO;
 import com.zm.goods.pojo.po.BigSalesGoodsRecord;
 import com.zm.goods.pojo.po.ComponentDataPO;
 import com.zm.goods.pojo.po.PagePO;
@@ -12,13 +11,7 @@ import com.zm.goods.seo.model.SEODetail;
 
 public interface SEOService {
 
-	List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId);
-
-	ResultModel publish(List<String> itemIdList, Integer centerId, boolean isNewPublish);
-
 	ResultModel navPublish();
-
-	ResultModel delPublish(List<String> itemIdList, Integer centerId);
 
 	ResultModel indexPublish(Integer id);
 	
@@ -39,11 +32,6 @@ public interface SEOService {
 
 	ResultModel getGoodsAccessPath(String goodsId, String itemId);
 
-	ResultModel publishByGoodsId(List<String> goodsIdList, Integer centerId, boolean isNewPublish);
-
-	ResultModel delPublishByGoodsId(List<String> goodsIdList, Integer centerId);
-
-	
 	/**
 	 * @fun sitemap
 	 * @param domains
@@ -63,4 +51,19 @@ public interface SEOService {
 	void deleteByIdList(List<Integer> idList);
 
 	List<BigSalesGoodsRecord> listRecord(Map<String, Integer> param);
+	/**
+	 * @fun 根据specsTpIds 发布商品
+	 * @param specsTpIdList
+	 * @param centerId
+	 * @param b
+	 * @return
+	 */
+	ResultModel publishGoods(List<String> specsTpIdList);
+	/**
+	 * @fun 根据specsTpIds 删除发布的商品
+	 * @param specsTpIdList
+	 * @param centerId
+	 * @return
+	 */
+	ResultModel delPublishGoods(List<String> specsTpIdList);
 }

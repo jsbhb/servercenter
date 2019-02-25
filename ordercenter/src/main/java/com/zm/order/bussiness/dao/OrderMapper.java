@@ -35,9 +35,9 @@ import com.zm.order.pojo.bo.SupplierPostFeeBO;
  */
 public interface OrderMapper {
 
-	void saveOrder(OrderInfo info);
+	void saveOrder(List<OrderInfo> infoList);
 	
-	void saveOrderDetail(OrderDetail orderDetail);
+	void saveOrderDetail(List<OrderDetail> detailList);
 	
 	void saveOrderGoods(List<OrderGoods> goodsList);
 	

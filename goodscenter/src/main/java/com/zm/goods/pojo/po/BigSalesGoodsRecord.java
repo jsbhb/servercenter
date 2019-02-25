@@ -8,7 +8,7 @@ package com.zm.goods.pojo.po;
 public class BigSalesGoodsRecord {
 
 	private int id;
-	private String itemId;
+	private String specsTpId;
 	private double newRebate;//特卖时的返佣
 	private double newRetailPrice;//特卖时的价格
 	private double oldRebate;//原来的返佣
@@ -52,11 +52,11 @@ public class BigSalesGoodsRecord {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 	public double getNewRebate() {
 		return newRebate;

@@ -15,11 +15,11 @@ import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItemEntity;
-import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.GoodsShelveRecordEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
+import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: BrandMapper <br/>

@@ -10,6 +10,8 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import com.zm.goods.bussiness.dao.GoodsMapper;
+import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
@@ -20,17 +22,16 @@ public class ProcessWarehouse {
 	@Resource
 	GoodsMapper goodsMapper;
 
-	public synchronized ResultModel processWarehouse(Integer orderFlag, List<OrderBussinessModel> orderList) {
+	public synchronized ResultModel processWarehouse(List<OrderBussinessModel> orderList) {
 		List<String> itemIds = new ArrayList<String>();
 		for (OrderBussinessModel model : orderList) {
 			itemIds.add(model.getItemId());
 		}
 		List<WarehouseModel> stockList = goodsMapper.listWarehouse(itemIds);
-		return process(stockList, orderList, orderFlag);
+		return process(stockList, orderList);
 	}
 
-	private ResultModel process(List<WarehouseModel> stockList, List<OrderBussinessModel> orderList,
-			Integer orderFlag) {
+	private ResultModel process(List<WarehouseModel> stockList, List<OrderBussinessModel> orderList) {
 		if (stockList == null || stockList.size() == 0) {
 			return new ResultModel(false, "没有对应的商品库存");
 		}
@@ -51,11 +52,12 @@ public class ProcessWarehouse {
 		}
 		if (!enough) {
 			String errorMsg = sb.substring(0, sb.length() - 1) + "库存不足";
-			return new ResultModel(false, errorMsg);
+			LogUtil.writeLog("商品库存不足:" + errorMsg);
+			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
+					ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
 		}
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("list", stockList);
-		param.put("orderFlag", orderFlag);
 		goodsMapper.updateStock(param);
 
 		return new ResultModel(true, null);

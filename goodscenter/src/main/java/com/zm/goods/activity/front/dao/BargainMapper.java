@@ -3,7 +3,6 @@ package com.zm.goods.activity.front.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.zm.goods.activity.model.ActiveGoods;
 import com.zm.goods.activity.model.bargain.bo.BargainCountBO;
 import com.zm.goods.activity.model.bargain.dto.BargainInfoDTO;
 import com.zm.goods.activity.model.bargain.po.BargainRecordPO;
@@ -18,8 +17,6 @@ public interface BargainMapper {
 	
 	UserBargainPO getBargainDetailByParam(Map<String,Object> param);
 
-	List<ActiveGoods> listActiceGoods(List<String> itemIdList);
-	
 	int getRuleTypeByUserBargainId(Integer id);
 
 	List<BargainRulePO> listBargainGoodsForPage(List<Integer> list);

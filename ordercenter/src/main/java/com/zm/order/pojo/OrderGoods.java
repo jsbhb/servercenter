@@ -41,17 +41,27 @@ public class OrderGoods extends Pagination {
 	private String remark;
 
 	private String goodsId;
-	
+
 	private Integer conversion;
-	
+
 	private String href;
-	
+
 	private String rebate;
-	
+
 	private String unit;
-	
+
 	private String carton;
-	
+
+	private String specsTpId;
+
+	public String getSpecsTpId() {
+		return specsTpId;
+	}
+
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
+	}
+
 	public String getUnit() {
 		return unit;
 	}
@@ -69,19 +79,16 @@ public class OrderGoods extends Pagination {
 	}
 
 	public boolean validate() {
-		return (sku != null && itemCode != null && itemQuantity != null && itemPrice != null
-				&& actualPrice != null);
+		return (itemQuantity != null && itemPrice != null && actualPrice != null);
 	}
 
 	public String getHref() {
 		return href;
 	}
 
-
 	public void setHref(String href) {
 		this.href = href;
 	}
-
 
 	public Integer getConversion() {
 		return conversion;
@@ -194,7 +201,7 @@ public class OrderGoods extends Pagination {
 	public void setItemInfo(String itemInfo) {
 		this.itemInfo = itemInfo;
 	}
-	
+
 	public String getCarton() {
 		return carton;
 	}

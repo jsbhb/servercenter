@@ -8,7 +8,7 @@ import com.zm.goods.activity.model.bargain.base.IUserBargain;
 public class UserBargainEntity implements IUserBargain{
 
 	private int id;
-	private String itemId;
+	private String specsTpId;
 	private boolean start;// 砍价是否结束
 	private String createTime;// 开团时间
 	private double initPrice;
@@ -73,12 +73,12 @@ public class UserBargainEntity implements IUserBargain{
 		this.start = start;
 	}
 
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
 
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 
 	public double getInitPrice() {

@@ -11,7 +11,7 @@
 		<result column="floor_price" property="floorPrice" jdbcType = "DOUBLE"/>
 		<result column="user_id" property="userId" jdbcType="INTEGER"/>
 		<result column="duration" property="duration" jdbcType="INTEGER"/>
-		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR"/>
 		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
@@ -28,22 +28,10 @@
 		</collection>
 	</resultMap>
 	
-	<resultMap type="com.zm.goods.activity.model.ActiveGoods" id="activeGoods">
-		<id column="id" property="id" jdbcType="INTEGER"/>
-		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
-		<result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
-		<result column="path" property="path" jdbcType = "VARCHAR"/>
-		<result column="description" property="description" jdbcType = "VARCHAR"/>
-		<result column="origin" property="origin" jdbcType="VARCHAR"/>
-		<result column="stock" property="stock" jdbcType="INTEGER"/>
-		<result column="init_price" property="initPrice" jdbcType = "DOUBLE"/>
-		<result column="floor_price" property="floorPrice" jdbcType = "DOUBLE"/>
-	</resultMap>
-	
 	<resultMap type="com.zm.goods.activity.model.bargain.po.BargainRulePO" id="bargainRule">
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="activity_id" property="activityId" jdbcType="INTEGER"/>
-		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR"/>
 		<result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
 		<result column="path" property="path" jdbcType = "VARCHAR"/>
 		<result column="description" property="description" jdbcType = "VARCHAR"/>
@@ -65,7 +53,7 @@
 		select agr.id, agr.status, agr.init_price, agr.floor_price, 
 		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time, agr.update_time, agr.user_id, 
 		agp.id as recordId, DATE_FORMAT(agp.create_time,'%Y-%m-%d %H:%i:%s') as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
-		agp.buy, agro.duration,  agro.item_id from 
+		agp.buy, agro.duration,  agro.specs_tp_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
@@ -84,7 +72,7 @@
 		select agr.id, agr.status, agr.init_price, agr.floor_price, 
 		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time, agr.update_time, agr.user_id, 
 		agp.id as recordId, DATE_FORMAT(agp.create_time ,'%Y-%m-%d %H:%i:%s') as sub_create_time, agp.user_id as sub_user_id, agp.bargain_price, 
-		agp.buy, agro.duration,  agro.item_id from 
+		agp.buy, agro.duration,  agro.specs_tp_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 
@@ -104,24 +92,12 @@
 		where agr.id = #{id}
 	</select>
 	
-	<select id="listActiceGoods" parameterType="Object" resultMap="activeGoods">
-		select g.id, g.goods_name, g.description, g.origin, gs.fxqty as stock, gf.path, gi.item_id   
-		from goods g left join goods_item gi on g.goods_id = gi.goods_id 
-		left join goods_stock gs on gs.item_id = gi.item_id 
-		left join goods_file gf on g.goods_id = gf.goods_id 
-		where gi.item_id in 
-		<foreach collection="list" open="(" close=")" separator="," item="item">
-			#{item}
-		</foreach>
-		group by g.goods_id,gi.item_id
-	</select>
-	
 	<select id="getBargainDetailByParam" parameterType="Object" resultMap="userBargain">
 		select agr.id, agr.status, agr.init_price, agr.floor_price, 
 		DATE_FORMAT(agr.create_time,'%Y-%m-%d %H:%i:%s') as create_time, 
 		agr.update_time, agr.user_id, 
 		agp.id as recordId, DATE_FORMAT(agp.create_time,'%Y-%m-%d %H:%i:%s') as sub_create_time, agp.user_id as sub_user_id, agp.user_name, 
-		agp.user_img, agp.bargain_price, agp.buy, agro.duration,  agro.item_id from 
+		agp.user_img, agp.bargain_price, agp.buy, agro.duration,  agro.specs_tp_id from 
 		activity_goods_record agr left join 
 		activity_goods_participant agp on agr.id = agp.goods_record_id  left join 
 		activity_goods_role agro on agr.goods_role_id = agro.id 

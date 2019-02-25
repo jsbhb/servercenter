@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,8 +23,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.BooleanFilter;
 import org.apache.lucene.search.BooleanClause;
@@ -68,7 +71,7 @@ public class GoodsLucene extends AbstractLucene {
 
 	private static String decimalFormat = "000000000";
 
-	private SplitAnalyzer splitAnalyzer = new SplitAnalyzer(",");// 按逗号分词
+	// private SplitAnalyzer splitAnalyzer = new SplitAnalyzer(",");// 按逗号分词
 
 	@Override
 	public <T> void writerIndex(List<T> objList) {
@@ -95,14 +98,14 @@ public class GoodsLucene extends AbstractLucene {
 		Document doc;
 		long time = 0;
 		GoodsSearch model = (GoodsSearch) obj;
-		//初始化导购信息
+		// 初始化导购信息
 		model.initGuideProperty();
 		doc = new Document();
 		doc.add(new StringField("specsTpId", model.getSpecsTpId(), Store.YES));
 
 		// 商品名称设置权重
 		TextField commodityName = new TextField("goodsName", model.getGoodsName() == null ? "" : model.getGoodsName(),
-				Store.YES);
+				Store.NO);
 		doc.add(commodityName);
 
 		doc.add(new IntField("ratio", model.getRatio() == null ? 0 : model.getRatio(), Store.NO));
@@ -115,13 +118,8 @@ public class GoodsLucene extends AbstractLucene {
 		doc.add(new StringField("price", model.getPrice() == null ? "0" : df2.format((model.getPrice() * 100)) + "",
 				Store.NO));
 		if (model.getGuideList() != null) {
-			try {
-				for (GuideProperty property : model.getGuideList()) {
-					doc.add(new TextField(property.getName(), splitAnalyzer.tokenStream(property.getName(),
-							new StringReader(property.getValue() == null ? "" : property.getValue()))));
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			for (GuideProperty property : model.getGuideList()) {
+				doc.add(new StoredField(property.getName(), property.getValue()));
 			}
 		}
 		try {
@@ -159,53 +157,51 @@ public class GoodsLucene extends AbstractLucene {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> packageData(Highlighter highlighter, TopDocs results, ScoreDoc[] hits,
 			TopDocs allResults) throws IOException, InvalidTokenOffsetsException {
 
 		Document doc1;
-		GoodsSearch info = null;
 		Map<String, Object> result = new HashMap<String, Object>(16);
 		List<String> commodityIdList = new ArrayList<String>();
-
-		Map<String, GoodsSearch> highlighterModel = new HashMap<String, GoodsSearch>();
 		for (ScoreDoc hit : hits) {
 			doc1 = indexSearch.doc(hit.doc);
-			String res = doc1.get("goodsId");
+			String res = doc1.get("specsTpId");
 			if (res != null) {
-				info = new GoodsSearch();
-				info.setGoodsName(highlighter.getBestFragment(analyzer, "goodsName", doc1.get("goodsName")));
-				highlighterModel.put(res, info);
 				commodityIdList.add(res);
 			}
 		}
-		Set<String> brandSet = new HashSet<String>();
-		Set<String> originSet = new HashSet<String>();
+		Set<String> tmpSet = null;
+		IndexableField idxField = null;
 		for (ScoreDoc hit : allResults.scoreDocs) {
 			doc1 = indexSearch.doc(hit.doc);
-			String res = doc1.get("brand");
-			if (res != null) {
-				brandSet.add(res);
+			Iterator<IndexableField> it = doc1.iterator();
+			while (it.hasNext()) {
+				idxField = it.next();
+				if (idxField.fieldType().stored()) {
+					if (!idxField.name().equals("specsTpId")) {
+						if (result.get(idxField.name()) == null) {
+							tmpSet = new HashSet<>();
+							tmpSet.add(idxField.stringValue());
+							result.put(idxField.name(), tmpSet);
+						} else {
+							Set<String> set = (Set<String>) result.get(idxField.name());
+							set.add(idxField.stringValue());
+						}
+					}
+				}
 			}
-			res = doc1.get("origin");
-			if (res != null) {
-				originSet.add(res);
-			}
-
 		}
 		result.put(Constants.TOTAL, results.totalHits);
 		result.put(Constants.ID_LIST, commodityIdList);
-		result.put(Constants.HIGHLIGHTER_MODEL, highlighterModel);
-		result.put(Constants.BRAND, brandSet);
-		result.put(Constants.ORIGIN, originSet);
 
 		return result;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void renderParameter(List<String> keyWordsList, List<String> filedsList, Map<String, String> accuratePara,
-			Object obj) {
+	public void renderParameter(Map<String, String> searchPara, Map<String, String> accuratePara, Object obj) {
 
 		Object o = null;
 
@@ -231,10 +227,16 @@ public class GoodsLucene extends AbstractLucene {
 			}
 			if (o != null) {
 				if (SearchCondition.FILTER == searchCondition.value()) {
-					accuratePara.put(field.getName(), o + "");
+					if (field.getName().equals("guideList")) {
+						List<GuideProperty> list = (List<GuideProperty>) o;
+						for (GuideProperty p : list) {
+							accuratePara.put(p.getName(), p.getValue());
+						}
+					} else {
+						accuratePara.put(field.getName(), o + "");
+					}
 				} else if (SearchCondition.SEARCH == searchCondition.value()) {
-					keyWordsList.add(o + "");
-					filedsList.add(field.getName());
+					searchPara.put(field.getName(), o + "");
 				}
 			}
 		}
@@ -269,24 +271,24 @@ public class GoodsLucene extends AbstractLucene {
 	}
 
 	@Override
-	public Query packageQuery(List<String> keyWordsList, List<String> filedsList) throws IOException {
+	public Query packageQuery(Map<String, String> searchPara) throws IOException {
 		BooleanQuery query = new BooleanQuery();
 		TokenStream stream = null;
-		for (int i = 0; i < keyWordsList.size(); i++) {
-			if (filedsList.get(i).contains("Category") || filedsList.get(i).contains("upShelves")) {
-				Term tm = new Term(filedsList.get(i), keyWordsList.get(i));
+		for (Map.Entry<String, String> entry : searchPara.entrySet()) {
+			if (entry.getKey().contains("Category") || entry.getKey().contains("upShelves")) {
+				Term tm = new Term(entry.getKey(), entry.getValue());
 				Query termQuery = new TermQuery(tm);
 				return termQuery;
 			}
 			BooleanQuery query1 = new BooleanQuery();
 
-			stream = analyzer.tokenStream(filedsList.get(i), new StringReader(keyWordsList.get(i)));
+			stream = analyzer.tokenStream(entry.getKey(), new StringReader(entry.getValue()));
 
 			CharTermAttribute cta = stream.addAttribute(CharTermAttribute.class);
 			stream.reset();
 			while (stream.incrementToken()) {
 				System.out.println(cta.toString());
-				Term tm = new Term(filedsList.get(i), cta.toString());
+				Term tm = new Term(entry.getKey(), cta.toString());
 
 				TermQuery parser = new TermQuery(tm);
 				query1.add(parser, BooleanClause.Occur.MUST);
@@ -350,8 +352,8 @@ public class GoodsLucene extends AbstractLucene {
 	public void deleteIndex(List<String> list) {
 		try {
 			if (list != null && list.size() > 0) {
-				for (String goodsId : list) {
-					indexWriter.deleteDocuments(new Term("goodsId", goodsId));
+				for (String specsTpId : list) {
+					indexWriter.deleteDocuments(new Term("specsTpId", specsTpId));
 				}
 			}
 			indexWriter.commit();

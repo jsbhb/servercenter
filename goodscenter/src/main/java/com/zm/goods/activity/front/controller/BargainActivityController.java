@@ -18,8 +18,8 @@ import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
-import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.bo.DealOrderDataBO;
 
 @RestController
 public class BargainActivityController {
@@ -135,9 +135,9 @@ public class BargainActivityController {
 	 */
 	@RequestMapping(value = "{version}/active/bargain/goods/info", method = RequestMethod.POST)
 	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
-			@RequestBody List<OrderBussinessModel> list, Integer userId, Integer id) {
+			@RequestBody DealOrderDataBO bo, Integer id) {
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return bargainActivityService.getBargainGoodsInfo(list, userId, id);
+			return bargainActivityService.getBargainGoodsInfo(bo, id);
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());

@@ -36,15 +36,16 @@ import com.zm.goods.activity.model.bargain.vo.BargainGoods;
 import com.zm.goods.activity.model.bargain.vo.MyBargain;
 import com.zm.goods.activity.model.bargain.vo.MyBargainRecord;
 import com.zm.goods.bussiness.dao.GoodsMapper;
+import com.zm.goods.bussiness.service.GoodsFeignService;
+import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.exception.ActiviteyException;
+import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.feignclient.UserFeignClient;
 import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.Tax;
-import com.zm.goods.pojo.po.GoodsSpecs;
+import com.zm.goods.pojo.bo.DealOrderDataBO;
+import com.zm.goods.pojo.vo.GoodsVO;
 import com.zm.goods.utils.CalculationUtils;
 import com.zm.goods.utils.DateUtil;
 
@@ -62,7 +63,13 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	RedisTemplate<String, String> template;
 
 	@Resource
+	GoodsService goodsService;
+
+	@Resource
 	GoodsMapper goodsMapper;
+
+	@Resource
+	GoodsFeignService goodsFeignService;
 
 	@Override
 	public List<MyBargain> listMyBargain(Integer userId, Integer start) {
@@ -152,13 +159,22 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	 */
 	private void renderBargain(List<MyBargain> myBargainList, boolean isDetail) {
 		// 获取商品信息
-		List<String> itemIdList = myBargainList.stream().map(my -> my.getItemId()).collect(Collectors.toList());
-		List<ActiveGoods> goodsList = bargainMapper.listActiceGoods(itemIdList);
+		List<String> specsTpIdList = myBargainList.stream().map(my -> my.getSpecsTpId()).collect(Collectors.toList());
+		List<ActiveGoods> goodsList = new ArrayList<>();
+		try {
+			List<GoodsVO> voList = goodsService.listGoodsSpecs(specsTpIdList, 99, 0);
+			BargainEntityConverter converter = new BargainEntityConverter();
+			voList.stream().forEach(vo -> {
+				goodsList.add(converter.GoodsVO2ActiveGoods(vo));
+			});
+		} catch (WrongPlatformSource e) {
+			e.printStackTrace();
+		}
 		// 完善数据
 		Map<String, ActiveGoods> map = goodsList.stream()
-				.collect(Collectors.toMap(ActiveGoods::getItemId, ActiveGoods -> ActiveGoods));
+				.collect(Collectors.toMap(ActiveGoods::getSpecsTpId, ActiveGoods -> ActiveGoods));
 		myBargainList.forEach(myBargain -> {
-			ActiveGoods goods = map.get(myBargain.getItemId());
+			ActiveGoods goods = map.get(myBargain.getSpecsTpId());
 			myBargain.setGoodsImg(goods.getPath());
 			myBargain.setGoodsName(goods.getGoodsName());
 			myBargain.setStock(goods.getStock());
@@ -223,14 +239,23 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			// 获取前端展示需要的对象
 			bargainGoodsList = convert.BargainRulePO2BargainGoods(page);
 			// 获取商品信息
-			List<String> itemIdList = bargainGoodsList.stream().map(goods -> goods.getItemId())
+			List<String> specsTpIds = bargainGoodsList.stream().map(goods -> goods.getSpecsTpId())
 					.collect(Collectors.toList());
-			List<ActiveGoods> goodsList = bargainMapper.listActiceGoods(itemIdList);
+			List<ActiveGoods> goodsList = new ArrayList<>();
+			try {
+				List<GoodsVO> voList = goodsService.listGoodsSpecs(specsTpIds, 99, 0);
+				BargainEntityConverter converter = new BargainEntityConverter();
+				voList.stream().forEach(vo -> {
+					goodsList.add(converter.GoodsVO2ActiveGoods(vo));
+				});
+			} catch (WrongPlatformSource e) {
+				e.printStackTrace();
+			}
 			// 完善商品数据
 			Map<String, ActiveGoods> map = goodsList.stream()
-					.collect(Collectors.toMap(ActiveGoods::getItemId, ActiveGoods -> ActiveGoods));
+					.collect(Collectors.toMap(ActiveGoods::getSpecsTpId, ActiveGoods -> ActiveGoods));
 			bargainGoodsList.forEach(goods -> {
-				ActiveGoods activeGoods = map.get(goods.getItemId());
+				ActiveGoods activeGoods = map.get(goods.getSpecsTpId());
 				goods.setGoodsImg(activeGoods.getPath());
 				goods.setGoodsName(activeGoods.getGoodsName());
 				goods.setStock(activeGoods.getStock());
@@ -336,30 +361,10 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 	}
 
 	@Override
-	public ResultModel getBargainGoodsInfo(List<OrderBussinessModel> list, Integer userId, Integer id) {
-		Map<String, Tax> tempTaxMap = new HashMap<String, Tax>();// 税费temp
-		Map<Tax, Double> taxMap = new HashMap<Tax, Double>();// 税费map
-		ResultModel result = new ResultModel(true, "");
-		Map<String, Object> map = new HashMap<String, Object>();// 返回结果的map
-		List<String> itemIds = list.stream().map(OrderBussinessModel::getItemId).collect(Collectors.toList());
-		// 获取所有税率信息
-		List<Tax> taxList = goodsMapper.getTax(itemIds);
-		for (Tax tax : taxList) {
-			tempTaxMap.put(tax.getItemId(), tax);
-		}
+	public ResultModel getBargainGoodsInfo(DealOrderDataBO bo, Integer id) {
 		Map<String, Object> param = new HashMap<String, Object>();// 参数map
-		param.put("list", itemIds);
-		List<GoodsSpecs> specsList = goodsMapper.getGoodsSpecsForOrder(param);
-		if (specsList == null || specsList.size() == 0) {
-			return new ResultModel(false, ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorCode(),
-					"所有商品" + ErrorCodeEnum.GOODS_DOWNSHELVES.getErrorMsg());
-		}
-		int weight = 0;
-		for (GoodsSpecs specs : specsList) {
-			weight += specs.getWeight() * list.get(0).getQuantity();
-		}
 		int type = bargainMapper.getRuleTypeByUserBargainId(id);// 获取该砍价记录的模式
-		param.put("userId", userId);
+		param.put("userId", bo.getUserId());
 		param.put("id", id);
 		param.put("type", type);
 		param.put("accurate", "yes");// 如果是订单作用的，需要根据userId等信息精确查询
@@ -367,22 +372,19 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		if (userBargainPO == null) {
 			return new ResultModel(false, "没有该活动订单");
 		}
-		boolean buy = userBargainPO.getBargainList().stream().filter(record -> record.getUserId() == userId).findAny()
-				.get().isBuy();
+		boolean buy = userBargainPO.getBargainList().stream().filter(record -> record.getUserId() == bo.getUserId())
+				.findAny().get().isBuy();
 		if (buy) {
 			return new ResultModel(false, "你已经买过该商品");
 		}
-		taxMap.put(tempTaxMap.get(list.get(0).getItemId()), userBargainPO.getInitPrice());// 税率对应的总金额
 		double alreadyBargainPrice = userBargainPO.getBargainList().stream()
 				.mapToDouble(BargainRecordPO::getBargainPrice).sum();
 		double totalAmount = CalculationUtils.sub(userBargainPO.getInitPrice(), alreadyBargainPrice);
-		totalAmount = CalculationUtils.round(2, totalAmount);
-		map.put("tax", taxMap);
-		map.put("originalPrice", userBargainPO.getInitPrice());
-		map.put("weight", weight);
-		map.put("totalAmount", totalAmount);
-		result.setSuccess(true);
-		result.setObj(map);
+		if (bo.getModelList().get(0).getActualPrice() != totalAmount) {
+			LogUtil.writeLog("前端价格：" + bo.getModelList().get(0).getActualPrice() + " =====后台计算价格：" + totalAmount);
+			return new ResultModel(false, "已砍价格和后台不一样");
+		}
+		ResultModel result = goodsFeignService.getPriceAndDelStock(bo);
 		return result;
 	}
 
@@ -420,7 +422,7 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 			}
 			BargainRecordPO record = userBargainPO.getBargainList().stream()
 					.filter(r -> dto.getUserId().equals(r.getUserId())).findAny().get();
-			if(record.isBuy()){
+			if (record.isBuy()) {
 				return new ResultModel(false, "", "你已经购买过该商品，不能重新发起砍价");
 			}
 		} catch (ParseException e) {
@@ -431,8 +433,8 @@ public class BargainActivityServiceImpl implements BargainActivityService {
 		if (num == 0) {
 			return new ResultModel(false, "", "没有满足条件的砍价记录可以发起重新砍价");
 		}
-		template.delete(BargainActiveComponent.BARGAIN_ACTIVE_PER+dto.getId());//删除redis数据
-		dto.setId(userBargainPO.getGoodsRoleId());//设置roleId
+		template.delete(BargainActiveComponent.BARGAIN_ACTIVE_PER + dto.getId());// 删除redis数据
+		dto.setId(userBargainPO.getGoodsRoleId());// 设置roleId
 		int id = startBargain(dto);// 开始砍价
 		return new ResultModel(true, id);
 	}

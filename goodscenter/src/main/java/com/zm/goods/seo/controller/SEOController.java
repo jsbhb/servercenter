@@ -28,23 +28,6 @@ public class SEOController {
 	SEOService seoService;
 
 	/**
-	 * @fun 获取item的stock
-	 * @param version
-	 * @param goodsId
-	 * @return
-	 */
-	@RequestMapping(value = "auth/{version}/goods/stock/{centerId}/{goodsId}", method = RequestMethod.GET)
-	public ResultModel getGoodsStock(@PathVariable("version") Double version, @PathVariable("goodsId") String goodsId,
-			@PathVariable("centerId") Integer centerId) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			return new ResultModel(true, seoService.getGoodsStock(goodsId, centerId));
-		}
-
-		return null;
-	}
-
-	/**
 	 * @fun 发布导航
 	 * @param version
 	 * @return
@@ -83,10 +66,10 @@ public class SEOController {
 	 */
 	@RequestMapping(value = "{version}/goods/publish/{centerId}", method = RequestMethod.POST)
 	public ResultModel goodsPublish(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestBody List<String> goodsIdList) {
+			@RequestBody List<String> specsTpIdList) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return seoService.publishByGoodsId(goodsIdList, centerId, true);
+			return seoService.publishGoods(specsTpIdList);
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -99,11 +82,11 @@ public class SEOController {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/goods/publish/del/{centerId}", method = RequestMethod.POST)
-	public ResultModel goodsPublishDel(@PathVariable("version") Double version, @RequestBody List<String> goodsIdList,
+	public ResultModel goodsPublishDel(@PathVariable("version") Double version, @RequestBody List<String> specsTpIdList,
 			@PathVariable("centerId") Integer centerId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return seoService.delPublishByGoodsId(goodsIdList, centerId);
+			return seoService.delPublishGoods(specsTpIdList);
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
@@ -118,10 +101,10 @@ public class SEOController {
 	@RequestMapping(value = "auth/{version}/goods/access-path", method = RequestMethod.GET)
 	public ResultModel getGoodsAccessPath(@PathVariable("version") Double version,
 			@RequestParam(value = "goodsId", required = false) String goodsId,
-			@RequestParam(value = "itemId", required = false) String itemId) {
+			@RequestParam(value = "specsTpId", required = false) String specsTpId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			return seoService.getGoodsAccessPath(goodsId, itemId);
+			return seoService.getGoodsAccessPath(goodsId, specsTpId);
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),

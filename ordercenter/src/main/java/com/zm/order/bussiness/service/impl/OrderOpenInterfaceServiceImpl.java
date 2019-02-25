@@ -3,15 +3,16 @@ package com.zm.order.bussiness.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zm.order.bussiness.component.OpenInterfaceUtil;
 import com.zm.order.bussiness.component.OrderComponentUtil;
 import com.zm.order.bussiness.component.ShareProfitComponent;
@@ -26,14 +27,17 @@ import com.zm.order.exception.ParameterException;
 import com.zm.order.exception.RuleCheckException;
 import com.zm.order.feignclient.GoodsFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
-import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.ButtJointOrder;
 import com.zm.order.pojo.ErrorCodeEnum;
+import com.zm.order.pojo.OrderGoods;
+import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.OrderStatus;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.pojo.bo.DealOrderDataBO;
 import com.zm.order.pojo.bo.ExpressRule;
+import com.zm.order.pojo.bo.OrderGoodsCompleteBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
 import com.zm.order.utils.JSONUtil;
 
@@ -65,7 +69,6 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 	@Resource
 	CacheAbstractService cacheAbstractService;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel addOrder(String order) throws Exception {
 
@@ -114,74 +117,42 @@ public class OrderOpenInterfaceServiceImpl implements OrderOpenInterfaceService 
 		orderInfo.setUserId(Integer.valueOf(resultModel.getObj().toString()));
 
 		// 判断费用
-		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(orderInfo, null);
-		resultModel = goodsFeignClient.getPriceAndDelStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
-				false, 2, orderInfo.getOrderFlag(), orderInfo.getCouponIds(), orderInfo.getUserId(), true, 0, 0);
+		DealOrderDataBO bo = OrderConvertUtil.convertToDealOrderDataBO(orderInfo, null, false, true);
+		resultModel = orderComponentUtil.doOrderGoodsDeal(bo, orderInfo.getCreateType());
 		if (!resultModel.isSuccess()) {
 			return resultModel;
 		}
-		Map<String, Object> priceAndWeightMap = null;
-		Double amount = 0.0;
-		priceAndWeightMap = (Map<String, Object>) resultModel.getObj();
-		amount = (Double) priceAndWeightMap.get("totalAmount");// 商品总价（扣掉了优惠券，折扣）
-
+		// 处理订单
 		// 邮费和税费初始值
-		Double postFee = 0.0;// 邮费
-		Double unDiscountAmount = (Double) priceAndWeightMap.get("originalPrice");// 商品原总价
+		Double postFee = 0.0;
 		TaxFeeBO taxFee = new TaxFeeBO();// 税费对象
-		Integer weight = (Integer) priceAndWeightMap.get("weight");
-
-		// 获取包邮包税
-		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<String, String> tempMap = hashOperations.entries(Constants.POST_TAX + orderInfo.getSupplierId());
-		boolean freePost = false;
-		boolean freeTax = false;
-		if (tempMap != null) {
-			freePost = Constants.FREE_POST.equals(tempMap.get("post"))
-					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
-			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
-		}
-		if (!freePost) {
-			// 计算邮费(自提不算邮费)
-			postFee = orderComponentUtil.getPostFee(orderInfo, amount, weight);
-		}
-		if (!freeTax) {
-			// 计算税费相关
-			if (Constants.O2O_ORDER_TYPE.equals(orderInfo.getOrderFlag())) {
-				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
-				// 获取税费
-				taxFee = orderComponentUtil.getTaxFee(map, unDiscountAmount, postFee, resultModel);
-				if (!resultModel.isSuccess()) {
-					return resultModel;
-				}
-			}
-		}
-
+		double amount = orderInfo.getOrderGoodsList().stream().mapToDouble(OrderGoods::getItemPrice).sum();
+		List<OrderGoodsCompleteBO> boList = JSONUtil.parse(JSONUtil.toJson(resultModel.getObj()),
+				new TypeReference<List<OrderGoodsCompleteBO>>() {
+				});
+		// 获取税费
+		taxFee = orderComponentUtil.getTaxFee(boList, amount, postFee);
 		// 判断价格是否一致
 		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, orderInfo)) {
 			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
 					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
 
-		if (orderInfo.getOrderFlag().equals(Constants.GENERAL_TRADE)) {// 一般贸易订单状态已付款
-			orderInfo.setStatus(Constants.ORDER_PAY);
-		} else if (orderInfo.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)) {// 跨境订单状态为支付单报关
-			orderInfo.setStatus(Constants.ORDER_PAY_CUSTOMS);
+		// 拆单
+		Map<Integer, List<OrderGoodsCompleteBO>> map = boList.stream()
+				.collect(Collectors.groupingBy(OrderGoodsCompleteBO::getSupplierId));
+		List<OrderInfo> infoList = orderComponentUtil.splitOrderInfo(orderInfo, map);
+		// 封装该订单商品的每一级的返佣比例
+		for (OrderInfo info : infoList) {
+			orderComponentUtil.packGoodsRebateByGrade(info);
+			if (info.getOrderFlag().equals(Constants.GENERAL_TRADE)) {// 一般贸易订单状态已付款
+				info.setStatus(Constants.ORDER_PAY);
+			} else if (info.getOrderFlag().equals(Constants.O2O_ORDER_TYPE)) {// 跨境订单状态为支付单报关
+				info.setStatus(Constants.ORDER_PAY_CUSTOMS);
+			}
 		}
-
-		// 判断库存
-		resultModel = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, orderInfo.getSupplierId(),
-				orderInfo.getOrderFlag());
-		if (!resultModel.isSuccess()) {
-			return new ResultModel(false, ErrorCodeEnum.OUT_OF_STOCK.getErrorCode(),
-					resultModel.getErrorMsg() + ErrorCodeEnum.OUT_OF_STOCK.getErrorMsg());
-		}
-
-		// 把商品的返佣补全
-		orderComponentUtil.renderOrderInfo(orderInfo, null, null, null, null, false);
-
 		// 保存订单
-		orderComponentUtil.saveOrder(orderInfo);
+		orderComponentUtil.saveOrder(infoList);
 
 		shareProfitComponent.calShareProfitStayToAccount(orderInfo.getOrderId());// 计算资金池和返佣
 		return new ResultModel(true, null);

@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.zm.goods.common.Pagination;
+import com.zm.goods.pojo.po.GoodsPrice;
 import com.zm.goods.utils.JSONUtil;
 
 /**

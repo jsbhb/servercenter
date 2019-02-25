@@ -7,7 +7,7 @@ import com.zm.order.common.Pagination;
 import io.swagger.annotations.ApiModel;
 
 @ApiModel
-public class OrderInfo extends Pagination{
+public class OrderInfo extends Pagination implements Cloneable {
 
 	private Integer id;
 
@@ -27,7 +27,7 @@ public class OrderInfo extends Pagination{
 	protected Integer centerId;
 
 	protected Integer shopId;
-	
+
 	protected String shopName;
 
 	protected Integer guideId;
@@ -35,8 +35,8 @@ public class OrderInfo extends Pagination{
 	protected Integer supplierId;
 
 	protected Integer tdq;
-	
-	protected Integer orderSource;//0：PC;1：手机:3：有赞；4：线下；5：展厅；6：大客户；7：福利商城；8：后台订单
+
+	protected Integer orderSource;// 0：PC;1：手机:3：有赞；4：线下；5：展厅；6：大客户；7：福利商城；8：后台订单
 
 	protected Integer weight;
 
@@ -65,29 +65,50 @@ public class OrderInfo extends Pagination{
 	private String endTime;
 
 	private String couponIds;
-	
+
 	private Integer pushUserId;
-	
+
 	private Integer tagFun;
-	
-	private Integer manual;//是否手工单，0：自动；1手动
+
+	private Integer manual;// 是否手工单，0：自动；1手动
+
+	private int handle;// 是否需要人工介入，0：否，1是
 
 	protected Integer createType;// 0:普通订单；1：活动订单；2：优惠券订单；3：活动+优惠券；4:预售订单；5：对接订单
-	
-	private Integer isEshopIn;//Eshop是否入库，0：未入库；1入库
-	
-	private Integer purchasingOrder;//采购订单0：否，1是
-	
+
+	private Integer isEshopIn;// Eshop是否入库，0：未入库；1入库
+
+	private Integer purchasingOrder;// 采购订单0：否，1是
+
 	private String deliveryTime;
-	
+
 	private String opt;
+
+	public OrderInfo clone() {
+		OrderInfo o = null;
+		try {
+			o = (OrderInfo) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		o.orderDetail = (OrderDetail) orderDetail.clone();
+		return o;
+	}
 
 	public boolean check() {
 		if (orderDetail == null || orderGoodsList == null || orderFlag == null || createType == null || userId == null
-				|| tdq == null || expressType == null || supplierId == null) {
+				|| tdq == null || expressType == null) {
 			return false;
 		}
 		return true;
+	}
+
+	public int getHandle() {
+		return handle;
+	}
+
+	public void setHandle(int handle) {
+		this.handle = handle;
 	}
 
 	public String getShopName() {
@@ -380,5 +401,4 @@ public class OrderInfo extends Pagination{
 				+ ", orderDetail=" + orderDetail + ", orderGoodsList=" + orderGoodsList + ", orderExpressList="
 				+ orderExpressList + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
-
 }

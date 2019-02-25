@@ -1,8 +1,8 @@
 package com.zm.goods.bussiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,35 +16,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zm.goods.annotation.GoodsLifeCycle;
 import com.zm.goods.bussiness.component.GoodsServiceComponent;
-import com.zm.goods.bussiness.component.PriceComponent;
 import com.zm.goods.bussiness.component.ThreadPoolComponent;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
-import com.zm.goods.enummodel.TpGoodsDisplay;
+import com.zm.goods.enummodel.AutoSelectionModeEnum;
+import com.zm.goods.enummodel.TpGoodsDisplayEnum;
 import com.zm.goods.enummodel.TradePatternEnum;
 import com.zm.goods.exception.WrongPlatformSource;
 import com.zm.goods.factory.ViewObjectFactory;
 import com.zm.goods.feignclient.SupplierFeignClient;
-import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
-import com.zm.goods.pojo.bo.CategoryBO;
-import com.zm.goods.pojo.bo.ItemCountBO;
+import com.zm.goods.pojo.bo.AutoSelectionBO;
 import com.zm.goods.pojo.dto.GoodsSearch;
-import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.po.Goods;
+import com.zm.goods.pojo.po.GoodsPricePO;
 import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
+import com.zm.goods.pojo.po.Items;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.GoodsSpecsVO;
 import com.zm.goods.pojo.vo.GoodsVO;
+import com.zm.goods.pojo.vo.SpecsTpStockVO;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 import com.zm.goods.utils.JSONUtil;
 import com.zm.goods.utils.PinYin4JUtil;
@@ -54,10 +51,6 @@ import com.zm.goods.utils.lucene.LuceneFactory;
 @Service("goodsService")
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class GoodsServiceImpl implements GoodsService {
-
-	private final Integer PICTURE_TYPE = 0;
-
-	private final Integer COOK_BOOK_TYPE = 1;
 
 	@Resource
 	GoodsMapper goodsMapper;
@@ -69,13 +62,24 @@ public class GoodsServiceImpl implements GoodsService {
 	SupplierFeignClient supplierFeignClient;
 
 	@Resource
-	PriceComponent priceComponent;
-
-	@Resource
 	GoodsServiceComponent goodsServiceComponent;
 
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
+
+	@Override
+	public List<SpecsTpStockVO> getGoodsStock(String goodsId, Integer centerId) {
+		int type = goodsMapper.getGoodsTypeByGoodsId(goodsId);
+		List<GoodsSpecsTradePattern> goodsSpecsTpList = goodsMapper.listGoodsSpecsTpByGoodsId(goodsId);// 获取商品
+		List<WarehouseModel> stockList = packStock(type, goodsSpecsTpList);
+		final List<SpecsTpStockVO> voList = new ArrayList<>();
+		if (stockList != null && stockList.size() > 0) {
+			stockList.stream().forEach(stock -> {
+				voList.add(ViewObjectFactory.createSpecsTpStockVO(stock));
+			});
+		}
+		return voList;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -84,7 +88,7 @@ public class GoodsServiceImpl implements GoodsService {
 			goodsId = goodsMapper.getGoodsIdBySpecsTpId(specsTpId);
 		}
 
-		GoodsItem goods = goodsMapper.getGoodsByGoodsId(goodsId);// 获取Goods
+		Goods goods = goodsMapper.getGoodsByGoodsId(goodsId);// 获取Goods
 		List<GoodsSpecsTradePattern> goodsSpecsTpList = goodsMapper.listGoodsSpecsTpByGoodsId(goodsId);// 获取商品
 		List<GoodsSpecs> specsList = new ArrayList<>();
 		if (goodsSpecsTpList.size() > 0) {// 获取规格
@@ -93,9 +97,16 @@ public class GoodsServiceImpl implements GoodsService {
 			specsList = goodsMapper.listGoodsSpecsBySpecsIds(specsIdList);
 		}
 		// 获取库存
-		TradePatternEnum tpe = TradePatternEnum.values()[goods.getType()];
+		List<WarehouseModel> stockList = packStock(goods.getType(), goodsSpecsTpList);
 		// 构造前端显示对象
-		GoodsVO vo = packGoodsVO(goods, goodsSpecsTpList, specsList, tpe);
+		GoodsVO vo = ViewObjectFactory.createGoodsVO(goods, goodsSpecsTpList, specsList,
+				Optional.ofNullable(stockList));
+		// 补全最小购买量
+		completionMinBuyCount(goods.getType(), vo);
+		// 跨境补全供应商信息
+		if (TradePatternEnum.CROSS_BORDER.getType() == goods.getType()) {
+			completionSupplier(vo);
+		}
 		// 初始化数据
 		vo.init();
 		if (isApplet) {
@@ -105,15 +116,66 @@ public class GoodsServiceImpl implements GoodsService {
 		List<String> bigSaleList = new ArrayList<>();
 		if (bigsaleJson != null) {
 			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
-			if (bigSaleList.contains(vo.getGoodsId())) {
-				vo.setBigSale(true);
+			for(GoodsSpecsVO v : vo.getSpecsList()){
+				if (bigSaleList.contains(v.getSpecsTpId())) {
+					v.setBigSale(true);
+				}
 			}
 		}
 		return vo;
 	}
 
-	private GoodsVO packGoodsVO(GoodsItem goods, List<GoodsSpecsTradePattern> goodsSpecsTpList,
-			List<GoodsSpecs> specsList, TradePatternEnum tpe) {
+	/**
+	 * @fun 补全最小购买量
+	 * @param type
+	 * @param vo
+	 */
+	private void completionMinBuyCount(int type, GoodsVO vo) {
+		TradePatternEnum tpe = TradePatternEnum.valueof(type);
+		List<GoodsPricePO> priceList = null;
+		switch (tpe) {
+		case CROSS_BORDER:
+			List<String> itemIds = vo.getSpecsList().stream().map(tp -> tp.getItemId()).collect(Collectors.toList());
+			priceList = goodsMapper.listGoodsPriceByItemIds(itemIds);
+			Map<String, List<GoodsPricePO>> map = priceList.stream()
+					.collect(Collectors.groupingBy(price -> price.getItemId()));
+			vo.getSpecsList().forEach(specs -> {
+				specs.setMinBuyCount(map.get(specs.getItemId()).stream()
+						.sorted(Comparator.comparing(GoodsPricePO::getMin)).findFirst().get().getMin());
+			});
+			break;
+		case GENERAL_TRADE:
+			List<String> specsTpIds = vo.getSpecsList().stream().map(tp -> tp.getSpecsTpId()).collect(Collectors.toList());
+			priceList = goodsMapper.listGoodsPriceBySpecsTpIds(specsTpIds);
+			Map<String, List<GoodsPricePO>> tmap = priceList.stream()
+					.collect(Collectors.groupingBy(price -> price.getSpecsTpId()));
+			vo.getSpecsList().forEach(specs -> {
+				specs.setMinBuyCount(tmap.get(specs.getSpecsTpId()).stream()
+						.sorted(Comparator.comparing(GoodsPricePO::getMin)).findFirst().get().getMin());
+			});
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	/**
+	 * @fun 补全供应商信息
+	 * @param vo
+	 */
+	private void completionSupplier(GoodsVO vo) {
+		List<String> itemIds = vo.getSpecsList().stream().map(tp -> tp.getItemId()).collect(Collectors.toList());
+		List<Items> itemsList = goodsMapper.listItemsByItemIds(itemIds);
+		Map<String, Items> itemsMap = itemsList.stream().collect(Collectors.toMap(Items::getItemId, items -> items));
+		vo.getSpecsList().stream().forEach(tp -> {
+			tp.setSupplierId(Optional.ofNullable(itemsMap.get(tp.getItemId())).orElse(new Items()).getSupplierId());
+			tp.setSupplierName(Optional.ofNullable(itemsMap.get(tp.getItemId())).orElse(new Items()).getSupplierName());
+		});
+	}
+
+	private List<WarehouseModel> packStock(int type, List<GoodsSpecsTradePattern> goodsSpecsTpList) {
+		TradePatternEnum tpe = TradePatternEnum.valueof(type);
 		List<WarehouseModel> stockList = null;
 		switch (tpe) {
 		case CROSS_BORDER:// 跨境
@@ -130,93 +192,76 @@ public class GoodsServiceImpl implements GoodsService {
 			}
 			break;
 		}
-		GoodsVO vo = ViewObjectFactory.createGoodsVO(goods, goodsSpecsTpList, specsList,
-				Optional.ofNullable(stockList));
-		return vo;
+		return stockList;
 	}
 
 	@Override
-	public List<GoodsFile> listGoodsCookFile(String goodsId) {
-
-		List<String> idList = new ArrayList<String>();
-		idList.add(goodsId);
-		Map<String, Object> parameter = new HashMap<String, Object>();
-		parameter.put("list", idList);
-		parameter.put("type", COOK_BOOK_TYPE);
-
-		return goodsMapper.listGoodsFile(parameter);
-	}
-
-	@Override
-	public Map<String, Object> listGoodsSpecs(List<String> list, int platformSource, int gradeId)
-			throws WrongPlatformSource {
-		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsTpBySpecsTpIds(list);
-		if (specsList == null || specsList.size() == 0) {
+	public List<GoodsVO> listGoodsSpecs(List<String> list, int platformSource, int gradeId) throws WrongPlatformSource {
+		List<GoodsSpecsTradePattern> goodsSpecsTpList = goodsMapper.listGoodsSpecsTpBySpecsTpIds(list);
+		if (goodsSpecsTpList == null || goodsSpecsTpList.size() == 0) {
 			return null;
 		}
+		List<GoodsVO> goodsVOList = packGoodsVOBySpecsTp(goodsSpecsTpList);
+		// 初始化
+		goodsVOList.stream().forEach(vo -> {
+			vo.init();
+			if (TradePatternEnum.CROSS_BORDER.getType() == vo.getType()) {
+				completionSupplier(vo);
+			}
+		});
 		// 设置价格
 		switch (platformSource) {
 		case Constants.WELFARE_WEBSITE:
-			getWelfareWebsitePriceInterval(specsList, gradeId);
+			getWelfareWebsitePriceInterval(goodsSpecsTpList, gradeId);
 			break;
 		case Constants.BACK_MANAGER_WEBSITE:
-			getBackWebsitePriceInterval(specsList, gradeId);
+			getBackWebsitePriceInterval(goodsSpecsTpList, gradeId);
 			break;
 		default:
-			getPriceInterval(specsList);
 			break;
 		}
 
-		List<WarehouseModel> stockList = goodsMapper.listWarehouse(list);
-		// 设置库存
-		for (GoodsSpecs specs : specsList) {
-			for (WarehouseModel model : stockList) {
-				if (specs.getItemId().equals(model.getItemId())) {
-					specs.setStock(model.getFxqty());
-					break;
-				}
-			}
-		}
-
-		// 设置图片
-		List<String> idList = new ArrayList<String>();
-		for (GoodsSpecs model : specsList) {
-			idList.add(model.getGoodsId());
-		}
-
-		Map<String, Object> parameter = new HashMap<String, Object>();
-		parameter.put("list", idList);
-		parameter.put("type", PICTURE_TYPE);
-
-		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
-
-		Map<String, Object> result = new HashMap<String, Object>();
-
-		result.put("specsList", specsList);
-		result.put("pic", fileList);
-
-		return result;
+		return goodsVOList;
 	}
 
-	private void getBackWebsitePriceInterval(List<GoodsSpecs> specsList, int gradeId) {
-		for (GoodsSpecs specs : specsList) {
+	/**
+	 * @fun 根据GoodsSpecsTradePattern生成GoodsVO
+	 * @param goodsSpecsTpList
+	 * @return
+	 */
+	private List<GoodsVO> packGoodsVOBySpecsTp(List<GoodsSpecsTradePattern> goodsSpecsTpList) {
+		// 获取goods
+		List<String> goodsIds = goodsSpecsTpList.stream().map(tp -> tp.getGoodsId()).collect(Collectors.toList());
+		List<Goods> goodsList = goodsMapper.listGoodsItemByGoodsIds(goodsIds);
+		// 获取specs
+		List<String> specsIds = goodsSpecsTpList.stream().map(tp -> tp.getSpecsId()).collect(Collectors.toList());
+		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsBySpecsIds(specsIds);
+		List<GoodsVO> goodsVOList = new ArrayList<>();
+		List<GoodsSpecsTradePattern> tmpList = new ArrayList<>();
+		Map<String, Goods> goodsMap = goodsList.stream()
+				.collect(Collectors.toMap(Goods::getGoodsId, GoodsItem -> GoodsItem));
+		goodsSpecsTpList.stream().forEach(specsTp -> {
+			tmpList.clear();
+			tmpList.add(specsTp);
+			goodsVOList
+					.add(ViewObjectFactory.createGoodsVO(goodsMap.get(specsTp.getGoodsId()), tmpList, specsList, null));
+		});
+		return goodsVOList;
+	}
+
+	private void getBackWebsitePriceInterval(List<GoodsSpecsTradePattern> goodsSpecsTpList, int gradeId) {
+		for (GoodsSpecsTradePattern specs : goodsSpecsTpList) {
 			goodsServiceComponent.getBackWebsitePriceInterval(specs, specs.getDiscount(), gradeId);
 		}
 	}
 
-	private void getWelfareWebsitePriceInterval(List<GoodsSpecsTradePattern> goodsSpecsTpList, int gradeId) throws WrongPlatformSource {
+	private void getWelfareWebsitePriceInterval(List<GoodsSpecsTradePattern> goodsSpecsTpList, int gradeId)
+			throws WrongPlatformSource {
 		for (GoodsSpecsTradePattern specs : goodsSpecsTpList) {
 			goodsServiceComponent.getWelfareWebsitePriceInterval(specs, specs.getDiscount(), gradeId);
 		}
 	}
 
-	private void getPriceInterval(List<GoodsSpecs> specsList) {
-		for (GoodsSpecs specs : specsList) {
-			goodsServiceComponent.getPriceInterval(specs, specs.getDiscount());
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	private void renderLuceneModel(Integer id, List<String> specsTpIdList) {
 		// 获取需要建索引的数据
 		List<GoodsSearch> indexList = goodsMapper.listSpecsNeedToCreateIndex(specsTpIdList);
@@ -225,49 +270,12 @@ public class GoodsServiceImpl implements GoodsService {
 		lucene.writerIndex(indexList);
 	}
 
-	// 更新上架中goods的tag lucene索引
+	// 更新lucene索引
 	@Override
-	public void updateLuceneIndex(List<String> updateTagList, Integer centerId) {
-		List<GoodsItem> itemList = goodsMapper.listGoodsForLuceneUpdateTag(updateTagList);
-		if (itemList != null && itemList.size() > 0) {
-			GoodsSearch search = null;
-			StringBuilder sb = new StringBuilder();
-			List<GoodsSearch> searchList = new ArrayList<GoodsSearch>();
-			Map<String, Double> result = null;
-			for (GoodsItem item : itemList) {
-				boolean isFx = false;
-				sb.delete(0, sb.length());
-				search = new GoodsSearch();
-				LucenceModelConvertor.convertToGoodsSearch(item, search);
-				if (item.getGoodsSpecsList() != null) {
-					result = goodsServiceComponent.getMinPrice(item.getGoodsSpecsList(), false);
-					search.setPrice(result.get("realPrice"));
-					for (GoodsSpecs specs : item.getGoodsSpecsList()) {
-						if (specs.getFx() == CAN_BE_FX) {// 有一个可以分销的就要做进lucene
-							isFx = true;
-						}
-						if (specs.getTagList() != null) {
-							for (GoodsTagEntity entity : specs.getTagList()) {
-								sb.append(entity.getTagName() + ",");
-							}
-						}
-					}
-					if (sb.length() > 0) {
-						search.setTag(sb.substring(0, sb.length() - 1));
-					} else {
-						search.setTag(sb.toString());
-					}
-					if (isFx) {
-						search.setFx(CAN_BE_FX);
-					} else {
-						search.setFx(CAN_NOT_BE_FX);
-					}
-				}
-				searchList.add(search);
-			}
-			AbstractLucene lucene = LuceneFactory.get(centerId);
-			lucene.updateIndex(searchList);
-		}
+	public void updateLuceneIndex(List<String> specsTpIdList, Integer centerId) {
+		List<GoodsSearch> indexList = goodsMapper.listSpecsNeedToCreateIndex(specsTpIdList);
+		AbstractLucene lucene = LuceneFactory.get(centerId);
+		lucene.updateIndex(indexList);
 	}
 
 	private final String GOODS_LIST = "goodsList";
@@ -299,26 +307,13 @@ public class GoodsServiceImpl implements GoodsService {
 			if (goodsSpecsTpList == null) {
 				return null;
 			}
-			// 获取goods
-			List<String> goodsIds = goodsSpecsTpList.stream().map(tp -> tp.getGoodsId()).collect(Collectors.toList());
-			List<GoodsItem> goodsList = goodsMapper.listGoodsItemByGoodsIds(goodsIds);
-			// 获取specs
-			List<String> specsIds = goodsSpecsTpList.stream().map(tp -> tp.getSpecsId()).collect(Collectors.toList());
-			List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecsBySpecsIds(specsIds);
-
+			// 生成显示对象list
+			List<GoodsVO> goodsVOList = packGoodsVOBySpecsTp(goodsSpecsTpList);
+			// 初始化
+			goodsVOList.stream().forEach(GoodsVO::init);
 			if (welfare) {
 				getWelfareWebsitePriceInterval(goodsSpecsTpList, gradeId);
 			}
-			List<GoodsVO> goodsVOList = new ArrayList<>();
-			List<GoodsSpecsTradePattern> tmpList = new ArrayList<>();
-			Map<String, GoodsItem> goodsMap = goodsList.stream()
-					.collect(Collectors.toMap(GoodsItem::getGoodsId, GoodsItem -> GoodsItem));
-			goodsSpecsTpList.stream().forEach(specsTp -> {
-				tmpList.clear();
-				tmpList.add(specsTp);
-				goodsVOList.add(
-						ViewObjectFactory.createGoodsVO(goodsMap.get(specsTp.getGoodsId()), tmpList, specsList, null));
-			});
 
 			for (GoodsVO vo : goodsVOList) {
 				vo.setHref("/" + vo.getAccessPath() + "/" + vo.getGoodsId() + ".html");
@@ -346,158 +341,73 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	@GoodsLifeCycle(status = 1, isFx = 1, remark = "商品上架")
 	public ResultModel tradeGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display) {
-		if (specsTpIdList != null && specsTpIdList.size() > 0) {
-			// 状态更新为上架
-			goodsMapper.updateTradeSpecsUpshelf(specsTpIdList, display);
-			// 只有前端展示的时候才需要建lucene索引
-			if (TpGoodsDisplay.FRONT.ordinal() == display || TpGoodsDisplay.BOTH.ordinal() == display) {
-				// 新上架创建索引
-				renderLuceneModel(centerId, specsTpIdList);
-			}
-			threadPoolComponent.publish(specsTpIdList, centerId);// 发布商品
-			// FIXME
-			// threadPoolComponent.sendGoodsInfo(specsTpIdList);// 通知对接用户商品上架
-			return new ResultModel(true, "");
-		} else {
-			return new ResultModel(false, "没有提供上架商品信息");
+		// 状态更新为上架
+		goodsMapper.updateTradeSpecsUpshelf(specsTpIdList, display);
+		// 只有前端展示的时候才需要建lucene索引
+		if (TpGoodsDisplayEnum.FRONT.ordinal() == display || TpGoodsDisplayEnum.BOTH.ordinal() == display) {
+			// 新上架创建索引
+			renderLuceneModel(centerId, specsTpIdList);
 		}
-	}
-
-	private static final Integer SHOW = 1;
-	private static final Integer HIDE = 0;
-
-	// 上下架时自动控制分类数据的上下架
-	@SuppressWarnings("unused")
-	private void categoryStatusModify(List<CategoryBO> categoryList, Integer status, String centerIdstr) {
-		if (categoryList != null && categoryList.size() > 0) {
-			Set<String> firstSet = new HashSet<>();
-			Set<String> secondSet = new HashSet<>();
-			Set<String> thirdSet = new HashSet<>();
-			for (CategoryBO model : categoryList) {
-				firstSet.add(model.getFirstId());
-				secondSet.add(model.getSecondId());
-				thirdSet.add(model.getThirdId());
-			}
-			Map<String, Object> param = new HashMap<String, Object>();
-			if (SHOW == status) {
-				param.put("status", SHOW);
-				param.put("cstatus", HIDE);
-				param.put("list", firstSet);
-				goodsMapper.updateFirstCategory(param);
-				param.put("list", secondSet);
-				goodsMapper.updateSecondCategory(param);
-				param.put("list", thirdSet);
-				goodsMapper.updateThirdCategory(param);
-			}
-			if (HIDE == status) {
-				param.put("status", HIDE);
-				param.put("cstatus", SHOW);
-				param.put("centerId", centerIdstr);
-				param.put("set", firstSet);
-				List<String> firstIdList = goodsMapper.listHideFirstCategory(param);
-				if (firstIdList == null || firstIdList.size() == 0) {
-					param.put("list", firstSet);
-					goodsMapper.updateFirstCategory(param);
-				} else {
-					if (firstIdList.size() < firstSet.size()) {
-						firstSet.removeAll(firstIdList);
-						param.put("list", firstSet);
-						goodsMapper.updateFirstCategory(param);
-					}
-				}
-				param.put("set", secondSet);
-				List<String> secondIdList = goodsMapper.listHideSecondCategory(param);
-				if (secondIdList == null || secondIdList.size() == 0) {
-					param.put("list", secondSet);
-					goodsMapper.updateSecondCategory(param);
-				} else {
-					if (secondIdList.size() < secondSet.size()) {
-						secondSet.removeAll(secondIdList);
-						param.put("list", secondSet);
-						goodsMapper.updateSecondCategory(param);
-					}
-				}
-				param.put("set", thirdSet);
-				List<String> thirdIdList = goodsMapper.listHideThirdCategory(param);
-				if (thirdIdList == null || thirdIdList.size() == 0) {
-					param.put("list", thirdSet);
-					goodsMapper.updateThirdCategory(param);
-				} else {
-					if (thirdIdList.size() < thirdSet.size()) {
-						thirdSet.removeAll(thirdIdList);
-						param.put("list", thirdSet);
-						goodsMapper.updateThirdCategory(param);
-					}
-				}
-			}
-		}
-
-	}
-
-	@Override
-	@GoodsLifeCycle(status = 0, isFx = 0, remark = "商品下架")
-	public ResultModel downShelves(List<String> itemIdList, Integer centerId) {
-		if (itemIdList == null || itemIdList.size() == 0) {
-			return new ResultModel(false, "请传入itemId");
-		}
-		List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
-		if (goodsIdList == null || goodsIdList.size() == 0) {
-			return new ResultModel(false, "没有该商品");
-		}
-		Set<String> goodsIdSet = new HashSet<String>(goodsIdList);// 去重
-		goodsMapper.updateGoodsItemDownShelves(itemIdList);// 商品更新为下架状态,同时不可分销
-
-		// 获取所有规格下架的goodsId和部分规格下架的goodsId
-		List<String> downShelvesGoodsIdList = new ArrayList<String>();
-		List<String> updateTagGoodsIdList = new ArrayList<String>();
-		getAllAndSectionSpecsDownShelves(goodsIdSet, downShelvesGoodsIdList, updateTagGoodsIdList);
-
-		// lucene下架商品，并更新整个goods为下架状态
-		if (downShelvesGoodsIdList != null && downShelvesGoodsIdList.size() > 0) {
-			deleteLuceneAndDownShelves(downShelvesGoodsIdList, centerId);
-			// 该部分为系统根据分类下是否还有上架的商品自动进行分类的显示和隐藏
-			// List<CategoryBO> categoryList =
-			// goodsMapper.listCategoryByGoodsIds(goodsIdList);
-			// categoryStatusModify(categoryList, HIDE, centerIdstr);
-		}
-		// 更新lucene索引
-		if (updateTagGoodsIdList.size() > 0) {
-			updateLuceneIndex(updateTagGoodsIdList, centerId);
-		}
-		threadPoolComponent.delPublish(itemIdList, centerId);// 删除商品和重新发布商品
-		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);// 通知对接用户商品下架
+		threadPoolComponent.publish(specsTpIdList, centerId);// 发布商品
+		// FIXME
+		// threadPoolComponent.sendGoodsInfo(specsTpIdList);// 通知对接用户商品上架
 		return new ResultModel(true, "");
 	}
 
-	private void getAllAndSectionSpecsDownShelves(Set<String> goodsIdSet, List<String> downShelvesGoodsIdList,
-			List<String> updateTagGoodsIdList) {
-		List<String> goodsIdList = new ArrayList<String>(goodsIdSet);
-		List<ItemCountBO> temp = goodsMapper.countUpShelvesStatus(goodsIdList);
-		if (temp == null || temp.size() == 0) {// 如果所有item已经下架，goods也下架，并删除索引
-			for (String str : goodsIdSet) {
-				downShelvesGoodsIdList.add(str);
-			}
-		} else {// 如果所有item已经下架，goods也下架，并删除索引
-			List<String> tempStrList = new ArrayList<String>();
-			for (ItemCountBO model : temp) {
-				tempStrList.add(model.getItemId().trim());
-			}
-			for (String str : goodsIdSet) {
-				if (!tempStrList.contains(str.trim())) {
-					downShelvesGoodsIdList.add(str);
-				} else {
-					updateTagGoodsIdList.add(str);
-				}
-			}
+	@Override
+	public ResultModel signalKjGoodsUpShelves(AutoSelectionBO bo, Integer centerId, int display) {
+		List<String> specsTpIds = new ArrayList<>();
+		specsTpIds.add(bo.getSpecsTpId());
+		// 状态更新为上架并绑定itemId
+		goodsMapper.updateSignalKjGoodsUpShelves(bo, display);
+		// 只有前端展示的时候才需要建lucene索引
+		if (TpGoodsDisplayEnum.FRONT.ordinal() == display || TpGoodsDisplayEnum.BOTH.ordinal() == display) {
+			// 新上架创建索引
+			renderLuceneModel(centerId, specsTpIds);
 		}
+		threadPoolComponent.publish(specsTpIds, centerId);// 发布商品
+		// FIXME
+		// threadPoolComponent.sendGoodsInfo(specsTpIdList);// 通知对接用户商品上架
+		return new ResultModel(true, "");
 	}
 
-	private void deleteLuceneAndDownShelves(List<String> goodsIdList, Integer id) {
+	@Override
+	public ResultModel batchKjGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display) {
+		// 自动选择对应的itemId
+		List<AutoSelectionBO> boList = goodsServiceComponent.AutoSelectItemId(specsTpIdList,
+				AutoSelectionModeEnum.INTERNAL_PRICE_LOWEST);
+		// 状态更新为上架并绑定itemId
+		goodsMapper.updateBatchKjGoodsUpShelves(boList, display);
+		// 只有前端展示的时候才需要建lucene索引
+		if (TpGoodsDisplayEnum.FRONT.ordinal() == display || TpGoodsDisplayEnum.BOTH.ordinal() == display) {
+			// 新上架创建索引
+			renderLuceneModel(centerId, specsTpIdList);
+		}
+		threadPoolComponent.publish(specsTpIdList, centerId);// 发布商品
+		// FIXME
+		// threadPoolComponent.sendGoodsInfo(specsTpIdList);// 通知对接用户商品上架
+		return new ResultModel(true, "");
+	}
+
+	@Override
+	public ResultModel downShelves(List<String> specsTpIdList, Integer centerId) {
+		if (specsTpIdList == null || specsTpIdList.size() == 0) {
+			return new ResultModel(false, "请传入specsTpId");
+		}
+		goodsMapper.updateSpecsTpDownShelves(specsTpIdList);// 商品更新为下架状态,同时不可分销
+
+		// lucene下架商品
+		deleteLuceneAndDownShelves(specsTpIdList, centerId);
+		threadPoolComponent.delPublish(specsTpIdList, centerId);// 删除商品和重新发布商品
+		// FIXME
+//		threadPoolComponent.sendGoodsInfoDownShelves(specsTpIdList);// 通知对接用户商品下架
+		return new ResultModel(true, "");
+	}
+
+	private void deleteLuceneAndDownShelves(List<String> specsTpIdList, Integer id) {
 		AbstractLucene lucene = LuceneFactory.get(id);
-		lucene.deleteIndex(goodsIdList);
-		goodsMapper.updateGoodsDownShelves(goodsIdList);
+		lucene.deleteIndex(specsTpIdList);
 	}
 
 	@Override
@@ -525,9 +435,8 @@ public class GoodsServiceImpl implements GoodsService {
 	}
 
 	@Override
-	public List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList) {
+	public List<Goods> listGoodsByGoodsIds(List<String> goodsIdList) {
 
 		return goodsMapper.listGoodsByGoodsIds(goodsIdList);
 	}
-
 }

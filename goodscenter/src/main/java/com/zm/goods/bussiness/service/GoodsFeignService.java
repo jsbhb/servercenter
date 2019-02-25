@@ -9,6 +9,7 @@ import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
+import com.zm.goods.pojo.bo.DealOrderDataBO;
 import com.zm.goods.pojo.bo.GoodsItemBO;
 
 public interface GoodsFeignService {
@@ -23,8 +24,7 @@ public interface GoodsFeignService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	ResultModel getPriceAndDelStock(List<OrderBussinessModel> list, Integer supplierId, boolean vip, Integer centerId,
-			Integer orderFlag, String couponIds, Integer userId, boolean isFx, int platformSource, int gradeId);
+	ResultModel getPriceAndDelStock(DealOrderDataBO bo);
 	
 	/**
 	 * stockBack:库存回滚. <br/>
@@ -60,8 +60,6 @@ public interface GoodsFeignService {
 	
 	Map<String, GoodsConvert> listSkuAndConversionByItemId(Set<String> set);
 
-	ResultModel calStock(List<OrderBussinessModel> list, Integer supplierId, Integer orderFlag);
-	
 	public List<String> listPreSellItemIds();
 
 }

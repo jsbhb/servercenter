@@ -10,7 +10,7 @@ public class UserBargainPO{
 	private String updateTime;
 	private String opt;
 	private int id;
-	private String itemId;
+	private String specsTpId;
 	private boolean start;// 砍价是否结束
 	private String createTime;// 开团时间
 	private double initPrice;
@@ -22,11 +22,11 @@ public class UserBargainPO{
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 	public boolean isStart() {
 		return start;

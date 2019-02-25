@@ -16,6 +16,7 @@ import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.pojo.GoodsItemEntity;
 import com.zm.order.pojo.OrderInfoDTO;
 import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.bo.DealOrderDataBO;
 import com.zm.order.pojo.bo.GoodsItemBO;
 
 @FeignClient("goodscenter")
@@ -25,41 +26,14 @@ public interface GoodsFeignClient {
 	 * @fun 获取订单商品的价格和税率等信息
 	 * @param version
 	 *            版本默认1.0
-	 * @param list
-	 *            订单商品信息
-	 * @param supplierId
-	 *            供应商ID
-	 * @param vip
-	 *            用户是否vip
-	 * @param centerId
-	 *            商城ID
-	 * @param orderFlag
-	 *            订单类型 0跨境，2一般贸易
-	 * @param couponIds
-	 *            优惠券id
-	 * @param userId
-	 *            用户ID
-	 * @param isFx
-	 *            是否获取分销商品
-	 * @param platformSource
-	 *            订单来源，福利网站单独计算
-	 * @param gradeId
-	 *            分级ID 如果是福利网站需要用到
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
-	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version,
-			@RequestBody List<OrderBussinessModel> list, @RequestParam("supplierId") Integer supplierId,
-			@RequestParam("vip") boolean vip, @RequestParam("centerId") Integer centerId,
-			@RequestParam("orderFlag") Integer orderFlag,
-			@RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId, @RequestParam("isFx") boolean isFx,
-			@RequestParam("platformSource") int platformSource, @RequestParam("gradeId") int gradeId);
+	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, @RequestBody DealOrderDataBO bo);
 
 	@RequestMapping(value = "auth/{version}/goods/goodsSpecs", method = RequestMethod.GET)
 	public ResultModel listGoodsSpecs(@PathVariable("version") Double version, @RequestParam("specsTpIds") String ids,
-			@RequestParam("platformSource") int platformSource,
-			@RequestParam("gradeId") int gradeId);
+			@RequestParam("platformSource") int platformSource, @RequestParam("gradeId") int gradeId);
 
 	@RequestMapping(value = "{version}/goods/stockback", method = RequestMethod.POST)
 	public ResultModel stockBack(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
@@ -75,10 +49,6 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/feign/manualordergoods/check", method = RequestMethod.POST)
 	public ResultModel manualOrderGoodsCheck(@PathVariable("version") Double version,
 			@RequestBody List<GoodsItemBO> set);
-
-	@RequestMapping(value = "{version}/goods/cal-stock", method = RequestMethod.POST)
-	public ResultModel calStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
-			@RequestParam("supplierId") Integer supplierId, @RequestParam("orderFlag") Integer orderFlag);
 
 	@RequestMapping(value = "{version}/goods/createPurchaseInfoForEshop", method = RequestMethod.POST)
 	public ResultModel createPurchaseInfo(@PathVariable("version") Double version, @RequestBody OrderInfoDTO info);
@@ -104,9 +74,8 @@ public interface GoodsFeignClient {
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/active/bargain/goods/info", method = RequestMethod.POST)
-	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version,
-			@RequestBody List<OrderBussinessModel> list, @RequestParam(value = "id") Integer id,
-			@RequestParam(value = "userId") Integer userId);
+	public ResultModel getBargainGoodsInfo(@PathVariable("version") Double version, @RequestBody DealOrderDataBO bo,
+			@RequestParam(value = "id") Integer id);
 
 	/**
 	 * @fun 下单后更新对应的记录为已购买

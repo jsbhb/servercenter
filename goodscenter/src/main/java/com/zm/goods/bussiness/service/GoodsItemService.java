@@ -13,10 +13,10 @@ import com.github.pagehelper.Page;
 import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsExtensionEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
-import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: GoodsItemService <br/>

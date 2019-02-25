@@ -40,7 +40,6 @@ import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsListDownloadParam;
-import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
@@ -48,6 +47,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
+import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: GoodsBackServiceImpl <br/>

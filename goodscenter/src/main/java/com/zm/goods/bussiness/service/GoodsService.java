@@ -4,16 +4,25 @@ import java.util.List;
 import java.util.Map;
 
 import com.zm.goods.exception.WrongPlatformSource;
-import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
+import com.zm.goods.pojo.bo.AutoSelectionBO;
 import com.zm.goods.pojo.dto.GoodsSearch;
-import com.zm.goods.pojo.po.GoodsItem;
+import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.GoodsVO;
+import com.zm.goods.pojo.vo.SpecsTpStockVO;
 
 public interface GoodsService {
+	
+	/**
+	 * @fun 获取specsTp的stock
+	 * @param version
+	 * @param goodsId
+	 * @return
+	 */
+	List<SpecsTpStockVO> getGoodsStock(String goodsId, Integer centerId);
 
 	/**
 	 * @fun 获取商品
@@ -24,23 +33,13 @@ public interface GoodsService {
 	GoodsVO listGoods(String goodsId, String specsTpId, boolean isApplet);
 
 	/**
-	 * listBigTradeGoods:获取大贸海蒸鲜商品菜谱. <br/>
-	 * 
-	 * @author wqy
-	 * @param goodsId
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<GoodsFile> listGoodsCookFile(String goodsId);
-
-	/**
-	 * listGoodsSpecs:获取规格信息.
+	 * listGoodsSpecs:购物车接口获取规格信息（内部调用）.
 	 * 
 	 * @param list
 	 * @param centerId
 	 * @return
 	 */
-	Map<String, Object> listGoodsSpecs(List<String> list, int platformSource, int gradeId)
+	List<GoodsVO> listGoodsSpecs(List<String> list, int platformSource, int gradeId)
 			throws WrongPlatformSource;
 
 	/**
@@ -73,9 +72,36 @@ public interface GoodsService {
 	 * @return
 	 */
 	ResultModel tradeGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display);
-
-	ResultModel downShelves(List<String> itemIdList, Integer centerId);
-
+	/**
+	 * @fun 跨境商品单个上架
+	 * @param bo
+	 * @param centerId
+	 * @param display
+	 *            0:不显示;1:前端显示;2:后台显示;3:前后台都显示
+	 * @return
+	 */
+	ResultModel signalKjGoodsUpShelves(AutoSelectionBO bo, Integer centerId, int display);
+	/**
+	 * @fun 跨境商品批量上架
+	 * @param specsTpIdList
+	 * @param centerId
+	 * @param display
+	 *            0:不显示;1:前端显示;2:后台显示;3:前后台都显示
+	 * @return
+	 */
+	ResultModel batchKjGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display);
+	/**
+	 * @fun 商品下架
+	 * @param specsTpIdList
+	 * @param centerId
+	 * @return
+	 */
+	ResultModel downShelves(List<String> specsTpIdList, Integer centerId);
+	/**
+	 * @fun 同步供应商库存
+	 * @param itemIdList
+	 * @return
+	 */
 	ResultModel syncStock(List<String> itemIdList);
 
 	/**
@@ -85,6 +111,5 @@ public interface GoodsService {
 	 */
 	void updateLuceneIndex(List<String> updateTagList, Integer centerId);
 
-	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
-
+	List<Goods> listGoodsByGoodsIds(List<String> goodsIdList);
 }

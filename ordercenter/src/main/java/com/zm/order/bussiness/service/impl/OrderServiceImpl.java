@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.zm.order.bussiness.component.OrderComponentUtil;
-import com.zm.order.bussiness.component.OrderGoodsDealByCreateType;
 import com.zm.order.bussiness.component.ShareProfitComponent;
 import com.zm.order.bussiness.component.ThreadPoolComponent;
 import com.zm.order.bussiness.convertor.OrderConvertUtil;
@@ -58,7 +58,9 @@ import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.UserInfo;
+import com.zm.order.pojo.bo.DealOrderDataBO;
 import com.zm.order.pojo.bo.GradeBO;
+import com.zm.order.pojo.bo.OrderGoodsCompleteBO;
 import com.zm.order.pojo.bo.OrderStatusCallBack;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 import com.zm.order.pojo.bo.TaxFeeBO;
@@ -102,9 +104,6 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	ShareProfitComponent shareProfitComponent;
 
-	// @Resource
-	// ActivityFeignClient activityFeignClient;
-
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
 
@@ -114,7 +113,6 @@ public class OrderServiceImpl implements OrderService {
 	@Resource
 	OrderComponentUtil orderComponentUtil;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ResultModel saveOrder(OrderInfo info, String payType, String type, HttpServletRequest req)
 			throws DataIntegrityViolationException, Exception {
@@ -130,118 +128,50 @@ public class OrderServiceImpl implements OrderService {
 		String orderId = CommonUtils.getOrderId(info.getOrderFlag() + "");
 		info.setOrderId(orderId);
 
-		Map<String, Object> priceAndWeightMap = null;
-		Double amount = 0.0;
-		boolean vip = false;
-
-		// ************************* 临时加的判断，砍价特殊处理
-		// 商品拆开，代码还原删掉该模块以及涉及的其他地方*********************
-		boolean isBargain = orderComponentUtil.judgeIsBargainOrder(info);
-		boolean isSpecial = orderComponentUtil.judgeIsSpecial(info);
-		// ***************************end****************************************
-
 		// 获取该用户是否是VIP
 		UserInfo user = userFeignClient.getVipUser(Constants.FIRST_VERSION, info.getUserId(), info.getCenterId());
-		vip = user.isVip();
+		boolean vip = user.isVip();
 
 		// 根据itemID和数量获得金额并扣减库存（除了第三方代发不需要扣库存，其他需要）
 		StringBuilder detail = new StringBuilder();
-		List<OrderBussinessModel> list = OrderConvertUtil.convertToOrderBussinessModel(info, detail);
-		// 创建订单商品信息获取组件
-		OrderGoodsDealByCreateType deal = new OrderGoodsDealByCreateType(goodsFeignClient);
+		DealOrderDataBO bo = OrderConvertUtil.convertToDealOrderDataBO(info, detail, vip, false);
 		// 获取订单商品信息
-		result = deal.doOrderGoodsDeal(info, list, vip, false);
+		result = orderComponentUtil.doOrderGoodsDeal(bo, info.getCreateType());
 		if (!result.isSuccess()) {
 			return result;
 		}
-		priceAndWeightMap = (Map<String, Object>) result.getObj();
-		amount = (Double) priceAndWeightMap.get("totalAmount");// 商品总价（扣掉了优惠券，折扣）
-
+		// 处理订单
 		// 邮费和税费初始值
 		Double postFee = 0.0;
 		TaxFeeBO taxFee = new TaxFeeBO();// 税费对象
-		Double unDiscountAmount = (Double) priceAndWeightMap.get("originalPrice");// 商品原总价
-		Integer weight = (Integer) priceAndWeightMap.get("weight");
-
-		// 获取包邮包税
-		HashOperations<String, String, String> hashOperations = template.opsForHash();
-		Map<String, String> tempMap = hashOperations.entries(Constants.POST_TAX + info.getSupplierId());
-		boolean freePost = false;
-		boolean freeTax = false;
-		if (tempMap != null) {
-			freePost = Constants.FREE_POST.equals(tempMap.get("post"))
-					|| Constants.ARRIVE_POST.equals(tempMap.get("post")) ? true : false;
-			freeTax = Constants.FREE_TAX.equals(tempMap.get("tax")) ? true : false;
+		double amount = info.getOrderGoodsList().stream().mapToDouble(OrderGoods::getItemPrice).sum();
+		List<OrderGoodsCompleteBO> boList = JSONUtil.parse(JSONUtil.toJson(result.getObj()),
+				new TypeReference<List<OrderGoodsCompleteBO>>() {
+				});
+		// 获取税费
+		taxFee = orderComponentUtil.getTaxFee(boList, amount, postFee);
+		// 判断价格是否一致
+		if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info)) {
+			return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
+					ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
 		}
-		if (isSpecial) {// 特殊包邮包税
-			freeTax = true;
-			freePost = true;
-		}
-		if (!freePost) {
-			// 计算邮费(自提不算邮费)
-			if (Constants.EXPRESS.equals(info.getExpressType())) {
-				postFee = orderComponentUtil.getPostFee(info, amount, weight);
-			}
-		}
-		if (!freeTax) {
-			// 计算税费
-			if (Constants.O2O_ORDER_TYPE.equals(info.getOrderFlag())) {
-				Map<String, Double> map = (Map<String, Double>) priceAndWeightMap.get("tax");
-
-				// 获取税费
-				taxFee = orderComponentUtil.getTaxFee(map, unDiscountAmount, postFee, result);
-				if (!result.isSuccess()) {
-					return result;
-				}
-			}
-		}
-		Double disAmount = 0.0;
-		if (!isBargain) {// 临时加的，如果不是砍价订单
-			// 计算优惠金额
-			if (unDiscountAmount > 0) {
-				disAmount = CalculationUtils.sub(unDiscountAmount, amount);
-			}
-
-			// 判断价格是否一致
-			if (!orderComponentUtil.judgeAmount(amount, taxFee, postFee, info)) {
-				return new ResultModel(false, ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorCode(),
-						ErrorCodeEnum.PAYMENT_VALIDATE_ERROR.getErrorMsg());
-			}
-		}
-
 		// 调用支付信息
 		orderComponentUtil.getPayInfo(payType, type, req, result, openId, info, detail, user);
 		if (!result.isSuccess()) {
 			return result;
 		}
 
-		ResultModel temp = goodsFeignClient.calStock(Constants.FIRST_VERSION, list, info.getSupplierId(),
-				info.getOrderFlag());
-		if (!temp.isSuccess()) {
-			Double rebateFee = info.getOrderDetail().getRebateFee();
-			if (rebateFee != null && rebateFee > 0) {
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
-						Constants.ALREADY_CHECK, rebateFee);// 增加返佣
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
-						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 减少冻结金额
-			}
-			return temp;
-		}
-
-		// ***************************临时针对天天仓的商品进行拆分***************************
-		orderComponentUtil.splitGoods(info, isBargain);
-		if (isSpecial) {// 拆税
-			orderComponentUtil.splitTax(info);
-		}
-		// *****************************end****************************************
-
 		try {
-			if (!isBargain && !isSpecial) {
-				// 完善订单信息
-				orderComponentUtil.renderOrderInfo(info, postFee, weight, taxFee, disAmount, true);
+			// 拆单
+			Map<Integer, List<OrderGoodsCompleteBO>> map = boList.stream()
+					.collect(Collectors.groupingBy(OrderGoodsCompleteBO::getSupplierId));
+			List<OrderInfo> infoList = orderComponentUtil.splitOrderInfo(info, map);
+			// 封装该订单商品的每一级的返佣比例
+			for (OrderInfo orderInfo : infoList) {
+				orderComponentUtil.packGoodsRebateByGrade(orderInfo);
 			}
 			// 保存订单
-			orderComponentUtil.saveOrder(info);
+			orderComponentUtil.saveOrder(infoList);
 			if (Constants.BARGAIN_ORDER == info.getCreateType()) {// 如果是砍价订单，下单后更新对应用户已经购买
 				int id = Integer.valueOf(info.getCouponIds().split(",")[0]);
 				boolean success = goodsFeignClient.updateBargainGoodsBuy(Constants.FIRST_VERSION, id, info.getUserId());
@@ -253,14 +183,13 @@ public class OrderServiceImpl implements OrderService {
 		} catch (Exception e) {// 如果出错，需要对返佣回滚，TODO 还需要对库存回滚
 			Double rebateFee = info.getOrderDetail().getRebateFee();
 			if (rebateFee != null && rebateFee > 0) {
-				hashOperations.increment(Constants.GRADE_ORDER_REBATE + info.getShopId(), Constants.ALREADY_CHECK,
-						rebateFee);// 增加返佣
+				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+						Constants.ALREADY_CHECK, rebateFee);// 增加返佣
 				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
 						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 减少冻结金额
 			}
 			throw new Exception(e);// 处理完后往外抛异常，使事务回滚
 		}
-
 		result.setSuccess(true);
 		result.setErrorMsg(orderId);
 		return result;
@@ -769,15 +698,11 @@ public class OrderServiceImpl implements OrderService {
 						double temactualprice = CalculationUtils.mul(temp.getActualPrice(), temp.getItemQuantity());
 						double temitemprice = CalculationUtils.mul(temp.getItemPrice(), temp.getItemQuantity());
 						model.setItemQuantity(model.getItemQuantity() + temp.getItemQuantity());
-						try {
-							model.setActualPrice(CalculationUtils.div(CalculationUtils.add(temactualprice, actualprice),
-									model.getItemQuantity(), 2));
-							model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
-									model.getItemQuantity(), 2));
-							it.remove();// 合并后删除该商品
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						}
+						model.setActualPrice(CalculationUtils.div(CalculationUtils.add(temactualprice, actualprice),
+								model.getItemQuantity(), 2));
+						model.setItemPrice(CalculationUtils.div(CalculationUtils.add(itemprice, temitemprice),
+								model.getItemQuantity(), 2));
+						it.remove();// 合并后删除该商品
 					} else {
 						tempMap.put(temp.getSku().trim(), temp);
 					}
@@ -796,13 +721,9 @@ public class OrderServiceImpl implements OrderService {
 		}
 		// 如果换算比例大于1，单价和售价需要除以换算比例，并且数量要乘以换算比例
 		if (convert.getConversion() != null && convert.getConversion() > 1) {
-			try {
-				temp.setActualPrice(CalculationUtils.div(temp.getActualPrice(), convert.getConversion(), 2));
-				temp.setItemPrice(CalculationUtils.div(temp.getItemPrice(), convert.getConversion(), 2));
-				temp.setItemQuantity((int) CalculationUtils.mul(temp.getItemQuantity(), convert.getConversion()));
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
+			temp.setActualPrice(CalculationUtils.div(temp.getActualPrice(), convert.getConversion(), 2));
+			temp.setItemPrice(CalculationUtils.div(temp.getItemPrice(), convert.getConversion(), 2));
+			temp.setItemQuantity((int) CalculationUtils.mul(temp.getItemQuantity(), convert.getConversion()));
 		}
 	}
 

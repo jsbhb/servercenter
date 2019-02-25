@@ -1,5 +1,6 @@
 package com.zm.goods.bussiness.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.goods.bussiness.service.GoodsFeignService;
@@ -24,7 +24,11 @@ import com.zm.goods.pojo.OrderBussinessModel;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
+import com.zm.goods.pojo.bo.DealOrderDataBO;
 import com.zm.goods.pojo.bo.GoodsItemBO;
+import com.zm.goods.pojo.vo.GoodsSpecsVO;
+import com.zm.goods.pojo.vo.GoodsVO;
+import com.zm.goods.utils.JSONUtil;
 
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -57,34 +61,17 @@ public class GoodsFeignController {
 	
 	/**
 	 * @fun 订单商品获取商品信息，校验商品合法性等操作
-	 * @param version
-	 * @param req
-	 * @param res
-	 * @param list
-	 * @param supplierId
-	 * @param vip
-	 * @param centerId
-	 * @param orderFlag
-	 * @param couponIds
-	 * @param userId
-	 * @param isFx
-	 * @param platformSource
-	 * @param gradeId
 	 * @return
 	 */
 	@RequestMapping(value = "{version}/goods/for-order", method = RequestMethod.POST)
 	@ApiIgnore
 	public ResultModel getPriceAndDelStock(@PathVariable("version") Double version, HttpServletRequest req,
-			HttpServletResponse res, @RequestBody List<OrderBussinessModel> list, Integer supplierId, boolean vip,
-			Integer centerId, Integer orderFlag, @RequestParam(value = "couponIds", required = false) String couponIds,
-			@RequestParam(value = "userId", required = false) Integer userId, boolean isFx, int platformSource,
-			int gradeId) {
+			HttpServletResponse res, @RequestBody DealOrderDataBO bo) {
 
 		ResultModel result = new ResultModel();
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
-				result = goodsFeignService.getPriceAndDelStock(list, supplierId, vip, centerId, orderFlag, couponIds, userId,
-						isFx, platformSource, gradeId);
+				result = goodsFeignService.getPriceAndDelStock(bo);
 			}
 		} catch (Exception e) {
 			LogUtil.writeErrorLog("【获取商品价格信息出错】", e);
@@ -195,17 +182,6 @@ public class GoodsFeignController {
 		return null;
 	}
 
-	@RequestMapping(value = "{version}/goods/cal-stock", method = RequestMethod.POST)
-	@ApiIgnore
-	public ResultModel calStock(@PathVariable("version") Double version, @RequestBody List<OrderBussinessModel> list,
-			Integer supplierId, Integer orderFlag) {
-		if (Constants.FIRST_VERSION.equals(version)) {
-			return goodsFeignService.calStock(list, supplierId, orderFlag);
-		}
-
-		return null;
-	}
-	
 	/**
 	 * @fun 获取预售商品的itemId
 	 * @param version
@@ -218,5 +194,14 @@ public class GoodsFeignController {
 			return goodsFeignService.listPreSellItemIds();
 		} 
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		GoodsVO vo = new GoodsVO();
+		List<GoodsSpecsVO> list = new ArrayList<>();
+		GoodsSpecsVO gsv = new GoodsSpecsVO();
+		list.add(gsv);
+		vo.setSpecsList(list);
+		System.out.println(JSONUtil.toJson(vo));
 	}
 }

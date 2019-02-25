@@ -1,7 +1,6 @@
 package com.zm.goods.bussiness.controller;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,9 @@ import com.zm.goods.log.LogUtil;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
+import com.zm.goods.pojo.bo.AutoSelectionBO;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.vo.GoodsVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -119,20 +120,17 @@ public class GoodsController {
 		String[] idArr = ids.split(",");
 		List<String> list = Arrays.asList(idArr);
 		if (Constants.FIRST_VERSION.equals(version)) {
-			Map<String, Object> resultMap = null;
 			try {
-				resultMap = goodsService.listGoodsSpecs(list, platformSource, gradeId);
+				List<GoodsVO> voList = goodsService.listGoodsSpecs(list, platformSource, gradeId);
+				result.setSuccess(true);
+				result.setObj(voList);
 			} catch (WrongPlatformSource e) {
 				LogUtil.writeErrorLog("获取规格信息出错", e);
 				result.setSuccess(false);
 				result.setErrorMsg(e.getMessage());
 				return result;
 			}
-
-			result.setSuccess(true);
-			result.setObj(resultMap);
 		}
-
 		return result;
 	}
 
@@ -181,15 +179,13 @@ public class GoodsController {
 	 * @param specsTpIdList
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/goods/kj/signal/upShelves/{centerId}", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/kj/signal/upShelves/{centerId}/{display}", method = RequestMethod.POST)
 	public ResultModel signalKjGoodsUpShelves(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId, @RequestBody List<String> specsTpIdList) {
+			@PathVariable("centerId") Integer centerId, @RequestBody AutoSelectionBO bo,
+			@PathVariable("display") int display) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if (itemIdList == null || itemIdList.size() == 0) {
-				return new ResultModel(false, "没有选择商品明细");
-			}
-			ResultModel result = goodsService.upShelves(itemIdList, centerId);
+			ResultModel result = goodsService.signalKjGoodsUpShelves(bo, centerId, display);
 			return result;
 		}
 
@@ -203,15 +199,16 @@ public class GoodsController {
 	 * @param specsTpIdList
 	 * @return
 	 */
-	@RequestMapping(value = "{version}/goods/kj/batch/upShelves/{centerId}", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/goods/kj/batch/upShelves/{centerId}/{display}", method = RequestMethod.POST)
 	public ResultModel batchKjGoodsUpShelves(@PathVariable("version") Double version,
-			@PathVariable("centerId") Integer centerId, @RequestBody List<String> specsTpIdList) {
+			@PathVariable("centerId") Integer centerId, @RequestBody List<String> specsTpIdList,
+			@PathVariable("display") int display) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			if (itemIdList == null || itemIdList.size() == 0) {
+			if (specsTpIdList == null || specsTpIdList.size() == 0) {
 				return new ResultModel(false, "没有选择商品明细");
 			}
-			ResultModel result = goodsService.upShelves(itemIdList, centerId);
+			ResultModel result = goodsService.batchKjGoodsUpShelves(specsTpIdList, centerId, display);
 			return result;
 		}
 
@@ -226,12 +223,12 @@ public class GoodsController {
 	 */
 	@RequestMapping(value = "{version}/goods/downShelves/{centerId}", method = RequestMethod.POST)
 	public ResultModel downShelves(@PathVariable("version") Double version, @PathVariable("centerId") Integer centerId,
-			@RequestParam("itemId") String itemId) {
+			@RequestParam("specsTpIds") String specsTpIds) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String[] arr = itemId.split(",");
-			List<String> itemIdList = Arrays.asList(arr);
-			ResultModel result = goodsService.downShelves(itemIdList, centerId);
+			String[] arr = specsTpIds.split(",");
+			List<String> specsTpIdList = Arrays.asList(arr);
+			ResultModel result = goodsService.downShelves(specsTpIdList, centerId);
 			return result;
 		}
 
@@ -250,6 +247,44 @@ public class GoodsController {
 		}
 
 		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 获取item的stock
+	 * @param version
+	 * @param goodsId
+	 * @return
+	 */
+	@RequestMapping(value = "auth/{version}/goods/stock/{centerId}/{goodsId}", method = RequestMethod.GET)
+	public ResultModel getGoodsStock(@PathVariable("version") Double version, @PathVariable("goodsId") String goodsId,
+			@PathVariable("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return new ResultModel(true, goodsService.getGoodsStock(goodsId, centerId));
+		}
+
+		return null;
+	}
+
+	/**
+	 * @fun 更新lucene索引
+	 * @param version
+	 * @param specsTpIds
+	 * @param centerId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/lucene/update", method = RequestMethod.POST)
+	public ResultModel updateLuceneIndex(@PathVariable("version") Double version,
+			@RequestParam("specsTpIds") String specsTpIds, @PathVariable("centerId") Integer centerId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			String[] arr = specsTpIds.split(",");
+			List<String> specsTpIdList = Arrays.asList(arr);
+			goodsService.updateLuceneIndex(specsTpIdList, centerId);
+			return new ResultModel(true, null);
+		}
+
+		return null;
 	}
 
 }

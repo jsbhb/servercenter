@@ -87,21 +87,19 @@ public abstract class AbstractLucene {
 	public Map<String, Object> search(Object obj, Pagination pagination, SortModelList sortList)
 			throws IOException, InvalidTokenOffsetsException {
 
-		List<String> keyWordsList = new ArrayList<String>();
-		List<String> filedsList = new ArrayList<String>();
+		Map<String, String> searchPara = new HashMap<>();
 		Map<String, String> accuratePara = new HashMap<String, String>();
 
 		getIndexSearch();
 
 		// 封装查询参数
-		renderParameter(keyWordsList, filedsList, accuratePara, obj);
+		renderParameter(searchPara, accuratePara, obj);
 
-		if (keyWordsList.size() == 0 && accuratePara.size() == 0) {
-			filedsList.add("upShelves");
-			keyWordsList.add("1");
-		} 
-		
-		return queryWithPara(pagination, sortList, keyWordsList, filedsList, accuratePara);
+		if (searchPara.size() == 0 && accuratePara.size() == 0) {
+			searchPara.put("upShelves", "1");
+		}
+
+		return queryWithPara(pagination, sortList, searchPara, accuratePara);
 
 	}
 
@@ -201,28 +199,21 @@ public abstract class AbstractLucene {
 	 * @return Map对象
 	 * @since JDK 1.7
 	 */
-	public abstract Map<String, Object> packageData(Highlighter highlighter, TopDocs results, ScoreDoc[] hits, TopDocs allResults)
-			throws IOException, InvalidTokenOffsetsException;
+	public abstract Map<String, Object> packageData(Highlighter highlighter, TopDocs results, ScoreDoc[] hits,
+			TopDocs allResults) throws IOException, InvalidTokenOffsetsException;
 
 	/**
 	 * 
 	 * renderParameter:lucene搜索条件渲染. <br/>
 	 * 
 	 * @author wqy
-	 * @param keyWordsList
-	 *            搜索条件
-	 * @param filedsList
-	 *            搜索域
-	 * @param occurList
-	 *            搜索逻辑（and/or/not in）
 	 * @param accuratePara
 	 *            精确搜索条件
 	 * @param obj
 	 *            对象
 	 * @since JDK 1.7
 	 */
-	public abstract void renderParameter(List<String> keyWordsList, List<String> filedsList,
-			Map<String, String> accuratePara, Object obj);
+	public abstract void renderParameter(Map<String, String> searchPara, Map<String, String> accuratePara, Object obj);
 
 	/**
 	 * 
@@ -234,7 +225,7 @@ public abstract class AbstractLucene {
 	 * @since JDK 1.7
 	 */
 	public abstract Sort renderSortParameter(SortModelList sortList);
-	
+
 	/**
 	 * 
 	 * packageQuery:封装query. <br/>
@@ -245,8 +236,7 @@ public abstract class AbstractLucene {
 	 * @return BooleanQuery
 	 * @since JDK 1.7
 	 */
-	public abstract Query packageQuery(List<String> keyWordsList, List<String> filedsList) throws IOException ;
-	
+	public abstract Query packageQuery(Map<String,String> searchPara) throws IOException;
 
 	/**
 	 * 
@@ -259,7 +249,7 @@ public abstract class AbstractLucene {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	public abstract BooleanFilter accurateQuery(Map<String, String> accuratePara); 
+	public abstract BooleanFilter accurateQuery(Map<String, String> accuratePara);
 
 	/**
 	 * 
@@ -270,12 +260,6 @@ public abstract class AbstractLucene {
 	 *            分页对象
 	 * @param sortList
 	 *            排序对象
-	 * @param keyWordsList
-	 *            搜索条件
-	 * @param filedsList
-	 *            搜索域
-	 * @param occurList
-	 *            搜索逻辑（and/or/not in）
 	 * @param accuratePara
 	 *            精确搜索条件
 	 * @return
@@ -283,38 +267,36 @@ public abstract class AbstractLucene {
 	 * @throws InvalidTokenOffsetsException
 	 * @since JDK 1.7
 	 */
-	private Map<String, Object> queryWithPara(Pagination pagination, SortModelList sortList, List<String> keyWordsList,
-			List<String> filedsList, Map<String, String> accuratePara)
+	private Map<String, Object> queryWithPara(Pagination pagination, SortModelList sortList,
+			Map<String, String> searchPara, Map<String, String> accuratePara)
 					throws IOException, InvalidTokenOffsetsException {
 
 		Map<String, Object> result = new HashMap<String, Object>(16);
 
-		Query query = packageQuery(keyWordsList, filedsList);
+		Query query = packageQuery(searchPara);
 
 		// 封装排序参数
 		Sort sort = renderSortParameter(sortList);
 
 		// 是否需要精确查找
-		BooleanFilter booleanFilter = accurateQuery(accuratePara); 
+		BooleanFilter booleanFilter = accurateQuery(accuratePara);
 
 		// 获取高亮对象
 		Highlighter highlighter = getHighlighter(query);
-		
+
 		ScoreDoc scoreDoc = getLastScoreDoc(pagination.getCurrentPage(), pagination.getNumPerPage(), query,
 				booleanFilter, indexSearch, sort);
 		TopDocs results = indexSearch.searchAfter(scoreDoc, query, booleanFilter, pagination.getNumPerPage(), sort);
 		System.out.println("Total match：" + results.totalHits);
 		ScoreDoc[] hits = results.scoreDocs;
-		
+
 		TopDocs allResults = indexSearch.search(query, booleanFilter, reader.maxDoc());
 
 		result = packageData(highlighter, results, hits, allResults);
-		
 
 		return result;
 	}
 
-	
 	/**
 	 * 
 	 * queryWithOutPara:查询所有. <br/>
@@ -326,6 +308,7 @@ public abstract class AbstractLucene {
 	 * @throws IOException
 	 * @since JDK 1.7
 	 */
+	@SuppressWarnings("unused")
 	private Map<String, Object> queryWithOutPara(Pagination pagination) throws IOException {
 		Document doc1;
 		Map<String, Object> result = new HashMap<String, Object>(16);
@@ -334,7 +317,7 @@ public abstract class AbstractLucene {
 		int count = reader.maxDoc();
 		int start = (pagination.getCurrentPage() - 1) * pagination.getNumPerPage();
 		int end = pagination.getCurrentPage() * pagination.getNumPerPage();
-		if(end >= count){
+		if (end >= count) {
 			end = count;
 		}
 		for (int i = start; i < end; i++) {

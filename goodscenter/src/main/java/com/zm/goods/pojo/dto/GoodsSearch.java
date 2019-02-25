@@ -25,7 +25,6 @@ public class GoodsSearch {
 
 	private Double price;
 
-	@SearchCondition(value = SearchCondition.FILTER)
 	private String upshelfTime;
 
 	@SearchCondition(value = SearchCondition.SEARCH)
