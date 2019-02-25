@@ -29,13 +29,13 @@ public class ThreadPoolComponent {
 		seoService.delPublishGoods(specsTpIdList);
 	}
 	
-	@Async("myAsync")
-	public void sendGoodsInfo(List<String> itemIds){
-		goodsOpenInterfaceService.sendGoodsInfo(itemIds);
-	}
-	
-	@Async("myAsync")
-	public void sendGoodsInfoDownShelves(List<String> itemIds){
-		goodsOpenInterfaceService.sendGoodsDownShelves(itemIds);
-	}
+//	@Async("myAsync")
+//	public void sendGoodsInfo(List<String> itemIds){
+//		goodsOpenInterfaceService.sendGoodsInfo(itemIds);
+//	}
+//	
+//	@Async("myAsync")
+//	public void sendGoodsInfoDownShelves(List<String> itemIds){
+//		goodsOpenInterfaceService.sendGoodsDownShelves(itemIds);
+//	}
 }

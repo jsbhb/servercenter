@@ -275,11 +275,9 @@ public class GoodsController {
 	 */
 	@RequestMapping(value = "{version}/goods/lucene/update", method = RequestMethod.POST)
 	public ResultModel updateLuceneIndex(@PathVariable("version") Double version,
-			@RequestParam("specsTpIds") String specsTpIds, @PathVariable("centerId") Integer centerId) {
+			@RequestBody List<String> specsTpIdList, @PathVariable("centerId") Integer centerId) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
-			String[] arr = specsTpIds.split(",");
-			List<String> specsTpIdList = Arrays.asList(arr);
 			goodsService.updateLuceneIndex(specsTpIdList, centerId);
 			return new ResultModel(true, null);
 		}
