@@ -147,7 +147,7 @@ public class GoodsServiceComponent {
 		AutoSelectionBO bo = null;
 		for (Map.Entry<String, List<Items>> entry : map.entrySet()) {
 			Items item = entry.getValue().stream().sorted(Comparator.comparing(Items::getInternalPrice)).findFirst()
-					.get();
+					.get(); 
 			bo = new AutoSelectionBO();
 			bo.setItemId(item.getItemId());
 			bo.setSpecsTpId(item.getSpecsTpId());

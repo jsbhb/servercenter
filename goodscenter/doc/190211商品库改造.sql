@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods` (
   `goods_name` VARCHAR(300) NULL COMMENT '商品名称',
   `subtitle` VARCHAR(300) NULL COMMENT '商品副标题',
   `description` VARCHAR(450) NULL COMMENT '商品描述',
-  `brand_id` INT NOT NULL COMMENT '品牌ID',
+  `brand_id` VARCHAR(45) NOT NULL COMMENT '品牌ID',
   `origin` VARCHAR(20) NULL COMMENT '产地',
   `detail_path` VARCHAR(300) NULL COMMENT '商详路径',
   `access_path` VARCHAR(50) NULL COMMENT '静态路径',
@@ -32,23 +32,21 @@ drop table if exists  `kj_specs_goods`;
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_specs_goods` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `goods_id` VARCHAR(45) NOT NULL,
   `specs_id` VARCHAR(45) NOT NULL,
   `encode` VARCHAR(45) NOT NULL COMMENT '条形码',
   `weight` INT NOT NULL DEFAULT 0 COMMENT '重量/克',
   `description` VARCHAR(100) NULL COMMENT '描述',
   `unit` VARCHAR(5) NULL COMMENT '单位',
-  `info` VARCHAR(100) NULL COMMENT '规格',
+  `info` VARCHAR(1000) NULL COMMENT '规格',
   `carton` VARCHAR(45) NULL COMMENT '箱规',
-  `conversion` TINYINT(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT '换算比例',
+  `conversion` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '换算比例',
   `specs_goods_name` VARCHAR(100) NULL COMMENT '每个规格的商品名称',
   `create_time` DATETIME NULL,
   `update_time` DATETIME NULL,
   `opt` VARCHAR(45) NULL,
   `is_del` TINYINT(3) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `specs_id_uk` (`specs_id` ASC),
-  INDEX `goods_id_idx` (`goods_id` ASC))
+  UNIQUE INDEX `specs_id_uk` (`specs_id` ASC))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品规格表';
 
 drop table if exists  `kj_goods_specs_tradepattern`;
@@ -62,9 +60,9 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `is_free_post` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '是否包邮;0:否,1:是',
   `is_free_tax` TINYINT(3) NOT NULL DEFAULT 0 COMMENT '是否包税,0:否,1是',
   `tag_ratio` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '权重',
-  `increment_tax` DECIMAL(12) NOT NULL DEFAULT 0 COMMENT '增值税',
-  `tariff` DECIMAL(12) NOT NULL DEFAULT 0 COMMENT '关税',
-  `excise_tax` DECIMAL(12) NOT NULL DEFAULT 0 COMMENT '消费税',
+  `increment_tax` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '增值税',
+  `tariff` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '关税',
+  `excise_tax` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '消费税',
   `is_promotion` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否促销0:否;1是',
   `discount` DECIMAL(5) NOT NULL DEFAULT 0 COMMENT '促销折扣',
   `is_distribution` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否分销0:否;1:是',
@@ -80,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_specs_tradepattern` (
   `instant_ratio` int(11) NOT NULL DEFAULT '0' COMMENT '顺加比例',
   `sale_num` INT NOT NULL DEFAULT 0 COMMENT '销量',
   `item_id` VARCHAR(45) DEFAULT NULL COMMENT '跨境商品上架需绑定对应ItemId',
-  `is_fresh` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否是新品:0是，1：否',
+  `is_fresh` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否是新品:0否，1：是',
   `upshelf_time` DATETIME NULL COMMENT '上架时间',
   `downshelf_time` DATETIME NULL COMMENT '下架时间',
   `create_time` DATETIME NULL,
