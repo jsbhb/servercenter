@@ -206,5 +206,35 @@ public interface GoodsMapper {
 	 * @return
 	 */
 	List<GoodsSearch> listSpecsNeedToCreateIndex(List<String> specsTpIdList);
+	/**
+	 * @fun 根据specsTpIds 获取商品的贸易属性
+	 * @param specsTpIdList
+	 * @return
+	 */
+	List<Integer> getGoodsTypeBySpecsTpIds(List<String> specsTpIdList);
+	/**
+	 * @fun 根据itemId 获取供应商商品
+	 * @param itemId
+	 * @return
+	 */
+	Items getItemsByItemIds(String itemId);
+	/**
+	 * @fun 根据specsTpId 获取specsTp
+	 * @param specsTpId
+	 * @return
+	 */
+	GoodsSpecsTradePattern getGoodsSpecsTpBySpecsTpId(String specsTpId);
+	/**
+	 * @fun 根据specsId 获取商品规格
+	 * @param specsId
+	 * @return
+	 */
+	GoodsSpecs getGoodsSpecsBySpecsId(String specsId);
+	/**
+	 * @fun 获取该specsTpId下的所有item有没有正常审核通过的
+	 * @param specsTpId
+	 * @return
+	 */
+	int countItemPassBySpecsTpId(String specsTpId);
 	
 }

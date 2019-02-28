@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.BrandMapper;
-import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.BrandService;
 import com.zm.goods.pojo.BrandEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
@@ -35,9 +34,6 @@ public class BrandServiceImpl implements BrandService {
 
 	@Resource
 	BrandMapper brandMapper;
-
-	@Resource
-	GoodsBaseMapper goodsBaseMapper;
 
 	@Override
 	public Page<BrandEntity> queryByPage(BrandEntity entity) {

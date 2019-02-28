@@ -19,7 +19,6 @@ import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.GoodsShelveRecordEntity;
 import com.zm.goods.pojo.GoodsStockEntity;
-import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: BrandMapper <br/>
@@ -31,6 +30,12 @@ import com.zm.goods.pojo.po.GoodsPrice;
  * @since JDK 1.7
  */
 public interface GoodsItemMapper {
+	
+	/**
+	 * @fun 批量更新商品图片
+	 * @param initFileList
+	 */
+	void updateFilesBatch(List<GoodsFile> initFileList);
 
 	/**
 	 * selectForPage:分页查询商品. <br/>
@@ -77,7 +82,7 @@ public interface GoodsItemMapper {
 	 * @param goodsPrice  
 	 * @since JDK 1.7  
 	 */
-	void insertPrice(GoodsPrice goodsPrice);
+//	void insertPrice(GoodsPrice goodsPrice);
 
 	/**  
 	 * updateStatus:更新状态. <br/>  
@@ -96,7 +101,7 @@ public interface GoodsItemMapper {
 	 * @param entity  
 	 * @since JDK 1.7
 	 */
-	void updatePrice(GoodsPrice entity);
+//	void updatePrice(GoodsPrice entity);
 
 	/**  
 	 * insertStock:插入库存. <br/>  
@@ -172,9 +177,9 @@ public interface GoodsItemMapper {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	GoodsPrice selectPurchaseCenterItemForEdit(GoodsItemEntity entity);
+//	GoodsPrice selectPurchaseCenterItemForEdit(GoodsItemEntity entity);
 	
-	GoodsPrice selectItemPrice(String itemId);
+//	GoodsPrice selectItemPrice(String itemId);
 
 	/**  
 	 * insertFiles:(这里用一句话描述这个方法的作用). <br/>  
@@ -183,7 +188,7 @@ public interface GoodsItemMapper {
 	 * @param files  
 	 * @since JDK 1.7  
 	 */
-	void updateItemPrice(GoodsPrice entity);
+//	void updateItemPrice(GoodsPrice entity);
 	
 	/**
 	 * selectForPage:分页查询商品. <br/>
@@ -233,7 +238,7 @@ public interface GoodsItemMapper {
 
 	void insertBatch(List<GoodsItemEntity> itemList);
 
-	void insertPriceBatch(List<GoodsPrice> priceList);
+//	void insertPriceBatch(List<GoodsPrice> priceList);
 
 	List<GoodsItemEntity> listGoodsItemByItemIds(List<String> itemIds);
 
@@ -241,7 +246,7 @@ public interface GoodsItemMapper {
 
 	void updateBatch(List<GoodsItemEntity> itemList);
 
-	void updatePriceBatch(List<GoodsPrice> priceList);
+//	void updatePriceBatch(List<GoodsPrice> priceList);
 	
 	void updateSubGoodsItemBatch(List<String> itemIds);
 
@@ -271,7 +276,7 @@ public interface GoodsItemMapper {
 
 	void updateGoodsItemNotBeFxForBatch(List<String> list);
 
-	void updateGoodsItemUpdateTimeByItemIdList(List<String> list);
+	void updateSpecsTpUpdateTimeBySpecsTpIdList(List<String> list);
 	
 	List<GoodsEntity> listGoodsIdByItemList(List<String> list);
 
@@ -285,5 +290,5 @@ public interface GoodsItemMapper {
 
 	void insertGoodsShelveRecord(GoodsShelveRecordEntity entity);
 
-	void updateGoodsItemPrice(List<GoodsPrice> list);
+//	void updateGoodsItemPrice(List<GoodsPrice> list);
 }

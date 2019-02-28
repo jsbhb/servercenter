@@ -19,6 +19,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.GoodsVO;
 import com.zm.order.pojo.bo.OrderStatusCallBack;
 import com.zm.order.pojo.bo.SupplierPostFeeBO;
 
@@ -114,7 +115,7 @@ public interface OrderService {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	List<ShoppingCart> listShoppingCart(ShoppingCart shoppingCart, Pagination pagination) throws Exception;
+	List<GoodsVO> listShoppingCart(ShoppingCart shoppingCart, Pagination pagination) throws Exception;
 
 	/**
 	 * getCountByStatus:获取各状态的订单数量. <br/>

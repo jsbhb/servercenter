@@ -28,14 +28,6 @@
 		<result column="shelf_life" property="shelfLife"/>
 		<result column="carton" property="carTon"/>
 		<result column="retailPrice" property="retailPrice"/>
-		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
-			<result column="min" property="min"/>
-			<result column="max" property="max"/>
-			<result column="proxy_price" property="proxyPrice"/>
-			<result column="fxprice" property="fxPrice"/>
-			<result column="delivery_Place" property="deliveryPlace"/>
-			<result column="retail_price" property="retailPrice"/>
-		</association>
 		<association property="stock" javaType="com.zm.goods.pojo.GoodsStockEntity">
 			<result column="qpQty" property="qpQty"/>
 			<result column="fxQty" property="fxQty"/>
@@ -54,22 +46,6 @@
 		</association>
 	</resultMap>
 	
-	<resultMap type="com.zm.goods.pojo.GoodsPrice" id="price">
-		<id column="id" property="id"/>
-		<result column="item_id" property="itemId" />
-		<result column="min" property="min"/>
-		<result column="max" property="max"/>
-		<result column="proxy_price" property="proxyPrice"/>
-		<result column="fxprice" property="fxPrice"/>
-		<result column="delivery_Place" property="deliveryPlace"/>
-		<result column="discount" property="discount"/>
-		<result column="retail_price" property="retailPrice"/>
-		<result column="line_price" property="linePrice"/>
-		<result column="info" property="info"/>
-		<result column="create_time" property="createTime"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="opt" property="opt"/>
-	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goods">
 		<id column="id" property="id"/>
@@ -108,15 +84,6 @@
 		<result column="shelf_life" property="shelfLife"/>
 		<result column="carton" property="carTon"/>
 		<result column="is_fx" property="isFx"/>
-		<association property="goodsPrice" javaType="com.zm.goods.pojo.GoodsPrice">
-			<result column="min" property="min"/>
-			<result column="max" property="max"/>
-			<result column="proxy_price" property="proxyPrice"/>
-			<result column="fxprice" property="fxPrice"/>
-			<result column="delivery_Place" property="deliveryPlace"/>
-			<result column="retail_price" property="retailPrice"/>
-			<result column="line_price" property="linePrice"/>
-		</association>
 		<association property="stock" javaType="com.zm.goods.pojo.GoodsStockEntity">
 			<result column="qpQty" property="qpQty"/>
 			<result column="fxQty" property="fxQty"/>
@@ -476,6 +443,13 @@
 		where id = #{id}
 	</update>
 	
+	<update id="updateFilesBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update goods_file set path = #{item.path},update_time = now(),opt = #{item.opt}
+			where id = #{item.id}
+		</foreach>
+	</update>
+	
 	
 	<select id="selectPurchaseCenterItem" parameterType="Object" resultMap="entity">
 		select g.id,g.goods_id,g.goods_name,g.status,
@@ -505,14 +479,6 @@
 		<if test="entity.goodsId!=null and entity.goodsId !=''">
 			and i.goods_id = #{entity.goodsId} 
 		</if>
-	</select>
-	
-	<select id="selectPurchaseCenterItemForEdit" parameterType="Object" resultMap="price">
-		select * from goods_price_2b where item_id = #{itemId}
-	</select>
-	
-	<select id="selectItemPrice" parameterType="Object" resultMap="price">
-		select * from goods_price where item_id = #{itemId}
 	</select>
 	
 	<update id="updateItemPrice" parameterType="Object">
@@ -848,8 +814,8 @@
 		</foreach>
 	</update>
 	
-	<update id="updateGoodsItemUpdateTimeByItemIdList" parameterType="Object">
-		update goods_item set update_time=now() where item_id in
+	<update id="updateSpecsTpUpdateTimeBySpecsTpIdList" parameterType="Object">
+		update kj_goods_specs_tradepattern set update_time=now() where specs_tp_id in
 		<foreach collection="list" item="item" open="(" close=")"
 			separator=",">
 			#{item}

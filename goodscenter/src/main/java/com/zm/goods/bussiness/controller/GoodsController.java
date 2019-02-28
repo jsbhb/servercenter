@@ -52,12 +52,12 @@ public class GoodsController {
 	@Resource
 	GoodsService goodsTagDecorator;
 
-	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.GET)
+	@RequestMapping(value = "auth/{version}/goods/base", method = RequestMethod.POST)
 	@ApiOperation(value = "搜索商品接口", response = ResultModel.class)
 	@ApiImplicitParams({
 			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0") })
 	public ResultModel listGoods(@PathVariable("version") Double version, @ModelAttribute Pagination pagination,
-			@ModelAttribute GoodsSearch searchModel, @ModelAttribute SortModelList sortList,
+			@RequestBody GoodsSearch searchModel, @ModelAttribute SortModelList sortList,
 			@RequestParam(value = "gradeId", required = false, defaultValue = "0") int gradeId,
 			@RequestParam(value = "welfare", required = false, defaultValue = "false") boolean welfare) {
 

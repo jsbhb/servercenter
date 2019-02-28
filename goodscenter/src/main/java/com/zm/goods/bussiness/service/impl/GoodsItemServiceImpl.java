@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.zm.goods.annotation.GoodsLifeCycle;
 import com.zm.goods.bussiness.component.ThreadPoolComponent;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
@@ -42,7 +41,6 @@ import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.GoodsShelveRecordEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.po.GoodsPrice;
 import com.zm.goods.seo.publish.PublishComponent;
 import com.zm.goods.utils.JSONUtil;
 
@@ -124,15 +122,14 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void save(GoodsItemEntity entity) {
-		goodsItemMapper.insert(entity);
-		goodsItemMapper.insertPrice(entity.getGoodsPrice());
-		if (entity.getTagBindEntity() != null) {
-			goodsBackMapper.insertTagBind(entity.getTagBindEntity());
-		}
+//		goodsItemMapper.insert(entity);
+//		goodsItemMapper.insertPrice(entity.getGoodsPrice());
+//		if (entity.getTagBindEntity() != null) {
+//			goodsBackMapper.insertTagBind(entity.getTagBindEntity());
+//		}
 	}
 
 	@Override
-	@GoodsLifeCycle(status = 1, isFx = 0, remark = "商品不可分销")
 	public void notBeFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.NOTFX.getIndex()+"");
 		goodsItemMapper.updateIsFXStatus(entity);
@@ -140,7 +137,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		itemIdList.add(entity.getItemId());
 		//更新索引并发布
 		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_DELETE);
-		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
+//		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 
 	private void updateLuceneAndPublish(List<String> itemIdList, PublishType publishType) {
@@ -164,7 +161,6 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	}
 
 	@Override
-	@GoodsLifeCycle(status = 1, isFx = 1, remark = "商品可分销")
 	public void beFx(GoodsItemEntity entity) {
 		entity.setStatus(GoodsStatusEnum.FX.getIndex()+"");
 		goodsItemMapper.updateIsFXStatus(entity);
@@ -172,7 +168,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		itemIdList.add(entity.getItemId());
 		//更新索引并发布
 		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_CREATE);
-		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
+//		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
 	@Override
@@ -210,7 +206,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void update(GoodsItemEntity entity) {
 		goodsItemMapper.update(entity);
-		goodsItemMapper.updatePrice(entity.getGoodsPrice());
+//		goodsItemMapper.updatePrice(entity.getGoodsPrice());
 		//判断商品标签
 		//增删改
 		ERPGoodsTagBindEntity oldTag = goodsBackMapper.selectGoodsTagBindByItemId(entity);
@@ -232,20 +228,20 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 		return goodsItemMapper.selectPurchaseCenterItem(params);
 	}
 
-	@Override
-	public GoodsPrice queryPurchaseCenterItemForEdit(GoodsItemEntity entity) {
-		return goodsItemMapper.selectPurchaseCenterItemForEdit(entity);
-	}
+//	@Override
+//	public GoodsPrice queryPurchaseCenterItemForEdit(GoodsItemEntity entity) {
+//		return goodsItemMapper.selectPurchaseCenterItemForEdit(entity);
+//	}
 
-	@Override
-	public GoodsPrice queryItemPrice(String itemId) {
-		return goodsItemMapper.selectItemPrice(itemId);
-	}
+//	@Override
+//	public GoodsPrice queryItemPrice(String itemId) {
+//		return goodsItemMapper.selectItemPrice(itemId);
+//	}
 
-	@Override
-	public void updateItemPrice(GoodsPrice entity) {
-		goodsItemMapper.updateItemPrice(entity);
-	}
+//	@Override
+//	public void updateItemPrice(GoodsPrice entity) {
+//		goodsItemMapper.updateItemPrice(entity);
+//	}
 
 	@Override
 	public Page<GoodsEntity> queryByPageDownload(GoodsItemEntity entity) {
@@ -273,26 +269,24 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
-	@GoodsLifeCycle(status = 1, isFx = 1, remark = "商品可分销")
 	public void batchBeFx(GoodsItemEntity entity) {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemBeFxForBatch(itemIdList);
 		//更新索引并发布
 		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_CREATE);
-		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
+//		threadPoolComponent.sendGoodsInfo(itemIdList);//通知对接用户上架，可能修改了价格等信息
 	}
 
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
-	@GoodsLifeCycle(status = 1, isFx = 0, remark = "商品不可分销")
 	public void batchNotBeFx(GoodsItemEntity entity) {
 		String[] arr = entity.getItemId().split(",");
 		List<String> itemIdList = Arrays.asList(arr);
 		goodsItemMapper.updateGoodsItemNotBeFxForBatch(itemIdList);
 		//更新索引并发布
 		updateLuceneAndPublish(itemIdList, PublishType.DISTRIBUTION_DELETE);
-		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
+//		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//通知对接用户下架
 	}
 
 	@Override
@@ -409,7 +403,7 @@ public class GoodsItemServiceImpl implements GoodsItemService {
 			record.setDetail(tmpRecordDetail);
 			
 			LogUtil.writeLog("upShelvesItemList:"+itemIdList.size());
-			result = goodsService.upShelves(itemIdList, Constants.CNCOOPBUY);
+//			result = goodsService.upShelves(itemIdList, Constants.CNCOOPBUY);
 			LogUtil.writeLog("upShelveStatus:"+result.isSuccess());
 			if (result.isSuccess()) {
 				goodsItemMapper.updateGoodsItemForStockEnough(itemIdList);

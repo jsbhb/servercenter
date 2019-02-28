@@ -10,6 +10,7 @@
 		<result column="tag_fun_id" property="tagFunId" jdbcType="INTEGER"/>
 		<result column="priority" property="priority" jdbcType="INTEGER"/>
 		<result column="description" property="description" jdbcType="VARCHAR"/>
+		<result column="tag_ratio" property="tagRatio" jdbcType="INTEGER"/>
 		<result column="createTime" property="createTime" jdbcType="VARCHAR"/>
 		<result column="updateTime" property="updateTime" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
@@ -18,17 +19,10 @@
 	<resultMap type="com.zm.goods.pojo.GoodsTagBindEntity" id="tagBind">
 		<id column="id" property="id" jdbcType="INTEGER"/>
 		<result column="tag_id" property="tagId" jdbcType="INTEGER"/>
-		<result column="item_id" property="itemId" jdbcType="VARCHAR"/>
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR"/>
 		<result column="createTime" property="createTime" jdbcType="VARCHAR"/>
 		<result column="updateTime" property="updateTime" jdbcType="VARCHAR"/>
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
-	</resultMap>
-	
-	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsItems">
-		<id column="goods_id" property="goodsId"/>
-		<collection property="items" ofType="com.zm.goods.pojo.GoodsItemEntity">
-			<id column="item_id" property="itemId"/>
-		</collection>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="goodsTagList">
@@ -39,7 +33,7 @@
 	</resultMap>
 	
 	<select id="listGoodsTagBySpecsTpIds" parameterType="Object" resultMap="tag">
-		select gt.*,gtb.specs_tp_id,tag_fun_id from goods_tag gt left join goods_tag_bind gtb on gt.id = gtb.tag_id 
+		select gt.*,gtb.specs_tp_id,tag_fun_id from goods_tag gt left join kj_goods_tag_bind gtb on gt.id = gtb.tag_id 
 		where gtb.specs_tp_id in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
@@ -52,36 +46,32 @@
 	</select>
 	
 	<insert id="batchInsert" parameterType="Object">
-		insert ignore into goods_tag_bind(item_id,tag_id,create_time,opt) value 
+		insert ignore into kj_goods_tag_bind(specs_tp_id,tag_id,create_time,opt) value 
 		<foreach collection="list" item="item" separator="," open="" close="">
-			(#{item.itemId},#{item.tagId},now(),#{item.opt})
+			(#{item.specsTpId},#{item.tagId},now(),#{item.opt})
 		</foreach>
 	</insert>
 	
-	<select id="listGoodsIdByItemList" resultMap="goodsItems">
-		select goods_id,item_id from goods_item where item_id in 
-		<foreach collection="list" item="item" open="(" separator="," close=")">
-            #{item}
-		</foreach>
-		order by goods_id
-	</select>
-	
-	<select id="listGoodsTagBindByItemList" resultMap="tagBind">
-		select * from goods_tag_bind
-		where item_id in 
+	<select id="listGoodsTagBindBySpecsTpIdList" resultMap="tagBind">
+		select * from kj_goods_tag_bind
+		where specs_tp_id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
 	</select>
 	
-	<select id="listGoodsTagByItemId" parameterType="Object" resultMap="goodsTagList">
-		select gtb.item_id,gt.tag_name 
-		from goods_tag gt 
-		left join goods_tag_bind gtb on gt.id = gtb.tag_id 
-		where gtb.item_id in
+	<select id="listGoodsTagByTagIds" parameterType="Object" resultMap="tag">
+		select * from goods_tag where id in 
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
 	</select>
+	
+	<delete id="deleteGoodsTagBindByIds" parameterType="Object">
+		delete from kj_goods_tag_bind where id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</delete>
 	
 </mapper>

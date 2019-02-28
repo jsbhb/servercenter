@@ -14,11 +14,13 @@ import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.decorator.GoodsServiceDecoratorAbstract;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.exception.WrongPlatformSource;
+import com.zm.goods.factory.ViewObjectFactory;
 import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
 import com.zm.goods.pojo.vo.GoodsSpecsVO;
+import com.zm.goods.pojo.vo.GoodsTagVO;
 import com.zm.goods.pojo.vo.GoodsVO;
 
 @Service("goodsTagDecorator")
@@ -45,9 +47,11 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 			int gradeId, boolean welfare) throws WrongPlatformSource {
 		Map<String, Object> result = goodsServiceImpl.queryGoods(searchModel, sortList, pagination, gradeId, welfare);
 		List<GoodsVO> goodsList = (List<GoodsVO>) result.get(GOODS_LIST);
-		goodsList.stream().forEach(vo -> {
-			addItemGoodsTag(vo.getSpecsList());
-		});
+		if(goodsList != null){
+			goodsList.stream().forEach(vo -> {
+				addItemGoodsTag(vo.getSpecsList());
+			});
+		}
 		return result;
 	}
 
@@ -60,16 +64,18 @@ public class GoodsServiceTagDecorator extends GoodsServiceDecoratorAbstract {
 			List<String> specsTpIdList = specsList.stream().map(specsTp -> specsTp.getSpecsTpId())
 					.collect(Collectors.toList());
 			List<GoodsTagEntity> list = goodsTagMapper.listGoodsTagBySpecsTpIds(specsTpIdList);
-			List<GoodsTagEntity> temp = null;
-			Map<String, List<GoodsTagEntity>> map = new HashMap<String, List<GoodsTagEntity>>();
+			List<GoodsTagVO> temp = null;
+			Map<String, List<GoodsTagVO>> map = new HashMap<String, List<GoodsTagVO>>();
 			if (list != null && list.size() > 0) {
+				GoodsTagVO vo = null;
 				for (GoodsTagEntity tag : list) {
-					if (map.get(tag.getSpecsTpId()) == null) {
-						temp = new ArrayList<GoodsTagEntity>();
-						temp.add(tag);
+					vo = ViewObjectFactory.createGoodsTagVO(tag);
+					if (map.get(vo.getSpecsTpId()) == null) {
+						temp = new ArrayList<GoodsTagVO>();
+						temp.add(vo);
 						map.put(tag.getSpecsTpId(), temp);
 					} else {
-						map.get(tag.getSpecsTpId()).add(tag);
+						map.get(tag.getSpecsTpId()).add(vo);
 					}
 				}
 			}

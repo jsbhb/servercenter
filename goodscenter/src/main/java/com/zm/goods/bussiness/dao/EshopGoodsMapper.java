@@ -7,7 +7,7 @@ import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
 import com.zm.goods.pojo.EshopGoodsStockEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
-import com.zm.goods.pojo.OrderInfoDTO;
+import com.zm.goods.pojo.dto.OrderInfoDTO;
 
 public interface EshopGoodsMapper {
 

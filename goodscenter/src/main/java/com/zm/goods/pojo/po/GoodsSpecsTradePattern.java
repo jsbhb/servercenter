@@ -61,6 +61,8 @@ public class GoodsSpecsTradePattern {
 	
 	private String upshelfTime;//上架时间
 	
+	private String downshelfTime;//上架时间
+	
 	private int stock;
 	
 	private String createTime;
@@ -68,6 +70,24 @@ public class GoodsSpecsTradePattern {
 	private String updateTime;
 	
 	private String opt;
+	
+	private String remark;
+
+	public String getDownshelfTime() {
+		return downshelfTime;
+	}
+
+	public void setDownshelfTime(String downshelfTime) {
+		this.downshelfTime = downshelfTime;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 
 	public int getStock() {
 		return stock;

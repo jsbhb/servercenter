@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -44,7 +43,6 @@ import com.zm.goods.pojo.vo.GoodsVO;
 import com.zm.goods.pojo.vo.SpecsTpStockVO;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 import com.zm.goods.utils.JSONUtil;
-import com.zm.goods.utils.PinYin4JUtil;
 import com.zm.goods.utils.lucene.AbstractLucene;
 import com.zm.goods.utils.lucene.LuceneFactory;
 
@@ -116,7 +114,7 @@ public class GoodsServiceImpl implements GoodsService {
 		List<String> bigSaleList = new ArrayList<>();
 		if (bigsaleJson != null) {
 			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
-			for(GoodsSpecsVO v : vo.getSpecsList()){
+			for (GoodsSpecsVO v : vo.getSpecsList()) {
 				if (bigSaleList.contains(v.getSpecsTpId())) {
 					v.setBigSale(true);
 				}
@@ -145,7 +143,8 @@ public class GoodsServiceImpl implements GoodsService {
 			});
 			break;
 		case GENERAL_TRADE:
-			List<String> specsTpIds = vo.getSpecsList().stream().map(tp -> tp.getSpecsTpId()).collect(Collectors.toList());
+			List<String> specsTpIds = vo.getSpecsList().stream().map(tp -> tp.getSpecsTpId())
+					.collect(Collectors.toList());
 			priceList = goodsMapper.listGoodsPriceBySpecsTpIds(specsTpIds);
 			Map<String, List<GoodsPricePO>> tmap = priceList.stream()
 					.collect(Collectors.groupingBy(price -> price.getSpecsTpId()));
@@ -243,8 +242,8 @@ public class GoodsServiceImpl implements GoodsService {
 		goodsSpecsTpList.stream().forEach(specsTp -> {
 			tmpList.clear();
 			tmpList.add(specsTp);
-			goodsVOList
-					.add(ViewObjectFactory.createGoodsVO(goodsMap.get(specsTp.getGoodsId()), tmpList, specsList, null));
+			goodsVOList.add(ViewObjectFactory.createGoodsVO(goodsMap.get(specsTp.getGoodsId()), tmpList, specsList,
+					Optional.ofNullable(null)));
 		});
 		return goodsVOList;
 	}
@@ -302,7 +301,6 @@ public class GoodsServiceImpl implements GoodsService {
 			if (sortList != null && sortList.getSortList() != null && sortList.getSortList().size() > 0) {
 				searchParm.put("sortList", sortList.getSortList());
 			}
-			searchParm.put("isWelfare", welfare ? 1 : 0);
 			List<GoodsSpecsTradePattern> goodsSpecsTpList = goodsMapper.listGoodsSpecsTpForFrontSearch(searchParm);// 获取商品
 			if (goodsSpecsTpList == null) {
 				return null;
@@ -323,15 +321,11 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 
 		resultMap.put(PAGINATION, pagination.webListConverter());
-		Object obj = luceneMap.get(Constants.BRAND);
-		if (obj != null) {
-			List<String> list = new ArrayList<>((Set<String>) obj);
-			Map<String, List<Object>> brandMap = PinYin4JUtil.packDataByFirstCode(list, String.class, null);
-			resultMap.put(Constants.BRAND_PY, brandMap);
+		for (Map.Entry<String, Object> entry : luceneMap.entrySet()) {
+			if (!entry.getKey().equals(Constants.TOTAL) && !entry.getKey().equals(Constants.ID_LIST)) {
+				resultMap.put(entry.getKey(), entry.getValue());
+			}
 		}
-		resultMap.put(Constants.BRAND, luceneMap.get(Constants.BRAND));
-		resultMap.put(Constants.ORIGIN, luceneMap.get(Constants.ORIGIN));
-
 		return resultMap;
 	}
 
@@ -342,6 +336,11 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel tradeGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display) {
+		// 判断specsTpIdList是不是都是一般贸易
+		List<Integer> types = goodsMapper.getGoodsTypeBySpecsTpIds(specsTpIdList);
+		if (types.size() > 1 || types.get(0) != TradePatternEnum.GENERAL_TRADE.getType()) {
+			return new ResultModel(false, "请选择一般贸易商品上架");
+		}
 		// 状态更新为上架
 		goodsMapper.updateTradeSpecsUpshelf(specsTpIdList, display);
 		// 只有前端展示的时候才需要建lucene索引
@@ -374,6 +373,11 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public ResultModel batchKjGoodsUpShelves(List<String> specsTpIdList, Integer centerId, int display) {
+		// 判断specsTpIdList是不是都是一般贸易
+		List<Integer> types = goodsMapper.getGoodsTypeBySpecsTpIds(specsTpIdList);
+		if (types.size() > 1 || types.get(0) != TradePatternEnum.CROSS_BORDER.getType()) {
+			return new ResultModel(false, "请选择跨境商品上架");
+		}
 		// 自动选择对应的itemId
 		List<AutoSelectionBO> boList = goodsServiceComponent.AutoSelectItemId(specsTpIdList,
 				AutoSelectionModeEnum.INTERNAL_PRICE_LOWEST);
@@ -401,7 +405,8 @@ public class GoodsServiceImpl implements GoodsService {
 		deleteLuceneAndDownShelves(specsTpIdList, centerId);
 		threadPoolComponent.delPublish(specsTpIdList, centerId);// 删除商品和重新发布商品
 		// FIXME
-//		threadPoolComponent.sendGoodsInfoDownShelves(specsTpIdList);// 通知对接用户商品下架
+		// threadPoolComponent.sendGoodsInfoDownShelves(specsTpIdList);//
+		// 通知对接用户商品下架
 		return new ResultModel(true, "");
 	}
 

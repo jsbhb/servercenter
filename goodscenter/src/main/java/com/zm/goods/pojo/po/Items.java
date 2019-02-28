@@ -12,7 +12,7 @@ public class Items {
 	
 	private String specsTpId;
 	
-	private Integer supplierId;
+	private int supplierId;
 	
 	private String supplierName;
 	
@@ -70,11 +70,11 @@ public class Items {
 		this.specsTpId = specsTpId;
 	}
 
-	public Integer getSupplierId() {
+	public int getSupplierId() {
 		return supplierId;
 	}
 
-	public void setSupplierId(Integer supplierId) {
+	public void setSupplierId(int supplierId) {
 		this.supplierId = supplierId;
 	}
 

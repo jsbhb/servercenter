@@ -18,9 +18,9 @@ import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
 import com.zm.goods.pojo.EshopGoodsStockEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
-import com.zm.goods.pojo.OrderGoodsDTO;
-import com.zm.goods.pojo.OrderInfoDTO;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.dto.OrderGoodsDTO;
+import com.zm.goods.pojo.dto.OrderInfoDTO;
 
 @Service("eshopGoodsService")
 @Transactional(isolation = Isolation.READ_COMMITTED)

@@ -32,6 +32,7 @@ import com.zm.order.pojo.PostFeeDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.GoodsVO;
 import com.zm.order.pojo.bo.OrderStatusCallBack;
 import com.zm.order.utils.JSONUtil;
 
@@ -284,17 +285,16 @@ public class OrderController {
 			shoppingCart.setGradeId(gradeId);
 			shoppingCart.setPlatformSource(platformSource);
 
-			List<ShoppingCart> list = null;
 			try {
-				list = orderService.listShoppingCart(shoppingCart, pagination);
+				List<GoodsVO> voList = orderService.listShoppingCart(shoppingCart, pagination);
+				result.setSuccess(true);
+				result.setObj(voList);
+				return result;
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("获取用户购物车接口", e);
 				return new ResultModel(false, ErrorCodeEnum.SERVER_ERROR.getErrorCode(),
 						ErrorCodeEnum.SERVER_ERROR.getErrorMsg());
 			}
-			result.setSuccess(true);
-			result.setObj(list);
-			return result;
 		}
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),

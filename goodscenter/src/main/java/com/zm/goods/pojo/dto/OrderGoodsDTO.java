@@ -1,4 +1,4 @@
-package com.zm.goods.pojo;
+package com.zm.goods.pojo.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;

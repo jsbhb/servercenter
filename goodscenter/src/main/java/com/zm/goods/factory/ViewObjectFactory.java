@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
 import com.zm.goods.pojo.vo.GoodsSpecsVO;
+import com.zm.goods.pojo.vo.GoodsTagVO;
 import com.zm.goods.pojo.vo.GoodsVO;
 import com.zm.goods.pojo.vo.SpecsTpStockVO;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
@@ -47,11 +49,11 @@ public class ViewObjectFactory {
 		List<GoodsSpecsVO> specsListVO = new ArrayList<>();
 		Map<String, GoodsSpecs> specsMap = specsList.stream()
 				.collect(Collectors.toMap(GoodsSpecs::getSpecsId, GoodsSpecs -> GoodsSpecs));
-		Map<String, Optional<WarehouseModel>> stockMap = stockList.orElse(new ArrayList<>()).stream().collect(
-				Collectors.toMap(WarehouseModel::getSpecsTpId, warehouseModel -> Optional.ofNullable(warehouseModel)));
+		Map<String, WarehouseModel> stockMap = stockList.orElse(new ArrayList<>()).stream().collect(
+				Collectors.toMap(WarehouseModel::getSpecsTpId, warehouseModel -> warehouseModel));
 		goodsSpecsTpList.stream().forEach(specsTp -> {
 			specsListVO.add(createGoodsSpecsVO(specsTp, specsMap.get(specsTp.getSpecsId()),
-					stockMap.get(specsTp.getSpecsTpId())));
+					Optional.ofNullable(stockMap.get(specsTp.getSpecsTpId()))));
 		});
 		vo.setSpecsList(specsListVO);
 		return vo;
@@ -88,6 +90,14 @@ public class ViewObjectFactory {
 		SpecsTpStockVO vo = new SpecsTpStockVO();
 		vo.setSpecsTpId(model.getSpecsTpId());
 		vo.setStock(model.getFxqty());
+		return vo;
+	}
+
+	public static GoodsTagVO createGoodsTagVO(GoodsTagEntity tag) {
+		GoodsTagVO vo = new GoodsTagVO();
+		vo.setTagName(tag.getTagName());
+		vo.setSpecsTpId(tag.getSpecsTpId());
+		vo.setTagFun(tag.getTagFunId());
 		return vo;
 	}
 }

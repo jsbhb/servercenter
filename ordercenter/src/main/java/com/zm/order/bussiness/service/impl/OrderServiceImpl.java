@@ -36,12 +36,9 @@ import com.zm.order.feignclient.PayFeignClient;
 import com.zm.order.feignclient.SupplierFeignClient;
 import com.zm.order.feignclient.UserFeignClient;
 import com.zm.order.feignclient.model.GoodsConvert;
-import com.zm.order.feignclient.model.GoodsFile;
-import com.zm.order.feignclient.model.GoodsSpecs;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.feignclient.model.RefundPayModel;
 import com.zm.order.feignclient.model.SendOrderResult;
-import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.Express;
@@ -59,6 +56,7 @@ import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
 import com.zm.order.pojo.UserInfo;
 import com.zm.order.pojo.bo.DealOrderDataBO;
+import com.zm.order.pojo.bo.GoodsVO;
 import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.pojo.bo.OrderGoodsCompleteBO;
 import com.zm.order.pojo.bo.OrderStatusCallBack;
@@ -315,9 +313,8 @@ public class OrderServiceImpl implements OrderService {
 		orderMapper.saveShoppingCart(cart);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<ShoppingCart> listShoppingCart(ShoppingCart shoppingCart, Pagination pagination) throws Exception {
+	public List<GoodsVO> listShoppingCart(ShoppingCart shoppingCart, Pagination pagination) throws Exception {
 
 		List<ShoppingCart> list = orderMapper.listShoppingCart(shoppingCart);
 
@@ -327,7 +324,7 @@ public class OrderServiceImpl implements OrderService {
 
 		StringBuilder sb = new StringBuilder();
 		for (ShoppingCart model : list) {
-			sb.append(model.getItemId() + ",");
+			sb.append(model.getSpecsTpId() + ",");
 		}
 
 		String ids = sb.substring(0, sb.length() - 1);
@@ -335,61 +332,12 @@ public class OrderServiceImpl implements OrderService {
 		ResultModel result = goodsFeignClient.listGoodsSpecs(Constants.FIRST_VERSION, ids,
 				shoppingCart.getPlatformSource(), shoppingCart.getGradeId());
 		if (result.isSuccess()) {
-			Map<String, Object> resultMap = (Map<String, Object>) result.getObj();
-			List<Map<String, Object>> specsList = (List<Map<String, Object>>) resultMap.get("specsList");
-			List<Map<String, Object>> fileList = (List<Map<String, Object>>) resultMap.get("pic");
-			GoodsSpecs specs = null;
-			for (ShoppingCart model : list) {
-				for (Map<String, Object> map : specsList) {
-					specs = JSONUtil.parse(JSONUtil.toJson(map), GoodsSpecs.class);
-					try {
-						if (specs.getItemId().equals(model.getItemId())) {
-							model.setGoodsSpecs(specs);
-							break;
-						}
-					} catch (NullPointerException e) {
-						LogUtil.writeErrorLog("【数据不完整】" + specs.toString() + "," + model.toString());
-					}
-				}
-			}
-			GoodsFile file = null;
-			HashOperations<String, String, String> hashOperations = template.opsForHash();
-			for (ShoppingCart model : list) {
-				for (Map<String, Object> map : fileList) {
-					file = JSONUtil.parse(JSONUtil.toJson(map), GoodsFile.class);
-					try {
-						if (file.getGoodsId().equals(model.getGoodsSpecs().getGoodsId())) {
-							model.setPicPath(file.getPath());
-							break;
-						}
-					} catch (NullPointerException e) {
-						LogUtil.writeErrorLog("【数据不完整】" + file.toString() + "," + model.toString());
-					}
-				}
-				Map<String, String> map = hashOperations.entries(Constants.POST_TAX + model.getSupplierId());
-				if (map != null) {
-					String post = map.get("post");
-					String tax = map.get("tax");
-					try {
-						model.setFreePost(Integer.valueOf(post == null ? "0" : post));
-						model.setFreeTax(Integer.valueOf(tax == null ? "0" : tax));
-					} catch (Exception e) {
-						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
-					}
-				}
-				try {
-					Object obj = template.opsForValue().get("href:" + model.getGoodsSpecs().getGoodsId());
-					model.setHref(obj == null ? "" : obj.toString());
-				} catch (NullPointerException e) {
-					LogUtil.writeErrorLog("【没有规格信息】" + model.toString());
-				}
-			}
-
+			List<GoodsVO> voList = JSONUtil.parse(JSONUtil.toJson(result.getObj()), new TypeReference<List<GoodsVO>>() {
+			});
+			return voList;
 		} else {
 			throw new RuntimeException("内部调用商品服务出错");
 		}
-
-		return list;
 	}
 
 	@Override

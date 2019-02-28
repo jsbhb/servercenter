@@ -3,7 +3,7 @@
 <mapper namespace="com.zm.goods.bussiness.dao.GoodsMapper">
 
 
-	<resultMap type="com.zm.goods.pojo.po.GoodsItem" id="goodsItem">
+	<resultMap type="com.zm.goods.pojo.po.Goods" id="goodsItem">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
@@ -139,13 +139,6 @@
 		</collection>
 	</resultMap>
 	
-	<resultMap type="com.zm.goods.pojo.Tax" id="tax">
-		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
-		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC" />
-		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
-	</resultMap>
-	
 	<resultMap type="com.zm.goods.processWarehouse.model.WarehouseModel" id="stockModel">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
@@ -193,7 +186,7 @@
 		gf.id as file_id,gf.path,gcb.brand
 		from kj_goods g 
 		left join goods_file gf on g.goods_id = gf.goods_id 
-		left join goods_category_brand gcb on g.brand_id = gcb.id
+		left join goods_category_brand gcb on g.brand_id = gcb.brand_id
 		where g.is_del = 0 and gf.type = 0 and g.goods_id = #{goodsId}
 	</select>
 	
@@ -204,6 +197,10 @@
 		upshelf_time from kj_goods_specs_tradepattern where is_del = 0 and goods_id = #{goodsId}
 	</select>
 	
+	<select id="getGoodsSpecsTpBySpecsTpId" parameterType="Object" resultMap="goodsSpecsTp">
+		select * from kj_goods_specs_tradepattern where specs_tp_id = #{specsTpId}
+	</select>
+	
 	<select id="listGoodsSpecsBySpecsIds" parameterType="Object" resultMap="goodsSpecs">
 		select id,weight,specs_id,encode,description,unit,info,carton,conversion from kj_specs_goods 
 		where is_del = 0 and specs_id in
@@ -211,6 +208,10 @@
 			separator=",">
 			#{item,jdbcType = VARCHAR}
 		</foreach>
+	</select>
+	
+	<select id="getGoodsSpecsBySpecsId" parameterType="Object" resultMap="goodsSpecs">
+		select * from kj_specs_goods where specs_id = #{specsId}
 	</select>
 
 	<select id="listGoodsFile" parameterType="Object" resultMap="goodsFile">
@@ -229,6 +230,10 @@
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
+	</select>
+	
+	<select id="getItemsByItemIds" parameterType="Object" resultMap="items">
+		select * from kj_goods_item where item_id = #{itemId} 
 	</select>
 	
 	<select id="listItemsBySpecsTpIds" parameterType="Object" resultMap="items">
@@ -276,9 +281,9 @@
 		<result column="tag_ratio" property="ratio" jdbcType="INTEGER" />
 		<result column="sale_num" property="saleNum" jdbcType="INTEGER" />
 		<collection property="guideList" ofType="com.zm.goods.pojo.dto.GuideProperty">
-			<id column="id" property="id" jdbcType="Integer" />
+			<id column="id" property="id" jdbcType="INTEGER" />
 			<result column="name" property="name" jdbcType="VARCHAR" />
-			<result column="value" property="value" jdbcType="VARCHAR" />
+			<result column="val" property="value" jdbcType="VARCHAR" />
 		</collection>
 	</resultMap>
 	
@@ -315,7 +320,7 @@
 	
 	<select id="listSpecsNeedToCreateIndex" parameterType="Object" resultMap = "goods4Lucene">
 		select g.first_category,g.second_category,g.third_category,g.goods_name,gtp.specs_tp_id,gtp.retail_price,
-		gtp.upshelf_time,gtp.is_welfare,gtp.tag_ratio,gtp.sale_num,pn.name,pv.value 
+		gtp.upshelf_time,gtp.is_welfare,gtp.tag_ratio,gtp.sale_num,pn.name,pv.val 
 		from kj_goods g 
 		left join kj_goods_specs_tradepattern gtp on g.goods_id = gtp.goods_id
 		left join kj_specs_goods ksg on gtp.specs_id = ksg.specs_id
@@ -348,10 +353,10 @@
 				separator="," close="">
 				${sort.sortField} ${sort.sortRule} 
 			</foreach>
-			, g.id desc
+			, id desc
 		</if>
 		<if test="sortList == null or sortList.size == 0">
-			order by tag_ratio desc, g.id desc
+			order by tag_ratio desc, id desc
 		</if>
 	</select>
 	
@@ -361,7 +366,7 @@
 		gf.id as file_id,gf.path,gcb.brand
 		from kj_goods g 
 		left join goods_file gf on g.goods_id = gf.goods_id 
-		left join goods_category_brand gcb on g.brand_id = gcb.id
+		left join goods_category_brand gcb on g.brand_id = gcb.brand_id
 		where g.is_del = 0 and gf.type = 0 and g.goods_id in 
 		<foreach item="id" index="index" collection="list" open="("
 			separator="," close=")">
@@ -494,6 +499,15 @@
 	
 	<select id="getGoodsTypeByGoodsId" parameterType="Object" resultType="java.lang.Integer">
 		select type from kj_goods where goods_id = #{goodsId}
+	</select>
+	
+	<select id="getGoodsTypeBySpecsTpIds" parameterType="Object" resultType="java.lang.Integer">
+		select g.type from kj_goods_specs_tradepattern gtp left join kj_goods g on gtp.goods_id = g.goods_id 
+		where gtp.specs_tp_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+		group by g.type
 	</select>
 	
 </mapper>

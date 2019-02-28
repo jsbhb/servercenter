@@ -23,7 +23,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
-import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexableField;
@@ -119,7 +118,7 @@ public class GoodsLucene extends AbstractLucene {
 				Store.NO));
 		if (model.getGuideList() != null) {
 			for (GuideProperty property : model.getGuideList()) {
-				doc.add(new StoredField(property.getName(), property.getValue()));
+				doc.add(new StringField(property.getName(), property.getValue(), Store.YES));
 			}
 		}
 		try {

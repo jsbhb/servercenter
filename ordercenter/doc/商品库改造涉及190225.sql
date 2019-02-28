@@ -6,3 +6,4 @@ drop index idx_combinationId on order_base;
 drop index idx_regionalCenterId on order_base;
 drop index tag_fun on order_base;
 drop index idx_orderFlag on order_base;
+alter table order_shopping_cart change item_id specs_tp_id varchar(45);

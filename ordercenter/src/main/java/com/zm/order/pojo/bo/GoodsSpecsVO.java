@@ -1,12 +1,12 @@
-package com.zm.goods.pojo.vo;
+package com.zm.order.pojo.bo;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.zm.goods.pojo.TempSpecs;
-import com.zm.goods.utils.JSONUtil;
+import com.zm.order.pojo.GoodsTagEntity;
+import com.zm.order.utils.JSONUtil;
 
 /**
  * @fun 前端展示规格类
@@ -44,7 +44,7 @@ public class GoodsSpecsVO {
 	
 	private int minBuyCount;//最小购买量
 
-	private List<GoodsTagVO> tagList;
+	private List<GoodsTagEntity> tagList;
 
 	private int saleNum;
 
@@ -208,11 +208,11 @@ public class GoodsSpecsVO {
 		this.linePrice = linePrice;
 	}
 
-	public List<GoodsTagVO> getTagList() {
+	public List<GoodsTagEntity> getTagList() {
 		return tagList;
 	}
 
-	public void setTagList(List<GoodsTagVO> tagList) {
+	public void setTagList(List<GoodsTagEntity> tagList) {
 		this.tagList = tagList;
 	}
 

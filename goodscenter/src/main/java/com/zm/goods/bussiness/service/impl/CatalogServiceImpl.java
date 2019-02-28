@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zm.goods.bussiness.dao.CatalogMapper;
-import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.CatalogService;
 import com.zm.goods.enummodel.CategoryTypeEnum;
 import com.zm.goods.pojo.FirstCatalogEntity;
@@ -38,9 +37,6 @@ public class CatalogServiceImpl implements CatalogService {
 
 	@Resource
 	CatalogMapper catalogMapper;
-
-	@Resource
-	GoodsBaseMapper goodsBaseMapper;
 
 	@Override
 	public List<FirstCatalogEntity> queryAll() {

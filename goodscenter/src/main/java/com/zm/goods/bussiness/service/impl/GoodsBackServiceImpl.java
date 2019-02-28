@@ -8,9 +8,11 @@
 package com.zm.goods.bussiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -23,31 +25,29 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
-import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
+import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.log.LogUtil;
-import com.zm.goods.pojo.ERPGoodsTagBindEntity;
-import com.zm.goods.pojo.ERPGoodsTagEntity;
-import com.zm.goods.pojo.GoodsBaseEntity;
-import com.zm.goods.pojo.GoodsEntity;
-import com.zm.goods.pojo.GoodsFielsMaintainBO;
 import com.zm.goods.pojo.GoodsFile;
-import com.zm.goods.pojo.GoodsInfoEntity;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
-import com.zm.goods.pojo.GoodsStockEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
+import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
-import com.zm.goods.pojo.Tax;
-import com.zm.goods.pojo.ThirdWarehouseGoods;
-import com.zm.goods.pojo.po.GoodsPrice;
+import com.zm.goods.pojo.bo.GoodsRender4New;
+import com.zm.goods.pojo.po.BackGoodsPO;
+import com.zm.goods.pojo.po.Goods;
+import com.zm.goods.pojo.po.GoodsPricePO;
+import com.zm.goods.pojo.po.GoodsSpecs;
+import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
+import com.zm.goods.pojo.po.Items;
+import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 /**
  * ClassName: GoodsBackServiceImpl <br/>
@@ -59,6 +59,7 @@ import com.zm.goods.pojo.po.GoodsPrice;
  * @since JDK 1.7
  */
 @Service
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Resource
@@ -68,140 +69,160 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	GoodsItemMapper goodsItemMapper;
 
 	@Resource
-	GoodsBaseMapper goodsBaseMapper;
-
-	@Resource
 	GoodsTagMapper goodsTagMapper;
 
 	@Resource
 	RedisTemplate<String, Object> template;
-	
+
 	@Resource
 	GoodsMapper goodsMapper;
-
-	@Override
-	public Page<GoodsEntity> queryByPage(GoodsEntity entity) {
-		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		return goodsBackMapper.selectForPage(entity);
-	}
-
-	@Override
-	public GoodsEntity queryById(int id) {
-		GoodsEntity entity = goodsBackMapper.selectById(id);
-		List<GoodsFile> fileList = goodsBackMapper.selectGoodsFileByGoodsId(entity);
-		GoodsEntity entityWithItem = goodsBackMapper.selectGoodsWithItem(id);
-		ERPGoodsTagBindEntity tagBind = goodsBackMapper.selectGoodsTagBindByItemId(entityWithItem.getGoodsItem());
-		entity.setFiles(fileList);
-		entity.setGoodsTagBind(tagBind);
-		return entity;
-	}
+	
+	@Resource
+	GoodsService goodsService;
 
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public void save(GoodsEntity entity, String type) {
-		goodsBackMapper.insert(entity);
-		goodsItemMapper.insert(entity.getGoodsItem());
-		goodsItemMapper.insertPrice(entity.getGoodsItem().getGoodsPrice());
-		if (entity.getFiles() != null && entity.getFiles().size() > 0) {
-			goodsItemMapper.insertFiles(entity.getFiles());
+	public void save(BackGoodsPO entity) {
+		if (entity.getGoods() != null) {
+			goodsBackMapper.insertGoods(entity.getGoods());
+			if (entity.getGoods().getGoodsFileList() != null && entity.getGoods().getGoodsFileList().size() > 0) {
+				goodsItemMapper.insertFiles(entity.getGoods().getGoodsFileList());
+			}
 		}
-
-		if ("sync".equals(type)) {
-			goodsBackMapper.updateThirdStatus(entity.getThirdId());
+		if (entity.getGoodsSpecsTradePattern() != null) {
+			goodsBackMapper.insertSpecsTp(entity.getGoodsSpecsTradePattern());
 		}
-		if (entity.getGoodsTagBind() != null) {
-			goodsBackMapper.insertTagBind(entity.getGoodsTagBind());
+		if (entity.getItemsList() != null && entity.getItemsList().size() > 0) {
+			goodsBackMapper.insertItemBatch(entity.getItemsList());
+		}
+		if (entity.getSpecs() != null) {
+			goodsBackMapper.insertSpecs(entity.getSpecs());
+		}
+		if (entity.getPriceList() != null && entity.getPriceList().size() > 0) {
+			goodsBackMapper.insertItemPriceBatch(entity.getPriceList());
+		}
+		if (entity.getStockList() != null && entity.getStockList().size() > 0) {
+			goodsBackMapper.insertStockBatch(entity.getStockList());
 		}
 	}
 
 	@Override
-	public Page<ThirdWarehouseGoods> queryByPage(ThirdWarehouseGoods entity) {
-		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		return goodsBackMapper.selectThirdForPage(entity);
+	public BackGoodsPO queryByItemdId(String itemId) {
+		Items item = goodsMapper.getItemsByItemIds(itemId);
+		if (item == null) {
+			return null;
+		}
+		List<Items> itemList = new ArrayList<>();
+		itemList.add(item);
+		GoodsSpecsTradePattern specsTp = goodsMapper.getGoodsSpecsTpBySpecsTpId(item.getSpecsTpId());
+		Goods goods = goodsMapper.getGoodsByGoodsId(specsTp.getGoodsId());
+		GoodsSpecs specs = goodsMapper.getGoodsSpecsBySpecsId(specsTp.getSpecsId());
+		List<String> itemIds = new ArrayList<>();
+		itemIds.add(item.getItemId());
+		List<GoodsPricePO> priceList = goodsMapper.listGoodsPriceByItemIds(itemIds);
+		List<WarehouseModel> stockList = goodsMapper.listWarehouse(itemIds);
+		List<String> specsTpIds = new ArrayList<>();
+		specsTpIds.add(specsTp.getSpecsTpId());
+		List<GoodsTagBindEntity> bindList = goodsTagMapper.listGoodsTagBindBySpecsTpIdList(specsTpIds);
+		List<GoodsRebateEntity> rebateList = goodsBackMapper.selectGoodsRebateBySpecsTpId(specsTp.getSpecsTpId());
+		// 创建返回对象
+		BackGoodsPO backGoods = new BackGoodsPO();
+		backGoods.setGoods(goods);
+		backGoods.setGoodsSpecsTradePattern(specsTp);
+		backGoods.setItemsList(itemList);
+		backGoods.setPriceList(priceList);
+		backGoods.setSpecs(specs);
+		backGoods.setStockList(stockList);
+		backGoods.setTagList(bindList);
+		backGoods.setRebateList(rebateList);
+		return backGoods;
 	}
 
 	@Override
-	public ThirdWarehouseGoods queryThird(ThirdWarehouseGoods entity) {
-		return goodsBackMapper.selectThird(entity);
+	public BackGoodsPO queryBySpecsTpId(String specsTpId) {
+		List<String> specsTpIds = new ArrayList<>();
+		specsTpIds.add(specsTpId);
+		List<Items> itemList = goodsMapper.listItemsBySpecsTpIds(specsTpIds);
+		GoodsSpecsTradePattern specsTp = goodsMapper.getGoodsSpecsTpBySpecsTpId(specsTpId);
+		Goods goods = goodsMapper.getGoodsByGoodsId(specsTp.getGoodsId());
+		GoodsSpecs specs = goodsMapper.getGoodsSpecsBySpecsId(specsTp.getSpecsId());
+		List<String> itemIds = itemList.stream().map(i -> i.getItemId()).collect(Collectors.toList());
+		List<GoodsPricePO> priceList = goodsMapper.listGoodsPriceByItemIds(itemIds);
+		List<WarehouseModel> stockList = goodsMapper.listWarehouse(itemIds);
+		List<GoodsTagBindEntity> bindList = goodsTagMapper.listGoodsTagBindBySpecsTpIdList(specsTpIds);
+		List<GoodsRebateEntity> rebateList = goodsBackMapper.selectGoodsRebateBySpecsTpId(specsTp.getSpecsTpId());
+		// 创建返回对象
+		BackGoodsPO backGoods = new BackGoodsPO();
+		backGoods.setGoods(goods);
+		backGoods.setGoodsSpecsTradePattern(specsTp);
+		backGoods.setItemsList(itemList);
+		backGoods.setPriceList(priceList);
+		backGoods.setSpecs(specs);
+		backGoods.setStockList(stockList);
+		backGoods.setTagList(bindList);
+		backGoods.setRebateList(rebateList);
+		return backGoods;
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public void edit(GoodsEntity entity) {
-		goodsBackMapper.update(entity);
-		List<GoodsFile> isrFileList = new ArrayList<GoodsFile>();
-		if (entity.getFiles() != null && entity.getFiles().size() > 0) {
-			for (GoodsFile gf : entity.getFiles()) {
-				if (gf.getId() != null) {
-					goodsItemMapper.updateFiles(gf);
-				} else {
-					isrFileList.add(gf);
+	public void updateGoods(BackGoodsPO entity) {
+		if (entity.getGoods() != null) {
+			goodsBackMapper.updateGoods(entity.getGoods());
+			if (entity.getGoods().getGoodsFileList() != null && entity.getGoods().getGoodsFileList().size() > 0) {
+				List<GoodsFile> initFileList = entity.getGoods().getGoodsFileList();
+				List<GoodsFile> insertFileList = initFileList.stream().filter(file -> file.getId() == null)
+						.collect(Collectors.toList());
+				initFileList.removeAll(insertFileList);
+				if (insertFileList.size() > 0) {
+					goodsItemMapper.insertFiles(insertFileList);
+				}
+				if (initFileList.size() > 0) {
+					goodsItemMapper.updateFilesBatch(initFileList);
 				}
 			}
 		}
-		if (isrFileList != null && isrFileList.size() > 0) {
-			goodsItemMapper.insertFiles(isrFileList);
+		if (entity.getGoodsSpecsTradePattern() != null) {
+			List<String> specsTpIds = new ArrayList<>();
+			specsTpIds.add(entity.getGoodsSpecsTradePattern().getSpecsTpId());
+			// 标签处理
+			List<GoodsTagBindEntity> bindList = goodsTagMapper.listGoodsTagBindBySpecsTpIdList(specsTpIds);
+			if (bindList.size() > 0) {// 先全部清除
+				List<Integer> idList = bindList.stream().map(t -> t.getId()).collect(Collectors.toList());
+				goodsTagMapper.deleteGoodsTagBindByIds(idList);
+			}
+			if (entity.getTagList() != null && entity.getTagList().size() > 0) {
+				List<Integer> tagIdList = entity.getTagList().stream().map(t -> t.getTagId())
+						.collect(Collectors.toList());
+				List<GoodsTagEntity> tagList = goodsTagMapper.listGoodsTagByTagIds(tagIdList);
+				int tagRatio = tagList.stream().mapToInt(t -> t.getTagRatio()).sum();
+				entity.getGoodsSpecsTradePattern().setTagRatio(tagRatio);
+				goodsTagMapper.batchInsert(entity.getTagList());
+			} else {
+				entity.getGoodsSpecsTradePattern().setTagRatio(0);
+			}
+			goodsBackMapper.updateSpecsTp(entity.getGoodsSpecsTradePattern());
 		}
-		// 判断商品标签
-		// if (entity.getGoodsTagBind() != null) {
-		// //增删改
-		// ERPGoodsTagBindEntity oldTag =
-		// goodsBackMapper.selectGoodsTagBindByGoodsId(entity.getGoodsItem());
-		// ERPGoodsTagBindEntity newTag = entity.getGoodsTagBind();
-		// if (oldTag == null && newTag.getTagId() != 0) {
-		// goodsBackMapper.insertTagBind(newTag);
-		// } else if (oldTag != null && newTag.getTagId() == 0) {
-		// goodsBackMapper.deleteTagBind(newTag);
-		// } else if (oldTag != null && newTag.getTagId() != 0) {
-		// goodsBackMapper.updateTagBind(newTag);
-		// }
-		// }
+		if (entity.getItemsList() != null && entity.getItemsList().size() > 0) {
+			goodsBackMapper.updateItemBatch(entity.getItemsList());
+		}
+		if (entity.getSpecs() != null) {
+			goodsBackMapper.updateSpecs(entity.getSpecs());
+		}
+		if (entity.getPriceList() != null && entity.getPriceList().size() > 0) {
+			goodsBackMapper.updateItemPriceBatch(entity.getPriceList());
+		}
+		if (entity.getStockList() != null && entity.getStockList().size() > 0) {
+			goodsBackMapper.updateStockBatch(entity.getStockList());
+		}
+		if (entity.getRebateList() != null && entity.getRebateList().size() > 0) {
+			goodsBackMapper.insertGoodsRebate(entity.getRebateList());
+			setRedis(entity.getRebateList());
+		}
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public void remove(GoodsEntity entity) {
-		goodsBackMapper.delete(entity);
-		goodsItemMapper.delete(entity);
-	}
-
-	@Override
-	public GoodsEntity checkRecordForDel(GoodsEntity entity) {
-		GoodsEntity retEntity = goodsBackMapper.selectRecordForDel(entity);
-		return retEntity;
-	}
-
-	@Override
-	public void saveDetailPath(GoodsEntity entity) {
+	public void saveDetailPath(Goods entity) {
 		goodsBackMapper.updateDetailPath(entity);
-	}
-
-	@Override
-	public GoodsEntity checkRecordForUpd(GoodsEntity entity) {
-		GoodsEntity retEntity = goodsBackMapper.selectRecordForUpd(entity);
-		return retEntity;
-	}
-
-	@Override
-	public Page<GoodsRebateEntity> queryAllGoods(GoodsEntity entity) {
-		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		return goodsBackMapper.selectAllGoodsForRebate(entity);
-	}
-
-	@Override
-	public List<GoodsRebateEntity> queryById(String itemId) {
-		return goodsBackMapper.selectGoodsRebateById(itemId);
-	}
-
-	@Override
-	public GoodsRebateEntity checkRecordForRebate(GoodsRebateEntity entity) {
-		return goodsBackMapper.selectRecordForRebate(entity);
-	}
-
-	@Override
-	public void insertGoodsRebate(List<GoodsRebateEntity> entityList) {
-		goodsBackMapper.insertGoodsRebate(entityList);
-		setRedis(entityList);
 	}
 
 	private void setRedis(List<GoodsRebateEntity> entityList) {
@@ -210,12 +231,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		Map<String, List<GoodsRebateEntity>> map = new HashMap<String, List<GoodsRebateEntity>>();
 		List<GoodsRebateEntity> tempList = null;
 		for (GoodsRebateEntity model : entityList) {
-			if (map.get(model.getItemId()) == null) {
+			if (map.get(model.getSpecsTpId()) == null) {
 				tempList = new ArrayList<GoodsRebateEntity>();
 				tempList.add(model);
-				map.put(model.getItemId(), tempList);
+				map.put(model.getSpecsTpId(), tempList);
 			} else {
-				map.get(model.getItemId()).add(model);
+				map.get(model.getSpecsTpId()).add(model);
 			}
 		}
 		for (Map.Entry<String, List<GoodsRebateEntity>> entry : map.entrySet()) {
@@ -228,259 +249,39 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	public void updateGoodsRebate(GoodsRebateEntity entity) {
-		// goodsBackMapper.updateGoodsRebate(entity);
-		// setRedis(entity);
-	}
-
-	@Override
-	public Page<ERPGoodsTagEntity> queryTagForPage(ERPGoodsTagEntity entity) {
+	public Page<GoodsTagEntity> queryTagForPage(GoodsTagEntity entity) {
 		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
 		return goodsBackMapper.selectTagForPage(entity);
 	}
 
 	@Override
-	public void insertGoodsTag(ERPGoodsTagEntity entity) {
+	public void insertGoodsTag(GoodsTagEntity entity) {
 		goodsBackMapper.insertGoodsTag(entity);
 	}
 
 	@Override
-	public void updateGoodsTag(ERPGoodsTagEntity entity) {
+	public void updateGoodsTag(GoodsTagEntity entity) {
 		goodsBackMapper.updateGoodsTag(entity);
 	}
 
 	@Override
-	public void deleteGoodsTag(ERPGoodsTagEntity entity) {
+	public ResultModel deleteGoodsTag(GoodsTagEntity entity) {
+		int count = goodsBackMapper.checkGoodsTagUsing(entity.getId());
+		if (count > 0) {
+			return new ResultModel(false, "该标签有商品绑定，请先解绑");
+		}
 		goodsBackMapper.deleteGoodsTag(entity);
+		return new ResultModel(true, null);
 	}
 
 	@Override
-	public ERPGoodsTagEntity queryTagInfo(ERPGoodsTagEntity entity) {
-		return goodsBackMapper.selectTagInfo(entity);
-	}
-
-	@Override
-	public List<ERPGoodsTagEntity> queryTagListInfo() {
+	public List<GoodsTagEntity> queryTagListInfo() {
 		return goodsBackMapper.selectTagListInfo();
 	}
 
 	@Override
 	public List<TagFuncEntity> queryTagFuncList() {
 		return goodsBackMapper.selectTagFuncListInfo();
-	}
-
-	@Override
-	public List<ERPGoodsTagBindEntity> queryGoodsTagBindListInfo(ERPGoodsTagBindEntity entity) {
-		return goodsBackMapper.selectGoodsTagBindListInfo(entity);
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public ResultModel saveGoodsInfo(GoodsInfoEntity entity) {
-		StringBuilder sb = new StringBuilder();
-
-		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
-		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
-		List<String> insItemIdList = new ArrayList<String>();
-		for (GoodsItemEntity gitem : entity.getGoods().getItems()) {
-			insItemList.add(gitem);
-			insPriceList.add(gitem.getGoodsPrice());
-			insItemIdList.add(gitem.getItemId());
-		}
-
-		List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(insItemList);
-		if (tempList != null && tempList.size() > 0) {
-			sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
-			for (GoodsItemEntity goodsItem : insItemList) {
-				sb.append(goodsItem.getSku() + "," + goodsItem.getConversion() + ";");
-			}
-			return new ResultModel(false, sb.toString());
-		}
-
-		// 设定商品的标签权重
-		Integer tmpGoodsTagRatio = 0;
-		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
-			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
-			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
-		}
-		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
-
-		if (entity.getGoodsBase().getId() != 0) {
-			goodsBaseMapper.insert(entity.getGoodsBase());
-		}
-		goodsBackMapper.insert(entity.getGoods());
-		if (insItemList.size() > 0) {
-			goodsItemMapper.insertBatch(insItemList);
-		}
-		if (insPriceList.size() > 0) {
-			goodsItemMapper.insertPriceBatch(insPriceList);
-		}
-		if (insItemIdList.size() > 0) {
-			goodsItemMapper.insertStockForBatch(insItemIdList);
-		}
-		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-		}
-		return new ResultModel(true, "");
-	}
-
-	@Override
-	public GoodsInfoEntity queryGoodsInfoEntity(String itemId) {
-		GoodsInfoEntity goodsInfo = new GoodsInfoEntity();
-		// 查询商品信息
-		GoodsItemEntity goodsItemEntity = goodsBackMapper.selectGoodsItemByItemId(itemId);
-		GoodsPrice goodsPrice = goodsItemMapper.selectItemPrice(itemId);
-		GoodsEntity goodsEntity = goodsBackMapper.selectGoodsEntityByItemId(goodsItemEntity.getGoodsId());
-		List<GoodsFile> goodsFiles = goodsBackMapper.selectGoodsFileByGoodsId(goodsEntity);
-		List<ERPGoodsTagBindEntity> erpGoodsTagBindList = goodsBackMapper
-				.selectGoodsTagBindListByItemId(goodsItemEntity);
-		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectById(goodsEntity.getBaseId());
-		// 组装商品信息
-		goodsItemEntity.setGoodsPrice(goodsPrice);
-		List<GoodsItemEntity> items = new ArrayList<GoodsItemEntity>();
-		items.add(goodsItemEntity);
-		goodsEntity.setFiles(goodsFiles);
-		// goodsEntity.setGoodsTagBind(erpGoodsTagBind);
-		goodsEntity.setGoodsTagBindList(erpGoodsTagBindList);
-		// goodsEntity.setGoodsItem(goodsItemEntity);
-		goodsEntity.setItems(items);
-		goodsInfo.setGoods(goodsEntity);
-		goodsInfo.setGoodsBase(goodsBaseEntity);
-		return goodsInfo;
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public ResultModel updateGoodsInfo(GoodsInfoEntity entity) {
-		StringBuilder sb = new StringBuilder();
-
-		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
-		List<GoodsItemEntity> updItemList = new ArrayList<GoodsItemEntity>();
-		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
-		List<GoodsPrice> updPriceList = new ArrayList<GoodsPrice>();
-		for (GoodsItemEntity gitem : entity.getGoods().getItems()) {
-			if ("true".equals(gitem.getIsCreate())) {
-				insItemList.add(gitem);
-				insPriceList.add(gitem.getGoodsPrice());
-			} else {
-				updItemList.add(gitem);
-				updPriceList.add(gitem.getGoodsPrice());
-			}
-		}
-
-		for (GoodsItemEntity gie : updItemList) {
-			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemForCheck(gie);
-			if (tempList != null && tempList.size() > 0) {
-				sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
-				sb.append(gie.getSku() + "," + gie.getConversion() + ";");
-				return new ResultModel(false, sb.toString());
-			}
-		}
-		if (insItemList.size() > 0) {
-			goodsItemMapper.insertBatch(insItemList);
-		}
-		if (updItemList.size() > 0) {
-			goodsItemMapper.updateBatch(updItemList);
-		}
-		if (insPriceList.size() > 0) {
-			goodsItemMapper.insertPriceBatch(insPriceList);
-		}
-		if (updPriceList.size() > 0) {
-			goodsItemMapper.updatePriceBatch(updPriceList);
-		}
-
-		// 商品主图
-		// 先将所有图片都删除，如果有图片信息，重新保存
-		goodsItemMapper.deleteAllFiles(entity.getGoods());
-		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-		}
-		// if (entity.getGoods().getFiles() != null &&
-		// entity.getGoods().getFiles().size() > 0) {
-		// // 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
-		// List<GoodsFile> oldFiles =
-		// goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
-		// List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
-		//
-		// // 过滤相同文件列表
-		// for (GoodsFile ngf : entity.getGoods().getFiles()) {
-		// for (GoodsFile gf : oldFiles) {
-		// if (ngf.getGoodsId().equals(gf.getGoodsId()) &&
-		// ngf.getPath().equals(gf.getPath())) {
-		// existFiles.add(gf);
-		// oldFiles.remove(gf);
-		// break;
-		// }
-		// }
-		// }
-		// // 挑出新增文件列表
-		// for (GoodsFile gf : existFiles) {
-		// for (GoodsFile ngf : entity.getGoods().getFiles()) {
-		// if (ngf.getGoodsId().equals(gf.getGoodsId()) &&
-		// ngf.getPath().equals(gf.getPath())) {
-		// entity.getGoods().getFiles().remove(ngf);
-		// break;
-		// }
-		// }
-		// }
-		//
-		// if (entity.getGoods().getFiles().size() > 0) {
-		// goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-		// }
-		// if (oldFiles.size() > 0) {
-		// goodsItemMapper.deleteListFiles(oldFiles);
-		// }
-		// } else {
-		// // 商品编辑时，如果没有传图片信息，则删除表中记录
-		// goodsItemMapper.deleteAllFiles(entity.getGoods());
-		// }
-
-		// 设定商品的标签权重
-		Integer tmpGoodsTagRatio = 0;
-
-		// 判断商品标签
-		List<ERPGoodsTagBindEntity> oldTagList = goodsBackMapper
-				.selectGoodsTagBindListByItemId(entity.getGoods().getItems().get(0));
-		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
-			// 增删改
-			List<ERPGoodsTagBindEntity> newTagList = entity.getGoods().getGoodsTagBindList();
-			List<ERPGoodsTagBindEntity> existTagList = new ArrayList<ERPGoodsTagBindEntity>();
-			for (ERPGoodsTagBindEntity netbe : newTagList) {
-				for (ERPGoodsTagBindEntity oetbe : oldTagList) {
-					if (oetbe.getItemId().equals(netbe.getItemId()) && oetbe.getTagId() == netbe.getTagId()) {
-						existTagList.add(oetbe);
-						oldTagList.remove(oetbe);
-						break;
-					}
-				}
-			}
-
-			for (ERPGoodsTagBindEntity eetbe : existTagList) {
-				for (ERPGoodsTagBindEntity netbe : newTagList) {
-					if (eetbe.getItemId().equals(netbe.getItemId()) && eetbe.getTagId() == netbe.getTagId()) {
-						newTagList.remove(netbe);
-						break;
-					}
-				}
-			}
-
-			if (newTagList.size() > 0) {
-				goodsBackMapper.insertTagBindList(newTagList);
-				tmpGoodsTagRatio = calcGoodsTagRatio(newTagList);
-			}
-			if (oldTagList.size() > 0) {
-				goodsBackMapper.deleteTagBindList(oldTagList);
-				tmpGoodsTagRatio = tmpGoodsTagRatio - calcGoodsTagRatio(oldTagList);
-			}
-		} else {
-			if (oldTagList.size() > 0) {
-				goodsBackMapper.deleteTagBindList(oldTagList);
-				tmpGoodsTagRatio = calcGoodsTagRatio(oldTagList);
-			}
-		}
-		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
-		goodsBackMapper.updateGoodsEntity(entity.getGoods());
-		return new ResultModel(true, "");
 	}
 
 	@Override
@@ -535,169 +336,17 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public void maintainStockByItemId(List<GoodsStockEntity> stocks) {
-		goodsItemMapper.updateGoodsStockByItemId(stocks);
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public String maintainFiles(List<GoodsFielsMaintainBO> list) {
-		StringBuilder sb = new StringBuilder();
-		if (list != null && list.size() > 0) {
-			GoodsEntity entity = null;
-			GoodsFile goodsFile = null;
-			List<GoodsFile> fileList = null;
-//			List<String> goodsIdList = null;
-			for (GoodsFielsMaintainBO model : list) {
-//				goodsIdList = goodsBackMapper.listGoodsIdsByItemCode(model.getItemCode());
-//				if (goodsIdList != null && goodsIdList.size() > 0) {
-//					for (String goodsId : goodsIdList) {
-//						entity = new GoodsEntity();
-//						entity.setGoodsId(goodsId);
-//						entity.setDetailPath(model.getGoodsDetailPath());
-//						goodsBackMapper.updateDetailPath(entity);
-//						if (model.getPicPathList() != null && model.getPicPathList().size() > 0) {
-//							fileList = new ArrayList<GoodsFile>();
-//							for (String str : model.getPicPathList()) {
-//								goodsFile = new GoodsFile();
-//								goodsFile.setGoodsId(goodsId);
-//								goodsFile.setPath(str);
-//								goodsFile.setOpt("batch");
-//								fileList.add(goodsFile);
-//							}
-//							goodsItemMapper.insertFiles(fileList);
-//						}
-//					}
-//				} else {
-//					sb.append(model.getItemCode() + ",");
-//				}
-				
-				entity = new GoodsEntity();
-				entity.setGoodsId(model.getItemCode());
-				entity.setDetailPath(model.getGoodsDetailPath());
-				goodsBackMapper.updateDetailPath(entity);
-				if (model.getPicPathList() != null && model.getPicPathList().size() > 0) {
-					fileList = new ArrayList<GoodsFile>();
-					for (String str : model.getPicPathList()) {
-						goodsFile = new GoodsFile();
-						goodsFile.setGoodsId(model.getItemCode());
-						goodsFile.setPath(str);
-						goodsFile.setOpt("batch");
-						fileList.add(goodsFile);
-					}
-					goodsItemMapper.insertFiles(fileList);
-				}
-			}
-//			if (sb.length() > 0) {
-//				sb.append("没有找到以上商家编码商品,请核对后重新上传以上商品");
-//			}
-		}
-		return sb.toString();
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public ResultModel importGoods(List<GoodsInfoEntity> list) {
-		StringBuilder sb = new StringBuilder();
-		List<GoodsBaseEntity> baseList = new ArrayList<GoodsBaseEntity>();
-		List<GoodsEntity> goodsList = new ArrayList<GoodsEntity>();
-		List<GoodsItemEntity> itemList = new ArrayList<GoodsItemEntity>();
-		List<GoodsPrice> priceList = new ArrayList<GoodsPrice>();
-		List<GoodsStockEntity> stockList = new ArrayList<GoodsStockEntity>();
-		List<GoodsRebateEntity> rebateList = new ArrayList<GoodsRebateEntity>();
-		List<GoodsTagBindEntity> tagBingList = new ArrayList<GoodsTagBindEntity>();
-		if (list != null && list.size() > 0) {
-			for (GoodsInfoEntity entity : list) {
-				for (GoodsItemEntity goodsItem : entity.getGoods().getItems()) {
-					itemList.add(goodsItem);
-					priceList.add(goodsItem.getGoodsPrice());
-					stockList.add(goodsItem.getStock());
-					if (goodsItem.getGoodsRebateList() != null) {
-						rebateList.addAll(goodsItem.getGoodsRebateList());
-					}
-				}
-				baseList.add(entity.getGoodsBase());
-				goodsList.add(entity.getGoods());
-				if (entity.getGoods().getGoodsTagBindList() != null) {
-					tagBingList.addAll(entity.getGoods().getGoodsTagBindList());
-				}
-			}
-			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemByParam(itemList);
-			if (tempList != null && tempList.size() > 0) {
-				sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
-				for (GoodsItemEntity goodsItem : tempList) {
-					sb.append(goodsItem.getSku() + "," + goodsItem.getConversion() + ";");
-				}
-				return new ResultModel(false, sb.toString());
-			}
-			if (baseList.size() > 0) {
-				goodsBaseMapper.insertBatch(baseList);
-			}
-			if (itemList.size() > 0) {
-				goodsItemMapper.insertBatch(itemList);
-			}
-			if (priceList.size() > 0) {
-				goodsItemMapper.insertPriceBatch(priceList);
-			}
-			if (stockList.size() > 0) {
-				goodsItemMapper.insertStockBatch(stockList);
-			}
-			if (rebateList.size() > 0) {
-				insertGoodsRebate(rebateList);
-			}
-			if (tagBingList.size() > 0) {
-				// 批量插入标签
-				goodsTagMapper.batchInsert(tagBingList);
-				calTagRatio(goodsList, tagBingList);
-			}
-			if (goodsList.size() > 0) {
-				goodsBackMapper.insertBatch(goodsList);
-			}
-		}
-		return new ResultModel(true, "操作成功");
-	}
-
-	/**
-	 * @fun 计算goods的权重
-	 * @param goodsList
-	 * @param tagBingList
-	 */
-	private void calTagRatio(List<GoodsEntity> goodsList, List<GoodsTagBindEntity> tagBingList) {
-		List<ERPGoodsTagBindEntity> tmpGoodsTagBindEntityList = null;
-		Map<String, List<ERPGoodsTagBindEntity>> tempMap = new HashMap<String, List<ERPGoodsTagBindEntity>>();
-		for (GoodsTagBindEntity gtbe : tagBingList) {
-			if (tempMap.get(gtbe.getItemId()) == null) {
-				tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
-				tmpGoodsTagBindEntityList.add(convertToERPGoodsTagBindEntity(gtbe));
-				tempMap.put(gtbe.getItemId(), tmpGoodsTagBindEntityList);
-			} else {
-				tempMap.get(gtbe.getItemId()).add(convertToERPGoodsTagBindEntity(gtbe));
-			}
-		}
-		for (GoodsEntity ge : goodsList) {
-			tmpGoodsTagBindEntityList = new ArrayList<ERPGoodsTagBindEntity>();
-			for (GoodsItemEntity gie : ge.getItems()) {
-				if (tempMap.get(gie.getItemId()) != null) {
-					tmpGoodsTagBindEntityList.addAll(tempMap.get(gie.getItemId()));
-				}
-			}
-			ge.setGoodsTagRatio(calcGoodsTagRatio(tmpGoodsTagBindEntityList));
-		}
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public ResultModel tagBatchBind(List<GoodsTagBindEntity> list) {
 		if (list != null && list.size() > 0) {
-			List<String> itemList = new ArrayList<String>();
+			List<String> specsTpIds = new ArrayList<String>();
 			for (GoodsTagBindEntity gtbe : list) {
-				itemList.add(gtbe.getItemId());
+				specsTpIds.add(gtbe.getSpecsTpId());
 			}
 			// 去除重复绑定的标签
-			List<GoodsTagBindEntity> existTagList = goodsTagMapper.listGoodsTagBindByItemList(itemList);
+			List<GoodsTagBindEntity> existTagList = goodsTagMapper.listGoodsTagBindBySpecsTpIdList(specsTpIds);
 			for (GoodsTagBindEntity gte : existTagList) {
 				for (GoodsTagBindEntity gtbe : list) {
-					if (gte.getItemId().equals(gtbe.getItemId()) && gte.getTagId() == gtbe.getTagId()) {
+					if (gte.getSpecsTpId().equals(gtbe.getSpecsTpId()) && gte.getTagId() == gtbe.getTagId()) {
 						list.remove(gtbe);
 						break;
 					}
@@ -706,201 +355,144 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			if (list.size() <= 0) {
 				return new ResultModel(true, null);
 			} else {
+				specsTpIds.clear();
 				for (GoodsTagBindEntity gtbe : list) {
-					itemList.add(gtbe.getItemId());
+					specsTpIds.add(gtbe.getSpecsTpId());
 				}
 			}
 			// 批量打标签后更新商品明细的更新时间
 			goodsTagMapper.batchInsert(list);
-			goodsItemMapper.updateGoodsItemUpdateTimeByItemIdList(itemList);
-
+			goodsItemMapper.updateSpecsTpUpdateTimeBySpecsTpIdList(specsTpIds);
+			List<Integer> tagIdList = list.stream().map(t -> t.getTagId()).collect(Collectors.toList());
+			List<GoodsTagEntity> tagList = goodsTagMapper.listGoodsTagByTagIds(tagIdList);
+			Map<Integer, GoodsTagEntity> tagMap = tagList.stream()
+					.collect(Collectors.toMap(GoodsTagEntity::getId, t -> t));
+			Map<String, List<GoodsTagBindEntity>> map = list.stream()
+					.collect(Collectors.groupingBy(t -> t.getSpecsTpId()));
+			List<GoodsSpecsTradePattern> specsTpList = new ArrayList<>();
+			for (Map.Entry<String, List<GoodsTagBindEntity>> entry : map.entrySet()) {
+				specsTpList.add(calTagRatio(entry.getKey(), entry.getValue(), tagMap));
+			}
 			// 设定权重
-			List<GoodsEntity> goodsIdList = goodsTagMapper.listGoodsIdByItemList(itemList);
-			calTagRatio(goodsIdList, list);
-			goodsBackMapper.updateGoodsTagRatioByList(goodsIdList);
+			goodsBackMapper.updateSpecsTpTagRatioByList(specsTpList);
 		}
 		return new ResultModel(true, null);
 	}
 
-	@Override
-	@Transactional(isolation = Isolation.READ_COMMITTED)
-	public ResultModel saveItemInfo(GoodsInfoEntity entity) {
-		StringBuilder sb = new StringBuilder();
-
-		List<GoodsItemEntity> insItemList = new ArrayList<GoodsItemEntity>();
-		List<GoodsPrice> insPriceList = new ArrayList<GoodsPrice>();
-		List<String> insItemIdList = new ArrayList<String>();
-		for (GoodsItemEntity gitem : entity.getGoods().getItems()) {
-			insItemList.add(gitem);
-			insPriceList.add(gitem.getGoodsPrice());
-			insItemIdList.add(gitem.getItemId());
+	private GoodsSpecsTradePattern calTagRatio(String key, List<GoodsTagBindEntity> value,
+			Map<Integer, GoodsTagEntity> tagMap) {
+		int ratio = 0;
+		for (GoodsTagBindEntity bind : value) {
+			ratio += tagMap.get(bind.getTagId()).getTagRatio();
 		}
-
-		for (GoodsItemEntity gie : insItemList) {
-			List<GoodsItemEntity> tempList = goodsItemMapper.listGoodsItemForCheck(gie);
-			if (tempList != null && tempList.size() > 0) {
-				sb.append("以下自有编码和换算比例的组合已经存在，请核对----");
-				sb.append(gie.getSku() + "," + gie.getConversion() + ";");
-				return new ResultModel(false, sb.toString());
-			}
-		}
-
-		if (insItemList.size() > 0) {
-			goodsItemMapper.insertBatch(insItemList);
-		}
-		if (insPriceList.size() > 0) {
-			goodsItemMapper.insertPriceBatch(insPriceList);
-		}
-		if (insItemIdList.size() > 0) {
-			goodsItemMapper.insertStockForBatch(insItemIdList);
-		}
-
-		// 商品主图
-		// 先将所有图片都删除，如果有图片信息，重新保存
-		goodsItemMapper.deleteAllFiles(entity.getGoods());
-		if (entity.getGoods().getFiles() != null && entity.getGoods().getFiles().size() > 0) {
-			goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-		}
-		// if (entity.getGoods().getFiles() != null &&
-		// entity.getGoods().getFiles().size() > 0) {
-		// // 商品编辑时，先查询原有的file数据进行比较，然后判断如何处理
-		// List<GoodsFile> oldFiles =
-		// goodsBackMapper.selectGoodsFileByGoodsId(entity.getGoods());
-		// List<GoodsFile> existFiles = new ArrayList<GoodsFile>();
-		//
-		// // 过滤相同文件列表
-		// for (GoodsFile ngf : entity.getGoods().getFiles()) {
-		// for (GoodsFile gf : oldFiles) {
-		// if (ngf.getGoodsId().equals(gf.getGoodsId()) &&
-		// ngf.getPath().equals(gf.getPath())) {
-		// existFiles.add(gf);
-		// oldFiles.remove(gf);
-		// break;
-		// }
-		// }
-		// }
-		// // 挑出新增文件列表
-		// for (GoodsFile gf : existFiles) {
-		// for (GoodsFile ngf : entity.getGoods().getFiles()) {
-		// if (ngf.getGoodsId().equals(gf.getGoodsId()) &&
-		// ngf.getPath().equals(gf.getPath())) {
-		// entity.getGoods().getFiles().remove(ngf);
-		// break;
-		// }
-		// }
-		// }
-		//
-		// if (entity.getGoods().getFiles().size() > 0) {
-		// goodsItemMapper.insertFiles(entity.getGoods().getFiles());
-		// }
-		// if (oldFiles.size() > 0) {
-		// goodsItemMapper.deleteListFiles(oldFiles);
-		// }
-		// } else {
-		// // 商品编辑时，如果没有传图片信息，则删除表中记录
-		// goodsItemMapper.deleteAllFiles(entity.getGoods());
-		// }
-		// 设定商品的标签权重
-		Integer tmpGoodsTagRatio = 0;
-		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
-			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
-			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
-		}
-		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
-		goodsBackMapper.updateGoodsEntity(entity.getGoods());
-		return new ResultModel(true, "");
-	}
-
-	private final Integer PUBLISH_ERROR = 1;
-	private final Integer UN_PUBLISH_ERROR = 2;
-
-	@Override
-	public Page<GoodsEntity> listPublishExceptionGoods(Integer type, GoodsEntity entity, Integer centerId) {
-		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
-		if (PUBLISH_ERROR == type) {
-			Page<GoodsEntity> page = goodsBackMapper.listPublishError(entity);
-			return getListGoodsInfoByPageGoodsInfo(page);
-		}
-		if (UN_PUBLISH_ERROR == type) {
-			Page<GoodsEntity> page = goodsBackMapper.listUnPublishError(entity);
-			return getListGoodsInfoByPageGoodsInfo(page);
-		}
-		return null;
-	}
-
-	private Page<GoodsEntity> getListGoodsInfoByPageGoodsInfo(Page<GoodsEntity> page) {
-		List<GoodsEntity> tmpPageGoodsInfoList = (List<GoodsEntity>) page;
-		if (tmpPageGoodsInfoList.size() > 0) {
-			List<String> ids = new ArrayList<String>();
-			for (GoodsEntity ge : tmpPageGoodsInfoList) {
-				ids.add(ge.getGoodsId());
-			}
-			Map<String, Object> fileParam = new HashMap<String, Object>();
-			fileParam.put("list", ids);
-			List<GoodsFile> files = goodsBackMapper.selectGoodsFileByParam(fileParam);
-			for (GoodsEntity ge : tmpPageGoodsInfoList) {
-				for (GoodsFile file : files) {
-					if (file.getGoodsId().equals(ge.getGoodsId())) {
-						List<GoodsFile> gfiles = new ArrayList<GoodsFile>();
-						gfiles.add(file);
-						ge.setFiles(gfiles);
-						break;
-					}
-				}
-			}
-			page = (Page<GoodsEntity>) tmpPageGoodsInfoList;
-		}
-		return page;
-	}
-
-	private Integer calcGoodsTagRatio(List<ERPGoodsTagBindEntity> checkList) {
-		Integer tmpGoodsTagRatio = 0;
-
-		List<ERPGoodsTagEntity> allTagList = goodsBackMapper.selectTagListInfo();
-		for (ERPGoodsTagBindEntity gtbe : checkList) {
-			for (ERPGoodsTagEntity gte : allTagList) {
-				if (gtbe.getTagId() == gte.getId()) {
-					tmpGoodsTagRatio += gte.getTagRatio();
-					break;
-				}
-			}
-		}
-		LogUtil.writeLog("权重：" + tmpGoodsTagRatio);
-		return tmpGoodsTagRatio;
-	}
-
-	private ERPGoodsTagBindEntity convertToERPGoodsTagBindEntity(GoodsTagBindEntity temp) {
-		ERPGoodsTagBindEntity entity = new ERPGoodsTagBindEntity();
-		entity.setItemId(temp.getItemId());
-		entity.setTagId(temp.getTagId());
-		return entity;
-
-	}
-
-	@Override
-	public GoodsEntity queryGoodsInfoByGoodsId(GoodsEntity entity) {
-		GoodsEntity retEntity = goodsBackMapper.selectGoodsInfoByGoodsId(entity);
-		return retEntity;
-	}
-
-	@Override
-	public List<String> getGoodsIdByItemCode(String itemCode) {
-		return goodsBackMapper.listGoodsIdsByItemCode(itemCode);
+		GoodsSpecsTradePattern sp = new GoodsSpecsTradePattern();
+		sp.setSpecsTpId(key);
+		sp.setTagRatio(ratio);
+		return sp;
 	}
 
 	@Override
 	public List<String> getGoodsPicPath(String goodsId) {
-		
-		return goodsBackMapper.getGoodsPicPath(goodsId);
-	}
 
-	@Override
-	public List<Tax> getTaxInfoByItemIds(List<String> itemIds) {
-		return goodsMapper.getTax(itemIds);
+		return goodsBackMapper.getGoodsPicPath(goodsId);
 	}
 
 	@Override
 	public void updateRetailPrice(Map<String, Object> param) {
 		goodsBackMapper.updateRetailPrice(param);
+	}
+
+	@Override
+	public void insertGoodsRebate(List<GoodsRebateEntity> entityList) {
+		goodsBackMapper.insertGoodsRebate(entityList);
+		setRedis(entityList);
+	}
+
+	@Override
+	public List<GoodsRender4New> queryByEnCode(String encode, int type) {
+		String[] arr = encode.split(",");
+		//获取规格
+		List<GoodsSpecs> specsList = goodsBackMapper.listGoodsSpecsByEnCodeList(Arrays.asList(arr));
+		if (specsList.size() == 0) {
+			return null;
+		}
+		List<String> specsIdList = specsList.stream().map(s -> s.getSpecsId()).collect(Collectors.toList());
+		Map<String, Object> param = new HashMap<>();
+		param.put("list", specsIdList);
+		param.put("type", type);
+		//获取specsTp
+		List<GoodsSpecsTradePattern> specsTpList = goodsBackMapper.listGoodsSpecsTradPatternByParam(param);
+		List<String> goodsIdList = specsTpList.stream().map(tp -> tp.getGoodsId()).distinct()
+				.collect(Collectors.toList());
+		List<String> specsTpIdList = specsTpList.stream().map(tp -> tp.getSpecsTpId()).collect(Collectors.toList());
+		//获取供应商商品
+		List<Items> itemList = goodsMapper.listItemsBySpecsTpIds(specsTpIdList);
+		//根据specsTpiD分组
+		Map<String,List<Items>> itemMap = itemList.stream().collect(Collectors.groupingBy(Items::getSpecsTpId));
+		//获取商品
+		List<Goods> goodsList = goodsMapper.listGoodsItemByGoodsIds(goodsIdList);
+		GoodsRender4New render = null;
+		List<GoodsSpecsTradePattern> specsTpTmp = null;
+		List<GoodsSpecs> specsTmp = null;
+		List<Items> itemTmp = null;
+		List<GoodsRender4New> result = new ArrayList<>();
+		Map<String, GoodsSpecs> specsMap = specsList.stream().collect(Collectors.toMap(GoodsSpecs::getSpecsId, s -> s));
+		for (Goods goods : goodsList) {
+			render = new GoodsRender4New();
+			specsTmp = new ArrayList<>();
+			specsTpTmp = new ArrayList<>();
+			itemTmp = new ArrayList<>();
+			render.setGoods(goods);
+			specsTpTmp = specsTpList.stream().filter(tp -> tp.getGoodsId().equals(goods.getGoodsId()))
+					.collect(Collectors.toList());
+			for (GoodsSpecsTradePattern tp : specsTpTmp) {
+				specsTmp.add(specsMap.get(tp.getSpecsId()));
+				itemTmp.addAll(itemMap.get(tp.getSpecsTpId()));
+			}
+			render.setSpecsList(specsTmp);
+			render.setSpecsTpList(specsTpTmp);
+			render.setItemList(itemTmp);
+			result.add(render);
+		}
+		return result;
+	}
+
+	@Override
+	public List<Goods> queryGoods4Tips(String thirdCategory, String brandId) {
+		Map<String,String> param = new HashMap<>();
+		param.put("thirdCategory", thirdCategory);
+		param.put("brandId", brandId);
+		List<Goods> goodsList = goodsBackMapper.listGoodsByCategoryAndBrand(param);
+		return goodsList;
+	}
+
+	@Override
+	public void itemAudit(Items item) {
+		if(item.getStatus() == 2){//审核通过
+			goodsBackMapper.updateItemStatusPass(item);//更新item状态
+			goodsBackMapper.updateSpecsTpCanBeUpShelf(item.getSpecsTpId());//更新specsTp为下架状态（如果是初始化状态的话）
+		}
+		if(item.getStatus() == 11){//审核未通过
+			goodsBackMapper.updateItemStatusUnPass(item);//更新item状态
+			int count = goodsMapper.countItemPassBySpecsTpId(item.getSpecsTpId());
+			if(count == 0){//全部没有了需要下架，并把商品状态置为初始化
+				GoodsSpecsTradePattern specsTp = goodsMapper.getGoodsSpecsTpBySpecsTpId(item.getSpecsTpId());
+				if(specsTp.getStatus() == 2 || specsTp.getStatus() == 3){//上架状态需要先下架
+					List<String> specsTpIdList = new ArrayList<>();
+					specsTpIdList.add(item.getSpecsTpId());
+					goodsService.downShelves(specsTpIdList, 2);
+				}
+				goodsBackMapper.updateSpecsTpInit(item.getSpecsTpId());
+			} 
+		}
+		
+	}
+
+	@Override
+	public void welfareDisplay(String specsTpId,int welfare) {
+		Map<String,Object> param = new HashMap<>();
+		param.put("specsTpId", specsTpId);
+		param.put("welfare", welfare);
+		goodsBackMapper.updateWelfareDisplay(param);
 	}
 }

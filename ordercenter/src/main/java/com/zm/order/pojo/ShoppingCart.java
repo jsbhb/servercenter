@@ -1,7 +1,6 @@
 package com.zm.order.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.zm.order.feignclient.model.GoodsSpecs;
 
 import io.swagger.annotations.ApiModel;
 
@@ -12,7 +11,7 @@ public class ShoppingCart {
 
 	private Integer userId;
 
-	private String itemId;
+	private String specsTpId;
 
 	private Integer quantity;
 
@@ -30,8 +29,6 @@ public class ShoppingCart {
 	private String updateTime;
 
 	private Integer type;
-
-	private GoodsSpecs goodsSpecs;
 
 	private String picPath;
 
@@ -76,7 +73,7 @@ public class ShoppingCart {
 	}
 
 	public boolean check() {
-		return userId != null && itemId != null && quantity != null && gradeId != null && goodsName != null
+		return userId != null && specsTpId != null && quantity != null && gradeId != null && goodsName != null
 				&& supplierId != null;
 	}
 
@@ -102,14 +99,6 @@ public class ShoppingCart {
 
 	public void setSupplierId(Integer supplierId) {
 		this.supplierId = supplierId;
-	}
-
-	public GoodsSpecs getGoodsSpecs() {
-		return goodsSpecs;
-	}
-
-	public void setGoodsSpecs(GoodsSpecs goodsSpecs) {
-		this.goodsSpecs = goodsSpecs;
 	}
 
 	public String getPicPath() {
@@ -152,12 +141,12 @@ public class ShoppingCart {
 		this.id = id;
 	}
 
-	public String getItemId() {
-		return itemId;
+	public String getSpecsTpId() {
+		return specsTpId;
 	}
 
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
+	public void setSpecsTpId(String specsTpId) {
+		this.specsTpId = specsTpId;
 	}
 
 	public Integer getQuantity() {
@@ -183,11 +172,4 @@ public class ShoppingCart {
 	public void setUpdateTime(String updateTime) {
 		this.updateTime = updateTime;
 	}
-
-	@Override
-	public String toString() {
-		return "ShoppingCart [id=" + id + ", itemId=" + itemId + ", quantity=" + quantity + ", gradeId=" + gradeId
-				+ ", goodsSpecs=" + goodsSpecs + "]";
-	}
-
 }

@@ -8,11 +8,11 @@ public class WarehouseModel {
 	
 	private String specsTpId;
 	
-	private Integer fxqty;
+	private int fxqty;
 	
-	private Integer frozenqty;
+	private int frozenqty;
 	
-	private Integer lockedqty;
+	private int lockedqty;
 
 	public String getSpecsTpId() {
 		return specsTpId;
@@ -38,27 +38,27 @@ public class WarehouseModel {
 		this.itemId = itemId;
 	}
 
-	public Integer getFxqty() {
+	public int getFxqty() {
 		return fxqty;
 	}
 
-	public void setFxqty(Integer fxqty) {
+	public void setFxqty(int fxqty) {
 		this.fxqty = fxqty;
 	}
 
-	public Integer getFrozenqty() {
+	public int getFrozenqty() {
 		return frozenqty;
 	}
 
-	public void setFrozenqty(Integer frozenqty) {
+	public void setFrozenqty(int frozenqty) {
 		this.frozenqty = frozenqty;
 	}
 
-	public Integer getLockedqty() {
+	public int getLockedqty() {
 		return lockedqty;
 	}
 
-	public void setLockedqty(Integer lockedqty) {
+	public void setLockedqty(int lockedqty) {
 		this.lockedqty = lockedqty;
 	}
 

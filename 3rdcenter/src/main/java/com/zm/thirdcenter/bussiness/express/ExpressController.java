@@ -97,7 +97,7 @@ public class ExpressController {
 		try {
 //			Map<String,String> carrierMap1 = (Map<String, String>) CacheMap.getCache().getData().get(Constants.CARRIER);
 //        	String carrierID = carrierMap1.get("申通快递");//获取快递公司编码
-			String result = api.getOrderTracesByJson("STO", "3344704220602");
+			String result = api.getOrderTracesByJson("ZTO", "77120142602566");
 			System.out.print(result);
 			RoteModel model = JSONUtil.parse(result, RoteModel.class);
 			System.out.println("\n");

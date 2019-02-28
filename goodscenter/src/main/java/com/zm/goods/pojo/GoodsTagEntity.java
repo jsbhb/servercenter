@@ -7,7 +7,7 @@
  */
 package com.zm.goods.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zm.goods.common.Pagination;
 
 /**
  * ClassName: GoodsTagEntity <br/>
@@ -18,22 +18,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @version
  * @since JDK 1.7
  */
-public class GoodsTagEntity {
+public class GoodsTagEntity extends Pagination{
 
 	private Integer id;
-	@JsonIgnore
 	private String specsTpId;
 	private String tagName;// 标签名称
 	private Integer tagFunId;//标签功能ID
-	@JsonIgnore
 	private Integer priority;//优先级
 	private String description;// 标签描述
-	@JsonIgnore
 	private String createTime;// 注册时间
-	@JsonIgnore
 	private String updateTime;// 更新时间
-	@JsonIgnore
 	private String opt;// 操作人
+	private int tagRatio;
+	public int getTagRatio() {
+		return tagRatio;
+	}
+	public void setTagRatio(int tagRatio) {
+		this.tagRatio = tagRatio;
+	}
 	public Integer getTagFunId() {
 		return tagFunId;
 	}

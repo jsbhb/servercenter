@@ -3,79 +3,6 @@
 <mapper namespace="com.zm.goods.bussiness.dao.GoodsBackMapper">
 
 	
-	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="entity">
-		<id column="id" property="id"/>
-		<result column="goods_id" property="goodsId"/>
-		<result column="specs_template_id" property="templateId"/>
-		<result column="base_id" property="baseId"/>
-		<result column="origin" property="origin"/>
-		<result column="supplier_id" property="supplierId"/>
-		<result column="supplier_name" property="supplierName"/>
-		<result column="goods_name" property="goodsName"/>
-		<result column="description" property="description"/>
-		<result column="status" property="status"/>
-		<result column="type" property="type"/>
-		<result column="detail_path" property="detailPath"/>
-		<result column="index_status" property="indexStatus"/>
-		<result column="create_time" property="createTime"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="opt" property="opt"/>
-		<collection property="files" ofType="com.zm.goods.pojo.GoodsFile">
-			<id column="file_id" property="id"/>
-			<result column="path" property="path" jdbcType="VARCHAR" />
-		</collection>
-	</resultMap>
-	
-
-	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsWithItems">
-			<id column="id" property="id"/>
-			<result column="goods_id" property="goodsId"/>
-			<result column="specs_template_id" property="templateId"/>
-			<result column="base_id" property="baseId"/>
-			<result column="origin" property="origin"/>
-			<result column="supplier_id" property="supplierId"/>
-			<result column="supplier_name" property="supplierName"/>
-			<result column="goods_name" property="goodsName"/>
-			<result column="description" property="description"/>
-			<result column="detail_path" property="detailPath"/>
-			<result column="index_status" property="indexStatus"/>
-			<collection property="items"
-				ofType="com.zm.goods.pojo.GoodsItemEntity">
-				<result column="goods_id" property="goodsId"/>
-				<result column="item_id" property="itemId" />
-				<result column="item_code" property="itemCode"/>
-				<result column="sku" property="sku"/>
-				<result column="encode" property="encode"/>
-				<result column="weight" property="weight"/>
-				<result column="proxy_price" property="proxyPrice"/>
-				<result column="fxprice" property="fxPrice"/>
-				<result column="excise_fax" property="exciseTax"/>
-				<result column="status" property="status"/>
-				<result column="discount" property="discount"/>
-				<result column="info" property="info"/>
-				<result column="shelf_life" property="shelfLife"/>
-				<result column="carton" property="carTon"/>
-			</collection>
-	</resultMap>
-	
-	<resultMap type="com.zm.goods.pojo.ThirdWarehouseGoods" id="thirdEntity">
-		<id column="id" property="id"/>
-		<result column="supplier_id" property="supplierId"/>
-		<result column="supplier_name" property="supplierName"/>
-		<result column="sku" property="sku"/>
-		<result column="item_code" property="itemCode"/>
-		<result column="goods_name" property="goodsName"/>
-		<result column="brand" property="brand"/>
-		<result column="weight" property="weight"/>
-		<result column="stock" property="stock"/>
-		<result column="min" property="min"/>
-		<result column="max" property="max"/>
-		<result column="status" property="status"/>
-		<result column="create_time" property="createTime"/>
-		<result column="update_time" property="updateTime"/>
-		<result column="opt" property="opt"/>
-	</resultMap>
-	
 	<resultMap type="com.zm.goods.pojo.GoodsFile" id="goodsFile">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
@@ -90,12 +17,12 @@
 	
 	<resultMap type="com.zm.goods.pojo.GoodsRebateEntity" id="goodsRebate">
 		<id column="id" property="id"/>
-		<result column="item_id" property="itemId"/>
+		<result column="specs_tp_id" property="specsTpId"/>
 		<result column="grade_type" property="gradeType"/>
 		<result column="proportion" property="proportion"/>
 	</resultMap>
 	
-	<resultMap type="com.zm.goods.pojo.ERPGoodsTagEntity" id="goodsTag">
+	<resultMap type="com.zm.goods.pojo.GoodsTagEntity" id="goodsTag">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="tag_name" property="tagName" jdbcType="VARCHAR" />
 		<result column="description" property="description" jdbcType="VARCHAR" />
@@ -106,70 +33,12 @@
 		<result column="tag_ratio" property="tagRatio" jdbcType="INTEGER" />
 	</resultMap>
 	
-	<resultMap type="com.zm.goods.pojo.ERPGoodsTagBindEntity" id="goodsTagBind">
-		<id column="id" property="id" jdbcType="INTEGER" />
-		<result column="tag_id" property="tagId" jdbcType="INTEGER" />
-		<result column="item_id" property="itemId" jdbcType="INTEGER" />
-		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
-		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
-		<result column="opt" property="opt" jdbcType="VARCHAR" />
-	</resultMap>
-	
-	
-	<resultMap type="com.zm.goods.pojo.GoodsEntity" id="goodsWithItem">
-			<id column="id" property="id"/>
-			<result column="goods_id" property="goodsId"/>
-			<result column="specs_template_id" property="templateId"/>
-			<result column="base_id" property="baseId"/>
-			<result column="origin" property="origin"/>
-			<result column="supplier_id" property="supplierId"/>
-			<result column="supplier_name" property="supplierName"/>
-			<result column="goods_name" property="goodsName"/>
-			<result column="description" property="description"/>
-			<result column="detail_path" property="detailPath"/>
-			<result column="index_status" property="indexStatus"/>
-			<collection property="goodsItem"
-				ofType="com.zm.goods.pojo.GoodsItemEntity">
-				<result column="goods_id" property="goodsId"/>
-				<result column="item_id" property="itemId" />
-				<result column="item_code" property="itemCode"/>
-				<result column="sku" property="sku"/>
-				<result column="encode" property="encode"/>
-				<result column="weight" property="weight"/>
-				<result column="proxy_price" property="proxyPrice"/>
-				<result column="fxprice" property="fxPrice"/>
-				<result column="excise_fax" property="exciseTax"/>
-				<result column="status" property="status"/>
-				<result column="discount" property="discount"/>
-				<result column="info" property="info"/>
-				<result column="shelf_life" property="shelfLife"/>
-				<result column="carton" property="carTon"/>
-			</collection>
-	</resultMap>
-	
 	<resultMap type="com.zm.goods.pojo.TagFuncEntity" id="tagFunc">
 		<id column="id" property="id" jdbcType="INTEGER" />
 		<result column="fun_name" property="funcName" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
-	</resultMap>
-	
-	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="goodsItemEntity">
-		<id column="id" property="id"/>
-		<result column="goods_id" property="goodsId"/>
-		<result column="item_id" property="itemId" />
-		<result column="item_code" property="itemCode"/>
-		<result column="sku" property="sku"/>
-		<result column="encode" property="encode"/>
-		<result column="weight" property="weight"/>
-		<result column="excise_tax" property="exciseTax"/>
-		<result column="status" property="status"/>
-		<result column="discount" property="discount"/>
-		<result column="info" property="info"/>
-		<result column="conversion" property="conversion"/>
-		<result column="shelf_life" property="shelfLife"/>
-		<result column="carton" property="carTon"/>
 	</resultMap>
 	
 	<resultMap type="com.zm.goods.pojo.GoodsInfoListForDownload" id="goodsInfoListForDownload">
@@ -257,32 +126,78 @@
 		</collection>
 	</resultMap>
 	
-	<select id="selectThirdForPage" parameterType="Object" resultMap="thirdEntity">
-		select * from third_goods where 1=1 
-		<if test="id != null and id > 0">
-			and id = #{id} 
-		</if>
-		<if test="itemCode != null and itemCode != ''">
-			and item_code = #{itemCode} 
-		</if>
-		<if test="sku != null and sku != ''">
-			and sku = #{sku} 
-		</if>
-		<if test="status != null and status != -1">
-			and status = #{status} 
-		</if>
-		<if test="supplierId != null and supplierId != -1">
-			and supplier_id = #{supplierId} 
-		</if>
-	</select>
+	<resultMap type="com.zm.goods.pojo.po.GoodsSpecs" id="goodsSpecs">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="specs_id" property="specsId" jdbcType="VARCHAR" />
+		<result column="encode" property="encode" jdbcType="VARCHAR" />
+		<result column="conversion" property="conversion" jdbcType="INTEGER" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
+		<result column="info" property="info" jdbcType="VARCHAR" />
+		<result column="carton" property="carton" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
 	
-	<select id="selectThird" parameterType="Object" resultMap="thirdEntity">
-		select * from third_goods where 1=1 
-		<if test="id != null and id > 0">
-			and id = #{id} 
-		</if>
-	</select>
+	<resultMap type="com.zm.goods.pojo.po.GoodsSpecsTradePattern" id="goodsSpecsTp">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="specs_id" property="specsId" jdbcType="VARCHAR" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="specs_tp_id" property="specsTpId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="is_free_post" property="freePost" jdbcType="INTEGER" />
+		<result column="is_free_tax" property="freeTax" jdbcType="INTEGER" />
+		<result column="tag_ratio" property="tagRatio" jdbcType="INTEGER" />
+		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC" />
+		<result column="tariff" property="tariff" jdbcType="NUMERIC" />
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="is_promotion" property="promotion" jdbcType="INTEGER" />
+		<result column="discount" property="discount" jdbcType="NUMERIC" />
+		<result column="is_welfare" property="welfare" jdbcType="INTEGER" />
+		<result column="is_distribution" property="distribution" jdbcType="INTEGER" />
+		<result column="is_combinedgoods" property="combinedgoods" jdbcType="INTEGER" />
+		<result column="combined_specs_tp_id" property="combinedSpecsTpId" jdbcType="VARCHAR" />
+		<result column="distribution_price" property="distributionPrice" jdbcType="NUMERIC" />
+		<result column="display" property="display" jdbcType="INTEGER" />
+		<result column="retail_price" property="retailPrice" jdbcType="NUMERIC" />
+		<result column="vip_price" property="vipPrice" jdbcType="NUMERIC" />
+		<result column="line_price" property="linePrice" jdbcType="NUMERIC" />
+		<result column="instant_ratio" property="instantRatio" jdbcType="NUMERIC" />
+		<result column="sale_num" property="saleNum" jdbcType="INTEGER" />
+		<result column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="is_fresh" property="fresh" jdbcType="INTEGER" />
+		<result column="upshelf_time" property="upshelfTime" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.po.Goods" id="goodsItem">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="brand_id" property="brandId" jdbcType="INTEGER" />
+		<result column="brand" property="brandName" jdbcType="VARCHAR" />
+		<result column="origin" property="origin" jdbcType="VARCHAR" />
+		<result column="subtitle" property="subtitle" jdbcType="VARCHAR" />
+		<result column="detail_path" property="detailPath" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
+		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
+		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
+		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+		<result column="opt" property="opt" jdbcType="VARCHAR" />
+		<result column="access_path" property="accessPath" jdbcType="VARCHAR" />
+		<collection property="goodsFileList" ofType="com.zm.goods.pojo.GoodsFile">
+			<id column="file_id" property="id" jdbcType="INTEGER" />
+			<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+			<result column="path" property="path" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
 	
 	<select id="select" parameterType="Object" resultMap="goodsWithItems">
 		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} and i.is_del = 0 and g.is_del = 0 
@@ -292,105 +207,236 @@
 		select * from goods where id = #{id} and is_del = 0
 	</select>
 	
-	<select id="selectForPage" parameterType="Object" resultMap="entity">
-		select * from goods where 1=1 and is_del = 0
-		<if test="goodsName!=null and goodsName!=''">
-			and goods_name like concat('%',#{goodsName},'%') 
-		</if>
-		<if test="id > 0">
-			and id = #{id} 
-		</if>
-		<if test="goodsId != null and goodsId != ''">
-			and goods_id = #{goodsId} 
-		</if>
-		<if test="baseId > 0">
-			and base_id = #{baseId} 
-		</if>
-		<if test="supplierId != null and supplierId != -1">
-			and supplier_id = #{supplierId} 
-		</if>
-	</select>
-	
-	<insert id="insert" parameterType="Object">
-		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt,goods_tag_ratio) value
-		(#{goodsId},#{templateId},#{baseId},#{supplierId},#{supplierName},#{goodsName},#{description},#{origin},0,#{detailPath},0,#{type},now(),now(),#{opt},#{goodsTagRatio})
+	<insert id="insertGoods" parameterType="Object">
+		insert into kj_goods (goods_id,type,goods_name,subtitle,description,brand_id,origin,detail_path,
+		first_category,second_category,third_category,hscode,display,is_del,create_time,opt) value
+		(#{goodsId},#{type},#{goodsName},#{subtitle},#{description},#{brandId},#{origin},#{detailPath},#{firstCategory},
+		#{secondCategory},#{thirdCategory},#{hscode},0,0,now(),#{opt})
 	</insert>
 	
-	<insert id="insertBatch" parameterType="Object">
-		insert into goods (goods_id,specs_template_id,base_id,supplier_id,supplier_name,goods_name,description,origin,status,detail_path,index_status,type,create_time,update_time,opt,goods_tag_ratio) value
+	<update id="updateGoods" parameterType="Object">
+		update kj_goods 
+		<if test="goodsName != null and goodsName != ''">
+			set goods_name = #{goodsName},
+		</if>
+		<if test="subtitle != null and subtitle != ''">
+			set subtitle = #{subtitle},
+		</if>
+		<if test="description != null and description != ''">
+			set description = #{description},
+		</if>
+		<if test="brandId != null and brandId != ''">
+			set brand_id = #{brandId},
+		</if>
+		<if test="origin != null and origin != ''">
+			set origin = #{origin},
+		</if>
+		<if test="detailPath != null and detailPath != ''">
+			set detail_path = #{detailPath},
+		</if>
+		<if test="firstCategory != null and firstCategory != ''">
+			set first_category = #{firstCategory},
+		</if>
+		<if test="secondCategory != null and secondCategory != ''">
+			set second_category = #{secondCategory},
+		</if>
+		<if test="thirdCategory != null and thirdCategory != ''">
+			set third_category = #{thirdCategory},
+		</if>
+		<if test="hscode != null and hscode != ''">
+			set hscode = #{hscode},
+		</if>
+		<if test="opt != null and opt != ''">
+			set opt = #{opt},
+		</if>
+		update_time = now() where goods_id = #{goodsId}
+	</update>
+	
+	<insert id="insertSpecsTp" parameterType="Object">
+		INSERT INTO kj_goods_specs_tradepattern
+		(specs_tp_id,goods_id,specs_id,increment_tax,tariff,excise_tax,distribution_price,retail_price,line_price,sale_num,
+		create_time,is_del,opt)
+		values
+		(#{specsTpId},#{goodsId},#{specsId},#{incrementTax},#{tariff},#{exciseTax},#{distributionPrice},#{retailPrice},
+		#{linePrice},#{saleNum},now(),0,#{opt})
+	</insert>
+	
+	<update id="updateSpecsTp" parameterType="Object">
+		update kj_goods_specs_tradepattern 
+		<if test="incrementTax != null and incrementTax != ''">
+			increment_tax = #{incrementTax},
+		</if>
+		<if test="tariff != null and tariff != ''">
+			tariff = #{tariff},
+		</if>
+		<if test="exciseTax != null and exciseTax != ''">
+			excise_tax = #{exciseTax},
+		</if>
+		<if test="distributionPrice != null and distributionPrice != ''">
+			distribution_price = #{distributionPrice},
+		</if>
+		<if test="retailPrice != null and retailPrice != ''">
+			retail_price = #{retailPrice},
+		</if>
+		<if test="linePrice != null and linePrice != ''">
+			line_price = #{linePrice},
+		</if>
+		<if test="saleNum != null and saleNum != ''">
+			sale_num = #{saleNum},
+		</if>
+		<if test="opt != null and opt != ''">
+			opt = #{opt},
+		</if>
+		tag_ratio = #{tagRatio}, update_time = now() where specs_tp_id = #{specsTpId}
+	</update>
+	
+	<insert id="insertItemBatch" parameterType="Object">
+		INSERT INTO kj_goods_item
+		(specs_tp_id,item_id,supplier_id,supplier_name,status,unit,sku,item_code,shelf_life,create_time,is_del,opt)
+		values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.goodsId},#{item.templateId},#{item.baseId},#{item.supplierId},#{item.supplierName},#{item.goodsName},#{item.description},#{item.origin},0,
-			#{item.detailPath},0,#{item.type},now(),now(),#{item.opt},#{item.goodsTagRatio})
+		(#{item.specsTpId},#{item.itemId},#{item.supplierId},#{item.supplierName},0,#{item.unit},#{item.sku},#{item.itemCode},
+		#{item.shelfLife},now(),0,#{item.opt})
 		</foreach>
 	</insert>
 	
-	<update id="updateThirdStatus" parameterType="Object">
-		update third_goods set status = 1 , update_time = now() where id = #{id};
+	<update id="updateItemBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update kj_goods_item 
+			<if test="supplierId != null and supplierId != ''">
+				supplier_id = #{supplierId},
+			</if>
+			<if test="supplierName != null and supplierName != ''">
+				supplier_name = #{supplierName},
+			</if>
+			<if test="unit != null and unit != ''">
+				unit = #{unit},
+			</if>
+			<if test="sku != null and sku != ''">
+				sku = #{sku},
+			</if>
+			<if test="itemCode != null and itemCode != ''">
+				item_code = #{itemCode},
+			</if>
+			<if test="shelfLife != null and shelfLife != ''">
+				shelf_life = #{shelfLife},
+			</if>
+			<if test="opt != null and opt != ''">
+				opt = #{opt},
+			</if>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+			update_time = now() where item_id = #{itemId}
+		</foreach>
 	</update>
 	
-	<update id="update" parameterType="Object">
-		update goods set goods_name = #{goodsName} , update_time = now() where id = #{id};
+	<insert id="insertItemPriceBatch" parameterType="Object">
+		insert into kj_goods_price(item_id,min,max,cost_price,internal_price,create_time,opt) 
+		values
+		<foreach collection="list" item="item" separator=",">
+		(#{item.itemId},#{item.min},#{item.max},#{item.costPrice},#{item.internalPrice},now(),0,#{item.opt})
+		</foreach>
+	</insert>
+	
+	<update id="updateItemPriceBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update kj_goods_price 
+			<if test="min != null and min != ''">
+				min = #{min},
+			</if>
+			<if test="max != null and max != ''">
+				max = #{max},
+			</if>
+			<if test="costPrice != null and costPrice != ''">
+				cost_price = #{costPrice},
+			</if>
+			<if test="internalPrice != null and internalPrice != ''">
+				internal_price = #{internalPrice},
+			</if>
+			<if test="opt != null and opt != ''">
+				opt = #{opt},
+			</if>
+			update_time = now() where item_id = #{itemId}
+		</foreach>
+	</update>
+	
+	<insert id="insertStockBatch" parameterType="Object">
+		insert ignore into goods_stock 
+		(item_id,qpqty,fxqty,defqty,lockedqty,frozenqty,create_time,update_time)
+		values
+		<foreach collection="list" item="item" open="" close=""
+			separator=",">
+			(#{item.itemId},#{item.fxqty},#{item.fxqty},0,0,0,now(),now())
+		</foreach>
+	</insert>
+	
+	<update id="updateStockBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update goods_stock set fxqty = #{item.fxqty}, update_time = now() where item_id = #{item.itemId}
+		</foreach>
+	</update>
+	
+	<insert id="insertSpecs" parameterType="Object">
+		INSERT INTO kj_specs_goods
+		(specs_id,encode,weight,description,unit,info,carton,conversion,specs_goods_name,create_time,is_del,opt)
+		values
+		(#{specsId},#{encode},#{weight},#{description},#{unit},#{info},#{carton},#{conversion},#{specsGoodsName},
+		now(),0,#{opt})
+	</insert>
+	
+	<update id="updateSpecs"  parameterType="Object">
+		update kj_specs_goods 
+		<if test="encode != null and encode != ''">
+			encode = #{encode},
+		</if>
+		<if test="weight != null and weight != ''">
+			weight = #{weight},
+		</if>
+		<if test="description != null and description != ''">
+			description = #{description},
+		</if>
+		<if test="unit != null and unit != ''">
+			unit = #{unit},
+		</if>
+		<if test="info != null and info != ''">
+			info = #{info},
+		</if>
+		<if test="carton != null and carton != ''">
+			carton = #{carton},
+		</if>
+		<if test="conversion != null and conversion != ''">
+			conversion = #{conversion},
+		</if>
+		<if test="specsGoodsName != null and specsGoodsName != ''">
+			specs_goods_name = #{specsGoodsName},
+		</if>
+		<if test="opt != null and opt != ''">
+			opt = #{opt},
+		</if>
+		update_time = now() where specs_id = #{specsId}
 	</update>
 	
 	<update id="updateDetailPath" parameterType="Object">
-		update goods set detail_path = #{detailPath} , update_time = now() where goods_id = #{goodsId};
+		update kj_goods set detail_path = #{detailPath} , update_time = now() where goods_id = #{goodsId};
 	</update>
 	
-	<delete id="delete" parameterType="Object">
-		delete from goods where id = #{id}; 
-	</delete>
-	
-	<select id="selectRecordForDel" parameterType="Object" resultMap="entity">
-		SELECT a.* FROM goods a where a.id = #{id} and a.is_del = 0 and exists 
-		(select goods_id from goods_item where status in('1','2')  and goods_id = a.goods_id);
-	</select>
-
 	<select id="selectGoodsFileByGoodsId" parameterType="Object" resultMap="goodsFile">
 		select * from goods_file where type = '0'
 		and goods_id = #{goodsId} order by id asc
 	</select>
 	
-	<select id="selectRecordForUpd" parameterType="Object" resultMap="entity">
-		SELECT a.* FROM goods a where a.id = #{id} and a.is_del = 0 and exists 
-		(select goods_id from goods_item where status = '2' and is_del = 0 and goods_id = a.goods_id);
-	</select>
-	
-	<select id="selectAllGoodsForRebate" parameterType="Object" resultMap="goodsRebate">
-		select g.id,g.goods_id,g.goods_name,g.supplier_id,g.supplier_name,g.description,
-		g.status,i.first,i.second,i.third,i.remark,i.update_time,i.opt 
-		from goods g left join goods_rebate i on i.goods_id = g.goods_id 
-		where 1=1 and g.is_del = 0
-		<if test="goodsName!=null and goodsName!=''">
-			and g.goods_name like concat('%',#{goodsName},'%') 
-		</if>
-		<if test="goodsId != null and goodsId != ''">
-			and g.goods_id = #{goodsId} 
-		</if>
-		<if test="supplierId != null and supplierId != -1">
-			and g.supplier_id = #{supplierId} 
-		</if>
-		order by g.id
-	</select>
-	
-	<select id="selectGoodsRebateById" parameterType="Object" resultMap="goodsRebate">
-		select * from goods_rebate where item_id = #{itemId} 
-	</select>
-	
-	<select id="selectRecordForRebate" parameterType="Object" resultMap="goodsRebate">
-		select * from goods_rebate where 1=1 and goods_id = #{goodsId} 
+	<select id="selectGoodsRebateBySpecsTpId" parameterType="Object" resultMap="goodsRebate">
+		select * from kj_goods_rebate where specs_tp_id = #{specsTpId} 
 	</select>
 	
 	<insert id="insertGoodsRebate" parameterType="Object">
-		insert into goods_rebate (item_id,grade_type,proportion,create_time,opt) values
+		insert into kj_goods_rebate (specs_tp_id,grade_type,proportion,create_time,opt) values
 		<foreach collection="list" item="item" separator=",">
-			(#{item.itemId},#{item.gradeType},#{item.proportion},now(),#{item.opt})
+			(#{item.specsTpId},#{item.gradeType},#{item.proportion},now(),#{item.opt})
 		</foreach>
 		ON DUPLICATE KEY UPDATE proportion = values(proportion),update_time = now()
 	</insert>
-	
-	<update id="updateGoodsRebate" parameterType="Object">
-		update goods_rebate set first = #{first} , second = #{second} , third = #{third} , update_time = now() where goods_id = #{goodsId} 
-	</update>
 	
 	<select id="selectTagForPage" parameterType="Object" resultMap="goodsTag">
 		select * from goods_tag
@@ -424,54 +470,9 @@
 		select * from goods_tag
 	</select>
 	
-	<insert id="insertTagBind" parameterType="Object">
-		insert into goods_tag_bind (item_id,tag_id,create_time,update_time,opt) value
-		(#{itemId},#{tagId},now(),now(),#{opt})
-	</insert>
-	
-	<update id="updateTagBind" parameterType="Object">
-		update goods_tag_bind set tag_id = #{tagId}, update_time = now() where item_id = #{itemId}
-	</update>
-	
-	<delete id="deleteTagBind" parameterType="Object">
-		delete from goods_tag_bind where item_id = #{itemId}
-	</delete>
-	
-	<select id="selectGoodsTagBindByItemId" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where item_id = #{itemId}
-	</select>
-	
-	<select id="selectGoodsWithItem" parameterType="Object" resultMap="goodsWithItem">
-		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} and i.is_del = 0 and g.is_del = 0
-	</select>
-	
 	<select id="selectTagFuncListInfo" parameterType="Object" resultMap="tagFunc">
 		select * from tag_fun
 	</select>
-	
-	<select id="selectGoodsTagBindListInfo" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where 1=1
-		<if test="tagId != null and tagId != '0'">
-			and tag_id = #{tagId} 
-		</if>
-	</select>
-	
-	<select id="selectGoodsItemByItemId" parameterType="Object" resultMap="goodsItemEntity">
-		select * from goods_item where item_id = #{itemId} and is_del = 0
-	</select>
-	
-	<select id="selectGoodsEntityByItemId" parameterType="Object" resultMap="entity">
-		select * from goods where goods_id = #{goodsId} and is_del = 0
-	</select>
-	
-	<update id="updateGoodsEntity" parameterType="Object">
-		update goods set goods_name = #{goodsName},
-		supplier_id = #{supplierId}, supplier_name = #{supplierName},
-		origin = #{origin}, type = #{type}, update_time = now(),
-		specs_template_id = #{templateId}, detail_path = #{detailPath},
-		goods_tag_ratio = goods_tag_ratio + #{goodsTagRatio} 
-		where goods_id = #{goodsId}
-	</update>
 	
 	<select id="selectGoodsListForDownload" parameterType="Object" resultMap="goodsInfoListForDownload">
 		select g.goods_id,gi.item_id,gi.sku,gi.info,g.goods_name,b.brand,g.origin,
@@ -662,59 +663,16 @@
 		)
 	</select>
 	
-	<select id="listGoodsIdsByItemCode" parameterType="Object" resultType="java.lang.String">
-		select distinct goods_id from goods_item where item_code = #{itemCode} and is_del = 0
-	</select>
-	
-	<insert id="insertTagBindList" parameterType="Object">
-		insert into goods_tag_bind (item_id,tag_id,create_time,update_time,opt) value
-		<foreach collection="list" item="item" separator=",">
-			(#{item.itemId},#{item.tagId},now(),now(),#{item.opt})
-		</foreach>
-	</insert>
-	
-	<select id="listPublishError" parameterType="Object" resultMap="entity">
-		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name from goods g 
-		where g.status = 1 and is_publish = 0 
-		<if test="goodsName != null and goodsName != ''">
-			and goods_name like concat('%',#{goodsName},'%') 
-		</if>
-	</select>
-	
-	<select id="listUnPublishError" parameterType="Object" resultMap="entity">
-		select g.id,g.goods_id,g.type,g.supplier_name,g.goods_name from goods g 
-		where g.status = 0 and is_publish = 1 
-		<if test="goodsName != null and goodsName != ''">
-			and goods_name like concat('%',#{goodsName},'%') 
-		</if>
-	</select>
-	
-	<select id="selectGoodsTagBindListByItemId" parameterType="Object" resultMap="goodsTagBind">
-		select * from goods_tag_bind where item_id = #{itemId}
-	</select>
-	
-	<delete id="deleteTagBindList" parameterType="Object">
-		delete from goods_tag_bind where id in 
-		<foreach collection="list" item="item" open="(" close=")"
-			separator=",">
-			#{item.id}
-		</foreach>
-	</delete>
-	
-	<update id="updateGoodsTagRatioByList" parameterType="Object">
+	<update id="updateSpecsTpTagRatioByList" parameterType="Object">
 		<foreach collection="list" item="item" separator=";">
-			UPDATE goods
+			UPDATE kj_goods_specs_tradepattern
 	        SET
-		        goods_tag_ratio = goods_tag_ratio + #{item.goodsTagRatio},
+		        tag_ratio = tag_ratio + #{item.tagRatio},
 		        update_time = now()
 	        WHERE
-	        	goods_id=#{item.goodsId}
+	        	specs_tp_id=#{item.specsTpId}
 		</foreach>
 	</update>
-	
-	<select id="selectGoodsInfoByGoodsId" parameterType="Object" resultMap="entity">
-		SELECT * FROM goods where goods_id = #{goodsId}
-	</select>
 	
 	<select id = "getGoodsPicPath" parameterType="Object" resultType="java.lang.String">
 		select path from goods_file where goods_id = #{goodsId} order by id asc
@@ -725,4 +683,58 @@
 			update kj_goods_specs_tradepattern set retail_price = #{value} where specs_tp_id =  #{key} limit 1
 		</foreach>
 	</update>
+	
+	<select id="checkGoodsTagUsing" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from kj_goods_tag_bind where tag_id = #{id}
+	</select>
+	
+	<select id="listGoodsSpecsByEnCodeList" parameterType="Object" resultMap="goodsSpecs">
+		select * from kj_specs_goods where encode in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGoodsSpecsTradPatternByParam" parameterType="Object" resultMap="goodsSpecsTp">
+		select gtp.* from kj_goods_specs_tradepattern gtp 
+		left join kj_goods g on gtp.goods_id = g.goods_id 
+		where g.type = #{type} and gtp.specs_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="listGoodsByCategoryAndBrand" parameterType="Object" resultMap="goodsItem">
+		select g.id,g.goods_id,g.goods_name, g.description,g.detail_path,g.subtitle,
+		g.type,g.third_category,g.first_category,g.second_category,g.access_path,g.origin,
+		gf.id as file_id,gf.path
+		from kj_goods g 
+		left join goods_file gf on g.goods_id = gf.goods_id 
+		where g.is_del = 0 and gf.type = 0 and g.third_category = #{thirdCategory} and g.brand_id = #{brandId}
+	</select>
+	
+	<update id="updateItemStatusPass" parameterType="Object">
+		update kj_goods_item set status = 2,update_time = now() where item_id = #{itemId}
+	</update>
+	
+	<update id="updateSpecsTpCanBeUpShelf" parameterType="Object">
+		update kj_goods_specs_tradepattern set status = 1,update_time = now() where specs_tp_id = #{specsTpId} and status = 0
+	</update>
+	
+	<update id="updateItemStatusUnPass" parameterType="Object">
+		update kj_goods_item set status = 11,reason = #{reason},update_time = now() where item_id = #{itemId}
+	</update>
+	
+	<select id="countItemPassBySpecsTpId" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from kj_goods_item where specs_tp_id = #{specsTpId} and status = 2
+	</select>
+	
+	<update id="updateSpecsTpInit" parameterType="Object">
+		update kj_goods_specs_tradepattern set status = 0,update_time = now() where specs_tp_id = #{specsTpId}
+	</update>
+	
+	<update id="updateWelfareDisplay" parameterType="Object">
+		update kj_goods_specs_tradepattern set is_welfare = #{welfare},update_time = now() where specs_tp_id = #{specsTpId}
+	</update>
+	
 </mapper>

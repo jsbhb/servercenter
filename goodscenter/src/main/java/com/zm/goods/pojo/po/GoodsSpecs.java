@@ -35,6 +35,16 @@ public class GoodsSpecs {
 	
 	private String unit;
 	
+	private String specsGoodsName;
+	
+	public String getSpecsGoodsName() {
+		return specsGoodsName;
+	}
+
+	public void setSpecsGoodsName(String specsGoodsName) {
+		this.specsGoodsName = specsGoodsName;
+	}
+
 	public String getUnit() {
 		return unit;
 	}

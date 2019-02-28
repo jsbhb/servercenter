@@ -13,16 +13,18 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.github.pagehelper.Page;
-import com.zm.goods.pojo.ERPGoodsTagBindEntity;
-import com.zm.goods.pojo.ERPGoodsTagEntity;
-import com.zm.goods.pojo.GoodsEntity;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsInfoListForDownload;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
+import com.zm.goods.pojo.GoodsTagEntity;
 import com.zm.goods.pojo.TagFuncEntity;
-import com.zm.goods.pojo.ThirdWarehouseGoods;
+import com.zm.goods.pojo.po.Goods;
+import com.zm.goods.pojo.po.GoodsPricePO;
+import com.zm.goods.pojo.po.GoodsSpecs;
+import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
+import com.zm.goods.pojo.po.Items;
+import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 /**
  * ClassName: BrandMapper <br/>
@@ -36,34 +38,10 @@ import com.zm.goods.pojo.ThirdWarehouseGoods;
 public interface GoodsBackMapper {
 
 	/**
-	 * selectForPage:分页查询商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param entity
-	 * @return
-	 * @since JDK 1.7
+	 * @fun 插入goodsSpecsTp
+	 * @param goodsSpecsTradePattern
 	 */
-	Page<GoodsEntity> selectForPage(GoodsEntity entity);
-	
-	/**
-	 * selectThirdForPage:分页查询同步商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param entity
-	 * @return
-	 * @since JDK 1.7
-	 */
-	Page<ThirdWarehouseGoods> selectThirdForPage(ThirdWarehouseGoods entity);
-
-	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	GoodsEntity selectById(int id);
+	void insertSpecsTp(GoodsSpecsTradePattern goodsSpecsTradePattern);
 
 	/**
 	 * insert:插入商品. <br/>
@@ -72,109 +50,68 @@ public interface GoodsBackMapper {
 	 * @param entity
 	 * @since JDK 1.7
 	 */
-	void insert(GoodsEntity entity);
-
+	void insertGoods(Goods goods);
 	/**
-	 * selectAll:检索所有商品. <br/>
-	 * 
-	 * @author hebin
+	 * @fun 批量插入供应商商品
+	 * @param items
+	 */
+	void insertItemBatch(List<Items> list);
+	/**
+	 * @fun 插入规格
+	 * @param specs
+	 */
+	void insertSpecs(GoodsSpecs specs);
+	/**
+	 * @fun 批量插入价格
+	 * @param priceList
+	 */
+	void insertItemPriceBatch(List<GoodsPricePO> priceList);
+	/**
+	 * @fun 批量插入库存
+	 * @param stockList
+	 */
+	void insertStockBatch(List<WarehouseModel> stockList);
+	/**
+	 * @fun 更新商品Goods
+	 * @param goods
+	 */
+	void updateGoods(Goods goods);
+	/**
+	 * @fun 更新goodsSpecsTp
+	 * @param goodsSpecsTradePattern
+	 */
+	void updateSpecsTp(GoodsSpecsTradePattern goodsSpecsTradePattern);
+	/**
+	 * @fun 批量更新供应商商品
+	 * @param itemsList
+	 */
+	void updateItemBatch(List<Items> itemsList);
+	/**
+	 * @fun 更新商品规格
+	 * @param specs
+	 */
+	void updateSpecs(GoodsSpecs specs);
+	/**
+	 * @fun 批量更新价格
+	 * @param priceList
+	 */
+	void updateItemPriceBatch(List<GoodsPricePO> priceList);
+	/**
+	 * @fun 批量更新库存
+	 * @param stockList
+	 */
+	void updateStockBatch(List<WarehouseModel> stockList);
+	/**
+	 * @fun 根据specsTpId查询返佣
+	 * @param specsTpId
 	 * @return
-	 * @since JDK 1.7
 	 */
-	List<GoodsEntity> selectAll();
-
-	/**  
-	 * selectThird:检索供应商商品. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param entity
-	 * @return  
-	 * @since JDK 1.7  
-	 */
-	ThirdWarehouseGoods selectThird(ThirdWarehouseGoods entity);
-
-	/**  
-	 * updateThirdStatus:更新三方商品状态. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param thirdId  
-	 * @since JDK 1.7  
-	 */
-	void updateThirdStatus(int thirdId);
-
+	List<GoodsRebateEntity> selectGoodsRebateBySpecsTpId(String specsTpId);
 	/**
-	 * insert:插入商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param entity
-	 * @since JDK 1.7
+	 * @fun 插入返佣
+	 * @param list
 	 */
-	void update(GoodsEntity entity);
-
-	/**
-	 * insert:插入商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param entity
-	 * @since JDK 1.7
-	 */
-	void delete(GoodsEntity entity);
-
-	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	GoodsEntity selectRecordForDel(GoodsEntity entity);
-
-	/**  
-	 * updateDetailPath:(这里用一句话描述这个方法的作用). <br/>  
-	 *  
-	 * @author hebin  
-	 * @param entity  
-	 * @since JDK 1.7  
-	 */
-	void updateDetailPath(GoodsEntity entity);
-
-	/**
-	 * 
-	 * @author hebin
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<GoodsFile> selectGoodsFileByGoodsId(GoodsEntity entity);
-
-	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	GoodsEntity selectRecordForUpd(GoodsEntity entity);
-
-	/**
-	 * selectForPage:分页查询商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param entity
-	 * @return
-	 * @since JDK 1.7
-	 */
-	Page<GoodsRebateEntity> selectAllGoodsForRebate(GoodsEntity entity);
-
-	List<GoodsRebateEntity> selectGoodsRebateById(String itemId);
-
-	GoodsRebateEntity selectRecordForRebate(GoodsRebateEntity entity);
-
 	void insertGoodsRebate(List<GoodsRebateEntity> list);
-
-	void updateGoodsRebate(GoodsRebateEntity entity);
-
 	/**
 	 * selectForPage:分页查询商品标签. <br/>
 	 * 
@@ -183,143 +120,56 @@ public interface GoodsBackMapper {
 	 * @return
 	 * @since JDK 1.7
 	 */
-	Page<ERPGoodsTagEntity> selectTagForPage(ERPGoodsTagEntity entity);
-
-	void insertGoodsTag(ERPGoodsTagEntity entity);
-
-	void updateGoodsTag(ERPGoodsTagEntity entity);
-
-	void deleteGoodsTag(ERPGoodsTagEntity entity);
-
+	Page<GoodsTagEntity> selectTagForPage(GoodsTagEntity entity);
 	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	ERPGoodsTagEntity selectTagInfo(ERPGoodsTagEntity entity);
-
-	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<ERPGoodsTagEntity> selectTagListInfo();
-
-	/**
-	 * insert:插入商品. <br/>
-	 * 
-	 * @author hebin
+	 * @fun 新增标签
 	 * @param entity
-	 * @since JDK 1.7
 	 */
-	void insertTagBind(ERPGoodsTagBindEntity entity);
-
+	void insertGoodsTag(GoodsTagEntity entity);
 	/**
-	 * 
-	 * @author hebin
-	 * @return
-	 * @since JDK 1.7
-	 */
-	ERPGoodsTagBindEntity selectGoodsTagBindByItemId(GoodsItemEntity entity);
-
-	/**
-	 * insert:插入商品. <br/>
-	 * 
-	 * @author hebin
+	 * @fun 更新标签
 	 * @param entity
-	 * @since JDK 1.7
 	 */
-	void updateTagBind(ERPGoodsTagBindEntity entity);
-
+	void updateGoodsTag(GoodsTagEntity entity);
 	/**
-	 * insert:插入商品. <br/>
-	 * 
-	 * @author hebin
+	 * @fun 删除标签
 	 * @param entity
-	 * @since JDK 1.7
 	 */
-	void deleteTagBind(ERPGoodsTagBindEntity entity);
-
+	void deleteGoodsTag(GoodsTagEntity entity);
 	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
+	 * @fun 判断该标签ID有没有绑定商品
 	 * @param id
 	 * @return
-	 * @since JDK 1.7
 	 */
-	GoodsEntity selectGoodsWithItem(int id);
-
+	int checkGoodsTagUsing(Integer id);
 	/**
-	 * selectById:根据商品编号检索商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param id
+	 * @fun 查询所有标签
 	 * @return
-	 * @since JDK 1.7
+	 */
+	List<GoodsTagEntity> selectTagListInfo();
+	/**
+	 * @fun 更新 权重
+	 * @param list
+	 */
+	void updateSpecsTpTagRatioByList(List<GoodsSpecsTradePattern> list);
+
+	/**  
+	 * updateDetailPath:(更新商品详情). <br/>  
+	 *  
+	 * @author hebin  
+	 * @param entity  
+	 * @since JDK 1.7  
+	 */
+	void updateDetailPath(Goods entity);
+	/**
+	 * @fun 查询标签功能
+	 * @return
 	 */
 	List<TagFuncEntity> selectTagFuncListInfo();
-
-	/**
-	 * 
-	 * @author hebin
-	 * @return
-	 * @since JDK 1.7
-	 */
-	List<ERPGoodsTagBindEntity> selectGoodsTagBindListInfo(ERPGoodsTagBindEntity entity);
-
-	/**
-	 * <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	GoodsItemEntity selectGoodsItemByItemId(String itemId);
-
-	/**
-	 * <br/>
-	 * 
-	 * @author hebin
-	 * @param id
-	 * @return
-	 * @since JDK 1.7
-	 */
-	GoodsEntity selectGoodsEntityByItemId(String goodsId);
-
-	/**
-	 * insert:插入商品. <br/>
-	 * 
-	 * @author hebin
-	 * @param entity
-	 * @since JDK 1.7
-	 */
-	void updateGoodsEntity(GoodsEntity entity);
 
 	List<GoodsInfoListForDownload> selectGoodsListForDownload(GoodsListDownloadParam param);
 
 	List<GoodsFile> selectGoodsFileByParam(Map<String,Object> param);
-
-	List<String> listGoodsIdsByItemCode(String itemCode);
-
-	void insertBatch(List<GoodsEntity> goodsList);
-
-	void insertTagBindList(List<ERPGoodsTagBindEntity> entityList);
-
-	Page<GoodsEntity> listPublishError(GoodsEntity entity);
-
-	Page<GoodsEntity> listUnPublishError(GoodsEntity entity);
-
-	List<ERPGoodsTagBindEntity> selectGoodsTagBindListByItemId(GoodsItemEntity entity);
-
-	void deleteTagBindList(List<ERPGoodsTagBindEntity> list);
 
 	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartOne(GoodsListDownloadParam param);
 
@@ -327,11 +177,54 @@ public interface GoodsBackMapper {
 
 	List<GoodsInfoListForDownload> selectGoodsListForDownloadPartThree(GoodsListDownloadParam param);
 
-	void updateGoodsTagRatioByList(List<GoodsEntity> goodsList);
-	
-	GoodsEntity selectGoodsInfoByGoodsId(GoodsEntity entity);
-
 	List<String> getGoodsPicPath(String goodsId);
 
+	/**
+	 * @fun 更新零售价
+	 * @param param
+	 */
 	void updateRetailPrice(@Param("param")Map<String, Object> param);
+	/**
+	 * @fun 根据条码查询商品规格
+	 * @param list
+	 * @return
+	 */
+	List<GoodsSpecs> listGoodsSpecsByEnCodeList(List<String> list);
+	/**
+	 * @fun 根据规格ID 和 贸易类型（一般贸易、跨境）来查询specsTp
+	 * @param param
+	 * @return
+	 */
+	List<GoodsSpecsTradePattern> listGoodsSpecsTradPatternByParam(Map<String, Object> param);
+	/**
+	 * @fun 根据三级分类和品牌查询goods
+	 * @param param
+	 * @return
+	 */
+	List<Goods> listGoodsByCategoryAndBrand(Map<String, String> param);
+	/**
+	 * @fun 更新供应商商品通过审核
+	 * @param item
+	 */
+	void updateItemStatusPass(Items item);
+	/**
+	 * @fun 更新specsTp为下架状态（如果是初始化状态的话）
+	 * @param specsTpId
+	 */
+	void updateSpecsTpCanBeUpShelf(String specsTpId);
+	/**
+	 * @fun 更新供应商商品未通过审核
+	 * @param item
+	 */
+	void updateItemStatusUnPass(Items item);
+	/**
+	 * @fun 更新specsTp为初始状态
+	 * @param specsTpId
+	 */
+	void updateSpecsTpInit(String specsTpId);
+	/**
+	 * @fun 
+	 * @param param
+	 */
+	void updateWelfareDisplay(Map<String,Object> param);
 }

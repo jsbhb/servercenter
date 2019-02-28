@@ -16,7 +16,6 @@ import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPriceRatioEntity;
 import com.zm.goods.pojo.GoodsRatioPlatformEntity;
 import com.zm.goods.pojo.ResultModel;
-import com.zm.goods.pojo.po.GoodsPrice;
 
 /**
  * ClassName: GoodsItemService <br/>
@@ -116,7 +115,7 @@ public interface GoodsItemService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	GoodsPrice queryPurchaseCenterItemForEdit(GoodsItemEntity entity);
+//	GoodsPrice queryPurchaseCenterItemForEdit(GoodsItemEntity entity);
 
 	/**  
 	 * queryCenterByPage:(这里用一句话描述这个方法的作用). <br/>  
@@ -127,7 +126,7 @@ public interface GoodsItemService {
 	 * @return  
 	 * @since JDK 1.7  
 	 */
-	GoodsPrice queryItemPrice(String itemId);
+//	GoodsPrice queryItemPrice(String itemId);
 
 	/**  
 	 * update:(这里用一句话描述这个方法的作用). <br/>  
@@ -136,7 +135,7 @@ public interface GoodsItemService {
 	 * @param entity  
 	 * @since JDK 1.7  
 	 */
-	void updateItemPrice(GoodsPrice entity);
+//	void updateItemPrice(GoodsPrice entity);
 
 	/**
 	 * queryByPage:分页查询商品信息. <br/>

@@ -2,8 +2,6 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 
-import com.zm.goods.pojo.GoodsEntity;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
 
@@ -19,9 +17,17 @@ public interface GoodsTagMapper {
 
 	void batchInsert(List<GoodsTagBindEntity> list);
 
-	List<GoodsEntity> listGoodsIdByItemList(List<String> list);
+	List<GoodsTagBindEntity> listGoodsTagBindBySpecsTpIdList(List<String> list);
+	/**
+	 * @fun 批量解除绑定
+	 * @param idList
+	 */
+	void deleteGoodsTagBindByIds(List<Integer> idList);
+	/**
+	 * @fun 根据主键Id获取tag实体
+	 * @param tagIdList
+	 * @return
+	 */
+	List<GoodsTagEntity> listGoodsTagByTagIds(List<Integer> tagIdList);
 
-	List<GoodsTagBindEntity> listGoodsTagBindByItemList(List<String> list);
-
-	List<GoodsItemEntity> listGoodsTagByItemId(List<String> list);
 }

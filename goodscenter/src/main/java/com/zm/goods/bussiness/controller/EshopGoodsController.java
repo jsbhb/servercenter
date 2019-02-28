@@ -16,8 +16,8 @@ import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
 import com.zm.goods.pojo.GoodsItemEntity;
-import com.zm.goods.pojo.OrderInfoDTO;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.dto.OrderInfoDTO;
 
 import io.swagger.annotations.Api;
 
