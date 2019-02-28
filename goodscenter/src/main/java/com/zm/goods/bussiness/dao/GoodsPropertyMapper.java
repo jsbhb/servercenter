@@ -78,4 +78,38 @@ public interface GoodsPropertyMapper {
 	void deleteGuidePropertyValue(String id);
 	
 	void deleteGuidePropertyValueBindGoodsList(String id);
+	/**
+	 * @fun 根据三级分类ID获取绑定的系列属性名
+	 * @param thirdCategory
+	 * @return
+	 */
+	List<PropertyEntity> listSpecsPropertyNameByThirdCategory(String thirdCategory);
+	/**
+	 * @fun 根据系列属性名ID获取属性值
+	 * @param nameId
+	 * @return
+	 */
+	List<PropertyValueEntity> listSpecsPropertyValueByNameId(String nameId);
+	/**
+	 * @fun 查询所有系列属性名
+	 * @return
+	 */
+	List<PropertyEntity> listAllSpecsPropertyName();
+	/**
+	 * @fun 根据三级分类ID获取绑定的导购属性名
+	 * @param thirdCategory
+	 * @return
+	 */
+	List<GuidePropertyEntity> listGuidePropertyNameByThirdCategory(String thirdCategory);
+	/**
+	 * @fun 根据系列属性名ID获取属性值
+	 * @param nameId
+	 * @return
+	 */
+	List<GuidePropertyValueEntity> listGuidePropertyValueByNameId(String nameId);
+	/**
+	 * @fun 查询所有导购属性名
+	 * @return
+	 */
+	List<GuidePropertyEntity> listAllGuidePropertyName();
 }

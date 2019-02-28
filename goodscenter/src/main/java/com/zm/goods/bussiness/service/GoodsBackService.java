@@ -16,6 +16,10 @@ import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
+import com.zm.goods.pojo.GuidePropertyEntity;
+import com.zm.goods.pojo.GuidePropertyValueEntity;
+import com.zm.goods.pojo.PropertyEntity;
+import com.zm.goods.pojo.PropertyValueEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.bo.GoodsRender4New;
@@ -162,4 +166,38 @@ public interface GoodsBackService {
 	 * @param specsTpId
 	 */
 	void welfareDisplay(String specsTpId,int status);
+	/**
+	 * @fun 根据三级分类ID获取绑定的系列属性名
+	 * @param thirdCategory
+	 * @return
+	 */
+	List<PropertyEntity> listSpecsPropertyName(String thirdCategory);
+	/**
+	 * @fun 根据属性nameId获取属性value
+	 * @param nameId
+	 * @return
+	 */
+	List<PropertyValueEntity> listSpecsPropertyValue(String nameId);
+	/**
+	 * @fun 查询所有的系列属性名
+	 * @return
+	 */
+	List<PropertyEntity> listAllSpecsPropertyName();
+	/**
+	 * @fun 根据三级分类ID获取绑定的导购属性名
+	 * @param thirdCategory
+	 * @return
+	 */
+	List<GuidePropertyEntity> listGuidePropertyName(String thirdCategory);
+	/**
+	 * @fun 根据属性nameId获取属性value
+	 * @param nameId
+	 * @return
+	 */
+	List<GuidePropertyValueEntity> listGuidePropertyValue(String nameId);
+	/**
+	 * @fun 查询所有的导购属性名
+	 * @return
+	 */
+	List<GuidePropertyEntity> listAllGuidePropertyName();
 }

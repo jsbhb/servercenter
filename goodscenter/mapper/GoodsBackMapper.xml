@@ -188,6 +188,7 @@
 		<result column="third_category" property="thirdCategory" jdbcType="VARCHAR" />
 		<result column="second_category" property="secondCategory" jdbcType="VARCHAR" />
 		<result column="first_category" property="firstCategory" jdbcType="VARCHAR" />
+		<result column="hscode" property="hscode" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
 		<result column="opt" property="opt" jdbcType="VARCHAR" />
@@ -705,7 +706,7 @@
 	</select>
 	
 	<select id="listGoodsByCategoryAndBrand" parameterType="Object" resultMap="goodsItem">
-		select g.id,g.goods_id,g.goods_name, g.description,g.detail_path,g.subtitle,
+		select g.id,g.goods_id,g.goods_name, g.description,g.detail_path,g.subtitle,g.hscode,
 		g.type,g.third_category,g.first_category,g.second_category,g.access_path,g.origin,
 		gf.id as file_id,gf.path
 		from kj_goods g 

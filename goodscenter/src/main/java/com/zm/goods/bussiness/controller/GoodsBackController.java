@@ -23,6 +23,10 @@ import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
+import com.zm.goods.pojo.GuidePropertyEntity;
+import com.zm.goods.pojo.GuidePropertyValueEntity;
+import com.zm.goods.pojo.PropertyEntity;
+import com.zm.goods.pojo.PropertyValueEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.bo.GoodsRender4New;
@@ -409,6 +413,119 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+	/**
+	 * @fun 根据三级分类ID获取绑定的系列属性名
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/specs/property/name", method = RequestMethod.GET)
+	public ResultModel listSpecsPropertyName(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestParam("thirdCategory") String thirdCategory) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<PropertyEntity> propertyList = goodsBackService.listSpecsPropertyName(thirdCategory);
+				return new ResultModel(true, propertyList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	/**
+	 * @fun 根据属性nameId 获取属性value
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/specs/property/value/{nameId}", method = RequestMethod.GET)
+	public ResultModel listSpecsPropertyValue(HttpServletRequest request, @PathVariable("version") Double version,
+			@PathVariable("nameId") String nameId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<PropertyValueEntity> valueList = goodsBackService.listSpecsPropertyValue(nameId);
+				return new ResultModel(true, valueList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	/**
+	 * @fun 查询所有系列属性名
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/specs/property/name/all", method = RequestMethod.GET)
+	public ResultModel listAllSpecsPropertyName(HttpServletRequest request, @PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<PropertyEntity> propertyList = goodsBackService.listAllSpecsPropertyName();
+				return new ResultModel(true, propertyList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
 	
-	
+	/**
+	 * @fun 根据三级分类ID获取绑定的导购属性名
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/guide/property/name", method = RequestMethod.GET)
+	public ResultModel listGuidePropertyName(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestParam("thirdCategory") String thirdCategory) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<GuidePropertyEntity> propertyList = goodsBackService.listGuidePropertyName(thirdCategory);
+				return new ResultModel(true, propertyList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	/**
+	 * @fun 根据属性nameId 获取属性value
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/guide/property/value/{nameId}", method = RequestMethod.GET)
+	public ResultModel listGuidePropertyValue(HttpServletRequest request, @PathVariable("version") Double version,
+			@PathVariable("nameId") String nameId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<GuidePropertyValueEntity> valueList = goodsBackService.listGuidePropertyValue(nameId);
+				return new ResultModel(true, valueList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	/**
+	 * @fun 查询所有导购属性名
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/guide/property/name/all", method = RequestMethod.GET)
+	public ResultModel listAllGuidePropertyName(HttpServletRequest request, @PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<GuidePropertyEntity> propertyList = goodsBackService.listAllGuidePropertyName();
+				return new ResultModel(true, propertyList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
 }

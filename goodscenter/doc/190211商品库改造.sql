@@ -203,19 +203,6 @@ CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_category_guide_property_bind` (
   UNIQUE KEY `categoryId_categoryType_propertyId_uk` (`category_id`,`category_type`,`property_id`))
 ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '类目导购绑定表';
 
-drop table if exists  `kj_goods_property_bind`;
-
-CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_property_bind` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `property_id` INT NOT NULL COMMENT '属性名ID',
-  `property_val_id` INT NOT NULL COMMENT '属性值ID',
-  `specs_tp_id` VARCHAR(45) NOT NULL COMMENT 'specs_tp_id',
-  `create_time` DATETIME NULL,
-  `update_time` DATETIME NULL,
-  `opt` VARCHAR(30) NULL,
-  PRIMARY KEY (`id`))
-ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT = '商品属性绑定表';
-
 drop table if exists  `kj_goods_guide_property_bind`;
 
 CREATE TABLE IF NOT EXISTS `zm_goods`.`kj_goods_guide_property_bind` (

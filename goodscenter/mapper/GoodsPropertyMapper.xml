@@ -220,4 +220,31 @@
 	<delete id="deleteGuidePropertyValueBindGoodsList" parameterType="Object">
 		delete from kj_goods_guide_property_bind where property_val_id = #{id}
 	</delete>
+	
+	<select id="listSpecsPropertyNameByThirdCategory" parameterType="Object" resultMap="entity">
+		select pn.* from kj_category_property_bind cpb left join kj_property_name pn on 
+		cpb.property_id = pn.id where cpb.category_type = 3 and cpb.category_id = #{thirdCategory} and pn.type = 1
+	</select>
+	
+	<select id="listSpecsPropertyValueByNameId" parameterType="Object" resultMap="valueEntity">
+		select * from kj_property_value where name_id = #{nameId}
+	</select>
+	
+	<select id="listAllSpecsPropertyName" parameterType="Object" resultMap="entity">
+		select * from kj_property_name where type = 1
+	</select>
+	
+	<select id="listGuidePropertyNameByThirdCategory" parameterType="Object" resultMap="guideEntity">
+		select * from kj_category_guide_property_bind cgpb left join 
+		kj_guide_property_name gpn on cgpb.property_id = gpn.id where cgpb.category_type = 3 
+		and cgpb.category_id = #{thirdCategory}
+	</select>
+	
+	<select id="listGuidePropertyValueByNameId" parameterType="Object" resultMap="guideValueEntity">
+		select * from kj_guide_property_value where guide_name_id = #{nameId}
+	</select>
+	
+	<select id="listAllGuidePropertyName" parameterType="Object" resultMap="guideEntity">
+		select * from kj_guide_property_name
+	</select>
 </mapper>

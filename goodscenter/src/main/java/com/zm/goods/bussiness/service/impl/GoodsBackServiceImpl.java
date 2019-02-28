@@ -27,6 +27,7 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.GoodsBackMapper;
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.dao.GoodsMapper;
+import com.zm.goods.bussiness.dao.GoodsPropertyMapper;
 import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsBackService;
 import com.zm.goods.bussiness.service.GoodsService;
@@ -38,6 +39,10 @@ import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.GoodsTagBindEntity;
 import com.zm.goods.pojo.GoodsTagEntity;
+import com.zm.goods.pojo.GuidePropertyEntity;
+import com.zm.goods.pojo.GuidePropertyValueEntity;
+import com.zm.goods.pojo.PropertyEntity;
+import com.zm.goods.pojo.PropertyValueEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.bo.GoodsRender4New;
@@ -79,6 +84,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	
 	@Resource
 	GoodsService goodsService;
+	
+	@Resource
+	GoodsPropertyMapper goodsPropertyMapper;
 
 	@Override
 	@Transactional(isolation = Isolation.READ_COMMITTED)
@@ -494,5 +502,41 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		param.put("specsTpId", specsTpId);
 		param.put("welfare", welfare);
 		goodsBackMapper.updateWelfareDisplay(param);
+	}
+
+	@Override
+	public List<PropertyEntity> listSpecsPropertyName(String thirdCategory) {
+		List<PropertyEntity> list = goodsPropertyMapper.listSpecsPropertyNameByThirdCategory(thirdCategory);
+		return list;
+	}
+
+	@Override
+	public List<PropertyValueEntity> listSpecsPropertyValue(String nameId) {
+		List<PropertyValueEntity> valueList = goodsPropertyMapper.listSpecsPropertyValueByNameId(nameId);
+		return valueList;
+	}
+
+	@Override
+	public List<PropertyEntity> listAllSpecsPropertyName() {
+		List<PropertyEntity> list = goodsPropertyMapper.listAllSpecsPropertyName();
+		return list;
+	}
+
+	@Override
+	public List<GuidePropertyEntity> listGuidePropertyName(String thirdCategory) {
+		List<GuidePropertyEntity> guideList = goodsPropertyMapper.listGuidePropertyNameByThirdCategory(thirdCategory);
+		return guideList;
+	}
+
+	@Override
+	public List<GuidePropertyValueEntity> listGuidePropertyValue(String nameId) {
+		List<GuidePropertyValueEntity> valueList = goodsPropertyMapper.listGuidePropertyValueByNameId(nameId);
+		return valueList;
+	}
+
+	@Override
+	public List<GuidePropertyEntity> listAllGuidePropertyName() {
+		List<GuidePropertyEntity> propertyList = goodsPropertyMapper.listAllGuidePropertyName();
+		return propertyList;
 	}
 }
