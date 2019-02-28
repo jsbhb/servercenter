@@ -133,6 +133,7 @@ public class Constants {
 	public static final Integer OWNER = 14;//自营
 	public static final Integer JIN_RONG_GONG_CHANG = 15;//金融工厂
 	public static final Integer ZHONGXING_LEYITONG = 16;//中信乐益通
+	public static final Integer BO_LUO_MI = 17;//菠萝蜜
 	
 	//*******************订单创建类型**********************
 	public static final int NORMAL_ORDER = 0;//普通订单
