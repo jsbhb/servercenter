@@ -9,7 +9,10 @@ package com.zm.goods.bussiness.dao;
 
 import java.util.List;
 
+import com.github.pagehelper.Page;
+import com.zm.goods.pojo.CategoryPropertyBindModel;
 import com.zm.goods.pojo.FirstCatalogEntity;
+import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.SecondCatalogEntity;
 import com.zm.goods.pojo.ThirdCatalogEntity;
 
@@ -171,4 +174,16 @@ public interface CatalogMapper {
 	void updateThirdCatalogByParam(ThirdCatalogEntity entity);
 
 	SecondCatalogEntity selectFirstBySecond(SecondCatalogEntity entity);
+
+	FirstCatalogEntity selectCatalogInfoByParams(String id,String catalog);
+	
+	Page<CategoryPropertyBindModel> selectJoinPropertyListForPage(CategoryPropertyBindModel entity,String propertyType);
+	
+	Page<PropertyEntity> selectAllPropertyListForPage(PropertyEntity entity,String propertyType);
+
+	void insertCategoryJoinProperty(List<CategoryPropertyBindModel> list, String propertyType);
+
+	void removeCategoryJoinProperty(String id, String propertyType);
+
+	void updateCategoryJoinProperty(String id, String sort, String propertyType);
 }

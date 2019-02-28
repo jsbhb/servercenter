@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.goods.bussiness.dao.GoodsPropertyMapper">
+
+	<resultMap type="com.zm.goods.pojo.PropertyEntity" id="entity">
+		<id column="id" property="id"/>
+		<result column="type" property="type"/>
+		<result column="name" property="name"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<collection property="valueList" ofType="com.zm.goods.pojo.PropertyValueEntity">
+			<id column="val_id" property="id"/>
+			<result column="name_id" property="nameId"/>
+			<result column="val" property="val"/>
+			<result column="pic_path" property="picPath"/>
+			<result column="sort" property="sort"/>
+			<result column="count_num" property="countNum"/>
+			<result column="val_create_time" property="createTime"/>
+			<result column="val_update_time" property="updateTime"/>
+			<result column="val_opt" property="opt"/>
+		</collection>
+	</resultMap>
+
+	<resultMap type="com.zm.goods.pojo.GuidePropertyEntity" id="guideEntity">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+		<collection property="valueList" ofType="com.zm.goods.pojo.GuidePropertyValueEntity">
+			<id column="val_id" property="id"/>
+			<result column="guide_name_id" property="guideNameId"/>
+			<result column="val" property="val"/>
+			<result column="pic_path" property="picPath"/>
+			<result column="sort" property="sort"/>
+			<result column="count_num" property="countNum"/>
+			<result column="val_create_time" property="createTime"/>
+			<result column="val_update_time" property="updateTime"/>
+			<result column="val_opt" property="opt"/>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.PropertyValueEntity" id="valueEntity">
+		<id column="id" property="id"/>
+		<result column="name_id" property="nameId"/>
+		<result column="val" property="val"/>
+		<result column="pic_path" property="picPath"/>
+		<result column="sort" property="sort"/>
+		<result column="count_num" property="countNum"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GuidePropertyValueEntity" id="guideValueEntity">
+		<id column="id" property="id"/>
+		<result column="guide_name_id" property="guideNameId"/>
+		<result column="val" property="val"/>
+		<result column="pic_path" property="picPath"/>
+		<result column="sort" property="sort"/>
+		<result column="count_num" property="countNum"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.GoodsPropertyBindModel" id="goodsPropertyBindModel">
+		<id column="id" property="id"/>
+		<result column="property_id" property="propertyId"/>
+		<result column="property_val_id" property="propertyValId"/>
+		<result column="specs_tp_id" property="specsTpId"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
+	
+	<select id="selectForPage" parameterType="Object" resultMap="entity">
+		select a.*,b.id val_id,b.name_id,b.val,b.picPath,b.sort,b.count_num,
+		b.create_time val_create_time,b.update_time val_update_time,b.opt val_opt 
+		from kj_property_name a
+		inner join kj_property_value b on a.id = b.name_id
+		where 1=1 
+		<if test="name !=null and name !=''">
+			and a.name like concat('%',#{name},'%') 
+		</if>
+		<if test="val !=null and val !=''">
+			and b.val like concat('%',#{val},'%') 
+		</if>
+	</select>
+	
+	<select id="selectGuidePropertyForPage" parameterType="Object" resultMap="guideEntity">
+		select a.*,b.id val_id,b.guide_name_id,b.val,b.picPath,b.sort,b.count_num,
+		b.create_time val_create_time,b.update_time val_update_time,b.opt val_opt
+        from kj_guide_property_name a
+		inner join kj_guide_property_value b on a.id = b.name_id
+		where 1=1 
+		<if test="name !=null and name !=''">
+			and a.name like concat('%',#{name},'%') 
+		</if>
+		<if test="val !=null and val !=''">
+			and b.val like concat('%',#{val},'%') 
+		</if>
+	</select>
+	
+	<insert id="insertPropertyName" parameterType="Object">
+		insert into kj_property_name value (#{id},'1',#{name},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertPropertyName" parameterType="Object">
+		insert into insertGuidePropertyName value (#{id},#{name},now(),now(),#{opt})
+	</insert>
+	
+	<select id="selectName" parameterType="Object" resultMap="entity">
+		select * from kj_property_name
+		where 1=1 
+		<if test="name !=null and name !=''">
+			and name like concat('%',#{name},'%')
+		</if>
+		<if test="id !=null and val !=0">
+			and id = #{id}
+		</if>
+	</select>
+	
+	<select id="selectGuideName" parameterType="Object" resultMap="guideEntity">
+		select * from kj_guide_property_name
+		where 1=1 
+		<if test="name !=null and name !=''">
+			and name like concat('%',#{name},'%')
+		</if>
+		<if test="id !=null and val !=0">
+			and id = #{id}
+		</if>
+	</select>
+	
+	<update id="updatePropertyName" parameterType="Object">
+		update kj_property_name set name = #{name},
+		opt = #{opt},update_time = now()
+		where id = #{id}
+	</update>
+	
+	<update id="updateGuidePropertyName" parameterType="Object">
+		update kj_guide_property_name set name = #{name},
+		opt = #{opt},update_time = now()
+		where id = #{id}
+	</update>
+	
+	<select id="checkPropertyNameToDelete" parameterType="Object" resultMap="valueEntity">
+		select * from kj_property_value
+		where 1=1 
+		and name_id = #{id}
+	</select>
+	
+	<select id="checkGuidePropertyNameToDelete" parameterType="Object" resultMap="guideValueEntity">
+		select * from kj_guide_property_value
+		where 1=1 
+		and guide_name_id = #{id}
+	</select>
+	
+	<delete id="deletePropertyName" parameterType="Object">
+		delete from kj_property_name where id = #{id}
+	</delete>
+	
+	<delete id="deleteGuidePropertyName" parameterType="Object">
+		delete from kj_guide_property_name where id = #{id}
+	</delete>
+	
+	<insert id="insertPropertyValue" parameterType="Object">
+		insert into kj_property_value value (#{id},#{nameId},#{val},#{picPath},#{sort},#{countNum},now(),now(),#{opt})
+	</insert>
+	
+	<insert id="insertGuidePropertyValue" parameterType="Object">
+		insert into kj_guide_property_value value (#{id},#{nameId},#{val},#{picPath},#{sort},#{countNum},now(),now(),#{opt})
+	</insert>
+	
+	<select id="selectValue" parameterType="Object" resultMap="entity">
+		select a.*,b.id val_id,b.name_id,b.val,b.picPath,b.sort,b.count_num,
+		b.create_time val_create_time,b.update_time val_update_time,b.opt val_opt
+		from kj_property_name a
+		inner join kj_property_value b on a.id = b.name_id
+		where 1=1 
+		and b.id = #{id}
+	</select>
+	
+	<select id="selectGuideValue" parameterType="Object" resultMap="guideEntity">
+		select a.*,b.id val_id,b.guide_name_id,b.val,b.picPath,b.sort,b.count_num,
+		b.create_time val_create_time,b.update_time val_update_time,b.opt val_opt
+		from kj_guide_property_name a
+		inner join kj_guide_property_value b on on a.id = b.guide_name_id
+		where 1=1 
+		and b.id = #{id}
+	</select>
+	
+	<update id="updatePropertyValue" parameterType="Object">
+		update kj_property_value set val = #{name},sort = #{sort},
+		opt = #{opt},update_time = now()
+		where id = #{id}
+	</update>
+	
+	<update id="updateGuidePropertyValue" parameterType="Object">
+		update kj_guide_property_name set val = #{name},sort = #{sort},
+		opt = #{opt},update_time = now()
+		where id = #{id}
+	</update>
+	
+	<select id="checkPropertyValueToDelete" parameterType="Object" resultMap="goodsPropertyBindModel">
+		select * from kj_goods_property_bind
+		where 1=1 
+		and property_val_id = #{id}
+	</select>
+	
+	<delete id="deletePropertyValue" parameterType="Object">
+		delete from kj_property_value where id = #{id}
+	</delete>
+	
+	<delete id="deleteGuidePropertyValue" parameterType="Object">
+		delete from kj_guide_property_value where id = #{id}
+	</delete>
+	
+	<delete id="deleteGuidePropertyValueBindGoodsList" parameterType="Object">
+		delete from kj_goods_guide_property_bind where property_val_id = #{id}
+	</delete>
+</mapper>

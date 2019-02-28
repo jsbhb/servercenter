@@ -79,4 +79,13 @@ public interface BrandMapper {
 	 */
 	void delete(String brandId);
 
+	/**
+	 * checkBrandJoinGoodsList:检索品牌是否已经绑定商品. <br/>
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
+	 */
+	List<BrandEntity> checkBrandJoinGoodsList(String brandId);
+
 }

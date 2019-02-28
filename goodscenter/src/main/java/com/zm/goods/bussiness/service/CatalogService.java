@@ -9,7 +9,10 @@ package com.zm.goods.bussiness.service;
 
 import java.util.List;
 
+import com.github.pagehelper.Page;
+import com.zm.goods.pojo.CategoryPropertyBindModel;
 import com.zm.goods.pojo.FirstCatalogEntity;
+import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.SecondCatalogEntity;
 import com.zm.goods.pojo.ThirdCatalogEntity;
 
@@ -151,5 +154,17 @@ public interface CatalogService {
 	void updateThirdByParam(ThirdCatalogEntity entity);
 	
 	SecondCatalogEntity queryFirstBySecond(SecondCatalogEntity entity);
+	
+	FirstCatalogEntity queryCatalogInfoByParams(String id,String catalog);
+	
+	Page<CategoryPropertyBindModel> queryJoinPropertyListForPage(CategoryPropertyBindModel entity,String propertyType);
+	
+	Page<PropertyEntity> queryAllPropertyListForPage(PropertyEntity entity, String propertyType);
+
+	void categoryJoinProperty(CategoryPropertyBindModel entity, String propertyType) throws Exception;
+
+	void categoryUnJoinProperty(String id, String propertyType) throws Exception;
+
+	void modifyCategoryJoinProperty(String id, String sort, String propertyType) throws Exception;
 
 }

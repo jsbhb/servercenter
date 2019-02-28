@@ -9,11 +9,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.pagehelper.Page;
 import com.zm.goods.bussiness.service.CatalogService;
+import com.zm.goods.common.Pagination;
 import com.zm.goods.constants.Constants;
+import com.zm.goods.pojo.CategoryPropertyBindModel;
 import com.zm.goods.pojo.FirstCatalogEntity;
+import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.SecondCatalogEntity;
 import com.zm.goods.pojo.ThirdCatalogEntity;
@@ -154,8 +159,7 @@ public class CatalogController {
 			return new ResultModel(false, e.getMessage());
 		}
 	}
-	
-	
+
 	@RequestMapping(value = "{version}/goods/catalog/modifyFirst", method = RequestMethod.POST)
 	public ResultModel modifyFirst(HttpServletRequest request, @PathVariable("version") Double version,
 			@RequestBody FirstCatalogEntity entity) {
@@ -325,5 +329,95 @@ public class CatalogController {
 			e.printStackTrace();
 			return new ResultModel(false, e.getMessage());
 		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/queryCatalogInfoByParams", method = RequestMethod.POST)
+	public ResultModel queryCatalogInfoByParams(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestParam String id, @RequestParam String catalog) {
+
+		try {
+			if (Constants.FIRST_VERSION.equals(version)) {
+				return new ResultModel(true, catalogService.queryCatalogInfoByParams(id, catalog));
+			}
+			return new ResultModel(false, "版本错误");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResultModel(false, e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/queryJoinPropertyListForPage", method = RequestMethod.POST)
+	public ResultModel queryJoinPropertyListForPage(@PathVariable("version") Double version,
+			@RequestBody CategoryPropertyBindModel entity, @RequestParam String propertyType) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<CategoryPropertyBindModel> page = catalogService.queryJoinPropertyListForPage(entity, propertyType);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/queryAllPropertyListForPage", method = RequestMethod.POST)
+	public ResultModel queryAllPropertyListForPage(@PathVariable("version") Double version,
+			@RequestBody PropertyEntity entity, @RequestParam String propertyType) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			Page<PropertyEntity> page = catalogService.queryAllPropertyListForPage(entity, propertyType);
+			return new ResultModel(true, page, new Pagination(page));
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/categoryJoinProperty", method = RequestMethod.POST)
+	public ResultModel categoryJoinProperty(@PathVariable("version") Double version,
+			@RequestBody CategoryPropertyBindModel entity, @RequestParam String propertyType) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				catalogService.categoryJoinProperty(entity, propertyType);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/categoryUnJoinProperty", method = RequestMethod.POST)
+	public ResultModel categoryUnJoinProperty(@PathVariable("version") Double version, @RequestParam String id,
+			@RequestParam String propertyType) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				catalogService.categoryUnJoinProperty(id, propertyType);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/goods/catalog/modifyCategoryJoinProperty", method = RequestMethod.POST)
+	public ResultModel modifyCategoryJoinProperty(@PathVariable("version") Double version, @RequestParam String id,
+			@RequestParam String propertyType, @RequestParam String sort) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				catalogService.modifyCategoryJoinProperty(id, sort, propertyType);
+				return new ResultModel(true, "");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
 	}
 }

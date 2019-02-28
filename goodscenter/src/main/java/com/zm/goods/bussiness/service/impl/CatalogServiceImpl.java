@@ -7,6 +7,7 @@
  */
 package com.zm.goods.bussiness.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -15,11 +16,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.CatalogMapper;
+import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.CatalogService;
 import com.zm.goods.enummodel.CategoryTypeEnum;
+import com.zm.goods.pojo.CategoryPropertyBindModel;
 import com.zm.goods.pojo.FirstCatalogEntity;
 import com.zm.goods.pojo.GoodsBaseEntity;
+import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.SecondCatalogEntity;
 import com.zm.goods.pojo.ThirdCatalogEntity;
 
@@ -37,6 +43,9 @@ public class CatalogServiceImpl implements CatalogService {
 
 	@Resource
 	CatalogMapper catalogMapper;
+
+	@Resource
+	GoodsBaseMapper goodsBaseMapper;
 
 	@Override
 	public List<FirstCatalogEntity> queryAll() {
@@ -144,5 +153,68 @@ public class CatalogServiceImpl implements CatalogService {
 	@Override
 	public SecondCatalogEntity queryFirstBySecond(SecondCatalogEntity entity) {
 		return catalogMapper.selectFirstBySecond(entity);
+	}
+	
+	@Override
+	public FirstCatalogEntity queryCatalogInfoByParams(String id,String catalog) {
+		return catalogMapper.selectCatalogInfoByParams(id,catalog);
+	}
+	
+	@Override
+	public Page<CategoryPropertyBindModel> queryJoinPropertyListForPage(CategoryPropertyBindModel entity,String propertyType) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return catalogMapper.selectJoinPropertyListForPage(entity,propertyType);
+	}
+	
+	@Override
+	public Page<PropertyEntity> queryAllPropertyListForPage(PropertyEntity entity, String propertyType) {
+		PageHelper.startPage(entity.getCurrentPage(), entity.getNumPerPage(), true);
+		return catalogMapper.selectAllPropertyListForPage(entity,propertyType);
+	}
+	
+	@Override
+	public void categoryJoinProperty(CategoryPropertyBindModel entity, String propertyType) throws Exception {
+		List<CategoryPropertyBindModel> arrList = new ArrayList<CategoryPropertyBindModel>();
+		FirstCatalogEntity first = catalogMapper.selectCatalogInfoByParams(entity.getCategoryId(),entity.getCategoryType()+"");
+		if (first != null) {
+			CategoryPropertyBindModel firstLevel = new CategoryPropertyBindModel();
+			firstLevel.setPropertyId(entity.getPropertyId());
+			firstLevel.setSort(1);
+			firstLevel.setCategoryId(first.getFirstId());
+			firstLevel.setCategoryType(1);
+			firstLevel.setOpt(entity.getOpt());
+			arrList.add(firstLevel);
+			if (first.getSeconds() != null && first.getSeconds().size() > 0) {
+				SecondCatalogEntity second = first.getSeconds().get(0);
+				CategoryPropertyBindModel secondLevel = new CategoryPropertyBindModel();
+				secondLevel.setPropertyId(entity.getPropertyId());
+				secondLevel.setSort(1);
+				secondLevel.setCategoryId(second.getSecondId());
+				secondLevel.setCategoryType(2);
+				secondLevel.setOpt(entity.getOpt());
+				arrList.add(secondLevel);
+				if (second.getThirds() != null && second.getThirds().size() > 0) {
+					ThirdCatalogEntity third = second.getThirds().get(0);
+					CategoryPropertyBindModel thirdLevel = new CategoryPropertyBindModel();
+					thirdLevel.setPropertyId(entity.getPropertyId());
+					thirdLevel.setSort(1);
+					thirdLevel.setCategoryId(third.getThirdId());
+					thirdLevel.setCategoryType(3);
+					thirdLevel.setOpt(entity.getOpt());
+					arrList.add(thirdLevel);
+				}
+			}
+		}
+		catalogMapper.insertCategoryJoinProperty(arrList,propertyType);
+	}
+	
+	@Override
+	public void categoryUnJoinProperty(String id, String propertyType) throws Exception {
+		catalogMapper.removeCategoryJoinProperty(id,propertyType);
+	}
+	
+	@Override
+	public void modifyCategoryJoinProperty(String id, String sort, String propertyType) throws Exception {
+		catalogMapper.updateCategoryJoinProperty(id,sort,propertyType);
 	}
 }

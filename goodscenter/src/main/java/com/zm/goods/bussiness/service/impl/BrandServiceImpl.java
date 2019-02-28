@@ -18,7 +18,6 @@ import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.BrandMapper;
 import com.zm.goods.bussiness.service.BrandService;
 import com.zm.goods.pojo.BrandEntity;
-import com.zm.goods.pojo.GoodsBaseEntity;
 
 /**
  * ClassName: BrandService <br/>
@@ -58,11 +57,8 @@ public class BrandServiceImpl implements BrandService {
 
 	@Override
 	public void delete(String brandId) throws Exception {
-		GoodsBaseEntity entity = new GoodsBaseEntity();
-		entity.setBrandId(brandId);
-		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectForExists(entity);
-
-		if (goodsBaseEntity != null) {
+		List<BrandEntity> list = brandMapper.checkBrandJoinGoodsList(brandId);
+		if (list != null && list.size() > 0) {
 			throw new Exception("已绑定商品,无法删除");
 		}
 		brandMapper.delete(brandId);

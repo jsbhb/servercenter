@@ -28,8 +28,12 @@ public class BrandEntity extends Pagination{
 	private String updateTime;
 	private String opt;
 
-	public BrandEntity() {
-	}
+	//商品库改造新增字段
+	private String brandLogo;
+	private String brandSynopsis;
+	private String brandNameCn;
+	private String brandNameEn;
+	private String country;
 
 	public int getId() {
 		return id;
@@ -85,5 +89,45 @@ public class BrandEntity extends Pagination{
 
 	public void setOpt(String opt) {
 		this.opt = opt;
+	}
+
+	public String getBrandLogo() {
+		return brandLogo;
+	}
+
+	public void setBrandLogo(String brandLogo) {
+		this.brandLogo = brandLogo;
+	}
+
+	public String getBrandSynopsis() {
+		return brandSynopsis;
+	}
+
+	public void setBrandSynopsis(String brandSynopsis) {
+		this.brandSynopsis = brandSynopsis;
+	}
+
+	public String getBrandNameCn() {
+		return brandNameCn;
+	}
+
+	public void setBrandNameCn(String brandNameCn) {
+		this.brandNameCn = brandNameCn;
+	}
+
+	public String getBrandNameEn() {
+		return brandNameEn;
+	}
+
+	public void setBrandNameEn(String brandNameEn) {
+		this.brandNameEn = brandNameEn;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 }

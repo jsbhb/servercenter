@@ -59,6 +59,26 @@
 		<result column="access_path" property="accessPath" jdbcType="VARCHAR"/>
 		<result column="is_popular" property="isPopular" jdbcType="INTEGER"/>
 	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.CategoryPropertyBindModel" id="categoryPropertyBind">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="property_id" property="propertyId" jdbcType="INTEGER"/>
+		<result column="sort" property="sort" jdbcType="INTEGER"/>
+		<result column="category_id" property="categoryId" jdbcType="VARCHAR"/>
+		<result column="category_type" property="categoryType" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+		<result column="opt" property="opt" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<resultMap type="com.zm.goods.pojo.PropertyEntity" id="allProperty">
+		<id column="id" property="id"/>
+		<result column="type" property="type"/>
+		<result column="name" property="name"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="opt" property="opt"/>
+	</resultMap>
 
 	<select id="selectFirstAll" resultMap="first">
 		select * from goods_first_category
@@ -240,4 +260,99 @@
 	<select id="selectFirstBySecond" resultMap="second">
 		select * from goods_second_category where second_id = #{secondId}
 	</select>
+	
+	<select id="selectCatalogInfoByParams" resultMap="entity">
+		<if test="catalog == 1">
+			select 
+			a.id,a.first_id,a.name,a.tag_path
+			from goods_first_category a
+			where a.first_id = #{id}
+		</if>
+		<if test="catalog == 2">
+			select 
+			a.id,a.first_id,a.name,a.tag_path,
+			b.id secondId,b.second_id,b.name secondName,b.tag_path stag_path
+			from goods_first_category a
+			inner join goods_second_category b on a.first_id = b.first_id
+			where b.second_id = #{id}
+		</if>
+		<if test="catalog == 3">
+			select 
+			a.id,a.first_id,a.name,a.tag_path,
+			b.id secondId,b.second_id,b.name secondName,b.tag_path stag_path,
+			c.id thirdId,c.third_id,c.name thirdName,c.tag_path ttag_path
+			from goods_first_category a
+			inner join goods_second_category b on a.first_id = b.first_id
+			inner join goods_third_category c on b.second_id = c.second_id
+			where c.third_id = #{id}
+		</if>
+	</select>
+	
+	<select id="selectJoinPropertyListForPage" resultMap="categoryPropertyBind">
+		select * from 
+		<if test="propertyType == 1">
+			kj_category_property_bind 
+		</if>
+		<if test="propertyType == 2">
+			kj_category_guide_property_bind 
+		</if>
+		where category_id = #{categoryId}
+		and category_type = #{categoryType}
+		order by sort,update_time desc
+	</select>
+	
+	<select id="selectAllPropertyListForPage" resultMap="allProperty">
+		select * from 
+		<if test="propertyType == 1">
+			kj_property_name 
+		</if>
+		<if test="propertyType == 2">
+			kj_guide_property_name 
+		</if>
+		order by update_time desc
+	</select>
+	
+	<insert id="insertCategoryJoinProperty" parameterType="Object">
+		INSERT INTO 
+		<if test="propertyType == 1">
+			kj_category_property_bind 
+		</if>
+		<if test="propertyType == 2">
+			kj_category_guide_property_bind 
+		</if>
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(#{item.id},#{item.propertyId},#{item.sort},#{item.categoryId},#{item.categoryType},now(),now(),#{item.opt})
+		ON DUPLICATE KEY UPDATE update_time = now(),opt = #{item.opt}
+		</foreach>
+	</insert>
+	
+	<delete id="removeCategoryJoinProperty" parameterType="Object">
+		delete from 
+		<if test="propertyType == 1">
+			kj_category_property_bind 
+		</if>
+		<if test="propertyType == 2">
+			kj_category_guide_property_bind 
+		</if>
+		where id = #{id}
+	</delete>
+	
+	<update id="updateCategoryJoinProperty" parameterType="Object">
+		update 
+		<if test="propertyType == 1">
+			kj_category_property_bind 
+		</if>
+		<if test="propertyType == 2">
+			kj_category_guide_property_bind 
+		</if>
+		set
+		<if test="sort == -1">
+			sort = sort - 1,
+		</if>
+		<if test="sort == 1">
+			sort = sort + 1,
+		</if>
+		update_time = now() where id = #{id} 
+	</update>
 </mapper>

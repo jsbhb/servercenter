@@ -11,6 +11,11 @@
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
+		<result column="brand_logo" property="brandLogo"/>
+		<result column="brand_synopsis" property="brandSynopsis"/>
+		<result column="brand_name_cn" property="brandNameCn"/>
+		<result column="brand_name_en" property="brandNameEn"/>
+		<result column="country" property="country"/>
 	</resultMap>
 
 	
@@ -24,8 +29,17 @@
 	
 	<select id="selectForPage" parameterType="Object" resultMap="entity">
 		select * from goods_category_brand where 1=1 
-		<if test="brand!=null and brand!=''">
+		<if test="brand !=null and brand!=''">
 			and brand like concat('%',#{brand},'%') 
+		</if>
+		<if test="brandNameEn !=null and brandNameEn !=''">
+			and brand_name_en like concat('%',#{brandNameEn},'%') 
+		</if>
+		<if test="brandNameCn !=null and brandNameCn !=''">
+			and brand_name_cn like concat('%',#{brandNameCn},'%') 
+		</if>
+		<if test="country !=null and country !=''">
+			and country like concat('%',#{country},'%') 
 		</if>
 		<if test="id > 0">
 			and id = #{id} 
@@ -33,14 +47,23 @@
 	</select>
 	
 	<insert id="insert" parameterType="Object">
-		insert into goods_category_brand value (#{id},#{brandId},#{brand},#{attr},now(),now(),#{opt})
+		insert into goods_category_brand value (#{id},#{brandId},#{brand},#{attr},now(),now(),#{opt}
+		,#{brandLogo},#{brandSynopsis},#{brandNameCn},#{brandNameEn},#{country})
 	</insert>
 	
 	<update id="update" parameterType="Object">
-		update goods_category_brand set brand = #{brand} where brand_id = #{brandId}
+		update goods_category_brand set brand = #{brand},
+		opt = #{opt},brand_logo = #{brandLogo},brand_synopsis = #{brandSynopsis},
+		brand_name_cn = #{brandNameCn},brand_name_en = #{brandNameEn},country = #{country},
+		where brand_id = #{brandId}
 	</update>
 	
 	<delete id="delete" parameterType="Object">
 		delete from goods_category_brand where brand_id = #{brandId}
 	</delete>
+	
+	<select id="checkBrandJoinGoodsList" parameterType="Object" resultMap="entity">
+		select a.* from goods_category_brand a
+		inner join kj_goods b on a.brand_id = b.brand_id where a.brand_id = #{brandId} limit 0,1
+	</select>
 </mapper>
