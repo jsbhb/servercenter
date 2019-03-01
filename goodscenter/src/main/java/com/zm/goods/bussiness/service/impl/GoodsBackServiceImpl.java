@@ -45,7 +45,6 @@ import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.PropertyValueEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
-import com.zm.goods.pojo.bo.GoodsRender4New;
 import com.zm.goods.pojo.po.BackGoodsPO;
 import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.pojo.po.GoodsPricePO;
@@ -102,14 +101,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				goodsItemMapper.insertFiles(entity.getGoods().getGoodsFileList());
 			}
 		}
-		if (entity.getGoodsSpecsTradePattern() != null) {
-			goodsBackMapper.insertSpecsTp(entity.getGoodsSpecsTradePattern());
+		if (entity.getGoodsSpecsTpList() != null && entity.getGoodsSpecsTpList().size() > 0) {
+			goodsBackMapper.insertSpecsTpBatch(entity.getGoodsSpecsTpList());
 		}
 		if (entity.getItemsList() != null && entity.getItemsList().size() > 0) {
 			goodsBackMapper.insertItemBatch(entity.getItemsList());
 		}
-		if (entity.getSpecs() != null) {
-			goodsBackMapper.insertSpecs(entity.getSpecs());
+		if (entity.getSpecsList() != null && entity.getSpecsList().size() > 0) {
+			goodsBackMapper.insertSpecsBatch(entity.getSpecsList());
 		}
 		if (entity.getPriceList() != null && entity.getPriceList().size() > 0) {
 			goodsBackMapper.insertItemPriceBatch(entity.getPriceList());
@@ -141,10 +140,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		// 创建返回对象
 		BackGoodsPO backGoods = new BackGoodsPO();
 		backGoods.setGoods(goods);
-		backGoods.setGoodsSpecsTradePattern(specsTp);
+		List<GoodsSpecsTradePattern> specsTpList = new ArrayList<>();
+		specsTpList.add(specsTp);
+		backGoods.setGoodsSpecsTpList(specsTpList);
 		backGoods.setItemsList(itemList);
 		backGoods.setPriceList(priceList);
-		backGoods.setSpecs(specs);
+		List<GoodsSpecs> specsList = new ArrayList<>();
+		specsList.add(specs);
+		backGoods.setSpecsList(specsList);
 		backGoods.setStockList(stockList);
 		backGoods.setTagList(bindList);
 		backGoods.setRebateList(rebateList);
@@ -167,10 +170,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		// 创建返回对象
 		BackGoodsPO backGoods = new BackGoodsPO();
 		backGoods.setGoods(goods);
-		backGoods.setGoodsSpecsTradePattern(specsTp);
+		List<GoodsSpecsTradePattern> specsTpList = new ArrayList<>();
+		specsTpList.add(specsTp);
+		backGoods.setGoodsSpecsTpList(specsTpList);
 		backGoods.setItemsList(itemList);
 		backGoods.setPriceList(priceList);
-		backGoods.setSpecs(specs);
+		List<GoodsSpecs> specsList = new ArrayList<>();
+		specsList.add(specs);
+		backGoods.setSpecsList(specsList);
 		backGoods.setStockList(stockList);
 		backGoods.setTagList(bindList);
 		backGoods.setRebateList(rebateList);
@@ -194,9 +201,9 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				}
 			}
 		}
-		if (entity.getGoodsSpecsTradePattern() != null) {
+		if (entity.getGoodsSpecsTpList() != null && entity.getGoodsSpecsTpList().size() > 0) {
 			List<String> specsTpIds = new ArrayList<>();
-			specsTpIds.add(entity.getGoodsSpecsTradePattern().getSpecsTpId());
+			specsTpIds.add(entity.getGoodsSpecsTpList().get(0).getSpecsTpId());
 			// 标签处理
 			List<GoodsTagBindEntity> bindList = goodsTagMapper.listGoodsTagBindBySpecsTpIdList(specsTpIds);
 			if (bindList.size() > 0) {// 先全部清除
@@ -208,18 +215,18 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 						.collect(Collectors.toList());
 				List<GoodsTagEntity> tagList = goodsTagMapper.listGoodsTagByTagIds(tagIdList);
 				int tagRatio = tagList.stream().mapToInt(t -> t.getTagRatio()).sum();
-				entity.getGoodsSpecsTradePattern().setTagRatio(tagRatio);
+				entity.getGoodsSpecsTpList().get(0).setTagRatio(tagRatio);
 				goodsTagMapper.batchInsert(entity.getTagList());
 			} else {
-				entity.getGoodsSpecsTradePattern().setTagRatio(0);
+				entity.getGoodsSpecsTpList().get(0).setTagRatio(0);
 			}
-			goodsBackMapper.updateSpecsTp(entity.getGoodsSpecsTradePattern());
+			goodsBackMapper.updateSpecsTp(entity.getGoodsSpecsTpList().get(0));
 		}
 		if (entity.getItemsList() != null && entity.getItemsList().size() > 0) {
 			goodsBackMapper.updateItemBatch(entity.getItemsList());
 		}
-		if (entity.getSpecs() != null) {
-			goodsBackMapper.updateSpecs(entity.getSpecs());
+		if (entity.getSpecsList() != null && entity.getSpecsList().size() > 0) {
+			goodsBackMapper.updateSpecs(entity.getSpecsList().get(0));
 		}
 		if (entity.getPriceList() != null && entity.getPriceList().size() > 0) {
 			goodsBackMapper.updateItemPriceBatch(entity.getPriceList());
@@ -422,7 +429,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	}
 
 	@Override
-	public List<GoodsRender4New> queryByEnCode(String encode, int type) {
+	public List<BackGoodsPO> queryByEnCode(String encode, int type) {
 		String[] arr = encode.split(",");
 		// 获取规格
 		List<GoodsSpecs> specsList = goodsBackMapper.listGoodsSpecsByEnCodeList(Arrays.asList(arr));
@@ -444,14 +451,14 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		Map<String, List<Items>> itemMap = itemList.stream().collect(Collectors.groupingBy(Items::getSpecsTpId));
 		// 获取商品
 		List<Goods> goodsList = goodsMapper.listGoodsItemByGoodsIds(goodsIdList);
-		GoodsRender4New render = null;
+		BackGoodsPO render = null;
 		List<GoodsSpecsTradePattern> specsTpTmp = null;
 		List<GoodsSpecs> specsTmp = null;
 		List<Items> itemTmp = null;
-		List<GoodsRender4New> result = new ArrayList<>();
+		List<BackGoodsPO> result = new ArrayList<>();
 		Map<String, GoodsSpecs> specsMap = specsList.stream().collect(Collectors.toMap(GoodsSpecs::getSpecsId, s -> s));
 		for (Goods goods : goodsList) {
-			render = new GoodsRender4New();
+			render = new BackGoodsPO();
 			specsTmp = new ArrayList<>();
 			specsTpTmp = new ArrayList<>();
 			itemTmp = new ArrayList<>();
@@ -463,8 +470,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 				itemTmp.addAll(itemMap.get(tp.getSpecsTpId()));
 			}
 			render.setSpecsList(specsTmp);
-			render.setSpecsTpList(specsTpTmp);
-			render.setItemList(itemTmp);
+			render.setGoodsSpecsTpList(specsTpTmp);
+			render.setItemsList(itemTmp);
 			result.add(render);
 		}
 		return result;

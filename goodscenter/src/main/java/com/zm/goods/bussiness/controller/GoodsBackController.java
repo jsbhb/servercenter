@@ -29,7 +29,6 @@ import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.PropertyValueEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
-import com.zm.goods.pojo.bo.GoodsRender4New;
 import com.zm.goods.pojo.po.BackGoodsPO;
 import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.pojo.po.GuidePropertyBindGoods;
@@ -160,7 +159,7 @@ public class GoodsBackController {
 
 		try {
 			if (Constants.FIRST_VERSION.equals(version)) {
-				List<GoodsRender4New> result = goodsBackService.queryByEnCode(encode, type);
+				List<BackGoodsPO> result = goodsBackService.queryByEnCode(encode, type);
 				return new ResultModel(true, result);
 			}
 

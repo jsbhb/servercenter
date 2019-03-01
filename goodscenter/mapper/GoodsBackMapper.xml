@@ -334,13 +334,15 @@
 		update_time = now() where goods_id = #{goodsId}
 	</update>
 	
-	<insert id="insertSpecsTp" parameterType="Object">
+	<insert id="insertSpecsTpBatch" parameterType="Object">
 		INSERT INTO kj_goods_specs_tradepattern
 		(specs_tp_id,goods_id,specs_id,increment_tax,tariff,excise_tax,distribution_price,retail_price,line_price,sale_num,
 		create_time,is_del,opt)
 		values
-		(#{specsTpId},#{goodsId},#{specsId},#{incrementTax},#{tariff},#{exciseTax},#{distributionPrice},#{retailPrice},
-		#{linePrice},#{saleNum},now(),0,#{opt})
+		<foreach collection="list" item="item" separator=",">
+			(#{item.specsTpId},#{item.goodsId},#{item.specsId},#{item.incrementTax},#{item.tariff},#{item.exciseTax},
+			#{item.distributionPrice},#{item.retailPrice},#{item.linePrice},#{item.saleNum},now(),0,#{item.opt})
+		</foreach>
 	</insert>
 	
 	<update id="updateSpecsTp" parameterType="Object">
@@ -459,12 +461,14 @@
 		</foreach>
 	</update>
 	
-	<insert id="insertSpecs" parameterType="Object">
+	<insert id="insertSpecsBatch" parameterType="Object">
 		INSERT INTO kj_specs_goods
 		(specs_id,encode,weight,description,unit,info,carton,conversion,specs_goods_name,create_time,is_del,opt)
 		values
-		(#{specsId},#{encode},#{weight},#{description},#{unit},#{info},#{carton},#{conversion},#{specsGoodsName},
-		now(),0,#{opt})
+		<foreach collection="list" item="item" separator=",">
+			(#{item.specsId},#{item.encode},#{item.weight},#{item.description},#{item.unit},#{item.info},#{item.carton},
+			#{item.conversion},#{item.specsGoodsName},now(),0,#{item.opt})
+		</foreach>
 	</insert>
 	
 	<update id="updateSpecs"  parameterType="Object">

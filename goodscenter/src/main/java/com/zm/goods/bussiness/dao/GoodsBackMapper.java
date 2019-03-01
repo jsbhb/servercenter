@@ -45,7 +45,7 @@ public interface GoodsBackMapper {
 	 * @fun 插入goodsSpecsTp
 	 * @param goodsSpecsTradePattern
 	 */
-	void insertSpecsTp(GoodsSpecsTradePattern goodsSpecsTradePattern);
+	void insertSpecsTpBatch(List<GoodsSpecsTradePattern> list);
 
 	/**
 	 * insert:插入商品. <br/>
@@ -64,7 +64,7 @@ public interface GoodsBackMapper {
 	 * @fun 插入规格
 	 * @param specs
 	 */
-	void insertSpecs(GoodsSpecs specs);
+	void insertSpecsBatch(List<GoodsSpecs> specsList);
 	/**
 	 * @fun 批量插入价格
 	 * @param priceList

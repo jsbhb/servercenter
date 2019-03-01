@@ -22,7 +22,6 @@ import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.PropertyValueEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
-import com.zm.goods.pojo.bo.GoodsRender4New;
 import com.zm.goods.pojo.po.BackGoodsPO;
 import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.pojo.po.GuidePropertyBindGoods;
@@ -163,7 +162,7 @@ public interface GoodsBackService {
 	 * @param encode
 	 * @return
 	 */
-	List<GoodsRender4New> queryByEnCode(String encode, int type);
+	List<BackGoodsPO> queryByEnCode(String encode, int type);
 
 	/**
 	 * @fun 根据三级分类和品牌来提示对应的Goods
