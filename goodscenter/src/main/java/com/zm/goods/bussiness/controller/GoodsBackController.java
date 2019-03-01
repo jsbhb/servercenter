@@ -32,7 +32,12 @@ import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.bo.GoodsRender4New;
 import com.zm.goods.pojo.po.BackGoodsPO;
 import com.zm.goods.pojo.po.Goods;
+import com.zm.goods.pojo.po.GuidePropertyBindGoods;
 import com.zm.goods.pojo.po.Items;
+import com.zm.goods.pojo.vo.BackGoodsItemVO;
+import com.zm.goods.pojo.vo.BackGoodsVO;
+import com.zm.goods.pojo.vo.BackItemsVO;
+import com.zm.goods.pojo.vo.GoodsSpecsVO;
 
 /**
  * ClassName: GoodsBackController <br/>
@@ -404,7 +409,7 @@ public class GoodsBackController {
 			@PathVariable("specsTpId") String specsTpId, @RequestParam("welfare") int welfare) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				goodsBackService.welfareDisplay(specsTpId,welfare);
+				goodsBackService.welfareDisplay(specsTpId, welfare);
 				return new ResultModel(true, null);
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
@@ -413,6 +418,7 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
 	/**
 	 * @fun 根据三级分类ID获取绑定的系列属性名
 	 * @param request
@@ -433,6 +439,7 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
 	/**
 	 * @fun 根据属性nameId 获取属性value
 	 * @param request
@@ -452,6 +459,7 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+
 	/**
 	 * @fun 查询所有系列属性名
 	 * @param request
@@ -470,7 +478,7 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	/**
 	 * @fun 根据三级分类ID获取绑定的导购属性名
 	 * @param request
@@ -491,6 +499,7 @@ public class GoodsBackController {
 
 		return new ResultModel(false, "版本错误");
 	}
+
 	/**
 	 * @fun 根据属性nameId 获取属性value
 	 * @param request
@@ -510,6 +519,7 @@ public class GoodsBackController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+
 	/**
 	 * @fun 查询所有导购属性名
 	 * @param request
@@ -522,6 +532,110 @@ public class GoodsBackController {
 			try {
 				List<GuidePropertyEntity> propertyList = goodsBackService.listAllGuidePropertyName();
 				return new ResultModel(true, propertyList);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 导购属性绑定商品
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/guide/property/bind", method = RequestMethod.POST)
+	public ResultModel guidePropertyBind(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody List<GuidePropertyBindGoods> bindList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				goodsBackService.guidePropertyBind(bindList);
+				return new ResultModel(true, null);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 获取供应商商品列表
+	 * @param request
+	 * @param version
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/item/list", method = RequestMethod.POST)
+	public ResultModel listItems4Page(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody BackGoodsItemVO item) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				Page<BackGoodsItemVO> page = goodsBackService.listItems4Page(item);
+				return new ResultModel(true, page, new Pagination(page));
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 获取商品列表
+	 * @param request
+	 * @param version
+	 * @param item
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/list", method = RequestMethod.POST)
+	public ResultModel listGoods4Page(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody BackGoodsVO item, @RequestParam("status") Integer status) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				Page<BackGoodsVO> page = goodsBackService.listGoods4Page(item, status);
+				return new ResultModel(true, page, new Pagination(page));
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 根据goodsId和状态获取该goods下的规格
+	 * @param request
+	 * @param version
+	 * @param status
+	 * @param goodsId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/specsTp/list/{goodsId}", method = RequestMethod.GET)
+	public ResultModel listGoodsSpecsTp(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestParam("status") Integer status, @PathVariable("goodsId") String goodsId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<GoodsSpecsVO> list = goodsBackService.listGoodsSpecsTp(goodsId, status);
+				return new ResultModel(true, list);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 根据specsTpId 获取items
+	 * @param request
+	 * @param version
+	 * @param specsTpId
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/item/list/{specsTpId}", method = RequestMethod.GET)
+	public ResultModel listItemBySpecsTpId(HttpServletRequest request, @PathVariable("version") Double version,
+			@PathVariable("specsTpId") String specsTpId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				List<BackItemsVO> list = goodsBackService.listItemBySpecsTpId(specsTpId);
+				return new ResultModel(true, list);
 			} catch (Exception e) {
 				return new ResultModel(false, e.getMessage());
 			}

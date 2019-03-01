@@ -98,4 +98,10 @@ public interface OrderStockOutService {
 
 	List<RebateDownload> queryForRebate(String startTime, String endTime, String gradeId, Integer exportType);
 
+	/**
+	 * @fun 一般贸易订单人工选择itemId进行拆单
+	 * @param list
+	 */
+	void orderHandle(List<OrderInfo> list);
+
 }

@@ -51,7 +51,12 @@ import com.zm.goods.pojo.po.Goods;
 import com.zm.goods.pojo.po.GoodsPricePO;
 import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
+import com.zm.goods.pojo.po.GuidePropertyBindGoods;
 import com.zm.goods.pojo.po.Items;
+import com.zm.goods.pojo.vo.BackGoodsItemVO;
+import com.zm.goods.pojo.vo.BackGoodsVO;
+import com.zm.goods.pojo.vo.BackItemsVO;
+import com.zm.goods.pojo.vo.GoodsSpecsVO;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 /**
@@ -81,10 +86,10 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Resource
 	GoodsMapper goodsMapper;
-	
+
 	@Resource
 	GoodsService goodsService;
-	
+
 	@Resource
 	GoodsPropertyMapper goodsPropertyMapper;
 
@@ -419,7 +424,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public List<GoodsRender4New> queryByEnCode(String encode, int type) {
 		String[] arr = encode.split(",");
-		//获取规格
+		// 获取规格
 		List<GoodsSpecs> specsList = goodsBackMapper.listGoodsSpecsByEnCodeList(Arrays.asList(arr));
 		if (specsList.size() == 0) {
 			return null;
@@ -428,16 +433,16 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		Map<String, Object> param = new HashMap<>();
 		param.put("list", specsIdList);
 		param.put("type", type);
-		//获取specsTp
+		// 获取specsTp
 		List<GoodsSpecsTradePattern> specsTpList = goodsBackMapper.listGoodsSpecsTradPatternByParam(param);
 		List<String> goodsIdList = specsTpList.stream().map(tp -> tp.getGoodsId()).distinct()
 				.collect(Collectors.toList());
 		List<String> specsTpIdList = specsTpList.stream().map(tp -> tp.getSpecsTpId()).collect(Collectors.toList());
-		//获取供应商商品
+		// 获取供应商商品
 		List<Items> itemList = goodsMapper.listItemsBySpecsTpIds(specsTpIdList);
-		//根据specsTpiD分组
-		Map<String,List<Items>> itemMap = itemList.stream().collect(Collectors.groupingBy(Items::getSpecsTpId));
-		//获取商品
+		// 根据specsTpiD分组
+		Map<String, List<Items>> itemMap = itemList.stream().collect(Collectors.groupingBy(Items::getSpecsTpId));
+		// 获取商品
 		List<Goods> goodsList = goodsMapper.listGoodsItemByGoodsIds(goodsIdList);
 		GoodsRender4New render = null;
 		List<GoodsSpecsTradePattern> specsTpTmp = null;
@@ -467,7 +472,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	public List<Goods> queryGoods4Tips(String thirdCategory, String brandId) {
-		Map<String,String> param = new HashMap<>();
+		Map<String, String> param = new HashMap<>();
 		param.put("thirdCategory", thirdCategory);
 		param.put("brandId", brandId);
 		List<Goods> goodsList = goodsBackMapper.listGoodsByCategoryAndBrand(param);
@@ -476,29 +481,29 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	public void itemAudit(Items item) {
-		if(item.getStatus() == 2){//审核通过
-			goodsBackMapper.updateItemStatusPass(item);//更新item状态
-			goodsBackMapper.updateSpecsTpCanBeUpShelf(item.getSpecsTpId());//更新specsTp为下架状态（如果是初始化状态的话）
+		if (item.getStatus() == 2) {// 审核通过
+			goodsBackMapper.updateItemStatusPass(item);// 更新item状态
+			goodsBackMapper.updateSpecsTpCanBeUpShelf(item.getSpecsTpId());// 更新specsTp为下架状态（如果是初始化状态的话）
 		}
-		if(item.getStatus() == 11){//审核未通过
-			goodsBackMapper.updateItemStatusUnPass(item);//更新item状态
+		if (item.getStatus() == 11) {// 审核未通过
+			goodsBackMapper.updateItemStatusUnPass(item);// 更新item状态
 			int count = goodsMapper.countItemPassBySpecsTpId(item.getSpecsTpId());
-			if(count == 0){//全部没有了需要下架，并把商品状态置为初始化
+			if (count == 0) {// 全部没有了需要下架，并把商品状态置为初始化
 				GoodsSpecsTradePattern specsTp = goodsMapper.getGoodsSpecsTpBySpecsTpId(item.getSpecsTpId());
-				if(specsTp.getStatus() == 2 || specsTp.getStatus() == 3){//上架状态需要先下架
+				if (specsTp.getStatus() == 2 || specsTp.getStatus() == 3) {// 上架状态需要先下架
 					List<String> specsTpIdList = new ArrayList<>();
 					specsTpIdList.add(item.getSpecsTpId());
 					goodsService.downShelves(specsTpIdList, 2);
 				}
 				goodsBackMapper.updateSpecsTpInit(item.getSpecsTpId());
-			} 
+			}
 		}
-		
+
 	}
 
 	@Override
-	public void welfareDisplay(String specsTpId,int welfare) {
-		Map<String,Object> param = new HashMap<>();
+	public void welfareDisplay(String specsTpId, int welfare) {
+		Map<String, Object> param = new HashMap<>();
 		param.put("specsTpId", specsTpId);
 		param.put("welfare", welfare);
 		goodsBackMapper.updateWelfareDisplay(param);
@@ -538,5 +543,42 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	public List<GuidePropertyEntity> listAllGuidePropertyName() {
 		List<GuidePropertyEntity> propertyList = goodsPropertyMapper.listAllGuidePropertyName();
 		return propertyList;
+	}
+
+	@Override
+	public void guidePropertyBind(List<GuidePropertyBindGoods> bindList) {
+		goodsPropertyMapper.insertIntoGoodsGuidePropertyBindBatch(bindList);
+	}
+
+	@Override
+	public Page<BackGoodsItemVO> listItems4Page(BackGoodsItemVO item) {
+		PageHelper.startPage(item.getCurrentPage(), item.getNumPerPage(), true);
+		Page<BackGoodsItemVO> page = goodsBackMapper.listItems4Page(item);
+		return page;
+	}
+
+	@Override
+	public Page<BackGoodsVO> listGoods4Page(BackGoodsVO item, Integer status) {
+		PageHelper.startPage(item.getCurrentPage(), item.getNumPerPage(), true);
+		Map<String,Object> param = new HashMap<>();
+		param.put("item", item);
+		param.put("status", status);
+		Page<BackGoodsVO> page = goodsBackMapper.listGoods4Page(param);
+		return page;
+	}
+
+	@Override
+	public List<GoodsSpecsVO> listGoodsSpecsTp(String goodsId, Integer status) {
+		Map<String,Object> param = new HashMap<>();
+		param.put("goodsId", goodsId);
+		param.put("status", status);
+		List<GoodsSpecsVO> list = goodsBackMapper.listGoodsSpecsTpByGoodsIdAndStatus(param);
+		return list;
+	}
+
+	@Override
+	public List<BackItemsVO> listItemBySpecsTpId(String specsTpId) {
+		List<BackItemsVO> list = goodsBackMapper.listItemBySpecsTpId(specsTpId);
+		return list;
 	}
 }

@@ -413,5 +413,20 @@
 		and ob.status in(1,2,3,4,5,6,7,8,11,12,99)
 		order by ob.grade_id,ob.create_time
 	</select>
+	
+	<update id="updateOrderInfo4Handler"  parameterType="Object">
+		update order_base set supplier_id = #{supplierId},tdq = #{tdq},handle = 0 where order_id = #{orderId}
+	</update>
+	
+	<update id="updateOrderDetail4Handler"  parameterType="Object">
+		update order_detail set payment = #{payment},pay_no = #{payNo} where order_id = #{orderId}
+	</update>
+	
+	<update id="updateOrderGoodsBatch" parameterType="Object">
+		<foreach collection="list" item="item" separator=";">
+			update order_goods set order_id = #{orderId},sku = #{sku},item_code = #{itemCode},item_id = #{itemId} 
+			where id = #{id}
+		</foreach>
+	</update>
 
 </mapper>

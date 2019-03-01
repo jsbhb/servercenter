@@ -6,7 +6,6 @@ import java.util.Map;
 import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
 import com.zm.goods.pojo.EshopGoodsStockEntity;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.dto.OrderInfoDTO;
 
 public interface EshopGoodsMapper {
@@ -36,6 +35,4 @@ public interface EshopGoodsMapper {
 	void syncGoodsStockForSellOrder(List<EshopGoodsStockEntity> goodsStockList);
 	
 	void insertGoodsOperationRecordForSellOrder(Map<String,Object> param);
-	
-	List<GoodsItemEntity> selectGoodsItemInfoByGoodsIdForEshop(List<String> goodsIds);
 }

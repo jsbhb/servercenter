@@ -211,4 +211,27 @@ public class OrderStockOutController {
 
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
+	
+	/**
+	 * @fun 人工选择商品对应的itemId进行拆单
+	 * @param request
+	 * @param version
+	 * @param list
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/handle", method = RequestMethod.POST)
+	public ResultModel orderHandle(HttpServletRequest request, @PathVariable("version") Double version,
+			@RequestBody List<OrderInfo> list) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			try {
+				orderStockOutService.orderHandle(list);
+				return new ResultModel(true, null);
+			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
 }

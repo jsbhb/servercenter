@@ -15,6 +15,7 @@ import com.zm.goods.pojo.GuidePropertyEntity;
 import com.zm.goods.pojo.GuidePropertyValueEntity;
 import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.PropertyValueEntity;
+import com.zm.goods.pojo.po.GuidePropertyBindGoods;
 
 /**
  * ClassName: GoodsPropertyMapper <br/>
@@ -112,4 +113,9 @@ public interface GoodsPropertyMapper {
 	 * @return
 	 */
 	List<GuidePropertyEntity> listAllGuidePropertyName();
+	/**
+	 * @fun 批量插入商品导购属性绑定表
+	 * @param bindList
+	 */
+	void insertIntoGoodsGuidePropertyBindBatch(List<GuidePropertyBindGoods> bindList);
 }

@@ -17,7 +17,6 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
 import com.zm.goods.pojo.EshopGoodsStockEntity;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.dto.OrderGoodsDTO;
 import com.zm.goods.pojo.dto.OrderInfoDTO;
@@ -220,10 +219,5 @@ public class EshopGoodsServiceImpl implements EshopGoodsService {
 		}
 		
 		return retGoodsList;
-	}
-	
-	@Override
-	public List<GoodsItemEntity> queryGoodsItemInfoByGoodsIdForEshop(List<String> goodsIds) {		
-		return eshopGoodsMapper.selectGoodsItemInfoByGoodsIdForEshop(goodsIds);
 	}
 }

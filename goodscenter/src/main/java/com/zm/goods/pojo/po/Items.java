@@ -1,4 +1,7 @@
 package com.zm.goods.pojo.po;
+
+import com.zm.goods.common.Pagination;
+
 /**
  * @fun 对应kj_goods_item
  * @author user
@@ -7,35 +10,35 @@ package com.zm.goods.pojo.po;
 public class Items {
 
 	private int id;
-	
+
 	private String itemId;
-	
+
 	private String specsTpId;
-	
+
 	private int supplierId;
-	
+
 	private String supplierName;
-	
+
 	private String itemCode;
-	
+
 	private String sku;
-	
+
 	private int status;
-	
+
 	private String reason;
-	
+
 	private String unit;
-	
+
 	private String shelfLife;
-	
+
 	private String createTime;
-	
+
 	private String updateTime;
-	
+
 	private String opt;
-	
+
 	private String remark;
-	
+
 	private double internalPrice;
 
 	public double getInternalPrice() {

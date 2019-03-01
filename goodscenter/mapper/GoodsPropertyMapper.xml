@@ -247,4 +247,12 @@
 	<select id="listAllGuidePropertyName" parameterType="Object" resultMap="guideEntity">
 		select * from kj_guide_property_name
 	</select>
+	
+	<insert id="insertIntoGoodsGuidePropertyBindBatch" parameterType="Object">
+		insert into kj_goods_guide_property_bind(property_id,property_val_id,specs_tp_id,create_time,opt)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.propertyId},#{item.propertyValId},#{item.specsTpId},now(),#{item.opt})
+		</foreach>
+	</insert>
 </mapper>

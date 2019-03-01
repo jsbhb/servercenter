@@ -265,7 +265,7 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 					// 增加月销售额
 					cacheAbstractService.addSalesCache(info.getShopId(), Constants.SALES_STATISTICS_MONTH, time,
 							info.getOrderDetail().getPayment());
-					//计算资金池（主要目的：将订单状态改为统一的资金池已扣款）
+					// 计算资金池（主要目的：将订单状态改为统一的资金池已扣款）
 					threadPoolComponent.capitalPool(info.getOrderId());
 				} else {// 其他来源的计算返佣，统计在计算时一起加上
 					threadPoolComponent.calShareProfitStayToAccount(info.getOrderId());
@@ -614,6 +614,33 @@ public class OrderStockOutServiceImpl implements OrderStockOutService {
 		param.put("orderIds", orderIds);
 		List<RebateDownload> orderResult = orderBackMapper.queryForRebate(param);
 		return orderResult;
+	}
+
+	@Override
+	public void orderHandle(List<OrderInfo> list) {
+		List<OrderInfo> insertInfoList = new ArrayList<>();//需要插入的info
+		List<OrderDetail> insertDetailList = new ArrayList<>();//需要插入的订单详情
+		List<OrderGoods> updateOrderGoodsList = new ArrayList<>();//需要更新的订单商品
+		for (OrderInfo info : list) {
+			if (info.getOrderId() != null) {//原来的订单信息更新
+				orderBackMapper.updateOrderInfo4Handler(info);
+				orderBackMapper.updateOrderDetail4Handler(info.getOrderDetail());
+				updateOrderGoodsList.addAll(info.getOrderGoodsList());//订单商品更新
+			} else {//拆出来的订单插入
+				String orderId = CommonUtils.getOrderId(info.getOrderFlag() + "");
+				info.setOrderId(orderId);
+				info.getOrderDetail().setOrderId(orderId);
+				for(OrderGoods goods : info.getOrderGoodsList()){
+					goods.setOrderId(orderId);
+				}
+				insertInfoList.add(info);
+				insertDetailList.add(info.getOrderDetail());
+				updateOrderGoodsList.addAll(info.getOrderGoodsList());
+			}
+		}
+		orderBackMapper.insertOrderBaseBatch(insertInfoList);
+		orderBackMapper.insertOrderDetailBatch(insertDetailList);
+		orderBackMapper.updateOrderGoodsBatch(updateOrderGoodsList);
 	}
 
 }

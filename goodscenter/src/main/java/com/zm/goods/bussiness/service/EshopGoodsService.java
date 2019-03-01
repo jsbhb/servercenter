@@ -1,10 +1,7 @@
 package com.zm.goods.bussiness.service;
 
-import java.util.List;
-
 import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.dto.OrderInfoDTO;
 
@@ -23,6 +20,4 @@ public interface EshopGoodsService {
 	ResultModel createSellOrderGoodsInfo(OrderInfoDTO info);
 
 	ResultModel checkSellOrderGoodsStock(OrderInfoDTO info);
-
-	List<GoodsItemEntity> queryGoodsItemInfoByGoodsIdForEshop(List<String> goodsIds);
 }

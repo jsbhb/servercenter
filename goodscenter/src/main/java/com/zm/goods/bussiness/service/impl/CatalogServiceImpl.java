@@ -19,12 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.zm.goods.bussiness.dao.CatalogMapper;
-import com.zm.goods.bussiness.dao.GoodsBaseMapper;
 import com.zm.goods.bussiness.service.CatalogService;
 import com.zm.goods.enummodel.CategoryTypeEnum;
 import com.zm.goods.pojo.CategoryPropertyBindModel;
 import com.zm.goods.pojo.FirstCatalogEntity;
-import com.zm.goods.pojo.GoodsBaseEntity;
 import com.zm.goods.pojo.PropertyEntity;
 import com.zm.goods.pojo.SecondCatalogEntity;
 import com.zm.goods.pojo.ThirdCatalogEntity;
@@ -43,9 +41,6 @@ public class CatalogServiceImpl implements CatalogService {
 
 	@Resource
 	CatalogMapper catalogMapper;
-
-	@Resource
-	GoodsBaseMapper goodsBaseMapper;
 
 	@Override
 	public List<FirstCatalogEntity> queryAll() {
@@ -85,18 +80,16 @@ public class CatalogServiceImpl implements CatalogService {
 	@Override
 	@Transactional(isolation=Isolation.READ_COMMITTED)
 	public void delete(String id, String type) throws Exception {
-		GoodsBaseEntity entity = new GoodsBaseEntity();
+		int i = 0;
 		if (CategoryTypeEnum.FIRST.getType().equals(type)) {
-			entity.setFirstCatalogId(id);
+			i = catalogMapper.countFirstCategory(id);
 		} else if (CategoryTypeEnum.SECOND.getType().equals(type)) {
-			entity.setSecondCatalogId(id);
+			i = catalogMapper.countSecondCategory(id);
 		} else if (CategoryTypeEnum.THIRD.getType().equals(type)) {
-			entity.setThirdCatalogId(id);
+			i = catalogMapper.countThirdCategory(id);
 		}
 
-		GoodsBaseEntity goodsBaseEntity = goodsBaseMapper.selectForExists(entity);
-
-		if (goodsBaseEntity != null) {
+		if (i > 0) {
 			throw new Exception("已绑定商品,无法删除");
 		}
 		

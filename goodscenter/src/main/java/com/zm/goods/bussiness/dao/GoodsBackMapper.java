@@ -24,6 +24,10 @@ import com.zm.goods.pojo.po.GoodsPricePO;
 import com.zm.goods.pojo.po.GoodsSpecs;
 import com.zm.goods.pojo.po.GoodsSpecsTradePattern;
 import com.zm.goods.pojo.po.Items;
+import com.zm.goods.pojo.vo.BackGoodsItemVO;
+import com.zm.goods.pojo.vo.BackGoodsVO;
+import com.zm.goods.pojo.vo.BackItemsVO;
+import com.zm.goods.pojo.vo.GoodsSpecsVO;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 
 /**
@@ -223,8 +227,32 @@ public interface GoodsBackMapper {
 	 */
 	void updateSpecsTpInit(String specsTpId);
 	/**
-	 * @fun 
+	 * @fun 更新福利商城是否显示
 	 * @param param
 	 */
 	void updateWelfareDisplay(Map<String,Object> param);
+	/**
+	 * @fun 获取供应商商品
+	 * @param item
+	 * @return
+	 */
+	Page<BackGoodsItemVO> listItems4Page(BackGoodsItemVO item);
+	/**
+	 * @fun 获取商品列表
+	 * @param item
+	 * @return
+	 */
+	Page<BackGoodsVO> listGoods4Page(Map<String,Object> param);
+	/**
+	 * @fun 根据goodsId 和状态获取goods对应下的规格
+	 * @param param
+	 * @return
+	 */
+	List<GoodsSpecsVO> listGoodsSpecsTpByGoodsIdAndStatus(Map<String, Object> param);
+	/**
+	 * @fun 根据specsTpId 获取items
+	 * @param specsTpId
+	 * @return
+	 */
+	List<BackItemsVO> listItemBySpecsTpId(String specsTpId);
 }

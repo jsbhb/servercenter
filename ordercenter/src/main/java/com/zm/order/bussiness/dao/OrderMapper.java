@@ -126,18 +126,6 @@ public interface OrderMapper {
 	void updateOrderRebate(String orderId);
 
 	/**
-	 * @fun 获取天天仓订单，过时，统一所有订单支付单报关后发仓库
-	 * @return
-	 */
-	@Deprecated
-	List<OrderInfo> listOrderForSendToTTWarehouse();
-	/**
-	 * @fun 获取其他仓仓订单，过时，统一所有订单支付单报关后发仓库
-	 * @return
-	 */
-	@Deprecated
-	List<OrderInfo> listOrderForSendToOtherWarehouse();
-	/**
 	 * @fun 获取跨境推送订单
 	 * @return
 	 */

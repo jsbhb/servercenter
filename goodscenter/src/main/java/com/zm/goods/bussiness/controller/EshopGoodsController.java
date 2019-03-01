@@ -1,7 +1,5 @@
 package com.zm.goods.bussiness.controller;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +13,6 @@ import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.pojo.EshopGoodsEntity;
 import com.zm.goods.pojo.EshopGoodsInventoryEntity;
-import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.dto.OrderInfoDTO;
 
@@ -184,29 +181,6 @@ public class EshopGoodsController {
 			}
 		} else {
 			return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
-		}
-	}
-
-	/**
-	 * @fun 根据商品GoodsId查询对应的ItemId信息接口
-	 * @param version
-	 * @param list
-	 * @return
-	 */
-	@RequestMapping(value = "{version}/goods/queryGoodsItemInfoByGoodsIdForEshop", method = RequestMethod.POST)
-	public List<GoodsItemEntity> queryGoodsItemInfoByGoodsIdForEshop(@PathVariable("version") Double version, @RequestBody List<String> goodsIds) {
-
-		if (Constants.FIRST_VERSION.equals(version)) {
-			if (goodsIds == null || goodsIds.size() <= 0) {
-				return null;
-			}
-			try {
-				return eshopGoodsService.queryGoodsItemInfoByGoodsIdForEshop(goodsIds);
-			} catch (Exception e) {
-				return null;
-			}
-		} else {
-			return null;
 		}
 	}
 }

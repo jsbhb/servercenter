@@ -81,5 +81,20 @@ public interface OrderStockOutMapper {
 	OrderInfo getOrderByOrderId(String orderId);
 
 	List<RebateDownload> queryForRebate(Map<String, Object> param);
+	/**
+	 * @fun 根据人工拆单更新订单信息
+	 * @param info
+	 */
+	void updateOrderInfo4Handler(OrderInfo info);
+	/**
+	 * @fun 根据人工拆单更新订单详情信息
+	 * @param info
+	 */
+	void updateOrderDetail4Handler(OrderDetail orderDetail);
+	/**
+	 * @fun 根据人工拆单更新订单商品信息
+	 * @param info
+	 */
+	void updateOrderGoodsBatch(List<OrderGoods> updateOrderGoodsList);
 
 }

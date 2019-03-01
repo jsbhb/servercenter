@@ -355,4 +355,16 @@
 		</if>
 		update_time = now() where id = #{id} 
 	</update>
+	
+	<select id="countFirstCategory" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from kj_goods where first_category = #{id}
+	</select>
+	
+	<select id="countSecondCategory" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from kj_goods where second_category = #{id}
+	</select>
+	
+	<select id="countthirdCategory" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from kj_goods where third_category = #{id}
+	</select>
 </mapper>

@@ -186,4 +186,22 @@ public interface CatalogMapper {
 	void removeCategoryJoinProperty(String id, String propertyType);
 
 	void updateCategoryJoinProperty(String id, String sort, String propertyType);
+	/**
+	 * @fun 判断一级分类有没有绑定商品
+	 * @param id
+	 * @return
+	 */
+	int countFirstCategory(String id);
+	/**
+	 * @fun 判断二级分类有没有绑定商品
+	 * @param id
+	 * @return
+	 */
+	int countSecondCategory(String id);
+	/**
+	 * @fun 判断三级分类有没有绑定商品
+	 * @param id
+	 * @return
+	 */
+	int countThirdCategory(String id);
 }
