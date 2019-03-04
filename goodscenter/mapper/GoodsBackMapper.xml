@@ -281,14 +281,6 @@
 			</collection>
 	</resultMap>
 	
-	<select id="select" parameterType="Object" resultMap="goodsWithItems">
-		select * from goods g left join goods_item i on i.goods_id = g.goods_id where g.id = #{id} and i.is_del = 0 and g.is_del = 0 
-	</select>
-	
-	<select id="selectById" parameterType="Object" resultMap="entity">
-		select * from goods where id = #{id} and is_del = 0
-	</select>
-	
 	<insert id="insertGoods" parameterType="Object">
 		insert into kj_goods (goods_id,type,goods_name,subtitle,description,brand_id,origin,detail_path,
 		first_category,second_category,third_category,hscode,display,is_del,create_time,opt) value

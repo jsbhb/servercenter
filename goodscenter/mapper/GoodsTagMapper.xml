@@ -25,13 +25,6 @@
 		<result column="opt" property="opt" jdbcType="VARCHAR"/>
 	</resultMap>
 	
-	<resultMap type="com.zm.goods.pojo.GoodsItemEntity" id="goodsTagList">
-		<id column="item_id" property="itemId"/>
-		<collection property="tagList" ofType="com.zm.goods.pojo.GoodsTagEntity">
-			<id column="tag_name" property="tagName"/>
-		</collection>
-	</resultMap>
-	
 	<select id="listGoodsTagBySpecsTpIds" parameterType="Object" resultMap="tag">
 		select gt.*,gtb.specs_tp_id,tag_fun_id from goods_tag gt left join kj_goods_tag_bind gtb on gt.id = gtb.tag_id 
 		where gtb.specs_tp_id in

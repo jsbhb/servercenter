@@ -107,8 +107,8 @@
 		insert into kj_property_name value (#{id},'1',#{name},now(),now(),#{opt})
 	</insert>
 	
-	<insert id="insertPropertyName" parameterType="Object">
-		insert into insertGuidePropertyName value (#{id},#{name},now(),now(),#{opt})
+	<insert id="insertGuidePropertyName" parameterType="Object">
+		insert into kj_guide_property_name value (#{id},#{name},now(),now(),#{opt})
 	</insert>
 	
 	<select id="selectName" parameterType="Object" resultMap="entity">
