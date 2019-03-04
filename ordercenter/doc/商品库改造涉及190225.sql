@@ -2,8 +2,11 @@ alter table order_base add column handle tinyint(3) not null default 0 comment '
 alter table order_goods add column specs_tp_id varchar(45) not null comment '商品规格ID';
 ALTER TABLE order_base ADD INDEX idx_handle (handle);
 drop index idx_push_user_id on order_base;
-drop index idx_combinationId on order_base;
+drop index idx_supplierId on order_base;
 drop index idx_regionalCenterId on order_base;
 drop index tag_fun on order_base;
 drop index idx_orderFlag on order_base;
+drop index is_manual on order_base;
+drop index idx_deliveryPlace on order_detail;
+drop index uk_payNo on order_detail;
 alter table order_shopping_cart change item_id specs_tp_id varchar(45);

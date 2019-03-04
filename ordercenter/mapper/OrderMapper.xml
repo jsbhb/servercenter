@@ -763,4 +763,12 @@
 			#{item}
 		</foreach>
 	</select>
+	
+	<select id="getCombinOrderIdByOrderId" parameterType="Object" resultType="java.lang.String">
+		select combination_id from order_base where order_id = #{orderId}
+	</select>
+	
+	<select id="listOrderIdByCombinOrderId" parameterType="Object" resultType="java.lang.String">
+		select order_id from order_base where combination_id = #{combinOrderId}
+	</select>
 </mapper>

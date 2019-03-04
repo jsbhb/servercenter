@@ -169,5 +169,17 @@ public interface OrderMapper {
 	List<OrderInfo> listOrderForSendByOrderId(String orderId);
 
 	List<OrderGoods> listOrderGoodsNameByOrderId(List<String> orderIds);
+	/**
+	 * @fun 根据订单号获取总订单号
+	 * @param orderId
+	 * @return
+	 */
+	String getCombinOrderIdByOrderId(String orderId);
+	/**
+	 * @fun 根据总订单号获取子订单号
+	 * @param combinOrderId
+	 * @return
+	 */
+	List<String> listOrderIdByCombinOrderId(String combinOrderId);
 	
 }

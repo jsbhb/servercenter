@@ -281,20 +281,30 @@ public class OrderServiceImpl implements OrderService {
 
 		String orderId = param.get("orderId") + "";
 
-		int count = orderMapper.updateOrderPayStatusByOrderId(orderId);
+		String combinOrderId = orderMapper.getCombinOrderIdByOrderId(orderId);
+		List<String> orderIdList = new ArrayList<>();
+		if (combinOrderId != null) {
+			orderIdList = orderMapper.listOrderIdByCombinOrderId(combinOrderId);
+		} else {
+			orderIdList.add(orderId);
+		}
+		for (String tmpOrderId : orderIdList) {
 
-		if (count > 0) {// 有更新结果后插入状态记录表
-			orderMapper.updateOrderDetailPayTime(param);
-			param.put("status", Constants.ORDER_PAY);
-			orderMapper.addOrderStatusRecord(param);
-			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
-			Double rebateFee = info.getOrderDetail().getRebateFee();
-			if (rebateFee != null && rebateFee > 0) {
-				threadPoolComponent.rebate4Order(info);
-				template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
-						Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 冻结金额扣除
+			int count = orderMapper.updateOrderPayStatusByOrderId(tmpOrderId);
+
+			if (count > 0) {// 有更新结果后插入状态记录表
+				orderMapper.updateOrderDetailPayTime(param);
+				param.put("status", Constants.ORDER_PAY);
+				orderMapper.addOrderStatusRecord(param);
+				OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+				Double rebateFee = info.getOrderDetail().getRebateFee();
+				if (rebateFee != null && rebateFee > 0) {
+					threadPoolComponent.rebate4Order(info);
+					template.opsForHash().increment(Constants.GRADE_ORDER_REBATE + info.getShopId(),
+							Constants.FROZEN_REBATE, CalculationUtils.sub(0, rebateFee));// 冻结金额扣除
+				}
+				shareProfitComponent.calShareProfitStayToAccount(orderId);
 			}
-			shareProfitComponent.calShareProfitStayToAccount(orderId);
 		}
 
 		result.setSuccess(true);
