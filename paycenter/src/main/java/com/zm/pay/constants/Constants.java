@@ -8,9 +8,9 @@ public class Constants {
 
 	public static final String FEE_TYPE = "CNY";
 
-//	public static final String WX_NOTIFY_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/wxPayReturn";//正式
+//	public static final String WX_NOTIFY_URL = "https://api.cncoopay.com/paycenter/auth/payMng/wxPayReturn";//正式
 
-	public static final String WX_NOTIFY_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/wxPayReturn";//测试
+	public static final String WX_NOTIFY_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/wxPayReturn";//测试
 
 	public static final String JSAPI = "JSAPI";
 	
@@ -76,10 +76,10 @@ public class Constants {
 	public static final String CUSTOMS_QUERY_SERVICE = "alipay.overseas.acquire.customs.query";// 报关接口
 
 	// ********************支付宝支付参数*****************************
-//	public static final String ALI_NOTIFY_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/payNotify";//正式
-//	public static final String ALI_RETURN_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/payReturn";//正式
-	public static final String ALI_NOTIFY_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/payNotify";//测试
-	public static final String ALI_RETURN_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/payReturn";//测试
+//	public static final String ALI_NOTIFY_URL = "https://api.cncoopay.com/paycenter/auth/payMng/payNotify";//正式
+//	public static final String ALI_RETURN_URL = "https://api.cncoopay.com/paycenter/auth/payMng/payReturn";//正式
+	public static final String ALI_NOTIFY_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/payNotify";//测试
+	public static final String ALI_RETURN_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/payReturn";//测试
 	public static final String SCAN_CODE = "scanCode";// 扫码支付
 	public static final String SCAN_CODE_SERVICE = "create_direct_pay_by_user";// 扫码支付接口名
 
@@ -93,15 +93,15 @@ public class Constants {
 	public static final boolean IF_VALIDATE_CNNAME = false;
 
 	// 后台服务对应的写法参照 BackRcvResponse.java
-	public static String BACK_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/unionNotify";//测试
-	public static String FRONT_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//测试
-//	public static String FRONT_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/union-frontrcv";//正式
-//	public static String BACK_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/unionNotify";//正式
+	public static String BACK_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/unionNotify";//测试
+	public static String FRONT_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/union-frontrcv";//测试
+//	public static String FRONT_URL = "https://api.cncoopay.com/paycenter/auth/payMng/union-frontrcv";//正式
+//	public static String BACK_URL = "https://api.cncoopay.com/paycenter/auth/payMng/unionNotify";//正式
 	
 	
 	// ********************易宝支付参数*****************************
-//	public static final String YOP_NOTIFY_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/yop-payNotify";//正式
-//	public static final String YOP_RETURN_URL = "https://api.cncoopbuy.com/paycenter/auth/payMng/yop-payReturn";//正式
-	public static final String YOP_NOTIFY_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/yop-payNotify";//测试
-	public static final String YOP_RETURN_URL = "https://testapi.cncoopbuy.com/paycenter/auth/payMng/yop-payReturn";//测试
+//	public static final String YOP_NOTIFY_URL = "https://api.cncoopay.com/paycenter/auth/payMng/yop-payNotify";//正式
+//	public static final String YOP_RETURN_URL = "https://api.cncoopay.com/paycenter/auth/payMng/yop-payReturn";//正式
+	public static final String YOP_NOTIFY_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/yop-payNotify";//测试
+	public static final String YOP_RETURN_URL = "https://testapi.cncoopay.com/paycenter/auth/payMng/yop-payReturn";//测试
 }

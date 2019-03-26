@@ -518,7 +518,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000300");
 		goods.setItemName("韩国Forencos芙恋可姿星期一 七天面膜10片装(效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000913/master/images/8f8f9297-2173-4104-92e2-a4b4e5d201a8.jpg");
+				"https://static.cncoopay.com:8080/goods/100000913/master/images/8f8f9297-2173-4104-92e2-a4b4e5d201a8.jpg");
 		goods.setGoodsId("100000913");
 		list.add(goods);
 		// ******写死商品七天面膜*********2
@@ -532,7 +532,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000301");
 		goods.setItemName("韩国Forencos芙恋可姿星期二 七天面膜10片装（效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000914/master/images/35b484f2-9899-432d-9eef-5269b67314ef.jpg");
+				"https://static.cncoopay.com:8080/goods/100000914/master/images/35b484f2-9899-432d-9eef-5269b67314ef.jpg");
 		goods.setGoodsId("100000914");
 		list.add(goods);
 		// ******写死商品七天面膜*********3
@@ -546,7 +546,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000302");
 		goods.setItemName("韩国Forencos芙恋可姿星期三 七天面膜10片装(效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000915/master/images/843ff607-e028-4692-9b6f-b2b6cee3fc20.jpg");
+				"https://static.cncoopay.com:8080/goods/100000915/master/images/843ff607-e028-4692-9b6f-b2b6cee3fc20.jpg");
 		goods.setGoodsId("100000915");
 		list.add(goods);
 		// ******写死商品七天面膜*********4
@@ -560,7 +560,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000303");
 		goods.setItemName("韩国Forencos芙恋可姿星期四 七天面膜10片装(效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000916/master/images/0384110b-9dbd-40db-82cb-4f057520f39a.jpg");
+				"https://static.cncoopay.com:8080/goods/100000916/master/images/0384110b-9dbd-40db-82cb-4f057520f39a.jpg");
 		goods.setGoodsId("100000916");
 		list.add(goods);
 		// ******写死商品七天面膜*********5
@@ -574,7 +574,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000304");
 		goods.setItemName("韩国Forencos芙恋可姿星期五 七天面膜10片装(效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000917/master/images/9df73ee5-271c-443e-aa40-98c170f61a4c.jpg");
+				"https://static.cncoopay.com:8080/goods/100000917/master/images/9df73ee5-271c-443e-aa40-98c170f61a4c.jpg");
 		goods.setGoodsId("100000917");
 		list.add(goods);
 		// ******写死商品七天面膜*********6
@@ -588,7 +588,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000305");
 		goods.setItemName("韩国Forencos芙恋可姿星期六 七天面膜10片装(效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000918/master/images/b285c36c-5f8d-4ef7-acd3-01c02e1fc59d.jpg");
+				"https://static.cncoopay.com:8080/goods/100000918/master/images/b285c36c-5f8d-4ef7-acd3-01c02e1fc59d.jpg");
 		goods.setGoodsId("100000918");
 		list.add(goods);
 		// ******写死商品七天面膜*********7
@@ -602,7 +602,7 @@ public class OrderComponentUtil {
 		goods.setSku("310517622300000306");
 		goods.setItemName("韩国Forencos芙恋可姿星期日 七天面膜10片装(效期:19年6月）");
 		goods.setItemImg(
-				"https://static.cncoopbuy.com:8080/goods/100000919/master/images/9ea72a8a-bfdd-4f9f-8af0-0377c0ee37b2.jpg");
+				"https://static.cncoopay.com:8080/goods/100000919/master/images/9ea72a8a-bfdd-4f9f-8af0-0377c0ee37b2.jpg");
 		goods.setGoodsId("100000919");
 		list.add(goods);
 		return list;
