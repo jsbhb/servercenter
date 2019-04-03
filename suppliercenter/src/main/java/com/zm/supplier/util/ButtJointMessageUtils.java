@@ -922,7 +922,7 @@ public class ButtJointMessageUtils {
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
 			payCompanyCode = "ZF14021901";
 		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
-			payCompanyCode = "4403169D3W";
+			payCompanyCode = "ZF14120401";
 		}
 		double goodsAmount = info.getOrderGoodsList().stream()
 				.mapToDouble(g -> CalculationUtils.mul(g.getItemPrice(), g.getItemQuantity())).sum();
@@ -986,7 +986,7 @@ public class ButtJointMessageUtils {
 					+ "</goodsModel>");
 			sb.append("<codeTs>" + goods.getHsCode() + "</codeTs>");
 			sb.append("<unitPrice>" + goods.getActualPrice() + "</unitPrice>");
-			sb.append("<goodsUnit>" + goods.getUnit() + "</goodsUnit>");
+			sb.append("<goodsUnit>" + UnitCode.get(goods.getUnit()) + "</goodsUnit>");
 			sb.append("<goodsCount>" + goods.getItemQuantity() + "</goodsCount>");
 			sb.append("<originCountry>" + CountryCode.get(goods.getOrigin()) + "</originCountry>");
 			sb.append("<currency>142</currency>");
@@ -1062,9 +1062,9 @@ public class ButtJointMessageUtils {
 			sb.append("<ceb:gnum>" + i + 1 + "</ceb:gnum>");
 			sb.append("<ceb:itemNo>" + goods.getItemId() + "</ceb:itemNo>");
 			sb.append("<ceb:itemName>" + goods.getItemName() + "</ceb:itemName>");
-			sb.append("<ceb:gModel>" + goods.getItemName() + "," + goods.getBrand() + "," + goods.getItemInfo()
-					+ "</ceb:gModel>");
-			sb.append("<ceb:unit>" + goods.getUnit() + "</ceb:unit>");
+			sb.append("<ceb:gmodel>" + goods.getItemName() + "," + goods.getBrand() + "," + goods.getItemInfo()
+					+ "</ceb:gmodel>");
+			sb.append("<ceb:unit>" + UnitCode.get(goods.getUnit()) + "</ceb:unit>");
 			sb.append("<ceb:qty>" + goods.getItemQuantity() + "</ceb:qty>");
 			sb.append("<ceb:price>" + goods.getItemPrice() + "</ceb:price>");
 			sb.append("<ceb:totalPrice>" + CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity())
