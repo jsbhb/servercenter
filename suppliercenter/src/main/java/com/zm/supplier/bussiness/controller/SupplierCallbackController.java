@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.supplier.bussiness.service.SupplierCallbackService;
 import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.log.LogUtil;
 import com.zm.supplier.pojo.ErrorCodeEnum;
 import com.zm.supplier.pojo.callback.OrderStatusCallBack;
 
@@ -38,13 +39,21 @@ public class SupplierCallbackController {
 	@RequestMapping(value = "auth/dolphin/callback", method = RequestMethod.POST)
 	public String dolphinCallBack(HttpServletRequest req) {
 		Map<String, String> getParam = new HashMap<String, String>();
-		getParam.put("type", req.getParameter("type"));
-		getParam.put("time", req.getParameter("time"));
-		getParam.put("name", req.getParameter("name"));
-		getParam.put("md5", req.getParameter("md5"));
-		getParam.put("debug", req.getParameter("debug"));
+		String type = req.getParameter("type");
+		String time = req.getParameter("time");
+		String name = req.getParameter("name");
+		String md5 = req.getParameter("md5");
+		String debug = req.getParameter("debug");
+		String data = req.getParameter("data");
+		getParam.put("type", type);
+		getParam.put("time", time);
+		getParam.put("name", name);
+		getParam.put("md5", md5);
+		getParam.put("debug", debug);
 		Map<String, String> postParam = new HashMap<String, String>();
-		postParam.put("data", req.getParameter("data"));
+		postParam.put("data", data);
+		LogUtil.writeLog("type=" + type + ";time=" + time + ";name=" + name + ";md5=" + md5 + ";debug=" + debug
+				+ ";data=" + data);
 		return supplierCallbackService.dolphinCallBack(getParam, postParam);
 	}
 

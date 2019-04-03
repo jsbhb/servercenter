@@ -1,7 +1,5 @@
 package com.zm.supplier.supplierinf.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,8 +19,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
-import com.zm.supplier.pojo.OrderDetail;
-import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.OrderStatus;
@@ -102,6 +98,9 @@ public class DolphinButtjoint extends AbstractSupplierButtJoint {
 			String data = obj.getString("data");
 			obj = JSONObject.parseObject(data);
 			JSONObject orderObj = obj.getJSONObject("childOrder");
+			if(orderObj == null){
+				return null;
+			}
 			Set<String> keySet = orderObj.keySet();
 			Iterator<String> it = keySet.iterator();
 			OrderStatus status = null;
@@ -186,44 +185,4 @@ public class DolphinButtjoint extends AbstractSupplierButtJoint {
 		// getParam.put("debug", "on");
 		return getParam;
 	}
-
-	public static void main(String[] args) throws UnsupportedEncodingException {
-		DolphinButtjoint b = new DolphinButtjoint();
-		b.setAppKey("test");
-		b.setUrl("http://qilinapi.dolphinsc.com/index.php");
-		b.setAppSecret("123456");
-		// DolphinToken token = b.getToken();
-		// System.out.println("name = " + token.getName() + ",key=" +
-		// token.getKey());
-		OrderInfo info = new OrderInfo();
-		info.setOrderId("GX1001001212110411");
-		info.setRemark("测试");
-		OrderDetail detail = new OrderDetail();
-		detail.setReceiveProvince("山东");
-		detail.setReceiveCity("济宁市");
-		detail.setReceiveArea("南山区");
-		detail.setReceiveAddress("南山科技园海天一路4栋");
-		detail.setReceivePhone("18949518599");
-		detail.setReceiveZipCode("273100");
-		detail.setReceiveName("李政");
-		detail.setCustomerIdNum("530121197008214197");
-		detail.setCustomerName("李政");
-		detail.setPayment(0.02);
-		detail.setPostFee(0.0);
-		detail.setPayNo("530121197008214197");
-		detail.setPayType(1);
-		List<OrderGoods> list = new ArrayList<OrderGoods>();
-		OrderGoods goods = new OrderGoods();
-		goods.setItemCode("ENPAM001");
-		goods.setItemQuantity(2);
-		goods.setItemName("ceshi");
-		goods.setActualPrice(0.01);
-		list.add(goods);
-		info.setOrderDetail(detail);
-		info.setOrderGoodsList(list);
-		List<OrderInfo> infoList = new ArrayList<>();
-		infoList.add(info);
-		System.out.println(b.sendOrder(infoList));
-	}
-
 }
