@@ -683,7 +683,7 @@
 	<select id="listUnDeliverOrder" parameterType="Object"
 		resultMap="orderIdAndSupplierId">
 		
-		select t.id,t.order_id,t.third_order_id,t.supplier_id from third_order_info t left join 
+		select t.id,t.order_id,t.third_order_id,o.supplier_id from third_order_info t left join 
 		order_base o on t.order_id = o.order_id where o.status in(3,4,5,99)
 	</select>
 	

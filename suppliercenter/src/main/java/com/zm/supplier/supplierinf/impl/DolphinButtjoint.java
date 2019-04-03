@@ -70,6 +70,7 @@ public class DolphinButtjoint extends AbstractSupplierButtJoint {
 				SendOrderResult orderResult = new SendOrderResult();
 				orderResult.setOrderId(info.get(0).getOrderId());
 				orderResult.setThirdOrderId(info.get(0).getOrderId());
+				orderResult.setSupplierId(50);
 				Set<SendOrderResult> set = new HashSet<>();
 				set.add(orderResult);
 				return set;
