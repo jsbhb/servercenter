@@ -46,8 +46,9 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 		String targetUrl = NEED_APP_ID_URL.replace("{action}", "addOutOrder").replace("{appKey}", appKey);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("paramjson", msg);
-		Set<SendOrderResult> set = sendLiangYouWarehouse(targetUrl, params, SendOrderResult.class, false, infoList.get(0).getOrderId());
-		if(set != null){
+		Set<SendOrderResult> set = sendLiangYouWarehouse(targetUrl, params, SendOrderResult.class, false,
+				infoList.get(0).getOrderId());
+		if (set != null) {
 			for (SendOrderResult model : set) {
 				model.setSupplierId(infoList.get(0).getSupplierId());
 				model.setOrderId(infoList.get(0).getOrderId());
@@ -143,7 +144,7 @@ public class LiangYouButtJoint extends AbstractSupplierButtJoint {
 			String param) {
 
 		logger.info("发送报文：" + params);
-		String result = HttpClientUtil.post(url, params);
+		String result = HttpClientUtil.post(url, params, "", false);
 		logger.info("返回：" + param + "=====" + result);
 
 		try {

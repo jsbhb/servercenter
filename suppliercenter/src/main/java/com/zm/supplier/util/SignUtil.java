@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,7 +19,7 @@ import com.zm.supplier.pojo.callback.base.CallBackBase;
 
 public class SignUtil {
 
-	public static String TianTianSign(String msg, String appSecret, String date) {
+	public static final String TianTianSign(String msg, String appSecret, String date) {
 		String toSignStr = msg + appSecret + date;
 		String sign = new String(Base64.encodeBase64(DigestUtils.md5(toSignStr))).toUpperCase();
 		try {
@@ -30,7 +31,7 @@ public class SignUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static String callBackSign(CallBackBase base, String appSecret) {
+	public static final String callBackSign(CallBackBase base, String appSecret) {
 		Map<String, Object> param = JSONUtil.parse(JSONUtil.toJson(base), Map.class);
 		param.put("appSecret", appSecret);
 		System.out.println("param:" + param);
@@ -40,7 +41,7 @@ public class SignUtil {
 		return DigestUtils.md5Hex(str);
 	}
 
-	public static String liangYouSign(Map<String, Object> param) {
+	public static final String liangYouSign(Map<String, Object> param) {
 		String s = sort(param);
 		String str = s.substring(0, s.length() - 1);
 
@@ -48,7 +49,7 @@ public class SignUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static String XinYunSing(String msg, String appSecret) {
+	public static final String XinYunSing(String msg, String appSecret) {
 		Map<String, Object> params = JSONUtil.parse(msg, Map.class);
 		if (params.get("items") != null) {
 			String items = params.get("items").toString();
@@ -66,7 +67,7 @@ public class SignUtil {
 	 * @param charset
 	 * @return
 	 */
-	public static byte[] getContentBytes(String content, String charset) {
+	public static final byte[] getContentBytes(String content, String charset) {
 		if (charset == null || "".equals(charset)) {
 			return content.getBytes();
 		}
@@ -82,7 +83,7 @@ public class SignUtil {
 	 * @param params
 	 * @return
 	 */
-	public static String sort(Map<String, ? extends Object> params) {
+	public static final String sort(Map<String, ? extends Object> params) {
 		if (params == null) {
 			return null;
 		}
@@ -99,12 +100,12 @@ public class SignUtil {
 		return sb.toString();
 	}
 
-	public static String fuBangSign(String msg, String appSecret) {
+	public static final String fuBangSign(String msg, String appSecret) {
 		String toSignStr = appSecret + msg;
 		return DigestUtils.md5Hex(toSignStr);
 	}
 
-	public static String qianFengSign(String appSecret, Map<String, String> param) {
+	public static final String qianFengSign(String appSecret, Map<String, String> param) {
 		if (param == null) {
 			return null;
 		}
@@ -131,7 +132,7 @@ public class SignUtil {
 	 *            参数
 	 * @return 签名结果
 	 */
-	public static String edbSignature(Map<String, String> params, String appScret, String token, String appKey) {
+	public static final String edbSignature(Map<String, String> params, String appScret, String token, String appKey) {
 		Map<String, String> treeMap = new TreeMap<String, String>(comparator);
 		treeMap.putAll(params);
 		treeMap.put("appscret", appScret);
@@ -161,13 +162,13 @@ public class SignUtil {
 	/**
 	 * 比较器
 	 */
-	private static Comparator<String> comparator = new Comparator<String>() {
+	private static final Comparator<String> comparator = new Comparator<String>() {
 		public int compare(String k1, String k2) {
 			return k1.compareToIgnoreCase(k2);
 		}
 	};
 
-	public static String JiaBeiAiTeSign(String appKey, String appSecret, String nonce_str) {
+	public static final String JiaBeiAiTeSign(String appKey, String appSecret, String nonce_str) {
 		String toSignStr = "appKey=" + appKey + "&nonce_str=" + nonce_str + "&" + appSecret;
 		// 拼接要签名的字符串
 		StringBuilder builder = new StringBuilder(toSignStr);
@@ -190,7 +191,7 @@ public class SignUtil {
 		}
 	}
 
-	public static String youStongSign(String appKey, String appSecret, String timestamp, String requestId, String msg) {
+	public static final String youStongSign(String appKey, String appSecret, String timestamp, String requestId, String msg) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("secret_key=");
 		sb.append(appSecret);
@@ -205,8 +206,33 @@ public class SignUtil {
 		return DigestUtils.md5Hex(sb.toString()).toLowerCase();
 	}
 
-	public static String getKjbSign(String appKey, String appSecret, String date) {
+	public static final String getKjbSign(String appKey, String appSecret, String date) {
 		String str = appKey + appSecret + date;
 		return DigestUtils.md5Hex(str).toLowerCase();
+	}
+	
+	public static final String getDolphinSign(Map<String,String> param, String key,String data){
+		List<String> keyList = new ArrayList<String>(param.keySet());
+		StringBuilder sb = new StringBuilder();
+		Collections.sort(keyList);
+		for (String s : keyList) {
+			if (!StringUtils.isEmpty(param.get(s)) && !"md5".equals(s)) {
+				sb.append(String.valueOf(param.get(s)));
+			}
+		}
+		sb.append(key);
+		if(!StringUtils.isEmpty(data)){
+			sb.append(data);
+		}
+		return DigestUtils.md5Hex(sb.toString()).toLowerCase();
+	}
+	
+	public static void main(String[] args) {
+		Map<String,String> param = new HashMap<String, String>();
+		param.put("type", "receiveLogisticsCompany");
+		param.put("time", "1234567");
+		param.put("name", "test");
+		param.put("debug", "on");
+		System.out.println(getDolphinSign(param, "123456", "{\"orderNo\":\"GX0180124132529700029\",\"logisCompanyCode\":\"3302462946\",\"logisCompanyName\":\"宁波鑫海通达跨境电子商务有限公司\"}"));
 	}
 }

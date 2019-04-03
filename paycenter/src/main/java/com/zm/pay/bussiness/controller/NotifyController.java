@@ -33,6 +33,7 @@ import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.yeepay.g3.sdk.yop.encrypt.DigitalEnvelopeDTO;
 import com.yeepay.g3.sdk.yop.utils.DigitalEnvelopeUtils;
+import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.constants.Constants;
 import com.zm.pay.feignclient.OrderFeignClient;
 import com.zm.pay.feignclient.UserFeignClient;
@@ -40,6 +41,7 @@ import com.zm.pay.feignclient.model.OrderInfo;
 import com.zm.pay.feignclient.model.UserInfo;
 import com.zm.pay.feignclient.model.UserVip;
 import com.zm.pay.pojo.AliPayConfigModel;
+import com.zm.pay.pojo.PayOriginData;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
@@ -67,6 +69,9 @@ public class NotifyController {
 	@Resource
 	UserFeignClient userFeignClient;
 
+	@Resource
+	PayMapper payMapper;
+
 	private Logger logger = LoggerFactory.getLogger(NotifyController.class);
 
 	@RequestMapping(value = "auth/payMng/wxPayReturn", method = RequestMethod.POST)
@@ -88,6 +93,8 @@ public class NotifyController {
 		Map<String, String> notifyMap = WXPayUtil.xmlToMap(sb.toString()); // 转换成map
 
 		String orderId = notifyMap.get("out_trade_no").split("_")[0];
+
+		savePayOriginData(Constants.WX_PAY, sb.toString(), orderId);
 
 		logger.info("微信回调订单号：====" + orderId);
 
@@ -148,7 +155,7 @@ public class NotifyController {
 
 			resXml = getWXCallBackMsg("FAIL", "验签失败");
 		}
-		
+
 		logger.info("微信回调回写：====" + resXml);
 
 		// ------------------------------
@@ -158,6 +165,15 @@ public class NotifyController {
 		out.write(resXml.getBytes());
 		out.flush();
 		out.close();
+	}
+
+	private void savePayOriginData(Integer payType, String string, String orderId) {
+		PayOriginData data = new PayOriginData();
+		data.setContent(string);
+		data.setOrderId(orderId);
+		data.setPayType(payType);
+		data.setType(2);// 支付请求返回类型
+		payMapper.savePayOriginData(data);
 	}
 
 	private String getWXCallBackMsg(String success, String msg) {
@@ -194,7 +210,7 @@ public class NotifyController {
 			String orderId = new String(req.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
 
 			logger.info("支付宝return回调订单号：====" + orderId);
-			
+
 			// 交易状态
 			String trade_status = new String(req.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
 
@@ -288,7 +304,8 @@ public class NotifyController {
 			// 商户订单号
 
 			String orderId = new String(req.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
-			
+
+			savePayOriginData(Constants.ALI_PAY, JSONUtil.toJson(params), orderId);
 			logger.info("支付宝notify回调订单号：====" + orderId);
 			// 交易状态
 			String trade_status = new String(req.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
@@ -371,7 +388,7 @@ public class NotifyController {
 		LogUtil.printRequestLog(respParam);
 		String orderId = valideData.get("orderId");
 		logger.info("银联后台回调订单号：====" + orderId);
-		
+
 		Integer clientId = null;
 		UserVip user = null;
 		OrderInfo info = null;

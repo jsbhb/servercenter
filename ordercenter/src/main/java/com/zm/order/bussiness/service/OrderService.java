@@ -334,4 +334,6 @@ public interface OrderService {
 	 * @return
 	 */
 	ResultModel refundsWithSendOrder(String orderId);
+
+	OrderInfo handleSupplierCenterExceptionOrder(String orderId);
 }

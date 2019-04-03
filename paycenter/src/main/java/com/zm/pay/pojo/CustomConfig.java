@@ -13,7 +13,8 @@ public class CustomConfig implements Serializable{
 	private Integer supplierId;
 	private String merchantCustomsCode;//海关备案号
 	private String merchantCustomsName;//海关备案名称
-	private String customsPlace;//海关编号
+	private String aliCustomsPlace;//支付宝海关编号
+	private String wxCustomsPlace;//微信海关编号
 	public Integer getId() {
 		return id;
 	}
@@ -38,11 +39,16 @@ public class CustomConfig implements Serializable{
 	public void setMerchantCustomsName(String merchantCustomsName) {
 		this.merchantCustomsName = merchantCustomsName;
 	}
-	public String getCustomsPlace() {
-		return customsPlace;
+	public String getAliCustomsPlace() {
+		return aliCustomsPlace;
 	}
-	public void setCustomsPlace(String customsPlace) {
-		this.customsPlace = customsPlace;
+	public void setAliCustomsPlace(String aliCustomsPlace) {
+		this.aliCustomsPlace = aliCustomsPlace;
 	}
-	
+	public String getWxCustomsPlace() {
+		return wxCustomsPlace;
+	}
+	public void setWxCustomsPlace(String wxCustomsPlace) {
+		this.wxCustomsPlace = wxCustomsPlace;
+	}
 }

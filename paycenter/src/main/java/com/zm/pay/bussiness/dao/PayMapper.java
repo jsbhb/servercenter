@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.CustomConfig;
+import com.zm.pay.pojo.PayOriginData;
 import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.pojo.YopConfigModel;
@@ -31,4 +32,8 @@ public interface PayMapper {
 	List<CustomConfig> listCustomConfig();
 	
 	CustomConfig getCustomConfig(@Param("supplierId") Integer supplierId);
+
+	void savePayOriginData(PayOriginData data);
+	
+	List<PayOriginData> listPayOriginDataByOrderId(String orderId);
 }

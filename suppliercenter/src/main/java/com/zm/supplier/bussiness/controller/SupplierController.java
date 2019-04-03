@@ -17,6 +17,7 @@ import com.zm.supplier.bussiness.service.SupplierService;
 import com.zm.supplier.common.Pagination;
 import com.zm.supplier.common.ResultModel;
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.log.LogUtil;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
@@ -156,9 +157,9 @@ public class SupplierController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
-	
+
 	@RequestMapping(value = "{version}/supplier/butt-joint", method = RequestMethod.GET)
-	public ResultModel getButtJointSupplier(@PathVariable("version") Double version){
+	public ResultModel getButtJointSupplier(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return supplierService.getButtJointSupplier();
 		}
@@ -174,6 +175,24 @@ public class SupplierController {
 				supplierService.updateSupplier(entity);
 				return new ResultModel(true, "");
 			} catch (Exception e) {
+				return new ResultModel(false, e.getMessage());
+			}
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+
+	@RequestMapping(value = "{version}/handle/exception/order/{orderId}/{type}", method = RequestMethod.POST)
+	public ResultModel handleExceptionOrder(@PathVariable("version") Double version,
+			@PathVariable("orderId") String orderId, @PathVariable("type") int type) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+
+			try {
+				supplierService.handleExceptionOrder(orderId, type);
+				return new ResultModel(true, "success");
+			} catch (Exception e) {
+				LogUtil.writeErrorLog("处理异常订单出错", e);
 				return new ResultModel(false, e.getMessage());
 			}
 		}

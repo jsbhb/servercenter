@@ -19,6 +19,7 @@ import com.zm.order.pojo.ProfitProportion;
 import com.zm.order.pojo.PushUserOrderCount;
 import com.zm.order.pojo.ShoppingCart;
 import com.zm.order.pojo.ThirdOrderInfo;
+import com.zm.order.pojo.bo.CustomOrderReturn;
 import com.zm.order.pojo.bo.ExpressMaintenanceBO;
 import com.zm.order.pojo.bo.ExpressRule;
 import com.zm.order.pojo.bo.Rebate4Order;
@@ -181,5 +182,26 @@ public interface OrderMapper {
 	List<OrderInfo> listOrderForSendByOrderId(String orderId);
 
 	List<OrderGoods> listOrderGoodsNameByOrderId(List<String> orderIds);
+	/**
+	 * @fun 保存订单对应的物流企业信息
+	 * @param orderExpress
+	 */
+	void saveCustomOrderExpress(CustomOrderReturn orderExpress);
+
+	/**
+	 * @fun 根据订单号获取订单商品
+	 * @param orderId
+	 * @return
+	 */
+	List<OrderGoods> listOrderGoodsByOrderId(String orderId);
+	/**
+	 * @fun 根据订单号获取订单详情
+	 * @return
+	 */
+	Map<String,String> getOrderDetailByOrderId(String orderId);
+
+	OrderInfo getOrderForSupplierCenterHandle(String orderId);
+
+	String getOrderExpressDetail(String orderId);
 	
 }

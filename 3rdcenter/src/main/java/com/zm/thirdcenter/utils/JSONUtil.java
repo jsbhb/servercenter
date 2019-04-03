@@ -3,6 +3,7 @@ package com.zm.thirdcenter.utils;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONObject;
@@ -39,6 +40,14 @@ public class JSONUtil {
 			throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
 		}
 	}
+	
+	public static <T> T parse(String jsonString, TypeReference<T> type) {
+        try {
+            return objectMapper.readValue(jsonString, type);
+        } catch (Exception e) {
+            throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+        }
+    }
 
 	/**
 	 * @fun json转xml后解析

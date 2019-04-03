@@ -8,9 +8,11 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.zm.goods.bussiness.dao.GoodsItemMapper;
+import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsFeignService;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsItemBO;
 
 @Service
@@ -18,6 +20,9 @@ public class GoodsFeignServiceImpl implements GoodsFeignService {
 
 	@Resource
 	GoodsItemMapper goodsItemMapper;
+	
+	@Resource
+	GoodsMapper goodsMapper;
 
 	@Override
 	public ResultModel manualOrderGoodsCheck(List<GoodsItemBO> list) {
@@ -52,6 +57,12 @@ public class GoodsFeignServiceImpl implements GoodsFeignService {
 			}
 		}
 		return new ResultModel(true, receiveList);
+	}
+
+	@Override
+	public List<CustomCompletion> customCompletion(List<String> itemIdList) {
+		
+		return goodsMapper.listGoodsInfoForCstomCompletion(itemIdList);
 	}
 
 }

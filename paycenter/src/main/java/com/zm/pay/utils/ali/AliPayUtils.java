@@ -36,7 +36,7 @@ public class AliPayUtils {
 		sParaTemp.put("merchant_customs_code", cfg.getMerchantCustomsCode());
 		sParaTemp.put("merchant_customs_name", cfg.getMerchantCustomsName());
 		sParaTemp.put("amount", custom.getAmount());
-		sParaTemp.put("customs_place", cfg.getCustomsPlace());
+		sParaTemp.put("customs_place", cfg.getAliCustomsPlace());
 
 		// 建立请求
 		String sHtmlText = AlipaySubmit.buildRequest(config, "", "", sParaTemp);

@@ -55,7 +55,8 @@
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="merchant_customs_code" property="merchantCustomsCode" jdbcType="VARCHAR" />
 		<result column="merchant_customs_name" property="merchantCustomsName" jdbcType="VARCHAR" />
-		<result column="customs_place" property="customsPlace" jdbcType="VARCHAR" />
+		<result column="customs_place" property="aliCustomsPlace" jdbcType="VARCHAR" />
+		<result column="wx_customs_place" property="wxCustomsPlace" jdbcType="VARCHAR" />
 	</resultMap>
 
 
@@ -104,6 +105,26 @@
 	
 	<select id="getCustomConfig" parameterType="Object" resultMap="customCfg">
 		select * from custom_config where supplier_id = #{supplierId}
+	</select>
+	
+	<!-- 支付原始数据相关 -->
+	<resultMap type="com.zm.pay.pojo.PayOriginData" id="data">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_id" property="orderId" jdbcType="VARCHAR" />
+		<result column="pay_type" property="payType" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<insert id="savePayOriginData" parameterType="Object">
+		insert into pay_origin_data (order_id,pay_type,type,content,create_time) 
+		values (#{orderId},#{payType},#{type},#{content},now())
+	</insert>
+	
+	<select id="listPayOriginDataByOrderId" parameterType="Object" resultMap="data">
+		select order_id,pay_type,content,type,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as create_time 
+		from pay_origin_data where order_id = #{orderId}
 	</select>
 
 </mapper>

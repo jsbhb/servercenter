@@ -55,8 +55,8 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 			String msg = ButtJointMessageUtils.getYouStongOrder(infoList);
 			String fullUrl = url + createOrder;
 			Set<SendOrderResult> set = sendYouStongWarehouse(fullUrl, msg, SendOrderResult.class);
-			if(set != null){
-				for(SendOrderResult result : set){
+			if (set != null) {
+				for (SendOrderResult result : set) {
 					result.setSupplierId(infoList.get(0).getSupplierId());
 				}
 			}
@@ -72,8 +72,8 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 			String msg = ButtJointMessageUtils.getYouStongOrderStatus(orderIds);
 			String fullUrl = url + getOrder;
 			Set<OrderStatus> set = sendYouStongWarehouse(fullUrl, msg, OrderStatus.class);
-			if(set != null){
-				for(OrderStatus result : set){
+			if (set != null) {
+				for (OrderStatus result : set) {
 					result.setSupplierId(orderList.get(0).getSupplierId());
 				}
 			}
@@ -87,7 +87,7 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 		List<String> itemCodeList = list.stream().map(tem -> tem.getItemCode()).collect(Collectors.toList());
 		String msg = ButtJointMessageUtils.getYouStongStock(itemCodeList);
 		String fullUrl = url + getProduct;
-		Set<CheckStockModel> set =  sendYouStongWarehouse(fullUrl, msg, CheckStockModel.class);
+		Set<CheckStockModel> set = sendYouStongWarehouse(fullUrl, msg, CheckStockModel.class);
 		return set;
 	}
 
@@ -113,7 +113,7 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 		param.put("request_id", requestId);
 		param.put("timestamp", timestamp);
 		param.put("data", msg);
-		String result = HttpClientUtil.post(url, param);
+		String result = HttpClientUtil.post(url, param, "", false);
 		if (result == null) {
 			return null;
 		}
@@ -126,7 +126,7 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 				return renderStatusResult(result, clazz);
 			} else if (obj instanceof SendOrderResult) {
 				return renderOrderResult(result, clazz);
-			} else if (obj instanceof CheckStockModel){
+			} else if (obj instanceof CheckStockModel) {
 				return renderStockResult(result, clazz);
 			} else {
 				return renderResult(result, "JSON", clazz);
@@ -153,13 +153,13 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 			}
 			Set set = new HashSet();
 			for (YouStongGoods goods : list) {
-				if(!goods.isHasQ4S() && !goods.isOnSale()){
+				if (!goods.isHasQ4S() && !goods.isOnSale()) {
 					set.add(goods.convert());
 				}
 			}
 			return set;
 		}
-		return null; 
+		return null;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -177,7 +177,7 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 			}
 			Set set = new HashSet();
 			for (YouStongOrder order : list) {
-				if(order.isSuccess()){
+				if (order.isSuccess()) {
 					set.add(order.convert());
 				}
 			}
@@ -241,7 +241,7 @@ public class YouStongButtjoint extends AbstractSupplierButtJoint {
 				set.add(status.convert());
 			}
 			System.out.println(set.toString());
-			
+
 		}
 	}
 

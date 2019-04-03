@@ -89,7 +89,7 @@ public class WeiXinPluginController {
 			// 公众号分享配置参数和公众号登录一样
 			WXLoginConfig param = new WXLoginConfig();
 			param.setCenterId(centerId);
-			param.setLoginType(1);
+			param.setLoginType(Constants.WX_LOGIN);
 			return weiXinPluginService.shareUrl(param, url);
 		}
 		return new ResultModel(false, "版本错误");

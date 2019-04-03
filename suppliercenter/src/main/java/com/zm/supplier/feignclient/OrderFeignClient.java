@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.zm.supplier.common.ResultModel;
+import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.ThirdOrderInfo;
+import com.zm.supplier.pojo.bo.CustomOrderExpress;
 import com.zm.supplier.pojo.callback.OrderStatusCallBack;
 
 @FeignClient("ordercenter")
@@ -27,4 +29,16 @@ public interface OrderFeignClient {
 	@RequestMapping(value = "{version}/order/status/call-back", method = RequestMethod.POST)
 	public ResultModel orderStatusCallBack(@PathVariable("version") Double version,
 			@RequestBody OrderStatusCallBack callBack);
+
+	@RequestMapping(value = "{version}/custom/order/express", method = RequestMethod.POST)
+	public void saveCustomOrderExpress(@PathVariable("version") Double version,
+			@RequestBody CustomOrderExpress orderExpress);
+
+	@RequestMapping(value = "{version}/order/exception/{orderId}", method = RequestMethod.GET)
+	public OrderInfo handleSupplierCenterExceptionOrder(@PathVariable("version") Double version,
+			@PathVariable("orderId") String orderId);
+	
+	@RequestMapping(value = "{version}/order/express/detail/{orderId}", method = RequestMethod.GET)
+	public String getOrderExpressDetail(@PathVariable("version") Double version,
+			@PathVariable("orderId") String orderId);
 }

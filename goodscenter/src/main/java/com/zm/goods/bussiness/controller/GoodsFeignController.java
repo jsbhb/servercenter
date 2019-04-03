@@ -14,6 +14,7 @@ import com.zm.goods.bussiness.service.GoodsFeignService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
 import com.zm.goods.pojo.ResultModel;
+import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsItemBO;
 
 /**
@@ -35,5 +36,20 @@ public class GoodsFeignController {
 		}
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+	
+	/**
+	 * @fun 补全订单申报时商品信息
+	 * @param version
+	 * @param itemIdList
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/goods/feign/custom/completion", method = RequestMethod.POST)
+	public List<CustomCompletion> customCompletion(@PathVariable("version") Double version,
+			@RequestBody List<String> itemIdList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsFeignService.customCompletion(itemIdList);
+		}
+		return null;
 	}
 }

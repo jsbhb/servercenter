@@ -107,7 +107,7 @@ public class QianFengButtJoint extends AbstractSupplierButtJoint {
 		}
 
 		logger.info("发送报文：" + msg + ",签名：" + sign);
-		String result = HttpClientUtil.post(url, paramMap);
+		String result = HttpClientUtil.post(url, paramMap, "", false);
 		logger.info("返回：" + param + "====" + result);
 
 		try {

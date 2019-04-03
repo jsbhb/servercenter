@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.zm.supplier.pojo.CheckStockModel;
+import com.zm.supplier.pojo.OrderStatus;
+import com.zm.supplier.pojo.ThirdOrderInfo;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.supplierinf.model.EdbGoodsInfo;
 import com.zm.supplier.supplierinf.model.EdbGoodsInfoList;
@@ -39,6 +41,26 @@ public class ConvertUtil {
 			}
 		}
 		return result;
+	}
+	
+	public static ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {
+		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
+		thirdOrder.setExpressId(orderStatus.getExpressId());
+		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
+		thirdOrder.setSupplierId(orderStatus.getSupplierId());
+		if (orderStatus.getLogisticsCode() == null) {
+			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsName()));
+		} else {
+			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
+		}
+		thirdOrder.setRemark(orderStatus.getMsg());
+		String CNStatus = StatusTOChiness.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus());
+		thirdOrder.setStatus((CNStatus == null || "".equals(CNStatus)) ? orderStatus.getStatus() : CNStatus);
+		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus()));
+		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
+		thirdOrder.setOrderId(orderStatus.getOrderId());
+		thirdOrder.setItemCode(orderStatus.getItemCode());
+		return thirdOrder;
 	}
 
 }

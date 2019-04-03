@@ -92,4 +92,11 @@ public interface SupplierService {
 	 * @since JDK 1.7  
 	 */
 	void updateSupplier(SupplierEntity entity);
+
+	/**
+	 * @fun 订单流程节点出错时，根据type进行申报或者加签推送总署
+	 * @param orderId
+	 * @param type
+	 */
+	void handleExceptionOrder(String orderId, int type);
 }

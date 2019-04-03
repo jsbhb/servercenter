@@ -31,7 +31,7 @@ public class XmlUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void parseNode(Map<String, String> result, Element node) {
+	public static void parseNode(Map<String, String> result, Element node) {
 		if (!(node.getTextTrim().equals(""))) {
 			Attribute attr = node.attribute("name");
 			if (attr == null) {

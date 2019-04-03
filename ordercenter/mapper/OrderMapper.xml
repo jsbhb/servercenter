@@ -16,6 +16,7 @@
 		<result column="guide_id" property="guideId" jdbcType="INTEGER" />
 		<result column="weight" property="weight" jdbcType="INTEGER" />
 		<result column="order_flag" property="orderFlag" jdbcType="INTEGER" />
+		<result column="tdq" property="tdq" jdbcType="INTEGER" />
 		<result column="create_type" property="createType" jdbcType="INTEGER" />
 		<result column="coupon_ids" property="couponIds" jdbcType="VARCHAR" />
 		<result column="express_type" property="expressType" jdbcType="INTEGER" />
@@ -401,12 +402,9 @@
 		,oe.id as orderExpress_id,oe.order_id as oeorder_id,oe.express_key,oe.express_name,oe.express_id,oe.status as oestatus
 		from order_base o
 		left join order_detail od on o.order_id =od.order_id
-		left join
-		order_goods og on o.order_id = og.order_id 
+		left join order_goods og on o.order_id = og.order_id 
         left join third_order_info oe on oe.order_id = o.order_id 
-        where o.order_id
-		=
-		#{orderId}
+        where o.order_id = #{orderId}
 	</select>
 	
 	<!-- 返佣 -->
@@ -603,6 +601,21 @@
 		left join
 		order_goods og on o.order_id = og.order_id where o.status=12 and tag_fun = 0 and o.order_flag = 2
 	</select>
+	
+	<select id="getOrderForSupplierCenterHandle" resultMap="orderBase">
+		select
+		o.id,o.order_id,o.status,o.weight,o.user_id,o.supplier_id,DATE_FORMAT(o.create_time,'%Y-%m-%d %H:%i:%s') as create_time,od.id
+		as
+		detail_id,od.payment,od.post_fee,od.tax_fee,od.tariff_tax,od.increment_tax,od.excise_tax,o.order_flag,o.mall_id,
+		od.pay_type,od.pay_no,og.id as goods_id,og.item_id,og.item_name,og.item_quantity,DATE_FORMAT(od.pay_time,'%Y-%m-%d %H:%i:%s') as pay_time,
+		og.item_code,od.customer_idnum,od.customer_name,od.customer_phone,og.unit,
+		og.item_price,og.actual_price,og.sku,od.dis_amount,od.receive_name,od.receive_phone,od.receive_province,
+		od.receive_city,od.receive_area,od.receive_address,o.tdq 
+		from order_base o
+		left join order_detail od on o.order_id =od.order_id
+		left join
+		order_goods og on o.order_id = og.order_id where o.order_id = #{orderId}
+	</select>
 	<!-- end -->
 	
 	<!-- 获取计算资金池订单 -->
@@ -781,5 +794,22 @@
 		 <foreach collection="list" item="item" open="(" close=")" separator=",">
 			#{item}
 		</foreach>
+	</select>
+	
+	<insert id="saveCustomOrderExpress" parameterType="Object">
+		insert ignore into custom_order_express(order_id,json_str,create_time) 
+		values (#{orderId},#{jsonStr},now())
+	</insert>
+	
+	<select id="getOrderExpressDetail" parameterType="Object" resultType="java.lang.String">
+		select json_str from custom_order_express where order_id = #{orderId}
+	</select>
+	
+	<select id="listOrderGoodsByOrderId" parameterType="Object" resultMap="orderGoods">
+		select id,order_id,item_name,goods_id as goodsId from order_goods where order_id = #{orderId}
+	</select>
+	
+	<select id="getOrderDetailByOrderId" parameterType="Object" resultType="java.util.HashMap">
+		select pay_no,payment from order_detail where order_id = #{orderId}
 	</select>
 </mapper>

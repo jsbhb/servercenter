@@ -1084,4 +1084,13 @@ public class OrderServiceImpl implements OrderService {
 		}
 		return result;
 	}
+
+	@Override
+	public OrderInfo handleSupplierCenterExceptionOrder(String orderId) {
+		OrderInfo info = orderMapper.getOrderForSupplierCenterHandle(orderId);
+		List<OrderInfo> orderList = new ArrayList<>();
+		orderList.add(info);
+		packageOrderInfoByList(orderList);
+		return info;
+	}
 }

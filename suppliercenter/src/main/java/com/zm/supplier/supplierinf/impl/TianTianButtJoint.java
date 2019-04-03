@@ -56,7 +56,7 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		String targetUrl = url.replace("{action}", "order.create");
 		Set<SendOrderResult> set = sendTianTianWarehouse(targetUrl, msg, SendOrderResult.class,
 				infoList.get(0).getOrderId());
-		if(set != null){
+		if (set != null) {
 			for (SendOrderResult model : set) {
 				model.setSupplierId(infoList.get(0).getSupplierId());
 				model.setOrderId(infoList.get(0).getOrderId());
@@ -114,7 +114,7 @@ public class TianTianButtJoint extends AbstractSupplierButtJoint {
 		paramMap.put("secretKey", appSecret);
 
 		logger.info("发送报文：" + msg + ",签名：" + sign);
-		String result = HttpClientUtil.post(url, paramMap);
+		String result = HttpClientUtil.post(url, paramMap, "", false);
 		logger.info("返回：" + param + "====" + result);
 
 		try {

@@ -35,4 +35,7 @@ public interface UserFeignClient {
 	
 	@RequestMapping(value = "{version}/user/feign/grade/children/{gradeId}", method = RequestMethod.GET)
 	public List<Integer> listChildrenGrade(@PathVariable("version") Double version,@PathVariable("gradeId") Integer gradeId);
+	
+	@RequestMapping(value = "{version}/grade-url/{centerId}", method = RequestMethod.GET)
+	public String getClientUrl(@PathVariable("centerId")Integer centerId, @PathVariable("version")Double version);
 }

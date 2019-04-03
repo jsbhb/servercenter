@@ -826,4 +826,14 @@
 		</foreach>
 	</select>
 	
+	<select id="listGoodsInfoForCstomCompletion" parameterType="Object" resultType="com.zm.goods.pojo.bo.CustomCompletion">
+		select gi.item_id as itemId,b.brand,g.origin,b.hscode from goods_item gi 
+		left join goods g on gi.goods_id = g.goods_id 
+		left join base b on b.id = g.base_id 
+		where gi.item_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
 </mapper>

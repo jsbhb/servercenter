@@ -29,10 +29,8 @@ import com.zm.supplier.pojo.ThirdOrderInfo;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
 import com.zm.supplier.pojo.WarehouseStock;
 import com.zm.supplier.supplierinf.AbstractSupplierButtJoint;
-import com.zm.supplier.util.ExpressContrast;
+import com.zm.supplier.util.ConvertUtil;
 import com.zm.supplier.util.SpringContextUtil;
-import com.zm.supplier.util.StatusContrast;
-import com.zm.supplier.util.StatusTOChiness;
 
 @Component
 public class WarehouseThreadPool {
@@ -110,7 +108,7 @@ public class WarehouseThreadPool {
 			List<ThirdOrderInfo> list = new ArrayList<ThirdOrderInfo>();
 			ThirdOrderInfo thirdOrder = null;
 			for (OrderStatus orderStatus : set) {
-				thirdOrder = toThirdOrder(orderStatus);
+				thirdOrder = ConvertUtil.toThirdOrder(orderStatus);
 				list.add(thirdOrder);
 			}
 			orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
@@ -213,26 +211,6 @@ public class WarehouseThreadPool {
 		stock.setItemId(tem.getItemId());
 		stock.setQuantity(Integer.valueOf(tem.getQuantity()));
 		return stock;
-	}
-
-	private ThirdOrderInfo toThirdOrder(OrderStatus orderStatus) {
-		ThirdOrderInfo thirdOrder = new ThirdOrderInfo();
-		thirdOrder.setExpressId(orderStatus.getExpressId());
-		thirdOrder.setExpressKey(orderStatus.getLogisticsCode());
-		thirdOrder.setSupplierId(orderStatus.getSupplierId());
-		if (orderStatus.getLogisticsCode() == null) {
-			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsName()));
-		} else {
-			thirdOrder.setExpressName(ExpressContrast.get(orderStatus.getLogisticsCode()));
-		}
-		thirdOrder.setRemark(orderStatus.getMsg());
-		String CNStatus = StatusTOChiness.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus());
-		thirdOrder.setStatus((CNStatus == null || "".equals(CNStatus)) ? orderStatus.getStatus() : CNStatus);
-		thirdOrder.setOrderStatus(StatusContrast.get(orderStatus.getSupplierId() + "-" + orderStatus.getStatus()));
-		thirdOrder.setThirdOrderId(orderStatus.getThirdOrderId());
-		thirdOrder.setOrderId(orderStatus.getOrderId());
-		thirdOrder.setItemCode(orderStatus.getItemCode());
-		return thirdOrder;
 	}
 
 	private AbstractSupplierButtJoint getTargetInterface(Integer supplierId) {

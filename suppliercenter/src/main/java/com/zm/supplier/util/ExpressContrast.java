@@ -41,6 +41,7 @@ public class ExpressContrast {
 			put("申通快递", "申通快递");
 			put("顺丰快递", "顺丰快递");
 			put("韵达速递", "韵达快递");
+			put("shunfeng", "顺丰快递");
 		}
 	};
 

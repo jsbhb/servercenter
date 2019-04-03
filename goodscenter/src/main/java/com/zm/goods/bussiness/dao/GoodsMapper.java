@@ -20,6 +20,7 @@ import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
 import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.bo.CategoryBO;
+import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsLifeCycleModel;
 import com.zm.goods.pojo.bo.ItemCountBO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
@@ -162,5 +163,7 @@ public interface GoodsMapper {
 	GoodsItem getGoodsItemByGoodsIdForGoodsBillboard(String goodsId);
 
 	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
+
+	List<CustomCompletion> listGoodsInfoForCstomCompletion(List<String> itemIdList);
 
 }

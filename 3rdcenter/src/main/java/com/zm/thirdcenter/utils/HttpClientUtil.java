@@ -34,6 +34,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.zm.thirdcenter.exception.WxCodeException;
 
@@ -198,12 +199,8 @@ public class HttpClientUtil {
 	}
 
 	/**
-	 * @fun 微信https请求
-	 * @param url
-	 * @param jsonStr
-	 * @return
-	 * @throws WxCodeException 
-	 * @throws  
+	 * @fun 微信https请求 @param url @param jsonStr @return @throws
+	 * WxCodeException @throws
 	 */
 	public static byte[] postForWxCode(String url, String jsonStr) throws WxCodeException {
 		byte[] resultStr = null;
@@ -374,6 +371,142 @@ public class HttpClientUtil {
 		} catch (Exception e) {
 			httpPost.abort();
 			logger.error("http post error ", e);
+			return null;
+			// 关闭连接,释放资源
+		} finally {
+			try {
+				if (entity != null) {
+					EntityUtils.consume(entity);// 关闭
+				}
+				if (response != null) {
+					response.close();
+				}
+				if (httpPost != null) {
+					// 关闭连接,释放资源
+					httpPost.releaseConnection();
+				}
+
+			} catch (Exception e) {
+				logger.error("http post error " + e.getMessage());
+			}
+
+		}
+		return resultStr;
+	}
+
+	public static String post(String url, String jsonStr, String ContentType, boolean isHttps) {
+		String resultStr = "";
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+
+		// 创建httppost
+		HttpPost httpPost = new HttpPost(url);
+
+		StringEntity stringEntity = new StringEntity(jsonStr, Charsets.UTF_8);
+		logger.info("executing request json：" + jsonStr);
+		if (ContentType == null) {
+			stringEntity.setContentType("text/plain; charset=UTF-8");
+			httpPost.addHeader("Content-Type", "text/plain; charset=UTF-8");
+		} else {
+			stringEntity.setContentType(ContentType);
+			httpPost.addHeader("Content-Type", ContentType);
+		}
+		HttpEntity entity = null;
+		CloseableHttpResponse response = null;
+		try {
+			httpPost.setEntity(stringEntity);
+			httpPost.setConfig(requestConfig);
+			logger.info("executing request uri：" + httpPost.getURI());
+			if (isHttps) {
+				response = httpsclient.execute(httpPost);
+			} else {
+				response = httpclient.execute(httpPost);
+			}
+
+			// 如果连接状态异常，则直接关闭
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logger.info("httpclient 访问异常 ");
+				httpPost.abort();
+				return null;
+			}
+			entity = response.getEntity();
+			if (entity != null) {
+				resultStr = EntityUtils.toString(entity, "UTF-8");
+				logger.info(" httpClient response string " + resultStr);
+			}
+
+		} catch (Exception e) {
+			httpPost.abort();
+			logger.error("http post error " + e.getMessage());
+			return null;
+			// 关闭连接,释放资源
+		} finally {
+			try {
+				if (entity != null) {
+					EntityUtils.consume(entity);// 关闭
+				}
+				if (response != null) {
+					response.close();
+				}
+				if (httpPost != null) {
+					// 关闭连接,释放资源
+					httpPost.releaseConnection();
+				}
+
+			} catch (Exception e) {
+				logger.error("http post error " + e.getMessage());
+			}
+
+		}
+		return resultStr;
+	}
+	
+	public static String post(String url, Map<String, String> params, String ContentType, boolean https) {
+		String resultStr = "";
+		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
+		// 创建httppost
+		HttpPost httpPost = new HttpPost(url);
+		// 创建参数队列
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		// 绑定到请求 Entry
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			formParams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+		}
+
+		UrlEncodedFormEntity uefEntity;
+		HttpEntity entity = null;
+		CloseableHttpResponse response = null;
+		try {
+			uefEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
+			logger.info("executing request params" + formParams.toString());
+			httpPost.setEntity(uefEntity);
+			httpPost.setConfig(requestConfig);
+			if (!StringUtils.isEmpty(ContentType)) {
+				httpPost.addHeader("Content-Type", ContentType);
+			} 
+			logger.info("executing request uri：" + httpPost.getURI());
+			if(https){
+				response = httpsclient.execute(httpPost);
+			} else {
+				response = httpclient.execute(httpPost);
+			}
+			// 如果连接状态异常，则直接关闭
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logger.info(response.getStatusLine().getStatusCode()+",httpclient 访问异常, "+response.toString());
+				httpPost.abort();
+				return null;
+			}
+			entity = response.getEntity();
+			if (entity != null) {
+				resultStr = EntityUtils.toString(entity, "UTF-8");
+				logger.info(" httpClient response string " + resultStr);
+			}
+
+		} catch (Exception e) {
+			httpPost.abort();
+			e.printStackTrace();
+			logger.error("http post error " + e.getMessage());
 			return null;
 			// 关闭连接,释放资源
 		} finally {

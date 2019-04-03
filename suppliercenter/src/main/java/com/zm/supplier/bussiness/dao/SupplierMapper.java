@@ -5,9 +5,12 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.github.pagehelper.Page;
+import com.zm.supplier.custominf.model.CustomConfig;
 import com.zm.supplier.pojo.Express;
 import com.zm.supplier.pojo.SupplierEntity;
 import com.zm.supplier.pojo.SupplierInterface;
+import com.zm.supplier.pojo.bo.CustomOrderExpress;
+import com.zm.supplier.pojo.bo.SupplierResponse;
 
 public interface SupplierMapper {
 
@@ -63,4 +66,18 @@ public interface SupplierMapper {
 	 * @since JDK 1.7
 	 */
 	void update(SupplierEntity entity);
+	/**
+	 * @fun 根据customId 获取对应海关的配置信息
+	 * @param id
+	 * @return
+	 */
+	CustomConfig getCustomConfig(Integer id);
+
+	/**
+	 * @fun 保存同步回执
+	 * @param response
+	 */
+	void saveResponse(SupplierResponse response);
+	
+	void saveCustomOrderReturn(CustomOrderExpress tmp);
 }

@@ -30,8 +30,9 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 		String msg = ButtJointMessageUtils.getFuBangOrderMsg(infoList.get(0));
 		String sign = SignUtil.fuBangSign(msg, appSecret);
 		String targetUrl = url.replace("{action}", "disOrder");
-		Set<SendOrderResult> set = sendFuBangWarehouse(targetUrl, msg, sign, SendOrderResult.class, infoList.get(0).getOrderId());
-		if(set != null){
+		Set<SendOrderResult> set = sendFuBangWarehouse(targetUrl, msg, sign, SendOrderResult.class,
+				infoList.get(0).getOrderId());
+		if (set != null) {
 			for (SendOrderResult model : set) {
 				model.setSupplierId(infoList.get(0).getSupplierId());
 				model.setOrderId(infoList.get(0).getOrderId());
@@ -86,7 +87,7 @@ public class FuBangButtJoint extends AbstractSupplierButtJoint {
 		param.put("data", msg);
 		param.put("sign", sign);
 
-		String result = HttpClientUtil.post(url, param);
+		String result = HttpClientUtil.post(url, param, "", false);
 		logger.info("返回：" + parem + "===" + result);
 
 		try {

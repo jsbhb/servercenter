@@ -38,6 +38,36 @@ public class OrderGoods {
 	private int conversion;
 	
 	private String unit;
+	
+	private String hsCode;
+	
+	private String origin;
+	
+	private String brand;
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
+	public String getHsCode() {
+		return hsCode;
+	}
+
+	public void setHsCode(String hsCode) {
+		this.hsCode = hsCode;
+	}
 
 	public String getUnit() {
 		return unit;

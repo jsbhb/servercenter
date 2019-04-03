@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.thirdcenter.bussiness.dao.CustomsMapper">
+
+	<insert id="saveCustomRequest" parameterType="Object">
+		insert into customs_request(order_id,session_id,service_time,status,create_time,remark) 
+		values (#{orderNo},#{sessionID},#{serviceTime},#{status},now(),#{remark})
+	</insert>
+
+</mapper>

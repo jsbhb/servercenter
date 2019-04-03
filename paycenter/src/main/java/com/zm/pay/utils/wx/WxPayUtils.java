@@ -18,7 +18,6 @@ import com.zm.pay.pojo.PayModel;
 import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.utils.CommonUtils;
-import com.zm.pay.utils.unionpay.sdk.LogUtil;
 
 public class WxPayUtils {
 
@@ -28,46 +27,6 @@ public class WxPayUtils {
 	private static final Integer READ_TIMEOUTMS = 5000;
 
 	private static Logger logger = LoggerFactory.getLogger(WxPayUtils.class);
-
-	// 统一下单接口
-	public static Map<String, String> unifiedOrder(String type, WeixinPayConfig config, PayModel model)
-			throws Exception {
-
-		if (Constants.JSAPI_WX_APPLET.equalsIgnoreCase(type)) {
-			config.setAppID(config.getAppletAppId());
-			type = type.split("_")[0];
-		}
-
-		WXPay wxpay = new WXPay(config);
-
-		Map<String, String> data = new HashMap<String, String>();
-		data.put("body", model.getBody());
-		data.put("device_info", "");
-		data.put("out_trade_no", model.getOrderId());
-		data.put("fee_type", Constants.FEE_TYPE);
-		data.put("total_fee", model.getTotalAmount());
-		data.put("notify_url", Constants.WX_NOTIFY_URL);
-		data.put("detail", model.getDetail() == null ? "" : model.getDetail());
-		// 支付时间设定为5分钟
-		// Calendar cal = Calendar.getInstance();
-		// data.put("time_start", sdf.format(cal.getTime()));
-		// cal.add(Calendar.HOUR, Constants.PAY_EFFECTIVE_TIME_HOUR);
-		// data.put("time_expire", sdf.format(cal.getTime()));
-		data.put("trade_type", type);
-		if (Constants.JSAPI.equals(type)) {
-			data.put("openid", model.getOpenId());
-			data.put("spbill_create_ip", Constants.CREATE_IP);
-		} else if (Constants.MWEB.equals(type) || Constants.APP.equals(type)) {
-			data.put("spbill_create_ip", model.getIP());
-		} else if (Constants.NATIVE.equals(type)) {
-			data.put("spbill_create_ip", Constants.CREATE_IP);
-			data.put("product_id", model.getOrderId());
-		}
-
-		Map<String, String> resp = wxpay.unifiedOrder(data);
-		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + resp.toString());
-		return resp;
-	}
 
 	// 微信退款接口
 	public static Map<String, String> wxRefundPay(WeixinPayConfig config, RefundPayModel model) throws Exception {
@@ -97,7 +56,7 @@ public class WxPayUtils {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("out_trade_no", custom.getOutRequestNo());
 		data.put("transaction_id", custom.getPayNo());
-		data.put("customs", customCfg.getCustomsPlace());
+		data.put("customs", customCfg.getWxCustomsPlace());
 		data.put("mch_customs_no", customCfg.getMerchantCustomsCode());
 
 		data = fillRequestData(data, config);

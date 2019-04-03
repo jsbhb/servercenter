@@ -94,7 +94,7 @@ public class JiaBeiAiTeButtjoint extends AbstractSupplierButtJoint {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("jsonStr", jsonStr);
 
-		String result = HttpClientUtil.post(url, param);
+		String result = HttpClientUtil.post(url, param, "", false);
 		logger.info("返回：" + parem + "===" + result);
 		result = result.substring(result.indexOf("{"), result.lastIndexOf("}") + 1);
 		try {

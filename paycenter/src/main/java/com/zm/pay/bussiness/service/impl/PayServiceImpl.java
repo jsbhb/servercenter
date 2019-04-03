@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayConstants;
+import com.github.wxpay.sdk.WXPayUtil;
 import com.zm.pay.bussiness.dao.PayMapper;
 import com.zm.pay.bussiness.service.PayService;
 import com.zm.pay.constants.Constants;
@@ -38,6 +40,7 @@ import com.zm.pay.pojo.AliPayConfigModel;
 import com.zm.pay.pojo.CustomConfig;
 import com.zm.pay.pojo.CustomModel;
 import com.zm.pay.pojo.PayModel;
+import com.zm.pay.pojo.PayOriginData;
 import com.zm.pay.pojo.RefundPayModel;
 import com.zm.pay.pojo.ResultModel;
 import com.zm.pay.pojo.UnionPayConfig;
@@ -99,7 +102,7 @@ public class PayServiceImpl implements PayService {
 		config.setHttpReadTimeoutMs(5000);
 		Map<String, String> result = new HashMap<String, String>();
 		try {
-			Map<String, String> resp = WxPayUtils.unifiedOrder(type, config, model);
+			Map<String, String> resp = unifiedOrder(type, config, model);
 			String return_code = (String) resp.get("return_code");
 			String result_code = (String) resp.get("result_code");
 			if ("SUCCESS".equals(return_code) && "SUCCESS".equals(result_code)) {
@@ -115,6 +118,64 @@ public class PayServiceImpl implements PayService {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	/**
+	 * @fun 微信数据封装及请求
+	 * @param type
+	 * @param config
+	 * @param model
+	 * @return
+	 * @throws Exception
+	 */
+	private Map<String, String> unifiedOrder(String type, WeixinPayConfig config, PayModel model) throws Exception {
+		if (Constants.JSAPI_WX_APPLET.equalsIgnoreCase(type)) {
+			config.setAppID(config.getAppletAppId());
+			type = type.split("_")[0];
+		}
+
+		WXPay wxpay = new WXPay(config);
+
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("body", model.getBody());
+		data.put("device_info", "");
+		data.put("out_trade_no", model.getOrderId());
+		data.put("fee_type", Constants.FEE_TYPE);
+		data.put("total_fee", model.getTotalAmount());
+		data.put("notify_url", Constants.WX_NOTIFY_URL);
+		data.put("detail", model.getDetail() == null ? "" : model.getDetail());
+		data.put("trade_type", type);
+		if (Constants.JSAPI.equals(type)) {
+			data.put("openid", model.getOpenId());
+			data.put("spbill_create_ip", Constants.CREATE_IP);
+		} else if (Constants.MWEB.equals(type) || Constants.APP.equals(type)) {
+			data.put("spbill_create_ip", model.getIP());
+		} else if (Constants.NATIVE.equals(type)) {
+			data.put("spbill_create_ip", Constants.CREATE_IP);
+			data.put("product_id", model.getOrderId());
+		}
+		//保存请求原始数据
+		String originData = createWXData(data,config);
+		savePayOriginData(Constants.WX_PAY, originData, model.getOrderId());
+		Map<String, String> resp = wxpay.unifiedOrder(data);
+		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + resp.toString());
+		return resp;
+	}
+
+	/**
+	 * @fun 微信生成请求数据
+	 * @param reqData
+	 * @param config
+	 * @return
+	 * @throws Exception
+	 */
+	private String createWXData(Map<String, String> reqData, WeixinPayConfig config) throws Exception {
+		reqData.put("appid", config.getAppID());
+		reqData.put("mch_id", config.getMchID());
+		reqData.put("nonce_str", WXPayUtil.generateNonceStr());
+		reqData.put("sign_type", "MD5");
+		reqData.put("sign", WXPayUtil.generateSignature(reqData, config.getKey(), WXPayConstants.SignType.MD5));
+		return WXPayUtil.mapToXml(reqData);
 	}
 
 	@Override
@@ -211,23 +272,27 @@ public class PayServiceImpl implements PayService {
 		if (Constants.SCAN_CODE.equals(type)) {
 			String htmlStr = AliPayUtils.aliPay(type, config, model);
 			LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + htmlStr);
-			// AlipayTradePrecreateResponse response =
-			// AliPayUtils.precreate(config, model);
-			// if (response.isSuccess()) {
 			result.put("success", true);
 			result.put("htmlStr", htmlStr);
-			// result.put("urlCode", response.getQrCode());
-			// } else {
-			// logger.info(response.getCode() + "=====" + response.getMsg() +
-			// "," + response.getSubCode() + "====="
-			// + response.getSubMsg());
-			// result.put("success", false);
-			// result.put("errorMsg", response.getMsg());
-			// result.put("errorSubMsg", response.getSubMsg());
-			// }
+			// 保存原始请求报文
+			savePayOriginData(Constants.ALI_PAY, htmlStr, model.getOrderId());
 		}
 
 		return result;
+	}
+
+	/**
+	 * @fun 保存原始请求数据
+	 * @param payType
+	 * @param htmlStr
+	 */
+	private void savePayOriginData(Integer payType, String htmlStr, String orderId) {
+		PayOriginData data = new PayOriginData();
+		data.setContent(htmlStr);
+		data.setOrderId(orderId);
+		data.setPayType(payType);
+		data.setType(1);// 支付请求类型
+		payMapper.savePayOriginData(data);
 	}
 
 	@Override

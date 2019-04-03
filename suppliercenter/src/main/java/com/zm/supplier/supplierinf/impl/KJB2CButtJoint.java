@@ -117,7 +117,11 @@ public class KJB2CButtJoint extends AbstractSupplierButtJoint {
 		paramMap.put("msgtype", msgType);
 
 		logger.info("发送报文：" + msg + ",签名：" + sign);
-		String result = HttpClientUtil.post(url, paramMap);
+		String result = HttpClientUtil.post(url, paramMap, "", false);
+		//保存推送订单回执
+		if(order.equals(msgType)){
+			saveResponse(param, result);
+		}
 		logger.info("返回：" + param + "====" + result);
 
 		try {

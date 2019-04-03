@@ -3,9 +3,12 @@ package com.zm.supplier.supplierinf;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.pojo.CheckStockModel;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderCancelResult;
@@ -15,6 +18,8 @@ import com.zm.supplier.pojo.OrderStatus;
 import com.zm.supplier.pojo.SendOrderResult;
 import com.zm.supplier.pojo.SupplierInterface;
 import com.zm.supplier.pojo.ThirdWarehouseGoods;
+import com.zm.supplier.pojo.bo.SupplierResponse;
+import com.zm.supplier.pojo.bo.SupplierResponseEnum;
 import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.XmlUtil;
 
@@ -29,6 +34,9 @@ public abstract class AbstractSupplierButtJoint {
 	protected String accountId;
 	
 	protected String memberId;
+	
+	@Resource
+	protected SupplierMapper supplierMapper;
 	
 	private static final String XML = "XML";
 	private static final String JSON = "JSON";
@@ -56,6 +64,18 @@ public abstract class AbstractSupplierButtJoint {
 			//失败后处理
 		}
 		return set;
+	}
+	/**
+	 * @fun 保存回执
+	 * @param orderId
+	 * @param result
+	 */
+	public void saveResponse(String orderId, String result){
+		SupplierResponse response = new SupplierResponse();
+		response.setContent(result);
+		response.setOrderId(orderId);
+		response.setType(SupplierResponseEnum.SEND_WAREHOUSE.ordinal());
+		supplierMapper.saveResponse(response);
 	}
 	
 	public void init(SupplierInterface inf){

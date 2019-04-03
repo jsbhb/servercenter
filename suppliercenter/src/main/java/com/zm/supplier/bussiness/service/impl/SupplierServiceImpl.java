@@ -13,16 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.zm.supplier.bussiness.component.CustomThreadPool;
 import com.zm.supplier.bussiness.component.WarehouseThreadPool;
 import com.zm.supplier.bussiness.dao.SupplierMapper;
 import com.zm.supplier.bussiness.service.SupplierService;
 import com.zm.supplier.common.ResultModel;
+import com.zm.supplier.constants.Constants;
+import com.zm.supplier.feignclient.OrderFeignClient;
 import com.zm.supplier.pojo.Express;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.SupplierEntity;
 import com.zm.supplier.pojo.SupplierInterface;
+import com.zm.supplier.pojo.bo.SupplierResponseEnum;
+import com.zm.supplier.pojo.callback.ReceiveLogisticsCompany;
+import com.zm.supplier.util.JSONUtil;
 import com.zm.supplier.util.ListUtil;
 
 @Service
@@ -35,6 +41,12 @@ public class SupplierServiceImpl implements SupplierService {
 	@Resource
 	WarehouseThreadPool warehouseThreadPool;
 	
+	@Resource
+	OrderFeignClient orderFeignClient;
+	
+	@Resource
+	CustomThreadPool customThreadPool;
+
 	private final Integer FUBANG_WAREHOUSE = 4;
 	private final Integer LIANGYOU_WAREHOUSE = 2;
 	private final Integer YOU_SHI_TONG_WAREHOUSE = 38;
@@ -172,6 +184,59 @@ public class SupplierServiceImpl implements SupplierService {
 	@Override
 	public void updateSupplier(SupplierEntity entity) {
 		supplierMapper.update(entity);
+	}
+
+	@Override
+	public void handleExceptionOrder(String orderId, int type) {
+		SupplierResponseEnum srenum = SupplierResponseEnum.values()[type];
+		switch (srenum) {
+		case SEND_WAREHOUSE:
+			sendToWarehouse(orderId);
+			break;
+		case CUSTOMS:
+			customsOrder(orderId);
+			break;
+		case SIGN:
+			addSignAndSendZsCustoms(orderId);
+			break;
+		case ZONGSHU_CUSTOMS:
+			addSignAndSendZsCustoms(orderId);
+			break;
+		default:
+			break;
+		}
+	}
+	
+	/**
+	 * @fun 加签并申报总署
+	 * @param orderId
+	 */
+	private void addSignAndSendZsCustoms(String orderId) {
+		OrderInfo info = orderFeignClient.handleSupplierCenterExceptionOrder(Constants.FIRST_VERSION, orderId);
+		String str = orderFeignClient.getOrderExpressDetail(Constants.FIRST_VERSION, orderId);
+		ReceiveLogisticsCompany receiveLogisticsCompany = JSONUtil.parse(str, ReceiveLogisticsCompany.class);
+		customThreadPool.addSignatureAndZsCustoms(info, receiveLogisticsCompany);
+	}
+
+	/**
+	 * @fun 属地版订单申报
+	 * @param orderId
+	 */
+	private void customsOrder(String orderId) {
+		String str = orderFeignClient.getOrderExpressDetail(Constants.FIRST_VERSION, orderId);
+		ReceiveLogisticsCompany receiveLogisticsCompany = JSONUtil.parse(str, ReceiveLogisticsCompany.class);
+		customThreadPool.customOrder(receiveLogisticsCompany);
+	}
+
+	/**
+	 * @fun 发送仓库
+	 * @param orderId
+	 */
+	private void sendToWarehouse(String orderId) {
+		OrderInfo info = orderFeignClient.handleSupplierCenterExceptionOrder(Constants.FIRST_VERSION, orderId);
+		List<OrderInfo> infoList = new ArrayList<>();
+		infoList.add(info);
+		sendOrder(infoList);
 	}
 
 }

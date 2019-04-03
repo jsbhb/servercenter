@@ -2,18 +2,23 @@ package com.zm.supplier.util;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.seatent.opensdk.input.hdServiceProvider.CreateOrderInputDto;
 import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
 import com.zm.supplier.constants.Constants;
+import com.zm.supplier.custominf.model.CustomConfig;
 import com.zm.supplier.pojo.OrderBussinessModel;
 import com.zm.supplier.pojo.OrderGoods;
 import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
+import com.zm.supplier.pojo.callback.ReceiveLogisticsCompany;
 import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
+import com.zm.supplier.supplierinf.model.DolphinOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
 import com.zm.supplier.supplierinf.model.GetXinYunGoodsParam;
@@ -29,8 +34,7 @@ import com.zm.supplier.supplierinf.model.XinYunOrder;
 
 public class ButtJointMessageUtils {
 
-	public static String getTianTianOrderMsg(OrderInfo info, String customer, String unionPayMerId,
-			String shopId) {
+	public static String getTianTianOrderMsg(OrderInfo info, String customer, String unionPayMerId, String shopId) {
 		StringBuilder sb = new StringBuilder();
 		String source = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -732,9 +736,9 @@ public class ButtJointMessageUtils {
 	}
 
 	public static String getJiaBeiAiTeOrderMsg(OrderInfo info) {
-		//佳贝艾特订单状态: 1>等待买家付款  2>等待卖家发货 3>卖家部分发货 4>等待买家确认收货 
-		//5>买家已签收确认收货 6>交易成功 7>交易自动关闭 8>交易主动关闭 9>退款中
-		//目前暂时只使用: 2>等待卖家发货 9>退款中
+		// 佳贝艾特订单状态: 1>等待买家付款 2>等待卖家发货 3>卖家部分发货 4>等待买家确认收货
+		// 5>买家已签收确认收货 6>交易成功 7>交易自动关闭 8>交易主动关闭 9>退款中
+		// 目前暂时只使用: 2>等待卖家发货 9>退款中
 		JiaBeiAiTeOrder order = new JiaBeiAiTeOrder();
 		order.setTrade_no(info.getOrderId());
 		if (Constants.REFUNDS.equals(info.getStatus())) {// 海外购系统状态
@@ -742,10 +746,10 @@ public class ButtJointMessageUtils {
 		} else {
 			order.setTrade_status("2");
 		}
-		order.setTotal_fee(info.getOrderDetail().getPayment()+"");
-		order.setPayment(info.getOrderDetail().getPayment()+"");
-		order.setPost_fee(info.getOrderDetail().getPostFee()+"");
-		order.setDiscount_fee(info.getOrderDetail().getDisAmount()+"");
+		order.setTotal_fee(info.getOrderDetail().getPayment() + "");
+		order.setPayment(info.getOrderDetail().getPayment() + "");
+		order.setPost_fee(info.getOrderDetail().getPostFee() + "");
+		order.setDiscount_fee(info.getOrderDetail().getDisAmount() + "");
 		order.setModify_time(info.getUpdateTime());
 		order.setCreate_time(info.getCreateTime());
 		order.setPay_time(info.getOrderDetail().getPayTime());
@@ -776,17 +780,18 @@ public class ButtJointMessageUtils {
 			orderGoods.setItem_sku_id(goods.getItemId());
 			orderGoods.setPop_item_title(goods.getItemName());
 			orderGoods.setItem_title(goods.getItemName());
-			orderGoods.setNum(goods.getItemQuantity()+"");
-			orderGoods.setItem_price(goods.getActualPrice()+"");
-			orderGoods.setTrade_total_payment(CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity())+"");
+			orderGoods.setNum(goods.getItemQuantity() + "");
+			orderGoods.setItem_price(goods.getActualPrice() + "");
+			orderGoods
+					.setTrade_total_payment(CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity()) + "");
 			orderGoods.setTrade_coupon_payment("0");
 			orderGoodsList.add(orderGoods);
 		}
 		order.setItemList(orderGoodsList);
 		return JSONUtil.toJson(order);
 	}
-	
-	public static String getZhengZhengOrderMsg(OrderInfo info,String accountId,String memberId) {
+
+	public static String getZhengZhengOrderMsg(OrderInfo info, String accountId, String memberId) {
 		String payMentName = "";
 		String payCode = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
@@ -819,11 +824,12 @@ public class ButtJointMessageUtils {
 		orderMap.put("ConsigneePhone", info.getOrderDetail().getReceivePhone());
 		orderMap.put("ConsigneeName", info.getOrderDetail().getReceiveName());
 		orderMap.put("CustomerAccount", info.getOrderDetail().getCustomerPhone());
-		Map<String,Object> goodsMap = null;
-		List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		Map<String, Object> goodsMap = null;
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		double goodsAmount = 0;
-		for(OrderGoods goods : info.getOrderGoodsList()){
-			goodsAmount = CalculationUtils.add(goodsAmount, CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity()));
+		for (OrderGoods goods : info.getOrderGoodsList()) {
+			goodsAmount = CalculationUtils.add(goodsAmount,
+					CalculationUtils.mul(goods.getActualPrice(), goods.getItemQuantity()));
 			goodsMap = new HashMap<String, Object>();
 			goodsMap.put("StoreItemNumber", goods.getItemCode());
 			goodsMap.put("StoreItemName", goods.getItemName());
@@ -839,11 +845,11 @@ public class ButtJointMessageUtils {
 	}
 
 	public static String getYouStongOrder(List<OrderInfo> infoList) {
-		List<Map<String, Object>> result = new ArrayList<Map<String,Object>>();
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		Map<String, Object> orderMap = null;
-		Map<String,Object> goodsMap = null;
-		List<Map<String,Object>> list = null;
-		for(OrderInfo info : infoList){
+		Map<String, Object> goodsMap = null;
+		List<Map<String, Object>> list = null;
+		for (OrderInfo info : infoList) {
 			orderMap = new HashMap<String, Object>();
 			orderMap.put("ParterOrderNo", info.getOrderId());
 			orderMap.put("ContactName", info.getOrderDetail().getCustomerName());
@@ -855,8 +861,8 @@ public class ButtJointMessageUtils {
 			orderMap.put("StreetAddress", info.getOrderDetail().getReceiveAddress());
 			orderMap.put("NotPayByBalance", false);
 			orderMap.put("NotUsePreOrderedInventory", false);
-			list = new ArrayList<Map<String,Object>>();
-			for(OrderGoods goods : info.getOrderGoodsList()){
+			list = new ArrayList<Map<String, Object>>();
+			for (OrderGoods goods : info.getOrderGoodsList()) {
 				goodsMap = new HashMap<String, Object>();
 				goodsMap.put("SKUNo", goods.getItemCode());
 				goodsMap.put("Qty", goods.getItemQuantity());
@@ -865,7 +871,7 @@ public class ButtJointMessageUtils {
 			orderMap.put("Items", list);
 			result.add(orderMap);
 		}
-		
+
 		return JSONUtil.toJson(result);
 	}
 
@@ -874,7 +880,7 @@ public class ButtJointMessageUtils {
 	}
 
 	public static String getYouStongStock(List<String> itemCodeList) {
-		
+
 		return JSONUtil.toJson(itemCodeList);
 	}
 
@@ -888,6 +894,193 @@ public class ButtJointMessageUtils {
 		sb.append("</MftNo>\n");
 		sb.append("</Header>\n");
 		sb.append("</Message>\n");
+		return sb.toString();
+	}
+
+	public static String getDolphinOrder(OrderInfo orderInfo) {
+		DolphinOrder order = new DolphinOrder(orderInfo);
+		List<DolphinOrder> orderList = new ArrayList<>();
+		orderList.add(order);
+		return JSONUtil.toJson(orderList);
+	}
+
+	public static String getDolphinOrderStatus(OrderIdAndSupplierId orderIdAndSupplierId) {
+		Map<String, String> param = new HashMap<>();
+		param.put("orderSn", orderIdAndSupplierId.getOrderId());
+		return JSONUtil.toJson(param);
+	}
+
+	/**
+	 * @fun 杭州海关订单申报
+	 * @param info
+	 * @param config
+	 * @return
+	 */
+	public static String getHangZhouCustomOrderMsg(OrderInfo info, CustomConfig config,
+			ReceiveLogisticsCompany receiveLogisticsCompany) {
+		String payCompanyCode = "";
+		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
+			payCompanyCode = "ZF14021901";
+		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+			payCompanyCode = "4403169D3W";
+		}
+		double goodsAmount = info.getOrderGoodsList().stream()
+				.mapToDouble(g -> CalculationUtils.mul(g.getItemPrice(), g.getItemQuantity())).sum();
+		StringBuilder sb = new StringBuilder();
+		sb.append("<mo version=\"1.0.0\">");
+		sb.append("<head>");
+		sb.append("<businessType>IMPORTORDER</businessType>");
+		sb.append("</head>");
+		sb.append("<body>");
+		sb.append("<orderInfoList>");
+		sb.append("<orderInfo>");
+		sb.append("<jkfSign>");
+		sb.append("<companyCode>" + config.getCompanyCode() + "</companyCode>");
+		sb.append("<businessNo>" + info.getOrderId() + "</businessNo>");
+		sb.append("<businessType>IMPORTORDER</businessType>");
+		sb.append("<declareType>1</declareType>");
+		sb.append("<cebFlag>02</cebFlag>");
+		sb.append("</jkfSign>");
+		sb.append("<jkfOrderImportHead>");
+		sb.append("<eCommerceCode>" + config.geteCommerceCode() + "</eCommerceCode>");
+		sb.append("<eCommerceName>" + config.getCompanyName() + "</eCommerceName>");
+		sb.append("<ieFlag>I</ieFlag>");
+		sb.append("<payType>03</payType>");
+		sb.append("<payCompanyCode>" + payCompanyCode + "</payCompanyCode>");
+		sb.append("<payNumber>" + info.getOrderDetail().getPayNo() + "</payNumber>");
+		sb.append("<orderTotalAmount>" + info.getOrderDetail().getPayment() + "</orderTotalAmount>");
+		sb.append("<orderNo>" + info.getOrderId() + "</orderNo>");
+		sb.append("<orderTaxAmount>" + info.getOrderDetail().getTaxFee() + "</orderTaxAmount>");
+		sb.append("<orderGoodsAmount>" + goodsAmount + "</orderGoodsAmount>");
+		sb.append("<feeAmount>0</feeAmount>");
+		sb.append("<insureAmount>0</insureAmount>");
+		sb.append("<companyName>" + config.getCompanyName() + "</companyName>");
+		sb.append("<companyCode>" + config.getCompanyCode() + "</companyCode>");
+		sb.append("<tradeTime>" + info.getCreateTime() + "</tradeTime>");
+		sb.append("<currCode>142</currCode>");
+		sb.append("<totalAmount>" + goodsAmount + "</totalAmount>");
+		sb.append("<consigneeTel>" + info.getOrderDetail().getReceivePhone() + "</consigneeTel>");
+		sb.append("<consignee>" + info.getOrderDetail().getReceiveName() + "</consignee>");
+		sb.append("<consigneeAddress>" + info.getOrderDetail().getReceiveProvince()
+				+ info.getOrderDetail().getReceiveCity() + info.getOrderDetail().getReceiveArea()
+				+ info.getOrderDetail().getReceiveAddress() + "</consigneeAddress>");
+		sb.append("<totalCount>" + info.getTdq() + "</totalCount>");
+		sb.append("<senderCountry>142</senderCountry>");
+		sb.append("<senderName>中国供销海外购</senderName>");
+		sb.append("<purchaserId>" + info.getOrderDetail().getCustomerPhone() + "</purchaserId>");
+		sb.append("<logisCompanyName>" + receiveLogisticsCompany.getLogisCompanyName() + "</logisCompanyName>");
+		sb.append("<logisCompanyCode>" + receiveLogisticsCompany.getLogisCompanyCode() + "</logisCompanyCode>");
+		sb.append("<zipCode>" + info.getOrderDetail().getReceiveZipCode() + "</zipCode>");
+		sb.append("<rate>1</rate>");
+		sb.append("<discount>" + info.getOrderDetail().getDisAmount() + "</discount>");
+		sb.append(
+				"<userProcotol>本人承诺所购买商品系个人合理自用，现委托商家代理申报、代缴税款等通关事宜，本人保证遵守《海关法》和国家相关法律法规，保证所提供的身份信息和收货信息真实完整，无侵犯他人权益的行为，以上委托关系系如实填写，本人愿意接受海关、检验检疫机构及其他监管部门的监管，并承担相应法律责任。</userProcotol>");
+		sb.append("</jkfOrderImportHead>");
+		sb.append("<jkfOrderDetailList>");
+		sb.append("<jkfOrderDetail>");
+		for (int i = 0; i < info.getOrderGoodsList().size(); i++) {
+			OrderGoods goods = info.getOrderGoodsList().get(i);
+			sb.append("<goodsOrder>" + i + 1 + "</goodsOrder>");
+			sb.append("<goodsName>" + goods.getItemName() + "</goodsName>");
+			sb.append("<goodsModel>" + goods.getItemName() + "," + goods.getBrand() + "," + goods.getItemInfo()
+					+ "</goodsModel>");
+			sb.append("<codeTs>" + goods.getHsCode() + "</codeTs>");
+			sb.append("<unitPrice>" + goods.getActualPrice() + "</unitPrice>");
+			sb.append("<goodsUnit>" + goods.getUnit() + "</goodsUnit>");
+			sb.append("<goodsCount>" + goods.getItemQuantity() + "</goodsCount>");
+			sb.append("<originCountry>" + CountryCode.get(goods.getOrigin()) + "</originCountry>");
+			sb.append("<currency>142</currency>");
+		}
+		sb.append("</jkfOrderDetail>");
+		sb.append("</jkfOrderDetailList>");
+		sb.append("<jkfGoodsPurchaser>");
+		sb.append("<id>" + info.getOrderDetail().getCustomerPhone() + "</id>");
+		sb.append("<name>" + info.getOrderDetail().getCustomerName() + "</name>");
+		sb.append("<telNumber>" + info.getOrderDetail().getCustomerPhone() + "</telNumber>");
+		sb.append("<paperType>01</paperType>");
+		sb.append("<paperNumber>" + info.getOrderDetail().getCustomerIdNum() + "</paperNumber>");
+		sb.append("</jkfGoodsPurchaser>");
+		sb.append("</orderInfo>");
+		sb.append("</orderInfoList>");
+		sb.append("</body>");
+		sb.append("</mo>");
+		return sb.toString();
+	}
+
+	public static String getKJBAddSignature(OrderInfo info, ReceiveLogisticsCompany receiveLogisticsCompany,
+			CustomConfig config) {
+		String payCompanyCode = "";
+		String payCompanyName = "";
+		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
+			payCompanyCode = "ZF14021901";
+			payCompanyName = "支付宝(中国)网络技术有限公司";
+		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
+			payCompanyCode = "440316T004";
+			payCompanyName = "财付通支付科技有限公司";
+		}
+		UUID uuid = UUID.randomUUID();
+		StringBuilder sb = new StringBuilder();
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		sb.append("<ceb:CEB311Message guid=\"" + uuid.toString().toUpperCase()
+				+ "\" version=\"1.0\"  xmlns:ceb=\"http://www.chinaport.gov.cn/ceb\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
+		sb.append("<ceb:Order>");
+		sb.append("<ceb:OrderHead>");
+		sb.append("<ceb:guid>" + uuid.toString().toUpperCase() + "</ceb:guid>");
+		sb.append("<ceb:appType>1</ceb:appType>");
+		sb.append("<ceb:appTime>" + DateUtil.getDateString(new Date(), "YYYYMMDDhhmmss") + "</ceb:appTime>");
+		sb.append("<ceb:appStatus>2</ceb:appStatus><ceb:orderType>I</ceb:orderType>");
+		sb.append("<ceb:orderNo>" + info.getOrderId() + "</ceb:orderNo>");
+		sb.append("<ceb:ebpCode>" + config.geteCommerceCode() + "</ceb:ebpCode>");
+		sb.append("<ceb:ebpName>" + config.geteCommerceName() + "</ceb:ebpName>");
+		sb.append("<ceb:ebcCode>" + config.getCompanyCode() + "</ceb:ebcCode>");
+		sb.append("<ceb:ebcName>" + config.getCompanyName() + "</ceb:ebcName>");
+		double goodsAmount = info.getOrderGoodsList().stream()
+				.mapToDouble(g -> CalculationUtils.mul(g.getItemPrice(), g.getItemQuantity())).sum();
+		sb.append("<ceb:goodsValue>" + goodsAmount + "</ceb:goodsValue>");
+		sb.append("<ceb:freight>0</ceb:freight>");
+		sb.append("<ceb:discount>0</ceb:discount>");
+		sb.append("<ceb:taxTotal>" + info.getOrderDetail().getTaxFee() + "</ceb:taxTotal>");
+		sb.append("<ceb:acturalPaid>" + info.getOrderDetail().getPayment() + "</ceb:acturalPaid>");
+		sb.append("<ceb:currency>142</ceb:currency>");
+		sb.append("<ceb:buyerRegNo>" + info.getOrderDetail().getCustomerPhone() + "</ceb:buyerRegNo>");
+		sb.append("<ceb:buyerName>" + info.getOrderDetail().getCustomerName() + "</ceb:buyerName>");
+		sb.append("<ceb:buyerTelephone>" + info.getOrderDetail().getCustomerPhone() + "</ceb:buyerTelephone>");
+		sb.append("<ceb:buyerIdType>1</ceb:buyerIdType>");
+		sb.append("<ceb:buyerIdNumber>" + info.getOrderDetail().getCustomerIdNum() + "</ceb:buyerIdNumber>");
+		sb.append("<ceb:payCode>" + payCompanyCode + "</ceb:payCode>");
+		sb.append("<ceb:payName>" + payCompanyName + "</ceb:payName>");
+		sb.append("<ceb:payTransactionId>" + info.getOrderDetail().getPayNo() + "</ceb:payTransactionId>");
+		sb.append("<ceb:consignee>" + info.getOrderDetail().getReceiveName() + "</ceb:consignee>");
+		sb.append("<ceb:consigneeTelephone>" + info.getOrderDetail().getReceivePhone() + "</ceb:consigneeTelephone>");
+		sb.append("<ceb:consigneeAddress>" + info.getOrderDetail().getReceiveProvince()
+				+ info.getOrderDetail().getReceiveCity() + info.getOrderDetail().getReceiveArea()
+				+ info.getOrderDetail().getReceiveAddress() + "</ceb:consigneeAddress>");
+		sb.append("</ceb:OrderHead>");
+		for (int i = 0; i < info.getOrderGoodsList().size(); i++) {
+			OrderGoods goods = info.getOrderGoodsList().get(i);
+			sb.append("<ceb:OrderList>");
+			sb.append("<ceb:gnum>" + i + 1 + "</ceb:gnum>");
+			sb.append("<ceb:itemNo>" + goods.getItemId() + "</ceb:itemNo>");
+			sb.append("<ceb:itemName>" + goods.getItemName() + "</ceb:itemName>");
+			sb.append("<ceb:gModel>" + goods.getItemName() + "," + goods.getBrand() + "," + goods.getItemInfo()
+					+ "</ceb:gModel>");
+			sb.append("<ceb:unit>" + goods.getUnit() + "</ceb:unit>");
+			sb.append("<ceb:qty>" + goods.getItemQuantity() + "</ceb:qty>");
+			sb.append("<ceb:price>" + goods.getItemPrice() + "</ceb:price>");
+			sb.append("<ceb:totalPrice>" + CalculationUtils.mul(goods.getItemPrice(), goods.getItemQuantity())
+					+ "</ceb:totalPrice>");
+			sb.append("<ceb:currency>142</ceb:currency>");
+			sb.append("<ceb:country>" + CountryCode.get(goods.getOrigin()) + "</ceb:country>");
+			sb.append("</ceb:OrderList>");
+		}
+		sb.append("</ceb:Order>");
+		sb.append("<ceb:BaseTransfer>");
+		sb.append("<ceb:copCode>" + config.getCompanyCode() + "</ceb:copCode>");
+		sb.append("<ceb:copName>" + config.getCompanyName() + "</ceb:copName>");
+		sb.append("<ceb:dxpMode>DXP</ceb:dxpMode>");
+		sb.append("<ceb:dxpId>" + config.getDxPid() + "</ceb:dxpId>");
+		sb.append("</ceb:BaseTransfer>");
+		sb.append("</ceb:CEB311Message>");
 		return sb.toString();
 	}
 }

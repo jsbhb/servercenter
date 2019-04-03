@@ -19,6 +19,23 @@
 		<result column="url" property="url" jdbcType="VARCHAR" />
 	</resultMap>
 	
+	<resultMap type="com.zm.supplier.custominf.model.CustomConfig" id="config">
+		<id column="custom_id" property="customId" jdbcType="VARCHAR" />
+		<result column="company_code" property="companyCode" jdbcType="VARCHAR" />
+		<result column="target_object" property="targetObject" jdbcType="VARCHAR" />
+		<result column="company_name" property="companyName" jdbcType="VARCHAR" />
+		<result column="eCommerce_code" property="eCommerceCode" jdbcType="VARCHAR" />
+		<result column="eCommerce_name" property="eCommerceName" jdbcType="VARCHAR" />
+		<result column="public_key" property="publicKey" jdbcType="VARCHAR" />
+		<result column="private_key" property="privateKey" jdbcType="VARCHAR" />
+		<result column="aes_key" property="aesKey" jdbcType="VARCHAR" />
+		<result column="customs_aes_key" property="customAesKey" jdbcType="VARCHAR" />
+		<result column="customs_public_key" property="customPublicKey" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="zsurl" property="zsurl" jdbcType="VARCHAR" />
+		<result column="dxpid" property="dxPid" jdbcType="VARCHAR" />
+	</resultMap>
+	
 	<resultMap type="com.zm.supplier.pojo.SupplierEntity" id="supplier">
 		<id column="id" property="id"/>
 		<result column="type" property="type"/>
@@ -144,5 +161,19 @@
 		</if>
 		where id = #{id}
 	</update>
+	
+	<select id="getCustomConfig" parameterType="Object" resultMap="config">
+		select * from custom_config where custom_id = #{id}
+	</select>
+	
+	<insert id="saveResponse" parameterType="Object">
+		insert into supplier_response(order_id,type,content,create_time) 
+		values(#{orderId},#{type},#{content},now())
+	</insert>
+	
+	<insert id="saveCustomOrderReturn" parameterType="Object">
+		insert into custom_order_return(order_id,json_str,create_time) 
+		values (#{orderId},#{jsonStr},now())
+	</insert>
 	
 </mapper>
