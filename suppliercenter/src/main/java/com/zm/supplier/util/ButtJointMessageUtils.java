@@ -1015,7 +1015,7 @@ public class ButtJointMessageUtils {
 			payCompanyCode = "ZF14021901";
 			payCompanyName = "支付宝(中国)网络技术有限公司";
 		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
-			payCompanyCode = "440316T004";
+			payCompanyCode = "ZF14120401";
 			payCompanyName = "财付通支付科技有限公司";
 		}
 		UUID uuid = UUID.randomUUID();
