@@ -71,7 +71,7 @@ public class DolphinOrder {
 		for (OrderGoods goods : info.getOrderGoodsList()) {
 			item = new DolphinItems();
 			item.setGoodsName(goods.getItemName());
-			item.setGoodsPrice(goods.getActualPrice() + "");
+			item.setGoodsPrice(goods.getItemPrice() + "");
 			item.setGoodsSn(goods.getItemCode());
 			item.setQuantity(goods.getItemQuantity() + "");
 			items.add(item);

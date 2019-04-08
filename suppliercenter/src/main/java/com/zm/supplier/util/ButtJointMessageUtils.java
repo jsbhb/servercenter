@@ -1008,14 +1008,14 @@ public class ButtJointMessageUtils {
 	}
 
 	public static String getKJBAddSignature(OrderInfo info, ReceiveLogisticsCompany receiveLogisticsCompany,
-			CustomConfig config) {
+			CustomConfig config, int appType) {
 		String payCompanyCode = "";
 		String payCompanyName = "";
 		if (Constants.ALI_PAY.equals(info.getOrderDetail().getPayType())) {// 支付方式
-			payCompanyCode = "ZF14021901";
+			payCompanyCode = "31222699S7";
 			payCompanyName = "支付宝(中国)网络技术有限公司";
 		} else if (Constants.WX_PAY.equals(info.getOrderDetail().getPayType())) {
-			payCompanyCode = "ZF14120401";
+			payCompanyCode = "4403169D3W";
 			payCompanyName = "财付通支付科技有限公司";
 		}
 		UUID uuid = UUID.randomUUID();
@@ -1026,7 +1026,7 @@ public class ButtJointMessageUtils {
 		sb.append("<ceb:Order>");
 		sb.append("<ceb:OrderHead>");
 		sb.append("<ceb:guid>" + uuid.toString().toUpperCase() + "</ceb:guid>");
-		sb.append("<ceb:appType>1</ceb:appType>");
+		sb.append("<ceb:appType>" + appType + "</ceb:appType>");
 		sb.append("<ceb:appTime>" + DateUtil.getDateString(new Date(), "YYYYMMDDhhmmss") + "</ceb:appTime>");
 		sb.append("<ceb:appStatus>2</ceb:appStatus><ceb:orderType>I</ceb:orderType>");
 		sb.append("<ceb:orderNo>" + info.getOrderId() + "</ceb:orderNo>");

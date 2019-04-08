@@ -49,5 +49,5 @@ public abstract class AbstractCustom {
 	 * @return
 	 */
 	public abstract Set<OrderStatus> addSignatureAndZsCustoms(OrderInfo info,
-			ReceiveLogisticsCompany receiveLogisticsCompany);
+			ReceiveLogisticsCompany receiveLogisticsCompany, int appType);
 }

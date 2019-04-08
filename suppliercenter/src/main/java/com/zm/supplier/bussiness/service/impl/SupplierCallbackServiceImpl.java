@@ -49,7 +49,7 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 
 	@Resource
 	SupplierMapper supplierMapper;
-	
+
 	@Resource
 	CustomThreadPool customThreadPool;
 
@@ -126,7 +126,7 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 		orderExpress.setJsonStr(data);
 		orderExpress.setOrderId(receiveLogisticsCompany.getOrderNo());
 		orderFeignClient.saveCustomOrderExpress(Constants.FIRST_VERSION, orderExpress);
-		//订单申报
+		// 订单申报
 		customThreadPool.customOrder(receiveLogisticsCompany);
 		DolphinCallBack callback = new DolphinCallBack("20000", "");
 		return JSONUtil.toJson(callback);
@@ -139,7 +139,8 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 			byte[] inputContent = Base64.decodeBase64(content.getBytes("utf-8"));
 			byte[] aesKey = Base64.decodeBase64(config.getCustomAesKey().getBytes("utf-8"));
 			String originalContent = new String(AESUtil.decrypt(inputContent, aesKey), "utf-8");
-			LogUtil.writeLog("解密后content=" + originalContent + "******msgType=" + msgType + "*****dataDigest=" + dataDigest);
+			LogUtil.writeLog(
+					"解密后content=" + originalContent + "******msgType=" + msgType + "*****dataDigest=" + dataDigest);
 			byte[] inputData = originalContent.getBytes("utf-8");
 			byte[] publicKey = Base64.decodeBase64(config.getCustomPublicKey());
 			byte[] sign = Base64.decodeBase64(dataDigest);
@@ -186,7 +187,7 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 				orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
 			}
 		}
-		//保存回执
+		// 保存回执
 		CustomOrderExpress tmp = new CustomOrderExpress();
 		tmp.setJsonStr(xml);
 		tmp.setOrderId(resultMap.get("orderNo") == null ? "error" : resultMap.get("orderNo"));
@@ -194,13 +195,14 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 	}
 
 	/**
-	 * @fun 判断总署申报是否成功
+	 * @fun 判断总署申报是否成功(包括重复推送的信息)
 	 * @param returnStatus
 	 * @return
 	 */
 	private boolean zongshuVerify(String returnStatus) {
 
-		return "2".equals(returnStatus) || "3".equals(returnStatus) || "120".equals(returnStatus);
+		return "2".equals(returnStatus) || "3".equals(returnStatus) || "120".equals(returnStatus)
+				|| "-301010".equals(returnStatus) || "-301014".equals(returnStatus);
 	}
 
 	/**
@@ -223,7 +225,7 @@ public class SupplierCallbackServiceImpl implements SupplierCallbackService {
 				orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
 			}
 		}
-		//保存回执
+		// 保存回执
 		CustomOrderExpress tmp = new CustomOrderExpress();
 		tmp.setJsonStr(xml);
 		tmp.setOrderId(resultMap.get("businessNo") == null ? "error" : resultMap.get("businessNo"));

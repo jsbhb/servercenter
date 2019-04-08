@@ -18,63 +18,63 @@ public interface SupplierService {
 
 	ResultModel sendOrderCancel(OrderInfo info);
 
-	/**  
-	 * queryByPage:查询分页效果. <br/>  
-	 *  
-	 * @author hebin  
+	/**
+	 * queryByPage:查询分页效果. <br/>
+	 * 
+	 * @author hebin
 	 * @param supplier
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	Page<SupplierEntity> queryByPage(SupplierEntity supplier);
 
-	/**  
-	 * saveSupplier:插入供应商表. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param entity  
-	 * @since JDK 1.7  
+	/**
+	 * saveSupplier:插入供应商表. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
 	 */
 	void saveSupplier(SupplierEntity entity);
 
-	/**  
-	 * queryById:根据编号查询. <br/>  
-	 *  
-	 * @author hebin  
+	/**
+	 * queryById:根据编号查询. <br/>
+	 * 
+	 * @author hebin
 	 * @param id
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	SupplierEntity queryById(int id);
 
-	/**  
-	 * checkOrderStatus:查询订单状态. <br/>  
-	 *  
-	 * @author wqy  
+	/**
+	 * checkOrderStatus:查询订单状态. <br/>
+	 * 
+	 * @author wqy
 	 * @param id
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	ResultModel checkOrderStatus(List<OrderIdAndSupplierId> list);
 
-	/**  
-	 * checkStock:获取第三方库存. <br/>  
-	 *  
-	 * @author wqy  
+	/**
+	 * checkStock:获取第三方库存. <br/>
+	 * 
+	 * @author wqy
 	 * @param id
-	 * @return  
-	 * @since JDK 1.7  
+	 * @return
+	 * @since JDK 1.7
 	 */
 	ResultModel checkStock(List<OrderBussinessModel> list, Integer supplierId, boolean flag);
 
 	ResultModel getGoods(List<String> list, Integer supplierId, String supplierName);
 
-	/**  
-	 * queryAll:(这里用一句话描述这个方法的作用). <br/>  
-	 *  
-	 * @author hebin  
-	 * @return  
-	 * @since JDK 1.7  
+	/**
+	 * queryAll:(这里用一句话描述这个方法的作用). <br/>
+	 * 
+	 * @author hebin
+	 * @return
+	 * @since JDK 1.7
 	 */
 	List<SupplierEntity> queryAll();
 
@@ -84,12 +84,12 @@ public interface SupplierService {
 	 */
 	ResultModel getButtJointSupplier();
 
-	/**  
-	 * saveSupplier:更新供应商表. <br/>  
-	 *  
-	 * @author hebin  
-	 * @param entity  
-	 * @since JDK 1.7  
+	/**
+	 * saveSupplier:更新供应商表. <br/>
+	 * 
+	 * @author hebin
+	 * @param entity
+	 * @since JDK 1.7
 	 */
 	void updateSupplier(SupplierEntity entity);
 
@@ -98,5 +98,5 @@ public interface SupplierService {
 	 * @param orderId
 	 * @param type
 	 */
-	void handleExceptionOrder(String orderId, int type);
+	void handleExceptionOrder(String orderId, int type, int appType);
 }

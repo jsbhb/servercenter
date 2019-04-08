@@ -47,6 +47,7 @@ import com.zm.pay.pojo.UnionPayConfig;
 import com.zm.pay.pojo.WeixinPayConfig;
 import com.zm.pay.pojo.YopConfigModel;
 import com.zm.pay.utils.CalculationUtils;
+import com.zm.pay.utils.CommonUtils;
 import com.zm.pay.utils.DateUtils;
 import com.zm.pay.utils.ali.AliPayUtils;
 import com.zm.pay.utils.unionpay.UnionPayUtil;
@@ -154,8 +155,8 @@ public class PayServiceImpl implements PayService {
 			data.put("spbill_create_ip", Constants.CREATE_IP);
 			data.put("product_id", model.getOrderId());
 		}
-		//保存请求原始数据
-		String originData = createWXData(data,config);
+		// 保存请求原始数据
+		String originData = createWXData(data, config);
 		savePayOriginData(Constants.WX_PAY, originData, model.getOrderId());
 		Map<String, String> resp = wxpay.unifiedOrder(data);
 		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + resp.toString());
@@ -239,7 +240,6 @@ public class PayServiceImpl implements PayService {
 		}
 
 		CustomConfig cfg = getCustomConfig(model.getSupplierId());
-
 		Map<String, String> result = AliPayUtils.acquireCustom(config, model, cfg);
 		logger.info("支付宝报关：" + model.getOutRequestNo() + "====" + result);
 		if ("T".equals(result.get("is_success")) && "SUCCESS".equals(result.get("result_code"))) {
@@ -489,11 +489,6 @@ public class PayServiceImpl implements PayService {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		Integer i = 0;
-		System.out.println("0".equals(i));
-	}
-
 	@Override
 	public Map<String, Object> unionPay(Integer clientId, PayModel model, String type) {
 		UnionPayConfig config = (UnionPayConfig) template.opsForValue()
@@ -620,5 +615,36 @@ public class PayServiceImpl implements PayService {
 		}
 		LogUtil.writeMessage("订单号：" + model.getOrderId() + "==返回：" + url);
 		return url;
+	}
+
+	public static void main(String[] args) throws Exception {
+		WeixinPayConfig config = new WeixinPayConfig();
+		config.setAppID("wxac0152a389221c86");
+		config.setMchID("1505554171");
+		config.setKey("AjW8S5x2ceYDofimglOqY9XwQhq5SIyh");
+		CustomModel custom = new CustomModel();
+		custom.setOutRequestNo("GX0190408100939200010");
+		custom.setPayNo("4200000302201904087823373032");
+		CustomConfig customCfg = new CustomConfig();
+		customCfg.setWxCustomsPlace("HANGZHOU_ZS");
+		customCfg.setMerchantCustomsCode("3302462946");
+		config.setHttpConnectTimeoutMs(5000);
+		config.setHttpReadTimeoutMs(5000);
+		WXPay wxpay = new WXPay(config);
+
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("out_trade_no", custom.getOutRequestNo());
+		data.put("transaction_id", custom.getPayNo());
+		data.put("customs", customCfg.getWxCustomsPlace());
+		data.put("mch_customs_no", customCfg.getMerchantCustomsCode());
+		data.put("appid", config.getAppID());
+		data.put("mch_id",config.getMchID());
+
+		data = WxPayUtils.fillRequestData(data, config);
+		System.out.println(data);
+		String res = wxpay.requestWithoutCert(
+				"https://api.mch.weixin.qq.com/cgi-bin/mch/customs/customdeclareorder", data, 5000, 5000);
+		System.out.println(res); 
+		System.out.println(CommonUtils.xmlToMap(res));
 	}
 }

@@ -41,14 +41,14 @@ public class CustomThreadPool {
 	public void customOrder(ReceiveLogisticsCompany receiveLogisticsCompany) {
 		OrderInfo order = orderFeignClient.handleSupplierCenterExceptionOrder(Constants.FIRST_VERSION,
 				receiveLogisticsCompany.getOrderNo());
-		//TODO 如何动态确定海关属地
+		// TODO 如何动态确定海关属地
 		AbstractCustom buttJoint = getTargetInterface(1);// 目前写死1、代表杭州海关
 		if (buttJoint == null || order == null) {
 			return;
 		}
 		// 补全hscode和原产国
 		completeGoodsDetailInfo(order);
-		//属地订单申报
+		// 属地订单申报
 		Set<OrderStatus> set = buttJoint.orderCustom(order, receiveLogisticsCompany);
 		if (set == null || set.size() == 0) {
 			return;
@@ -61,21 +61,23 @@ public class CustomThreadPool {
 		}
 		orderFeignClient.changeOrderStatusByThirdWarehouse(Constants.FIRST_VERSION, list);
 	}
+
 	/**
 	 * @fun 加签并发送总署
 	 * @param order
 	 * @param receiveLogisticsCompany
 	 */
-	public void addSignatureAndZsCustoms(OrderInfo order, ReceiveLogisticsCompany receiveLogisticsCompany){
-		//TODO 如何动态确定海关属地
+	public void addSignatureAndZsCustoms(OrderInfo order, ReceiveLogisticsCompany receiveLogisticsCompany,
+			int appType) {
+		// TODO 如何动态确定海关属地
 		AbstractCustom buttJoint = getTargetInterface(1);// 目前写死1、代表杭州海关
 		if (buttJoint == null) {
 			return;
 		}
 		// 补全hscode和原产国
 		completeGoodsDetailInfo(order);
-		//加签并发送总署
-		Set<OrderStatus> set = buttJoint.addSignatureAndZsCustoms(order, receiveLogisticsCompany);
+		// 加签并发送总署
+		Set<OrderStatus> set = buttJoint.addSignatureAndZsCustoms(order, receiveLogisticsCompany, appType);
 		if (set == null || set.size() == 0) {
 			return;
 		}
@@ -94,7 +96,7 @@ public class CustomThreadPool {
 		List<CustomCompletion> ccList = goodsFeignClient.customCompletion(Constants.FIRST_VERSION, itemIdList);
 		Map<String, List<CustomCompletion>> map = ccList.stream()
 				.collect(Collectors.groupingBy(CustomCompletion::getItemId));
-		order.getOrderGoodsList().stream().forEach(g->{
+		order.getOrderGoodsList().stream().forEach(g -> {
 			g.setHsCode(map.get(g.getItemId()).get(0).getHscode());
 			g.setOrigin(map.get(g.getItemId()).get(0).getOrigin());
 			g.setBrand(map.get(g.getItemId()).get(0).getBrand());

@@ -182,14 +182,15 @@ public class SupplierController {
 		return new ResultModel(false, "版本错误");
 	}
 
-	@RequestMapping(value = "{version}/handle/exception/order/{orderId}/{type}", method = RequestMethod.POST)
+	@RequestMapping(value = "{version}/handle/exception/order/{orderId}/{type}/{appType}", method = RequestMethod.POST)
 	public ResultModel handleExceptionOrder(@PathVariable("version") Double version,
-			@PathVariable("orderId") String orderId, @PathVariable("type") int type) {
+			@PathVariable("orderId") String orderId, @PathVariable("type") int type,
+			@PathVariable("appType") int appType) {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 
 			try {
-				supplierService.handleExceptionOrder(orderId, type);
+				supplierService.handleExceptionOrder(orderId, type,appType);
 				return new ResultModel(true, "success");
 			} catch (Exception e) {
 				LogUtil.writeErrorLog("处理异常订单出错", e);

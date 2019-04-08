@@ -32,10 +32,10 @@ import com.zm.supplier.util.XmlUtil;
  */
 @Component
 public class CustomsAddSignatureComponent {
-	
+
 	@Resource
 	SupplierMapper supplierMapper;
-	
+
 	// 国际物流账号
 	@Value("${userId}")
 	private String userId;
@@ -55,10 +55,10 @@ public class CustomsAddSignatureComponent {
 	 * @throws UnsupportedEncodingException
 	 * @throws DocumentException
 	 */
-	public String addSignature(OrderInfo info, ReceiveLogisticsCompany receiveLogisticsCompany, CustomConfig config)
-			throws UnsupportedEncodingException, DocumentException {
+	public String addSignature(OrderInfo info, ReceiveLogisticsCompany receiveLogisticsCompany, CustomConfig config,
+			int appType) throws UnsupportedEncodingException, DocumentException {
 
-		String msg = ButtJointMessageUtils.getKJBAddSignature(info, receiveLogisticsCompany, config);
+		String msg = ButtJointMessageUtils.getKJBAddSignature(info, receiveLogisticsCompany, config, appType);
 		Map<String, String> paramMap = initData(msg, "CEB311");
 		boolean https = false;
 		if (url.startsWith("https")) {
@@ -66,8 +66,8 @@ public class CustomsAddSignatureComponent {
 		}
 		String result = HttpClientUtil.post(url, paramMap, "", https);
 		LogUtil.writeLog("加签返回：" + info.getOrderId() + "====" + result);
-		//保存返回报文
-		saveResponse(info.getOrderId(),result);
+		// 保存返回报文
+		saveResponse(info.getOrderId(), result);
 		Map<String, String> resultMap = XmlUtil.xmlToMap(result);
 		if ("T".equalsIgnoreCase(resultMap.get("Result"))) {
 			String signatureStr = new String(Base64.decodeBase64(resultMap.get("ResultMsg")), "UTF-8");

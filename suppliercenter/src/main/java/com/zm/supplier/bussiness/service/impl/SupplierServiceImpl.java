@@ -40,10 +40,10 @@ public class SupplierServiceImpl implements SupplierService {
 
 	@Resource
 	WarehouseThreadPool warehouseThreadPool;
-	
+
 	@Resource
 	OrderFeignClient orderFeignClient;
-	
+
 	@Resource
 	CustomThreadPool customThreadPool;
 
@@ -187,7 +187,7 @@ public class SupplierServiceImpl implements SupplierService {
 	}
 
 	@Override
-	public void handleExceptionOrder(String orderId, int type) {
+	public void handleExceptionOrder(String orderId, int type, int appType) {
 		SupplierResponseEnum srenum = SupplierResponseEnum.values()[type];
 		switch (srenum) {
 		case SEND_WAREHOUSE:
@@ -197,25 +197,25 @@ public class SupplierServiceImpl implements SupplierService {
 			customsOrder(orderId);
 			break;
 		case SIGN:
-			addSignAndSendZsCustoms(orderId);
+			addSignAndSendZsCustoms(orderId, appType);
 			break;
 		case ZONGSHU_CUSTOMS:
-			addSignAndSendZsCustoms(orderId);
+			addSignAndSendZsCustoms(orderId, appType);
 			break;
 		default:
 			break;
 		}
 	}
-	
+
 	/**
 	 * @fun 加签并申报总署
 	 * @param orderId
 	 */
-	private void addSignAndSendZsCustoms(String orderId) {
+	private void addSignAndSendZsCustoms(String orderId, int appType) {
 		OrderInfo info = orderFeignClient.handleSupplierCenterExceptionOrder(Constants.FIRST_VERSION, orderId);
 		String str = orderFeignClient.getOrderExpressDetail(Constants.FIRST_VERSION, orderId);
 		ReceiveLogisticsCompany receiveLogisticsCompany = JSONUtil.parse(str, ReceiveLogisticsCompany.class);
-		customThreadPool.addSignatureAndZsCustoms(info, receiveLogisticsCompany);
+		customThreadPool.addSignatureAndZsCustoms(info, receiveLogisticsCompany, appType);
 	}
 
 	/**
