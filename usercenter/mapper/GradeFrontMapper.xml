@@ -7,6 +7,7 @@
 		<result column="aboutus" property="aboutus" jdbcType="VARCHAR" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="head_img" property="headImg" jdbcType="VARCHAR" />
+		<result column="shop_extension_flg" property="shopExtensionFlg" jdbcType="INTEGER" />
 	</resultMap>
 	
 	<resultMap type="com.zm.user.pojo.Grade" id="grade">
@@ -17,7 +18,11 @@
 	
 	
 	<select id="getGradeConfig" parameterType="Object" resultMap="gradeConfig">
-		select id,grade_id,aboutus,head_img,name from grade_config where grade_id = #{gradeId}
+		select gc.id,gc.grade_id,gc.aboutus,
+		gc.head_img,gc.name,g.shop_extension_flg
+		from grade_config gc
+		left join grade g on gc.grade_id = g.id
+		where gc.grade_id = #{gradeId}
 	</select>
 	
 	<select id="getClientUrlById" parameterType="Object" resultType="java.lang.String">

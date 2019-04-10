@@ -12,6 +12,8 @@ public class GradeConfig {
 	
 	private String name;
 	
+	private Integer shopExtensionFlg;  //微店推广入口
+	
 	public Integer getId() {
 		return id;
 	}
@@ -51,5 +53,12 @@ public class GradeConfig {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
+	public Integer getShopExtensionFlg() {
+		return shopExtensionFlg;
+	}
+
+	public void setShopExtensionFlg(Integer shopExtensionFlg) {
+		this.shopExtensionFlg = shopExtensionFlg;
+	}
 }

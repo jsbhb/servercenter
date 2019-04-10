@@ -101,6 +101,8 @@ public class Grade extends Pagination{
 	
 	private String gradeInviter;
 	
+	private Integer shopExtensionFlg;
+
 	public boolean check(){
 		if(Constants.AREA_CENTER.equals(gradeType)){
 //			if(redirectUrl == null || mobileUrl == null){
@@ -465,4 +467,11 @@ public class Grade extends Pagination{
 		this.gradeInviter = gradeInviter;
 	}
 	
+	public Integer getShopExtensionFlg() {
+		return shopExtensionFlg;
+	}
+
+	public void setShopExtensionFlg(Integer shopExtensionFlg) {
+		this.shopExtensionFlg = shopExtensionFlg;
+	}
 }

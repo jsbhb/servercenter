@@ -2,12 +2,17 @@ package com.zm.user.bussiness.service.impl;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 
 import com.zm.user.bussiness.component.UserComponent;
 import com.zm.user.bussiness.dao.GradeFrontMapper;
 import com.zm.user.bussiness.dao.UserMapper;
 import com.zm.user.bussiness.service.GradeFrontService;
+import com.zm.user.common.ResultModel;
+import com.zm.user.constants.Constants;
+import com.zm.user.feignclient.ThirdPartFeignClient;
+import com.zm.user.feignclient.model.AppletCodeParameter;
 import com.zm.user.pojo.GradeConfig;
 import com.zm.user.pojo.UserInfo;
 
@@ -22,6 +27,9 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 	
 	@Resource
 	UserComponent userComponent;
+	
+	@Resource
+	ThirdPartFeignClient thirdPartFeignClient;
 	
 	@Override
 	public GradeConfig getGradeConfig(Integer mallId, Integer shopId, Integer userId) {
@@ -55,6 +63,26 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 		Integer parentId = userMapper.getParentIdByGradeId(shopId);
 		
 		return gradeFrontMapper.getMobileUrl(parentId);
+	}
+	
+	@Override
+	public byte[] getShopBillboard(Integer shopId) {
+		// 获取小程序二维码流
+//		InputStream in = null;
+		// 生成二维码
+		AppletCodeParameter param = new AppletCodeParameter();
+		param.setScene("shopId=" + shopId);
+		param.setPage("separate/joinUs/joinUs");
+		param.setWidth("400");
+		ResultModel model = thirdPartFeignClient.getAppletCode(Constants.FIRST_VERSION, param);
+		if (!model.isSuccess()) {
+			throw new RuntimeException("获取二维码失败");
+		}
+		// 图片字符串需base64解码
+		Base64 base = new Base64();
+//		in = new ByteArrayInputStream(base.decode(model.getObj().toString()));
+		byte[] result = base.decode(model.getObj().toString());
+		return result;
 	}
 
 }

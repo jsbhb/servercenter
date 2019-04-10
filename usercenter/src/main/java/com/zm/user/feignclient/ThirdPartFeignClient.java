@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.zm.user.common.ResultModel;
+import com.zm.user.feignclient.model.AppletCodeParameter;
 import com.zm.user.pojo.NotifyMsg;
 
 @FeignClient("3rdcenter")
@@ -23,4 +24,7 @@ public interface ThirdPartFeignClient {
 	
 	@RequestMapping(value = "{version}/third-part/phone", method = RequestMethod.POST)
 	public ResultModel sendCode(@PathVariable("version") Double version, @RequestBody List<NotifyMsg> notifyList);
+	
+	@RequestMapping(value = "{version}/getwxacodeunlimit", method = RequestMethod.POST)
+	public ResultModel getAppletCode(@PathVariable("version") Double version, @RequestBody AppletCodeParameter param);
 }

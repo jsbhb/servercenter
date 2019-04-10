@@ -9,4 +9,6 @@ public interface GradeFrontService {
 	String getClientUrl(Integer centerId);
 
 	String getMobileUrl(Integer shopId);
+	
+	byte[] getShopBillboard(Integer shopId);
 }
