@@ -40,6 +40,7 @@ import com.zm.goods.seo.model.SEOModel;
 import com.zm.goods.seo.model.SEONavigation;
 import com.zm.goods.seo.publish.PublishComponent;
 import com.zm.goods.seo.service.SEOService;
+import com.zm.goods.utils.HttpClientUtil;
 import com.zm.goods.utils.JSONUtil;
 
 @Service("seoService")
@@ -64,8 +65,13 @@ public class SEOServiceImpl implements SEOService {
 	private static Integer CNCOOPBUY_ID = 2;
 	private static String HTTP_STR = "http";
 
+	private static final String DEL_BAIDU_SITE_PC = "http://data.zz.baidu.com/del?site=https://www.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+	private static final String ADD_BAIDU_SITE_PC = "http://data.zz.baidu.com/urls?site=https://www.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+	private static final String DEL_BAIDU_SITE_MP = "http://data.zz.baidu.com/del?site=https://m.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+	private static final String ADD_BAIDU_SITE_MP = "http://data.zz.baidu.com/urls?site=https://m.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+
 	@Override
-	public List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId) {
+	public List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId) {  
 		List<String> itemIds = seoMapper.listItemIdsByGoodsId(goodsId);
 		if (itemIds != null && itemIds.size() > 0) {
 			return seoMapper.listStockByItemIds(itemIds);
@@ -302,6 +308,8 @@ public class SEOServiceImpl implements SEOService {
 				pathParam.put(categoryPath.getThirdId(), categoryPath.getPath());
 			}
 			// 开始处理商品
+			StringBuilder tmp_pc = new StringBuilder();
+			StringBuilder tmp_mp = new StringBuilder();
 			for (GoodsItem goodsItem : goodsItemList) {
 				String goodsId = goodsItem.getGoodsId();
 				LogUtil.writeLog("SPECS-SIZE:" + goodsItem.getGoodsSpecsList().size());
@@ -331,7 +339,12 @@ public class SEOServiceImpl implements SEOService {
 				}
 				param.put(goodsId, path);
 				successGoodsIdList.add(goodsId);
+				tmp_pc.append("https://www.cncoopay.com/" + path + "/" + goodsId + ".html\n");
+				tmp_mp.append("https://m.cncoopay.com/" + path + "/" + goodsId + ".html\n");
 			}
+			//发布百度站点
+			HttpClientUtil.post(ADD_BAIDU_SITE_PC, tmp_pc.toString(), "POST", "text/plain");
+			HttpClientUtil.post(ADD_BAIDU_SITE_MP, tmp_mp.toString(), "POST", "text/plain");
 			if (param.size() > 0) {
 				seoMapper.updateGoodsAccessPath(param);
 			}
@@ -367,6 +380,8 @@ public class SEOServiceImpl implements SEOService {
 			boolean success;
 			if (needDelgoodsIdList != null && needDelgoodsIdList.size() > 0) {
 				SEOGoodsDel seoGoodsDel = null;
+//				StringBuilder tmp_pc = new StringBuilder();
+//				StringBuilder tmp_mp = new StringBuilder();
 				for (String goodsId : needDelgoodsIdList) {
 					String path = seoMapper.getGoodsAccessPath(goodsId);
 					seoGoodsDel = new SEOGoodsDel(path, SystemEnum.PCMALL, goodsId + ".html");
@@ -380,7 +395,12 @@ public class SEOServiceImpl implements SEOService {
 						continue;
 					}
 					seoMapper.updateGoodsDelPublishByGoodsId(goodsId);
+//					tmp_pc.append("https://www.cncoopay.com/" + path + "/" + goodsId + ".html\n");
+//					tmp_mp.append("https://m.cncoopay.com/" + path + "/" + goodsId + ".html\n");
 				}
+				//删除百度站点
+//				HttpClientUtil.post(DEL_BAIDU_SITE_PC, tmp_pc.toString(), "POST", "text/plain");
+//				HttpClientUtil.post(DEL_BAIDU_SITE_MP, tmp_mp.toString(), "POST", "text/plain");
 			}
 			if (sb.length() > 0) {
 				sb.append("删除失败");

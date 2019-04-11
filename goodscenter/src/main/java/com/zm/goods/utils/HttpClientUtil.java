@@ -76,7 +76,7 @@ public class HttpClientUtil {
 
 	}
 
-	public static String post(String url, String jsonStr, String method) {
+	public static String post(String url, String jsonStr, String method, String content) {
 		String resultStr = "";
 		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)
 				.setConnectTimeout(connectTimeout).setConnectionRequestTimeout(connectTimeout).build();
@@ -91,7 +91,7 @@ public class HttpClientUtil {
 		}
 
 		StringEntity stringEntity = new StringEntity(jsonStr, Charsets.UTF_8);
-		stringEntity.setContentType("application/json; charset=UTF-8");
+		stringEntity.setContentType(content);
 		HttpEntity entity = null;
 		CloseableHttpResponse response = null;
 		try {
@@ -251,7 +251,7 @@ public class HttpClientUtil {
 		}
 		return resultStr;
 	}
-	
+
 	public static byte[] getByteArr(String url) {
 		byte[] result = null;
 		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(connectTimeout)

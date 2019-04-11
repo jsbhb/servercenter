@@ -10,7 +10,7 @@ public class PublishComponent {
 
 	public static ResultModel publish(String jsonStr, PublishType type) {
 		LogUtil.writeLog(jsonStr);
-		String result = HttpClientUtil.post(type.getUrl(), jsonStr, type.getMethod());
+		String result = HttpClientUtil.post(type.getUrl(), jsonStr, type.getMethod(),"application/json; charset=UTF-8");
 		LogUtil.writeLog(result);
 		if(result == null){
 			return new ResultModel(false, "", "写入失败");
