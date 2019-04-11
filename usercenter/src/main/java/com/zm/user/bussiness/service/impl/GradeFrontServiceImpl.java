@@ -76,7 +76,7 @@ public class GradeFrontServiceImpl implements GradeFrontService {
 		param.setWidth("400");
 		ResultModel model = thirdPartFeignClient.getAppletCode(Constants.FIRST_VERSION, param);
 		if (!model.isSuccess()) {
-			throw new RuntimeException("获取二维码失败");
+			throw new RuntimeException(model.getErrorCode() + "==" + model.getErrorMsg());
 		}
 		// 图片字符串需base64解码
 		Base64 base = new Base64();

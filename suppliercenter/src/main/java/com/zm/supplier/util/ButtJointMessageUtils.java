@@ -1027,7 +1027,7 @@ public class ButtJointMessageUtils {
 		sb.append("<ceb:OrderHead>");
 		sb.append("<ceb:guid>" + uuid.toString().toUpperCase() + "</ceb:guid>");
 		sb.append("<ceb:appType>" + appType + "</ceb:appType>");
-		sb.append("<ceb:appTime>" + DateUtil.getDateString(new Date(), "YYYYMMDDhhmmss") + "</ceb:appTime>");
+		sb.append("<ceb:appTime>" + DateUtil.getDateString(new Date(), "yyyyMMddHHmmss") + "</ceb:appTime>");
 		sb.append("<ceb:appStatus>2</ceb:appStatus><ceb:orderType>I</ceb:orderType>");
 		sb.append("<ceb:orderNo>" + info.getOrderId() + "</ceb:orderNo>");
 		sb.append("<ceb:ebpCode>" + config.geteCommerceCode() + "</ceb:ebpCode>");
