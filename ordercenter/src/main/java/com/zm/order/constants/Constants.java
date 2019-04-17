@@ -136,6 +136,7 @@ public class Constants {
 	public static final Integer BO_LUO_MI = 17;//菠萝蜜
 	public static final Integer MA_SHANG_XIAO_FEI_JIN_RONG = 18;//马上消费金融
 	public static final Integer GONG_XIAO_E_JIA = 19;//供销e家
+	public static final Integer TAO_BAO = 20;//淘宝
 	
 	//*******************订单创建类型**********************
 	public static final int NORMAL_ORDER = 0;//普通订单
