@@ -81,7 +81,7 @@ public class GradeFrontController {
 			HttpServletResponse res, @RequestParam(value = "shopId", required = true) Integer shopId) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			byte[] data = gradeFrontService.getShopBillboard(shopId);
-			res.setContentType("image/png");
+			res.setContentType("image/jpg");
 			OutputStream stream;
 			try {
 				stream = res.getOutputStream();

@@ -25,10 +25,10 @@ public class ImageUtils {
 			BufferedImage qrcode = ImageIO.read(in);
 			// 画二维码
 			g.drawImage(qrcode, 185, 770, 380, 380, null);
-			
+
 			g.dispose();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ImageIO.write(template, "png", out);
+			ImageIO.write(template, "jpg", out);
 			return out.toByteArray();
 		} catch (IOException e) {
 			e.printStackTrace();
