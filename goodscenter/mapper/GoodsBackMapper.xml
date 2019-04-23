@@ -20,6 +20,7 @@
 		<result column="create_time" property="createTime"/>
 		<result column="update_time" property="updateTime"/>
 		<result column="opt" property="opt"/>
+		<result column="goods_tag_ratio" property="goodsTagRatio"/>
 		<collection property="files" ofType="com.zm.goods.pojo.GoodsFile">
 			<id column="file_id" property="id"/>
 			<result column="path" property="path" jdbcType="VARCHAR" />
@@ -402,7 +403,8 @@
 	</insert>
 	
 	<update id="updateGoodsTag" parameterType="Object">
-		update goods_tag set tag_name = #{tagName} , priority = #{priority} , description = #{description} , update_time = now() where id = #{id} 
+		update goods_tag set tag_name = #{tagName} , priority = #{priority} , 
+		description = #{description} , tag_ratio = #{tagRatio}, update_time = now() where id = #{id} 
 	</update>
 	
 	<delete id="deleteGoodsTag" parameterType="Object">
@@ -469,7 +471,7 @@
 		supplier_id = #{supplierId}, supplier_name = #{supplierName},
 		origin = #{origin}, type = #{type}, update_time = now(),
 		specs_template_id = #{templateId}, detail_path = #{detailPath},
-		goods_tag_ratio = goods_tag_ratio + #{goodsTagRatio} 
+		goods_tag_ratio = #{goodsTagRatio} 
 		where goods_id = #{goodsId}
 	</update>
 	

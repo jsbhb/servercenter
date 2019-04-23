@@ -298,12 +298,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		}
 
 		// 设定商品的标签权重
-		Integer tmpGoodsTagRatio = 0;
+//		Integer tmpGoodsTagRatio = 0;
 		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
 			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
-			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
+//			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
 		}
-		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
+//		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
 
 		if (entity.getGoodsBase().getId() != 0) {
 			goodsBaseMapper.insert(entity.getGoodsBase());
@@ -436,7 +436,7 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		// }
 
 		// 设定商品的标签权重
-		Integer tmpGoodsTagRatio = 0;
+//		Integer tmpGoodsTagRatio = 0;
 
 		// 判断商品标签
 		List<ERPGoodsTagBindEntity> oldTagList = goodsBackMapper
@@ -466,19 +466,19 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 			if (newTagList.size() > 0) {
 				goodsBackMapper.insertTagBindList(newTagList);
-				tmpGoodsTagRatio = calcGoodsTagRatio(newTagList);
+//				tmpGoodsTagRatio = calcGoodsTagRatio(newTagList);
 			}
 			if (oldTagList.size() > 0) {
 				goodsBackMapper.deleteTagBindList(oldTagList);
-				tmpGoodsTagRatio = tmpGoodsTagRatio - calcGoodsTagRatio(oldTagList);
+//				tmpGoodsTagRatio = tmpGoodsTagRatio - calcGoodsTagRatio(oldTagList);
 			}
 		} else {
 			if (oldTagList.size() > 0) {
 				goodsBackMapper.deleteTagBindList(oldTagList);
-				tmpGoodsTagRatio = calcGoodsTagRatio(oldTagList);
+//				tmpGoodsTagRatio = calcGoodsTagRatio(oldTagList);
 			}
 		}
-		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
+//		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		return new ResultModel(true, "");
 	}
@@ -801,12 +801,12 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 		// goodsItemMapper.deleteAllFiles(entity.getGoods());
 		// }
 		// 设定商品的标签权重
-		Integer tmpGoodsTagRatio = 0;
+//		Integer tmpGoodsTagRatio = 0;
 		if (entity.getGoods().getGoodsTagBindList() != null && entity.getGoods().getGoodsTagBindList().size() > 0) {
 			goodsBackMapper.insertTagBindList(entity.getGoods().getGoodsTagBindList());
-			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
+//			tmpGoodsTagRatio = calcGoodsTagRatio(entity.getGoods().getGoodsTagBindList());
 		}
-		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
+//		entity.getGoods().setGoodsTagRatio(tmpGoodsTagRatio);
 		goodsBackMapper.updateGoodsEntity(entity.getGoods());
 		return new ResultModel(true, "");
 	}
