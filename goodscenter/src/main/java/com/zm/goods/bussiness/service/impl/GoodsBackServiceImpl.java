@@ -648,7 +648,8 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 			if (tagBingList.size() > 0) {
 				// 批量插入标签
 				goodsTagMapper.batchInsert(tagBingList);
-				calTagRatio(goodsList, tagBingList);
+				//权重不按标签计算，人工定义
+//				calTagRatio(goodsList, tagBingList);
 			}
 			if (goodsList.size() > 0) {
 				goodsBackMapper.insertBatch(goodsList);
