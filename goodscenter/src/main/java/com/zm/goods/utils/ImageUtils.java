@@ -89,7 +89,7 @@ public class ImageUtils {
 			
 			g.dispose();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ImageIO.write(template, "png", out);
+			ImageIO.write(template, "jpg", out);
 			return out.toByteArray();
 		} catch (IOException e) {
 			e.printStackTrace();

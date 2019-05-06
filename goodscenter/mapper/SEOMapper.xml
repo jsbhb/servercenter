@@ -8,6 +8,7 @@
 		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
 		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
 		<result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+		<result column="description" property="description" jdbcType="VARCHAR" />
 		<result column="customGoodsName" property="customGoodsName"
 			jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="INTEGER" />
