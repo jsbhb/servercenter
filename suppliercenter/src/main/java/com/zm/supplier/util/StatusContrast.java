@@ -94,6 +94,7 @@ public class StatusContrast {
 			put("50-20",4);
 			put("50-30",6);
 			put("50-100",99);
+			put("65-已发货",6);
 		}
 	};
 

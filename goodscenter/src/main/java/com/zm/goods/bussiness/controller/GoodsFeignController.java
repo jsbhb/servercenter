@@ -37,7 +37,7 @@ public class GoodsFeignController {
 		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
 				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
-	
+
 	/**
 	 * @fun 补全订单申报时商品信息
 	 * @param version
@@ -49,6 +49,18 @@ public class GoodsFeignController {
 			@RequestBody List<String> itemIdList) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return goodsFeignService.customCompletion(itemIdList);
+		}
+		return null;
+	}
+
+	/**
+	 * @fun 根据itemId 获取成本价
+	 */
+	@RequestMapping(value = "{version}/goods/feign/item/proxy-price", method = RequestMethod.POST)
+	public String getGoodsItemProxyPrice(@PathVariable("version") Double version,
+			@RequestBody List<String> itemIdList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsFeignService.getGoodsItemProxyPrice(itemIdList);
 		}
 		return null;
 	}

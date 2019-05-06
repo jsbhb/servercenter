@@ -25,4 +25,7 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/goods/feign/custom/completion", method = RequestMethod.POST)
 	public List<CustomCompletion> customCompletion(@PathVariable("version") Double version,
 			@RequestBody List<String> itemIdList);
+	
+	@RequestMapping(value = "{version}/goods/feign/item/proxy-price", method = RequestMethod.POST)
+	public String getGoodsItemProxyPrice(@PathVariable("version") Double version,@RequestBody List<String> itemIdList);
 }

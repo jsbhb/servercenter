@@ -11,6 +11,7 @@ import com.zm.goods.pojo.DictData;
 import com.zm.goods.pojo.GoodsConvert;
 import com.zm.goods.pojo.GoodsFile;
 import com.zm.goods.pojo.GoodsItem;
+import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
@@ -165,5 +166,7 @@ public interface GoodsMapper {
 	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
 
 	List<CustomCompletion> listGoodsInfoForCstomCompletion(List<String> itemIdList);
+
+	List<GoodsPrice> listGoodsItemProxyPrice(List<String> itemIdList);
 
 }

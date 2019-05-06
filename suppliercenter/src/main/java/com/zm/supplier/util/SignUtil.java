@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -191,7 +190,8 @@ public class SignUtil {
 		}
 	}
 
-	public static final String youStongSign(String appKey, String appSecret, String timestamp, String requestId, String msg) {
+	public static final String youStongSign(String appKey, String appSecret, String timestamp, String requestId,
+			String msg) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("secret_key=");
 		sb.append(appSecret);
@@ -210,8 +210,8 @@ public class SignUtil {
 		String str = appKey + appSecret + date;
 		return DigestUtils.md5Hex(str).toLowerCase();
 	}
-	
-	public static final String getDolphinSign(Map<String,String> param, String key,String data){
+
+	public static final String getDolphinSign(Map<String, String> param, String key, String data) {
 		List<String> keyList = new ArrayList<String>(param.keySet());
 		StringBuilder sb = new StringBuilder();
 		Collections.sort(keyList);
@@ -221,18 +221,27 @@ public class SignUtil {
 			}
 		}
 		sb.append(key);
-		if(!StringUtils.isEmpty(data)){
+		if (!StringUtils.isEmpty(data)) {
 			sb.append(data);
 		}
 		return DigestUtils.md5Hex(sb.toString()).toLowerCase();
 	}
-	
-	public static void main(String[] args) {
-		Map<String,String> param = new HashMap<String, String>();
-		param.put("type", "receiveLogisticsCompany");
-		param.put("time", "1234567");
-		param.put("name", "test");
-		param.put("debug", "on");
-		System.out.println(getDolphinSign(param, "123456", "{\"orderNo\":\"GX0180124132529700029\",\"logisCompanyCode\":\"3302462946\",\"logisCompanyName\":\"宁波鑫海通达跨境电子商务有限公司\"}"));
+
+	public static final String DbClickSign(Map<String, String> param, String appSecret) {
+		List<String> keyList = new ArrayList<String>(param.keySet());
+		Collections.sort(keyList);
+		StringBuilder sb = new StringBuilder();
+		for (String key : keyList) {
+			if (!"sign".equals(key) && !StringUtils.isEmpty(param.get(key))) {
+				sb.append(param.get(key).toString());
+			}
+		}
+		sb.append(appSecret);
+		try {
+			return DigestUtils.md5Hex(Base64.encodeBase64String(sb.toString().getBytes("UTF-8"))).toLowerCase();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

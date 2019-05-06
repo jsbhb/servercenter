@@ -83,6 +83,6 @@ public class StatusTOChiness {
 	 */
 	public static String get(String code) {
 		String result = status.get(code);
-		return result != null ? result : "";
+		return result != null ? result : code;
 	}
 }

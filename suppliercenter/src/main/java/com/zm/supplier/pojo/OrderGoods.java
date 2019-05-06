@@ -44,6 +44,16 @@ public class OrderGoods {
 	private String origin;
 	
 	private String brand;
+	
+	private double proxyPrice;
+
+	public double getProxyPrice() {
+		return proxyPrice;
+	}
+
+	public void setProxyPrice(double proxyPrice) {
+		this.proxyPrice = proxyPrice;
+	}
 
 	public String getOrigin() {
 		return origin;

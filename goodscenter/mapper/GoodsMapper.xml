@@ -836,4 +836,11 @@
 		</foreach>
 	</select>
 	
+	<select id="listGoodsItemProxyPrice" parameterType="Object" resultType = "com.zm.goods.pojo.GoodsPrice">
+		select id ,proxy_price as proxyPrice ,item_id as itemId from goods_price where item_id in 
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</select>
+	
 </mapper>

@@ -1,7 +1,9 @@
 package com.zm.goods.bussiness.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -11,9 +13,11 @@ import com.zm.goods.bussiness.dao.GoodsItemMapper;
 import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsFeignService;
 import com.zm.goods.pojo.GoodsItemEntity;
+import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsItemBO;
+import com.zm.goods.utils.JSONUtil;
 
 @Service
 public class GoodsFeignServiceImpl implements GoodsFeignService {
@@ -63,6 +67,17 @@ public class GoodsFeignServiceImpl implements GoodsFeignService {
 	public List<CustomCompletion> customCompletion(List<String> itemIdList) {
 		
 		return goodsMapper.listGoodsInfoForCstomCompletion(itemIdList);
+	}
+
+	@Override
+	public String getGoodsItemProxyPrice(List<String> itemIdList) {
+		
+		List<GoodsPrice> priceList = goodsMapper.listGoodsItemProxyPrice(itemIdList);
+		Map<String,Double> tmpMap = new HashMap<>();
+		for(GoodsPrice price : priceList){
+			tmpMap.put(price.getItemId(), price.getProxyPrice());
+		}
+		return JSONUtil.toJson(tmpMap);
 	}
 
 }

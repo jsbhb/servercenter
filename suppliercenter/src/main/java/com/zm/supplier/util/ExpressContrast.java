@@ -54,6 +54,6 @@ public class ExpressContrast {
 	 */
 	public static String get(String code) {
 		String result = express.get(code);
-		return result != null ? result : "";
+		return result != null ? result : code;
 	}
 }

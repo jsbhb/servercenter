@@ -5,12 +5,14 @@ import java.util.List;
 
 import com.zm.order.bussiness.component.expressrule.inf.AbstractExpressRule;
 import com.zm.order.bussiness.component.expressrule.inf.impl.ExpressRule4BookingAmount;
+import com.zm.order.bussiness.component.expressrule.inf.impl.ExpressRule4OrderGoodsLimit;
 import com.zm.order.exception.ParameterException;
 import com.zm.order.pojo.bo.ExpressRule;
 
 public class ExpressRuleFactory {
 
 	private static final int BOOKING_AMOUNT = 1;//金额判断
+	private static final int ORDER_GOODS_TDQ = 2;//商品种类判断
 
 	/**
 	 * @fun 获取指定的规则判断类集合
@@ -24,6 +26,9 @@ public class ExpressRuleFactory {
 			switch (rule.getType()) {
 			case BOOKING_AMOUNT:
 				list.add(new ExpressRule4BookingAmount(rule.getJson()));
+				break;
+			case ORDER_GOODS_TDQ:
+				list.add(new ExpressRule4OrderGoodsLimit(rule.getJson()));
 				break;
 			default:
 				throw new ParameterException("没有对应的规则，请先联系技术增加规则");

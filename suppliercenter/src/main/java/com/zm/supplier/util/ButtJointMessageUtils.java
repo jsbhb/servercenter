@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.cglib.beans.BeanMap;
+import org.springframework.util.StringUtils;
+
 import com.seatent.opensdk.input.hdServiceProvider.CreateOrderInputDto;
 import com.seatent.opensdk.input.hdServiceProvider.GetGoodsInfoApiInputDto;
 import com.zm.supplier.constants.Constants;
@@ -18,6 +21,7 @@ import com.zm.supplier.pojo.OrderIdAndSupplierId;
 import com.zm.supplier.pojo.OrderInfo;
 import com.zm.supplier.pojo.callback.ReceiveLogisticsCompany;
 import com.zm.supplier.supplierinf.impl.HaiDaiButtjoint;
+import com.zm.supplier.supplierinf.model.DbClickOrder;
 import com.zm.supplier.supplierinf.model.DolphinOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrder;
 import com.zm.supplier.supplierinf.model.FuBangOrderGoods;
@@ -1082,5 +1086,33 @@ public class ButtJointMessageUtils {
 		sb.append("</ceb:BaseTransfer>");
 		sb.append("</ceb:CEB311Message>");
 		return sb.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String,String> getDbClickOrder(OrderInfo orderInfo, String appKey, String appSecret) {
+		DbClickOrder dbOrder = new DbClickOrder(orderInfo, appKey);
+		Map<Object,Object> map = BeanMap.create(dbOrder);
+		Map<String,String> resultMap = new HashMap<>();
+		for(Map.Entry<Object,Object> entry : map.entrySet()){
+			if(!StringUtils.isEmpty(entry.getValue())){
+				resultMap.put(entry.getKey().toString(), entry.getValue().toString());
+			}
+		}
+		String sign = SignUtil.DbClickSign(resultMap, appSecret);
+		resultMap.put("sign", sign);
+		return resultMap;
+	}
+
+	public static Map<String,String> getDbClickOrderStatus(OrderIdAndSupplierId orderIdAndSupplierId, String appKey,
+			String appSecret) {
+		Map<String,String> param = new HashMap<>();
+		List<String> orderIds = new ArrayList<>();
+		orderIds.add(orderIdAndSupplierId.getOrderId());
+		param.put("app_id", appKey);
+		param.put("version", "1.0");
+		param.put("order_sn", JSONUtil.toJson(orderIds));
+		String sign = SignUtil.DbClickSign(param, appSecret);
+		param.put("sign", sign);
+		return param;
 	}
 }

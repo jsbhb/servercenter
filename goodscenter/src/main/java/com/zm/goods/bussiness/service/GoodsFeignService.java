@@ -12,4 +12,6 @@ public interface GoodsFeignService {
 
 	List<CustomCompletion> customCompletion(List<String> itemIdList);
 
+	String getGoodsItemProxyPrice(List<String> itemIdList);
+
 }
