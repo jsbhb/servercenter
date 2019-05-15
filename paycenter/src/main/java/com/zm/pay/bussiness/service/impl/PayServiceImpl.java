@@ -623,10 +623,10 @@ public class PayServiceImpl implements PayService {
 		config.setMchID("1505554171");
 		config.setKey("AjW8S5x2ceYDofimglOqY9XwQhq5SIyh");
 		CustomModel custom = new CustomModel();
-		custom.setOutRequestNo("GX0190408100939200010");
-		custom.setPayNo("4200000302201904087823373032");
+		custom.setOutRequestNo("GX0190514140657539050");
+		custom.setPayNo("4200000298201905141365516684");
 		CustomConfig customCfg = new CustomConfig();
-		customCfg.setWxCustomsPlace("HANGZHOU_ZS");
+		customCfg.setWxCustomsPlace("CHONGQING");
 		customCfg.setMerchantCustomsCode("3302462946");
 		config.setHttpConnectTimeoutMs(5000);
 		config.setHttpReadTimeoutMs(5000);
@@ -643,7 +643,7 @@ public class PayServiceImpl implements PayService {
 		data = WxPayUtils.fillRequestData(data, config);
 		System.out.println(data);
 		String res = wxpay.requestWithoutCert(
-				"https://api.mch.weixin.qq.com/cgi-bin/mch/customs/customdeclareorder", data, 5000, 5000);
+				"https://api.mch.weixin.qq.com/cgi-bin/mch/newcustoms/customdeclareredeclare", data, 5000, 5000);
 		System.out.println(res); 
 		System.out.println(CommonUtils.xmlToMap(res));
 	}
