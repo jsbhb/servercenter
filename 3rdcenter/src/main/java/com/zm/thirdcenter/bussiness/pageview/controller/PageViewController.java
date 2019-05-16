@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.thirdcenter.bussiness.pageview.service.PageViewService;
 import com.zm.thirdcenter.constants.Constants;
 import com.zm.thirdcenter.pojo.ResultModel;
+import com.zm.thirdcenter.utils.IPUtils;
 
 @RestController
 public class PageViewController {
@@ -37,5 +38,17 @@ public class PageViewController {
 		if(Constants.FIRST_VERSION.equals(version)){
 			pageViewService.persistTask();
 		}
+	}
+	
+	/**
+	 * @fun 获取IP
+	 * @param version
+	 */
+	@RequestMapping(value = "auth/{version}/ip", method = RequestMethod.GET)
+	public ResultModel getIp(@PathVariable("version") Double version,HttpServletRequest req) {
+		if(Constants.FIRST_VERSION.equals(version)){
+			return new ResultModel(IPUtils.getOriginIp(req));
+		}
+		return new ResultModel(false, "版本错误");
 	}
 }

@@ -32,6 +32,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
+import com.zm.goods.pojo.bo.RecommendGoods;
 
 /**
  * ClassName: GoodsBackController <br/>
@@ -552,6 +553,17 @@ public class GoodsBackController {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			List<Tax> taxList = goodsBackService.getTaxInfoByItemIds(itemIds);
 			return new ResultModel(true, taxList);
+		}
+
+		return new ResultModel(false, "版本错误");
+	}
+	
+	@RequestMapping(value = "{version}/goods/list/rand", method = RequestMethod.GET)
+	public ResultModel listGoodsRand(@PathVariable("version") Double version) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			List<RecommendGoods> goodsList = goodsBackService.listGoodsRand();
+			return new ResultModel(true, goodsList);
 		}
 
 		return new ResultModel(false, "版本错误");

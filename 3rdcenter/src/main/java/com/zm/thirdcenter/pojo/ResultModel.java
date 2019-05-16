@@ -1,5 +1,8 @@
 package com.zm.thirdcenter.pojo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * ClassName: ResultPojo <br/>
  * Function: 返回统一对象. <br/>
@@ -9,11 +12,13 @@ package com.zm.thirdcenter.pojo;
  * @version
  * @since JDK 1.7
  */
+@JsonInclude(Include.NON_NULL) 
 public class ResultModel {
 
 	private String errorCode;
 	private String errorMsg;
 	private boolean success;
+	private Pagination pagination;
 	private Object obj;
 
 	public ResultModel(boolean flag, String msg) {
@@ -30,6 +35,20 @@ public class ResultModel {
 	public ResultModel(Object obj) {
 		this.success = true;
 		this.obj = obj;
+	}
+	
+	public ResultModel(Object obj,Pagination pagination){
+		this.success = true;
+		this.obj = obj;
+		this.pagination = pagination;
+	}
+
+	public Pagination getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
 	}
 
 	public ResultModel() {

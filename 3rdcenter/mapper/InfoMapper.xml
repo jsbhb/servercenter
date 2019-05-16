@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zm.thirdcenter.bussiness.dao.InfoMapper">
+
+	<resultMap type="com.zm.thirdcenter.pojo.NewsModel" id="newsModel">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="info_title" property="infoTitle" jdbcType="VARCHAR" />
+		<result column="cover_pic" property="coverPic" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="invite_path" property="invitePath" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="introduction" property="introduction" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="saveNews" parameterType="Object">
+		insert into info(info_title,type,invite_path,cover_pic,introduction,create_time,opt) 
+		values (#{infoTitle},#{type},#{invitePath},#{coverPic},#{introduction},now(),#{opt})
+	</insert>
+	
+	<select id="listNewsRand" parameterType="Object" resultMap="newsModel">
+		select id,info_title,invite_path,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as create_time 
+		from info where type = #{type} and id >= ((SELECT MAX(id) FROM info)-(SELECT MIN(id) FROM info)) * RAND() + 
+		(SELECT MIN(id) FROM info) LIMIT 9
+	</select>
+	
+	<select id="listNews" parameterType="Object" resultMap="newsModel">
+		select id,info_title,invite_path,cover_pic,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as create_time, introduction
+		from info where type = #{type} order by id desc limit #{startRow}, #{numPerPage} 
+	</select>
+	
+	<select id="countNews" parameterType="Object" resultType="java.lang.Integer">
+		select count(*) from info where type = #{type}
+	</select>
+
+</mapper>

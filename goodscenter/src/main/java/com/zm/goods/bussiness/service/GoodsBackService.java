@@ -25,6 +25,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
+import com.zm.goods.pojo.bo.RecommendGoods;
 
 /**
  * ClassName: GoodsBackService <br/>
@@ -284,5 +285,11 @@ public interface GoodsBackService {
 	List<Tax> getTaxInfoByItemIds(List<String> itemIds);
 	
 	void updateRetailPrice(Map<String,Object> param);
+
+	/**
+	 * @fun 随机获取推荐商品
+	 * @return
+	 */
+	List<RecommendGoods> listGoodsRand();
 
 }

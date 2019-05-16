@@ -727,4 +727,15 @@
 			update goods_price set retail_price = #{value} where item_id =  #{key} limit 1
 		</foreach>
 	</update>
+	
+	<select id="listGoodsRand" parameterType="Object" resultType = "com.zm.goods.pojo.bo.RecommendGoods">
+		select g.*,gf.path as picPath,gp.line_price as linePrice,gp.retail_price as price 
+		from (select goods_id, goods_name as goodsName, concat_ws('/',access_path,goods_id) as href, description from goods 
+		where status = 1 and id >= 
+		((SELECT MAX(id) FROM goods)-(SELECT MIN(id) FROM goods)) * RAND() + (SELECT MIN(id) FROM goods) LIMIT 6) as g 
+		left join goods_file gf on g.goods_id = gf.goods_id 
+		left join goods_item gi on g.goods_id = gi.goods_id 
+		left join goods_price gp on gp.item_id = gi.item_id 
+		group by g.goods_id 
+	</select>
 </mapper>

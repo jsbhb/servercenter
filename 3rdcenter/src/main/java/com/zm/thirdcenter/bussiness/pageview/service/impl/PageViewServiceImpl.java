@@ -17,7 +17,6 @@ import com.zm.thirdcenter.bussiness.dao.PageViewMapper;
 import com.zm.thirdcenter.bussiness.pageview.service.PageViewService;
 import com.zm.thirdcenter.pojo.PageViewBO;
 import com.zm.thirdcenter.utils.IPUtils;
-import com.zm.thirdcenter.utils.LogUtil;
 
 @Service
 public class PageViewServiceImpl implements PageViewService {

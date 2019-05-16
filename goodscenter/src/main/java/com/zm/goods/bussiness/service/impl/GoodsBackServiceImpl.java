@@ -48,6 +48,7 @@ import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.Tax;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
+import com.zm.goods.pojo.bo.RecommendGoods;
 
 /**
  * ClassName: GoodsBackServiceImpl <br/>
@@ -903,5 +904,11 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 	@Override
 	public void updateRetailPrice(Map<String, Object> param) {
 		goodsBackMapper.updateRetailPrice(param);
+	}
+
+	@Override
+	public List<RecommendGoods> listGoodsRand() {
+		List<RecommendGoods> goodsList = goodsBackMapper.listGoodsRand();
+		return goodsList;
 	}
 }

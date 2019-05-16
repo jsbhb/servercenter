@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class DateUtil {
 
-	public static String dataformat(String data,String oldFormat,String newFormat){
+	public static String dataformat(String data, String oldFormat, String newFormat) {
 		SimpleDateFormat sdf = new SimpleDateFormat(oldFormat);
 		SimpleDateFormat newSdf = new SimpleDateFormat(newFormat);
 		Date date = null;
@@ -16,5 +16,10 @@ public class DateUtil {
 			e.printStackTrace();
 		}
 		return newSdf.format(date);
-	} 
+	}
+
+	public static String dataformat(Date d, String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		return sdf.format(d);
+	}
 }

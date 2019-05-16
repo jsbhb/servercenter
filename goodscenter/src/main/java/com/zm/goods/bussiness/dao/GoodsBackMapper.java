@@ -23,6 +23,7 @@ import com.zm.goods.pojo.GoodsListDownloadParam;
 import com.zm.goods.pojo.GoodsRebateEntity;
 import com.zm.goods.pojo.TagFuncEntity;
 import com.zm.goods.pojo.ThirdWarehouseGoods;
+import com.zm.goods.pojo.bo.RecommendGoods;
 
 /**
  * ClassName: BrandMapper <br/>
@@ -334,4 +335,6 @@ public interface GoodsBackMapper {
 	List<String> getGoodsPicPath(String goodsId);
 
 	void updateRetailPrice(@Param("param")Map<String, Object> param);
+
+	List<RecommendGoods> listGoodsRand();
 }
