@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.Resource;
 
@@ -908,7 +909,11 @@ public class GoodsBackServiceImpl implements GoodsBackService {
 
 	@Override
 	public List<RecommendGoods> listGoodsRand() {
-		List<RecommendGoods> goodsList = goodsBackMapper.listGoodsRand();
+		int count = goodsBackMapper.getGoodsUpshelvCount();
+		//默认写死获取6个
+		Random rand = new Random();
+		int startRow = rand.nextInt(count - 5 < 0 ? 0 : count - 5);
+		List<RecommendGoods> goodsList = goodsBackMapper.listGoodsRand(startRow);
 		return goodsList;
 	}
 }

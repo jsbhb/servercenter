@@ -336,5 +336,7 @@ public interface GoodsBackMapper {
 
 	void updateRetailPrice(@Param("param")Map<String, Object> param);
 
-	List<RecommendGoods> listGoodsRand();
+	List<RecommendGoods> listGoodsRand(int startRow);
+
+	int getGoodsUpshelvCount();
 }
