@@ -101,4 +101,10 @@ public class UserFeignServiceImpl implements UserFeignService {
 		}
 		return true;
 	}
+
+	@Override
+	public int getGradeTypeIdByGradeId(Integer gradeId) {
+		
+		return gradeMapper.getGradeTypeByGradeId(gradeId);
+	}
 }

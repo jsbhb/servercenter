@@ -7,4 +7,6 @@ public interface PageViewService {
 	void pageviewStatistics(HttpServletRequest request, String pageName, Integer type);
 
 	void persistTask();
+
+	void flowStatis(HttpServletRequest request,int shopId);
 }

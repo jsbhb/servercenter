@@ -14,6 +14,7 @@ import com.zm.goods.bussiness.dao.GoodsMapper;
 import com.zm.goods.bussiness.service.GoodsFeignService;
 import com.zm.goods.pojo.GoodsItemEntity;
 import com.zm.goods.pojo.GoodsPrice;
+import com.zm.goods.pojo.OrderGoodsDTO;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsItemBO;
@@ -78,6 +79,11 @@ public class GoodsFeignServiceImpl implements GoodsFeignService {
 			tmpMap.put(price.getItemId(), price.getProxyPrice());
 		}
 		return JSONUtil.toJson(tmpMap);
+	}
+
+	@Override
+	public void updateGoodsSale(List<OrderGoodsDTO> orderGoodsList) {
+		goodsMapper.updateGoodsSale(orderGoodsList);
 	}
 
 }

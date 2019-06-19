@@ -120,7 +120,7 @@ public class ShareProfitComponent {
 			// 增加月订单数
 			cacheAbstractService.addOrderCountCache(info.getShopId(), Constants.ORDER_STATISTICS_MONTH, time);
 
-			if(Constants.BARGAIN_ORDER == info.getCreateType()){//砍价订单不计算返佣
+			if (Constants.BARGAIN_ORDER == info.getCreateType()) {// 砍价订单不计算返佣
 				return;
 			}
 			if (Constants.PREDETERMINE_ORDER == info.getOrderSource()) {
@@ -144,11 +144,29 @@ public class ShareProfitComponent {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		template.opsForSet().remove(Constants.ORDER_REBATE, orderId);
 		Map<String, String> result = hashOperations.entries(Constants.REBATE_DETAIL + orderId);
+		String payTime = orderMapper.getPayTimeByOrderId(orderId);
+		int difference = DateUtils.differentDays(payTime, "yyyy-MM-dd HH:mm:ss");
 		for (Map.Entry<String, String> entry : result.entrySet()) {
-			if (!"orderId".equals(entry.getKey())) {
+			if (!"orderId".equals(entry.getKey()) && !"orderFlag".equals(entry.getKey())) {
 				hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
 						CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
 				LogUtil.writeLog("退单返回返佣====GradeId:" + entry.getKey() + ",返佣=" + entry.getValue());
+				if (difference == 0) {// 当天退款，扣除当天的待到账统计
+					template.opsForValue().increment(Constants.GRADE_ORDER_REBATE_DAY + entry.getKey(),
+							CalculationUtils.sub(0, CalculationUtils.round(2, Double.valueOf(entry.getValue()))));
+				} else {
+					Object o = template.opsForList().index(Constants.GRADE_ORDER_REBATE_DAY_LIST + entry.getKey(),
+							-difference);
+					String value = o == null ? "0" : o.toString();
+					double resultValue = CalculationUtils.sub(Double.valueOf(value), Double.valueOf(entry.getValue()));
+					if (resultValue < 0) {
+						resultValue = 0;
+					} else {
+						resultValue = CalculationUtils.round(resultValue, 2);
+					}
+					template.opsForList().set(Constants.GRADE_ORDER_REBATE_DAY_LIST + entry.getKey(), -difference,
+							resultValue + "");
+				}
 			}
 		}
 		template.delete(Constants.REBATE_DETAIL + orderId);
@@ -304,6 +322,9 @@ public class ShareProfitComponent {
 		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
 			hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), "stayToAccount",
 					CalculationUtils.round(2, entry.getValue()));
+			// 当天待到账统计
+			template.opsForValue().increment(Constants.GRADE_ORDER_REBATE_DAY + entry.getKey(),
+					CalculationUtils.round(2, entry.getValue()));
 		}
 		Map<String, String> result = packageDetailMap(orderInfo, rebateMap);
 		financeFeignClient.saveRebateDetail(Constants.FIRST_VERSION, result);
@@ -322,6 +343,7 @@ public class ShareProfitComponent {
 				HashOperations<String, String, String> hashOperations = template.opsForHash();
 				Map<String, String> result = hashOperations.entries(Constants.REBATE_DETAIL + orderInfo.getOrderId());
 				result.remove("orderId", orderInfo.getOrderId());
+				result.remove("orderFlag", orderInfo.getOrderFlag());
 				for (Map.Entry<String, String> entry : result.entrySet()) {
 					hashOperations.increment(Constants.GRADE_ORDER_REBATE + entry.getKey(), Constants.CAN_BE_PRESENTED,
 							CalculationUtils.round(2, Double.valueOf(entry.getValue())));
@@ -344,7 +366,7 @@ public class ShareProfitComponent {
 		result.put("orderId", orderInfo.getOrderId());
 		result.put("orderFlag", orderInfo.getOrderFlag() + "");
 		for (Map.Entry<Integer, Double> entry : rebateMap.entrySet()) {
-			if(entry.getValue() > 0){
+			if (entry.getValue() > 0) {
 				result.put(entry.getKey().toString(), entry.getValue().toString());
 			}
 		}
@@ -412,19 +434,20 @@ public class ShareProfitComponent {
 						it.remove();
 						continue;
 					} else {
-						balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), Constants.CAPITAL_MONEY,
+						balance = hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(),
+								Constants.CAPITAL_MONEY,
 								CalculationUtils.sub(0, orderInfo.getOrderDetail().getPayment()));// 扣除资金池
 						if (balance < 0) {// 如果扣除后小于0，则不发送订单给仓库，并把扣除的资金加回去
 							orderIdListForCapitalNotEnough.add(orderInfo.getOrderId());
 							it.remove();
-							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), Constants.CAPITAL_MONEY,
-									orderInfo.getOrderDetail().getPayment());
+							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(),
+									Constants.CAPITAL_MONEY, orderInfo.getOrderDetail().getPayment());
 						} else {// 如果余额足够，把资金放到冻结资金处
 							orderIdListForCapitalEnough.add(orderInfo.getOrderId());
-							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), Constants.CAPITAL_FROZEN_MONEY,
-									orderInfo.getOrderDetail().getPayment());// 冻结资金增加
-							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(), Constants.CAPITAL_USE_MONEY,
-									orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
+							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(),
+									Constants.CAPITAL_FROZEN_MONEY, orderInfo.getOrderDetail().getPayment());// 冻结资金增加
+							hashOperations.increment(Constants.CAPITAL_PERFIX + orderInfo.getShopId(),
+									Constants.CAPITAL_USE_MONEY, orderInfo.getOrderDetail().getPayment());// 总共使用的资金增加
 							Map<String, Object> capitalPoolDetailMap = getCapitalDetail(orderInfo);
 							listOperations.leftPush(Constants.CAPITAL_DETAIL, JSONUtil.toJson(capitalPoolDetailMap));
 						}
@@ -467,10 +490,11 @@ public class ShareProfitComponent {
 				try {
 					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), Constants.CAPITAL_MONEY,
 							order.getOrderDetail().getPayment());
-					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), Constants.CAPITAL_FROZEN_MONEY,
+					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(),
+							Constants.CAPITAL_FROZEN_MONEY,
 							CalculationUtils.sub(0, order.getOrderDetail().getPayment()));
-					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(), Constants.CAPITAL_USE_MONEY,
-							CalculationUtils.sub(0, order.getOrderDetail().getPayment()));
+					hashOperations.increment(Constants.CAPITAL_PERFIX + order.getCenterId(),
+							Constants.CAPITAL_USE_MONEY, CalculationUtils.sub(0, order.getOrderDetail().getPayment()));
 				} catch (Exception e2) {
 					LogUtil.writeErrorLog("【资金回滚出错】订单号：" + order.getOrderId(), e2);
 				}

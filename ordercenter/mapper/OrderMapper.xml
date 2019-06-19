@@ -812,4 +812,14 @@
 	<select id="getOrderDetailByOrderId" parameterType="Object" resultType="java.util.HashMap">
 		select pay_no,payment from order_detail where order_id = #{orderId}
 	</select>
+	
+	<select id="listOrderGoodsByCreateTime" parameterType="Object" resultMap = "orderGoods">
+		select og.item_name,og.goods_id as goodsId from order_base ob 
+		left join order_goods og on ob.order_id = og.order_id where ob.status in (1,2,3,4,5,6,7,12) 
+		and ob.create_time > #{time}
+	</select>
+	
+	<select id="getPayTimeByOrderId" parameterType="Object" resultType="java.lang.String">
+		select DATE_FORMAT(pay_time,'%Y-%m-%d %H:%i:%s') as pay_time from order_detail where order_id = #{orderId}
+	</select>
 </mapper>

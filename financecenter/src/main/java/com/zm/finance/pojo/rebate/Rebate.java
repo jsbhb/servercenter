@@ -1,5 +1,7 @@
 package com.zm.finance.pojo.rebate;
 
+import com.zm.finance.util.CalculationUtils;
+
 public class Rebate {
 
 	private Integer id;
@@ -15,6 +17,17 @@ public class Rebate {
 	private String createTime;
 	private String updateTime;
 	private String opt;
+	
+	public void init(){
+		canBePresented = CalculationUtils.round(canBePresented, 2);
+		alreadyCheck = CalculationUtils.round(alreadyCheck, 2);
+		alreadyPresented = CalculationUtils.round(alreadyPresented, 2);
+		stayToAccount = CalculationUtils.round(stayToAccount, 2);
+		refilling = CalculationUtils.round(refilling, 2);
+		orderConsume = CalculationUtils.round(orderConsume, 2);
+		frozenRebate = CalculationUtils.round(frozenRebate, 2);
+	}
+	
 	public Double getOrderConsume() {
 		return orderConsume;
 	}

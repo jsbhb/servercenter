@@ -25,6 +25,7 @@ import com.zm.order.log.LogUtil;
 import com.zm.order.pojo.ErrorCodeEnum;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
+import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
@@ -741,6 +742,24 @@ public class OrderController {
 			return orderService.handleSupplierCenterExceptionOrder(orderId);
 		}
 		return null;
+	}
+
+	/**
+	 * @fun 手动进行商品销量的维护,每调用一次，orderGood对应的商品订单量+1，由于是程序缓存，重启应用后商品订单量数据消失
+	 * 商品销量对应增加quantity的值，实时增加，不会因为程序重启而丢失
+	 * 内部必传参数：goodsId，itemId，quantity，itemName
+	 * @param version
+	 * @param goodsList
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/order/goods/handle/statis", method = RequestMethod.POST)
+	public ResultModel handleOrderGoodsStatis(@PathVariable("version") Double version,
+			@RequestBody List<OrderGoods> goodsList) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return orderService.handleOrderGoodsStatis(goodsList);
+		}
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 }

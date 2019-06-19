@@ -1,6 +1,7 @@
 package com.zm.user.utils;
 
 import com.zm.user.pojo.Grade;
+import com.zm.user.pojo.GradeFront;
 import com.zm.user.pojo.bo.ButtjointUserBO;
 import com.zm.user.pojo.bo.GradeBO;
 import com.zm.user.pojo.bo.RebateFormulaBO;
@@ -35,6 +36,22 @@ public class ConvertUtil {
 		bo.setFormula(temp.getFormula());
 		bo.setGradeTypeId(temp.getGradeTypeId());
 		return bo;
+	}
+
+	public static Grade converToGrade(GradeFront grade) {
+		Grade g = new Grade();
+		g.setId(grade.getId());
+		g.setStoreName(grade.getGradeName());
+		g.setStoreOperator(grade.getPersonInCharge());
+		g.setProvince(grade.getProvince());
+		g.setCity(grade.getCity());
+		g.setDistrict(grade.getDistrict());
+		g.setAddress(grade.getAddress());
+		g.setPicPath1(grade.getIdCardPicPath());
+		g.setContacts(grade.getPersonInCharge());
+		g.setContactsPhone(grade.getPhone());
+		g.setRemark(grade.getRemark());
+		return g;
 	}
 
 }

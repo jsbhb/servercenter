@@ -32,6 +32,7 @@ import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.dto.ShopManage4GoodsDTO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -70,7 +71,8 @@ public class GoodsController {
 
 		if (Constants.FIRST_VERSION.equals(version)) {
 			try {
-				Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination,gradeId,welfare);
+				Map<String, Object> resultMap = goodsTagDecorator.queryGoods(searchModel, sortList, pagination, gradeId,
+						welfare);
 				return new ResultModel(true, resultMap);
 			} catch (WrongPlatformSource e) {
 				e.printStackTrace();
@@ -118,10 +120,11 @@ public class GoodsController {
 			param.put("itemId", itemId);
 			pagination.init();
 			param.put("pagination", pagination);
+			param.put("req", req);
 
 			// result.setObj(goodsService.listGoods(param, centerId, userId,
 			// proportion));
-			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion,isApplet));
+			result.setObj(goodsTagDecorator.listGoods(param, centerId, userId, proportion, isApplet));
 			result.setSuccess(true);
 		}
 
@@ -208,31 +211,37 @@ public class GoodsController {
 		return result;
 	}
 
-//	@RequestMapping(value = "auth/{version}/goods/active", method = RequestMethod.GET)
-//	@ApiOperation(value = "获取活动接口", response = ResultModel.class)
-//	@ApiImplicitParams({
-//			@ApiImplicitParam(paramType = "path", name = "version", dataType = "Double", required = true, value = "版本号，默认1.0"),
-//			@ApiImplicitParam(paramType = "query", name = "typeStatus", dataType = "Integer", required = true, value = "活动范围，1全场，0特定区域"),
-//			@ApiImplicitParam(paramType = "query", name = "type", dataType = "Integer", required = false, value = "活动类型：0：限时抢购；1：满减，2满打折"),
-//			@ApiImplicitParam(paramType = "query", name = "centerId", dataType = "Integer", required = true, value = "客户端ID") })
-//	public ResultModel getActivity(@PathVariable("version") Double version,
-//			@RequestParam(value = "type", required = false) Integer type,
-//			@RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId") Integer centerId) {
-//
-//		if (Constants.FIRST_VERSION.equals(version)) {
-//			Map<String, Object> param = new HashMap<String, Object>();
-//			param.put("typeStatus", typeStatus);
-//			if (!Constants.ACTIVE_AREA.equals(typeStatus)) {
-//				param.put("type", type);
-//			}
-//			param.put("centerId", "_" + centerId);
-//
-//			return new ResultModel(true, goodsService.getActivity(param));
-//		}
-//
-//		return new ResultModel(false, "版本错误");
-//
-//	}
+	// @RequestMapping(value = "auth/{version}/goods/active", method =
+	// RequestMethod.GET)
+	// @ApiOperation(value = "获取活动接口", response = ResultModel.class)
+	// @ApiImplicitParams({
+	// @ApiImplicitParam(paramType = "path", name = "version", dataType =
+	// "Double", required = true, value = "版本号，默认1.0"),
+	// @ApiImplicitParam(paramType = "query", name = "typeStatus", dataType =
+	// "Integer", required = true, value = "活动范围，1全场，0特定区域"),
+	// @ApiImplicitParam(paramType = "query", name = "type", dataType =
+	// "Integer", required = false, value = "活动类型：0：限时抢购；1：满减，2满打折"),
+	// @ApiImplicitParam(paramType = "query", name = "centerId", dataType =
+	// "Integer", required = true, value = "客户端ID") })
+	// public ResultModel getActivity(@PathVariable("version") Double version,
+	// @RequestParam(value = "type", required = false) Integer type,
+	// @RequestParam("typeStatus") Integer typeStatus, @RequestParam("centerId")
+	// Integer centerId) {
+	//
+	// if (Constants.FIRST_VERSION.equals(version)) {
+	// Map<String, Object> param = new HashMap<String, Object>();
+	// param.put("typeStatus", typeStatus);
+	// if (!Constants.ACTIVE_AREA.equals(typeStatus)) {
+	// param.put("type", type);
+	// }
+	// param.put("centerId", "_" + centerId);
+	//
+	// return new ResultModel(true, goodsService.getActivity(param));
+	// }
+	//
+	// return new ResultModel(false, "版本错误");
+	//
+	// }
 
 	@RequestMapping(value = "auth/{version}/goods/modular/{centerId}/{page}/{pageType}", method = RequestMethod.GET)
 	@ApiOperation(value = "获取模块布局接口", response = ResultModel.class)
@@ -510,6 +519,39 @@ public class GoodsController {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @fun 微店店铺商品列表
+	 * @param version
+	 * @param smg
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/shop/manager/goods", method = RequestMethod.POST)
+	public ResultModel listGoodsItem4ShopManage(@PathVariable("version") Double version,
+			@RequestBody ShopManage4GoodsDTO smg) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsTagDecorator.listGoodsItem4ShopManage(smg);
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
+	}
+
+	/**
+	 * @fun 加载筛选条件
+	 * @param version
+	 * @param 
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/shop/manager/goods/search-conditions", method = RequestMethod.GET)
+	public ResultModel loadSearchConditions(@PathVariable("version") Double version) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return goodsService.loadSearchConditions();
+		}
+
+		return new ResultModel(false, ErrorCodeEnum.VERSION_ERROR.getErrorCode(),
+				ErrorCodeEnum.VERSION_ERROR.getErrorMsg());
 	}
 
 }

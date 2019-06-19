@@ -24,4 +24,6 @@ public interface GoodsTagMapper {
 	List<GoodsTagBindEntity> listGoodsTagBindByItemList(List<String> list);
 
 	List<GoodsItemEntity> listGoodsTagByItemId(List<String> list);
+
+	List<GoodsTagEntity> listTage();
 }

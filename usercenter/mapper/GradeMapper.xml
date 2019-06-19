@@ -50,6 +50,8 @@
 		<result column="grade_inviter" property="gradeInviter" jdbcType="VARCHAR" />
 		<result column="profit_ratio" property="profitRatio" jdbcType="INTEGER" />
 		<result column="shop_extension_flg" property="shopExtensionFlg" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
 	</resultMap>
 	<resultMap type="com.zm.user.pojo.ShopEntity" id="shop">
 		<id column="id" property="id" jdbcType="INTEGER" />
@@ -132,7 +134,7 @@
 		a.*,b.grade_name as parentGradeName
 		,store_name,contacts,contacts_phone,province
 		,city,district,address,store_operator,operator_idnum
-		,pic1_path,pic2_path,pic3_path,pic4_path
+		,pic1_path,pic2_path,pic3_path,pic4_path,c.remark
 		from grade a
 		left join grade b on a.parent_id = b.id
 		left join grade_data c on a.id = c.id
@@ -162,6 +164,9 @@
 		<if test="welfareType!=null and welfareType!=-1">
 			and a.welfare_type = #{welfareType}
 		</if>
+		<if test="status != null and status != '' or status == 0">
+			and a.status = #{status}
+		</if>
 		order by a.id
 	</select>
 
@@ -179,7 +184,7 @@
 		where id =
 		#{id}
 	</update>
-
+	
 	<select id="selectByGradeId" parameterType="Object" resultMap="shop">
 		select a.*
 		from grade_config a
@@ -343,5 +348,37 @@
 	
 	<select id="listAllGradeTypeRebateFormula" parameterType="Object" resultMap="rebateFormula">
 		select r.*,g.name from grade_type_rebate_formula r left join grade_type g on r.grade_type_id = g.id
+	</select>
+	
+	<select id="getGradeTypeByGradeId" parameterType="Object" resultType="java.lang.Integer">
+		select grade_type from grade where id = #{gradeId}
+	</select>
+	
+	<select id="getGradeTypeId" parameterType="Object" resultType="java.lang.Integer">
+		select id from grade_type where parent_id = #{parentId} limit 1;
+	</select>
+	
+	<select id="getGradeStatusByPhone" parameterType="Object" resultType="java.lang.Integer">
+		select status from grade where phone = #{phone}
+	</select>
+	
+	<update id="auditShop" parameterType="Object">
+		update grade set status = #{status}
+		<if test="parentId != null and parentId != ''">
+			,parent_id = #{parentId}
+		</if>
+		<if test="gradeType != null and  gradeType != ''">
+			,grade_type = #{gradeType}
+		</if>
+		where id = #{id}
+	</update>
+	
+	<update id="applyShopResubmit" parameterType="Object">
+		update grade_data set province = #{province},city = #{city},district = #{district}, address = #{address},
+		pic1_path = #{idCardPicPath},remark = #{remark} where id = #{id}
+	</update>
+	
+	<select id="getParentIdById" parameterType="Object" resultType="java.lang.Integer">
+		select parent_id from grade where id = #{id}
 	</select>
 </mapper>

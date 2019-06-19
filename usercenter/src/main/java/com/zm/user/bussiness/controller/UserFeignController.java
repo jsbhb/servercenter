@@ -64,4 +64,12 @@ public class UserFeignController {
 		}
 		return false;
 	}
+	
+	@RequestMapping(value = "{version}/user/feign/grade-type/{gradeId}", method = RequestMethod.GET)
+	public int getGradeTypeIdByGradeId(@PathVariable("version") Double version, @PathVariable("gradeId") Integer gradeId){
+		if(Constants.FIRST_VERSION.equals(version)){
+			return userFeignService.getGradeTypeIdByGradeId(gradeId);
+		}
+		return -1;
+	}
 }

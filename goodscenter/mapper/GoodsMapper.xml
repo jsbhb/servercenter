@@ -262,6 +262,25 @@
 		<result column="lockedqty" property="lockedqty" jdbcType="INTEGER" />
 	</resultMap>
 	
+	<resultMap type="com.zm.goods.pojo.vo.Goods4ShopManager" id="gsm">
+		<id column="item_id" property="itemId" jdbcType="VARCHAR" />
+		<result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+		<result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+		<result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="retail_price" property="retailPrice" jdbcType="NUMERIC" />
+		<result column="item_code" property="itemCode" jdbcType="VARCHAR" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<result column="sku" property="sku" jdbcType="VARCHAR" />
+		<result column="info" property="info" jdbcType="VARCHAR" />
+		<result column="weight" property="weight" jdbcType="INTEGER" />
+		<result column="fxqty" property="stock" jdbcType="INTEGER" />
+		<result column="sale_num" property="saleNum" jdbcType="INTEGER" />
+		<result column="rebate" property="rebate" jdbcType="NUMERIC" />
+		<result column="excise_tax" property="exciseTax" jdbcType="NUMERIC" />
+		<result column="increment_tax" property="incrementTax" jdbcType="NUMERIC" />
+	</resultMap>
+	
 	<select id="getTax" parameterType="Object" resultMap="tax">
 		select gs.id,gs.item_id,gs.excise_tax,gb.increment_tax from goods_item gs left join goods g on 
 		gs.goods_id = g.goods_id 
@@ -278,6 +297,11 @@
 		from goods_first_category gfc left join goods_second_category gsc on gfc.first_id = gsc.first_id 
 		left join goods_third_category gtc on gsc.second_id = gtc.second_id 
 		where gfc.status = 1 and gsc.status =1 and gtc.status =1 order by gfc.sort ,gsc.sort ,gtc.sort
+	</select>
+	
+	<select id="queryFirstCategory" parameterType="Object" resultMap = "goodsIndustry">
+		select id,first_id,name as industryName,tag_path from goods_first_category 
+		where status = 1
 	</select>
 
 	<select id="getActivity" parameterType="Object" resultMap="activity">
@@ -842,5 +866,47 @@
 			#{item}
 		</foreach>
 	</select>
+	
+	<select id="listGoodsItem4ShopManage" parameterType="Object" resultMap="gsm">
+		select g.goods_name,g.goods_id,gi.item_id,gi.sale_num,gi.weight,gi.excise_tax,gi.info,gi.sku,gi.item_code,
+		gp.retail_price,gs.fxqty,b.unit,b.increment_tax,gp.retail_price*gr.proportion as rebate,g.type,g.supplier_id
+		from goods_item gi left join goods g on gi.goods_id = g.goods_id 
+		left join base b on b.id = g.base_id 
+		left join goods_price gp on gi.item_id = gp.item_id 
+		left join goods_stock gs on gs.item_id = gi.item_id 
+		left join goods_rebate gr on gi.item_id = gr.item_id 
+		<if test="tagId != null and tagId != ''">
+			left join goods_tag_bind gtb on gi.item_id = gtb.item_id 
+			left join goods_tag gt on gt.id = gtb.tag_id 
+		</if>
+		where gi.status = 1 and gr.grade_type = #{gradeType} 
+		<if test="goodsName != null and goodsName != ''">
+			and g.goods_name like concat('%',#{goodsName},'%') 
+		</if>
+		<if test="tagId != null and tagId != ''">
+			and gt.id = #{tagId}
+		</if>
+		<if test="first != null and first != ''">
+			and b.first_category = #{first}
+		</if>
+		<if test="sortName != null and sortName != '' and sortRule != null and sortRule != ''">
+			order by ${sortName} ${sortRule}
+		</if>
+		limit #{startRow},#{numPerPage}
+	</select>
+	
+	<select id="countGoodsItem4ShopManage" parameterType="Object" resultType = "java.lang.Integer">
+		select count(*) from goods_item gi left join goods g on gi.goods_id = g.goods_id 
+		where gi.status = 1 
+		<if test="goodsName != null and goodsName != ''">
+			and g.goods_name like concat('%',#{goodsName},'%') 
+		</if>
+	</select>
+	
+	<update id="updateGoodsSale" parameterType="Object">
+		<foreach collection="list" item="item" open="" close="" separator=";">
+			update goods_item set sale_num = sale_num + #{item.itemQuantity} where item_id = #{item.itemId}
+		</foreach>
+	</update>
 	
 </mapper>

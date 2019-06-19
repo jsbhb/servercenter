@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class PageViewServiceImpl implements PageViewService {
 
 	@Resource
 	RedisTemplate<String, String> template;
-	
+
 	@Resource
 	PageViewMapper pageViewMapper;
 
@@ -40,7 +41,7 @@ public class PageViewServiceImpl implements PageViewService {
 			boolean flag = template.hasKey(REDIS_PV_PRE + pageName);
 			if (flag) {
 				boolean existIp = template.opsForSet().isMember(REDIS_PV_IP, ip);
-				if(!existIp){
+				if (!existIp) {
 					template.opsForSet().add(REDIS_PV_IP, ip);
 					hashOperations.increment(REDIS_PV_PRE + pageName, "ipNum", 1);
 				}
@@ -63,12 +64,12 @@ public class PageViewServiceImpl implements PageViewService {
 	public void persistTask() {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		Set<String> keys = template.keys(REDIS_PV_PRE + "*");
-		if(keys != null && keys.size() > 0){
-			Map<String,String> temp = null;
+		if (keys != null && keys.size() > 0) {
+			Map<String, String> temp = null;
 			List<PageViewBO> list = null;
-			for(String key : keys){
+			for (String key : keys) {
 				temp = hashOperations.entries(key);
-				if(temp.size() > 0){
+				if (temp.size() > 0) {
 					list = packageDate(temp);
 					pageViewMapper.savePageView(list);
 					pageViewMapper.saveUniqueVisitor(temp);
@@ -78,8 +79,8 @@ public class PageViewServiceImpl implements PageViewService {
 		}
 		template.delete(REDIS_PV_IP);
 	}
-	
-	private List<PageViewBO> packageDate(Map<String,String> temp){
+
+	private List<PageViewBO> packageDate(Map<String, String> temp) {
 		List<PageViewBO> list = new ArrayList<PageViewBO>();
 		PageViewBO pageViewBO = null;
 		pageViewBO = new PageViewBO();
@@ -95,4 +96,14 @@ public class PageViewServiceImpl implements PageViewService {
 		return list;
 	}
 
+	//当天的key
+	private final String VISIT_STATISTICS_DAY = "flowstatis:day:visit:";
+	private final String PAGE_STATISTICS_DAY = "flowstatis:day:page:";
+
+	@Override
+	public void flowStatis(HttpServletRequest request, int shopId) {
+		String ip = IPUtils.getOriginIp(request);
+		template.opsForHash().increment(VISIT_STATISTICS_DAY + shopId, ip, 1);
+		template.opsForValue().increment(PAGE_STATISTICS_DAY + shopId, 1);
+	}
 }

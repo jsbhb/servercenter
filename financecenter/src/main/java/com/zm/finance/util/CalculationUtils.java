@@ -2,6 +2,7 @@ package com.zm.finance.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 public class CalculationUtils {
 	/**
@@ -106,5 +107,19 @@ public class CalculationUtils {
 	public static double round(int scale, String value) {
 		BigDecimal b = new BigDecimal(value);
 		return b.setScale(scale, RoundingMode.HALF_UP).doubleValue();
+	}
+	
+	/**
+	 * @fun 不进行四舍五入
+	 * @param value
+	 * @param scale
+	 * @return
+	 */
+	public static double round(Double value, int scale){
+		DecimalFormat formater = new DecimalFormat();
+		formater.setMaximumFractionDigits(scale);
+		formater.setGroupingSize(0);
+		formater.setRoundingMode(RoundingMode.FLOOR);
+		return Double.valueOf(formater.format(value == null ? 0.00 : value));
 	}
 }

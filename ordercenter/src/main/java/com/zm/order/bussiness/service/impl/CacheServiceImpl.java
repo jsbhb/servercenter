@@ -1,5 +1,7 @@
 package com.zm.order.bussiness.service.impl;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -15,7 +17,11 @@ import com.zm.order.bussiness.dao.StatisticsMapper;
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
+import com.zm.order.pojo.OrderGoodsCacheModel;
 import com.zm.order.pojo.OrderInfo;
+import com.zm.order.pojo.ResultModel;
+import com.zm.order.pojo.ShopManagerStatis;
+import com.zm.order.pojo.ShopManagerStatisIndex;
 import com.zm.order.pojo.bo.DiagramBO;
 import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.pojo.bo.IntradayOrderBO;
@@ -103,20 +109,65 @@ public class CacheServiceImpl extends CacheAbstractService {
 	@Override
 	public void saveDayCacheToWeek() {
 		Set<GradeBO> set = CacheComponent.getInstance().getSet();
+		Map<String, String> tmp = null;
 		for (GradeBO grade : set) {
 			// 放入周统计
 			String str = entries(Constants.ORDER_STATISTICS_DAY + grade.getId(), "produce");
-			addList(Constants.ORDER_STATISTICS_WEEK + grade.getId(), str, LAST_WEEK);
+			addList(Constants.ORDER_STATISTICS_WEEK + grade.getId(), str, LAST_DAY);
 			// 缓存置0
 			put(Constants.ORDER_STATISTICS_DAY + grade.getId(), "produce", "0");
 			put(Constants.ORDER_STATISTICS_DAY + grade.getId(), "deliver", "0");
 			put(Constants.ORDER_STATISTICS_DAY + grade.getId(), "cancel", "0");
 			// 放入周统计
 			str = entries(Constants.SALES_STATISTICS_DAY + grade.getId(), "sales");
-			addList(Constants.SALES_STATISTICS_WEEK + grade.getId(), str, LAST_WEEK);
+			addList(Constants.SALES_STATISTICS_WEEK + grade.getId(), str, LAST_DAY);
 			// 缓存置0
 			put(Constants.SALES_STATISTICS_DAY + grade.getId(), "sales", "0");
+			// pv uv放入
+			addList(Constants.PAGE_STATISTICS_DAY_LIST + grade.getId(),
+					getValues(Constants.PAGE_STATISTICS_DAY + grade.getId()), LAST_DAY);
+			tmp = entries(Constants.VISIT_STATISTICS_DAY + grade.getId());
+			int count = 0;
+			if (tmp != null) {
+				count = tmp.size();
+			}
+			addList(Constants.VISIT_STATISTICS_DAY_LIST + grade.getId(), count + "", LAST_DAY);
+			// 缓存清空
+			empty(Constants.PAGE_STATISTICS_DAY + grade.getId(), false);
+			empty(Constants.VISIT_STATISTICS_DAY + grade.getId(), false);
+			// 返佣
+			addList(Constants.GRADE_ORDER_REBATE_DAY_LIST + grade.getId(),
+					getValues(Constants.GRADE_ORDER_REBATE_DAY + grade.getId()), LAST_DAY);
+			empty(Constants.GRADE_ORDER_REBATE_DAY + grade.getId(), false);
 		}
+		// 商品订单量放入缓存
+		for (Map.Entry<String, OrderGoodsCacheModel> entry : com.zm.order.bussiness.component.CacheComponent
+				.getOrderGoodsCache().entrySet()) {
+			addList(Constants.ORDER_GOODS_STATISTICS_DAY_LIST + entry.getKey(), JSONUtil.toJson(entry.getValue()),
+					LAST_DAY);
+		}
+		com.zm.order.bussiness.component.CacheComponent.clearOrderGoodsCache();
+		// 商品pv
+		Set<String> keys = getAllKey(Constants.GOODS_PAGE_STATISTICS_DAY);
+		for (String str : keys) {
+			String goodsId = str.split(":")[3];
+			addList(Constants.GOODS_PAGE_STATISTICS_DAY_LIST + goodsId, getValues(str), LAST_DAY);
+		}
+		// 清空
+		empty(Constants.GOODS_PAGE_STATISTICS_DAY, true);
+		// 商品uv
+		keys = getAllKey(Constants.GOODS_VISIT_STATISTICS_DAY);
+		for (String str : keys) {
+			tmp = entries(str);
+			String goodsId = str.split(":")[3];
+			int count = 0;
+			if (tmp != null) {
+				count = tmp.size();
+			}
+			addList(Constants.GOODS_VISIT_STATISTICS_DAY_LIST + goodsId, count + "", LAST_DAY);
+		}
+		// 清空
+		empty(Constants.GOODS_VISIT_STATISTICS_DAY, true);
 	}
 
 	private String chartStatisticsByMonth(Integer gradeId, List<Integer> list, String key) {
@@ -187,7 +238,7 @@ public class CacheServiceImpl extends CacheAbstractService {
 		// renderData(key, tempList, diagramList);
 		// } else {
 		for (Integer temGradeId : list) {
-			tempList = list(key + temGradeId, 0, -1);
+			tempList = list(key + temGradeId, -7, -1);
 			mergeList(result, tempList);
 		}
 		renderData(key, result, diagramList);
@@ -205,7 +256,7 @@ public class CacheServiceImpl extends CacheAbstractService {
 				TreeNodeUtil.getchildNode(TreeNodeUtil.getchildNode(CacheComponent.getInstance().getSet(), tempGradeId),
 						list);
 				for (Integer temId : list) {
-					tempList = list(key + temId, 0, -1);
+					tempList = list(key + temId, -7, -1);
 					for (String str : tempList) {
 						total = CalculationUtils.add(total, Double.valueOf(str));
 					}
@@ -283,7 +334,8 @@ public class CacheServiceImpl extends CacheAbstractService {
 				String tempCanBePresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId, Constants.ALREADY_CHECK);
 				canBePresented = CalculationUtils.add(canBePresented,
 						Double.valueOf(tempCanBePresented == null ? "0" : tempCanBePresented));
-				String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId, Constants.ALREADY_PRESENTED);
+				String tempAlreadyPresented = entries(Constants.GRADE_ORDER_REBATE + temGradeId,
+						Constants.ALREADY_PRESENTED);
 				alreadyPresented = CalculationUtils.add(alreadyPresented,
 						Double.valueOf(tempAlreadyPresented == null ? "0" : tempAlreadyPresented));
 			}
@@ -427,7 +479,7 @@ public class CacheServiceImpl extends CacheAbstractService {
 		Map<String, IntradayOrderBO> orderCacheMap = new HashMap<String, IntradayOrderBO>();
 		// 销售额统计map
 		Map<String, Double> salesAmountCacheMap = new HashMap<String, Double>();
-		for (int i = LAST_WEEK; i >= 0; i--) {
+		for (int i = LAST_DAY; i >= 0; i--) {
 			String time = DateUtils.getTime(Calendar.DATE, -i, "yyyyMMdd");
 			temp = result.get(time);
 
@@ -535,13 +587,13 @@ public class CacheServiceImpl extends CacheAbstractService {
 	private void putToRedis(Map<String, IntradayOrderBO> orderCacheMap, Map<String, Double> salesAmountCacheMap) {
 		for (Map.Entry<String, IntradayOrderBO> entry : orderCacheMap.entrySet()) {
 			if (entry.getKey().contains("week")) {
-				addList(entry.getKey(), entry.getValue().getProduce().toString(), LAST_WEEK);
+				addList(entry.getKey(), entry.getValue().getProduce().toString(), LAST_DAY);
 			}
 		}
 
 		for (Map.Entry<String, Double> entry : salesAmountCacheMap.entrySet()) {
 			if (entry.getKey().contains("week")) {
-				addList(entry.getKey(), entry.getValue().toString(), LAST_WEEK);
+				addList(entry.getKey(), entry.getValue().toString(), LAST_DAY);
 			}
 		}
 	}
@@ -608,5 +660,73 @@ public class CacheServiceImpl extends CacheAbstractService {
 			intradayOrder.incrCancel();
 			break;
 		}
+	}
+
+	@Override
+	public ResultModel getShopManagerStatis(Integer gradeId, int time) {
+		ShopManagerStatis sms = new ShopManagerStatis();
+		List<String> visitList = list(Constants.VISIT_STATISTICS_DAY_LIST + gradeId, -time, -1);
+		sms.setVisitViewList(visitList);
+		List<String> pageList = list(Constants.PAGE_STATISTICS_DAY_LIST + gradeId, -time, -1);
+		sms.setPageViewList(pageList);
+		List<String> orderList = list(Constants.ORDER_STATISTICS_WEEK + gradeId, -time, -1);
+		sms.setOrderNumList(orderList);
+		List<String> rebateList = list(Constants.GRADE_ORDER_REBATE_DAY_LIST + gradeId, -time, -1);
+		sms.setRebateList(rebateList);
+		// 所有商品的订单量/pv/uv
+		Set<String> keys = getAllKey(Constants.ORDER_GOODS_STATISTICS_DAY_LIST);
+		if (keys != null) {
+			List<String> orderGoodsNumList = null;
+			List<String> goodsPV = null;
+			List<String> goodsUV = null;
+			OrderGoodsCacheModel ogc = null;
+			for (String str : keys) {
+				orderGoodsNumList = list(str, -time, -1);
+				if (orderGoodsNumList != null) {
+					String goodsId = str.split(":")[4];
+					String goodsName = null;
+					int orderNum = 0;
+					int pv = 0;
+					int uv = 0;
+					for (String tmpStr : orderGoodsNumList) {
+						ogc = JSONUtil.parse(tmpStr, OrderGoodsCacheModel.class);
+						goodsName = ogc.getGoodsName();
+						orderNum += ogc.getOrderNum().get();
+					}
+					goodsPV = list(Constants.GOODS_PAGE_STATISTICS_DAY_LIST + goodsId, -time, -1);
+					pv = goodsPV.stream().map(Integer::new).mapToInt(i -> i).sum();
+					goodsUV = list(Constants.GOODS_VISIT_STATISTICS_DAY_LIST + goodsId, -time, -1);
+					uv = goodsUV.stream().map(Integer::new).mapToInt(i -> i).sum();
+					sms.createGoodsViewList(goodsName, pv, uv, orderNum, goodsId);
+				}
+			}
+		}
+		sms.init(time);
+		return new ResultModel(true, sms);
+	}
+
+	@Override
+	public ResultModel getShopManagerIndex(Integer gradeId) {
+		Map<String, String> tmp = entries(Constants.VISIT_STATISTICS_DAY + gradeId);
+		int visitView = 0;
+		if (tmp != null) {
+			visitView = tmp.size();
+		}
+		String orderNum = entries(Constants.ORDER_STATISTICS_DAY + gradeId, "produce");
+		String rebate = getValues(Constants.GRADE_ORDER_REBATE_DAY + gradeId);
+		//保留2位小数
+		DecimalFormat formater = new DecimalFormat();
+		formater.setMaximumFractionDigits(2);
+		formater.setGroupingSize(0);
+		formater.setRoundingMode(RoundingMode.FLOOR);
+		rebate = formater.format(Double.valueOf(rebate == null ? "0.00" : rebate));
+		//end
+		String pageView = getValues(Constants.PAGE_STATISTICS_DAY + gradeId);
+		ShopManagerStatisIndex smi = new ShopManagerStatisIndex();
+		smi.setOrderNum(orderNum == null ? "0" : orderNum);
+		smi.setRebate(rebate);
+		smi.setVisitView(visitView + "");
+		smi.setPageView(pageView == null ? "0" : pageView);
+		return new ResultModel(true, smi);
 	}
 }

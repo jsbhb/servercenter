@@ -34,4 +34,8 @@ public interface UserFeignClient {
 	@RequestMapping(value = "{version}/grade/rebate/formula/{needPaging}", method = RequestMethod.POST)
 	public ResultModel listGradeTypeRebateFormula(@PathVariable("version") Double version,
 			@PathVariable("needPaging") boolean needPaging, @RequestBody RebateFormula rebateFormula);
+
+	@RequestMapping(value = "{version}/user/feign/grade-type/{gradeId}", method = RequestMethod.GET)
+	public int getGradeTypeIdByGradeId(@PathVariable("version") Double version,
+			@PathVariable("gradeId") Integer gradeId);
 }

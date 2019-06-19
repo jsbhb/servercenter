@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zm.goods.bussiness.service.GoodsFeignService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.enummodel.ErrorCodeEnum;
+import com.zm.goods.pojo.OrderGoodsDTO;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsItemBO;
@@ -63,5 +64,16 @@ public class GoodsFeignController {
 			return goodsFeignService.getGoodsItemProxyPrice(itemIdList);
 		}
 		return null;
+	}
+	
+	/**
+	 * @fun 更新商品销量
+	 * @param orderGoodsList
+	 */
+	@RequestMapping(value = "{version}/goods/feign/item/salenum", method = RequestMethod.POST)
+	public void updateGoodsSale(@PathVariable("version") Double version,@RequestBody List<OrderGoodsDTO> orderGoodsList){
+		if (Constants.FIRST_VERSION.equals(version)) {
+			goodsFeignService.updateGoodsSale(orderGoodsList);
+		}
 	}
 }

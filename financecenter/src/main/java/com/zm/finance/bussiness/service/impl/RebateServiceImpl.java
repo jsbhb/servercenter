@@ -107,6 +107,7 @@ public class RebateServiceImpl implements RebateService {
 		}
 		Rebate rebate = JSONUtil.parse(JSONUtil.toJson(result), Rebate.class);
 		rebate.setGradeId(gradeId);
+		rebate.init();//把科学计数法转为正常显示
 		return new ResultModel(true, rebate);
 	}
 

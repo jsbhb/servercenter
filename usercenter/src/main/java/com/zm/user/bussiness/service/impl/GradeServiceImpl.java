@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -155,23 +156,17 @@ public class GradeServiceImpl implements GradeService {
 
 	@Override
 	public ResultModel listGradeTypeChildren(Integer id) {
-
+		List<GradeTypePO> poList = new ArrayList<>();
 		String parentIdStr = gradeMapper.listGradeTypeChildren(id);
-		List<Integer> list = new ArrayList<Integer>();
+
 		if (parentIdStr == null) {
-			return new ResultModel(true, null);
+			return new ResultModel(true, poList);
 		}
-		String[] parentIdArr = parentIdStr.split(",");
-		for (String str : parentIdArr) {
-			if (!"$".equals(str) && !id.equals(str)) {
-				try {
-					list.add(Integer.valueOf(str));
-				} catch (NumberFormatException e) {
-					LogUtil.writeErrorLog("【封装下级ID出错】===ID：" + str, e);
-				}
-			}
+		List<Integer> list = packAllGradeTypeChildId(id, parentIdStr);
+		if (list.size() == 0) {
+			return new ResultModel(true, poList);
 		}
-		List<GradeTypePO> poList = gradeMapper.listGradeTypeByIds(list);
+		poList = gradeMapper.listGradeTypeByIds(list);
 
 		return new ResultModel(true, TreePackUtil.packGradeTypeChildren(poList, id));
 	}
@@ -240,7 +235,7 @@ public class GradeServiceImpl implements GradeService {
 	public ResultModel saveGradeTypeRebateFormula(RebateFormula rebateFormula) {
 		Integer id = gradeMapper.getIdByGradeTypeId(rebateFormula.getGradeTypeId());
 		if (id != null) {
-			return new ResultModel(false, "","该分级类型公式已经存在");
+			return new ResultModel(false, "", "该分级类型公式已经存在");
 		}
 		gradeMapper.saveGradeTypeRebateFormula(rebateFormula);
 		return new ResultModel(true, "");
@@ -271,6 +266,58 @@ public class GradeServiceImpl implements GradeService {
 	@Override
 	public ResultModel getGradeTypeRebateFormulaById(Integer id) {
 		return new ResultModel(true, gradeMapper.getGradeTypeRebateFormulaById(id));
+	}
+
+	@Override
+	public ResultModel auditShop(Grade grade) {
+		Grade g = gradeMapper.selectById(grade.getId());
+		// 由于存在事务管理，读出来的数据不是最新的，所以重新设置
+		g.setParentId(grade.getParentId());
+		g.setGradeType(grade.getGradeType());
+		g.setRemark(grade.getRemark());
+		g.setStatus(grade.getStatus());
+		if (grade.getStatus() == 2) {// 审核通过生效后
+			// 通知订单中心新增grade并做缓存
+			grade.setType(1);// 普通客户
+			grade.setWelfareType(0);// 非福利客户
+			GradeBO gradeBO = ConvertUtil.converToGradeBO(g);
+			template.opsForHash().put(Constants.GRADEBO_INFO, grade.getId() + "", JSONUtil.toJson(gradeBO));
+			orderFeignClient.noticeToAddGrade(Constants.FIRST_VERSION, gradeBO);
+		}
+		gradeMapper.auditShop(grade);
+		return new ResultModel(true, g);
+	}
+
+	@Override
+	public ResultModel listGradeTypeChildrenByParentGradeId(Integer gradeId) {
+		List<GradeTypePO> poList = new ArrayList<>();
+		Integer tmp = gradeMapper.getGradeTypeByGradeId(gradeId);
+		tmp = tmp == null ? 1 : tmp;// 中国供销海外购没有上级
+		String parentIdStr = gradeMapper.listGradeTypeChildren(tmp);
+		if (parentIdStr == null) {
+			return new ResultModel(true, poList);
+		}
+		List<Integer> list = packAllGradeTypeChildId(tmp, parentIdStr);
+		if (list.size() == 0) {
+			return new ResultModel(true, poList);
+		}
+		poList = gradeMapper.listGradeTypeByIds(list);
+		return new ResultModel(true, poList);
+	}
+
+	private List<Integer> packAllGradeTypeChildId(Integer tmp, String parentIdStr) {
+		String[] parentIdArr = parentIdStr.split(",");
+		List<Integer> list = new ArrayList<Integer>();
+		for (String str : parentIdArr) {
+			if (!"$".equals(str) && !str.equals(tmp.toString())) {
+				try {
+					list.add(Integer.valueOf(str));
+				} catch (NumberFormatException e) {
+					LogUtil.writeErrorLog("【封装下级ID出错】===ID：" + str, e);
+				}
+			}
+		}
+		return list;
 	}
 
 }

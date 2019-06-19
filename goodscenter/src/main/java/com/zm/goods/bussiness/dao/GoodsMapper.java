@@ -15,6 +15,7 @@ import com.zm.goods.pojo.GoodsPrice;
 import com.zm.goods.pojo.GoodsSpecs;
 import com.zm.goods.pojo.Layout;
 import com.zm.goods.pojo.OrderBussinessModel;
+import com.zm.goods.pojo.OrderGoodsDTO;
 import com.zm.goods.pojo.PopularizeDict;
 import com.zm.goods.pojo.PriceModel;
 import com.zm.goods.pojo.Tax;
@@ -24,6 +25,8 @@ import com.zm.goods.pojo.bo.CategoryBO;
 import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsLifeCycleModel;
 import com.zm.goods.pojo.bo.ItemCountBO;
+import com.zm.goods.pojo.dto.ShopManage4GoodsDTO;
+import com.zm.goods.pojo.vo.Goods4ShopManager;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 
@@ -168,5 +171,13 @@ public interface GoodsMapper {
 	List<CustomCompletion> listGoodsInfoForCstomCompletion(List<String> itemIdList);
 
 	List<GoodsPrice> listGoodsItemProxyPrice(List<String> itemIdList);
+
+	List<Goods4ShopManager> listGoodsItem4ShopManage(ShopManage4GoodsDTO smg);
+
+	int countGoodsItem4ShopManage(ShopManage4GoodsDTO smg);
+
+	void updateGoodsSale(List<OrderGoodsDTO> orderGoodsList);
+
+	List<GoodsIndustryModel> queryFirstCategory();
 
 }

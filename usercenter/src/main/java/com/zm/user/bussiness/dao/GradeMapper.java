@@ -12,6 +12,7 @@ import java.util.List;
 import com.github.pagehelper.Page;
 import com.zm.user.pojo.FuzzySearchGrade;
 import com.zm.user.pojo.Grade;
+import com.zm.user.pojo.GradeFront;
 import com.zm.user.pojo.ShopEntity;
 import com.zm.user.pojo.po.GradeTypePO;
 import com.zm.user.pojo.po.RebateFormula;
@@ -160,5 +161,17 @@ public interface GradeMapper<T> {
 	Integer getIdByGradeTypeId(Integer gradeTypeId);
 
 	List<RebateFormula> listAllGradeTypeRebateFormula();
+	
+	Integer getGradeTypeByGradeId(int id);
+	
+	Integer getGradeTypeId(int parentId);
+
+	Integer getGradeStatusByPhone(String phone);
+
+	void auditShop(Grade grade);
+
+	void applyShopResubmit(GradeFront gradeFront);
+
+	int getParentIdById(Integer parentId);
 
 }

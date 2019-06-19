@@ -7,12 +7,23 @@ public class NotifyMsg {
 	private String name;
 	private String shopName;
 	private String msg;
+	private String account;
 	private NotifyTypeEnum type;
 	
 	public boolean check(){
 		return phone != null;
 	}
 	
+	public String getAccount() {
+		return account;
+	}
+
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+
+
 	public String getPhone() {
 		return phone;
 	}

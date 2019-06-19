@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.zm.order.feignclient.model.GoodsConvert;
 import com.zm.order.feignclient.model.OrderBussinessModel;
 import com.zm.order.pojo.GoodsItemEntity;
+import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderInfoDTO;
 import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.bo.GoodsItemBO;
@@ -125,4 +126,7 @@ public interface GoodsFeignClient {
 	@RequestMapping(value = "{version}/active/bargain/goods/buy", method = RequestMethod.POST)
 	public boolean updateBargainGoodsBuy(@PathVariable("version") Double version,
 			@RequestParam(value = "id") Integer id, @RequestParam(value = "userId") Integer userId);
+
+	@RequestMapping(value = "{version}/goods/feign/item/salenum", method = RequestMethod.POST)
+	public void updateGoodsSale(@PathVariable("version") Double version,@RequestBody List<OrderGoods> orderGoodsList);
 }

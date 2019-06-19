@@ -12,6 +12,7 @@ import com.zm.order.pojo.CustomModel;
 import com.zm.order.pojo.Express;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
+import com.zm.order.pojo.OrderGoods;
 import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
@@ -336,4 +337,6 @@ public interface OrderService {
 	ResultModel refundsWithSendOrder(String orderId);
 
 	OrderInfo handleSupplierCenterExceptionOrder(String orderId);
+
+	ResultModel handleOrderGoodsStatis(List<OrderGoods> goodsList);
 }

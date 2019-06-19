@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zm.order.bussiness.service.CacheAbstractService;
 import com.zm.order.constants.Constants;
+import com.zm.order.pojo.ResultModel;
 
 @RestController
 public class CacheController {
@@ -33,11 +34,43 @@ public class CacheController {
 			cacheAbstractService.saveDayCacheToWeek();
 		}
 	}
-	
+
 	@RequestMapping(value = "{version}/cache/month", method = RequestMethod.GET)
 	public void initMonth(@PathVariable("version") Double version) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			cacheAbstractService.initMonth();
 		}
+	}
+
+	/**
+	 * @fun 前端店铺管理获取统计数据
+	 * @param version
+	 * @param gradeId
+	 * @param time
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/cache/shop/manager/statis", method = RequestMethod.GET)
+	public ResultModel getShopManagerStatis(@PathVariable("version") Double version,
+			@RequestParam("gradeId") Integer gradeId, @RequestParam("time") int time) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return cacheAbstractService.getShopManagerStatis(gradeId, time);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+	
+	/**
+	 * @fun 前端店铺管理获取统计数据
+	 * @param version
+	 * @param gradeId
+	 * @param time
+	 * @return
+	 */
+	@RequestMapping(value = "{version}/cache/shop/manager/index/{gradeId}", method = RequestMethod.GET)
+	public ResultModel getShopManagerIndex(@PathVariable("version") Double version,
+			@PathVariable("gradeId") Integer gradeId) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return cacheAbstractService.getShopManagerIndex(gradeId);
+		}
+		return new ResultModel(false, "版本错误");
 	}
 }

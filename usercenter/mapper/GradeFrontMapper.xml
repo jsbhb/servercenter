@@ -36,5 +36,24 @@
 	<select id="getGradeUrl" parameterType="Object" resultMap="grade">
 		select id,redirect_url,mobile_url from grade where id = #{id}
 	</select>
+	
+	<insert id="saveGradeFront" parameterType="Object" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,person_in_charge_id,phone,create_time,company,status)
+		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{userId},#{phone},now(),#{company},#{status})
+	</insert>
+	
+	<select id="getDataByPhone" parameterType="Object" resultType = "com.zm.user.pojo.GradeFront">
+		select g.id,g.person_in_charge as personInCharge,g.phone,gd.province,gd.city,gd.district,gd.address,
+		gd.pic1_path as idCardPicPath,gd.remark from grade g left join grade_data gd on g.id = gd.id 
+		where g.phone = #{phone}
+	</select>
+	
+	<update id="applyShopResubmit" parameterType="Object">
+		update grade set status = 0 
+		<if test="personInCharge != null and personInCharge != ''">
+			,person_in_charge = #{personInCharge}
+		</if>
+		where id = #{id}
+	</update>
 
 </mapper>

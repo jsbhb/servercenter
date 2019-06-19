@@ -2,6 +2,7 @@ package com.zm.goods.bussiness.service;
 
 import java.util.List;
 
+import com.zm.goods.pojo.OrderGoodsDTO;
 import com.zm.goods.pojo.ResultModel;
 import com.zm.goods.pojo.bo.CustomCompletion;
 import com.zm.goods.pojo.bo.GoodsItemBO;
@@ -13,5 +14,7 @@ public interface GoodsFeignService {
 	List<CustomCompletion> customCompletion(List<String> itemIdList);
 
 	String getGoodsItemProxyPrice(List<String> itemIdList);
+
+	void updateGoodsSale(List<OrderGoodsDTO> orderGoodsList);
 
 }

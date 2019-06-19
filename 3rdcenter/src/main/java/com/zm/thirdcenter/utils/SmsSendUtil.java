@@ -55,6 +55,8 @@ public class SmsSendUtil {
 		SendSmsResponse sendSmsResponse = null;
 		try {
 			sendSmsResponse = acsClient.getAcsResponse(request);
+			LogUtil.writeLog(sendSmsResponse.getCode() + "==" + sendSmsResponse.getMessage() + "=="
+					+ sendSmsResponse.getBizId());
 		} catch (ServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,11 +83,41 @@ public class SmsSendUtil {
 			return packageRepayingRequest(notifyMsg);
 		case INVITATION_CODE:
 			return packageInvitationCodeRequest(notifyMsg);
+		case SHOP_MANAGER_AUDIT_PASS:
+			return packageShopManagerPassNotifyRequest(notifyMsg);
+		case SHOP_MANAGER_AUDIT_UNPASS:
+			return packageShopManagerUnPassNotifyRequest(notifyMsg);
 		default:
 			logger.error("短信模板类型出错====================");
 			return null;
 		}
 
+	}
+
+	private static SendSmsRequest packageShopManagerPassNotifyRequest(NotifyMsg notifyMsg) {
+		SendSmsRequest request = new SendSmsRequest();
+		request.setMethod(MethodType.POST);
+		request.setPhoneNumbers(notifyMsg.getPhone());
+		request.setSignName(Constants.SMS_SIGN);
+		request.setTemplateCode(Constants.SHOP_MANAGER_AUDIT_PASS);
+		String json = "{\"name\":\"" + notifyMsg.getName() + "\",\"time\":\"" + notifyMsg.getTime() + "\",\"account\":\""
+				+ notifyMsg.getAccount() + "\"}";
+		logger.info("json===========" + json);
+		request.setTemplateParam(json);
+		return request;
+	}
+	
+	private static SendSmsRequest packageShopManagerUnPassNotifyRequest(NotifyMsg notifyMsg) {
+		SendSmsRequest request = new SendSmsRequest();
+		request.setMethod(MethodType.POST);
+		request.setPhoneNumbers(notifyMsg.getPhone());
+		request.setSignName(Constants.SMS_SIGN);
+		request.setTemplateCode(Constants.SHOP_MANAGER_AUDIT_UNPASS);
+		String json = "{\"name\":\"" + notifyMsg.getName() + "\",\"time\":\"" + notifyMsg.getTime() + "\",\"msg\":\""
+				+ notifyMsg.getMsg() + "\"}";
+		logger.info("json===========" + json);
+		request.setTemplateParam(json);
+		return request;
 	}
 
 	private static SendSmsRequest packageInvitationCodeRequest(NotifyMsg notifyMsg) {

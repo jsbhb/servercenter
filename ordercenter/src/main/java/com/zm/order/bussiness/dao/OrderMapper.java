@@ -203,5 +203,9 @@ public interface OrderMapper {
 	OrderInfo getOrderForSupplierCenterHandle(String orderId);
 
 	String getOrderExpressDetail(String orderId);
+
+	List<OrderGoods> listOrderGoodsByCreateTime(String timeString);
+
+	String getPayTimeByOrderId(String orderId);
 	
 }

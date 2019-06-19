@@ -89,6 +89,11 @@ public class Constants {
 
 	// *********************等级返佣***************************
 	public static final String GRADE_ORDER_REBATE = "grade:orderrebate:";
+	
+	//分级每天返佣金额
+	public static final String GRADE_ORDER_REBATE_DAY = "grade:day:orderrebate:";
+	//90天返佣列表
+	public static final String GRADE_ORDER_REBATE_DAY_LIST = "grade:day:orderrebate:list:";
 
 	// *********************返佣详情***************************
 	public static final String REBATE_DETAIL = "rebatedetail:";
@@ -107,6 +112,25 @@ public class Constants {
 
 	// **********************订单当天统计前缀***********************
 	public static final String ORDER_STATISTICS_DAY = "orderstatistics:day:";
+	
+	// **********************pv uv 统计*****************************
+	//当天的key
+	public static final String VISIT_STATISTICS_DAY = "flowstatis:day:visit:";
+	public static final String PAGE_STATISTICS_DAY = "flowstatis:day:page:";
+	//保存90天数据的key
+	public static final String VISIT_STATISTICS_DAY_LIST = "flowstatis:day:list:visit:";
+	public static final String PAGE_STATISTICS_DAY_LIST = "flowstatis:day:list:page:";
+	
+	// ********************商品订单量统计*************************************
+	public static final String ORDER_GOODS_STATISTICS_DAY_LIST = "order:goods:day:list:";
+	
+	// ********************商品pv,uv统计*************************************
+	//当天
+	public static final String GOODS_VISIT_STATISTICS_DAY = "goodsview:day:visit:";
+	public static final String GOODS_PAGE_STATISTICS_DAY = "goodsview:day:page:";
+	//保存90天数据的key
+	public static final String GOODS_VISIT_STATISTICS_DAY_LIST = "goodsview:day:list:visit:";
+	public static final String GOODS_PAGE_STATISTICS_DAY_LIST = "goodsview:day:list:page:";
 
 	// **********************销售额当天统计前缀***********************
 	public static final String SALES_STATISTICS_DAY = "salesstatistics:day:";

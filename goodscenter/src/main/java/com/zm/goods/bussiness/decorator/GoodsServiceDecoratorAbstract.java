@@ -161,5 +161,9 @@ public abstract class GoodsServiceDecoratorAbstract implements GoodsService {
 	public List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList) {
 		return null;
 	}
-
+	
+	@Override
+	public ResultModel loadSearchConditions() {
+		return null;
+	}
 }

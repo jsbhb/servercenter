@@ -103,8 +103,8 @@ public class RebateCheckServiceImpl implements RebateCheckService {
 			String filePath = fileUtil.writeToFile(sb.toString());
 			// 发送邮件
 			MailUtil mailUtil = new MailUtil(true);
-			String[] receives = { "caiqiaoling@nkhwg.com", "wangqiyun@nkhwg.com", "wanghaiyang@nkhwg.com",
-					"hebin@nkhwg.com" };
+			String[] receives = { "caiqiaoling@cncoopay.com", "wangqiyun@cncoopay.com", "wanghaiyang@cncoopay.com",
+					"hebin@cncoopay.com" };
 			File affix = new File(filePath);
 			mailUtil.doSendHtmlEmail("返佣对账出现问题" + DateUtils.getTimeString("yyyy-MM-dd"), "返佣对账出现问题", receives, affix);//
 		}

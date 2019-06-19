@@ -45,7 +45,7 @@ public class GradeController {
 
 	@Resource
 	GradeService gradeService;
-	
+
 	@Resource
 	UserService userService;
 
@@ -204,6 +204,16 @@ public class GradeController {
 		}
 		return new ResultModel(false, "版本错误");
 	}
+	
+	@RequestMapping(value = "{version}/grade/type/children/gradeId", method = RequestMethod.GET)
+	public ResultModel listGradeTypeChildrenByParentGradeId(@PathVariable("version") Double version,
+			@RequestParam(value = "gradeId") Integer gradeId) {
+
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.listGradeTypeChildrenByParentGradeId(gradeId);
+		}
+		return new ResultModel(false, "版本错误");
+	}
 
 	@RequestMapping(value = "{version}/grade/type", method = RequestMethod.DELETE)
 	public ResultModel removeGradeType(@PathVariable("version") Double version,
@@ -284,6 +294,17 @@ public class GradeController {
 			@PathVariable("id") Integer id) {
 		if (Constants.FIRST_VERSION.equals(version)) {
 			return gradeService.getGradeTypeRebateFormulaById(id);
+		}
+		return new ResultModel(false, "版本错误");
+	}
+
+	/**
+	 * @fun 审核微店
+	 */
+	@RequestMapping(value = "{version}/shop/audit", method = RequestMethod.POST)
+	public ResultModel auditShop(@PathVariable("version") Double version, @RequestBody Grade grade) {
+		if (Constants.FIRST_VERSION.equals(version)) {
+			return gradeService.auditShop(grade);
 		}
 		return new ResultModel(false, "版本错误");
 	}

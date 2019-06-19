@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zm.goods.annotation.GoodsLifeCycle;
 import com.zm.goods.bussiness.component.GoodsServiceComponent;
 import com.zm.goods.bussiness.component.PriceComponent;
+import com.zm.goods.bussiness.component.StatisComponent;
 import com.zm.goods.bussiness.component.ThreadPoolComponent;
 import com.zm.goods.bussiness.dao.GoodsMapper;
+import com.zm.goods.bussiness.dao.GoodsTagMapper;
 import com.zm.goods.bussiness.service.GoodsService;
 import com.zm.goods.constants.Constants;
 import com.zm.goods.convertor.LucenceModelConvertor;
@@ -47,8 +51,11 @@ import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.bo.CategoryBO;
 import com.zm.goods.pojo.bo.ItemCountBO;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.dto.ShopManage4GoodsDTO;
+import com.zm.goods.pojo.vo.Goods4ShopManager;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
+import com.zm.goods.pojo.vo.ShopManagerSearchConditions;
 import com.zm.goods.processWarehouse.ProcessWarehouse;
 import com.zm.goods.processWarehouse.model.WarehouseModel;
 import com.zm.goods.utils.CalculationUtils;
@@ -80,9 +87,6 @@ public class GoodsServiceImpl implements GoodsService {
 	@Resource
 	SupplierFeignClient supplierFeignClient;
 
-	// @Resource
-	// ActivityComponent activityComponent;
-
 	@Resource
 	PriceComponent priceComponent;
 
@@ -91,6 +95,12 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Resource
 	ThreadPoolComponent threadPoolComponent;
+
+	@Resource
+	StatisComponent statisComponent;
+	
+	@Resource
+	GoodsTagMapper goodsTagMapper;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -102,6 +112,8 @@ public class GoodsServiceImpl implements GoodsService {
 			List<String> goodsIdList = goodsMapper.getGoodsIdByItemId(itemIdList);
 			param.put("goodsId", goodsIdList.get(0));
 		}
+		//统计
+		statisComponent.statisGoodsView((HttpServletRequest) param.get("req"), param.get("goodsId").toString());
 
 		List<GoodsItem> goodsList = goodsMapper.listGoods(param);
 
@@ -119,13 +131,13 @@ public class GoodsServiceImpl implements GoodsService {
 		parameter.put("type", PICTURE_TYPE);
 		List<GoodsFile> fileList = goodsMapper.listGoodsFile(parameter);
 		List<GoodsSpecs> specsList = goodsMapper.listGoodsSpecs(parameter);
-		specsList.stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum()*11));
+		specsList.stream().forEach(specs -> specs.setSaleNum(specs.getSaleNum() * 11));
 		goodsServiceComponent.packageGoodsItem(goodsList, fileList, specsList, true);
 		// if (param.get("goodsId") != null && Constants.PREDETERMINE_PLAT_TYPE
 		// != centerId) {
 		// activityComponent.doPackCoupon(centerId, userId, goodsList);
 		// }
-		if(isApplet){
+		if (isApplet) {
 			goodsServiceComponent.packDetailPath(goodsList);
 		}
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
@@ -142,7 +154,7 @@ public class GoodsServiceImpl implements GoodsService {
 		}
 		String bigsaleJson = (String) template.opsForValue().get(Constants.BIG_SALES_PRE);
 		List<String> bigSaleList = new ArrayList<>();
-		if(bigsaleJson != null){
+		if (bigsaleJson != null) {
 			bigSaleList = JSONUtil.parse(bigsaleJson, List.class);
 		}
 		for (Map.Entry<Integer, List<GoodsItem>> entry : tempMap.entrySet()) {
@@ -157,9 +169,9 @@ public class GoodsServiceImpl implements GoodsService {
 					} catch (Exception e) {
 						LogUtil.writeErrorLog("【数字转换出错】" + post + "," + tax);
 					}
-					if(item.getGoodsSpecsList() != null){//增加每周特卖标签
-						for(GoodsSpecs specs : item.getGoodsSpecsList()){
-							if(bigSaleList.contains(specs.getItemId())){
+					if (item.getGoodsSpecsList() != null) {// 增加每周特卖标签
+						for (GoodsSpecs specs : item.getGoodsSpecsList()) {
+							if (bigSaleList.contains(specs.getItemId())) {
 								specs.setBigSale(1);
 							}
 						}
@@ -847,7 +859,7 @@ public class GoodsServiceImpl implements GoodsService {
 				updateLuceneIndex(updateTagList, centerId);
 			}
 			threadPoolComponent.publish(itemIdList, centerId);// 发布商品
-			threadPoolComponent.sendGoodsInfo(itemIdList);// 通知对接用户商品上架
+			// threadPoolComponent.sendGoodsInfo(itemIdList);// 通知对接用户商品上架
 			return new ResultModel(true, "");
 		} else {
 			return new ResultModel(false, "没有提供上架商品信息");
@@ -956,7 +968,8 @@ public class GoodsServiceImpl implements GoodsService {
 			updateLuceneIndex(updateTagGoodsIdList, centerId);
 		}
 		threadPoolComponent.delPublish(itemIdList, centerId);// 删除商品和重新发布商品
-		threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);// 通知对接用户商品下架
+		// threadPoolComponent.sendGoodsInfoDownShelves(itemIdList);//
+		// 通知对接用户商品下架
 		return new ResultModel(true, "");
 	}
 
@@ -1057,8 +1070,52 @@ public class GoodsServiceImpl implements GoodsService {
 
 	@Override
 	public List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList) {
-		
+
 		return goodsMapper.listGoodsByGoodsIds(goodsIdList);
 	}
 
+	@Override
+	public ResultModel listGoodsItem4ShopManage(ShopManage4GoodsDTO smg) {
+		smg.init();
+		int gradeType = userFeignClient.getGradeTypeIdByGradeId(Constants.FIRST_VERSION, smg.getShopId());
+		smg.setGradeType(gradeType);
+		List<Goods4ShopManager> gsmList = goodsMapper.listGoodsItem4ShopManage(smg);
+		// 分页参数
+		com.zm.goods.common.Pagination pagination = new com.zm.goods.common.Pagination();
+		pagination.setCurrentPage(smg.getCurrentPage());
+		pagination.setNumPerPage(smg.getNumPerPage());
+		if (gsmList.size() == 0) {
+			pagination.setTotalRows(0);
+		} else {
+			// 获取主图地址，没有在第一条sql查询防止连表太多速度太慢并且主图表有一对多
+			List<String> goodsIdList = gsmList.stream().map(gsm -> gsm.getGoodsId()).collect(Collectors.toList());
+			Map<String, Object> param = new HashMap<String, Object>();
+			param.put("list", goodsIdList);
+			param.put("type", PICTURE_TYPE);
+			List<GoodsFile> fileList = goodsMapper.listGoodsFile(param);
+			Map<String, List<GoodsFile>> fileMap = fileList.stream()
+					.collect(Collectors.groupingBy(GoodsFile::getGoodsId));
+			for (Goods4ShopManager gsm : gsmList) {
+				List<GoodsFile> tmp = fileMap.get(gsm.getGoodsId());
+				if (tmp != null) {
+					gsm.setPicPath(tmp.get(0).getPath());
+				}
+			}
+			// 获取总条数
+			int count = goodsMapper.countGoodsItem4ShopManage(smg);
+			pagination.setTotalRows(count);
+		}
+		pagination.webListConverter();
+		return new ResultModel(true, gsmList, pagination);
+	}
+
+	@Override
+	public ResultModel loadSearchConditions() {
+		List<GoodsIndustryModel> first = goodsMapper.queryFirstCategory();
+		List<GoodsTagEntity> tagList = goodsTagMapper.listTage();
+		ShopManagerSearchConditions ssc = new ShopManagerSearchConditions();
+		ssc.setFirstList(first);
+		ssc.setTagList(tagList);
+		return new ResultModel(true, ssc);
+	}
 }

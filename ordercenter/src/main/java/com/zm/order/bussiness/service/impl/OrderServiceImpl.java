@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zm.order.bussiness.component.CacheComponent;
 import com.zm.order.bussiness.component.OrderComponentUtil;
 import com.zm.order.bussiness.component.OrderGoodsDealByCreateType;
 import com.zm.order.bussiness.component.ShareProfitComponent;
@@ -50,6 +52,7 @@ import com.zm.order.pojo.Order4Confirm;
 import com.zm.order.pojo.OrderCount;
 import com.zm.order.pojo.OrderDetail;
 import com.zm.order.pojo.OrderGoods;
+import com.zm.order.pojo.OrderGoodsCacheModel;
 import com.zm.order.pojo.OrderIdAndSupplierId;
 import com.zm.order.pojo.OrderInfo;
 import com.zm.order.pojo.Pagination;
@@ -361,6 +364,8 @@ public class OrderServiceImpl implements OrderService {
 			param.put("status", Constants.ORDER_PAY);
 			orderMapper.addOrderStatusRecord(param);
 			OrderInfo info = orderMapper.getOrderByOrderId(orderId);
+			//统计分级订单数、商品销售量
+			threadPoolComponent.statis(info);
 			Double rebateFee = info.getOrderDetail().getRebateFee();
 			if (rebateFee != null && rebateFee > 0) {
 				threadPoolComponent.rebate4Order(info);
@@ -1092,5 +1097,19 @@ public class OrderServiceImpl implements OrderService {
 		orderList.add(info);
 		packageOrderInfoByList(orderList);
 		return info;
+	}
+
+	@Override
+	public ResultModel handleOrderGoodsStatis(List<OrderGoods> goodsList) {
+		OrderGoodsCacheModel ogc = null;
+		for (OrderGoods og : goodsList) {
+			ogc = new OrderGoodsCacheModel();
+			ogc.setGoodsName(og.getItemName());
+			ogc.setOrderNum(new AtomicInteger(1));
+			CacheComponent.putOrderGoodsCache(og.getGoodsId(), ogc);
+		}
+		goodsFeignClient.updateGoodsSale(Constants.FIRST_VERSION, goodsList);
+		
+		return new ResultModel(true,null);
 	}
 }

@@ -362,10 +362,10 @@
 	</select>
 	
 	<insert id="saveGrade" parameterType="com.zm.user.pojo.Grade" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,
+		INSERT INTO grade(parent_id,grade_type,grade_name,person_in_charge,phone,attribute,grade_person_in_charge,grade_level,status
 		create_time,opt,company,redirect_url,mobile_url,type,appKey,appSecret,calc_rebate_flg,grade_inviter,profit_ratio,shop_extension_flg)
 		VALUES (#{parentId},#{gradeType},#{gradeName},#{personInCharge},#{phone},#{attribute},
-		#{gradePersonInCharge},#{gradeLevel},now(),#{opt},#{company},#{redirectUrl},#{mobileUrl},#{type},#{appKey},#{appSecret},
+		#{gradePersonInCharge},#{gradeLevel},2,now(),#{opt},#{company},#{redirectUrl},#{mobileUrl},#{type},#{appKey},#{appSecret},
 		#{calcRebateFlg},#{gradeInviter},#{profitRatio},#{shopExtensionFlg})
 	</insert>
 	
@@ -403,8 +403,8 @@
 
 	<insert id="saveGradeData" parameterType="com.zm.user.pojo.Grade">
 		INSERT INTO grade_data
-		VALUES (#{id},#{storeName},#{contacts},#{contactsPhone},#{province},#{city},
-		#{district},#{address},#{storeOperator},#{operatorIDNum},#{picPath1},#{picPath2},#{picPath3},#{picPath4},now(),now(),#{opt})
+		VALUES (#{id},#{storeName},#{contacts},#{contactsPhone},#{province},#{city},#{district},#{address},#{storeOperator},
+		#{operatorIDNum},#{picPath1},#{picPath2},#{picPath3},#{picPath4},now(),now(),#{opt},#{remark})
 	</insert>
 	
 	<select id="getAllCustomer" resultMap="UserDetail">

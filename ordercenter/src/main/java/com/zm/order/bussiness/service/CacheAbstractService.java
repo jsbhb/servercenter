@@ -14,62 +14,84 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.zm.order.component.CacheComponent;
 import com.zm.order.constants.Constants;
+import com.zm.order.pojo.ResultModel;
 import com.zm.order.pojo.bo.GradeBO;
 import com.zm.order.utils.DateUtils;
 
-
 public abstract class CacheAbstractService {
-	
-	protected static final String HEAD = "head";//头部数据
-	protected static final String CHART = "chart";//图表数据
-	protected static final String WEEK = "week";//每周
-	protected static final String MONTH = "month";//每月
-	protected static final String ORDER = "order";//订单
-	protected static final String FINANCE = "finance";//财务
-	
+
+	protected static final String HEAD = "head";// 头部数据
+	protected static final String CHART = "chart";// 图表数据
+	protected static final String WEEK = "week";// 每周
+	protected static final String MONTH = "month";// 每月
+	protected static final String ORDER = "order";// 订单
+	protected static final String FINANCE = "finance";// 财务
+	// 过去的90天
+	protected static final int LAST_DAY = 90;
+
+	// 过去一周
 	protected static final int LAST_WEEK = 7;
-	
+
 	@Resource
 	private RedisTemplate<String, String> template;
-	
+
 	/**
 	 * @fun 初始化缓存
 	 */
 	public abstract void initCache();
-	
+
 	/**
 	 * @fun 每天凌晨放入周统计
 	 */
 	public abstract void saveDayCacheToWeek();
-	
+
 	/**
 	 * @fun 获取缓存
-	 * @param gradeId 分级ID
-	 * @param dataType 数据类型
-	 * @param time 时间按月，按周
-	 * @param modelType 模块类型
+	 * @param gradeId
+	 *            分级ID
+	 * @param dataType
+	 *            数据类型
+	 * @param time
+	 *            时间按月，按周
+	 * @param modelType
+	 *            模块类型
 	 * @return
 	 */
 	public abstract String getCache(Integer gradeId, String dataType, String time, String modelType);
-	
+
+	/**
+	 * @fun 前端店铺管理获取统计数据
+	 * @param gradeId
+	 * @param time
+	 * @return
+	 */
+	public abstract ResultModel getShopManagerStatis(Integer gradeId, int time);
+
+	/**
+	 * @fun 获取首页数据
+	 * @param gradeId
+	 * @return
+	 */
+	public abstract ResultModel getShopManagerIndex(Integer gradeId);
+
 	/**
 	 * @fun 每月第一天初始化缓存
 	 */
-	public void initMonth(){
+	public void initMonth() {
 		Set<GradeBO> set = CacheComponent.getInstance().getSet();
 		for (GradeBO grade : set) {
-				String time = DateUtils.getTimeString("yyyyMM");
-				put(Constants.SALES_STATISTICS_MONTH + grade.getId(), time, "0");
-				put(Constants.ORDER_STATISTICS_MONTH + grade.getId(), time, "0");
+			String time = DateUtils.getTimeString("yyyyMM");
+			put(Constants.SALES_STATISTICS_MONTH + grade.getId(), time, "0");
+			put(Constants.ORDER_STATISTICS_MONTH + grade.getId(), time, "0");
 		}
 	}
-	
+
 	/**
 	 * @fun 新增等级时初始化缓存
 	 * @param gradeId
 	 */
-	public void initNewGradeCache(Integer gradeId){
-		//初始化月统计
+	public void initNewGradeCache(Integer gradeId) {
+		// 初始化月统计
 		String earliest = "201801";
 		int monthCount = DateUtils.compareWithNow(earliest);
 		for (int i = 0; i <= monthCount; i++) {
@@ -77,48 +99,47 @@ public abstract class CacheAbstractService {
 			put(Constants.SALES_STATISTICS_MONTH + gradeId, time, "0");
 			put(Constants.ORDER_STATISTICS_MONTH + gradeId, time, "0");
 		}
-		//初始化上周统计
-		for(int i=0;i<LAST_WEEK;i++){
-			addList(Constants.ORDER_STATISTICS_WEEK + gradeId, "0", LAST_WEEK);
-			addList(Constants.SALES_STATISTICS_WEEK + gradeId, "0", LAST_WEEK);
+		// 初始化前90天的统计
+		for (int i = 0; i < LAST_DAY; i++) {
+			addList(Constants.ORDER_STATISTICS_WEEK + gradeId, "0", LAST_DAY);
+			addList(Constants.SALES_STATISTICS_WEEK + gradeId, "0", LAST_DAY);
 		}
-		//初始化当天订单
+		// 初始化当天订单
 		Map<String, String> temp = new HashMap<String, String>();
 		temp.put("produce", "0");
 		temp.put("deliver", "0");
 		temp.put("cancel", "0");
 		putAll(Constants.ORDER_STATISTICS_DAY + gradeId, temp);
-		//初始化当天销售额
+		// 初始化当天销售额
 		temp.clear();
 		temp.put("sales", "0");
 		putAll(Constants.SALES_STATISTICS_DAY + gradeId, temp);
 	}
-	
+
 	/**
 	 * @fun 增加订单数量
 	 * @param gradeId
 	 * @param incr
 	 */
-	public void addOrderCountCache(Integer gradeId, String perkey, String filed){
+	public void addOrderCountCache(Integer gradeId, String perkey, String filed) {
 		increment(perkey + gradeId, filed, 1);
-//		if (!Constants.CNCOOPBUY.equals(gradeId)) {
-//			increment(perkey + Constants.CNCOOPBUY, filed, 1);
-//		}
+		// if (!Constants.CNCOOPBUY.equals(gradeId)) {
+		// increment(perkey + Constants.CNCOOPBUY, filed, 1);
+		// }
 	}
-	
+
 	/**
 	 * @fun 增加销售额
 	 * @param gradeId
 	 * @param incr
 	 */
-	public void addSalesCache(Integer gradeId, String perkey, String filed, double amount){
+	public void addSalesCache(Integer gradeId, String perkey, String filed, double amount) {
 		increment(perkey + gradeId, filed, amount);
-//		if (!Constants.CNCOOPBUY.equals(gradeId)) {
-//			increment(perkey + Constants.CNCOOPBUY, filed, amount);
-//		}
+		// if (!Constants.CNCOOPBUY.equals(gradeId)) {
+		// increment(perkey + Constants.CNCOOPBUY, filed, amount);
+		// }
 	}
-	
-	
+
 	/**
 	 * @fun 将value 放入指定的redis列表，列表长度超过length时移除第一个， 从尾部插入，length为0时，不限制长度
 	 * @param key
@@ -127,6 +148,7 @@ public abstract class CacheAbstractService {
 	 */
 	public void addList(String key, String value, int lengh) {
 		ListOperations<String, String> listOperations = template.opsForList();
+		value = value == null ? "0" : value;
 		if (lengh == 0) {
 			listOperations.rightPush(key, value);
 		} else {
@@ -139,8 +161,17 @@ public abstract class CacheAbstractService {
 			}
 		}
 	}
-	
-	
+
+	/**
+	 * @fun 获取list长度
+	 * @param key
+	 * @return
+	 */
+	public long size(String key) {
+		ListOperations<String, String> listOperations = template.opsForList();
+		return listOperations.size(key);
+	}
+
 	/**
 	 * @fun 将map设置到对应的key
 	 * @param key
@@ -189,13 +220,13 @@ public abstract class CacheAbstractService {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		return hashOperations.entries(key);
 	}
-	
+
 	/**
 	 * @fun 获取指定key,指定field的value
 	 * @param key
 	 * @return
 	 */
-	protected String entries(String key,String field) {
+	protected String entries(String key, String field) {
 		HashOperations<String, String, String> hashOperations = template.opsForHash();
 		return hashOperations.get(key, field);
 	}
@@ -211,26 +242,35 @@ public abstract class CacheAbstractService {
 		ListOperations<String, String> listOperations = template.opsForList();
 		return listOperations.range(key, start, end);
 	}
-	
+
 	/**
 	 * @fun 根据all判断清空单个还是清空所有
 	 * @param key
 	 * @param all
 	 */
-	protected void empty(String key, boolean all){
-		if(all){
+	protected void empty(String key, boolean all) {
+		if (all) {
 			template.delete(getAllKey(key));
 		} else {
 			template.delete(key);
 		}
 	}
-	
+
 	/**
 	 * @fun 模糊获取传入的key的所有keys
 	 * @param key
 	 * @return
 	 */
-	protected Set<String> getAllKey(String key){
+	protected Set<String> getAllKey(String key) {
 		return template.keys(key + "*");
+	}
+
+	/**
+	 * @fun 获取key对应的value
+	 * @param key
+	 * @return
+	 */
+	protected String getValues(String key) {
+		return template.opsForValue().get(key);
 	}
 }

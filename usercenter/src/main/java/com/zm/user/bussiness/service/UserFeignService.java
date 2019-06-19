@@ -16,4 +16,6 @@ public interface UserFeignService {
 	List<UserBO> listUserByUserId(List<Integer> userIdList);
 
 	boolean verifyUserId(Integer userId);
+
+	int getGradeTypeIdByGradeId(Integer gradeId);
 }

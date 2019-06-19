@@ -1,0 +1,1 @@
+alter table goods_tag add column front_show tinyint unsigned default 0 comment '微店前端筛选显示，0不显示，1显示';

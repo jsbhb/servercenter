@@ -102,6 +102,10 @@ public class Grade extends Pagination{
 	private String gradeInviter;
 	
 	private Integer shopExtensionFlg;
+	
+	private Integer status;
+	
+	private String remark;
 
 	public boolean check(){
 		if(Constants.AREA_CENTER.equals(gradeType)){
@@ -114,13 +118,31 @@ public class Grade extends Pagination{
 				return false;
 			}
 		}
+		if(parentId == null || gradeType == null){
+			return false;
+		}
 		return true;
 	}
 	
 	public Grade(){
 		super();
 	}
-	
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
 	public String getAppKey() {
 		return appKey;
 	}

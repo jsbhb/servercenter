@@ -17,6 +17,7 @@ import com.zm.goods.pojo.WarehouseStock;
 import com.zm.goods.pojo.base.Pagination;
 import com.zm.goods.pojo.base.SortModelList;
 import com.zm.goods.pojo.dto.GoodsSearch;
+import com.zm.goods.pojo.dto.ShopManage4GoodsDTO;
 import com.zm.goods.pojo.vo.GoodsIndustryModel;
 import com.zm.goods.pojo.vo.PageModule;
 
@@ -217,5 +218,9 @@ public interface GoodsService {
 	void updateLuceneIndex(List<String> updateTagList, Integer centerId);
 
 	List<GoodsItem> listGoodsByGoodsIds(List<String> goodsIdList);
+
+	ResultModel listGoodsItem4ShopManage(ShopManage4GoodsDTO smg);
+
+	ResultModel loadSearchConditions();
 
 }
