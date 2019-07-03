@@ -65,10 +65,10 @@ public class SEOServiceImpl implements SEOService {
 	private static Integer CNCOOPBUY_ID = 2;
 	private static String HTTP_STR = "http";
 
-	private static final String DEL_BAIDU_SITE_PC = "http://data.zz.baidu.com/del?site=https://www.cncoopay.com&token=DpCOPnVUBG3bh6g7";
-	private static final String ADD_BAIDU_SITE_PC = "http://data.zz.baidu.com/urls?site=https://www.cncoopay.com&token=DpCOPnVUBG3bh6g7";
-	private static final String DEL_BAIDU_SITE_MP = "http://data.zz.baidu.com/del?site=https://m.cncoopay.com&token=DpCOPnVUBG3bh6g7";
-	private static final String ADD_BAIDU_SITE_MP = "http://data.zz.baidu.com/urls?site=https://m.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+//	private static final String DEL_BAIDU_SITE_PC = "http://data.zz.baidu.com/del?site=https://www.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+//	private static final String ADD_BAIDU_SITE_PC = "http://data.zz.baidu.com/urls?site=https://www.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+//	private static final String DEL_BAIDU_SITE_MP = "http://data.zz.baidu.com/del?site=https://m.cncoopay.com&token=DpCOPnVUBG3bh6g7";
+//	private static final String ADD_BAIDU_SITE_MP = "http://data.zz.baidu.com/urls?site=https://m.cncoopay.com&token=DpCOPnVUBG3bh6g7";
 
 	@Override
 	public List<ItemStockBO> getGoodsStock(String goodsId, Integer centerId) {  
@@ -343,8 +343,8 @@ public class SEOServiceImpl implements SEOService {
 				tmp_mp.append("https://m.cncoopay.com/" + path + "/" + goodsId + ".html\n");
 			}
 			//发布百度站点
-			HttpClientUtil.post(ADD_BAIDU_SITE_PC, tmp_pc.toString(), "POST", "text/plain");
-			HttpClientUtil.post(ADD_BAIDU_SITE_MP, tmp_mp.toString(), "POST", "text/plain");
+//			HttpClientUtil.post(ADD_BAIDU_SITE_PC, tmp_pc.toString(), "POST", "text/plain");
+//			HttpClientUtil.post(ADD_BAIDU_SITE_MP, tmp_mp.toString(), "POST", "text/plain");
 			if (param.size() > 0) {
 				seoMapper.updateGoodsAccessPath(param);
 			}
